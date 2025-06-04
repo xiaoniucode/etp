@@ -11,8 +11,12 @@
     <name>vine-protocol</name>
     <dependencies>
         <dependency>
-            <groupId>cn.xilio</groupId>
-            <artifactId>vine-core</artifactId>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java-util</artifactId>
         </dependency>
 
     </dependencies>
