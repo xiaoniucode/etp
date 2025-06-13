@@ -14,8 +14,8 @@ import io.netty.channel.ChannelOption;
 public class ConnectHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
-        String uri = msg.getUri();
-        String[] split = uri.split("@");
+        String ext = msg.getExt();
+        String[] split = ext.split("@");
         String visitorId = split[0];
         String authToken = split[1];
         Channel tunnelChannel = ChannelManager.getTunnelChannel(authToken);

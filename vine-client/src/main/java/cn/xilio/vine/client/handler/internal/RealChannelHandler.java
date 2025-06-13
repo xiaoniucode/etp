@@ -19,8 +19,8 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
         TunnelMessage.Message message = TunnelMessage.Message
                 .newBuilder()
                 .setType(TunnelMessage.Message.Type.TRANSFER)
-                .setUri(visitorId)
-                .setData(ByteString.copyFrom(dataBytes))
+                .setExt(visitorId)
+                .setPayload(ByteString.copyFrom(dataBytes))
                 .build();
         tunnelChannel.writeAndFlush(message);
     }

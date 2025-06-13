@@ -13,5 +13,6 @@ message Message {
   }
   Type type = 1;
   string session_id = 2;
-  bytes data = 3;
+  bytes payload = 3;
+  string ext = 4;
 }
