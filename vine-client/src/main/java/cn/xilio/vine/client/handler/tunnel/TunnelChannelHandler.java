@@ -17,6 +17,9 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
+        if (TunnelMessage.Message.Type.HEARTBEAT.getNumber() == msg.getType().getNumber()) {
+            return;//客户端不处理心跳
+        }
         MessageHandler handler = MessageHandlerFactory.getHandler(msg.getType());
         ctx.channel().attr(Constants.REAL_BOOTSTRAP).set(realBootstrap);
         ctx.channel().attr(Constants.TUNNEL_BOOTSTRAP).set(tunnelBootstrap);

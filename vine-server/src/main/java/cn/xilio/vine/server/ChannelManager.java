@@ -6,10 +6,13 @@ import io.netty.util.AttributeKey;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 通道管理器
+ */
 public class ChannelManager {
     private static final AttributeKey<Map<String, Channel>> VISITOR_CHANNELS = AttributeKey.newInstance("user_channels");
-    private static Map<String, Channel> tunnelChannel = new ConcurrentHashMap<>();
-    private static Map<Integer, Channel> portTunnelChannelMapping = new ConcurrentHashMap<>();
+    private static final Map<String, Channel> tunnelChannel = new ConcurrentHashMap<>();
+    private static final Map<Integer, Channel> portTunnelChannelMapping = new ConcurrentHashMap<>();
 
     public static void addTunnelChannel(int port, String authToken, Channel channel) {
         portTunnelChannelMapping.put(port, channel);
