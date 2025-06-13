@@ -1,5 +1,6 @@
 package cn.xilio.vine.client.handler.tunnel;
 
+import cn.xilio.vine.core.ChannelStatusCallback;
 import cn.xilio.vine.core.Constants;
 import cn.xilio.vine.core.MessageHandler;
 import cn.xilio.vine.core.protocol.TunnelMessage;
@@ -9,12 +10,13 @@ import io.netty.channel.*;
 public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
     private final Bootstrap realBootstrap;
     private final Bootstrap tunnelBootstrap;
+    private final ChannelStatusCallback channelStatusCallback;
 
-    public TunnelChannelHandler(Bootstrap realBootstrap, Bootstrap tunnelBootstrap) {
+    public TunnelChannelHandler(Bootstrap realBootstrap, Bootstrap tunnelBootstrap,ChannelStatusCallback channelStatusCallback) {
         this.realBootstrap = realBootstrap;
         this.tunnelBootstrap = tunnelBootstrap;
+        this.channelStatusCallback = channelStatusCallback;
     }
-
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
         if (TunnelMessage.Message.Type.HEARTBEAT.getNumber() == msg.getType().getNumber()) {
@@ -24,5 +26,11 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
         ctx.channel().attr(Constants.REAL_BOOTSTRAP).set(realBootstrap);
         ctx.channel().attr(Constants.TUNNEL_BOOTSTRAP).set(tunnelBootstrap);
         handler.handle(ctx, msg);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        channelStatusCallback.channelInactive(ctx);
+        super.channelInactive(ctx);
     }
 }
