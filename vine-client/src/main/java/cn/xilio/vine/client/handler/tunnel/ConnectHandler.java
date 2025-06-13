@@ -10,8 +10,8 @@ import io.netty.channel.*;
 public class ConnectHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
-        String visitorId = msg.getUri();
-        ByteString data = msg.getData();
+        String visitorId = msg.getExt();
+        ByteString data = msg.getPayload();
         String lan = data.toStringUtf8();
         String[] split = lan.split(":");
         String ip = split[0];
@@ -35,7 +35,7 @@ public class ConnectHandler extends AbstractMessageHandler {
                                 realChannel.attr(Constants.NEXT_CHANNEL).set(tunnelChannel.channel());
                                 TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                                         .setType(TunnelMessage.Message.Type.CONNECT)
-                                        .setUri(visitorId + "@" + "10086key")
+                                        .setExt(visitorId + "@" + "10086key")
                                         .build();
 
                                 tunnelChannel.channel().writeAndFlush(tunnelMessage);

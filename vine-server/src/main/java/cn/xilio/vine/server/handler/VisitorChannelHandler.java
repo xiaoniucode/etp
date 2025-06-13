@@ -27,8 +27,8 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
 
             TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                     .setType(TunnelMessage.Message.Type.TRANSFER)
-                    .setData(byteString)
-                    .setUri("1001")
+                    .setPayload(byteString)
+                    .setExt("1001")
                     .build();
 
             if (tunnelChannel.isWritable()) {
@@ -58,8 +58,8 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
 
         TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                 .setType(TunnelMessage.Message.Type.CONNECT)
-                .setUri(visitorId)
-                .setData(ByteString.copyFrom("localhost:3306".getBytes(StandardCharsets.UTF_8)))
+                .setExt(visitorId)
+                .setPayload(ByteString.copyFrom("localhost:3306".getBytes(StandardCharsets.UTF_8)))
                 .build();
         turnnelChannel.writeAndFlush(tunnelMessage);
         super.channelActive(ctx);

@@ -12,7 +12,7 @@ public class TransferHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
         Channel realChannel = ctx.channel().attr(Constants.NEXT_CHANNEL).get();
-        ByteString data = msg.getData();
+        ByteString data = msg.getPayload();
 
         ByteBuf buffer = ctx.alloc().buffer(data.size());
         buffer.writeBytes(data.toByteArray());

@@ -61,7 +61,7 @@ public class TunnelClient implements Tunnel {
             if (channelFuture.isSuccess()) {
                 TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                         .setType(TunnelMessage.Message.Type.AUTH)
-                        .setUri(secretKey)
+                        .setExt(secretKey)
                         .build();
                 future.channel().writeAndFlush(message);
                 System.out.println("success");

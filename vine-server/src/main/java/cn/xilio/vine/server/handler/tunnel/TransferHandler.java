@@ -20,7 +20,7 @@ public class TransferHandler extends AbstractMessageHandler {
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
         Channel visitorChannel = ctx.channel().attr(Constants.NEXT_CHANNEL).get();
         if (visitorChannel != null && visitorChannel.isWritable()) {
-            ByteString bytes = msg.getData();
+            ByteString bytes = msg.getPayload();
             ByteBuf byteBuf = ctx.alloc().buffer(bytes.size()).writeBytes(bytes.asReadOnlyByteBuffer());
             visitorChannel.writeAndFlush(byteBuf).addListener(future -> {
                 if (!future.isSuccess()) {

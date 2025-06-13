@@ -3,6 +3,7 @@ package cn.xilio.vine.server.handler.tunnel;
 import cn.xilio.vine.core.protocol.TunnelMessage;
 import cn.xilio.vine.server.ChannelManager;
 import cn.xilio.vine.core.AbstractMessageHandler;
+import com.google.protobuf.ByteString;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -11,7 +12,7 @@ import io.netty.channel.ChannelHandlerContext;
 public class AuthHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
-        String authToken = msg.getUri();
-        ChannelManager.addTunnelChannel(3307, authToken, ctx.channel());
+        String secretKey = msg.getExt();
+        ChannelManager.addTunnelChannel(3307, secretKey, ctx.channel());
     }
 }
