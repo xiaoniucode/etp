@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.xilio</groupId>
     <artifactId>vine</artifactId>
-    <version>1.0.0</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
     <properties>
         <java.version>17</java.version>
@@ -12,16 +12,30 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <netty.version>4.2.1.Final</netty.version>
         <protobuf.version>4.31.1</protobuf.version>
+        <picocli.version>4.7.7</picocli.version>
+        <springboot.version>3.5.0</springboot.version>
     </properties>
     <modules>
         <module>vine-core</module>
         <module>vine-common</module>
         <module>vine-server</module>
-        <module>vine-protocol</module>
         <module>vine-client</module>
     </modules>
+
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${springboot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>info.picocli</groupId>
+                <artifactId>picocli</artifactId>
+                <version>${picocli.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
@@ -55,11 +69,6 @@
             <dependency>
                 <groupId>cn.xilio</groupId>
                 <artifactId>vine-server</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.xilio</groupId>
-                <artifactId>vine-protocol</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

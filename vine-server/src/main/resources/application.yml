@@ -1,0 +1,4 @@
+spring:
+  main:
+    web-application-type: none #是否开启Tomcat;开启: servlet,关闭: none
+
