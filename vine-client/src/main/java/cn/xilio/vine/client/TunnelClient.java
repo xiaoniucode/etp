@@ -21,14 +21,29 @@ public class TunnelClient implements Tunnel {
     private String serverAddr;
     private int serverPort;
     private String secretKey;
+    /**
+     * 初始化重连延迟时间
+     */
     private long initialDelaySec = 2;
-    //最大重试次数 超过以后关闭workerGroup
+    /**
+     * 最大重试次数 超过以后关闭workerGroup
+     */
     private int maxRetries = 10;
-    //最大延迟时间 如果超过了则取maxDelaySec为最大延迟时间 单位：秒
+    /**
+     * 最大延迟时间 如果超过了则取maxDelaySec为最大延迟时间 单位：秒
+     */
     private long maxDelaySec = 6;
-    //当前重试次数
+    /**
+     * 用于记录当前重试次数
+     */
     private AtomicInteger retryCount = new AtomicInteger(0);
+    /**
+     * 隧道BootStrap
+     */
     private Bootstrap tunnelBootstrap;
+    /**
+     * 隧道工作线程组
+     */
     private EventLoopGroup tunnelWorkerGroup;
 
     public static void main(String[] args) {
