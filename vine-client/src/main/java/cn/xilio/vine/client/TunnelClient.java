@@ -50,7 +50,7 @@ public class TunnelClient implements Tunnel {
                     @Override
                     protected void initChannel(SocketChannel sc) throws Exception {
                         sc.pipeline()
-                                .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 0, 0, 0))
+                                .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 4, 0, 0))
                                 .addLast(new TunnelMessageEncoder())
                                 .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
                                 .addLast(new TunnelChannelHandler(realBootstrap, bootstrap));

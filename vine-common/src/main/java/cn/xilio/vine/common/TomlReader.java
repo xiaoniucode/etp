@@ -81,7 +81,7 @@ import java.util.List;
 public class TomlReader {
     public static void main(String[] args) {
         // 1. 加载 TOML 文件
-        Toml toml = new Toml().read(new File("config.toml"));
+        Toml toml = new Toml().read(new File("/Users/liuxin/Desktop/vine/vine-server/src/main/resources/proxy.toml"));
         List<Toml> proxies = toml.getTables("proxies");
         for (Toml proxy : proxies) {
             System.out.println(proxy.getString("name"));

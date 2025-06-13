@@ -1,4 +1,10 @@
 spring:
   main:
-    web-application-type: none #是否开启Tomcat;开启: servlet,关闭: none
+    web-application-type: none #是否开启Tomcat;开启: servlet,关闭: none，关闭后无法使用web界面管理代理信息
+
+vine:
+  bind-port: 8523 #隧道监听端口
+  #代理配置文件存储地址
+  proxy-path: /Users/liuxin/Desktop/vine/vine-server/src/main/resources/proxy.toml
+
 

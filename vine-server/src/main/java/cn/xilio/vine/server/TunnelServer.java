@@ -8,6 +8,7 @@ import cn.xilio.vine.core.protocol.TunnelMessageDecoder;
 import cn.xilio.vine.core.protocol.TunnelMessageEncoder;
 import cn.xilio.vine.server.handler.TunnelChannelHandler;
 import cn.xilio.vine.server.handler.VisitorChannelHandler;
+import cn.xilio.vine.server.store.ProxyManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -81,7 +83,10 @@ public class TunnelServer implements Tunnel {
                     }
                 });
         try {
-            serverBootstrap.bind(3307).get();
+            List<Integer> ports = ProxyManager.getInstance().getAllPublicNetworkPort();
+            for (Integer port : ports) {
+                serverBootstrap.bind(port).get();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

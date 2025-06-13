@@ -1,6 +1,4 @@
-bindPort=8523
 
-#第一个客户端 用户1
 [[clients]]
 name = "客户端1" #客户端的名字 可以当作一个用户
 secretKey = "4b0063baa5ae47c2910fc25265aae4b9" #客户端秘钥
@@ -11,7 +9,7 @@ name = "mysql" #代理名称 自定义
 type = "tcp" #代理类型 TCP HTTP UDP HTTPS 不区分大小写
 localIP = "127.0.0.1" #内网IP地址 localhost/192.168.x.x/127.0.0.1
 localPort = 3306 #内网服务的端口
-remotePort = 6000 #暴露在公网的端口
+remotePort = 3307 #暴露在公网的端口
 
 [[clients.proxies]]
 name = "redis"
@@ -19,7 +17,6 @@ type = "tcp"
 localIP = "127.0.0.1"
 localPort = 6379
 remotePort = 6380
-
 
 #第二个客户端 用户2
 [[clients]]
