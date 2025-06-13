@@ -21,8 +21,9 @@ public class TunnelClient implements Tunnel {
     private String serverAddr;
     private int serverPort;
     private String secretKey;
+    private long initialDelaySec = 2;
     //最大重试次数 超过以后关闭workerGroup
-    private int maxRetries=10;
+    private int maxRetries = 10;
     //最大延迟时间 如果超过了则取maxDelaySec为最大延迟时间 单位：秒
     private long maxDelaySec = 6;
     //当前重试次数
@@ -61,10 +62,10 @@ public class TunnelClient implements Tunnel {
                                 .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 4, 0, 0))
                                 .addLast(new TunnelMessageEncoder())
                                 .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
-                                .addLast(new TunnelChannelHandler(realBootstrap, tunnelBootstrap,new ChannelStatusCallback(){
+                                .addLast(new TunnelChannelHandler(realBootstrap, tunnelBootstrap, new ChannelStatusCallback() {
                                     @Override
                                     public void channelInactive(ChannelHandlerContext ctx) {
-                                        //重新连接
+                                        //服务器断开 执行重试 重新连接
                                         scheduleReconnect();
                                     }
                                 }));
@@ -101,13 +102,25 @@ public class TunnelClient implements Tunnel {
         // 计算退避时间 (2^n秒，最大不超过maxDelaySec)
         int retries = retryCount.getAndIncrement();
         //指数计算，如果超过了最大延迟时间，则取最大延迟时间
-        long delay = Math.min((1L << retries), maxDelaySec);
+        // long delay = Math.min((1L << retries), maxDelaySec);
+        long delay = calculateDelay();//指数退避 + 随机抖动(±30%)
         System.out.printf("第%d次重连将在%d秒后执行...%n", retries + 1, delay);
         // 调度重连任务
         tunnelWorkerGroup.schedule(() -> {
             System.out.println("执行重连...");
             connectTunnelServer();
         }, delay, TimeUnit.SECONDS);
+    }
+
+    private long calculateDelay() {
+        int retries = retryCount.get();
+        if (retries == 0) {
+            return initialDelaySec;
+        }
+        // 指数退避 + 随机抖动(±30%)
+        long delay = Math.min((1L << retries), maxDelaySec);
+        long jitter = (long) (delay * 0.3 * (Math.random() * 2 - 1));
+        return Math.min(delay + jitter, maxDelaySec);
     }
 
     @Override
