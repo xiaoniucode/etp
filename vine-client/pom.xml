@@ -4,7 +4,7 @@
     <parent>
         <groupId>cn.xilio</groupId>
         <artifactId>vine</artifactId>
-        <version>1.0.0</version>
+        <version>1.0</version>
     </parent>
     <artifactId>vine-client</artifactId>
     <packaging>jar</packaging>
@@ -14,5 +14,23 @@
             <groupId>cn.xilio</groupId>
             <artifactId>vine-core</artifactId>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-web</artifactId>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                    <artifactId>spring-boot-starter-tomcat</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.springframework</groupId>-->
+<!--                    <artifactId>spring-web</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.springframework</groupId>-->
+<!--                    <artifactId>spring-webmvc</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
     </dependencies>
 </project>

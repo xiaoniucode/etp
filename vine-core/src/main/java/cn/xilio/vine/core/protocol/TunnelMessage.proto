@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package cn.xilio.vine.protocol;
+option java_outer_classname = "TunnelMessage";
+message Message {
+  enum Type {
+    AUTH = 0;
+    CONNECT = 1;
+    DISCONNECT = 2;
+    TRANSFER = 3;
+    HEARTBEAT = 4;
+    ERROR = 5;
+  }
+  Type type = 1;
+  string session_id = 2;
+  bytes data = 3;
+}
