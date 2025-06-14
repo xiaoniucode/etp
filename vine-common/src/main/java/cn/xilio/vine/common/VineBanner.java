@@ -1,6 +1,5 @@
-package cn.xilio.vine.console;
+package cn.xilio.vine.common;
 
-import cn.xilio.vine.common.IOUtils;
 import com.taobao.text.Color;
 import com.taobao.text.Decoration;
 import com.taobao.text.ui.TableElement;
@@ -17,13 +16,10 @@ public class VineBanner {
     private static final String LOGO_PATH = "logo.txt";
 
     public static void welcome() {
-        TableElement wikiRow = new TableElement();
-        wikiRow.row(label("wiki\t").style(Decoration.bold.fg(Color.white)),
-                label("https://localhost/vine/doc").style(Decoration.bold.fg(Color.green))
-        );
-        String intro = RenderUtil.render(wikiRow);
-
-        System.out.println(logo() + "\n" + intro);
+        System.out.println(logo());
+    }
+    public static void printLogo() {
+        System.out.println(logo());
     }
 
     /**
@@ -31,7 +27,7 @@ public class VineBanner {
      *
      * @return 格式化后的logo
      */
-    private static String logo() {
+    public static String logo() {
         try {
             InputStream in = VineBanner.class.getClassLoader().getResourceAsStream(LOGO_PATH);
             String logoText = IOUtils.toString(in);

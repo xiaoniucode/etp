@@ -11,6 +11,17 @@
     <name>vine-common</name>
     <dependencies>
         <dependency>
+            <groupId>com.alibaba.middleware</groupId>
+            <artifactId>cli</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.taobao.text</groupId>
+            <artifactId>text-ui</artifactId>
+            <version>0.0.3</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.moandjiezana.toml</groupId>
             <artifactId>toml4j</artifactId>
             <version>0.7.2</version>

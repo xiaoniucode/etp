@@ -1,4 +1,4 @@
-package cn.xilio.vine.common;
+package cn.xilio.vine.common.demo;
 
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
