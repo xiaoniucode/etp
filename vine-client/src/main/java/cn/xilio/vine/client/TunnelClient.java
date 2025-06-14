@@ -2,9 +2,8 @@ package cn.xilio.vine.client;
 
 import cn.xilio.vine.client.handler.internal.RealChannelHandler;
 import cn.xilio.vine.client.handler.tunnel.TunnelChannelHandler;
-import cn.xilio.vine.core.ChannelStatusCallback;
 import cn.xilio.vine.core.EventLoopUtils;
-import cn.xilio.vine.core.Tunnel;
+import cn.xilio.vine.core.ServerLife;
 import cn.xilio.vine.core.protocol.TunnelMessage;
 import cn.xilio.vine.core.heart.IdleCheckHandler;
 import cn.xilio.vine.core.protocol.TunnelMessageDecoder;
@@ -16,13 +15,13 @@ import io.netty.channel.socket.SocketChannel;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class TunnelClient implements Tunnel {
+public class TunnelClient implements ServerLife {
     private boolean ssl;
     private String serverAddr;
     private int serverPort;
     private String secretKey;
     /**
-     * 初始化重连延迟时间
+     * 初始化重连延迟时间 单位：秒
      */
     private long initialDelaySec = 2;
     /**
@@ -32,7 +31,7 @@ public class TunnelClient implements Tunnel {
     /**
      * 最大延迟时间 如果超过了则取maxDelaySec为最大延迟时间 单位：秒
      */
-    private long maxDelaySec = 6;
+    private long maxDelaySec = 10;
     /**
      * 用于记录当前重试次数
      */
@@ -47,6 +46,7 @@ public class TunnelClient implements Tunnel {
     private EventLoopGroup tunnelWorkerGroup;
 
     public static void main(String[] args) {
+        checkArgs(args);
         TunnelClient tunnelClient = new TunnelClient();
         tunnelClient.setServerAddr("localhost");
         tunnelClient.setServerPort(8523);
@@ -72,17 +72,15 @@ public class TunnelClient implements Tunnel {
                 .channel(eventLoopConfig.clientChannelClass)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel sc) throws Exception {
+                    protected void initChannel(SocketChannel sc) {
                         sc.pipeline()
                                 .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 4, 0, 0))
                                 .addLast(new TunnelMessageEncoder())
                                 .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
-                                .addLast(new TunnelChannelHandler(realBootstrap, tunnelBootstrap, new ChannelStatusCallback() {
-                                    @Override
-                                    public void channelInactive(ChannelHandlerContext ctx) {
-                                        //服务器断开 执行重试 重新连接
-                                        scheduleReconnect();
-                                    }
+                                .addLast(new TunnelChannelHandler(realBootstrap, tunnelBootstrap, ctx -> {
+                                    retryCount.set(0); // 重置重试计数器
+                                    //服务器断开 执行重试 重新连接
+                                    scheduleReconnect();
                                 }));
                     }
                 });
@@ -127,6 +125,11 @@ public class TunnelClient implements Tunnel {
         }, delay, TimeUnit.SECONDS);
     }
 
+    /**
+     * 计算延迟时间
+     *
+     * @return 时间（秒）
+     */
     private long calculateDelay() {
         int retries = retryCount.get();
         if (retries == 0) {

@@ -9,6 +9,7 @@
 - 8核32G：60-100万连接
   
 对于一般中小企业，vine完全能满足日常内网穿透的业务需求。由于Java 线程创建开销较大（每个线程约 1MB），且 Netty 的 Channel 占用约 50KB 内存，相比 Go 语言的轻量级 Goroutine线程（仅 2KB，可支持百万连接）。由于本项目是采用Java语言开发的，若需支持更多连接，需增加 CPU 核心数和内存。
+
 官方文档：https://xilio1.github.io/vine
 
 ## 截图

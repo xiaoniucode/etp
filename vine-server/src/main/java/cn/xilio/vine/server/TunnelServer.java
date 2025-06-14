@@ -2,7 +2,7 @@ package cn.xilio.vine.server;
 
 
 import cn.xilio.vine.core.EventLoopUtils;
-import cn.xilio.vine.core.Tunnel;
+import cn.xilio.vine.core.ServerLife;
 import cn.xilio.vine.core.heart.IdleCheckHandler;
 import cn.xilio.vine.core.protocol.TunnelMessageDecoder;
 import cn.xilio.vine.core.protocol.TunnelMessageEncoder;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class TunnelServer implements Tunnel {
+public class TunnelServer implements ServerLife {
     private final Logger logger = LoggerFactory.getLogger(TunnelServer.class);
     private boolean ssl;
     private String host;

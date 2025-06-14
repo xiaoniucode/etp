@@ -1,7 +1,7 @@
 package cn.xilio.vine.client.handler.tunnel;
 
 import cn.xilio.vine.core.AbstractMessageHandler;
-import cn.xilio.vine.core.Constants;
+import cn.xilio.vine.core.VineConstants;
 import cn.xilio.vine.core.protocol.TunnelMessage;
 import com.google.protobuf.ByteString;
 import io.netty.bootstrap.Bootstrap;
@@ -17,8 +17,8 @@ public class ConnectHandler extends AbstractMessageHandler {
         String ip = split[0];
         int port = Integer.parseInt(split[1]);
         //  data.toString()
-        Bootstrap realBootstrap = ctx.channel().attr(Constants.REAL_BOOTSTRAP).get();
-        Bootstrap tunnelBootstrap = ctx.channel().attr(Constants.TUNNEL_BOOTSTRAP).get();
+        Bootstrap realBootstrap = ctx.channel().attr(VineConstants.REAL_BOOTSTRAP).get();
+        Bootstrap tunnelBootstrap = ctx.channel().attr(VineConstants.TUNNEL_BOOTSTRAP).get();
         realBootstrap.connect(ip, port).addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture cf) throws Exception {
@@ -31,8 +31,8 @@ public class ConnectHandler extends AbstractMessageHandler {
                         @Override
                         public void operationComplete(ChannelFuture tunnelChannel) throws Exception {
                             if (tunnelChannel.isSuccess()) {
-                                tunnelChannel.channel().attr(Constants.NEXT_CHANNEL).set(realChannel);
-                                realChannel.attr(Constants.NEXT_CHANNEL).set(tunnelChannel.channel());
+                                tunnelChannel.channel().attr(VineConstants.NEXT_CHANNEL).set(realChannel);
+                                realChannel.attr(VineConstants.NEXT_CHANNEL).set(tunnelChannel.channel());
                                 TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                                         .setType(TunnelMessage.Message.Type.CONNECT)
                                         .setExt(visitorId + "@" + "10086key")

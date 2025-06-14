@@ -1,6 +1,6 @@
 package cn.xilio.vine.client.handler.internal;
 
-import cn.xilio.vine.core.Constants;
+import cn.xilio.vine.core.VineConstants;
 import cn.xilio.vine.core.protocol.TunnelMessage;
 import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
@@ -11,7 +11,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
-        Channel tunnelChannel = ctx.channel().attr(Constants.NEXT_CHANNEL).get();
+        Channel tunnelChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
         String visitorId="1001";
         byte[] dataBytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(dataBytes);

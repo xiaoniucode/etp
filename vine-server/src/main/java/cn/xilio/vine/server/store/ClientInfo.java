@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * 客户端
  */
-public class Client implements Serializable {
+public class ClientInfo implements Serializable {
     /**
      * 客户端名称
      */

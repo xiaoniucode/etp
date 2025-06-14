@@ -1,6 +1,6 @@
 package cn.xilio.vine.server.handler.tunnel;
 
-import cn.xilio.vine.core.Constants;
+import cn.xilio.vine.core.VineConstants;
 import cn.xilio.vine.core.protocol.TunnelMessage;
 import cn.xilio.vine.core.AbstractMessageHandler;
 import com.google.protobuf.ByteString;
@@ -18,7 +18,7 @@ public class TransferHandler extends AbstractMessageHandler {
 
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
-        Channel visitorChannel = ctx.channel().attr(Constants.NEXT_CHANNEL).get();
+        Channel visitorChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
         if (visitorChannel != null && visitorChannel.isWritable()) {
             ByteString bytes = msg.getPayload();
             ByteBuf byteBuf = ctx.alloc().buffer(bytes.size()).writeBytes(bytes.asReadOnlyByteBuffer());

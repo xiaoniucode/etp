@@ -24,7 +24,7 @@ public class ProxyManager {
     /**
      * 存储客户端信息，包括客户端的服务端口配置信息
      */
-    private static List<Client> clients;
+    private static List<ClientInfo> clients;
     /**
      * 公网端口与内网服务映射信息，内网服务包括内网的IP和PORT信息。
      */
@@ -51,7 +51,7 @@ public class ProxyManager {
             Long status = client.getLong("status");
             String secretKey = client.getString("secretKey");
             //创建一个客户端
-            Client c = new Client();
+            ClientInfo c = new ClientInfo();
             c.setName(name);
             c.setStatus(status.intValue());
             c.setSecretKey(secretKey);
