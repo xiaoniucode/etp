@@ -1,6 +1,6 @@
 package cn.xilio.vine.server.store;
 
-import cn.xilio.vine.core.ProtocolType;
+import cn.xilio.vine.core.protocol.ProtocolType;
 
 import java.io.Serializable;
 

@@ -27,7 +27,7 @@ public class VineBanner {
      *
      * @return 格式化后的logo
      */
-    public static String logo() {
+    private static String logo() {
         try {
             InputStream in = VineBanner.class.getClassLoader().getResourceAsStream(LOGO_PATH);
             String logoText = IOUtils.toString(in);

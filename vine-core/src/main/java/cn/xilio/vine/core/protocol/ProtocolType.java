@@ -1,4 +1,4 @@
-package cn.xilio.vine.core;
+package cn.xilio.vine.core.protocol;
 
 import java.util.Collections;
 import java.util.HashMap;

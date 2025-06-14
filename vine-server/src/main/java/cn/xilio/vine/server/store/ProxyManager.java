@@ -4,7 +4,7 @@ package cn.xilio.vine.server.store;
 import cn.xilio.vine.common.TomlUtils;
 
 
-import cn.xilio.vine.core.ProtocolType;
+import cn.xilio.vine.core.protocol.ProtocolType;
 import com.moandjiezana.toml.Toml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
