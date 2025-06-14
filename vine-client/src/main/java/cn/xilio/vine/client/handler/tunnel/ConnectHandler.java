@@ -10,13 +10,13 @@ import io.netty.channel.*;
 public class ConnectHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
-        String visitorId = msg.getExt();
+        long sessionId = msg.getSessionId();
         ByteString data = msg.getPayload();
         String lan = data.toStringUtf8();
         String[] split = lan.split(":");
         String ip = split[0];
         int port = Integer.parseInt(split[1]);
-        //  data.toString()
+
         Bootstrap realBootstrap = ctx.channel().attr(VineConstants.REAL_BOOTSTRAP).get();
         Bootstrap tunnelBootstrap = ctx.channel().attr(VineConstants.TUNNEL_BOOTSTRAP).get();
         realBootstrap.connect(ip, port).addListener(new ChannelFutureListener() {
@@ -35,7 +35,8 @@ public class ConnectHandler extends AbstractMessageHandler {
                                 realChannel.attr(VineConstants.NEXT_CHANNEL).set(tunnelChannel.channel());
                                 TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                                         .setType(TunnelMessage.Message.Type.CONNECT)
-                                        .setExt(visitorId + "@" + "4b0063baa5ae47c2910fc25265aae4b9")
+                                        .setSessionId(sessionId)
+                                        .setExt("4b0063baa5ae47c2910fc25265aae4b9")
                                         .build();
 
                                 tunnelChannel.channel().writeAndFlush(tunnelMessage);

@@ -8,11 +8,14 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 public class TunnelMessageDecoder extends LengthFieldBasedFrameDecoder {
     private static final byte HEADER_SIZE = 4;
     private static final int TYPE_SIZE = 1;
-    private static final int EXT_LENGTH_SIZE = 1;
+    private static final int EXT_SIZE = 1;
+    private static final int SESSION_ID_SIZE = 8;
+
     public TunnelMessageDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength, int lengthAdjustment,
                                 int initialBytesToStrip) {
         super(maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip);
     }
+
     @Override
     protected TunnelMessage.Message decode(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
         ByteBuf in = (ByteBuf) super.decode(ctx, buf);
@@ -26,18 +29,22 @@ public class TunnelMessageDecoder extends LengthFieldBasedFrameDecoder {
         if (in.readableBytes() < frameLength) {
             return null;
         }
-        TunnelMessage.Message.Builder proxyMessage = TunnelMessage.Message.newBuilder();
+        TunnelMessage.Message.Builder tunnelMessage = TunnelMessage.Message.newBuilder();
         byte type = in.readByte();
-        proxyMessage.setType(TunnelMessage.Message.Type.forNumber(type));
-        byte uriLength = in.readByte();
-        byte[] uriBytes = new byte[uriLength];
-        in.readBytes(uriBytes);
-        proxyMessage.setExt(new String(uriBytes));
+        tunnelMessage.setType(TunnelMessage.Message.Type.forNumber(type));
 
-        byte[] data = new byte[frameLength - TYPE_SIZE  - EXT_LENGTH_SIZE - uriLength];
+        long sessionId = in.readLong();
+        tunnelMessage.setSessionId(sessionId);
+
+        byte extLength = in.readByte();
+        byte[] extBytes = new byte[extLength];
+        in.readBytes(extBytes);
+        tunnelMessage.setExt(new String(extBytes));
+
+        byte[] data = new byte[frameLength - TYPE_SIZE - SESSION_ID_SIZE - EXT_SIZE - extLength];
         in.readBytes(data);
-        proxyMessage.setPayload(ByteString.copyFrom(data));//todo 需要优化
+        tunnelMessage.setPayload(ByteString.copyFrom(data));
         in.release();
-        return proxyMessage.build();
+        return tunnelMessage.build();
     }
 }

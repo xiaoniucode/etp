@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 通道管理器
  */
 public class ChannelManager {
-    private static final AttributeKey<Map<String, Channel>> VISITOR_CHANNELS = AttributeKey.newInstance("user_channels");
+    private static final AttributeKey<Map<Long, Channel>> VISITOR_CHANNELS = AttributeKey.newInstance("user_channels");
     private static final Map<String, Channel> tunnelChannel = new ConcurrentHashMap<>();
     private static final Map<Integer, Channel> portTunnelChannelMapping = new ConcurrentHashMap<>();
 
@@ -37,11 +37,11 @@ public class ChannelManager {
         return tunnelChannel.get(secretKey);
     }
 
-    public static Channel getVisitorChannel(Channel tunnelChannel, String visitorId) {
-        return tunnelChannel.attr(VISITOR_CHANNELS).get().get(visitorId);
+    public static Channel getVisitorChannel(Channel tunnelChannel, Long sessionId) {
+        return tunnelChannel.attr(VISITOR_CHANNELS).get().get(sessionId);
     }
 
-    public static void addVisitorChannelToTunnelChannel(Channel visitorChannel, String visitorId, Channel turnnelChannel) {
-        turnnelChannel.attr(VISITOR_CHANNELS).get().put(visitorId, visitorChannel);
+    public static void addVisitorChannelToTunnelChannel(Channel visitorChannel, Long sessionId, Channel turnnelChannel) {
+        turnnelChannel.attr(VISITOR_CHANNELS).get().put(sessionId, visitorChannel);
     }
 }
