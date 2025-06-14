@@ -1,5 +1,6 @@
 package cn.xilio.vine.client.handler.tunnel;
 
+import cn.xilio.vine.client.Config;
 import cn.xilio.vine.core.AbstractMessageHandler;
 import cn.xilio.vine.core.VineConstants;
 import cn.xilio.vine.core.protocol.TunnelMessage;
@@ -27,7 +28,7 @@ public class ConnectHandler extends AbstractMessageHandler {
                     //与本地mysql建立连接后，先不读取数据，等与远程建立连接后再读取
                     realChannel.config().setOption(ChannelOption.AUTO_READ, false);
 
-                    tunnelBootstrap.connect("localhost", 8523).addListener(new ChannelFutureListener() {
+                    tunnelBootstrap.connect(Config.getServerAddr(), Config.getServerPort()).addListener(new ChannelFutureListener() {
                         @Override
                         public void operationComplete(ChannelFuture tunnelChannel) throws Exception {
                             if (tunnelChannel.isSuccess()) {
@@ -36,7 +37,7 @@ public class ConnectHandler extends AbstractMessageHandler {
                                 TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                                         .setType(TunnelMessage.Message.Type.CONNECT)
                                         .setSessionId(sessionId)
-                                        .setExt("4b0063baa5ae47c2910fc25265aae4b9")
+                                        .setExt(Config.getSecretKey())
                                         .build();
 
                                 tunnelChannel.channel().writeAndFlush(tunnelMessage);

@@ -45,15 +45,6 @@ public class TunnelClient implements ServerLife {
      */
     private EventLoopGroup tunnelWorkerGroup;
 
-    public static void main(String[] args) {
-        //checkArgs(args);
-        TunnelClient tunnelClient = new TunnelClient();
-        tunnelClient.setServerAddr("localhost");
-        tunnelClient.setServerPort(8523);
-        tunnelClient.setSecretKey("4b0063baa5ae47c2910fc25265aae4b9");
-        tunnelClient.start();
-    }
-
     @Override
     public void start() {
         tunnelBootstrap = new Bootstrap();
@@ -143,15 +134,7 @@ public class TunnelClient implements ServerLife {
 
     @Override
     public void stop() {
-    }
-
-    private static void checkArgs(String[] args) {
-        if (args.length < 2) {
-            throw new IllegalArgumentException("请指定配置文件！");
-        }
-        if (!"-c".equalsIgnoreCase(args[0])) {
-            throw new IllegalArgumentException("参数有误，请通过-c <path>指定配置文件！");
-        }
+        tunnelWorkerGroup.shutdownGracefully();
     }
 
     public boolean isSsl() {
