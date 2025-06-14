@@ -1,4 +1,4 @@
-package cn.xilio.vine.common;
+package cn.xilio.vine.common.demo;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;

@@ -1,6 +1,7 @@
 package cn.xilio.vine.client;
 
 import cn.xilio.vine.common.AnsiLog;
+import cn.xilio.vine.common.VineBanner;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -16,6 +17,7 @@ public class TunnelClientStartup {
         tunnelClient.setServerPort(Config.getServerPort());
         tunnelClient.setSecretKey(Config.getSecretKey());
         tunnelClient.start();
+        VineBanner.printLogo();/*打印logo*/
     }
 
     private static boolean checkArgs(String[] args) {

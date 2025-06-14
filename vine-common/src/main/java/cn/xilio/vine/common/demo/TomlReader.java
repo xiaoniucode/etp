@@ -1,4 +1,4 @@
-package cn.xilio.vine.common;
+package cn.xilio.vine.common.demo;
 
 import com.moandjiezana.toml.Toml;
 import java.io.File;
