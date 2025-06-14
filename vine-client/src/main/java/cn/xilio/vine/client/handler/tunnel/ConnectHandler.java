@@ -35,7 +35,7 @@ public class ConnectHandler extends AbstractMessageHandler {
                                 realChannel.attr(VineConstants.NEXT_CHANNEL).set(tunnelChannel.channel());
                                 TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                                         .setType(TunnelMessage.Message.Type.CONNECT)
-                                        .setExt(visitorId + "@" + "10086key")
+                                        .setExt(visitorId + "@" + "4b0063baa5ae47c2910fc25265aae4b9")
                                         .build();
 
                                 tunnelChannel.channel().writeAndFlush(tunnelMessage);

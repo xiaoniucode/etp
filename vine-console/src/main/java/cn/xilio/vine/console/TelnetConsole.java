@@ -1,8 +1,7 @@
 package cn.xilio.vine.console;
 
-public class Vine {
+public class TelnetConsole {
     public static void main(String[] args) {
         VineBanner.welcome();
-
     }
 }

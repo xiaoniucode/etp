@@ -46,11 +46,11 @@ public class TunnelClient implements ServerLife {
     private EventLoopGroup tunnelWorkerGroup;
 
     public static void main(String[] args) {
-        checkArgs(args);
+        //checkArgs(args);
         TunnelClient tunnelClient = new TunnelClient();
         tunnelClient.setServerAddr("localhost");
         tunnelClient.setServerPort(8523);
-        tunnelClient.setSecretKey("10086key");
+        tunnelClient.setSecretKey("4b0063baa5ae47c2910fc25265aae4b9");
         tunnelClient.start();
     }
 
@@ -98,7 +98,7 @@ public class TunnelClient implements ServerLife {
                         .build();
                 future.channel().writeAndFlush(message);
                 retryCount.set(0); // 重置重试计数器
-                System.out.println("success");
+                System.out.println("成功连接到代理服务器～");
             } else {
                 //重新连接
                 scheduleReconnect();
