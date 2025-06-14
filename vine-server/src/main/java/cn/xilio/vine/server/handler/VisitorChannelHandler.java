@@ -13,9 +13,10 @@ import io.netty.util.ReferenceCountUtil;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
-
+    private static final AtomicLong sessionIdProducer = new AtomicLong(0);
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
         Channel tunnelChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
@@ -51,14 +52,13 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
             visitorChannel.close();
             return;
         }
-        String visitorId = "1001";
+        long nextSessionId =  nextSessionId();
          visitorChannel.config().setOption(ChannelOption.AUTO_READ, false);
 
-        ChannelManager.addVisitorChannelToTunnelChannel(visitorChannel, visitorId, turnnelChannel);
-
+        ChannelManager.addVisitorChannelToTunnelChannel(visitorChannel, nextSessionId, turnnelChannel);
         TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                 .setType(TunnelMessage.Message.Type.CONNECT)
-                .setExt(visitorId)
+                .setSessionId(nextSessionId)
                 .setPayload(ByteString.copyFrom("localhost:3306".getBytes(StandardCharsets.UTF_8)))
                 .build();
         turnnelChannel.writeAndFlush(tunnelMessage);
@@ -70,5 +70,8 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
         cause.printStackTrace();
         // 当出现异常就关闭连接
         ctx.close();
+    }
+    public long nextSessionId() {
+        return sessionIdProducer.incrementAndGet();
     }
 }

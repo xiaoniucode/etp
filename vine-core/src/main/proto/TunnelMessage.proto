@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package cn.xilio.vine.protocol;
+package cn.xilio.vine.core.protocol;
 option java_outer_classname = "TunnelMessage";
 message Message {
   enum Type {
@@ -12,7 +12,7 @@ message Message {
     ERROR = 5;
   }
   Type type = 1;
-  string session_id = 2;
+  int64 session_id = 2;
   bytes payload = 3;
   string ext = 4;
 }

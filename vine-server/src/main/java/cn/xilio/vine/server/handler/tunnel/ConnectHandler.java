@@ -14,12 +14,10 @@ import io.netty.channel.ChannelOption;
 public class ConnectHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
-        String ext = msg.getExt();
-        String[] split = ext.split("@");
-        String visitorId = split[0];
-        String authToken = split[1];
-        Channel tunnelChannel = ChannelManager.getTunnelChannel(authToken);
-        Channel visitorChannel = ChannelManager.getVisitorChannel(tunnelChannel, visitorId);
+        long sessionId = msg.getSessionId();
+        String secretKey = msg.getExt();
+        Channel tunnelChannel = ChannelManager.getTunnelChannel(secretKey);
+        Channel visitorChannel = ChannelManager.getVisitorChannel(tunnelChannel, sessionId);
         ctx.channel().attr(VineConstants.NEXT_CHANNEL).set(visitorChannel);
         visitorChannel.attr(VineConstants.NEXT_CHANNEL).set(ctx.channel());
         visitorChannel.config().setOption(ChannelOption.AUTO_READ, true);
