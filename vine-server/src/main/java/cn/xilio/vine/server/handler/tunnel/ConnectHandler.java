@@ -1,6 +1,6 @@
 package cn.xilio.vine.server.handler.tunnel;
 
-import cn.xilio.vine.core.Constants;
+import cn.xilio.vine.core.VineConstants;
 import cn.xilio.vine.core.protocol.TunnelMessage;
 import cn.xilio.vine.server.ChannelManager;
 import cn.xilio.vine.core.AbstractMessageHandler;
@@ -20,8 +20,8 @@ public class ConnectHandler extends AbstractMessageHandler {
         String authToken = split[1];
         Channel tunnelChannel = ChannelManager.getTunnelChannel(authToken);
         Channel visitorChannel = ChannelManager.getVisitorChannel(tunnelChannel, visitorId);
-        ctx.channel().attr(Constants.NEXT_CHANNEL).set(visitorChannel);
-        visitorChannel.attr(Constants.NEXT_CHANNEL).set(ctx.channel());
+        ctx.channel().attr(VineConstants.NEXT_CHANNEL).set(visitorChannel);
+        visitorChannel.attr(VineConstants.NEXT_CHANNEL).set(ctx.channel());
         visitorChannel.config().setOption(ChannelOption.AUTO_READ, true);
     }
 }

@@ -1,7 +1,7 @@
 package cn.xilio.vine.client.handler.tunnel;
 
 import cn.xilio.vine.core.ChannelStatusCallback;
-import cn.xilio.vine.core.Constants;
+import cn.xilio.vine.core.VineConstants;
 import cn.xilio.vine.core.MessageHandler;
 import cn.xilio.vine.core.protocol.TunnelMessage;
 import io.netty.bootstrap.Bootstrap;
@@ -10,21 +10,25 @@ import io.netty.channel.*;
 public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
     private final Bootstrap realBootstrap;
     private final Bootstrap tunnelBootstrap;
+    /**
+     * 连接断开的时候回调接口
+     */
     private final ChannelStatusCallback channelStatusCallback;
 
-    public TunnelChannelHandler(Bootstrap realBootstrap, Bootstrap tunnelBootstrap,ChannelStatusCallback channelStatusCallback) {
+    public TunnelChannelHandler(Bootstrap realBootstrap, Bootstrap tunnelBootstrap, ChannelStatusCallback channelStatusCallback) {
         this.realBootstrap = realBootstrap;
         this.tunnelBootstrap = tunnelBootstrap;
         this.channelStatusCallback = channelStatusCallback;
     }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
         if (TunnelMessage.Message.Type.HEARTBEAT.getNumber() == msg.getType().getNumber()) {
             return;//客户端不处理心跳
         }
         MessageHandler handler = MessageHandlerFactory.getHandler(msg.getType());
-        ctx.channel().attr(Constants.REAL_BOOTSTRAP).set(realBootstrap);
-        ctx.channel().attr(Constants.TUNNEL_BOOTSTRAP).set(tunnelBootstrap);
+        ctx.channel().attr(VineConstants.REAL_BOOTSTRAP).set(realBootstrap);
+        ctx.channel().attr(VineConstants.TUNNEL_BOOTSTRAP).set(tunnelBootstrap);
         handler.handle(ctx, msg);
     }
 

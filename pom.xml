@@ -20,6 +20,7 @@
         <module>vine-common</module>
         <module>vine-server</module>
         <module>vine-client</module>
+        <module>vine-console</module>
     </modules>
 
     <dependencyManagement>

@@ -1,6 +1,6 @@
 package cn.xilio.vine.server.handler;
 
-import cn.xilio.vine.core.Constants;
+import cn.xilio.vine.core.VineConstants;
 import cn.xilio.vine.core.protocol.TunnelMessage;
 import cn.xilio.vine.server.ChannelManager;
 import com.google.protobuf.ByteString;
@@ -18,7 +18,7 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
-        Channel tunnelChannel = ctx.channel().attr(Constants.NEXT_CHANNEL).get();
+        Channel tunnelChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
         try {
             // 增加引用计数，确保 buf 在处理期间有效
             buf.retain();
