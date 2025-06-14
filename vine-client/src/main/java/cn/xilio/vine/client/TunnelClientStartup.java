@@ -1,6 +1,6 @@
 package cn.xilio.vine.client;
 
-import cn.xilio.vine.common.AnsiLog;
+import cn.xilio.vine.common.ansi.AnsiLog;
 import cn.xilio.vine.common.VineBanner;
 import org.springframework.util.StringUtils;
 

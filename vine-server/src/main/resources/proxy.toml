@@ -18,6 +18,14 @@ localIP = "127.0.0.1"
 localPort = 6379
 remotePort = 6380
 
+[[clients.proxies]]
+name = "web"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8080
+remotePort = 8085
+
+
 #第二个客户端 用户2
 [[clients]]
 name = "客户端2"

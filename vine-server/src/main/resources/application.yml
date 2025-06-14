@@ -1,5 +1,5 @@
 server:
-  port: 8080 #管理界面访问端口
+  port: 8082 #管理界面访问端口
 spring:
   main:
     web-application-type: none #是否开启Tomcat;开启: servlet,关闭: none，关闭后无法使用web界面管理代理信息
