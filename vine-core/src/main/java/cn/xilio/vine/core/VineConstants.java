@@ -9,4 +9,6 @@ public class VineConstants {
     public static final AttributeKey<Bootstrap> REAL_BOOTSTRAP = AttributeKey.valueOf("real_bootstrap");
     public static final AttributeKey<Bootstrap> VISITOR_BOOTSTRAP = AttributeKey.valueOf("visitor_bootstrap");
     public static final AttributeKey<Channel> NEXT_CHANNEL = AttributeKey.newInstance("nxt_channel");
+    public static final AttributeKey<Long> SESSION_ID = AttributeKey.newInstance("session_id");
+    public static final AttributeKey<String> SECRET_KEY = AttributeKey.newInstance("secret_key");
 }

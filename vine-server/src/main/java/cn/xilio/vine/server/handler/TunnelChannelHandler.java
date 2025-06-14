@@ -15,8 +15,17 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
         handler.handle(ctx, msg);
     }
 
+    /**
+     * 服务端与某个客户端断开连接 可能是客户端们主动断开，也可能是代理服务器断开。
+     */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("断开连接了");
+
+        //1、删除该客户端的安全隧道绑定的所有公网端口号
+
+        //2、清理掉所有绑定关系
+
         super.channelInactive(ctx);
     }
 

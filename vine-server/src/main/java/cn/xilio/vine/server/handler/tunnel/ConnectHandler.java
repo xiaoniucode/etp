@@ -19,6 +19,9 @@ public class ConnectHandler extends AbstractMessageHandler {
         Channel tunnelChannel = ChannelManager.getTunnelChannel(secretKey);
         Channel visitorChannel = ChannelManager.getVisitorChannel(tunnelChannel, sessionId);
         ctx.channel().attr(VineConstants.NEXT_CHANNEL).set(visitorChannel);
+        ctx.channel().attr(VineConstants.SECRET_KEY).set(secretKey);
+        ctx.channel().attr(VineConstants.SESSION_ID).set(sessionId);
+
         visitorChannel.attr(VineConstants.NEXT_CHANNEL).set(ctx.channel());
         visitorChannel.config().setOption(ChannelOption.AUTO_READ, true);
     }

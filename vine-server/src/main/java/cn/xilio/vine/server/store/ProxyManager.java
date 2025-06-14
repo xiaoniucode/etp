@@ -12,6 +12,10 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
+/**
+ * 代理规则管理器
+ *
+ */
 public class ProxyManager {
     private static final Logger logger = LoggerFactory.getLogger(ProxyManager.class);
     /**

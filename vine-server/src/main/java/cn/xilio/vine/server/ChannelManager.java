@@ -1,5 +1,6 @@
 package cn.xilio.vine.server;
 
+import cn.xilio.vine.core.VineConstants;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 
@@ -43,5 +44,6 @@ public class ChannelManager {
 
     public static void addVisitorChannelToTunnelChannel(Channel visitorChannel, Long sessionId, Channel turnnelChannel) {
         turnnelChannel.attr(VISITOR_CHANNELS).get().put(sessionId, visitorChannel);
+        visitorChannel.attr(VineConstants.SESSION_ID).set(sessionId);
     }
 }
