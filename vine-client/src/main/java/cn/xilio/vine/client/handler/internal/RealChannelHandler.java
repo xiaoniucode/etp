@@ -12,14 +12,12 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
         Channel tunnelChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
-        String visitorId="1001";
         byte[] dataBytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(dataBytes);
 
         TunnelMessage.Message message = TunnelMessage.Message
                 .newBuilder()
                 .setType(TunnelMessage.Message.Type.TRANSFER)
-                .setExt(visitorId)
                 .setPayload(ByteString.copyFrom(dataBytes))
                 .build();
         tunnelChannel.writeAndFlush(message);

@@ -26,16 +26,12 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
         try {
             buf.retain();
             ByteString byteString = ByteString.copyFrom(buf.nioBuffer());
-
             TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                     .setType(TunnelMessage.Message.Type.TRANSFER)
                     .setPayload(byteString)
                     .build();
-
             if (tunnelChannel.isWritable()) {
                 tunnelChannel.writeAndFlush(message);
-            } else {
-                System.err.println("Tunnel channel is not writable");
             }
         } finally {
             // 释放 ByteBuf

@@ -1,4 +1,4 @@
-package cn.xilio.vine.console;
+package cn.xilio.vine.common;
 
 import java.util.logging.Level;
 import java.util.regex.Matcher;
