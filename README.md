@@ -16,7 +16,7 @@
 [![License](https://img.shields.io/github/license/xilio-dev/vine?style=for-the-badge)](https://github.com/xilio-dev/vine/blob/main/LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/xilio-dev/vine?style=for-the-badge)](https://github.com/xilio-dev/vine/commits)
 
-[README](README.md) | [中文文档](README_zh.md)
+[README](README.md) | [中文文档](README_ZH.md)
 
 
 ## Introduction
