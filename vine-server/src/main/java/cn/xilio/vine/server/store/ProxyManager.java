@@ -128,4 +128,14 @@ public class ProxyManager {
     public List<Integer> getClientPublicNetworkPorts(String secretKey) {
         return clienttPublicNetworkPortMapping.get(secretKey);
     }
+
+    /**
+     * 通过公网端口获取内网服务对应的内网服务器信息
+     *
+     * @param publicNetworkPort 公网端口
+     * @return 内网服务器信息
+     */
+    public LocalServerInfo getInternalServerInfo(int publicNetworkPort) {
+        return portLocalServerMapping.get(publicNetworkPort);
+    }
 }
