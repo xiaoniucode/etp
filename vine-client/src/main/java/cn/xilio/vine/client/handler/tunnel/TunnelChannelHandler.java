@@ -1,11 +1,13 @@
 package cn.xilio.vine.client.handler.tunnel;
 
+import cn.xilio.vine.client.ChannelManager;
 import cn.xilio.vine.core.ChannelStatusCallback;
 import cn.xilio.vine.core.VineConstants;
 import cn.xilio.vine.core.MessageHandler;
 import cn.xilio.vine.core.protocol.TunnelMessage;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import org.springframework.util.ObjectUtils;
 
 public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
     private final Bootstrap realBootstrap;
@@ -34,7 +36,21 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        channelStatusCallback.channelInactive(ctx);
+        //控制通道断开 因为与代理服务器的连接会存在一条控制通道和多条数据通道
+        if (ctx.channel() == ChannelManager.getControlTunnelChannel()) {
+            //清除当前控制通道
+            ChannelManager.setControlTunnelChannel(null);
+            ChannelManager.clearAllRealServerChannel();
+            //控制通道断开回调
+            channelStatusCallback.channelInactive(ctx);
+        } else {
+            //数据隧道-通道断开连接 此时需要关闭代理客户端与真实服务的连接
+            Channel realServerChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
+            if (!ObjectUtils.isEmpty(realServerChannel)) {
+                ctx.channel().close();
+            }
+        }
+        //todo
         super.channelInactive(ctx);
     }
 }

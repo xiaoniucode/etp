@@ -1,5 +1,6 @@
 package cn.xilio.vine.client.handler.tunnel;
 
+import cn.xilio.vine.client.ChannelManager;
 import cn.xilio.vine.client.Config;
 import cn.xilio.vine.core.AbstractMessageHandler;
 import cn.xilio.vine.core.VineConstants;
@@ -41,8 +42,9 @@ public class ConnectHandler extends AbstractMessageHandler {
                                         .build();
 
                                 tunnelChannel.channel().writeAndFlush(tunnelMessage);
+                                ChannelManager.addRealServerChannel(sessionId, realChannel);
+                                realChannel.attr(VineConstants.SESSION_ID).set(sessionId);
                                 realChannel.config().setOption(ChannelOption.AUTO_READ, true);
-
                             }
                         }
                     });

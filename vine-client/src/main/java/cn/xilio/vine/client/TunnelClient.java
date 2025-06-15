@@ -83,6 +83,8 @@ public class TunnelClient implements ServerLife {
         ChannelFuture future = tunnelBootstrap.connect(serverAddr, serverPort);
         future.addListener((ChannelFutureListener) channelFuture -> {
             if (channelFuture.isSuccess()) {
+                //缓存控制隧道
+                ChannelManager.setControlTunnelChannel(channelFuture.channel());
                 TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                         .setType(TunnelMessage.Message.Type.AUTH)
                         .setExt(secretKey)
