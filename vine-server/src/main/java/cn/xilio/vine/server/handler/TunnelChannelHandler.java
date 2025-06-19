@@ -37,7 +37,7 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
             Channel tunnelChannel = ChannelManager.getTunnelChannel(secretKey);
             if (!ObjectUtils.isEmpty(tunnelChannel)) {
                 //删除该隧道所有的用户连接
-                ChannelManager.removeSessionChannelFromTunnelChannel(tunnelChannel, sessionId);
+                ChannelManager.removeVisitorChannelFromTunnelChannel(tunnelChannel, sessionId);
                 ChannelUtils.closeOnFlush(tunnelChannel);
                 visitorChannel.close();//关闭一个用户session连接
             }

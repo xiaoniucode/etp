@@ -4,7 +4,6 @@ import cn.xilio.vine.core.VineConstants;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,15 +28,20 @@ public class ChannelManager {
     private static final AttributeKey<String> CHANNEL_SECRET_KEY = AttributeKey.newInstance("channel_client_key");
 
     /**
-     *
      * @param internalPorts 客户端内网服务的端口号
-     * @param secretKey 客户端认证密钥
-     * @param channel 安全认证后的隧道-通道
+     * @param secretKey     客户端认证密钥
+     * @param channel       安全认证后的隧道-通道
      */
     public static void addTunnelChannel(List<Integer> internalPorts, String secretKey, Channel channel) {
-        for (Integer port : internalPorts) {
-            portTunnelChannelMapping.put(port, channel);
+        //共享资源，put会在多个地方被调用，避免同时调用put导致线程安全问题
+        synchronized (portTunnelChannelMapping) {
+            for (Integer port : internalPorts) {
+                portTunnelChannelMapping.put(port, channel);
+            }
         }
+
+        channel.attr(CHANNEL_PORT).set(internalPorts);//该通道上的代理服务端口
+        channel.attr(CHANNEL_SECRET_KEY).set(secretKey);//该条通道对应的客户端
         channel.attr(VISITOR_CHANNELS).set(new ConcurrentHashMap<>());
         tunnelChannels.put(secretKey, channel);
     }
@@ -59,8 +63,11 @@ public class ChannelManager {
         visitorChannel.attr(VineConstants.SESSION_ID).set(sessionId);
     }
 
-    public static void removeSessionChannelFromTunnelChannel(Channel tunnelChannel, Long sessionId) {
-        tunnelChannel.attr(VISITOR_CHANNELS).get().remove(sessionId);
+    public static Channel removeVisitorChannelFromTunnelChannel(Channel tunnelChannel, Long sessionId) {
+        if (tunnelChannel.attr(VISITOR_CHANNELS).get() == null) {
+            return null;
+        }
+        return tunnelChannel.attr(VISITOR_CHANNELS).get().remove(sessionId);
     }
 
     public static void removeTunnelAndBindRelationship(Channel channel) {
@@ -97,6 +104,7 @@ public class ChannelManager {
         });
 
     }
+
     public static Map<Long, Channel> getVisitorChannels(Channel tunnelChannel) {
         return tunnelChannel.attr(VISITOR_CHANNELS).get();
     }
