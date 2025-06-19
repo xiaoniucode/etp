@@ -38,7 +38,7 @@ public class ProxyManager {
     /**
      * 客户端内网服务端口号列表 格式：[secretKey1:port1,secretKey2:port2]，用于用过客户端密钥获取客户端内网服务所有端口
      */
-    private static volatile Map<String, List<Integer>> clienttPublicNetworkPortMapping = new HashMap<String, List<Integer>>();
+    private  static volatile Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<String, List<Integer>>();
 
     private ProxyManager() {
     }
@@ -64,7 +64,7 @@ public class ProxyManager {
             String name = client.getString("name");
             Long status = client.getLong("status");
             String secretKey = client.getString("secretKey");
-            if (clienttPublicNetworkPortMapping.containsKey(secretKey)) {
+            if (clientPublicNetworkPortMapping.containsKey(secretKey)) {
                 throw new IllegalArgumentException("客户端密钥冲突，不能存在重复的密钥！");
             }
             //创建一个客户端
@@ -76,7 +76,7 @@ public class ProxyManager {
             List<ProxyMapping> proxyMappings = new ArrayList<>();
             List<Toml> proxies = client.getTables("proxies");
             List<Integer> remotePorts = new ArrayList<>();
-            clienttPublicNetworkPortMapping.put(secretKey, remotePorts);
+            clientPublicNetworkPortMapping.put(secretKey, remotePorts);
             for (Toml proxy : proxies) {
                 String proxyName = proxy.getString("name");
                 String type = proxy.getString("type");
@@ -130,7 +130,7 @@ public class ProxyManager {
      * @return 所有内网服务对应的公网端口号
      */
     public List<Integer> getClientPublicNetworkPorts(String secretKey) {
-        return clienttPublicNetworkPortMapping.get(secretKey);
+        return clientPublicNetworkPortMapping.get(secretKey);
     }
 
     /**
