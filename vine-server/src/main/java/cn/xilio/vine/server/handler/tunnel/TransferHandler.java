@@ -22,14 +22,7 @@ public class TransferHandler extends AbstractMessageHandler {
         if (visitorChannel != null && visitorChannel.isWritable()) {
             ByteString bytes = msg.getPayload();
             ByteBuf byteBuf = ctx.alloc().buffer(bytes.size()).writeBytes(bytes.asReadOnlyByteBuffer());
-            visitorChannel.writeAndFlush(byteBuf).addListener(future -> {
-                if (!future.isSuccess()) {
-                    logger.error("Write to visitorChannel failed: {}", future.cause().getMessage());
-                    visitorChannel.close();
-                }
-            });
-        } else {
-            logger.warn("visitorChannel is null or not writable for TRANSFER");
+            visitorChannel.writeAndFlush(byteBuf);
         }
     }
 }
