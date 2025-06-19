@@ -21,7 +21,7 @@ public class ConnectHandler extends AbstractMessageHandler {
         ctx.channel().attr(VineConstants.NEXT_CHANNEL).set(visitorChannel);
         ctx.channel().attr(VineConstants.SECRET_KEY).set(secretKey);
         ctx.channel().attr(VineConstants.SESSION_ID).set(sessionId);
-
+        //将数据隧道-通道绑定到访问者通道上，用于访问通道代理将消息通过数据隧道转发到内网
         visitorChannel.attr(VineConstants.NEXT_CHANNEL).set(ctx.channel());
         visitorChannel.config().setOption(ChannelOption.AUTO_READ, true);
     }

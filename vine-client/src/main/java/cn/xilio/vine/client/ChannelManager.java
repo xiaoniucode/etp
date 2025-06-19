@@ -1,11 +1,15 @@
 package cn.xilio.vine.client;
 
 import cn.xilio.vine.core.ChannelUtils;
+import cn.xilio.vine.core.VineConstants;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ChannelManager {
     /**
@@ -17,6 +21,14 @@ public class ChannelManager {
      * 当前控制隧道通道，每个客户端和远程代理服务器只有一条认证成功的控制隧道
      */
     private static Channel controlTunnelChannel;
+    /**
+     * 最大数据隧道通道池大小，超过该大小则关闭当前的通道丢弃
+     */
+    private static final int MAX_DATA_TUNNEL_CHANNEL_POOL_SIZE = 100;
+    /**
+     *
+     */
+    private static final Queue<Channel> dataTunnelChannelPool = new ConcurrentLinkedQueue<>();
 
     public static Channel getControlTunnelChannel() {
         return controlTunnelChannel;
@@ -45,5 +57,30 @@ public class ChannelManager {
             ChannelUtils.closeOnFlush(channel);//如果是存活的则关闭
             iterator.remove();//清除缓存
         }
+    }
+
+    /**
+     * 归还数据隧道通道
+     * 如果数据隧道通道池已满则关闭该通道
+     *
+     * @param dataTunnelChannel 数据隧道通道
+     */
+    public static void returnDataTunnelChanel(Channel dataTunnelChannel) {
+        if (dataTunnelChannelPool.size() > MAX_DATA_TUNNEL_CHANNEL_POOL_SIZE) {
+            dataTunnelChannel.close();
+        } else {
+            dataTunnelChannel.config().setOption(ChannelOption.AUTO_READ, true);
+            dataTunnelChannel.attr(VineConstants.NEXT_CHANNEL).remove();
+            dataTunnelChannelPool.offer(dataTunnelChannel);
+        }
+    }
+
+    /**
+     * 删除数据隧道通道
+     *
+     * @param dataTunnelChannel 数据隧道通道
+     */
+    public static void removeDataTunnelChanel(Channel dataTunnelChannel) {
+        dataTunnelChannelPool.remove(dataTunnelChannel);
     }
 }

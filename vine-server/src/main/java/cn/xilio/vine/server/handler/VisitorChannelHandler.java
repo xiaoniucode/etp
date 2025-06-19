@@ -17,11 +17,15 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * 访问者通道处理器，用于处理来自外部访问者的请求（session），将访问者的消息通过数据隧道代理转发给内网
+ */
 public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private static final AtomicLong sessionIdProducer = new AtomicLong(0);
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
+        //获取数据隧道-通道
         Channel tunnelChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
         try {
             buf.retain();

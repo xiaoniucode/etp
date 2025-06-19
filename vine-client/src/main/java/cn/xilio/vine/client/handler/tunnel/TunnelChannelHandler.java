@@ -50,7 +50,8 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
                 ctx.channel().close();
             }
         }
-        //todo
+        //从数据隧道池中删除该通道
+        ChannelManager.removeDataTunnelChanel(ctx.channel());
         super.channelInactive(ctx);
     }
 }
