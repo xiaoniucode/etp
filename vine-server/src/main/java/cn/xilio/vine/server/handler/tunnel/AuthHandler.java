@@ -35,7 +35,7 @@ public class AuthHandler extends AbstractMessageHandler {
         }
         //获取客户端的所有内网服务对应的公网端口
         List<Integer> internalPorts = ProxyManager.getInstance().getClientPublicNetworkPorts(secretKey);
-        //将客户端所有内网服务对应的公网端口绑定到已经成功认证的安全隧道通道上，后面所有数据会通过该通道传输
+        //将客户端所有内网服务对应的公网端口绑定到控制隧道通道上
         ChannelManager.addTunnelChannel(internalPorts, secretKey, ctx.channel());
     }
 }

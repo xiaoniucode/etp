@@ -1,8 +1,7 @@
 package cn.xilio.vine.client;
 
-import io.netty.buffer.Unpooled;
+import cn.xilio.vine.core.ChannelUtils;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -35,15 +34,16 @@ public class ChannelManager {
         realServerChannels.put(sessionId, realChannel);
     }
 
+    /**
+     * 关闭所有的真实服务连接通道同时清理掉所有缓存
+     */
     public static void clearAllRealServerChannel() {
         Iterator<Map.Entry<Long, Channel>> iterator = realServerChannels.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Long, Channel> entry = iterator.next();
             Channel channel = entry.getValue();
-            if (channel.isActive()) {
-                channel.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
-                iterator.remove(); // 安全移除
-            }
+            ChannelUtils.closeOnFlush(channel);//如果是存活的则关闭
+            iterator.remove();//清除缓存
         }
     }
 }
