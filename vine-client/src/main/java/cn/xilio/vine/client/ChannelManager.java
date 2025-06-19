@@ -1,9 +1,14 @@
 package cn.xilio.vine.client;
 
 import cn.xilio.vine.core.ChannelUtils;
+import cn.xilio.vine.core.DataTunnelChannelBorrowCallback;
 import cn.xilio.vine.core.VineConstants;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOption;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -82,5 +87,28 @@ public class ChannelManager {
      */
     public static void removeDataTunnelChanel(Channel dataTunnelChannel) {
         dataTunnelChannelPool.remove(dataTunnelChannel);
+    }
+
+    /**
+     * 用于从数据隧道通道池中获取一个通道连接，如果没有则创建一个新的通道
+     *
+     * @param tunnelBootstrap 隧道
+     * @param callback        回调接口
+     */
+    public static void borrowDataTunnelChanel(Bootstrap tunnelBootstrap, DataTunnelChannelBorrowCallback callback) {
+        //从队列中压出一个通道
+        Channel dataTunnelChannel = dataTunnelChannelPool.poll();
+        if (!ObjectUtils.isEmpty(dataTunnelChannel)) {
+            callback.success(dataTunnelChannel);
+            return;
+        }
+        //如果连接池没有，则新建一个连接
+        tunnelBootstrap.connect(Config.getServerAddr(), Config.getServerPort()).addListener((ChannelFutureListener) future -> {
+            if (future.isSuccess()) {
+                callback.success(future.channel());
+            } else {
+                callback.fail(future.cause());
+            }
+        });
     }
 }
