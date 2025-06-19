@@ -67,6 +67,39 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
     }
 
     @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        // 通知代理客户端
+        Channel visitorChannel = ctx.channel();
+        InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
+        //获取控制通道
+        Channel controllTunnelChannel = ChannelManager.getTunnelChannel(sa.getPort());
+        if (controllTunnelChannel == null) {
+            //该端口还没有配置代理规则，没有内网服务对应，断开的时候直接关闭通道就可以了
+            ctx.channel().close();
+        } else {
+            //获取访问者的会话ID
+            Long sessionId = ChannelManager.getVisitorChannelSessionId(visitorChannel);
+            ChannelManager.removeVisitorChannelFromTunnelChannel(controllTunnelChannel, sessionId);
+            //获取数据隧道通道
+            Channel dataTunnelChannel = visitorChannel.attr(VineConstants.NEXT_CHANNEL).get();
+            if (dataTunnelChannel != null && dataTunnelChannel.isActive()) {
+                dataTunnelChannel.attr(VineConstants.NEXT_CHANNEL).remove();
+                dataTunnelChannel.attr(VineConstants.SECRET_KEY).remove();
+                dataTunnelChannel.attr(VineConstants.SESSION_ID).remove();
+
+                dataTunnelChannel.config().setOption(ChannelOption.AUTO_READ, true);
+                // 通知客户端，访问者连接已经断开
+                TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
+                        .setType(TunnelMessage.Message.Type.DISCONNECT)
+                        .setSessionId(sessionId)
+                        .build();
+                dataTunnelChannel.writeAndFlush(tunnelMessage);
+            }
+        }
+        super.channelInactive(ctx);
+    }
+
+    @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
         // 当出现异常就关闭连接

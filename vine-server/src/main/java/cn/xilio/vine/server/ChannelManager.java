@@ -108,4 +108,8 @@ public class ChannelManager {
     public static Map<Long, Channel> getVisitorChannels(Channel tunnelChannel) {
         return tunnelChannel.attr(VISITOR_CHANNELS).get();
     }
+
+    public static Long getVisitorChannelSessionId(Channel visitorChannel) {
+        return visitorChannel.attr(VineConstants.SESSION_ID).get();
+    }
 }
