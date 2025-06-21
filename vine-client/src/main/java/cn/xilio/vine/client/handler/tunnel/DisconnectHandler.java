@@ -14,11 +14,11 @@ import io.netty.channel.ChannelHandlerContext;
 public class DisconnectHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
-        Channel realServerChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
-        if (realServerChannel != null) {
+        Channel realChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
+        if (realChannel != null) {
             ctx.channel().attr(VineConstants.NEXT_CHANNEL).remove();
             ChannelManager.returnDataTunnelChanel(ctx.channel());
-            ChannelUtils.closeOnFlush(realServerChannel);
+            ChannelUtils.closeOnFlush(realChannel);
         }
     }
 }

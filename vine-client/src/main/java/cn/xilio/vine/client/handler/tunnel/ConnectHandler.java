@@ -13,7 +13,7 @@ import io.netty.channel.*;
 public class ConnectHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
-        Channel controllTunnelChannel = ctx.channel();
+        Channel controlTunnelChannel = ctx.channel();
         long sessionId = msg.getSessionId();
         ByteString data = msg.getPayload();
         String lan = data.toStringUtf8();
@@ -53,7 +53,7 @@ public class ConnectHandler extends AbstractMessageHandler {
                                 .setSessionId(sessionId)
                                 .setType(TunnelMessage.Message.Type.DISCONNECT)
                                 .build();
-                        controllTunnelChannel.writeAndFlush(message);
+                        controlTunnelChannel.writeAndFlush(message);
                     }
                 });
             }

@@ -16,7 +16,7 @@ public class ConnectHandler extends AbstractMessageHandler {
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
         long sessionId = msg.getSessionId();
         String secretKey = msg.getExt();
-        Channel controllTunnelChannel = ChannelManager.getControllTunnelChannel(secretKey);
+        Channel controllTunnelChannel = ChannelManager.getControlTunnelChannel(secretKey);
         Channel visitorChannel = ChannelManager.getVisitorChannel(controllTunnelChannel, sessionId);
         ctx.channel().attr(VineConstants.NEXT_CHANNEL).set(visitorChannel);
         ctx.channel().attr(VineConstants.SECRET_KEY).set(secretKey);

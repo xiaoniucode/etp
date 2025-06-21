@@ -21,12 +21,12 @@ public class DisconnectHandler extends AbstractMessageHandler {
             return;
         }
 
-        Channel controllTunnelChannel = ChannelManager.getControllTunnelChannel(secretKey);
-        if (controllTunnelChannel == null) {
+        Channel controlTunnelChannel = ChannelManager.getControlTunnelChannel(secretKey);
+        if (controlTunnelChannel == null) {
             return;
         }
 
-        Channel visitorChannel = ChannelManager.removeVisitorChannelFromTunnelChannel(controllTunnelChannel, ctx.channel().attr(VineConstants.SESSION_ID).get());
+        Channel visitorChannel = ChannelManager.removeVisitorChannelFromTunnelChannel(controlTunnelChannel, ctx.channel().attr(VineConstants.SESSION_ID).get());
         if (visitorChannel != null) {
             ChannelUtils.closeOnFlush(visitorChannel);
             ctx.channel().attr(VineConstants.NEXT_CHANNEL).remove();

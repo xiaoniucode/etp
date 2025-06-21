@@ -39,7 +39,7 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         Channel visitorChannel = ctx.channel();
         InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
-        Channel controllTurnnelChannel = ChannelManager.getControllTunnelChannel(sa.getPort());
+        Channel controllTurnnelChannel = ChannelManager.getControlTunnelChannel(sa.getPort());
         if (controllTurnnelChannel == null) {
             visitorChannel.close();
             return;
@@ -64,7 +64,7 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
         Channel visitorChannel = ctx.channel();
         InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
         //获取控制通道
-        Channel controllTunnelChannel = ChannelManager.getControllTunnelChannel(sa.getPort());
+        Channel controllTunnelChannel = ChannelManager.getControlTunnelChannel(sa.getPort());
         if (controllTunnelChannel == null) {
             //该端口还没有配置代理规则，没有内网服务对应，断开的时候直接关闭通道就可以了
             ctx.channel().close();
@@ -102,8 +102,8 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel visitorChannel = ctx.channel();
         InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
-        Channel controlleTunnelChannel = ChannelManager.getControllTunnelChannel(sa.getPort());
-        if (controlleTunnelChannel == null) {
+        Channel controlTunnelChannel = ChannelManager.getControlTunnelChannel(sa.getPort());
+        if (controlTunnelChannel == null) {
             ctx.channel().close();
         } else {
             Channel dataTunnelChannel = visitorChannel.attr(VineConstants.NEXT_CHANNEL).get();
