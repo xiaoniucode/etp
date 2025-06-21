@@ -35,11 +35,11 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
             String secretKey = ctx.channel().attr(VineConstants.SECRET_KEY).get();
             Long sessionId = ctx.channel().attr(VineConstants.SESSION_ID).get();
             //获取控制通道
-            Channel tunnelChannel = ChannelManager.getTunnelChannel(secretKey);
-            if (!ObjectUtils.isEmpty(tunnelChannel)) {
+            Channel controllTunnelChannel = ChannelManager.getControllTunnelChannel(secretKey);
+            if (!ObjectUtils.isEmpty(controllTunnelChannel)) {
                 //删除该隧道所有的用户连接
-                ChannelManager.removeVisitorChannelFromTunnelChannel(tunnelChannel, sessionId);
-                ChannelUtils.closeOnFlush(tunnelChannel);
+                ChannelManager.removeVisitorChannelFromTunnelChannel(controllTunnelChannel, sessionId);
+                ChannelUtils.closeOnFlush(controllTunnelChannel);
                 visitorChannel.close();//关闭一个用户session连接
             }
             logger.info("断开数据连接成功");
