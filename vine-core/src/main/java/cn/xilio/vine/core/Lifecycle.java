@@ -3,7 +3,7 @@ package cn.xilio.vine.core;
 /**
  * Netty 容器服务生命周期
  */
-public interface ServerLife {
+public interface Lifecycle {
     /**
      * 启动容器服务
      */
