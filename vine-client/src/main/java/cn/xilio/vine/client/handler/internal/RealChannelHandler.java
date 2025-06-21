@@ -44,15 +44,15 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
         //获取访问者会话ID,sessionId在与真实服务连接的时候被设置
         Long sessionId = realChannel.attr(VineConstants.SESSION_ID).get();
         ChannelManager.removeRealServerChannel(sessionId);//移除会话与真实服务连接的通道记录
-        Channel tunnelChannel = realChannel.attr(VineConstants.NEXT_CHANNEL).get();//获取隧道通道
-        if (!ObjectUtils.isEmpty(tunnelChannel)) {
+        Channel dataTunnelChannel = realChannel.attr(VineConstants.NEXT_CHANNEL).get();//获取隧道通道
+        if (!ObjectUtils.isEmpty(dataTunnelChannel)) {
             //远程代理服务器发送断开连接消息，通知服务器断开连接和清理资源
             TunnelMessage.Message message = TunnelMessage.Message
                     .newBuilder()
                     .setType(TunnelMessage.Message.Type.DISCONNECT)
                     .setSessionId(sessionId)
                     .build();
-            tunnelChannel.writeAndFlush(message);
+            dataTunnelChannel.writeAndFlush(message);
         }
         logger.info("与内网真实服务通道断开连接, sessionId:{}", sessionId);
         super.channelInactive(ctx);
@@ -60,10 +60,10 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        Channel realServerChannel = ctx.channel();
-        Channel tunnelChannel = realServerChannel.attr(VineConstants.NEXT_CHANNEL).get();
-        if (!ObjectUtils.isEmpty(tunnelChannel)) {
-            tunnelChannel.config().setOption(ChannelOption.AUTO_READ, realServerChannel.isWritable());
+        Channel realChannel = ctx.channel();
+        Channel dataTunnelChannel = realChannel.attr(VineConstants.NEXT_CHANNEL).get();
+        if (!ObjectUtils.isEmpty(dataTunnelChannel)) {
+            dataTunnelChannel.config().setOption(ChannelOption.AUTO_READ, realChannel.isWritable());
         }
 
         super.channelWritabilityChanged(ctx);
