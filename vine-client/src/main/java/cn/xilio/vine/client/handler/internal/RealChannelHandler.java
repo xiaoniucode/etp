@@ -22,6 +22,10 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
         Channel tunnelChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
+        if (ObjectUtils.isEmpty(tunnelChannel)) {
+            logger.error("tunnelChannel is null");
+            return;
+        }
         byte[] dataBytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(dataBytes);
 
