@@ -54,4 +54,13 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
         ChannelManager.removeDataTunnelChanel(ctx.channel());
         super.channelInactive(ctx);
     }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        Channel realServerChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
+        if (!ObjectUtils.isEmpty(realServerChannel) && realServerChannel.isActive()) {
+            realServerChannel.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
+        }
+        super.channelWritabilityChanged(ctx);
+    }
 }

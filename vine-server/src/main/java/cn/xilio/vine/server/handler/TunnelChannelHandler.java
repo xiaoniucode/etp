@@ -7,6 +7,7 @@ import cn.xilio.vine.core.protocol.TunnelMessage;
 import cn.xilio.vine.server.ChannelManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,11 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        Channel visitorChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
+        if (!ObjectUtils.isEmpty(visitorChannel)) {
+            visitorChannel.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
+        }
+
         super.channelWritabilityChanged(ctx);
     }
 

@@ -14,6 +14,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.ReferenceCountUtil;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -27,19 +28,13 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
         //获取数据隧道-通道
         Channel tunnelChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
-        try {
-            buf.retain();
-            ByteString byteString = ByteString.copyFrom(buf.nioBuffer());
-            TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
-                    .setType(TunnelMessage.Message.Type.TRANSFER)
-                    .setPayload(byteString)
-                    .build();
-            if (tunnelChannel.isWritable()) {
-                tunnelChannel.writeAndFlush(message);
-            }
-        } finally {
-            // 释放 ByteBuf
-            ReferenceCountUtil.release(buf);
+        ByteString payload = ByteString.copyFrom(buf.nioBuffer());
+        TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
+                .setType(TunnelMessage.Message.Type.TRANSFER)
+                .setPayload(payload)
+                .build();
+        if (tunnelChannel.isWritable()) {
+            tunnelChannel.writeAndFlush(message);
         }
     }
 
@@ -104,6 +99,23 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
         cause.printStackTrace();
         // 当出现异常就关闭连接
         ctx.close();
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        Channel visitorChannel = ctx.channel();
+        InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
+        Channel controlleTunnelChannel = ChannelManager.getTunnelChannel(sa.getPort());
+        if (controlleTunnelChannel == null) {
+            ctx.channel().close();
+        } else {
+            Channel tunnelChannel = visitorChannel.attr(VineConstants.NEXT_CHANNEL).get();
+            if (tunnelChannel != null) {
+                tunnelChannel.config().setOption(ChannelOption.AUTO_READ, visitorChannel.isWritable());
+            }
+        }
+
+        super.channelWritabilityChanged(ctx);
     }
 
     public long nextSessionId() {
