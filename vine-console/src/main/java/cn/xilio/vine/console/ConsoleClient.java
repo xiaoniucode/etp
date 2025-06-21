@@ -15,11 +15,12 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Scanner;
 
 public class ConsoleClient implements Lifecycle {
-    private static final String SERVER_URI = "ws://localhost:9871/command";
+    private String remoteHost = "127.0.0.1";
+    private int remotePort = 9871;
+    private static final String SERVER_URI_PATTERN = "ws://%s:%d/command";
 
     @Override
     public void start() {
@@ -38,7 +39,7 @@ public class ConsoleClient implements Lifecycle {
                             pipeline.addLast(new HttpObjectAggregator(65536));
                             // WebSocket客户端协议处理器
                             pipeline.addLast(new WebSocketClientProtocolHandler(
-                                    URI.create(SERVER_URI),
+                                    URI.create(String.format(SERVER_URI_PATTERN, remoteHost, remotePort)),
                                     WebSocketVersion.V13,
                                     null,
                                     false,
@@ -49,15 +50,17 @@ public class ConsoleClient implements Lifecycle {
                             pipeline.addLast(new ClientResponseHandler());
                         }
                     });
-            ChannelFuture future = bootstrap.connect(new URI(SERVER_URI).getHost(), new URI(SERVER_URI).getPort()).sync();
+            ChannelFuture future = bootstrap.connect(remoteHost, remotePort).sync();
             VineBanner.welcome();
             // 用户输入命令
             Scanner scanner = new Scanner(System.in);
             while (true) {
                 System.out.print("\u001B[32mvine > \u001B[0m");
                 String input = scanner.nextLine();
-                if ("exit".equalsIgnoreCase(input)) break;
-
+                if ("exit".equalsIgnoreCase(input)) {
+                    future.channel().close();
+                    break;
+                }
                 // 发送命令到服务端
                 if (future.channel().isActive()) {
                     future.channel().writeAndFlush(new TextWebSocketFrame(input));
@@ -67,7 +70,7 @@ public class ConsoleClient implements Lifecycle {
             }
             scanner.close();
             future.channel().closeFuture().sync();
-        } catch (InterruptedException | URISyntaxException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
             group.shutdownGracefully();
@@ -79,5 +82,19 @@ public class ConsoleClient implements Lifecycle {
 
     }
 
+    public String getRemoteHost() {
+        return remoteHost;
+    }
 
+    public void setRemoteHost(String remoteHost) {
+        this.remoteHost = remoteHost;
+    }
+
+    public int getRemotePort() {
+        return remotePort;
+    }
+
+    public void setRemotePort(int remotePort) {
+        this.remotePort = remotePort;
+    }
 }
