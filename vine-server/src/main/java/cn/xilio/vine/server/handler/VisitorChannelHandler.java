@@ -11,11 +11,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.ReferenceCountUtil;
 
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -27,14 +24,14 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
         //获取数据隧道-通道
-        Channel tunnelChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
+        Channel dataTunnelChannel = ctx.channel().attr(VineConstants.NEXT_CHANNEL).get();
         ByteString payload = ByteString.copyFrom(buf.nioBuffer());
         TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                 .setType(TunnelMessage.Message.Type.TRANSFER)
                 .setPayload(payload)
                 .build();
-        if (tunnelChannel.isWritable()) {
-            tunnelChannel.writeAndFlush(message);
+        if (dataTunnelChannel.isWritable()) {
+            dataTunnelChannel.writeAndFlush(message);
         }
     }
 
@@ -42,21 +39,21 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         Channel visitorChannel = ctx.channel();
         InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
-        Channel turnnelChannel = ChannelManager.getTunnelChannel(sa.getPort());
-        if (turnnelChannel == null) {
+        Channel controllTurnnelChannel = ChannelManager.getControllTunnelChannel(sa.getPort());
+        if (controllTurnnelChannel == null) {
             visitorChannel.close();
             return;
         } else {
             long nextSessionId = nextSessionId();
             visitorChannel.config().setOption(ChannelOption.AUTO_READ, false);
             LocalServerInfo serverInfo = ProxyManager.getInstance().getInternalServerInfo(sa.getPort());
-            ChannelManager.addVisitorChannelToTunnelChannel(visitorChannel, nextSessionId, turnnelChannel);
+            ChannelManager.addVisitorChannelToTunnelChannel(visitorChannel, nextSessionId, controllTurnnelChannel);
             TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                     .setType(TunnelMessage.Message.Type.CONNECT)
                     .setSessionId(nextSessionId)
                     .setPayload(ByteString.copyFrom((serverInfo.getLocalIp() + ":" + serverInfo.getLocalPort()).getBytes()))
                     .build();
-            turnnelChannel.writeAndFlush(tunnelMessage);
+            controllTurnnelChannel.writeAndFlush(tunnelMessage);
         }
         super.channelActive(ctx);
     }
@@ -67,7 +64,7 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
         Channel visitorChannel = ctx.channel();
         InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
         //获取控制通道
-        Channel controllTunnelChannel = ChannelManager.getTunnelChannel(sa.getPort());
+        Channel controllTunnelChannel = ChannelManager.getControllTunnelChannel(sa.getPort());
         if (controllTunnelChannel == null) {
             //该端口还没有配置代理规则，没有内网服务对应，断开的时候直接关闭通道就可以了
             ctx.channel().close();
@@ -105,13 +102,13 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel visitorChannel = ctx.channel();
         InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
-        Channel controlleTunnelChannel = ChannelManager.getTunnelChannel(sa.getPort());
+        Channel controlleTunnelChannel = ChannelManager.getControllTunnelChannel(sa.getPort());
         if (controlleTunnelChannel == null) {
             ctx.channel().close();
         } else {
-            Channel tunnelChannel = visitorChannel.attr(VineConstants.NEXT_CHANNEL).get();
-            if (tunnelChannel != null) {
-                tunnelChannel.config().setOption(ChannelOption.AUTO_READ, visitorChannel.isWritable());
+            Channel dataTunnelChannel = visitorChannel.attr(VineConstants.NEXT_CHANNEL).get();
+            if (dataTunnelChannel != null) {
+                dataTunnelChannel.config().setOption(ChannelOption.AUTO_READ, visitorChannel.isWritable());
             }
         }
 

@@ -28,14 +28,14 @@ public class AuthHandler extends AbstractMessageHandler {
             return;//返回方法，不执行后续的逻辑
         }
         //获取与客户端绑定的安全隧道channel
-        Channel tunnelChannel = ChannelManager.getTunnelChannel(secretKey);
+        Channel controllTunnelChannel = ChannelManager.getControllTunnelChannel(secretKey);
         //如果已经存在安全通道，表示已经认证过了，不能够重复认证，一个客户端只绑定一条安全通道-隧道
-        if (!ObjectUtils.isEmpty(tunnelChannel)) {
+        if (!ObjectUtils.isEmpty(controllTunnelChannel)) {
             ctx.channel().close();//关闭当前客户端的通道
         }
         //获取客户端的所有内网服务对应的公网端口
         List<Integer> internalPorts = ProxyManager.getInstance().getClientPublicNetworkPorts(secretKey);
         //将客户端所有内网服务对应的公网端口绑定到控制隧道通道上
-        ChannelManager.addTunnelChannel(internalPorts, secretKey, ctx.channel());
+        ChannelManager.addControllTunnelChannel(internalPorts, secretKey, ctx.channel());
     }
 }

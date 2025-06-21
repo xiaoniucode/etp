@@ -32,7 +32,7 @@ public class ChannelManager {
      * @param secretKey     客户端认证密钥
      * @param channel       安全认证后的隧道-通道
      */
-    public static void addTunnelChannel(List<Integer> internalPorts, String secretKey, Channel channel) {
+    public static void addControllTunnelChannel(List<Integer> internalPorts, String secretKey, Channel channel) {
         //共享资源，put会在多个地方被调用，避免同时调用put导致线程安全问题
         synchronized (portTunnelChannelMapping) {
             for (Integer port : internalPorts) {
@@ -46,11 +46,11 @@ public class ChannelManager {
         tunnelChannels.put(secretKey, channel);
     }
 
-    public static Channel getTunnelChannel(int port) {
+    public static Channel getControllTunnelChannel(int port) {
         return portTunnelChannelMapping.get(port);
     }
 
-    public static Channel getTunnelChannel(String secretKey) {
+    public static Channel getControllTunnelChannel(String secretKey) {
         return tunnelChannels.get(secretKey);
     }
 

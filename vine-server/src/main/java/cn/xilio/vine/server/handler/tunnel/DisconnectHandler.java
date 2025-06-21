@@ -5,9 +5,7 @@ import cn.xilio.vine.core.ChannelUtils;
 import cn.xilio.vine.core.VineConstants;
 import cn.xilio.vine.core.protocol.TunnelMessage;
 import cn.xilio.vine.server.ChannelManager;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 
 public class DisconnectHandler extends AbstractMessageHandler {
@@ -16,19 +14,19 @@ public class DisconnectHandler extends AbstractMessageHandler {
         String secretKey = ctx.channel().attr(VineConstants.SECRET_KEY).get();
         if (secretKey == null) {
             Long sessionId = msg.getSessionId();
-            Channel userChannel = ChannelManager.removeVisitorChannelFromTunnelChannel(ctx.channel(), sessionId);
-            if (userChannel != null) {
-                ChannelUtils.closeOnFlush(userChannel);
+            Channel visitorChannel = ChannelManager.removeVisitorChannelFromTunnelChannel(ctx.channel(), sessionId);
+            if (visitorChannel != null) {
+                ChannelUtils.closeOnFlush(visitorChannel);
             }
             return;
         }
 
-        Channel tunnelChannel = ChannelManager.getTunnelChannel(secretKey);
-        if (tunnelChannel == null) {
+        Channel controllTunnelChannel = ChannelManager.getControllTunnelChannel(secretKey);
+        if (controllTunnelChannel == null) {
             return;
         }
 
-        Channel visitorChannel = ChannelManager.removeVisitorChannelFromTunnelChannel(tunnelChannel, ctx.channel().attr(VineConstants.SESSION_ID).get());
+        Channel visitorChannel = ChannelManager.removeVisitorChannelFromTunnelChannel(controllTunnelChannel, ctx.channel().attr(VineConstants.SESSION_ID).get());
         if (visitorChannel != null) {
             ChannelUtils.closeOnFlush(visitorChannel);
             ctx.channel().attr(VineConstants.NEXT_CHANNEL).remove();
