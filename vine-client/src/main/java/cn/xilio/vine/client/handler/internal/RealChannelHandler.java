@@ -7,6 +7,7 @@ import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +59,19 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable throwable) throws Exception {
-        throwable.printStackTrace();
-        super.exceptionCaught(ctx, throwable);
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        Channel realServerChannel = ctx.channel();
+        Channel tunnelChannel = realServerChannel.attr(VineConstants.NEXT_CHANNEL).get();
+        if (!ObjectUtils.isEmpty(tunnelChannel)) {
+            tunnelChannel.config().setOption(ChannelOption.AUTO_READ, realServerChannel.isWritable());
+        }
+
+        super.channelWritabilityChanged(ctx);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        super.exceptionCaught(ctx, cause);
     }
 }
