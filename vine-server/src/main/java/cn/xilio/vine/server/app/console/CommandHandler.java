@@ -14,7 +14,11 @@ public class CommandHandler extends SimpleChannelInboundHandler<TextWebSocketFra
         if (command.startsWith("add")) {
             String response = "服务端执行成功: " + command.toUpperCase();
             ctx.writeAndFlush(new TextWebSocketFrame(response));
-        } else {
+        }else if (command.startsWith("list")) {
+            String response = "服务端执行成功: " + command.toUpperCase();
+            ctx.writeAndFlush(new TextWebSocketFrame(response));
+        }
+        else {
             ctx.writeAndFlush(new TextWebSocketFrame("未知命令"));
         }
     }
