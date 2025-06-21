@@ -9,6 +9,37 @@ public class VineProperties {
     private String bindAddr = "localhost";
     private Integer bindPort;
     private String proxyPath;
+    private Console console = new Console();
+
+    static class Console {
+        private Boolean enable;
+        private String username;
+        private String password;
+
+        public Boolean getEnable() {
+            return enable;
+        }
+
+        public void setEnable(Boolean enable) {
+            this.enable = enable;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+    }
 
     public String getBindAddr() {
         return bindAddr;
@@ -32,5 +63,13 @@ public class VineProperties {
 
     public void setProxyPath(String proxyPath) {
         this.proxyPath = proxyPath;
+    }
+
+    public Console getConsole() {
+        return console;
+    }
+
+    public void setConsole(Console console) {
+        this.console = console;
     }
 }

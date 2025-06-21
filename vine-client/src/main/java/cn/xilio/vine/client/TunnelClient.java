@@ -3,7 +3,7 @@ package cn.xilio.vine.client;
 import cn.xilio.vine.client.handler.internal.RealChannelHandler;
 import cn.xilio.vine.client.handler.tunnel.TunnelChannelHandler;
 import cn.xilio.vine.core.EventLoopUtils;
-import cn.xilio.vine.core.ServerLife;
+import cn.xilio.vine.core.Lifecycle;
 import cn.xilio.vine.core.protocol.TunnelMessage;
 import cn.xilio.vine.core.heart.IdleCheckHandler;
 import cn.xilio.vine.core.protocol.TunnelMessageDecoder;
@@ -15,7 +15,7 @@ import io.netty.channel.socket.SocketChannel;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class TunnelClient implements ServerLife {
+public class TunnelClient implements Lifecycle {
     private boolean ssl;
     private String serverAddr;
     private int serverPort;
