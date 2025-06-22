@@ -2,6 +2,7 @@ package cn.xilio.vine.console.command;
 
 import cn.xilio.vine.console.ChannelHelper;
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.QueryStringEncoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -34,15 +35,19 @@ public class ClientCommand implements Callable<Integer> {
         public Integer call() {
             Channel channel = ChannelHelper.get();
             if (channel.isActive()) {
-                    channel.writeAndFlush(new TextWebSocketFrame("list"))
-                            .addListener(future -> {
-                                if (!future.isSuccess()) {
-                                    System.err.println("\n发送失败: " + future.cause().getMessage());
-                                }
-                            });
-                } else {
-                    System.err.println("\n连接未就绪");
-                }
+                QueryStringEncoder encoder = new QueryStringEncoder("client/add");
+                encoder.addParam("secretKey", "123456");
+                encoder.addParam("status", "1");
+                String data = encoder.toString();
+                channel.writeAndFlush(new TextWebSocketFrame(data))
+                        .addListener(future -> {
+                            if (!future.isSuccess()) {
+                                System.err.println("\n发送失败: " + future.cause().getMessage());
+                            }
+                        });
+            } else {
+                System.err.println("\n连接未就绪");
+            }
             return 0;
         }
     }
