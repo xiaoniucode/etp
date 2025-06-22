@@ -18,6 +18,8 @@ import java.net.URI;
 import java.util.Scanner;
 
 public class ConsoleClient implements Lifecycle {
+    private String username;
+    private String password;
     private String remoteHost = "127.0.0.1";
     private int remotePort = 9871;
     private static final String SERVER_URI_PATTERN = "ws://%s:%d/command";
@@ -96,5 +98,21 @@ public class ConsoleClient implements Lifecycle {
 
     public void setRemotePort(int remotePort) {
         this.remotePort = remotePort;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
