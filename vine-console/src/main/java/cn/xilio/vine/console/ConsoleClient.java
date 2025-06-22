@@ -54,9 +54,10 @@ public class ConsoleClient implements Lifecycle {
                     });
             ChannelFuture future = bootstrap.connect(remoteHost, remotePort).sync();
             VineBanner.welcome();
-          channel = future.channel();
+            channel = future.channel();
+            ChannelHelper.set(channel);
             //处理命令行输入
-            new Thread(new InputHandler(channel)).start();
+            new Thread(new InputHandler()).start();
             channel.closeFuture().sync();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

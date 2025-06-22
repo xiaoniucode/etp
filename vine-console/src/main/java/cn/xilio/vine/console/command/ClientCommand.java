@@ -1,5 +1,8 @@
 package cn.xilio.vine.console.command;
 
+import cn.xilio.vine.console.ChannelHelper;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Command;
@@ -18,6 +21,7 @@ import java.util.concurrent.Callable;
         }
 )
 public class ClientCommand implements Callable<Integer> {
+
     @Override
     public Integer call() {
         System.out.println("请输入有效的 client 子命令：list, delete, update, add");
@@ -28,15 +32,24 @@ public class ClientCommand implements Callable<Integer> {
     static class ClientListCommand implements Callable<Integer> {
         @Override
         public Integer call() {
-            System.out.println("执行 client list 命令，显示所有客户端");
-            // 这里添加查询客户端列表的逻辑
+            Channel channel = ChannelHelper.get();
+            if (channel.isActive()) {
+                    channel.writeAndFlush(new TextWebSocketFrame("list"))
+                            .addListener(future -> {
+                                if (!future.isSuccess()) {
+                                    System.err.println("\n发送失败: " + future.cause().getMessage());
+                                }
+                            });
+                } else {
+                    System.err.println("\n连接未就绪");
+                }
             return 0;
         }
     }
 
-    @Command(name = "delete", description = "删除指定客户端")
+    @Command(name = "delete", description = "删除指定客户端", usageHelpAutoWidth = true)
     static class ClientDeleteCommand implements Callable<Integer> {
-        @Parameters(index = "0", description = "客户端的 secretKey")
+        @Parameters(index = "0", description = "客户端的 secretKey（必填）", paramLabel = "<secretKey>")
         private String secretKey;
 
         @Override
