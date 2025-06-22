@@ -1,7 +1,7 @@
 package cn.xilio.vine.server.app.configuration;
 
 import cn.xilio.vine.server.TunnelServer;
-import cn.xilio.vine.server.app.console.ConsoleServer;
+import cn.xilio.vine.server.app.adapter.console.ConsoleServer;
 import cn.xilio.vine.server.store.ProxyManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

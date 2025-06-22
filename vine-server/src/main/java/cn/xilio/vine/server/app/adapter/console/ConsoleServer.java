@@ -1,4 +1,4 @@
-package cn.xilio.vine.server.app.console;
+package cn.xilio.vine.server.app.adapter.console;
 
 import cn.xilio.vine.core.EventLoopUtils;
 import cn.xilio.vine.core.Lifecycle;
