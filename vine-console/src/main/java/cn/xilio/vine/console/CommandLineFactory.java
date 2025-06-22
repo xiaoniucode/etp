@@ -18,6 +18,8 @@ public class CommandLineFactory {
 
     public static CommandLine getCommand(CommandType type) {
         CommandLine commandLine = commandLines.get(type);
+        commandLine.setCaseInsensitiveEnumValuesAllowed(true);
+        commandLine.setUnmatchedArgumentsAllowed(false);
         if (ObjectUtils.isEmpty(commandLine)) {
             throw new RuntimeException("not found commandline for type:" + type);
         }
