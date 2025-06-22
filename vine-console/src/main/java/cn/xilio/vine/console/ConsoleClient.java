@@ -9,13 +9,12 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
+import picocli.CommandLine;
 
 
 import java.net.URI;
-import java.util.Scanner;
 
 public class ConsoleClient implements Lifecycle {
     private String username;
@@ -23,6 +22,7 @@ public class ConsoleClient implements Lifecycle {
     private String remoteHost = "127.0.0.1";
     private int remotePort = 9871;
     private static final String SERVER_URI_PATTERN = "ws://%s:%d/command";
+    private Channel channel;
 
     @Override
     public void start() {
@@ -54,24 +54,10 @@ public class ConsoleClient implements Lifecycle {
                     });
             ChannelFuture future = bootstrap.connect(remoteHost, remotePort).sync();
             VineBanner.welcome();
-            // 用户输入命令
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                System.out.print("\u001B[32mvine > \u001B[0m");
-                String input = scanner.nextLine();
-                if ("exit".equalsIgnoreCase(input)) {
-                    future.channel().close();
-                    break;
-                }
-                // 发送命令到服务端
-                if (future.channel().isActive()) {
-                    future.channel().writeAndFlush(new TextWebSocketFrame(input));
-                } else {
-                    System.err.println("连接未就绪");
-                }
-            }
-            scanner.close();
-            future.channel().closeFuture().sync();
+          channel = future.channel();
+            //处理命令行输入
+            new Thread(new InputHandler(channel)).start();
+            channel.closeFuture().sync();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
@@ -81,7 +67,13 @@ public class ConsoleClient implements Lifecycle {
 
     @Override
     public void stop() {
-
+        if (channel != null && channel.isOpen()) {
+            try {
+                channel.close().sync();
+            } catch (InterruptedException e) {
+                System.err.println("关闭通道失败: " + e.getMessage());
+            }
+        }
     }
 
     public String getRemoteHost() {
