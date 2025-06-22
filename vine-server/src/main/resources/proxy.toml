@@ -2,7 +2,7 @@
 [[clients]]
 name = "客户端1" #客户端的名字 可以当作一个用户
 secretKey = "4b0063baa5ae47c2910fc25265aae4b9" #客户端秘钥
-status = 1 #客户端状态 1:启用 0:禁用
+status = 1 #客户端状态 1:在线 0:离线
 
 [[clients.proxies]]
 name = "mysql" #代理名称 自定义
