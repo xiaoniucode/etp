@@ -1,11 +1,9 @@
 package cn.xilio.vine.console.command;
 
 import cn.xilio.vine.console.ChannelHelper;
-import cn.xilio.vine.core.command.CommandMessage;
-import cn.xilio.vine.core.command.MethodType;
-import com.google.gson.Gson;
+import cn.xilio.vine.core.command.protocol.CommandMessage;
+import cn.xilio.vine.core.command.protocol.MethodType;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.QueryStringEncoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -39,13 +37,9 @@ public class ClientCommand implements Callable<Integer> {
             Channel channel = ChannelHelper.get();
             if (channel.isActive()) {
                 CommandMessage<?> commandMessage = new CommandMessage<>(MethodType.CLIENT_LIST);
-
                 channel.writeAndFlush(new TextWebSocketFrame(commandMessage.toJson()));
-
-            } else {
-                System.err.println("\n连接未就绪");
             }
-            return 0;
+            return 1;
         }
     }
 
@@ -62,12 +56,12 @@ public class ClientCommand implements Callable<Integer> {
         }
     }
 
-    @Command(name = "update", description = "更新客户端",usageHelpAutoWidth = true, mixinStandardHelpOptions = true)
+    @Command(name = "update", description = "更新客户端", usageHelpAutoWidth = true, mixinStandardHelpOptions = true)
     static class ClientUpdateCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "客户端密钥")
         private String secretKey;
 
-        @Option(names = "--name", description = "客户端名称",required = false)
+        @Option(names = "--name", description = "客户端名称", required = false)
         private String name;
 
         @Override
@@ -80,12 +74,12 @@ public class ClientCommand implements Callable<Integer> {
 
     @Command(name = "add", description = "添加客户端", mixinStandardHelpOptions = true)
     static class ClientAddCommand implements Callable<Integer> {
-        @Option(names = {"-n","--name"}, description = "客户端名称", required = false)
+        @Option(names = {"-n", "--name"}, description = "客户端名称", required = false)
         private String name;
 
         @Override
         public Integer call() {
-            System.out.println("执行 client add 命令，name: " + name );
+            System.out.println("执行 client add 命令，name: " + name);
             // 这里添加创建客户端的逻辑
             return 0;
         }
