@@ -1,6 +1,9 @@
 package cn.xilio.vine.console.command;
 
 import cn.xilio.vine.console.ChannelHelper;
+import cn.xilio.vine.core.command.CommandMessage;
+import cn.xilio.vine.core.command.MethodType;
+import com.google.gson.Gson;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.QueryStringEncoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -29,22 +32,16 @@ public class ClientCommand implements Callable<Integer> {
         return 0;
     }
 
-    @Command(name = "list", description = "查看所有客户端列表")
+    @Command(name = "list", description = "查看所有客户端列表", mixinStandardHelpOptions = true)
     static class ClientListCommand implements Callable<Integer> {
         @Override
         public Integer call() {
             Channel channel = ChannelHelper.get();
             if (channel.isActive()) {
-                QueryStringEncoder encoder = new QueryStringEncoder("client/add");
-                encoder.addParam("secretKey", "123456");
-                encoder.addParam("status", "1");
-                String data = encoder.toString();
-                channel.writeAndFlush(new TextWebSocketFrame(data))
-                        .addListener(future -> {
-                            if (!future.isSuccess()) {
-                                System.err.println("\n发送失败: " + future.cause().getMessage());
-                            }
-                        });
+                CommandMessage<?> commandMessage = new CommandMessage<>(MethodType.CLIENT_LIST);
+
+                channel.writeAndFlush(new TextWebSocketFrame(commandMessage.toJson()));
+
             } else {
                 System.err.println("\n连接未就绪");
             }
@@ -52,9 +49,9 @@ public class ClientCommand implements Callable<Integer> {
         }
     }
 
-    @Command(name = "delete", description = "删除指定客户端", usageHelpAutoWidth = true)
+    @Command(name = "del", description = "删除指定客户端", mixinStandardHelpOptions = true)
     static class ClientDeleteCommand implements Callable<Integer> {
-        @Parameters(index = "0", description = "客户端的 secretKey（必填）", paramLabel = "<secretKey>")
+        @Parameters(index = "0", description = "客户端密钥")
         private String secretKey;
 
         @Override
@@ -65,12 +62,12 @@ public class ClientCommand implements Callable<Integer> {
         }
     }
 
-    @Command(name = "update", description = "修改客户端信息")
+    @Command(name = "update", description = "更新客户端",usageHelpAutoWidth = true, mixinStandardHelpOptions = true)
     static class ClientUpdateCommand implements Callable<Integer> {
-        @Parameters(index = "0", description = "客户端的 secretKey")
+        @Parameters(index = "0", description = "客户端密钥")
         private String secretKey;
 
-        @Option(names = "--name", description = "客户端名称")
+        @Option(names = "--name", description = "客户端名称",required = false)
         private String name;
 
         @Override
@@ -81,17 +78,14 @@ public class ClientCommand implements Callable<Integer> {
         }
     }
 
-    @Command(name = "add", description = "添加一个客户端")
+    @Command(name = "add", description = "添加客户端", mixinStandardHelpOptions = true)
     static class ClientAddCommand implements Callable<Integer> {
-        @Option(names = "--name", description = "客户端名称", required = true)
+        @Option(names = {"-n","--name"}, description = "客户端名称", required = false)
         private String name;
-
-        @Option(names = "--secretKey", description = "客户端 secretKey", required = true)
-        private String secretKey;
 
         @Override
         public Integer call() {
-            System.out.println("执行 client add 命令，name: " + name + ", secretKey: " + secretKey);
+            System.out.println("执行 client add 命令，name: " + name );
             // 这里添加创建客户端的逻辑
             return 0;
         }
