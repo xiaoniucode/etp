@@ -1,4 +1,4 @@
-package cn.xilio.vine.core.command;
+package cn.xilio.vine.core.command.protocol;
 
 public enum MethodType {
     CLIENT_LIST,

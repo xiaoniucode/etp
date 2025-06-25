@@ -1,10 +1,11 @@
-package cn.xilio.vine.core.command;
+package cn.xilio.vine.core.command.protocol;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.List;
 
 public class CommandMessage<T> implements Serializable {
     private MethodType method;
@@ -40,6 +41,12 @@ public class CommandMessage<T> implements Serializable {
         // 执行反序列化
         return new Gson().fromJson(json, type);
     }
-
+    public static <T> CommandMessage<T> fromJson(String json, Type type) {
+        return new Gson().fromJson(json, type);
+    }
+    public static <T> CommandMessage<List<T>> fromJson(String json, Class<List> listType, Class<T> elementType) {
+        Type type = TypeToken.getParameterized(CommandMessage.class, TypeToken.getParameterized(List.class, elementType).getType()).getType();
+        return new Gson().fromJson(json, type);
+    }
 
 }
