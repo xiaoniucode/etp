@@ -30,16 +30,16 @@ proxy list
 
 添加一个代理
 
-proxy add --name mysql --type tcp --localIP 127.0.0.1 --localPort 3306 --remotePort 3307
+proxy add  <secretKey> --name mysql --type tcp --localIP 127.0.0.1 --localPort 3306 --remotePort 3307
 
 or
 
-proxy add  --type tcp  --localPort 3306  --remotePort 3307
+proxy add <secretKey>  --type tcp  --localPort 3306  --remotePort 3307
 
 删除一个代理
 
-proxy delete <remotePort>
+proxy delete <secretKey>  <remotePort>
 
 更新一个代理
 
-proxy update <remotePort> --name mysql --type tcp --localIP 127.0.0.1 --localPort 3306 --remotePort 3307
+proxy update <secretKey>  <remotePort> --name mysql --type tcp --localIP 127.0.0.1 --localPort 3306 --remotePort 3307

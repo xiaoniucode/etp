@@ -142,4 +142,8 @@ public class ProxyManager {
     public LocalServerInfo getInternalServerInfo(int publicNetworkPort) {
         return portLocalServerMapping.get(publicNetworkPort);
     }
+
+    public   List<ClientInfo> getClients() {
+        return clients;
+    }
 }

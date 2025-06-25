@@ -25,6 +25,8 @@ public class ProxyCommand implements Callable<Integer> {
 
     @Command(name = "list", description = "查看所有代理列表")
     static class ProxyListCommand implements Callable<Integer> {
+        @Parameters(index = "0", description = "secretKey")
+        private String secretKey;
         @Override
         public Integer call() {
             System.out.println("执行 proxy list 命令，显示所有代理");
@@ -59,7 +61,7 @@ public class ProxyCommand implements Callable<Integer> {
         }
     }
 
-    @Command(name = "delete", description = "删除指定代理")
+    @Command(name = "delete", description = "删除指定代理",mixinStandardHelpOptions = true)
     static class ProxyDeleteCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "代理的 remotePort")
         private int remotePort;
