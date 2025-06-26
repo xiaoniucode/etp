@@ -1,5 +1,10 @@
 package cn.xilio.vine.console.command;
 
+import cn.xilio.vine.console.ChannelHelper;
+import cn.xilio.vine.core.command.protocol.CommandMessage;
+import cn.xilio.vine.core.command.protocol.MethodType;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Command;
@@ -25,13 +30,16 @@ public class ProxyCommand implements Callable<Integer> {
 
     @Command(name = "list", description = "查看所有代理列表")
     static class ProxyListCommand implements Callable<Integer> {
-        @Parameters(index = "0", description = "secretKey")
-        private String secretKey;
+//        @Parameters(index = "0", description = "secretKey")
+//        private String secretKey;
         @Override
         public Integer call() {
-            System.out.println("执行 proxy list 命令，显示所有代理");
-            // 这里添加查询代理列表的逻辑
-            return 0;
+            Channel channel = ChannelHelper.get();
+            if (channel.isActive()) {
+                CommandMessage message = new CommandMessage(MethodType.PROXY_LIST);
+                channel.writeAndFlush(new TextWebSocketFrame(message.toJson()));
+            }
+            return 1;
         }
     }
 
