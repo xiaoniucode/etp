@@ -1,15 +1,16 @@
 package cn.xilio.vine.core.command.protocol;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class CommandMessage<T> implements Serializable {
+public class CommandMessage implements Serializable {
     private MethodType method;
-    private T data;
+    private JsonElement data;
 
     public CommandMessage(MethodType method) {
         this.method = method;
@@ -23,30 +24,22 @@ public class CommandMessage<T> implements Serializable {
         this.method = method;
     }
 
-    public T getData() {
+    public JsonElement getData() {
         return data;
     }
 
-    public void setData(T data) {
+    public void setData(JsonElement data) {
         this.data = data;
     }
+
+
+
 
     public String toJson() {
         return new Gson().toJson(this);
     }
-
-    public static <T> CommandMessage<T> fromJson(String json, Class<T> dataType) {
-        // 构造包含泛型信息的TypeToken
-        Type type = TypeToken.getParameterized(CommandMessage.class, dataType).getType();
-        // 执行反序列化
-        return new Gson().fromJson(json, type);
+    // JSON 反序列化
+    public static CommandMessage fromJson(String json) {
+        return new Gson().fromJson(json, CommandMessage.class);
     }
-    public static <T> CommandMessage<T> fromJson(String json, Type type) {
-        return new Gson().fromJson(json, type);
-    }
-    public static <T> CommandMessage<List<T>> fromJson(String json, Class<List> listType, Class<T> elementType) {
-        Type type = TypeToken.getParameterized(CommandMessage.class, TypeToken.getParameterized(List.class, elementType).getType()).getType();
-        return new Gson().fromJson(json, type);
-    }
-
 }

@@ -36,8 +36,8 @@ public class ClientCommand implements Callable<Integer> {
         public Integer call() {
             Channel channel = ChannelHelper.get();
             if (channel.isActive()) {
-                CommandMessage<?> commandMessage = new CommandMessage<>(MethodType.CLIENT_LIST);
-                channel.writeAndFlush(new TextWebSocketFrame(commandMessage.toJson()));
+                CommandMessage message = new CommandMessage(MethodType.CLIENT_LIST);
+                channel.writeAndFlush(new TextWebSocketFrame(message.toJson()));
             }
             return 1;
         }

@@ -1,10 +1,9 @@
 package cn.xilio.vine.server.store;
 
 import cn.xilio.vine.core.command.model.ClientModel;
-import cn.xilio.vine.server.store.dto.ClientInfoDTO;
-import cn.xilio.vine.server.store.dto.ProxyInfoDTO;
-import org.springframework.stereotype.Service;
+import cn.xilio.vine.core.command.model.ProxyModel;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +27,21 @@ public class FileProxyRuleStore implements ProxyRuleStore {
     }
 
     @Override
-    public List<ProxyInfoDTO> getProxies() {
-        return Collections.emptyList();
+    public List<ProxyModel> getProxies() {
+        List<ClientInfo> clients = ProxyManager.getInstance().getClients();
+        ArrayList<ProxyModel> res = new ArrayList<>();
+        for (ClientInfo client : clients) {
+            for (ProxyMapping proxyMapping : client.getProxyMappings()) {
+                ProxyModel proxyModel = new ProxyModel();
+                proxyModel.setName(proxyMapping.getName());
+                proxyModel.setSecretKey(client.getSecretKey());
+                proxyModel.setType(proxyMapping.getType());
+                proxyModel.setLocalIP(proxyMapping.getLocalIP());
+                proxyModel.setLocalPort(proxyMapping.getLocalPort());
+                proxyModel.setRemotePort(proxyMapping.getRemotePort());
+                res.add(proxyModel);
+            }
+        }
+        return res;
     }
 }

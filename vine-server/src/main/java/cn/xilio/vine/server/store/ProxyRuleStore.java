@@ -1,8 +1,7 @@
 package cn.xilio.vine.server.store;
 
 import cn.xilio.vine.core.command.model.ClientModel;
-import cn.xilio.vine.server.store.dto.ClientInfoDTO;
-import cn.xilio.vine.server.store.dto.ProxyInfoDTO;
+import cn.xilio.vine.core.command.model.ProxyModel;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ public interface ProxyRuleStore {
 //    public void updateClient();
 //
 //    public void addProxy();
-    public List<ProxyInfoDTO> getProxies();
+    public List<ProxyModel> getProxies();
 //    public void deleteProxy();
 //    public void updateProxy();
 

@@ -33,7 +33,7 @@ secretKey = "7c0084cbb6bf58d3021fd36376bbf5c0"
 status = 1
 
 [[clients.proxies]]
-name = "postgresql"
+name = "postgre"
 type = "tcp"
 localIP = "127.0.0.1"
 localPort = 5432
