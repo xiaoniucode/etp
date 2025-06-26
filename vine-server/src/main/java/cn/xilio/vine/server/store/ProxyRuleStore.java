@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface ProxyRuleStore {
 
-   // public void addClient();
+    public void addClient(String name);
     public List<ClientModel> getClients();
 //    public void deleteClient();
 //    public void updateClient();

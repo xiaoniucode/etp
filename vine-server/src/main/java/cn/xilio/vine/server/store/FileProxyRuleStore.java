@@ -6,6 +6,7 @@ import cn.xilio.vine.core.command.model.ProxyModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -13,6 +14,14 @@ import java.util.stream.Collectors;
  */
 
 public class FileProxyRuleStore implements ProxyRuleStore {
+
+    @Override
+    public void addClient(String name) {
+        String uuid = UUID.randomUUID().toString();
+        String secretKey = uuid.replaceAll("-", "");
+
+
+    }
 
     @Override
     public List<ClientModel> getClients() {
