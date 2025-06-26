@@ -10,7 +10,6 @@ import java.util.Map;
 
 public class CommandLineFactory {
     private static final Map<CommandType, CommandLine> commandLines = new HashMap<>();
-
     static {
         commandLines.put(CommandType.CLIENT, new CommandLine(new ClientCommand()));
         commandLines.put(CommandType.PROXY, new CommandLine(new ProxyCommand()));

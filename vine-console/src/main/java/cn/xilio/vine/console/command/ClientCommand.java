@@ -3,6 +3,8 @@ package cn.xilio.vine.console.command;
 import cn.xilio.vine.console.ChannelHelper;
 import cn.xilio.vine.core.command.protocol.CommandMessage;
 import cn.xilio.vine.core.command.protocol.MethodType;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import picocli.CommandLine.Option;
@@ -43,15 +45,21 @@ public class ClientCommand implements Callable<Integer> {
         }
     }
 
-    @Command(name = "del", description = "删除指定客户端", mixinStandardHelpOptions = true)
+    @Command(name = "delete", description = "删除指定客户端", mixinStandardHelpOptions = true)
     static class ClientDeleteCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "客户端密钥")
         private String secretKey;
 
         @Override
         public Integer call() {
-            System.out.println("执行 client delete 命令，secretKey: " + secretKey);
-            // 这里添加删除客户端的逻辑
+            Channel channel = ChannelHelper.get();
+            if (channel.isActive()) {
+                CommandMessage message = new CommandMessage(MethodType.CLIENT_DELETE);
+                JsonObject json = new JsonObject();
+                json.addProperty("secretKey", secretKey);
+                message.setData(json);
+                channel.writeAndFlush(new TextWebSocketFrame(message.toJson()));
+            }
             return 0;
         }
     }
@@ -61,26 +69,39 @@ public class ClientCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "客户端密钥")
         private String secretKey;
 
-        @Option(names = "--name", description = "客户端名称", required = false)
+        @Option(names = {"-n", "--name"}, description = "客户端名称", required = true)
         private String name;
 
         @Override
         public Integer call() {
-            System.out.println("执行 client update 命令，secretKey: " + secretKey + ", name: " + name);
-            // 这里添加更新客户端的逻辑
-            return 0;
+            Channel channel = ChannelHelper.get();
+            if (channel.isActive()) {
+                CommandMessage message = new CommandMessage(MethodType.CLIENT_UPDATE);
+                JsonObject json = new JsonObject();
+                json.addProperty("secretKey", secretKey);
+                json.addProperty("name", name);
+                message.setData(json);
+                channel.writeAndFlush(new TextWebSocketFrame(message.toJson()));
+            }
+            return 1;
         }
     }
 
     @Command(name = "add", description = "添加客户端", mixinStandardHelpOptions = true)
     static class ClientAddCommand implements Callable<Integer> {
-        @Option(names = {"-n", "--name"}, description = "客户端名称", required = false)
+        @Option(names = {"-n", "--name"}, description = "客户端名称", required = true)
         private String name;
 
         @Override
         public Integer call() {
-            System.out.println("执行 client add 命令，name: " + name);
-            // 这里添加创建客户端的逻辑
+            Channel channel = ChannelHelper.get();
+            if (channel.isActive()) {
+                CommandMessage message = new CommandMessage(MethodType.CLIENT_ADD);
+                JsonObject json = new JsonObject();
+                json.addProperty("name", name);
+                message.setData(json);
+                channel.writeAndFlush(new TextWebSocketFrame(message.toJson()));
+            }
             return 0;
         }
     }

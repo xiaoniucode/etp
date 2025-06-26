@@ -33,6 +33,10 @@ public class CommandHandler extends SimpleChannelInboundHandler<TextWebSocketFra
             CommandMessage res = new CommandMessage(MethodType.PROXY_LIST);
             res.setData(gson.toJsonTree(proxies));
             ctx.writeAndFlush(new TextWebSocketFrame(res.toJson()));
+        }else if ("client_add".equalsIgnoreCase(method.name())) {
+            JsonElement json = message.getData();
+            JsonElement name = json.getAsJsonObject().get("name");
+            store.addClient(name.getAsString());
         }
     }
 }

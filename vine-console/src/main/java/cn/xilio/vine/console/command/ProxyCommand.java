@@ -3,6 +3,7 @@ package cn.xilio.vine.console.command;
 import cn.xilio.vine.console.ChannelHelper;
 import cn.xilio.vine.core.command.protocol.CommandMessage;
 import cn.xilio.vine.core.command.protocol.MethodType;
+import com.google.gson.JsonObject;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import picocli.CommandLine.Option;
@@ -28,10 +29,8 @@ public class ProxyCommand implements Callable<Integer> {
         return 0;
     }
 
-    @Command(name = "list", description = "查看所有代理列表")
+    @Command(name = "list", description = "查看所有代理列表", mixinStandardHelpOptions = true)
     static class ProxyListCommand implements Callable<Integer> {
-//        @Parameters(index = "0", description = "secretKey")
-//        private String secretKey;
         @Override
         public Integer call() {
             Channel channel = ChannelHelper.get();
@@ -43,16 +42,16 @@ public class ProxyCommand implements Callable<Integer> {
         }
     }
 
-    @Command(name = "add", description = "添加一个代理")
+    @Command(name = "add", description = "添加一个代理", mixinStandardHelpOptions = true)
     static class ProxyAddCommand implements Callable<Integer> {
-        @Option(names = "--name", description = "代理名称")
+        @Option(names = "--name", description = "代理名称(不填以本地端口命名)", required = false)
         private String name;
 
-        @Option(names = "--type", description = "代理类型", required = true)
+        @Option(names = "--type", description = "代理类型(TCP)", required = true)
         private String type;
 
-        @Option(names = "--localIP", description = "本地IP")
-        private String localIP = "127.0.0.1";
+        @Option(names = "--localIP", description = "本地IP(默认127.0.0.1)", required = false,defaultValue = "127.0.0.1")
+        private String localIP;
 
         @Option(names = "--localPort", description = "本地端口", required = true)
         private int localPort;
@@ -62,38 +61,53 @@ public class ProxyCommand implements Callable<Integer> {
 
         @Override
         public Integer call() {
-            System.out.printf("执行 proxy add 命令，name: %s, type: %s, localIP: %s, localPort: %d, remotePort: %d%n",
-                    name, type, localIP, localPort, remotePort);
-            // 这里添加创建代理的逻辑
+            Channel channel = ChannelHelper.get();
+            if (channel.isActive()) {
+                CommandMessage message = new CommandMessage(MethodType.PROXY_ADD);
+                JsonObject json = new JsonObject();
+                json.addProperty("name", name);
+                json.addProperty("type", type.toUpperCase());
+                json.addProperty("localIP", localIP);
+                json.addProperty("localPort", localPort);
+                json.addProperty("remotePort", remotePort);
+                message.setData(json);
+                channel.writeAndFlush(new TextWebSocketFrame(message.toJson()));
+            }
             return 0;
         }
     }
 
-    @Command(name = "delete", description = "删除指定代理",mixinStandardHelpOptions = true)
+    @Command(name = "delete", description = "删除指定代理", mixinStandardHelpOptions = true)
     static class ProxyDeleteCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "代理的 remotePort")
         private int remotePort;
 
         @Override
         public Integer call() {
-            System.out.println("执行 proxy delete 命令，remotePort: " + remotePort);
-            // 这里添加删除代理的逻辑
-            return 0;
+            Channel channel = ChannelHelper.get();
+            if (channel.isActive()) {
+                CommandMessage message = new CommandMessage(MethodType.PROXY_DELETE);
+                JsonObject json = new JsonObject();
+                json.addProperty("remotePort", remotePort);
+                message.setData(json);
+                channel.writeAndFlush(new TextWebSocketFrame(message.toJson()));
+            }
+            return 1;
         }
     }
 
-    @Command(name = "update", description = "更新代理信息")
+    @Command(name = "update", description = "更新代理信息", mixinStandardHelpOptions = true)
     static class ProxyUpdateCommand implements Callable<Integer> {
         @Parameters(index = "0", description = "代理的 remotePort")
         private int remotePort;
 
-        @Option(names = "--name", description = "代理名称")
+        @Option(names = "--name", description = "代理名称(不填以本地端口命名)")
         private String name;
 
-        @Option(names = "--type", description = "代理类型")
+        @Option(names = "--type", description = "代理类型(TCP)")
         private String type;
 
-        @Option(names = "--localIP", description = "本地IP")
+        @Option(names = "--localIP", description = "本地IP(默认127.0.0.1)",defaultValue = "127.0.0.1")
         private String localIP;
 
         @Option(names = "--localPort", description = "本地端口")
@@ -104,9 +118,19 @@ public class ProxyCommand implements Callable<Integer> {
 
         @Override
         public Integer call() {
-            System.out.printf("执行 proxy update 命令，remotePort: %d, name: %s, type: %s, localIP: %s, localPort: %s, newRemotePort: %s%n",
-                    remotePort, name, type, localIP, localPort, newRemotePort);
-            // 这里添加更新代理的逻辑
+            Channel channel = ChannelHelper.get();
+            if (channel.isActive()) {
+                CommandMessage message = new CommandMessage(MethodType.PROXY_UPDATE);
+                JsonObject json = new JsonObject();
+                json.addProperty("name", name);
+                json.addProperty("type", type.toUpperCase());
+                json.addProperty("localIP", localIP);
+                json.addProperty("localPort", localPort);
+                json.addProperty("remotePort", remotePort);
+                json.addProperty("newRemotePort", newRemotePort);
+                message.setData(json);
+                channel.writeAndFlush(new TextWebSocketFrame(message.toJson()));
+            }
             return 0;
         }
     }

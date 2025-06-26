@@ -2,6 +2,7 @@ package cn.xilio.vine.console.handler;
 
 import cn.xilio.vine.core.command.CommandMessageHandler;
 import cn.xilio.vine.core.command.model.ProxyModel;
+import cn.xilio.vine.core.command.protocol.MethodType;
 import cn.xilio.vine.core.command.view.ProxyTableView;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -15,7 +16,7 @@ public class ProxyListHandler implements CommandMessageHandler {
 
     @Override
     public String getMethod() {
-        return "proxy_list";
+        return MethodType.PROXY_LIST.name();
     }
 
     @Override

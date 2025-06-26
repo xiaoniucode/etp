@@ -1,7 +1,9 @@
 package cn.xilio.vine.console.handler;
 
+import cn.xilio.vine.console.CommandType;
 import cn.xilio.vine.core.command.CommandMessageHandler;
 import cn.xilio.vine.core.command.model.ClientModel;
+import cn.xilio.vine.core.command.protocol.MethodType;
 import cn.xilio.vine.core.command.view.ClientTableView;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -15,7 +17,7 @@ public class ClientListHandler implements CommandMessageHandler {
 
     @Override
     public String getMethod() {
-        return "client_list";
+        return MethodType.CLIENT_LIST.name();
     }
 
     @Override
