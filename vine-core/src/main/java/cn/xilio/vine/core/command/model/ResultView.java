@@ -22,11 +22,59 @@ public abstract class ResultView<T> {
      * @param data 处理后的数据
      */
     protected void write(String data) {
-        // 1. 标准化输入：去除行首尾空格，分割有效行
-        String[] lines = data.trim().split("\\s*\n\\s*");
-        for (int i = 0; i < lines.length; i++) {
-            // 2. 输出
-            System.out.println(lines[i]);
+        // 按行分割
+        String[] rows = data.split("\n");
+
+        // 获取表头（第一行）并确定列数
+        String[] headerCols = rows[0].trim().split("\\s+");
+        int numCols = headerCols.length;
+
+        // 存储每列的最大宽度
+        int[] maxWidths = new int[numCols];
+
+        // 初始化最大宽度为表头宽度
+        for (int j = 0; j < headerCols.length; j++) {
+            maxWidths[j] = headerCols[j].length();
+        }
+
+        // 存储数据行的列数据（跳过第二行的横线）
+        String[][] dataCols = new String[rows.length - 2][numCols];
+
+        // 第一遍：收集数据行并更新每列最大宽度
+        for (int i = 2; i < rows.length; i++) { // 从第三行开始（跳过表头和横线）
+            String[] cols = rows[i].trim().split("\\s+", numCols);
+            dataCols[i - 2] = cols;
+
+            // 更新每列最大宽度
+            for (int j = 0; j < cols.length; j++) {
+                maxWidths[j] = Math.max(maxWidths[j], cols[j].length());
+            }
+        }
+
+        // 输出表头
+        StringBuilder headerRow = new StringBuilder();
+        for (int j = 0; j < headerCols.length; j++) {
+            headerRow.append(String.format("%-" + (maxWidths[j] + 2) + "s", headerCols[j]));
+        }
+        System.out.println(headerRow.toString());
+
+        // 输出重新生成的连续横线分割行
+        StringBuilder separatorRow = new StringBuilder();
+        for (int width : maxWidths) {
+            // Java 8 不支持 String.repeat，使用循环生成横线
+            for (int i = 0; i < width + 2; i++) { // 包含2个空格的宽度
+                separatorRow.append("-");
+            }
+        }
+        System.out.println(separatorRow.toString());
+
+        // 输出数据行
+        for (String[] cols : dataCols) {
+            StringBuilder formattedRow = new StringBuilder();
+            for (int j = 0; j < cols.length; j++) {
+                formattedRow.append(String.format("%-" + (maxWidths[j] + 2) + "s", cols[j]));
+            }
+            System.out.println(formattedRow.toString());
         }
 
     }

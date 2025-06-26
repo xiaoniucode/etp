@@ -20,14 +20,14 @@ public class ClientTableView extends ResultView<List<ClientModel>> {
     public void draw(List<ClientModel> result) {
         TableElement table = new TableElement();
         table.row(true,
-                label("name\t").style(Decoration.bold.fg(Color.red)),
-                label("type\t").style(Decoration.bold.fg(Color.yellow)),
-                label("status\t").style(Decoration.bold.fg(Color.blue))
+                label("Name ") ,
+                label("SecretKey ") ,
+                label("Status ")
         );
         for (ClientModel model : result) {
             String status = getStatusLabel(model.getStatus());
             RowElement rowElement = new RowElement(false);
-            rowElement.add(model.getName() + "\t", model.getSecretKey() + "\t" + status + "\t");
+            rowElement.add(model.getName() + " ", model.getSecretKey() + " " + status);
             table.add(rowElement);
         }
         write(RenderUtil.render(table));
