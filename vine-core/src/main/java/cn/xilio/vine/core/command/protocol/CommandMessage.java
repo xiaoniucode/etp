@@ -8,6 +8,9 @@ import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.List;
 
+/**
+ * 命令消息协议
+ */
 public class CommandMessage implements Serializable {
     private MethodType method;
     private JsonElement data;
@@ -32,12 +35,10 @@ public class CommandMessage implements Serializable {
         this.data = data;
     }
 
-
-
-
     public String toJson() {
         return new Gson().toJson(this);
     }
+
     // JSON 反序列化
     public static CommandMessage fromJson(String json) {
         return new Gson().fromJson(json, CommandMessage.class);

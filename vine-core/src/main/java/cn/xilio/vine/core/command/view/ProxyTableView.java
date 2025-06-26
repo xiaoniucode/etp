@@ -19,26 +19,26 @@ public class ProxyTableView extends ResultView<List<ProxyModel>> {
         TableElement table = new TableElement();
         // 表头仅包含模型实际字段
         table.row(true,
-                label("Name").style(Decoration.bold.fg(Color.red)),
-                label("Type").style(Decoration.bold.fg(Color.yellow)),
-                label("Local IP").style(Decoration.bold.fg(Color.green)),
-                label("Local Port").style(Decoration.bold.fg(Color.cyan)),
-                label("Remote Port").style(Decoration.bold.fg(Color.magenta)),
-                label("Secret Key").style(Decoration.bold.fg(Color.white))
+                label("Name "),
+                label("Type "),
+                label("LocalIP "),
+                label("LocalPort "),
+                label("RemotePort "),
+                label("SecretKey ")
         );
 
         for (ProxyModel model : result) {
             RowElement rowElement = new RowElement(false); // 显式创建行对象
             rowElement.add(
-                    model.getName() ,
-                    (model.getType() != null ? model.getType().name() : "N/A") ,
-                    model.getLocalIP() ,
-                    (model.getLocalPort() != null ? model.getLocalPort().toString() : "N/A") ,
-                    (model.getRemotePort() != null ? model.getRemotePort().toString() : "N/A") ,
-                    model.getSecretKey()
+                    model.getName() + " ",
+                    model.getType().name() + " ",
+                    model.getLocalIP() + " ",
+                    model.getLocalPort().toString() + " ",
+                    model.getRemotePort().toString() + " ",
+                    model.getSecretKey() + " "
             );
             table.add(rowElement); // 添加行到表格
         }
-        write(RenderUtil.render(table,500));
+        write(RenderUtil.render(table));
     }
 }
