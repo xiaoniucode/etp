@@ -56,17 +56,17 @@ public abstract class ResultView<T> {
         for (int j = 0; j < headerCols.length; j++) {
             headerRow.append(String.format("%-" + (maxWidths[j] + 2) + "s", headerCols[j]));
         }
-        System.out.println(headerRow.toString());
+        System.out.println(headerRow);
 
         // 输出重新生成的连续横线分割行
         StringBuilder separatorRow = new StringBuilder();
         for (int width : maxWidths) {
-            // Java 8 不支持 String.repeat，使用循环生成横线
+             //使用循环生成横线
             for (int i = 0; i < width + 2; i++) { // 包含2个空格的宽度
                 separatorRow.append("-");
             }
         }
-        System.out.println(separatorRow.toString());
+        System.out.println(separatorRow);
 
         // 输出数据行
         for (String[] cols : dataCols) {
@@ -74,7 +74,7 @@ public abstract class ResultView<T> {
             for (int j = 0; j < cols.length; j++) {
                 formattedRow.append(String.format("%-" + (maxWidths[j] + 2) + "s", cols[j]));
             }
-            System.out.println(formattedRow.toString());
+            System.out.println(formattedRow);
         }
 
     }

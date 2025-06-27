@@ -36,7 +36,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<TextWebSocketFra
         }else if ("client_add".equalsIgnoreCase(method.name())) {
             JsonElement json = message.getData();
             JsonElement name = json.getAsJsonObject().get("name");
-            store.addClient(name.getAsString());
+            store.addClient(null);
         }
     }
 }
