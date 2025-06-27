@@ -21,10 +21,10 @@
 vine is an Intranet penetration tool used to expose Intranet services to the public network, provide external services, reduce the cost of cloud servers, and support the penetration of protocols such as TCP and HTTP.
 
 ## Features
--Supports protocols such as TCP, UDP, HTTP, HTTPS, etc
--Secure encrypted communication
--Interactive Terminal Management
--Multi client support
+- Supports protocols such as TCP, UDP, HTTP, HTTPS, etc
+- Secure encrypted communication
+- Interactive Terminal Management
+- Multi client support
 ## Getting Started
 
 The installation of a proxy server can be done through methods such as nohup, docker, or defining services. The following is a brief introduction to the startup and usage of services.
