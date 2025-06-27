@@ -14,12 +14,8 @@ import java.util.stream.Collectors;
  */
 
 public class FileProxyRuleStore implements ProxyRuleStore {
-
     @Override
-    public void addClient(String name) {
-        String uuid = UUID.randomUUID().toString();
-        String secretKey = uuid.replaceAll("-", "");
-
+    public void addClient(ClientModel clientModel) {
 
     }
 
@@ -33,6 +29,21 @@ public class FileProxyRuleStore implements ProxyRuleStore {
             dto.setSecretKey(client.getSecretKey());
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean deleteClient(String secretKey) {
+        return false;
+    }
+
+    @Override
+    public void updateClient(ProxyModel proxyModel) {
+
+    }
+
+    @Override
+    public void addProxy(ProxyModel proxyModel) {
+
     }
 
     @Override
@@ -53,4 +64,15 @@ public class FileProxyRuleStore implements ProxyRuleStore {
         }
         return res;
     }
+
+    @Override
+    public boolean deleteProxy(int remotePort) {
+        return false;
+    }
+
+    @Override
+    public void updateProxy(ProxyModel proxyModel) {
+
+    }
+
 }

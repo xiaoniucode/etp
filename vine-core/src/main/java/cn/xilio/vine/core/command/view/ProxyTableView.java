@@ -1,10 +1,7 @@
 package cn.xilio.vine.core.command.view;
 
-import cn.xilio.vine.core.command.model.ClientModel;
 import cn.xilio.vine.core.command.model.ProxyModel;
 import cn.xilio.vine.core.command.model.ResultView;
-import com.taobao.text.Color;
-import com.taobao.text.Decoration;
 import com.taobao.text.ui.RowElement;
 import com.taobao.text.ui.TableElement;
 import com.taobao.text.util.RenderUtil;
