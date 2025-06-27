@@ -72,6 +72,8 @@ secretKey="4b0063baa5ae47c2910fc25265aae4b9" #认证密钥
 ```shell
 java -jar vine-client-1.0.jar -c conf.toml
 ```
+## 联系
+Email：xilio1024@gmail.com
 ## 项目趋势
 
 <p align="center">

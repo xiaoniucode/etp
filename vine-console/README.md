@@ -37,6 +37,13 @@ Commands:
 ```shell
 client list
 ```
+```shell
+admin $ client list
+Name  SecretKey                         Status  
+------------------------------------------------
+客户端1  4b0063baa5ae47c2910fc25265aae4b9  在线      
+客户端2  7c0084cbb6bf58d3021fd36376bbf5c0  在线 
+```
 
 ### 删除某一个客户端
 

@@ -72,6 +72,8 @@ Start the client:
 ```shell
 java -jar vine-client-1.0.jar -c conf.toml
 ```
+## Contact
+Email：xilio1024@gmail.com
 ## Project Trends
 
 <p align="center">
