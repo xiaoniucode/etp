@@ -17,10 +17,15 @@
 [![Last Commit](https://img.shields.io/github/last-commit/xilio-dev/vine?style=for-the-badge)](https://github.com/xilio-dev/vine/commits)
 
 [README](README.md) | [中文文档](README_ZH.md)
-## Introduce
+## Overview
 vine is an Intranet penetration tool used to expose Intranet services to the public network, provide external services, reduce the cost of cloud servers, and support the penetration of protocols such as TCP and HTTP.
 
-## Install
+## Features
+-Supports protocols such as TCP, UDP, HTTP, HTTPS, etc
+-Secure encrypted communication
+-Interactive Terminal Management
+-Multi client support
+## Getting Started
 
 The installation of a proxy server can be done through methods such as nohup, docker, or defining services. The following is a brief introduction to the startup and usage of services.
 
@@ -72,6 +77,8 @@ Start the client:
 ```shell
 java -jar vine-client-1.0.jar -c conf.toml
 ```
+## License
+
 ## Contact
 Email：xilio1024@gmail.com
 ## Project Trends

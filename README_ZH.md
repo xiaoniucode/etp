@@ -20,6 +20,11 @@
 ## 介绍
   vine 是一个内网穿透工具，用于将内网服务暴露到公网，提供外部服务，减少云服务器成本，支持TCP、HTTP等协议的穿透.
 
+## 功能特性
+- 支持TCP、UDP、HTTP、HTTPS等协议
+- 安全加密通信
+- 交互式终端管理
+- 多客户端支持
 ## 安装
 
 代理服务器的安装可以采用nohup、docker、定义服务等方式安装，下文简单介绍一下服务的启动和使用。
@@ -72,6 +77,9 @@ secretKey="4b0063baa5ae47c2910fc25265aae4b9" #认证密钥
 ```shell
 java -jar vine-client-1.0.jar -c conf.toml
 ```
+
+## 开源许可
+
 ## 联系
 Email：xilio1024@gmail.com
 ## 项目趋势
