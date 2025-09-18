@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.xilio</groupId>
-    <artifactId>vine</artifactId>
+    <artifactId>etp</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
     <properties>
@@ -16,11 +16,10 @@
         <springboot.version>2.7.6</springboot.version>
     </properties>
     <modules>
-        <module>vine-core</module>
-        <module>vine-common</module>
-        <module>vine-server</module>
-        <module>vine-client</module>
-        <module>vine-console</module>
+        <module>etp-core</module>
+        <module>etp-common</module>
+        <module>etp-server</module>
+        <module>etp-client</module>
     </modules>
 
     <dependencyManagement>
@@ -54,22 +53,22 @@
             </dependency>
             <dependency>
                 <groupId>cn.xilio</groupId>
-                <artifactId>vine-core</artifactId>
+                <artifactId>etp-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.xilio</groupId>
-                <artifactId>vine-common</artifactId>
+                <artifactId>etp-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.xilio</groupId>
-                <artifactId>vine-client</artifactId>
+                <artifactId>etp-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.xilio</groupId>
-                <artifactId>vine-server</artifactId>
+                <artifactId>etp-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
