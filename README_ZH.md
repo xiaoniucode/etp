@@ -1,24 +1,18 @@
 ```text
-
- ___      ___  __    _____  ___    _______  
-|"  \    /"  ||" \  (\"   \|"  \  /"     "| 
- \   \  //  / ||  | |.\\   \    |(: ______) 
-  \\  \/. ./  |:  | |: \.   \\  | \/    |   
-   \.    //   |.  | |.  \    \. | // ___)_  
-    \\   /    /\  |\|    \    \ |(:      "| 
-     \__/    (__\_|_)\___|\____\) \_______) 
-                                            
-
+▗▄▄▄▖▗▄▄▄▖▗▄▄▖ 
+▐▌     █  ▐▌ ▐▌
+▐▛▀▀▘  █  ▐▛▀▘ 
+▐▙▄▄▖  █  ▐▌                                
 ```
-[![GitHub Stars](https://img.shields.io/github/stars/xilio-dev/vine?style=for-the-badge&logo=github)](https://github.com/xilio-dev/vine)
-[![GitHub Forks](https://img.shields.io/github/forks/xilio-dev/vine?style=for-the-badge&logo=github)](https://github.com/xilio-dev/vine)
-[![Open Issues](https://img.shields.io/github/issues/xilio-dev/vine?style=for-the-badge)](https://github.com/xilio-dev/vine/issues)
-[![License](https://img.shields.io/github/license/xilio-dev/vine?style=for-the-badge)](https://github.com/xilio-dev/vine/blob/main/LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/xilio-dev/vine?style=for-the-badge)](https://github.com/xilio-dev/vine/commits)
+[![GitHub Stars](https://img.shields.io/github/stars/xilio-dev/etp?style=for-the-badge&logo=github)](https://github.com/xilio-dev/etp)
+[![GitHub Forks](https://img.shields.io/github/forks/xilio-dev/etp?style=for-the-badge&logo=github)](https://github.com/xilio-dev/etp)
+[![Open Issues](https://img.shields.io/github/issues/xilio-dev/etp?style=for-the-badge)](https://github.com/xilio-dev/etp/issues)
+[![License](https://img.shields.io/github/license/xilio-dev/etp?style=for-the-badge)](https://github.com/xilio-dev/etp/blob/main/LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/xilio-dev/etp?style=for-the-badge)](https://github.com/xilio-dev/etp/commits)
 
 [README](README.md) | [中文文档](README_ZH.md)
 ## 介绍
-  vine 是一个内网穿透工具，用于将内网服务暴露到公网，提供外部服务，减少云服务器成本，支持TCP、HTTP等协议的穿透.
+  etp 是一个内网穿透工具，用于将内网服务暴露到公网，提供外部服务，减少云服务器成本，支持TCP、HTTP等协议的穿透.
 
 ## 功能特性
 - 支持TCP、UDP、HTTP、HTTPS等协议
@@ -33,7 +27,7 @@
 ⚠️ 当前版本不支持管理界面，需手动配置代理规则
 修改application.yml也可以采用默认的，需要保证proxy-path目录有访问权限。
 ```yaml
-vine:
+etp:
   bind-port: 8523 #隧道监听端口，用于与客户端进行通信
   #代理规则配置文件存储地址,需要自己配置
   proxy-path: /home/proxy.toml
@@ -62,7 +56,7 @@ remotePort = 6380
 ```
 启动服务端：
 ```shell
-java -jar vine-server-1.0.jar
+java -jar etp-server-1.0.jar
 ```
 ### 客户端
 > 客户端支持启动多个，每个客户端通过secretKey密钥进行标识。
@@ -75,7 +69,7 @@ secretKey="4b0063baa5ae47c2910fc25265aae4b9" #认证密钥
 ```
 启动客户端：
 ```shell
-java -jar vine-client-1.0.jar -c conf.toml
+java -jar etp-client-1.0.jar -c conf.toml
 ```
 
 ## 开源许可
@@ -85,8 +79,8 @@ Email：xilio1024@gmail.com
 ## 项目趋势
 
 <p align="center">
-  <a href="https://github.com/xilio-dev/vine/stargazers">
-    <img src="https://api.star-history.com/svg?repos=xilio-dev/vine&type=Date" alt="Star History">
+  <a href="https://github.com/xilio-dev/etp/stargazers">
+    <img src="https://api.star-history.com/svg?repos=xilio-dev/etp&type=Date" alt="Star History">
   </a>
 </p>
 
