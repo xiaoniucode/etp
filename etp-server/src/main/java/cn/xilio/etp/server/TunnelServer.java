@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class TunnelServer implements Lifecycle {
     private final Logger logger = LoggerFactory.getLogger(TunnelServer.class);
     private boolean ssl;
-    private String host;
+    private String host="127.0.0.1";
     private int port;
     private EventLoopGroup tunnelBossGroup;
     private EventLoopGroup tunnelWorkerGroup;
@@ -87,9 +87,7 @@ public class TunnelServer implements Lifecycle {
             for (Integer port : ports) {
                 serverBootstrap.bind(port).get();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 

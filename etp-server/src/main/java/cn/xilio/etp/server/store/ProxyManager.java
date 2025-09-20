@@ -14,7 +14,6 @@ import java.util.*;
 
 /**
  * 代理规则管理器
- *
  */
 public class ProxyManager {
     private static final Logger logger = LoggerFactory.getLogger(ProxyManager.class);
@@ -26,6 +25,8 @@ public class ProxyManager {
      * 默认的代理配置信息存储路径，如果用户没有指定则采用默认的。
      */
     private static final String DEFAULT_PROXY_PATH = System.getProperty("user.home") + "/etp/" + "proxy.toml";
+
+    private static Integer bindPort;
     /**
      * 存储客户端信息，包括客户端的服务端口配置信息
      */
@@ -38,7 +39,7 @@ public class ProxyManager {
     /**
      * 客户端内网服务端口号列表 格式：[secretKey1:port1,secretKey2:port2]，用于用过客户端密钥获取客户端内网服务所有端口
      */
-    private  static volatile Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<String, List<Integer>>();
+    private static volatile Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<String, List<Integer>>();
 
     private ProxyManager() {
     }
@@ -60,6 +61,9 @@ public class ProxyManager {
         clients = new ArrayList<>();
         clientSecretKeys = new HashSet<>();
         Toml toml = TomlUtils.readToml(proxyPath);
+        if (toml.contains("bindPort")) {
+            bindPort = toml.getLong("bindPort").intValue();
+        }
         for (Toml client : toml.getTables("clients")) {
             String name = client.getString("name");
             Long status = client.getLong("status");
@@ -143,7 +147,11 @@ public class ProxyManager {
         return portLocalServerMapping.get(publicNetworkPort);
     }
 
-    public   List<ClientInfo> getClients() {
+    public List<ClientInfo> getClients() {
         return clients;
+    }
+
+    public   Integer getBindPort() {
+        return bindPort;
     }
 }
