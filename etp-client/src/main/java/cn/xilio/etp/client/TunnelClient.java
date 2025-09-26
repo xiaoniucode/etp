@@ -27,11 +27,11 @@ public class TunnelClient implements Lifecycle {
     /**
      * 最大重试次数 超过以后关闭workerGroup
      */
-    private int maxRetries = 10;
+    private int maxRetries = 5;
     /**
      * 最大延迟时间 如果超过了则取maxDelaySec为最大延迟时间 单位：秒
      */
-    private long maxDelaySec = 10;
+    private long maxDelaySec = 5;
     /**
      * 用于记录当前重试次数
      */

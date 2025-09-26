@@ -5,6 +5,7 @@ import cn.xilio.etp.core.EtpConstants;
 import cn.xilio.etp.core.protocol.TunnelMessage;
 import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
@@ -13,26 +14,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
 
-/**
- *
- */
 public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final Logger logger = LoggerFactory.getLogger(RealChannelHandler.class);
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) {
         Channel tunnelChannel = ctx.channel().attr(EtpConstants.NEXT_CHANNEL).get();
         if (ObjectUtils.isEmpty(tunnelChannel)) {
             logger.error("tunnelChannel is null");
             return;
         }
-        byte[] dataBytes = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(dataBytes);
-
+        ByteString payload = ByteString.copyFrom(byteBuf.nioBuffer());
         TunnelMessage.Message message = TunnelMessage.Message
                 .newBuilder()
                 .setType(TunnelMessage.Message.Type.TRANSFER)
-                .setPayload(ByteString.copyFrom(dataBytes))
+                .setPayload(payload)
                 .build();
         tunnelChannel.writeAndFlush(message);
     }

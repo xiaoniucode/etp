@@ -21,9 +21,9 @@ public class ConnectHandler extends AbstractMessageHandler {
         String ip = split[0];
         int port = Integer.parseInt(split[1]);
 
-        Bootstrap realBootstrap = ctx.channel().attr(EtpConstants.REAL_BOOTSTRAP).get();
+        Bootstrap realBootstrap = controlTunnelChannel.attr(EtpConstants.REAL_BOOTSTRAP).get();
         Bootstrap tunnelBootstrap = ctx.channel().attr(EtpConstants.TUNNEL_BOOTSTRAP).get();
-        realBootstrap.connect(ip, port).addListener((ChannelFutureListener) cf -> {
+        realBootstrap.connect("localhost", port).addListener((ChannelFutureListener) cf -> {
             if (cf.isSuccess()) {
                 Channel realChannel = cf.channel();
                 //与本地mysql建立连接后，先不读取数据，等与远程建立连接后再读取
