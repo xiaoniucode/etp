@@ -8,6 +8,7 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 public class TunnelMessageDecoder extends LengthFieldBasedFrameDecoder {
     private static final byte HEADER_SIZE = 4;
     private static final int TYPE_SIZE = 1;
+    private static final int PORT_SIZE=4;
     private static final int EXT_SIZE = 1;
     private static final int SESSION_ID_SIZE = 8;
 
@@ -35,13 +36,15 @@ public class TunnelMessageDecoder extends LengthFieldBasedFrameDecoder {
 
         long sessionId = in.readLong();
         tunnelMessage.setSessionId(sessionId);
+        int port = in.readInt();
+        tunnelMessage.setPort(port);
 
         byte extLength = in.readByte();
         byte[] extBytes = new byte[extLength];
         in.readBytes(extBytes);
         tunnelMessage.setExt(new String(extBytes));
 
-        byte[] data = new byte[frameLength - TYPE_SIZE - SESSION_ID_SIZE - EXT_SIZE - extLength];
+        byte[] data = new byte[frameLength - TYPE_SIZE - SESSION_ID_SIZE -PORT_SIZE- EXT_SIZE - extLength];
         in.readBytes(data);
         tunnelMessage.setPayload(ByteString.copyFrom(data));
         in.release();

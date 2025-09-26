@@ -11,7 +11,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <netty.version>4.2.1.Final</netty.version>
-        <protobuf.version>4.31.1</protobuf.version>
+        <protobuf.version>4.32.1</protobuf.version>
         <picocli.version>4.7.7</picocli.version>
         <springboot.version>2.7.6</springboot.version>
     </properties>

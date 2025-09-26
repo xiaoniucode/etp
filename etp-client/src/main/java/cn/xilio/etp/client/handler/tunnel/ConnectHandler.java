@@ -15,15 +15,10 @@ public class ConnectHandler extends AbstractMessageHandler {
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
         Channel controlTunnelChannel = ctx.channel();
         long sessionId = msg.getSessionId();
-        ByteString data = msg.getPayload();
-        String lan = data.toStringUtf8();
-        String[] split = lan.split(":");
-        String ip = split[0];
-        int port = Integer.parseInt(split[1]);
-
+        int port = msg.getPort();
         Bootstrap realBootstrap = controlTunnelChannel.attr(EtpConstants.REAL_BOOTSTRAP).get();
         Bootstrap tunnelBootstrap = ctx.channel().attr(EtpConstants.TUNNEL_BOOTSTRAP).get();
-        realBootstrap.connect("localhost", port).addListener((ChannelFutureListener) cf -> {
+        realBootstrap.connect("127.0.0.1", port).addListener((ChannelFutureListener) cf -> {
             if (cf.isSuccess()) {
                 Channel realChannel = cf.channel();
                 //与本地mysql建立连接后，先不读取数据，等与远程建立连接后再读取

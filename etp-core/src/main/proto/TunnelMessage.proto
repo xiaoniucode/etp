@@ -14,5 +14,6 @@ message Message {
   Type type = 1;
   int64 session_id = 2;
   bytes payload = 3;
-  string ext = 4;
+  uint32 port=4;
+  string ext = 5;
 }

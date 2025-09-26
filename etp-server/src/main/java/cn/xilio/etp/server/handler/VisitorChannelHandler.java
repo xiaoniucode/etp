@@ -50,7 +50,7 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
             TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                     .setType(TunnelMessage.Message.Type.CONNECT)
                     .setSessionId(nextSessionId)
-                    .setPayload(ByteString.copyFrom((serverInfo.getLocalIp() + ":" + serverInfo.getLocalPort()).getBytes()))
+                    .setPort(serverInfo.getLocalPort())
                     .build();
             controllTurnnelChannel.writeAndFlush(tunnelMessage);
         }
