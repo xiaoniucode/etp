@@ -23,7 +23,6 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
-        //获取数据隧道-通道
         Channel dataTunnelChannel = ctx.channel().attr(EtpConstants.NEXT_CHANNEL).get();
         ByteString payload = ByteString.copyFrom(buf.nioBuffer());
         TunnelMessage.Message message = TunnelMessage.Message.newBuilder()

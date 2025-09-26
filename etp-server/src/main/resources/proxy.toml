@@ -1,7 +1,7 @@
 bindPort=9527
 [[clients]]
-name = "客户端1"
-secretKey = "4b0063baa5ae47c2910fc25265aae4b9" #客户端秘钥
+name = "windows"
+secretKey = "4b0063baa5ae47c2910fc25265aae4b9" #客户端秘钥，自定义
 status = 1 #客户端状态 1:在线 0:离线
 
 [[clients.proxies]]
@@ -24,7 +24,7 @@ remotePort = 8085
 
 #第二个客户端
 [[clients]]
-name = "客户端2"
+name = "MAC"
 secretKey = "7c0084cbb6bf58d3021fd36376bbf5c0"
 status = 1
 
