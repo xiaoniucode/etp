@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TunnelClient implements Lifecycle {
-    private boolean ssl;
     private String serverAddr;
     private int serverPort;
     private String secretKey;
@@ -65,10 +64,6 @@ public class TunnelClient implements Lifecycle {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
-//                        if(ssl){
-//                            SslContext sslCtx = ClientSslContextFactory.buildWithJks();
-//                            sc.pipeline().addLast("ssl",sslCtx.newHandler(sc.alloc()));
-//                        }
                         sc.pipeline()
                                 .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 4, 0, 0))
                                 .addLast(new TunnelMessageEncoder())
@@ -96,7 +91,7 @@ public class TunnelClient implements Lifecycle {
                         .build();
                 future.channel().writeAndFlush(message);
                 retryCount.set(0); // 重置重试计数器
-                System.out.println("成功连接到代理服务器～");
+                System.out.println("连接成功");
             } else {
                 //重新连接
                 scheduleReconnect();
@@ -115,10 +110,10 @@ public class TunnelClient implements Lifecycle {
         //指数计算，如果超过了最大延迟时间，则取最大延迟时间
         // long delay = Math.min((1L << retries), maxDelaySec);
         long delay = calculateDelay();//指数退避 + 随机抖动(±30%)
-        System.out.printf("第%d次重连将在%d秒后执行...%n", retries + 1, delay);
+        System.out.printf("[连接失败] 第%d次重连将在%d秒后执行%n", retries + 1, delay);
         // 调度重连任务
         tunnelWorkerGroup.schedule(() -> {
-            System.out.println("执行重连...");
+            System.out.println("重连中...");
             connectTunnelServer();
         }, delay, TimeUnit.SECONDS);
     }
@@ -142,14 +137,6 @@ public class TunnelClient implements Lifecycle {
     @Override
     public void stop() {
         tunnelWorkerGroup.shutdownGracefully();
-    }
-
-    public boolean isSsl() {
-        return ssl;
-    }
-
-    public void setSsl(boolean ssl) {
-        this.ssl = ssl;
     }
 
     public String getServerAddr() {
