@@ -5,6 +5,8 @@ import cn.xilio.etp.common.EtpBanner;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TunnelClientStartup {
     public static void main(String[] args) {
@@ -18,6 +20,7 @@ public class TunnelClientStartup {
         tunnelClient.setSecretKey(Config.getSecretKey());
         tunnelClient.start();
         EtpBanner.printLogo();/*打印logo*/
+
     }
 
     private static boolean checkArgs(String[] args) {

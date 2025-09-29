@@ -36,6 +36,7 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("用户开始连接");
         Channel visitorChannel = ctx.channel();
         InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
         Channel controllTurnnelChannel = ChannelManager.getControlTunnelChannel(sa.getPort());

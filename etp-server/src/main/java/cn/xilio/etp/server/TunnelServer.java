@@ -17,6 +17,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.ssl.SslContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -28,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class TunnelServer implements Lifecycle {
     private final Logger logger = LoggerFactory.getLogger(TunnelServer.class);
     private boolean ssl;
-    private String host="127.0.0.1";
+    private String host="0.0.0.0";
     private int port;
     private EventLoopGroup tunnelBossGroup;
     private EventLoopGroup tunnelWorkerGroup;
@@ -44,7 +45,11 @@ public class TunnelServer implements Lifecycle {
                     .channel(config.serverChannelClass)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel sc) throws Exception {
+                        protected void initChannel(SocketChannel sc) {
+//                            if(ssl){
+//                                SslContext sslCtx = SslContextFactory.createServerSslContext();
+//                                sc.pipeline().addLast(sslCtx.newHandler(sc.alloc()));
+//                            }
                             sc.pipeline()
                                     .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 4, 0, 0))
                                     .addLast(new TunnelMessageEncoder())

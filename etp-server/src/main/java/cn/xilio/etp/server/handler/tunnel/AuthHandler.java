@@ -17,7 +17,6 @@ import java.util.List;
  */
 public class AuthHandler extends AbstractMessageHandler {
     private final Logger logger = LoggerFactory.getLogger(AuthHandler.class);
-
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
         String secretKey = msg.getExt();//获取客户端传过来的认证密钥

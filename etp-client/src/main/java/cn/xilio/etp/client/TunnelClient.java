@@ -11,6 +11,7 @@ import cn.xilio.etp.core.protocol.TunnelMessageEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.ssl.SslContext;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -64,6 +65,10 @@ public class TunnelClient implements Lifecycle {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
+//                        if(ssl){
+//                            SslContext sslCtx = ClientSslContextFactory.buildWithJks();
+//                            sc.pipeline().addLast("ssl",sslCtx.newHandler(sc.alloc()));
+//                        }
                         sc.pipeline()
                                 .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 4, 0, 0))
                                 .addLast(new TunnelMessageEncoder())
