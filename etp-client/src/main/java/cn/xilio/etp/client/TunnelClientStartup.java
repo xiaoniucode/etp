@@ -19,8 +19,6 @@ public class TunnelClientStartup {
         tunnelClient.setServerPort(Config.getServerPort());
         tunnelClient.setSecretKey(Config.getSecretKey());
         tunnelClient.start();
-        EtpBanner.printLogo();/*打印logo*/
-
     }
 
     private static boolean checkArgs(String[] args) {

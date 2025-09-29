@@ -19,7 +19,8 @@ public class AuthHandler extends AbstractMessageHandler {
     private final Logger logger = LoggerFactory.getLogger(AuthHandler.class);
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
-        String secretKey = msg.getExt();//获取客户端传过来的认证密钥
+        //获取客户端传过来的认证密钥
+        String secretKey = msg.getExt();
         //如果系统中不存在客户端的密钥，说明该客户端没有注册或者密钥错误
         if (!ProxyManager.getInstance().isClientExist(secretKey)) {
             logger.info("认证失败，客户端不存在！");
