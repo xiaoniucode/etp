@@ -17,6 +17,7 @@ public class TunnelClientStartup {
         tunnelClient.setServerPort(Config.getServerPort());
         tunnelClient.setSecretKey(Config.getSecretKey());
         tunnelClient.start();
+
     }
     private static void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

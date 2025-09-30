@@ -12,16 +12,15 @@
 - 高性能数据传输
 - 支持多客户端
 - 轻量级，使用简单
-## 安装
-代理服务器的安装可以采用nohup、docker、定义服务等方式安装，下文简单介绍一下服务的启动和使用。
-### 服务端etps配置
->etps.toml
+## 快速开始
+确保服务器和客户端都安装JDK8或以上版本
+### 服务端
+>编辑配置文件 etps.toml
 ```toml 
 bindPort=9527
 [[clients]]
 name = "Mac"
 secretKey = "4b0063baa5ae47c2910fc25265aae4b9"
-status = 1 
 
 [[clients.proxies]]
 name = "mysql"
@@ -35,19 +34,19 @@ type = "tcp"
 localPort = 6379
 remotePort = 6380
 ```
-启动服务端
+在公网服务器启动服务端
 ```shell
 java -jar etps.jar -c etps.toml
 ```
 ### 客户端etpc配置
->etpc.toml 
+>编辑配置文件 etpc.toml 
 
 ```toml
 serverAddr = "127.0.0.1"
 serverPort=9527
 secretKey="4b0063baa5ae47c2910fc25265aae4b9"
 ```
-启动客户端
+在内网电脑启动客户端
 ```shell
 java -jar etpc.jar -c etpc.toml
 ```

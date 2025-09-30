@@ -68,7 +68,6 @@ public class ProxyManager {
             //创建一个客户端
             ClientInfo c = new ClientInfo();
             c.setName(name);
-            c.setStatus(status.intValue());
             c.setSecretKey(secretKey);
 
             List<ProxyMapping> proxyMappings = new ArrayList<>();

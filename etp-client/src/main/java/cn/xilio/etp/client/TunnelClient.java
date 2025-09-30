@@ -2,6 +2,7 @@ package cn.xilio.etp.client;
 
 import cn.xilio.etp.client.handler.internal.RealChannelHandler;
 import cn.xilio.etp.client.handler.tunnel.TunnelChannelHandler;
+import cn.xilio.etp.common.ansi.AnsiLog;
 import cn.xilio.etp.core.EventLoopUtils;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.protocol.TunnelMessage;
@@ -91,7 +92,7 @@ public class TunnelClient implements Lifecycle {
                         .build();
                 future.channel().writeAndFlush(message);
                 retryCount.set(0); // 重置重试计数器
-                System.out.println("连接成功");
+                AnsiLog.info("etp客户端启动成功");
             } else {
                 //重新连接
                 scheduleReconnect();
