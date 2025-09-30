@@ -11,23 +11,16 @@ import cn.xilio.etp.server.handler.VisitorChannelHandler;
 import cn.xilio.etp.server.store.ProxyManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
-
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class TunnelServer implements Lifecycle {
-    private final Logger logger = LoggerFactory.getLogger(TunnelServer.class);
-    private String host="0.0.0.0";
+    private String host = "0.0.0.0";
     private int port;
     private EventLoopGroup tunnelBossGroup;
     private EventLoopGroup tunnelWorkerGroup;
@@ -51,7 +44,7 @@ public class TunnelServer implements Lifecycle {
                                     .addLast(new TunnelChannelHandler());
                         }
                     });
-            if (StringUtils.hasText(host)) {
+            if (host != null) {
                 serverBootstrap.bind(host, port).sync();
             } else {
                 serverBootstrap.bind(port).sync();
@@ -64,7 +57,6 @@ public class TunnelServer implements Lifecycle {
 
     @Override
     public void stop() {
-        logger.info("关闭TunnelServer|释放资源");
         tunnelBossGroup.shutdownGracefully();
         tunnelWorkerGroup.shutdownGracefully();
     }
@@ -91,6 +83,7 @@ public class TunnelServer implements Lifecycle {
         }
 
     }
+
     public String getHost() {
         return host;
     }

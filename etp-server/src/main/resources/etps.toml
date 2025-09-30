@@ -21,21 +21,3 @@ name = "web"
 type = "tcp"
 localPort = 8080
 remotePort = 8085
-
-#第二个客户端
-[[clients]]
-name = "MAC"
-secretKey = "7c0084cbb6bf58d3021fd36376bbf5c0"
-status = 1
-
-[[clients.proxies]]
-name = "postgre"
-type = "tcp"
-localPort = 5432
-remotePort = 5433
-
-[[clients.proxies]]
-name = "http"
-type = "tcp"
-localPort = 8080
-remotePort = 8081

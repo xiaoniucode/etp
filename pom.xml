@@ -13,7 +13,6 @@
         <netty.version>4.2.1.Final</netty.version>
         <protobuf.version>4.32.1</protobuf.version>
         <picocli.version>4.7.7</picocli.version>
-        <springboot.version>2.7.6</springboot.version>
     </properties>
     <modules>
         <module>etp-core</module>
@@ -24,13 +23,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${springboot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>info.picocli</groupId>
                 <artifactId>picocli</artifactId>

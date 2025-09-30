@@ -7,7 +7,6 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOption;
-import org.springframework.util.ObjectUtils;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -97,7 +96,7 @@ public class ChannelManager {
     public static void borrowDataTunnelChanel(Bootstrap tunnelBootstrap, DataTunnelChannelBorrowCallback callback) {
         //从队列中压出一个通道
         Channel dataTunnelChannel = dataTunnelChannelPool.poll();
-        if (!ObjectUtils.isEmpty(dataTunnelChannel)) {
+        if (dataTunnelChannel != null) {
             callback.success(dataTunnelChannel);
             return;
         }
