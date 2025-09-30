@@ -15,33 +15,20 @@
             <groupId>cn.xilio</groupId>
             <artifactId>etp-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
     </dependencies>
-<!--    <build>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-compiler-plugin</artifactId>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${springboot.version}</version> <!-- 与Spring Boot版本一致 -->
+                <version>2.7.6</version>
+                <configuration>
+                    <mainClass>cn.xilio.etp.server.TunnelServerStartup</mainClass>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>repackage</goal> <!-- 关键目标 -->
+                            <goal>repackage</goal>
                         </goals>
                     </execution>
                 </executions>

@@ -6,17 +6,12 @@ import cn.xilio.etp.common.TomlUtils;
 
 import cn.xilio.etp.core.protocol.ProtocolType;
 import com.moandjiezana.toml.Toml;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-
 import java.util.*;
 
 /**
  * 代理规则管理器
  */
 public class ProxyManager {
-    private static final Logger logger = LoggerFactory.getLogger(ProxyManager.class);
     /**
      * 饿汉单例模式
      */
@@ -54,8 +49,7 @@ public class ProxyManager {
      * @param proxyPath 代理配置文件路径
      */
     public static void init(String proxyPath) {
-        logger.info("开始初始化客户端代理配置信息");
-        if (!StringUtils.hasText(proxyPath)) {
+        if (proxyPath == null) {
             proxyPath = DEFAULT_PROXY_PATH;
         }
         clients = new ArrayList<>();
@@ -106,7 +100,6 @@ public class ProxyManager {
             clients.add(c);
             clientSecretKeys.add(secretKey);
         }
-        logger.info("客户端代理配置信息初始化完成");
     }
 
     /**
@@ -151,7 +144,7 @@ public class ProxyManager {
         return clients;
     }
 
-    public   Integer getBindPort() {
+    public Integer getBindPort() {
         return bindPort;
     }
 }

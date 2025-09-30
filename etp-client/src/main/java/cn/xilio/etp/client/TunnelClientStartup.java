@@ -1,26 +1,34 @@
 package cn.xilio.etp.client;
 
 import cn.xilio.etp.common.ansi.AnsiLog;
-import cn.xilio.etp.common.EtpBanner;
-import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 public class TunnelClientStartup {
+    private static TunnelClient tunnelClient;
     public static void main(String[] args) {
         if (!checkArgs(args)) {
             return;
         }
         Config.init(args[1]);
-        TunnelClient tunnelClient = new TunnelClient();
+        registerShutdownHook();
+        tunnelClient = new TunnelClient();
         tunnelClient.setServerAddr(Config.getServerAddr());
         tunnelClient.setServerPort(Config.getServerPort());
         tunnelClient.setSecretKey(Config.getSecretKey());
         tunnelClient.start();
     }
-
+    private static void registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (tunnelClient != null) {
+                try {
+                    tunnelClient.stop();
+                } catch (Exception e) {
+                    AnsiLog.error("停止隧道客户端时发生错误: " + e.getMessage());
+                }
+            }
+        }));
+    }
     private static boolean checkArgs(String[] args) {
         if (args.length < 2) {
             AnsiLog.error("请指定配置文件！");
@@ -30,7 +38,7 @@ public class TunnelClientStartup {
             AnsiLog.error("参数有误，请通过-c <path>指定配置文件！");
             return false;
         }
-        if (!StringUtils.hasText(args[1])) {
+        if (args[1] == null) {
             AnsiLog.error("配置文件路径不能为空！");
             return false;
         }

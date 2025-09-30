@@ -7,7 +7,6 @@ import cn.xilio.etp.core.MessageHandler;
 import cn.xilio.etp.core.protocol.TunnelMessage;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import org.springframework.util.ObjectUtils;
 
 public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
     private final Bootstrap realBootstrap;
@@ -46,7 +45,7 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
         } else {
             //数据隧道-通道断开连接 此时需要关闭代理客户端与真实服务的连接
             Channel realServerChannel = ctx.channel().attr(EtpConstants.NEXT_CHANNEL).get();
-            if (!ObjectUtils.isEmpty(realServerChannel)) {
+            if (realServerChannel != null) {
                 ctx.channel().close();
             }
         }
@@ -58,7 +57,7 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel realChannel = ctx.channel().attr(EtpConstants.NEXT_CHANNEL).get();
-        if (!ObjectUtils.isEmpty(realChannel) && realChannel.isActive()) {
+        if (realChannel != null && realChannel.isActive()) {
             realChannel.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
         }
         super.channelWritabilityChanged(ctx);

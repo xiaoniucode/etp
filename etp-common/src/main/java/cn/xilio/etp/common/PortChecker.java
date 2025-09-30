@@ -8,6 +8,7 @@ import java.util.List;
 public class PortChecker {
     /**
      * 检查指定端口是否被占用
+     *
      * @param port 端口号
      * @return true 如果端口被占用
      */
@@ -21,6 +22,7 @@ public class PortChecker {
 
     /**
      * 获取占用指定端口的进程ID (适用于Windows和Unix-like系统)
+     *
      * @param port 端口号
      * @return 进程ID列表
      */
@@ -60,6 +62,7 @@ public class PortChecker {
 
     /**
      * 强制终止占用指定端口的进程
+     *
      * @param port 端口号
      * @return true 如果成功终止
      */
@@ -84,16 +87,7 @@ public class PortChecker {
 
     public static void killPort(int port) {
         if (isPortOccupied(port)) {
-            System.out.println("端口 " + port + " 已被占用");
-            List<String> pids = getProcessIdByPort(port);
-            System.out.println("占用端口的进程ID: " + pids);
-            if (killProcessByPort(port)) {
-                System.out.println("成功终止占用端口 " + port + " 的进程");
-            } else {
-                System.out.println("无法终止占用端口 " + port + " 的进程");
-            }
-        } else {
-            System.out.println("端口 " + port + " 未被占用");
+            killProcessByPort(port);
         }
     }
 }
