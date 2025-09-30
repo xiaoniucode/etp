@@ -16,10 +16,6 @@ public class ClientInfo implements Serializable {
      */
     private String secretKey;
     /**
-     * 客户端的状态。1:在线，0:离线
-     */
-    private int status;
-    /**
      * 代理映射信息，一个内网服务端口对应一个外网服务端口
      */
     private List<ProxyMapping> proxyMappings;
@@ -38,14 +34,6 @@ public class ClientInfo implements Serializable {
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
     }
 
     public List<ProxyMapping> getProxyMappings() {

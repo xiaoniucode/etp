@@ -16,6 +16,7 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>etpc</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
