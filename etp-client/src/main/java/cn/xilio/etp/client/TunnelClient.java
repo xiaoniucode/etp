@@ -163,6 +163,4 @@ public class TunnelClient implements Lifecycle {
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
-
-
 }
