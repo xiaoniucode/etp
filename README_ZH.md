@@ -10,10 +10,11 @@
 ## 功能特性
 - 支持TCP、HTTP、HTTPS等协议
 - 高性能数据传输
+- 毫秒级启动
 - 支持多客户端
 - 轻量级，使用简单
 ## 快速开始
-确保服务器和客户端都安装JDK8或以上版本
+根据操作系统下载对应的[发行版本](https://github.com/xilio-dev/etp/releases)安装包，服务端一般部署在具备公网IP的服务器上。
 ### 服务端
 >编辑配置文件 etps.toml
 ```toml 
@@ -34,9 +35,9 @@ type = "tcp"
 localPort = 6379
 remotePort = 6380
 ```
-在公网服务器启动服务端
+启动etp服务端，若需要外部访问，需要部署在具备公网IP的服务器上。
 ```shell
-java -jar etps.jar -c etps.toml
+./etps -c etps.toml
 ```
 ### 客户端etpc配置
 >编辑配置文件 etpc.toml 
@@ -48,7 +49,7 @@ secretKey="4b0063baa5ae47c2910fc25265aae4b9"
 ```
 在内网电脑启动客户端
 ```shell
-java -jar etpc.jar -c etpc.toml
+./etpc -c etpc.toml
 ```
 ## 项目趋势
 <p align="center">

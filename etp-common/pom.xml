@@ -4,7 +4,7 @@
     <parent>
         <groupId>cn.xilio</groupId>
         <artifactId>etp</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
     <artifactId>etp-common</artifactId>
     <packaging>jar</packaging>
@@ -13,7 +13,6 @@
         <dependency>
             <groupId>com.moandjiezana.toml</groupId>
             <artifactId>toml4j</artifactId>
-            <version>0.7.2</version>
         </dependency>
     </dependencies>
 </project>
