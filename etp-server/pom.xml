@@ -4,16 +4,14 @@
     <parent>
         <groupId>cn.xilio</groupId>
         <artifactId>etp</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
     <artifactId>etp-server</artifactId>
     <packaging>jar</packaging>
     <name>etp-server</name>
 
-    <!-- 公共属性 -->
     <properties>
         <java.version>17</java.version>
-        <native.version>1.0.0</native.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>
