@@ -1,0 +1,36 @@
+[
+  {
+    "name": "io.netty.buffer.PooledByteBufAllocator",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "io.netty.buffer.UnpooledByteBufAllocator",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "io.netty.buffer.ByteBufAllocator",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "io.netty.channel.DefaultChannelConfig",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "io.netty.channel.kqueue.KQueue",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "io.netty.channel.kqueue.KQueueEventLoop",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "io.netty.channel.unix.LimitsStaticallyReferencedJniMethods",
+    "allDeclaredMethods": true
+  }
+]
