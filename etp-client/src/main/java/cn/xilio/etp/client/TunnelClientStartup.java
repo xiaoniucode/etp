@@ -3,7 +3,6 @@ package cn.xilio.etp.client;
 import cn.xilio.etp.common.ansi.AnsiLog;
 
 import java.io.File;
-
 public class TunnelClientStartup {
     private static TunnelClient tunnelClient;
     public static void main(String[] args) {
