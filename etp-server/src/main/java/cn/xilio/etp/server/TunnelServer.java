@@ -57,8 +57,12 @@ public class TunnelServer implements Lifecycle {
 
     @Override
     public void stop() {
-        tunnelBossGroup.shutdownGracefully();
-        tunnelWorkerGroup.shutdownGracefully();
+        try {
+            tunnelBossGroup.shutdownGracefully().sync();
+            tunnelWorkerGroup.shutdownGracefully().sync();
+        }catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void startTcpProxy() {
