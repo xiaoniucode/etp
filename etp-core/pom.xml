@@ -31,7 +31,6 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-
                 <includes>
                     <include>META-INF/native-image/etp-core/*.json</include>
                 </includes>
