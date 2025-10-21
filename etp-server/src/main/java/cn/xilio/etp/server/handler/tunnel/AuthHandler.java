@@ -3,7 +3,7 @@ package cn.xilio.etp.server.handler.tunnel;
 import cn.xilio.etp.core.protocol.TunnelMessage;
 import cn.xilio.etp.server.ChannelManager;
 import cn.xilio.etp.core.AbstractMessageHandler;
-import cn.xilio.etp.server.store.ProxyManager;
+import cn.xilio.etp.server.store.Config;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import java.util.List;
@@ -17,7 +17,7 @@ public class AuthHandler extends AbstractMessageHandler {
         //获取客户端传过来的认证密钥
         String secretKey = msg.getExt();
         //如果系统中不存在客户端的密钥，说明该客户端没有注册或者密钥错误
-        if (!ProxyManager.getInstance().isClientExist(secretKey)) {
+        if (!Config.getInstance().isClientExist(secretKey)) {
             ctx.channel().close();//关闭当前通道
             return;//返回方法，不执行后续的逻辑
         }
@@ -28,7 +28,7 @@ public class AuthHandler extends AbstractMessageHandler {
             ctx.channel().close();//关闭当前客户端的通道
         }
         //获取客户端的所有内网服务对应的公网端口
-        List<Integer> internalPorts = ProxyManager.getInstance().getClientPublicNetworkPorts(secretKey);
+        List<Integer> internalPorts = Config.getInstance().getClientPublicNetworkPorts(secretKey);
         //将客户端所有内网服务对应的公网端口绑定到控制隧道通道上
         ChannelManager.addControlTunnelChannel(internalPorts, secretKey, ctx.channel());
     }

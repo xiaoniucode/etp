@@ -3,8 +3,7 @@ package cn.xilio.etp.server.handler;
 import cn.xilio.etp.core.EtpConstants;
 import cn.xilio.etp.core.protocol.TunnelMessage;
 import cn.xilio.etp.server.ChannelManager;
-import cn.xilio.etp.server.store.LocalServerInfo;
-import cn.xilio.etp.server.store.ProxyManager;
+import cn.xilio.etp.server.store.Config;
 import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -45,12 +44,12 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
         } else {
             long nextSessionId = nextSessionId();
             visitorChannel.config().setOption(ChannelOption.AUTO_READ, false);
-            LocalServerInfo serverInfo = ProxyManager.getInstance().getInternalServerInfo(sa.getPort());
+            Integer localPort = Config.getInstance().getInternalServerInfo(sa.getPort());
             ChannelManager.addVisitorChannelToTunnelChannel(visitorChannel, nextSessionId, controllTurnnelChannel);
             TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                     .setType(TunnelMessage.Message.Type.CONNECT)
                     .setSessionId(nextSessionId)
-                    .setPort(serverInfo.getLocalPort())
+                    .setPort(localPort)
                     .build();
             controllTurnnelChannel.writeAndFlush(tunnelMessage);
         }
