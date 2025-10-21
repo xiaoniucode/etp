@@ -8,26 +8,36 @@ import cn.xilio.etp.core.protocol.TunnelMessageDecoder;
 import cn.xilio.etp.core.protocol.TunnelMessageEncoder;
 import cn.xilio.etp.server.handler.TunnelChannelHandler;
 import cn.xilio.etp.server.handler.VisitorChannelHandler;
-import cn.xilio.etp.server.store.ProxyManager;
+import cn.xilio.etp.server.store.Config;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.ssl.SslContext;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author xilio.cn
+ */
 public class TunnelServer implements Lifecycle {
     private String host = "0.0.0.0";
     private int port;
+    private boolean ssl;
     private EventLoopGroup tunnelBossGroup;
     private EventLoopGroup tunnelWorkerGroup;
+    private SslContext sslContext;
 
     @Override
     public void start() {
         try {
+            if (ssl) {
+                sslContext = new ServerSslContextFactory().createContext();
+            }
             EventLoopUtils.ServerConfig config = EventLoopUtils.createServerEventLoopConfig();
             tunnelBossGroup = config.bossGroup;
             tunnelWorkerGroup = config.workerGroup;
@@ -37,6 +47,9 @@ public class TunnelServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
+                            if (ssl) {
+                                sc.pipeline().addLast("ssl", sslContext.newHandler(sc.alloc()));
+                            }
                             sc.pipeline()
                                     .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 4, 0, 0))
                                     .addLast(new TunnelMessageEncoder())
@@ -60,7 +73,7 @@ public class TunnelServer implements Lifecycle {
         try {
             tunnelBossGroup.shutdownGracefully().sync();
             tunnelWorkerGroup.shutdownGracefully().sync();
-        }catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -78,7 +91,7 @@ public class TunnelServer implements Lifecycle {
                     }
                 });
         try {
-            List<Integer> ports = ProxyManager.getInstance().getAllPublicNetworkPort();
+            List<Integer> ports = Config.getInstance().getAllPublicNetworkPort();
             for (Integer port : ports) {
                 serverBootstrap.bind(port).get();
             }
@@ -102,5 +115,9 @@ public class TunnelServer implements Lifecycle {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public void setSsl(boolean ssl) {
+        this.ssl = ssl;
     }
 }

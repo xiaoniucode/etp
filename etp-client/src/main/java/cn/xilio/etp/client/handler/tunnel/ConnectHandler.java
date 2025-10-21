@@ -32,7 +32,7 @@ public class ConnectHandler extends AbstractMessageHandler {
                         TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                                 .setType(TunnelMessage.Message.Type.CONNECT)
                                 .setSessionId(sessionId)
-                                .setExt(Config.getSecretKey())
+                                .setExt(Config.getInstance().getSecretKey())
                                 .build();
 
                         dataTunnelChannel.writeAndFlush(tunnelMessage);
