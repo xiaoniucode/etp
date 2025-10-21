@@ -44,19 +44,25 @@ public class Config {
 
     public static final class KeystoreConfig {
         private final String path;
-        private final String password;
+        private final String keyPass;
+        private final String storePass;
 
-        public KeystoreConfig(String path, String password) {
+        public KeystoreConfig(String path, String keyPass, String storePass) {
             this.path = path;
-            this.password = password;
+            this.keyPass = keyPass;
+            this.storePass = storePass;
         }
 
         public String getPath() {
             return path;
         }
 
-        public String getPassword() {
-            return password;
+        public String getKeyPass() {
+            return keyPass;
+        }
+
+        public String getStorePass() {
+            return storePass;
         }
     }
 
@@ -100,17 +106,20 @@ public class Config {
                 Toml keystore = toml.getTable("keystore");
                 if (keystore != null) {
                     String path = keystore.getString("path");
-                    String password = keystore.getString("password");
-                    if (path != null && password != null) {
-                        keystoreConfig = new KeystoreConfig(path, password);
+                    String keyPass = keystore.getString("keyPass");
+                    String storePass = keystore.getString("storePass");
+                    if (path != null && keyPass != null && storePass != null) {
+                        keystoreConfig = new KeystoreConfig(path, keyPass, storePass);
                     }
                     if (keystoreConfig != null) {
                         // 清理可能存在的旧配置
                         System.clearProperty("server.keystore.path");
-                        System.clearProperty("server.keystore.pass");
+                        System.clearProperty("server.keystore.keyPass");
+                        System.clearProperty("server.keystore.storePass");
                         //添加到系统属性中
                         System.setProperty("server.keystore.path", keystoreConfig.getPath());
-                        System.setProperty("server.keystore.pass", keystoreConfig.getPassword());
+                        System.setProperty("server.keystore.keyPass", keystoreConfig.getKeyPass());
+                        System.setProperty("server.keystore.storePass", keystoreConfig.getStorePass());
                     }
 
                 }
