@@ -13,7 +13,9 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslHandler;
 
+import javax.net.ssl.SSLEngine;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,6 +23,7 @@ public class TunnelClient implements Lifecycle {
     private String serverAddr;
     private int serverPort;
     private String secretKey;
+    private boolean ssl;
     /**
      * 初始化重连延迟时间 单位：秒
      */
@@ -46,38 +49,53 @@ public class TunnelClient implements Lifecycle {
      */
     private EventLoopGroup tunnelWorkerGroup;
 
+    private SslContext sslContext;
+
     @Override
     public void start() {
-        tunnelBootstrap = new Bootstrap();
-        Bootstrap realBootstrap = new Bootstrap();
-        EventLoopUtils.ClientConfig eventLoopConfig = EventLoopUtils.createClientEventLoopConfig();
-        realBootstrap.group(eventLoopConfig.workerGroup)
-                .channel(eventLoopConfig.clientChannelClass)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new RealChannelHandler());
-                    }
-                });
-        tunnelWorkerGroup = eventLoopConfig.workerGroup;
-        tunnelBootstrap.group(tunnelWorkerGroup)
-                .channel(eventLoopConfig.clientChannelClass)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel sc) {
-                        sc.pipeline()
-                                .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 4, 0, 0))
-                                .addLast(new TunnelMessageEncoder())
-                                .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
-                                .addLast(new TunnelChannelHandler(realBootstrap, tunnelBootstrap, ctx -> {
-                                    retryCount.set(0); // 重置重试计数器
-                                    //服务器断开 执行重试 重新连接
-                                    scheduleReconnect();
-                                }));
-                    }
-                });
-        //连接到服务器
-        connectTunnelServer();
+        try {
+            tunnelBootstrap = new Bootstrap();
+            Bootstrap realBootstrap = new Bootstrap();
+            EventLoopUtils.ClientConfig eventLoopConfig = EventLoopUtils.createClientEventLoopConfig();
+            realBootstrap.group(eventLoopConfig.workerGroup)
+                    .channel(eventLoopConfig.clientChannelClass)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) throws Exception {
+                            ch.pipeline().addLast(new RealChannelHandler());
+                        }
+                    });
+
+            if (ssl) {
+                sslContext = new ClientSslContextFactory().createContext();
+            }
+            tunnelWorkerGroup = eventLoopConfig.workerGroup;
+            tunnelBootstrap.group(tunnelWorkerGroup)
+                    .channel(eventLoopConfig.clientChannelClass)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel sc) {
+                            if (ssl){
+                                SSLEngine engine = sslContext.newEngine(sc.alloc(), serverAddr, serverPort);
+                                engine.setUseClientMode(true);
+                                sc.pipeline().addLast("ssl", new SslHandler(engine));
+                            }
+                            sc.pipeline()
+                                    .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 4, 0, 0))
+                                    .addLast(new TunnelMessageEncoder())
+                                    .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
+                                    .addLast(new TunnelChannelHandler(realBootstrap, tunnelBootstrap, ctx -> {
+                                        retryCount.set(0); // 重置重试计数器
+                                        //服务器断开 执行重试 重新连接
+                                        scheduleReconnect();
+                                    }));
+                        }
+                    });
+            //连接到服务器
+            connectTunnelServer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void connectTunnelServer() {
@@ -162,5 +180,9 @@ public class TunnelClient implements Lifecycle {
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public void setSsl(boolean ssl) {
+        this.ssl = ssl;
     }
 }

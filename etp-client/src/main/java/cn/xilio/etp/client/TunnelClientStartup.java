@@ -10,12 +10,16 @@ public class TunnelClientStartup {
             return;
         }
         Config.init(args[1]);
+        Config config = Config.getInstance();
+
         registerShutdownHook();
         tunnelClient = new TunnelClient();
-        tunnelClient.setServerAddr(Config.getServerAddr());
-        tunnelClient.setServerPort(Config.getServerPort());
-        tunnelClient.setSecretKey(Config.getSecretKey());
+        tunnelClient.setServerAddr(config.getServerAddr());
+        tunnelClient.setServerPort(config.getServerPort());
+        tunnelClient.setSecretKey(config.getSecretKey());
+        tunnelClient.setSsl(config.isSsl());
         tunnelClient.start();
+
 
     }
     private static void registerShutdownHook() {

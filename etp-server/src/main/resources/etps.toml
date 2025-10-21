@@ -1,4 +1,11 @@
-bindPort=9527
+#绑定端口
+bindPort = 9527
+#SSL安全加密传输配置
+ssl = true
+[keystore]
+path = "cert/server.jks"
+password = "123456"
+# 代理客户端配置
 [[clients]]
 name = "windows"
 secretKey = "4b0063baa5ae47c2910fc25265aae4b9" #客户端秘钥，自定义

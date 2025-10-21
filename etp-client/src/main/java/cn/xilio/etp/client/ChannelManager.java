@@ -101,7 +101,7 @@ public class ChannelManager {
             return;
         }
         //如果连接池没有，则新建一个连接
-        tunnelBootstrap.connect(Config.getServerAddr(), Config.getServerPort()).addListener((ChannelFutureListener) future -> {
+        tunnelBootstrap.connect(Config.getInstance().getServerAddr(), Config.getInstance().getServerPort()).addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 callback.success(future.channel());
             } else {
