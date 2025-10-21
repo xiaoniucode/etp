@@ -7,4 +7,4 @@ secretKey = "4b0063baa5ae47c2910fc25265aae4b9"
 ssl = true
 [truststore]
 path = "pkc/client.truststore.p12"
-password = "123456"
+storePass = "123456"

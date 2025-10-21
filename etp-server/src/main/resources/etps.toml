@@ -4,7 +4,8 @@ bindPort = 9527
 ssl = true
 [keystore]
 path = "pkc/server.p12"
-password = "123456"
+keyPass = "123456"
+storePass="123456"
 # 代理客户端配置
 [[clients]]
 name = "windows"
