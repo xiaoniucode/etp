@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 通道管理器
+ * @author xilio.cn
  */
 public class ChannelManager {
     /**
@@ -39,9 +40,10 @@ public class ChannelManager {
                 portTunnelChannelMapping.put(port, channel);
             }
         }
-
-        channel.attr(CHANNEL_PORT).set(internalPorts);//该通道上的代理服务端口
-        channel.attr(CHANNEL_SECRET_KEY).set(secretKey);//该条通道对应的客户端
+        //该通道上的代理服务端口
+        channel.attr(CHANNEL_PORT).set(internalPorts);
+        //该条通道对应的客户端
+        channel.attr(CHANNEL_SECRET_KEY).set(secretKey);
         channel.attr(VISITOR_CHANNELS).set(new ConcurrentHashMap<>());
         tunnelChannels.put(secretKey, channel);
     }

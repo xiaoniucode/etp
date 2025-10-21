@@ -17,10 +17,6 @@ public class ProxyMapping implements Serializable {
      */
     private ProtocolType type;
     /**
-     * 内网IP地址
-     */
-    private String localIP;
-    /**
      * 内网被代理服务的IP地址
      */
     private Integer localPort;
@@ -43,14 +39,6 @@ public class ProxyMapping implements Serializable {
 
     public void setType(ProtocolType type) {
         this.type = type;
-    }
-
-    public String getLocalIP() {
-        return localIP;
-    }
-
-    public void setLocalIP(String localIP) {
-        this.localIP = localIP;
     }
 
     public Integer getLocalPort() {
