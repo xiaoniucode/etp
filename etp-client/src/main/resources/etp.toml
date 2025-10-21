@@ -6,5 +6,5 @@ secretKey = "4b0063baa5ae47c2910fc25265aae4b9"
 #TCP SSL安全加密密码配置
 ssl = true
 [truststore]
-path = "pkc/client.truststore.p12"
-storePass = "123456"
+path = "cert/client.p12"
+storePass = "JCAkB4X7G3T6"

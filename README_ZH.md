@@ -50,9 +50,6 @@ secretKey="4b0063baa5ae47c2910fc25265aae4b9"
 ```
 启动成功后用***3307***端口去连接MySQL
 
-## 开启SSL
-
-
 ## 项目趋势
 <p align="center">
   <a href="https://github.com/xiaoniucode/etp/stargazers">
