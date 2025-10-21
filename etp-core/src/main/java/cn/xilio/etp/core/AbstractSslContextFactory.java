@@ -36,7 +36,7 @@ public abstract class AbstractSslContextFactory {
      */
     protected KeyManagerFactory loadKeyStore(File keyStoreFile, String password) throws Exception {
         validateFile(keyStoreFile, "密钥库");
-        KeyStore keyStore = KeyStore.getInstance("JKS");
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
         try (FileInputStream is = new FileInputStream(keyStoreFile)) {
             keyStore.load(is, password.toCharArray());
         }
@@ -52,7 +52,7 @@ public abstract class AbstractSslContextFactory {
      */
     protected TrustManagerFactory loadTrustStore(File trustStoreFile, String password) throws Exception {
         validateFile(trustStoreFile, "信任库");
-        KeyStore trustStore = KeyStore.getInstance("JKS");
+        KeyStore trustStore = KeyStore.getInstance("PKCS12");
         try (FileInputStream is = new FileInputStream(trustStoreFile)) {
             trustStore.load(is, password.toCharArray());
         }
