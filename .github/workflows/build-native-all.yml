@@ -70,12 +70,10 @@ jobs:
           key: ${{ matrix.platform }}-${{ matrix.arch }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ matrix.platform }}-${{ matrix.arch }}-maven-
-      - name: 🏗️ 构建 Server 模块原生镜像
-        run: mvn clean install native:compile -Pnative -DskipTests --no-transfer-progress -pl etp-server
-
-      - name: 🏗️ 构建 Client 模块原生镜像
-        run: mvn clean install native:compile -Pnative -DskipTests --no-transfer-progress -pl etp-client
-
+      - name: 🏗️ 构建 etp-server 模块原生镜像
+        run: mvn clean install native:compile -Pnative -am -DskipTests --no-transfer-progress -pl etp-server
+      - name: 🏗️ 构建 etp-client 模块原生镜像
+        run: mvn clean install native:compile -Pnative -am -DskipTests --no-transfer-progress -pl etp-client
       # Linux/macOS 打包
       - name: 📦 打包Unix发布文件
         if: matrix.os != 'windows-latest'
@@ -134,11 +132,8 @@ jobs:
           cache: maven
 
       - name: 🏗️ 构建 Server 模块 JAR
-        run: mvn clean install package -DskipTests -Dnative.skip=true --no-transfer-progress -pl etp-server
-
-      - name: 🏗️ 构建 Client 模块 JAR
-        run: mvn clean install package -DskipTests -Dnative.skip=true --no-transfer-progress -pl etp-client
-
+        run: |
+          mvn clean install package -DskipTests -Dnative.skip=true --no-transfer-progress
       - name: 📦 打包 JAR 发布文件
         shell: bash
         run: |
