@@ -1,6 +1,6 @@
 
 # 证书生成脚本
-
+ [查看详细使用手册](generate_ssl_cert.md)
 ## 参看帮助信息
 ![cert-gen-help.png](image/cert/cert-gen-help.png)
 如果嫌麻烦可以直接执行命令，不需要任何参数，脚本飞会生成默认的配置。
