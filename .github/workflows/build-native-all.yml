@@ -17,7 +17,7 @@ jobs:
       fail-fast: false  # ⚡ 一个平台失败不影响其他平台
       matrix:
         include:
-           🐧 Linux 平台
+       #   🐧 Linux 平台
           - os: ubuntu-latest
             platform: linux
             arch: amd64
