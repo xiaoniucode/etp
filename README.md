@@ -71,7 +71,7 @@ After successful startup, use the **3307** port to connect to MySQL
 ## 🔒 Configure SSL (Optional)
 > Versions of etp after v1.0.2 have added TLS 1.3-based secure encryption functionality, which can be configured as needed.
 
-1️⃣ First, download the certificate generation command-line tool provided by the project [cert-gen.sh](scripts/cert-gen.sh) to your local machine (you can also use JDK's keytool directly). For detailed usage instructions, please refer to the [Certificate Generation Document](docs/code-gen.md). This tool currently depends on JDK 17, so ensure the runtime environment is available.
+1️⃣ First, download the certificate generation command-line tool provided by the project [cert-gen.sh](scripts/cert-gen.sh) to your local machine (you can also use JDK's keytool directly). For detailed usage instructions, please refer to the [Certificate Generation Document](docs/code-gen.md). This tool currently depends on JDK, so ensure the runtime environment is available.
 
 2️⃣ After downloading the script locally, execute the following command in the terminal to generate the certificate and key. If it's too troublesome, you can run it without any parameters, and the script will automatically generate complex keys.
 

@@ -32,5 +32,23 @@
   {
     "name": "io.netty.channel.unix.LimitsStaticallyReferencedJniMethods",
     "allDeclaredMethods": true
+  },
+  {
+    "name": "io.netty.channel.kqueue.KQueueSocketChannel",
+    "methods": [
+      { "name": "<init>", "parameterTypes": [] }
+    ]
+  },
+  {
+    "name": "io.netty.channel.kqueue.KQueueServerSocketChannel",
+    "methods": [
+      { "name": "<init>", "parameterTypes": [] }
+    ]
+  },
+  {
+    "name": "io.netty.channel.kqueue.KQueueEventLoopGroup",
+    "methods": [
+      { "name": "<init>", "parameterTypes": [] }
+    ]
   }
 ]
