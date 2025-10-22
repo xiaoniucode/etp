@@ -59,7 +59,7 @@ Start the client on an intranet computer:
 
 ## Project Trends
 <p align="center">
-  <a href="https://github.com/xilio-dev/etp/stargazers">
-    <img src="https://api.star-history.com/svg?repos=xilio-dev/etp&type=Date" alt="Star History">
+  <a href="https://github.com/xiaoniucode/etp/stargazers">
+    <img src="https://api.star-history.com/svg?repos=xiaoniucode/etp&type=Date" alt="Star History">
   </a>
 </p>

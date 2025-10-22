@@ -32,16 +32,17 @@ public abstract class AbstractSslContextFactory {
     /**
      * 加载JKS格式的密钥库
      * @param keyStoreFile 密钥库文件
-     * @param password 密钥库密码
+     * @param keyPass 私钥密码
+     * @param storePass 存储库密码
      */
-    protected KeyManagerFactory loadKeyStore(File keyStoreFile, String password) throws Exception {
+    protected KeyManagerFactory loadKeyStore(File keyStoreFile, String keyPass,String storePass) throws Exception {
         validateFile(keyStoreFile, "密钥库");
-        KeyStore keyStore = KeyStore.getInstance("JKS");
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
         try (FileInputStream is = new FileInputStream(keyStoreFile)) {
-            keyStore.load(is, password.toCharArray());
+            keyStore.load(is, storePass.toCharArray());
         }
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(keyStore, password.toCharArray());
+        kmf.init(keyStore, keyPass.toCharArray());
         return kmf;
     }
 
@@ -52,7 +53,7 @@ public abstract class AbstractSslContextFactory {
      */
     protected TrustManagerFactory loadTrustStore(File trustStoreFile, String password) throws Exception {
         validateFile(trustStoreFile, "信任库");
-        KeyStore trustStore = KeyStore.getInstance("JKS");
+        KeyStore trustStore = KeyStore.getInstance("PKCS12");
         try (FileInputStream is = new FileInputStream(trustStoreFile)) {
             trustStore.load(is, password.toCharArray());
         }

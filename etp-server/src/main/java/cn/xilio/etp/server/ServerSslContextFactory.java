@@ -14,13 +14,14 @@ import java.io.File;
  */
 public class ServerSslContextFactory extends AbstractSslContextFactory {
     private static final String KEYSTORE_PATH = System.getProperty("server.keystore.path");
-    private static final String KEYSTORE_PASS = System.getProperty("server.keystore.pass");
+    private static final String KEYSTORE_KEY_PASS = System.getProperty("server.keystore.keyPass");
+    private static final String KEYSTORE_STORE_PASS = System.getProperty("server.keystore.storePass");
     private static final File SERVER_KEYSTORE = new File(KEYSTORE_PATH);
 
     @Override
     public SslContext createContext() throws Exception {
         // 调用父类方法加载密钥库
-        KeyManagerFactory serverKmf = loadKeyStore(SERVER_KEYSTORE, KEYSTORE_PASS);
+        KeyManagerFactory serverKmf = loadKeyStore(SERVER_KEYSTORE, KEYSTORE_KEY_PASS,KEYSTORE_STORE_PASS);
 
         return SslContextBuilder
                 .forServer(serverKmf)

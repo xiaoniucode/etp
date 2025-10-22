@@ -12,13 +12,13 @@ import java.io.File;
  */
 public class ClientSslContextFactory extends AbstractSslContextFactory {
     private static final String TRUSTSTORE_PATH = System.getProperty("client.truststore.path");
-    private static final String TRUSTSTORE_PASS = System.getProperty("client.truststore.pass");
+    private static final String TRUSTSTORE_STORE_PASS = System.getProperty("client.truststore.storePass");
     private static final File CLIENT_TRUSTSTORE = new File(TRUSTSTORE_PATH);
 
     @Override
     public SslContext createContext() throws Exception {
         // 调用父类方法加载信任库
-        TrustManagerFactory clientTmf = loadTrustStore(CLIENT_TRUSTSTORE, TRUSTSTORE_PASS);
+        TrustManagerFactory clientTmf = loadTrustStore(CLIENT_TRUSTSTORE, TRUSTSTORE_STORE_PASS);
         return SslContextBuilder
                 .forClient()
                 .sslProvider(DEFAULT_SSL_PROVIDER)
