@@ -6,6 +6,7 @@ import cn.xilio.etp.common.TomlUtils;
 
 import cn.xilio.etp.core.protocol.ProtocolType;
 import com.moandjiezana.toml.Toml;
+import io.netty.util.internal.ObjectUtil;
 
 import java.util.*;
 
@@ -124,31 +125,34 @@ public class Config {
 
                 }
             }
-            //代理信息配置
-            List<ProxyMapping> proxyMappings = new ArrayList<>();
-            List<Toml> proxies = client.getTables("proxies");
-            List<Integer> remotePorts = new ArrayList<>();
-            clientPublicNetworkPortMapping.put(secretKey, remotePorts);
-            for (Toml proxy : proxies) {
-                String proxyName = proxy.getString("name");
-                String type = proxy.getString("type");
-                Long localPort = proxy.getLong("localPort");
-                Long remotePort = proxy.getLong("remotePort");
 
-                ProxyMapping proxyMapping = new ProxyMapping();
-                proxyMapping.setName(proxyName);
-                proxyMapping.setType(ProtocolType.getType(type));
-                proxyMapping.setLocalPort(localPort.intValue());
-                proxyMapping.setRemotePort(remotePort.intValue());
-                proxyMappings.add(proxyMapping);
-                //记录公网端口到内网服务的映射
-                if (portLocalServerMapping.containsKey(remotePort.intValue())) {
-                    throw new IllegalArgumentException("公网端口映射冲突，一个公网端口只能对应一个内网服务！");
+            List<Toml> proxies = client.getTables("proxies");
+            if (proxies != null) {
+                //代理信息配置
+                List<ProxyMapping> proxyMappings = new ArrayList<>();
+                List<Integer> remotePorts = new ArrayList<>();
+                clientPublicNetworkPortMapping.put(secretKey, remotePorts);
+                for (Toml proxy : proxies) {
+                    String proxyName = proxy.getString("name");
+                    String type = proxy.getString("type");
+                    Long localPort = proxy.getLong("localPort");
+                    Long remotePort = proxy.getLong("remotePort");
+
+                    ProxyMapping proxyMapping = new ProxyMapping();
+                    proxyMapping.setName(proxyName);
+                    proxyMapping.setType(ProtocolType.getType(type));
+                    proxyMapping.setLocalPort(localPort.intValue());
+                    proxyMapping.setRemotePort(remotePort.intValue());
+                    proxyMappings.add(proxyMapping);
+                    //记录公网端口到内网服务的映射
+                    if (portLocalServerMapping.containsKey(remotePort.intValue())) {
+                        throw new IllegalArgumentException("公网端口映射冲突，一个公网端口只能对应一个内网服务！");
+                    }
+                    portLocalServerMapping.put(remotePort.intValue(), localPort.intValue());
+                    remotePorts.add(remotePort.intValue());
                 }
-                portLocalServerMapping.put(remotePort.intValue(), localPort.intValue());
-                remotePorts.add(remotePort.intValue());
+                c.setProxyMappings(proxyMappings);
             }
-            c.setProxyMappings(proxyMappings);
             clients.add(c);
             clientSecretKeys.add(secretKey);
         }
