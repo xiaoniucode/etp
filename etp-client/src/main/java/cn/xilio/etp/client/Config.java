@@ -49,19 +49,19 @@ public final class Config {
      */
     public static final class TruststoreConfig {
         private final String path;
-        private final String password;
+        private final String storePass;
 
-        public TruststoreConfig(String path, String password) {
+        public TruststoreConfig(String path, String storePass) {
             this.path = path;
-            this.password = password;
+            this.storePass = storePass;
         }
 
         public String getPath() {
             return path;
         }
 
-        public String getPassword() {
-            return password;
+        public String getStorePass() {
+            return storePass;
         }
     }
 
@@ -124,17 +124,17 @@ public final class Config {
                 Toml truststoreTable = toml.getTable("truststore");
                 if (truststoreTable != null) {
                     String path = truststoreTable.getString("path");
-                    String password = truststoreTable.getString("password");
+                    String password = truststoreTable.getString("storePass");
                     if (path != null && password != null) {
                         truststoreConfig = new TruststoreConfig(path, password);
                     }
                     if (truststoreConfig != null) {
                         // 清理可能存在的旧配置
                         System.clearProperty("client.truststore.path");
-                        System.clearProperty("client.truststore.pass");
+                        System.clearProperty("client.truststore.storePass");
                         //添加到系统属性中
                         System.setProperty("client.truststore.path", truststoreConfig.getPath());
-                        System.setProperty("client.truststore.pass", truststoreConfig.getPassword());
+                        System.setProperty("client.truststore.storePass", truststoreConfig.getStorePass());
                     }
 
                 }

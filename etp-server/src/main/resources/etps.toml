@@ -3,8 +3,9 @@ bindPort = 9527
 #SSL安全加密传输配置
 ssl = true
 [keystore]
-path = "cert/server.jks"
-password = "123456"
+path = "cert/server.p12"
+keyPass = "veHzlXBADiAr"
+storePass = "veHzlXBADiAr"
 # 代理客户端配置
 [[clients]]
 name = "windows"
