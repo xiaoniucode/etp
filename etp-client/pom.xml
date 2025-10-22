@@ -15,6 +15,44 @@
             <artifactId>etp-core</artifactId>
         </dependency>
     </dependencies>
+    <profiles>
+        <profile>
+            <id>native</id>
+            <activation>
+                <property>
+                    <name>env.GRAALVM_HOME</name> <!-- 只有GraalVM环境存在时才激活 -->
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native.version}</version>
+                        <configuration>
+                            <mainClass>cn.xilio.etp.client.TunnelClientStartup</mainClass>
+                            <imageName>etp-client</imageName>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>add-reachability-metadata</id>
+                                <goals>
+                                    <goal>add-reachability-metadata</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>native-compile</id>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
@@ -24,29 +62,6 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.graalvm.buildtools</groupId>
-                <artifactId>native-maven-plugin</artifactId>
-                <version>${native.version}</version>
-                <configuration>
-                    <mainClass>cn.xilio.etp.client.TunnelClientStartup</mainClass>
-                    <imageName>etpc</imageName>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>add-reachability-metadata</id>
-                        <goals>
-                            <goal>add-reachability-metadata</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>native-compile</id>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
