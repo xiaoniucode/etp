@@ -1,4 +1,4 @@
-name: 🚀 统一构建与发布
+name: 🚀 构建跨平台程序与发布
 
 on:
   workflow_dispatch:    # 🎮 手动触发
@@ -7,7 +7,7 @@ on:
       - 'v*'           # 🏷️ 版本标签触发
 
 env:
-  JAVA_VERSION: '21'
+  JAVA_VERSION: '17'
 
 jobs:
   # 🔨 构建原生镜像（多平台）
@@ -17,7 +17,7 @@ jobs:
       fail-fast: false  # ⚡ 一个平台失败不影响其他平台
       matrix:
         include:
-          # 🐧 Linux 平台
+           🐧 Linux 平台
           - os: ubuntu-latest
             platform: linux
             arch: amd64
@@ -35,11 +35,6 @@ jobs:
             arch: amd64
             artifact_suffix: windows_amd64
             display_name: "Windows AMD64"
-          - os: windows-latest
-            platform: windows
-            arch: arm64
-            artifact_suffix: windows_arm64
-            display_name: "Windows ARM64"
 
           # 🍎 macOS 平台
           - os: macos-latest
@@ -75,72 +70,50 @@ jobs:
           key: ${{ matrix.platform }}-${{ matrix.arch }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ matrix.platform }}-${{ matrix.arch }}-maven-
-
       - name: 🏗️ 构建 Server 模块原生镜像
-        run: mvn clean native:compile -Pnative -DskipTests --no-transfer-progress -pl eeip-server
+        run: mvn clean native:compile -Pnative -DskipTests --no-transfer-progress -pl etp-server
 
       - name: 🏗️ 构建 Client 模块原生镜像
-        run: mvn clean native:compile -Pnative -DskipTests --no-transfer-progress -pl eeip-client
+        run: mvn clean native:compile -Pnative -DskipTests --no-transfer-progress -pl etp-client
 
-      - name: 📦 打包原生镜像发布文件
+      # Linux/macOS 打包
+      - name: 📦 打包Unix发布文件
+        if: matrix.os != 'windows-latest'
+        shell: bash
         run: |
           VERSION="${{ github.ref_name }}"
           RELEASE_NAME="eeip_${VERSION}_${{ matrix.artifact_suffix }}"
-          
-          # 创建发布目录
+
           mkdir -p "$RELEASE_NAME"
+          cp "etp-server/target/etp-server" "$RELEASE_NAME/etps"
+          cp "etp-client/target/etp-client" "$RELEASE_NAME/etpc"
+          
+          cp etp-server/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
+          cp etp-client/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
 
-          # 复制 Server 可执行文件（根据平台调整扩展名）
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            SERVER_SOURCE="eeip-server/target/eeip-server.exe"
-            SERVER_DEST="$RELEASE_NAME/eeips.exe"
-            CLIENT_SOURCE="eeip-client/target/eeip-client.exe"
-            CLIENT_DEST="$RELEASE_NAME/eeipc.exe"
-          else
-            SERVER_SOURCE="eeip-server/target/eeip-server"
-            SERVER_DEST="$RELEASE_NAME/eeips"
-            CLIENT_SOURCE="eeip-client/target/eeip-client"
-            CLIENT_DEST="$RELEASE_NAME/eeipc"
-          fi
+          tar -czf "$RELEASE_NAME.tar.gz" "$RELEASE_NAME"
+          echo "✅ Unix打包完成: $RELEASE_NAME.tar.gz"
+      # Windows 打包
+      - name: 📦 打包Windows发布文件
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $VERSION = "${{ github.ref_name }}"
+          $RELEASE_NAME = "eeip_${VERSION}_${{ matrix.artifact_suffix }}"
 
-          # 复制可执行文件
-          if [ -f "$SERVER_SOURCE" ]; then
-            cp "$SERVER_SOURCE" "$SERVER_DEST"
-            chmod +x "$SERVER_DEST"
-            echo "✅ 已复制 Server 可执行文件"
-          else
-            echo "❌ 错误：未找到 Server 可执行文件: $SERVER_SOURCE"
-            exit 1
-          fi
-
-          if [ -f "$CLIENT_SOURCE" ]; then
-            cp "$CLIENT_SOURCE" "$CLIENT_DEST"
-            chmod +x "$CLIENT_DEST"
-            echo "✅ 已复制 Client 可执行文件"
-          else
-            echo "❌ 错误：未找到 Client 可执行文件: $CLIENT_SOURCE"
-            exit 1
-          fi
-
-          # 复制配置文件
-          cp *.toml "$RELEASE_NAME/" 2>/dev/null || true
-          if [ -d "cert" ]; then
-            cp -r cert "$RELEASE_NAME/"
-          fi
-
-          # 创建压缩包
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            zip -r "$RELEASE_NAME.zip" "$RELEASE_NAME"
-          else
-            tar -czf "$RELEASE_NAME.tar.gz" "$RELEASE_NAME"
-          fi
-
-          echo "✅ 原生镜像打包完成"
-
-      - name: ⬆️ 上传原生镜像构件
+          New-Item -ItemType Directory -Force -Path $RELEASE_NAME
+          Copy-Item "etp-server\target\etp-server.exe" "$RELEASE_NAME\etps.exe"
+          Copy-Item "etp-client\target\etp-client.exe" "$RELEASE_NAME\etpc.exe"
+          
+          Copy-Item "etp-server/target/classes/*.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
+          Copy-Item "etp-client/target/classes/*.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
+          
+          Compress-Archive -Path "$RELEASE_NAME\*" -DestinationPath "$RELEASE_NAME.zip"
+          Write-Host "✅ Windows打包完成: $RELEASE_NAME.zip"
+      - name: ⬆️ 上传构件
         uses: actions/upload-artifact@v4
         with:
-          name: eeip-native-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
+          name: etp-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
           path: eeip_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
 
   # 📦 构建 JAR 包
@@ -151,8 +124,7 @@ jobs:
       contents: write
 
     steps:
-      - name: 📥 检出代码
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: ☕ 设置 Java 环境
         uses: actions/setup-java@v4
@@ -162,57 +134,39 @@ jobs:
           cache: maven
 
       - name: 🏗️ 构建 Server 模块 JAR
-        run: mvn clean package -DskipTests --no-transfer-progress -pl eeip-server
+        run: mvn clean package -DskipTests -Dnative.skip=true --no-transfer-progress -pl etp-server
 
       - name: 🏗️ 构建 Client 模块 JAR
-        run: mvn clean package -DskipTests --no-transfer-progress -pl eeip-client
+        run: mvn clean package -DskipTests -Dnative.skip=true --no-transfer-progress -pl etp-client
 
       - name: 📦 打包 JAR 发布文件
+        shell: bash
         run: |
           VERSION="${{ github.ref_name }}"
-          RELEASE_NAME="etp_${VERSION}_jar"
+          RELEASE_NAME="etp_${VERSION}_JDK${{ env.JAVA_VERSION }}_jar"
           
           mkdir -p "$RELEASE_NAME"
-
-          # 复制并重命名 JAR 文件
-          SERVER_JAR=$(find eeip-server/target -name "eeip-server-*.jar" | head -1)
-          CLIENT_JAR=$(find eeip-client/target -name "eeip-client-*.jar" | head -1)
-
-          if [ -f "$SERVER_JAR" ]; then
-            cp "$SERVER_JAR" "$RELEASE_NAME/etps.jar"
-            echo "✅ 已复制 Server JAR"
-          else
-            echo "❌ 错误：未找到 Server JAR"
-            exit 1
-          fi
-
-          if [ -f "$CLIENT_JAR" ]; then
-            cp "$CLIENT_JAR" "$RELEASE_NAME/etpc.jar"
-            echo "✅ 已复制 Client JAR"
-          else
-            echo "❌ 错误：未找到 Client JAR"
-            exit 1
-          fi
-
-          # 复制配置文件
-          cp *.toml "$RELEASE_NAME/" 2>/dev/null || true
-          if [ -d "cert" ]; then
-            cp -r cert "$RELEASE_NAME/"
-          fi
-
+          SERVER_JAR=$(find etp-server/target -name "etp-server-*.jar" | head -1)
+          CLIENT_JAR=$(find etp-client/target -name "etp-client-*.jar" | head -1)
+          
+          cp "$SERVER_JAR" "$RELEASE_NAME/etps.jar"
+          cp "$CLIENT_JAR" "$RELEASE_NAME/etpc.jar"
+          
+          cp etp-server/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
+          cp etp-client/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
+          
           zip -r "$RELEASE_NAME.zip" "$RELEASE_NAME"
-          echo "✅ JAR 包打包完成"
-
+          echo "✅ JAR包打包完成: $RELEASE_NAME.zip"
       - name: ⬆️ 上传 JAR 构件
         uses: actions/upload-artifact@v4
         with:
-          name: etp-jar-${{ github.ref_name }}
-          path: etp_${{ github.ref_name }}_jar.zip
+          name: etp-jar-${{ github.ref_name }}-JDK${{ env.JAVA_VERSION }}
+          path: etp_${{ github.ref_name }}_JDK${{ env.JAVA_VERSION }}_jar.zip
 
   # 🚀 统一发布阶段
   create-release:
     name: 🚀 创建统一 Release
-    needs: [build-native, build-jar]  # ⛓️ 等待所有构建任务完成
+    needs: [build-jar] # [build-native, build-jar]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     permissions:
@@ -226,34 +180,8 @@ jobs:
           pattern: '*'
           merge-multiple: true
 
-      - name: 📋 准备发布资源
-        run: |
-          echo "🎯 准备统一发布资源..."
-          mkdir -p release-assets
-          
-          # 移动所有构建产物到发布目录
-          find ./artifacts -name "*.zip" -o -name "*.tar.gz" -exec cp {} ./release-assets/ \;
-          
-          echo "📊 发布文件统计:"
-          ls -lh ./release-assets/
-          echo ""
-          echo "🎁 生成的发布文件:"
-          for file in ./release-assets/*; do
-            if [ -f "$file" ]; then
-              filename=$(basename "$file")
-              size=$(ls -lh "$file" | awk '{print $5}')
-              echo "  📦 $filename ($size)"
-            fi
-          done
-          
-          file_count=$(ls -1 ./release-assets/* 2>/dev/null | wc -l)
-          echo ""
-          echo "📈 总共生成 $file_count 个发布文件"
-
       - name: 🏷️ 创建 GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./release-assets/*
+          files: artifacts/**/*
           generate_release_notes: true
-          draft: false
-          prerelease: false
