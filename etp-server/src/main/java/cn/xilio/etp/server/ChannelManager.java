@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 通道管理器
+ *
  * @author xilio.cn
  */
 public class ChannelManager {

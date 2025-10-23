@@ -10,9 +10,12 @@ import com.google.protobuf.ByteString;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 
+/**
+ * @author liuxin
+ */
 public class ConnectHandler extends AbstractMessageHandler {
     @Override
-    protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
+    protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
         Channel controlTunnelChannel = ctx.channel();
         long sessionId = msg.getSessionId();
         int port = msg.getPort();
