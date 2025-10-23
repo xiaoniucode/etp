@@ -9,6 +9,7 @@
 ##  ✨ 介绍
 **etp**（Easy Tunnel Proxy）是一个轻量级的高性能隧道代理中间件，支持TCP、HTTP协议以及TCP上层协议且支持TLS1.3安全加密。用于将内网服务快速暴露为公网服务，便于开发测试，减少购买云服务器成本。
 
+📄[访问文档站点](https://xiaoniucode.github.io/etp)
 ## 🌟 功能特性
 - 💻 支持TCP、HTTP、HTTPS等协议
 - 🔐 采用TLS1.3高效安全加密
