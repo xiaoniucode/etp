@@ -133,7 +133,7 @@ jobs:
         shell: bash
         run: |
           VERSION="${{ github.ref_name }}"
-          RELEASE_NAME="etp_${VERSION}_JDK${{ env.JAVA_VERSION }}_jar"
+          RELEASE_NAME="etp_${VERSION}_jdk${{ env.JAVA_VERSION }}_jar"
           
           mkdir -p "$RELEASE_NAME"
           SERVER_JAR=$(find etp-server/target -name "etp-server-*.jar" | head -1)
@@ -150,8 +150,8 @@ jobs:
       - name: ⬆️ 上传 JAR 构件
         uses: actions/upload-artifact@v4
         with:
-          name: etp-jar-${{ github.ref_name }}-JDK${{ env.JAVA_VERSION }}
-          path: etp_${{ github.ref_name }}_JDK${{ env.JAVA_VERSION }}_jar.zip
+          name: etp-jar-${{ github.ref_name }}-jdk${{ env.JAVA_VERSION }}
+          path: etp_${{ github.ref_name }}_jdk${{ env.JAVA_VERSION }}_jar.zip
 
   # 🚀 统一发布阶段
   create-release:
