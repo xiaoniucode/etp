@@ -13,3 +13,5 @@ buildNumber.properties
 bak
 etps.toml
 etpc.toml
+etp-server/dependency-reduced-pom.xml
+etp-client/dependency-reduced-pom.xml
