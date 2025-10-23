@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="rss.xsl"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+    <channel>
+        <title>etp Blog</title>
+        <link>https://etp.github.io/etp/blog</link>
+        <description>etp Blog</description>
+        <lastBuildDate>Thu, 23 Oct 2025 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <language>en</language>
+        <item>
+            <title><![CDATA[1.0.3版本发布]]></title>
+            <link>https://etp.github.io/etp/blog/1</link>
+            <guid>https://etp.github.io/etp/blog/1</guid>
+            <pubDate>Thu, 23 Oct 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[新特性]]></description>
+            <content:encoded><![CDATA[<h3 class="anchor anchorWithStickyNavbar_Xi3w" id="新特性">新特性<a href="https://etp.github.io/etp/blog/1#%E6%96%B0%E7%89%B9%E6%80%A7" class="hash-link" aria-label="Direct link to 新特性" title="Direct link to 新特性" translate="no">​</a></h3>
+<ul>
+<li>新增TLS1.3协议安全传输功能，采用PKCS12安全加密。</li>
+<li>新增TLS证书生成命令行工具。</li>
+<li>支持常见操作系统，windows、Linux、mac，除了windows不提供arm版本，其他都提供amd64和arm64版本</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_Xi3w" id="代码完善">代码完善<a href="https://etp.github.io/etp/blog/1#%E4%BB%A3%E7%A0%81%E5%AE%8C%E5%96%84" class="hash-link" aria-label="Direct link to 代码完善" title="Direct link to 代码完善" translate="no">​</a></h3>
+<ul>
+<li>修复加载配置文件时，无配置空指针异常</li>
+<li>去除部分冗余代码。</li>
+</ul>]]></content:encoded>
+            <category>etp</category>
+        </item>
+    </channel>
+</rss>
