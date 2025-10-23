@@ -71,17 +71,17 @@ After successful startup, use the **3307** port to connect to MySQL
 ## 🔒 Configure SSL (Optional)
 > Versions of etp after v1.0.2 have added TLS 1.3-based secure encryption functionality, which can be configured as needed.
 
-1️⃣ First, download the certificate generation command-line tool provided by the project [generate_ssl_cert-en.sh](scripts/generate_ssl_cert-en.sh) to your local machine (you can also use JDK's keytool directly). For detailed usage instructions, please refer to the [Certificate Generation Document](docs/code-gen.md). This tool currently depends on JDK, so ensure the runtime environment is available.
+1️⃣ First, download the certificate generation command-line tool provided by the project [generate_ssl_cert-en.sh](scripts/generate_ssl_cert-en.sh) to your local machine (you can also use JDK's keytool directly). For detailed usage instructions, please refer to the [Certificate Generation Document](doc/code-gen.md). This tool currently depends on JDK, so ensure the runtime environment is available.
 
 2️⃣ After downloading the script locally, execute the following command in the terminal to generate the certificate and key. If it's too troublesome, you can run it without any parameters, and the script will automatically generate complex keys.
 
 ```shell
 sudo sh cert-gen.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k123456
 ```
-![cert-gen-en.png](docs/image/cert/cert-gen-en.png)
+![cert-gen-en.png](doc/image/cert/cert-gen-en.png)
 3️⃣ After executing the script, two important certificate files will be generated: **server.p12** needs to be deployed on the server, while **client.p12** is deployed on the client. The configuration information is in the corresponding toml files.
 
-![result.png](docs/image/cert/result.png)
+![result.png](doc/image/cert/result.png)
 
 - Add the following content to the `etps.toml` configuration file
 
@@ -104,7 +104,7 @@ storePass = "JCAkB4X7G3T6" #Client truststore password
 
 > ⚠️ If ssl is set to true, ensure both server and client are set to true, otherwise it will error!
 
-For specific details, please view the [Certificate Configuration Document](docs/code-gen.md)!
+For specific details, please view the [Certificate Configuration Document](doc/code-gen.md)!
 ## Issue Reporting
 Report issues: [issues](https://github.com/xiaoniucode/etp/issues)
 ## 📈 Project Trends
