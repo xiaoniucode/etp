@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="atom.xsl"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://etp.github.io/etp/blog</id>
+    <title>etp Blog</title>
+    <updated>2025-10-23T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://etp.github.io/etp/blog"/>
+    <subtitle>etp Blog</subtitle>
+    <icon>https://etp.github.io/etp/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[1.0.3版本发布]]></title>
+        <id>https://etp.github.io/etp/blog/1</id>
+        <link href="https://etp.github.io/etp/blog/1"/>
+        <updated>2025-10-23T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[新特性]]></summary>
+        <content type="html"><![CDATA[<h3 class="anchor anchorWithStickyNavbar_Xi3w" id="新特性">新特性<a href="https://etp.github.io/etp/blog/1#%E6%96%B0%E7%89%B9%E6%80%A7" class="hash-link" aria-label="Direct link to 新特性" title="Direct link to 新特性" translate="no">​</a></h3>
+<ul>
+<li>新增TLS1.3协议安全传输功能，采用PKCS12安全加密。</li>
+<li>新增TLS证书生成命令行工具。</li>
+<li>支持常见操作系统，windows、Linux、mac，除了windows不提供arm版本，其他都提供amd64和arm64版本</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_Xi3w" id="代码完善">代码完善<a href="https://etp.github.io/etp/blog/1#%E4%BB%A3%E7%A0%81%E5%AE%8C%E5%96%84" class="hash-link" aria-label="Direct link to 代码完善" title="Direct link to 代码完善" translate="no">​</a></h3>
+<ul>
+<li>修复加载配置文件时，无配置空指针异常</li>
+<li>去除部分冗余代码。</li>
+</ul>]]></content>
+        <author>
+            <name>🐮</name>
+            <uri>https://github.com/xiaoniucode</uri>
+        </author>
+        <category label="etp" term="etp"/>
+    </entry>
+</feed>
