@@ -16,7 +16,7 @@ jobs:
       fail-fast: false  # ⚡ 一个平台失败不影响其他平台
       matrix:
         include:
-       #   🐧 Linux 平台
+          #   🐧 Linux 平台
           - os: ubuntu-latest
             platform: linux
             arch: amd64
@@ -112,51 +112,56 @@ jobs:
           path: etp_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
 
   # 📦 构建 JAR 包
-#  build-jar:
-#    name: 📦 构建 JAR 包
-#    runs-on: ubuntu-latest
-#    permissions:
-#      contents: write
-#    steps:
-#      - uses: actions/checkout@v4
-#
-#      - name: ☕ 设置 Java 环境
-#        uses: actions/setup-java@v4
-#        with:
-#          java-version: ${{ env.JAVA_VERSION }}
-#          distribution: 'temurin'
-#          cache: maven
-#
-#      - name: 🏗️ 构建模块 JAR
-#        run: mvn clean install package -DskipTests -Dnative.skip=true --no-transfer-progress
-#      - name: 📦 打包 JAR 发布文件
-#        shell: bash
-#        run: |
-#          VERSION="${{ github.ref_name }}"
-#          RELEASE_NAME="etp_${VERSION}_jdk${{ env.JAVA_VERSION }}_jar"
-#
-#          mkdir -p "$RELEASE_NAME"
-#          SERVER_JAR=$(find etp-server/target -name "etp-server-*.jar" | head -1)
-#          CLIENT_JAR=$(find etp-client/target -name "etp-client-*.jar" | head -1)
-#
-#          cp "$SERVER_JAR" "$RELEASE_NAME/etps.jar"
-#          cp "$CLIENT_JAR" "$RELEASE_NAME/etpc.jar"
-#
-#          cp etp-server/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
-#          cp etp-client/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
-#
-#          zip -r "$RELEASE_NAME.zip" "$RELEASE_NAME"
-#          echo "✅ JAR包打包完成: $RELEASE_NAME.zip"
-#      - name: ⬆️ 上传 JAR 构件
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: etp-jar-${{ github.ref_name }}-jdk${{ env.JAVA_VERSION }}
-#          path: etp_${{ github.ref_name }}_jdk${{ env.JAVA_VERSION }}_jar.zip
+  build-jar:
+    name: 📦 构建 JAR 包
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ☕ 设置 Java 环境
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: maven
+
+      - name: 🏗️ 构建模块 JAR
+        run: |
+          mv pom.xml pom.xml.bak
+          mv build.xml pom.xml
+          mvn clean install package -DskipTests -Dnative.skip=true --no-transfer-progress
+          mv pom.xml build.xml
+          mv pom.xml.bak pom.xml
+      - name: 📦 打包 JAR 发布文件
+        shell: bash
+        run: |
+          VERSION="${{ github.ref_name }}"
+          RELEASE_NAME="etp_${VERSION}_jdk${{ env.JAVA_VERSION }}_jar"
+
+          mkdir -p "$RELEASE_NAME"
+          SERVER_JAR=$(find etp-server/target -name "etp-server-*.jar" | head -1)
+          CLIENT_JAR=$(find etp-client/target -name "etp-client-*.jar" | head -1)
+
+          cp "$SERVER_JAR" "$RELEASE_NAME/etps.jar"
+          cp "$CLIENT_JAR" "$RELEASE_NAME/etpc.jar"
+
+          cp etp-server/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
+          cp etp-client/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
+
+          zip -r "$RELEASE_NAME.zip" "$RELEASE_NAME"
+          echo "✅ JAR包打包完成: $RELEASE_NAME.zip"
+      - name: ⬆️ 上传 JAR 构件
+        uses: actions/upload-artifact@v4
+        with:
+          name: etp-jar-${{ github.ref_name }}-jdk${{ env.JAVA_VERSION }}
+          path: etp_${{ github.ref_name }}_jdk${{ env.JAVA_VERSION }}_jar.zip
 
   # 🚀 统一发布阶段
   create-release:
     name: 🚀 创建统一 Release
-    needs: [build-native]
+    needs: [ build-native,build-jar ]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     permissions:
