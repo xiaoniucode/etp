@@ -4,10 +4,28 @@
         <title>etp Blog</title>
         <link>https://etp.github.io/etp/blog</link>
         <description>etp Blog</description>
-        <lastBuildDate>Thu, 23 Oct 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Fri, 24 Oct 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[1.0.4版本发布]]></title>
+            <link>https://etp.github.io/etp/blog/2</link>
+            <guid>https://etp.github.io/etp/blog/2</guid>
+            <pubDate>Fri, 24 Oct 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[新特性]]></description>
+            <content:encoded><![CDATA[<h3 class="anchor anchorWithStickyNavbar_Xi3w" id="新特性">新特性<a href="https://etp.github.io/etp/blog/2#%E6%96%B0%E7%89%B9%E6%80%A7" class="hash-link" aria-label="Direct link to 新特性" title="Direct link to 新特性" translate="no">​</a></h3>
+<ul>
+<li>配置文件和可执行文件在同一个目录，不需要-c指定配置路径。</li>
+<li>新增文档站点</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_Xi3w" id="问题修复">问题修复<a href="https://etp.github.io/etp/blog/2#%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="Direct link to 问题修复" title="Direct link to 问题修复" translate="no">​</a></h3>
+<ul>
+<li>修复服务端<strong>端口代理</strong>配置为空的时，客户端连接异常。</li>
+<li>GitHub工作流完善，为构建jar发布包定制专属pom，解决GraalVM反射问题。</li>
+</ul>]]></content:encoded>
+            <category>etp</category>
+        </item>
         <item>
             <title><![CDATA[1.0.3版本发布]]></title>
             <link>https://etp.github.io/etp/blog/1</link>
