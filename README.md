@@ -11,12 +11,15 @@
 
 📄[Visit document site](https://xiaoniucode.github.io/etp)
 ## 🌟 Features
-- 💻 Supports TCP, HTTP, HTTPS and other protocols
-- 🔐 Uses TLS 1.3 for efficient and secure encryption
+- 💻 Supports TCP, HTTP/HTTPS and other protocols
+- 🔐 Adopts TLS1.3 efficient and secure encryption protocol
 - 🛜 High-performance data transmission
 - 🚀 Millisecond-level startup
+- 🔗 Disconnection reconnection
+- 🔐 Identity authentication
 - 🐒 Supports multiple clients
-- 💨 Lightweight with low resource usage
+- 📺 Cross-platform support including arm64 and amd64 architectures
+- 💨 Lightweight with low resource consumption
 
 ## 🚀 Quick Start
 Download the corresponding [release version](https://github.com/xiaoniucode/etp/releases) installation package based on your operating system. The server is generally deployed on a server with a public IP.
