@@ -108,6 +108,9 @@ storePass = "JCAkB4X7G3T6" #客户端存储库密钥
 
 具体细节请查看[证书配置文档](docs/code-gen.md)！
 
+## 问题反馈
+反馈问题:[issues](https://github.com/xiaoniucode/etp/issues)
+
 ## 📈 项目趋势
 <p align="center">
   <a href="https://github.com/xiaoniucode/etp/stargazers">

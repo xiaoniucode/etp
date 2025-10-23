@@ -105,7 +105,8 @@ storePass = "JCAkB4X7G3T6" #Client truststore password
 > ⚠️ If ssl is set to true, ensure both server and client are set to true, otherwise it will error!
 
 For specific details, please view the [Certificate Configuration Document](docs/code-gen.md)!
-
+## Issue Reporting
+Report issues: [issues](https://github.com/xiaoniucode/etp/issues)
 ## 📈 Project Trends
 <p align="center">
   <a href="https://github.com/xiaoniucode/etp/stargazers">
