@@ -183,7 +183,8 @@ public class Config {
      * @return 所有内网服务对应的公网端口号
      */
     public List<Integer> getClientPublicNetworkPorts(String secretKey) {
-        return clientPublicNetworkPortMapping.get(secretKey);
+        List<Integer> res = clientPublicNetworkPortMapping.get(secretKey);
+        return res != null ? res : new ArrayList<>();
     }
 
     /**

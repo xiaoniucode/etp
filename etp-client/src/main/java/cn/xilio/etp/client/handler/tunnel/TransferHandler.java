@@ -11,7 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class TransferHandler extends AbstractMessageHandler {
     @Override
-    protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
+    protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
         Channel realChannel = ctx.channel().attr(EtpConstants.NEXT_CHANNEL).get();
         ByteString data = msg.getPayload();
         ByteBuf buffer = Unpooled.wrappedBuffer(data.asReadOnlyByteBuffer());

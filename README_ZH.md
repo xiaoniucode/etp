@@ -73,7 +73,7 @@ nohup ./etpc -c etpc.toml &
 启动成功后用 **3307** 端口去连接MySQL
 
 ## 🔒 配置SSL（可选）
-> etp v1.0.2以后的版本增加了基于TLS1.3的安全加密功能，可根据需要配置。
+> etp v1.0.3及以后的版本增加了基于TLS1.3的安全加密功能，可根据需要配置。
 
 1️⃣ 首先需要下载项目提供的证书生成命令行工具[generate_ssl_cert.sh](scripts/generate_ssl_cert.sh) 到本地（也可以直接使用jdk的keytool生成），该工具详细使用教程请参考[证书生成文档](doc/code-gen.md),该工具目前依赖jdk，需要保证有该运行环境。
 
