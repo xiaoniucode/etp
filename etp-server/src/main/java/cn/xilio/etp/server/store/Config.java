@@ -7,6 +7,7 @@ import cn.xilio.etp.common.TomlUtils;
 import cn.xilio.etp.core.protocol.ProtocolType;
 import com.moandjiezana.toml.Toml;
 import io.netty.util.internal.ObjectUtil;
+import io.netty.util.internal.StringUtil;
 
 import java.util.*;
 
@@ -32,7 +33,7 @@ public class Config {
     /**
      * 公网端口与内网服务映射信息，内网服务包括内网的IP和PORT信息。
      */
-    private static final Map<Integer, Integer> portLocalServerMapping = new HashMap<>();
+    private static volatile Map<Integer, Integer> portLocalServerMapping = new HashMap<>();
     /**
      * 客户端内网服务端口号列表 格式：[secretKey1:port1,secretKey2:port2]，用于用过客户端密钥获取客户端内网服务所有端口
      */
@@ -133,23 +134,35 @@ public class Config {
                 List<Integer> remotePorts = new ArrayList<>();
                 clientPublicNetworkPortMapping.put(secretKey, remotePorts);
                 for (Toml proxy : proxies) {
+                    ProxyMapping proxyMapping = new ProxyMapping();
                     String proxyName = proxy.getString("name");
                     String type = proxy.getString("type");
                     Long localPort = proxy.getLong("localPort");
                     Long remotePort = proxy.getLong("remotePort");
 
-                    ProxyMapping proxyMapping = new ProxyMapping();
+                    if (Objects.isNull(localPort)) {
+                        throw new IllegalArgumentException("必须指定内网服务端口");
+                    }
+                    if (StringUtil.isNullOrEmpty(proxyName)) {
+                        //如果没有设置名字采用内网端口号标识
+                        proxyMapping.setName(String.valueOf(localPort));
+                    }
                     proxyMapping.setName(proxyName);
                     proxyMapping.setType(ProtocolType.getType(type));
                     proxyMapping.setLocalPort(localPort.intValue());
-                    proxyMapping.setRemotePort(remotePort.intValue());
+                    if (!Objects.isNull(remotePort)) {
+                        proxyMapping.setRemotePort(remotePort.intValue());
+                    }
                     proxyMappings.add(proxyMapping);
-                    //记录公网端口到内网服务的映射
-                    if (portLocalServerMapping.containsKey(remotePort.intValue())) {
+                    //todo 记录公网端口到内网服务的映射
+                    if (!Objects.isNull(remotePort) && portLocalServerMapping.containsKey(remotePort.intValue())) {
                         throw new IllegalArgumentException("公网端口映射冲突，一个公网端口只能对应一个内网服务！");
                     }
-                    portLocalServerMapping.put(remotePort.intValue(), localPort.intValue());
-                    remotePorts.add(remotePort.intValue());
+                    //todo 需要记录 ，如果用户没有指定
+                    if (!Objects.isNull(remotePort)) {
+                        portLocalServerMapping.put(remotePort.intValue(), localPort.intValue());
+                        remotePorts.add(remotePort.intValue());
+                    }
                 }
                 c.setProxyMappings(proxyMappings);
             }
@@ -187,6 +200,12 @@ public class Config {
         return res != null ? res : new ArrayList<>();
     }
 
+    public  void addClientPublicNetworkPortMapping(String secretKey,Integer remotePort) {
+        List<Integer> ports = clientPublicNetworkPortMapping.get(secretKey);
+        ports.add(remotePort);
+        clientPublicNetworkPortMapping.put(secretKey, ports);
+    }
+
     /**
      * 通过公网端口获取内网服务对应的内网服务器信息
      *
@@ -211,5 +230,9 @@ public class Config {
 
     public static KeystoreConfig getKeystoreConfig() {
         return keystoreConfig;
+    }
+
+    public  Map<Integer, Integer> getPortLocalServerMapping() {
+        return portLocalServerMapping;
     }
 }

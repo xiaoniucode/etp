@@ -9,6 +9,9 @@
     <artifactId>etp-server</artifactId>
     <packaging>jar</packaging>
     <name>etp-server</name>
+    <properties>
+        <shade.mainClass>cn.xilio.etp.server.TunnelServerStartup</shade.mainClass>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>cn.xilio</groupId>
@@ -32,7 +35,8 @@
             <id>native</id>
             <activation>
                 <property>
-                    <name>env.GRAALVM_HOME</name> <!-- 只有GraalVM环境存在时才激活 -->
+                    <!-- 只有GraalVM环境存在时才激活 -->
+                    <name>env.GRAALVM_HOME</name>
                 </property>
             </activation>
             <build>

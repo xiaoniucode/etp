@@ -1,6 +1,8 @@
 package cn.xilio.etp.client;
 
+import ch.qos.logback.classic.Level;
 import cn.xilio.etp.common.ConfigUtils;
+import cn.xilio.etp.common.LogbackConfigurator;
 import cn.xilio.etp.common.ansi.AnsiLog;
 
 import java.io.File;
@@ -8,7 +10,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * @author xiaoniucode
+ */
 public class TunnelClientStartup {
+    static {
+        //日志配置
+        new LogbackConfigurator.LogbackConfigBuilder()
+                .setLogDir("logs")
+                .setLogFilePath("logs" + File.separator + "etpc.log")
+                .setArchiveFilePattern("logs" + File.separator + "etpc.%d{yyyy-MM-dd}.log")
+                .setLogLevel(Level.WARN)
+                .build()
+                .configureLogback();
+    }
     private static TunnelClient tunnelClient;
 
     public static void main(String[] args) {

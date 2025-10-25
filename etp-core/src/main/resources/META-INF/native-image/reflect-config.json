@@ -50,25 +50,5 @@
     "methods": [
       { "name": "<init>", "parameterTypes": [] }
     ]
-  },
-
-  {
-    "name": "org.bouncycastle.jsse.BCSSLEngine",
-    "methods": [
-      {"name": "<init>", "parameterTypes": [] }
-    ],
-    "fields": []
-  },
-  {
-    "name": "org.bouncycastle.jsse.provider.BouncyCastleJsseProvider",
-    "methods": [
-      {"name": "<init>", "parameterTypes": [] }
-    ]
-  },
-  {
-    "name": "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider",
-    "methods": [
-      {"name": "<init>", "parameterTypes": [] }
-    ]
   }
 ]

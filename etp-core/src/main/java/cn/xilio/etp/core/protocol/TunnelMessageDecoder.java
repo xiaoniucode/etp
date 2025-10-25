@@ -5,6 +5,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
+/**
+ * @author xiaoniucode
+ */
 public class TunnelMessageDecoder extends LengthFieldBasedFrameDecoder {
     private static final byte HEADER_SIZE = 4;
     private static final int TYPE_SIZE = 1;
