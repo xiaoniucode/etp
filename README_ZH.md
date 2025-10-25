@@ -18,6 +18,7 @@
 - 🔗 断线重连
 - 🔐 身份认证
 - 🐒 支持多客户端
+- 🧿 自动分配映射端口
 - 📺 跨平台支持且包括arm64和amd64架构
 - 💨 轻量级，资源占用率低
 
@@ -33,19 +34,13 @@
 bindPort=9527
 [[clients]]
 name = "Mac" #客户端名称
-secretKey = "4b0063baa5ae47c2910fc25265aae4b9" #[必填]32位密钥请自定义，不要使用这个
+secretKey = "你的客户端认证密钥" #[必填]自定义32位密钥
 
 [[clients.proxies]]
-name = "mysql" #自定义一个名字
-type = "tcp" #网络传输协议
-localPort = 3306 #内网服务的端口
-remotePort = 3307 #公网服务端口
-
-#[[clients.proxies]]
-#name = "redis"
-#type = "tcp"
-#localPort = 6379
-#remotePort = 6380
+name = "mysql" #[可选]服务名字
+type = "tcp" #[必填]网络传输协议
+localPort = 3306 #[必填]内网服务的端口
+remotePort = 3307 #[可选]公网服务端口，如果不填系统会随机分配一个端口
 ```
 
 在Linux服务器上启动etp服务端，若需要外部访问，需要部署在具备公网IP的服务器上。
@@ -53,22 +48,26 @@ remotePort = 3307 #公网服务端口
 ```shell
 nohup ./etps -c etps.toml &
 ```
-
+🔔备注：1.0.4版本后，如果**etps.toml**和可执行程序在同一个文件夹，可不用**-c**指定，可按以下方式启动：
+```shell
+./etps # 或后台运行：nohup ./etps &
+```
 ### 💻 客户端etpc配置
 
 > 编辑配置文件 `etpc.toml`
 
 ```toml
-serverAddr = "127.0.0.1" #etps部署服务器地址
+serverAddr = "x.x.x.x" #etps部署服务器IP地址
 serverPort=9527 #服务端的bindPort端口
-secretKey="4b0063baa5ae47c2910fc25265aae4b9" #和服务端配置保持一致
+secretKey="你的客户端认证密钥" #和服务端配置保持一致
 ```
 
 在内网电脑启动客户端，以unix操作系统为例
 
 ```shell
-nohup ./etpc -c etpc.toml &
+./etpc -c etpc.toml # 或后台运行：nohup ./etpc -c etpc.toml &  
 ```
+🔔**备注**：如果配置文件和可执行程序在同一个文件夹可**不用用-c**指定配置。
 
 启动成功后用 **3307** 端口去连接MySQL
 
