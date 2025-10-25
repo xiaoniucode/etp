@@ -7,11 +7,13 @@ import io.netty.util.AttributeKey;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 通道管理器
  *
- * @author xilio.cn
+ * @author xiaoniucode
  */
 public class ChannelManager {
     /**
@@ -25,9 +27,10 @@ public class ChannelManager {
     /**
      * 端口和隧道映射
      */
-    private static final Map<Integer, Channel> portTunnelChannelMapping = new ConcurrentHashMap<>();
+    private static final Map<Integer, Channel> portTunnelChannelMapping = new ConcurrentHashMap<>(64);
     private static final AttributeKey<List<Integer>> CHANNEL_PORT = AttributeKey.newInstance("channel_port");
     private static final AttributeKey<String> CHANNEL_SECRET_KEY = AttributeKey.newInstance("channel_client_key");
+    private final static Lock lock = new ReentrantLock();
 
     /**
      * @param internalPorts 客户端内网服务的端口号
@@ -35,11 +38,13 @@ public class ChannelManager {
      * @param channel       安全认证后的隧道-通道
      */
     public static void addControlTunnelChannel(List<Integer> internalPorts, String secretKey, Channel channel) {
-        //共享资源，put会在多个地方被调用，避免同时调用put导致线程安全问题
-        synchronized (portTunnelChannelMapping) {
+        lock.lock();
+        try {
             for (Integer port : internalPorts) {
                 portTunnelChannelMapping.put(port, channel);
             }
+        } finally {
+            lock.unlock();
         }
         //该通道上的代理服务端口
         channel.attr(CHANNEL_PORT).set(internalPorts);

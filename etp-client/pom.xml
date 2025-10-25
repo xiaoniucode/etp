@@ -9,6 +9,9 @@
     <artifactId>etp-client</artifactId>
     <packaging>jar</packaging>
     <name>etp-client</name>
+    <properties>
+            <shade.mainClass>cn.xilio.etp.client.TunnelClientStartup</shade.mainClass>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>cn.xilio</groupId>

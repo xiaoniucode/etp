@@ -9,7 +9,7 @@ import java.util.Objects;
  * 客户端配置类
  * 使用单例模式管理全局配置
  *
- * @author xilio.cn
+ * @author xiaoniucode
  * @since 2025
  */
 public final class Config {

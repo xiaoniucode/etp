@@ -7,24 +7,21 @@ import cn.xilio.etp.core.heart.IdleCheckHandler;
 import cn.xilio.etp.core.protocol.TunnelMessageDecoder;
 import cn.xilio.etp.core.protocol.TunnelMessageEncoder;
 import cn.xilio.etp.server.handler.TunnelChannelHandler;
-import cn.xilio.etp.server.handler.VisitorChannelHandler;
-import cn.xilio.etp.server.store.Config;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author xilio.cn
+ * @author xiaoniucode
  */
 public class TunnelServer implements Lifecycle {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TunnelServer.class);
     private String host = "0.0.0.0";
     private int port;
     private boolean ssl;
@@ -62,9 +59,10 @@ public class TunnelServer implements Lifecycle {
             } else {
                 serverBootstrap.bind(port).sync();
             }
-            startTcpProxy();
+            //启动所有端口映射服务
+            TcpProxyServer.getInstance().start();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -73,34 +71,12 @@ public class TunnelServer implements Lifecycle {
         try {
             tunnelBossGroup.shutdownGracefully().sync();
             tunnelWorkerGroup.shutdownGracefully().sync();
+            //关闭所有端口代理，释放资源
+            TcpProxyServer.getInstance().stop();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
     }
-
-    private static void startTcpProxy() {
-        ServerBootstrap serverBootstrap = new ServerBootstrap();
-        NioEventLoopGroup bossGroup = new NioEventLoopGroup();
-        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
-        serverBootstrap.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel sc) throws Exception {
-                        sc.pipeline().addLast(new VisitorChannelHandler());
-                    }
-                });
-        try {
-            List<Integer> ports = Config.getInstance().getAllPublicNetworkPort();
-            for (Integer port : ports) {
-                serverBootstrap.bind(port).get();
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     public String getHost() {
         return host;
     }
