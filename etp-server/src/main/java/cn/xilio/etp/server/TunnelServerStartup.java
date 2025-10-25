@@ -16,6 +16,7 @@ import java.io.File;
  */
 public class TunnelServerStartup {
     private static TunnelServer tunnelServer;
+    private static final String DEFAULT_CONFIG_NAME = "etps.toml";
     private static final Logger logger = LoggerFactory.getLogger(TunnelServerStartup.class);
 
     // 初始化日志配置
@@ -29,7 +30,7 @@ public class TunnelServerStartup {
     }
 
     public static void main(String[] args) {
-        String configPath = ConfigUtils.getConfigPath(args, "etps.toml");
+        String configPath = ConfigUtils.getConfigPath(args, DEFAULT_CONFIG_NAME);
         if (configPath == null) {
             return;
         }

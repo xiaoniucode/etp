@@ -14,6 +14,8 @@ import java.nio.file.Paths;
  * @author xiaoniucode
  */
 public class TunnelClientStartup {
+    private static final String DEFAULT_CONFIG_NAME = "etpc.toml";
+
     static {
         //日志配置
         new LogbackConfigurator.LogbackConfigBuilder()
@@ -24,10 +26,11 @@ public class TunnelClientStartup {
                 .build()
                 .configureLogback();
     }
+
     private static TunnelClient tunnelClient;
 
     public static void main(String[] args) {
-        String configPath = ConfigUtils.getConfigPath(args, "etpc.toml");
+        String configPath = ConfigUtils.getConfigPath(args, DEFAULT_CONFIG_NAME);
         if (configPath == null) {
             return;
         }
