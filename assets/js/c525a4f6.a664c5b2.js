@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkdocusaurus_classic_typescript=globalThis.webpackChunkdocusaurus_classic_typescript||[]).push([[335],{3367:s=>{s.exports=JSON.parse('{"tags":[{"label":"etp","permalink":"/etp/blog/tags/docs","description":"etp\u662f\u4e00\u4e2a\u8f7b\u91cf\u7ea7\u7684\u5185\u7f51\u7a7f\u900f\u5de5\u5177","count":3}]}')}}]);
