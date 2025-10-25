@@ -9,7 +9,7 @@ secretKey = "4b0063baa5ae47c2910fc25265aae4b9" #[必填]客户端秘钥，自定
 name = "mysql" #代理名称 自定义
 type = "tcp" #代理类型 TCP HTTP 不区分大小写
 localPort = 3306 #内网服务的端口
-#remotePort = 3307 #暴露在公网的端口
+remotePort = 3307 #暴露在公网的端口
 
 [[clients.proxies]]
 name = "redis"
