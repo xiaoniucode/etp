@@ -15,7 +15,7 @@ localPort = 3306 #内网服务的端口
 name = "redis"
 type = "tcp"
 localPort = 6379
-remotePort = 60312
+remotePort = 6380
 
 #[[clients.proxies]]
 #name = "web"
