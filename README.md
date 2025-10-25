@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge)](https://github.com/xiaoniucode/etp/blob/main/LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/xiaoniucode/etp?style=for-the-badge)](https://github.com/xiaoniucode/etp/commits)
 
-[README](README.md) | [Chinese Documentation](README_ZH.md)
+[README](README.md) | [中文文档](README_ZH.md)
 
 ## ✨ Introduction
 **etp** (Easy Tunnel Proxy) is a lightweight, high-performance tunnel proxy middleware that supports TCP, HTTP protocols, and upper-layer TCP protocols with TLS 1.3 encryption. It enables quick exposure of internal network services to the public internet, facilitating development and testing while reducing the need for cloud server purchases.
