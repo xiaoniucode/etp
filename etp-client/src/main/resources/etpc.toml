@@ -1,4 +1,6 @@
-serverAddr = "127.0.0.1"
+#你的etps所在服务器IP地址
+serverAddr = "x.x.x.x"
+#你的etps 绑定的端口
 serverPort = 9527
 #认证密码[必填]
 secretKey = "your secret key"
