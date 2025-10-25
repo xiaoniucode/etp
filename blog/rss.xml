@@ -4,10 +4,31 @@
         <title>etp Blog</title>
         <link>https://etp.github.io/etp/blog</link>
         <description>etp Blog</description>
-        <lastBuildDate>Fri, 24 Oct 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 25 Oct 2025 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[1.0.5版本发布]]></title>
+            <link>https://etp.github.io/etp/blog/2</link>
+            <guid>https://etp.github.io/etp/blog/2</guid>
+            <pubDate>Sat, 25 Oct 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[新特性]]></description>
+            <content:encoded><![CDATA[<h3 class="anchor anchorWithStickyNavbar_Xi3w" id="新特性">新特性<a href="https://etp.github.io/etp/blog/2#%E6%96%B0%E7%89%B9%E6%80%A7" class="hash-link" aria-label="Direct link to 新特性" title="Direct link to 新特性" translate="no">​</a></h3>
+<ul>
+<li>自动分配代理端口：如果用户没有设置remotePort，系统会随机分配一个端口</li>
+</ul>
+<div class="language-shell codeBlockContainer_FKlL theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_wza5"><pre tabindex="0" class="prism-code language-shell codeBlock_A0u7 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_xPaX"><span class="token-line" style="color:#393A34"><span class="token plain">#绑定端口</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">bindPort = 9527</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"># 代理客户端配置，可以有多个</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">[[clients]]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">name = "windows"</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">secretKey = "4b0063baa5ae47c2910fc25265aae4b9" #[必填]客户端认证秘钥，不要用这个，请自定义</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">[[clients.proxies]]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">name = "mysql" #代理名称 自定义</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">type = "tcp" #代理类型 TCP HTTP 不区分大小写</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">localPort = 3306 #内网服务的端口</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">#remotePort = 3307 #暴露在公网的端口</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">[[clients.proxies]]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">name = "redis"</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">type = "tcp"</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">localPort = 6379</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">remotePort = 6380</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span></code></pre></div></div>
+<div class="language-shell codeBlockContainer_FKlL theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_wza5"><pre tabindex="0" class="prism-code language-shell codeBlock_A0u7 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_xPaX"><span class="token-line" style="color:#393A34"><span class="token plain">./etps</span><br></span></code></pre></div></div>
+<p>控制台会打印如下内容：</p>
+<p>客户端名称   代理服务名称  协议类型    内网端口    <strong>公网端口</strong>
+<img decoding="async" loading="lazy" alt="bind-ports.png" src="https://etp.github.io/etp/assets/images/bind-ports-ccfeb6529e966bbce0f02a8cd5fb4a31.png" width="777" height="200" class="img_iAYU"></p>
+<ul>
+<li>采用logback收集日志</li>
+</ul>
+<p>日志会保存到当前启动服务的logs文件夹，保存到文件的日志级别是warn</p>]]></content:encoded>
+            <category>etp</category>
+        </item>
         <item>
             <title><![CDATA[1.0.4版本发布]]></title>
             <link>https://etp.github.io/etp/blog/2</link>
@@ -16,14 +37,17 @@
             <description><![CDATA[新特性]]></description>
             <content:encoded><![CDATA[<h3 class="anchor anchorWithStickyNavbar_Xi3w" id="新特性">新特性<a href="https://etp.github.io/etp/blog/2#%E6%96%B0%E7%89%B9%E6%80%A7" class="hash-link" aria-label="Direct link to 新特性" title="Direct link to 新特性" translate="no">​</a></h3>
 <ul>
-<li>配置文件和可执行文件在同一个目录，不需要-c指定配置路径。</li>
-<li>新增文档站点</li>
+<li>自动分配代理端口：如果用户没有设置remotePort，系统会随机分配一个端口</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_Xi3w" id="问题修复">问题修复<a href="https://etp.github.io/etp/blog/2#%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="Direct link to 问题修复" title="Direct link to 问题修复" translate="no">​</a></h3>
+<div class="language-shell codeBlockContainer_FKlL theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_wza5"><pre tabindex="0" class="prism-code language-shell codeBlock_A0u7 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_xPaX"><span class="token-line" style="color:#393A34"><span class="token plain">#绑定端口</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">bindPort = 9527</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"># 代理客户端配置，可以有多个</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">[[clients]]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">name = "windows"</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">secretKey = "4b0063baa5ae47c2910fc25265aae4b9" #[必填]客户端认证秘钥，不要用这个，请自定义</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">[[clients.proxies]]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">name = "mysql" #代理名称 自定义</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">type = "tcp" #代理类型 TCP HTTP 不区分大小写</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">localPort = 3306 #内网服务的端口</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">#remotePort = 3307 #暴露在公网的端口</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">[[clients.proxies]]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">name = "redis"</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">type = "tcp"</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">localPort = 6379</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">remotePort = 6380</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span></code></pre></div></div>
+<div class="language-shell codeBlockContainer_FKlL theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_wza5"><pre tabindex="0" class="prism-code language-shell codeBlock_A0u7 thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_xPaX"><span class="token-line" style="color:#393A34"><span class="token plain">./etps</span><br></span></code></pre></div></div>
+<p>控制台会打印如下内容：</p>
+<p>客户端名称   代理服务名称  协议类型    内网端口    <strong>公网端口</strong>
+<img decoding="async" loading="lazy" alt="bind-ports.png" src="https://etp.github.io/etp/assets/images/bind-ports-ccfeb6529e966bbce0f02a8cd5fb4a31.png" width="777" height="200" class="img_iAYU"></p>
 <ul>
-<li>修复服务端<strong>端口代理</strong>配置为空的时，客户端连接异常。</li>
-<li>GitHub工作流完善，为构建jar发布包定制专属pom，解决GraalVM反射问题。</li>
-</ul>]]></content:encoded>
+<li>采用logback收集日志</li>
+</ul>
+<p>日志会保存到当前启动服务的logs文件夹，保存到文件的日志级别是warn</p>]]></content:encoded>
             <category>etp</category>
         </item>
         <item>
