@@ -11,8 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
- * 端口分配器类（单例模式），用于动态分配用户指定范围内的可用端口，并缓存已分配端口。
- * 提供端口可用性检查功能，跨平台兼容（Windows、Linux、macOS）。
+ * 端口分配器，用于动态分配用户指定范围内的可用端口，并缓存已分配端口。
  *
  * @author liuxin
  */
@@ -64,14 +63,14 @@ public class PortAllocator {
                     int port = socket.getLocalPort();
                     if (!allocatedPorts.contains(port)) {
                         allocatedPorts.add(port);
-                        LOGGER.info( "成功分配系统端口: {}", port);
+                        LOGGER.info("成功分配系统端口: {}", port);
                         return port;
                     }
                 } catch (IOException e) {
-                    LOGGER.warn( "系统端口分配失败，重试: {}/10", i + 1);
+                    LOGGER.warn("系统端口分配失败，重试: {}/10", i + 1);
                 }
             }
-            LOGGER.error( "无法分配系统端口，尝试次数耗尽");
+            LOGGER.error("无法分配系统端口，尝试次数耗尽");
             throw new IOException("无法分配系统端口：无可用端口");
         } finally {
             lock.unlock();
@@ -111,11 +110,11 @@ public class PortAllocator {
         if (minPort > maxPort || minPort < 1024 || maxPort > 65535) {
             String errorMsg = String.format("无效端口范围: minPort=%d, maxPort=%d，必须在1024到65535之间，且minPort <= maxPort",
                     minPort, maxPort);
-            LOGGER.error( errorMsg);
+            LOGGER.error(errorMsg);
             throw new IllegalArgumentException(errorMsg);
         }
 
-        LOGGER.info( "开始分配端口，范围: {} 到 {1}, 重试: {2}",
+        LOGGER.info("开始分配端口，范围: {} 到 {1}, 重试: {2}",
                 new Object[]{minPort, maxPort, retry});
 
         lock.lock();
@@ -130,10 +129,10 @@ public class PortAllocator {
                 for (int i = 0; i < attempts; i++) {
                     try (ServerSocket socket = new ServerSocket(port)) {
                         allocatedPorts.add(port);
-                        LOGGER.info( "成功分配端口: {}", port);
+                        LOGGER.info("成功分配端口: {}", port);
                         return port;
                     } catch (IOException e) {
-                        LOGGER.warn( "端口 {} 被占用，尝试次数: {1}/{2}", new Object[]{port, i + 1, attempts});
+                        LOGGER.warn("端口 {} 被占用，尝试次数: {1}/{2}", new Object[]{port, i + 1, attempts});
                         if (i < attempts - 1) {
                             try {
                                 // 等待100ms后重试
@@ -147,7 +146,7 @@ public class PortAllocator {
                 }
             }
             String errorMsg = String.format("范围内无可用端口: %d 到 %d", minPort, maxPort);
-            LOGGER.error( errorMsg);
+            LOGGER.error(errorMsg);
             throw new IOException(errorMsg);
         } finally {
             lock.unlock();
@@ -164,10 +163,10 @@ public class PortAllocator {
         lock.lock();
         try {
             if (allocatedPorts.remove(port)) {
-                LOGGER.info( "成功释放端口: {}", port);
+                LOGGER.info("成功释放端口: {}", port);
                 return true;
             } else {
-                LOGGER.warn( "尝试释放未分配的端口: {}", port);
+                LOGGER.warn("尝试释放未分配的端口: {}", port);
                 return false;
             }
         } finally {
@@ -202,25 +201,25 @@ public class PortAllocator {
         // 验证端口号
         if (port < 1 || port > 65535) {
             String errorMsg = String.format("无效端口号: %d，必须在1到65535之间", port);
-            LOGGER.error( errorMsg);
+            LOGGER.error(errorMsg);
             throw new IllegalArgumentException(errorMsg);
         }
 
-        LOGGER.info( "开始检查端口可用性: {}", port);
+        LOGGER.info("开始检查端口可用性: {}", port);
         lock.lock();
         try {
             // 检查是否已被本实例分配
             if (allocatedPorts.contains(port)) {
-                LOGGER.info( "端口 {} 已被分配，不可使用", port);
+                LOGGER.info("端口 {} 已被分配，不可使用", port);
                 return false;
             }
 
             // 尝试绑定端口
             try (ServerSocket socket = new ServerSocket(port)) {
-                LOGGER.info( "端口 {} 可用", port);
+                LOGGER.info("端口 {} 可用", port);
                 return true;
             } catch (IOException e) {
-                LOGGER.warn( "端口 {} 不可用: {1}", new Object[]{port, e.getMessage()});
+                LOGGER.warn("端口 {} 不可用: {1}", new Object[]{port, e.getMessage()});
                 return false;
             }
         } finally {
@@ -242,7 +241,7 @@ public class PortAllocator {
         }
     }
 
-    public  void addPort(Integer port ) {
-       allocatedPorts.add(port);
+    public void addPort(Integer port) {
+        allocatedPorts.add(port);
     }
 }
