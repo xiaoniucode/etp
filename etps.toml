@@ -1,10 +1,16 @@
 #绑定端口
 bindPort = 9527
+
+ssl = true
+[keystore]
+path = "cert/server.p12"
+keyPass = "3FbV8R8VW49O"
+storePass = "3FbV8R8VW49O"
+
 # 代理客户端配置
 [[clients]]
 name = "windows"
 secretKey = "4b0063baa5ae47c2910fc25265aae4b9" #[必填]客户端秘钥，自定义
-
 [[clients.proxies]]
 name = "mysql" #代理名称 自定义
 type = "tcp" #代理类型 TCP HTTP 不区分大小写
@@ -23,9 +29,5 @@ remotePort = 6380
 #localPort = 8080
 #remotePort = 8085
 
-#SSL安全加密传输配置
-#ssl = true
-#[keystore]
-#path = "cert/server.p12"
-#keyPass = "veHzlXBADiAr"
-#storePass = "veHzlXBADiAr"
+
+
