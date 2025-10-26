@@ -90,6 +90,31 @@ public class Config {
         if (toml.contains("bindPort")) {
             bindPort = toml.getLong("bindPort").intValue();
         }
+        //SSL密钥
+        Boolean sslValue = toml.getBoolean("ssl");
+        ssl = (sslValue != null) ? sslValue : false;
+        if (ssl) {
+            Toml keystore = toml.getTable("keystore");
+            if (keystore != null) {
+                String path = keystore.getString("path");
+                String keyPass = keystore.getString("keyPass");
+                String storePass = keystore.getString("storePass");
+                if (path != null && keyPass != null && storePass != null) {
+                    keystoreConfig = new KeystoreConfig(path, keyPass, storePass);
+                }
+                if (keystoreConfig != null) {
+                    // 清理可能存在的旧配置
+                    System.clearProperty("server.keystore.path");
+                    System.clearProperty("server.keystore.keyPass");
+                    System.clearProperty("server.keystore.storePass");
+                    //添加到系统属性中
+                    System.setProperty("server.keystore.path", keystoreConfig.getPath());
+                    System.setProperty("server.keystore.keyPass", keystoreConfig.getKeyPass());
+                    System.setProperty("server.keystore.storePass", keystoreConfig.getStorePass());
+                }
+            }
+        }
+        //代理端口
         for (Toml client : toml.getTables("clients")) {
             String name = client.getString("name");
             String secretKey = client.getString("secretKey");
@@ -100,33 +125,6 @@ public class Config {
             ClientInfo c = new ClientInfo();
             c.setName(name);
             c.setSecretKey(secretKey);
-
-            //SSL密钥
-            Boolean sslValue = toml.getBoolean("ssl");
-            ssl = (sslValue != null) ? sslValue : false;
-            if (ssl) {
-                Toml keystore = toml.getTable("keystore");
-                if (keystore != null) {
-                    String path = keystore.getString("path");
-                    String keyPass = keystore.getString("keyPass");
-                    String storePass = keystore.getString("storePass");
-                    if (path != null && keyPass != null && storePass != null) {
-                        keystoreConfig = new KeystoreConfig(path, keyPass, storePass);
-                    }
-                    if (keystoreConfig != null) {
-                        // 清理可能存在的旧配置
-                        System.clearProperty("server.keystore.path");
-                        System.clearProperty("server.keystore.keyPass");
-                        System.clearProperty("server.keystore.storePass");
-                        //添加到系统属性中
-                        System.setProperty("server.keystore.path", keystoreConfig.getPath());
-                        System.setProperty("server.keystore.keyPass", keystoreConfig.getKeyPass());
-                        System.setProperty("server.keystore.storePass", keystoreConfig.getStorePass());
-                    }
-
-                }
-            }
-
             List<Toml> proxies = client.getTables("proxies");
             if (proxies != null) {
                 //代理信息配置
