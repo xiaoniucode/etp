@@ -1,31 +1,11 @@
-#绑定端口
 bindPort = 9527
-# 代理客户端配置
 [[clients]]
 name = "windows"
-secretKey = "your secret key" #[必填]客户端认证秘钥，自定义
+secretKey = "your-secret-key"
 
-#[[clients.proxies]]
-#name = "mysql" #代理名称 自定义
-#type = "tcp" #代理类型 TCP HTTP 不区分大小写
-#localPort = 3306 #内网服务的端口
-#remotePort = 3307 #暴露在公网的端口，如果不指定，由系统自动分配一个随机的端口
-#
-#[[clients.proxies]]
-#name = "redis"
-#type = "tcp"
-#localPort = 6379
-#remotePort = 6380
-#
-#[[clients.proxies]]
-#name = "web"
-#type = "tcp"
-#localPort = 8080
-#remotePort = 8085
+[[clients.proxies]]
+name = "mysql"
+type = "tcp"
+localPort = 3306
+remotePort = 3307
 
-#SSL安全加密传输配置
-#ssl = true
-#[keystore]
-#path = "cert/server.p12"
-#keyPass = "veHzlXBADiAr"
-#storePass = "veHzlXBADiAr"

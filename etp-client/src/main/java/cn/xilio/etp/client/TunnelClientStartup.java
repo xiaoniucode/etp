@@ -4,6 +4,8 @@ import ch.qos.logback.classic.Level;
 import cn.xilio.etp.common.ConfigUtils;
 import cn.xilio.etp.common.LogbackConfigurator;
 import cn.xilio.etp.common.ansi.AnsiLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -11,9 +13,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * @author xiaoniucode
+ * @author liuxin
  */
 public class TunnelClientStartup {
+    private static final Logger logger = LoggerFactory.getLogger(TunnelClientStartup.class);
     private static final String DEFAULT_CONFIG_NAME = "etpc.toml";
 
     static {
@@ -52,7 +55,7 @@ public class TunnelClientStartup {
                 try {
                     tunnelClient.stop();
                 } catch (Exception e) {
-                    AnsiLog.error("停止隧道客户端时发生错误: " + e.getMessage());
+                    logger.error(e.getMessage(), e);
                 }
             }
         }));

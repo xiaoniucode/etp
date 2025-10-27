@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 /**
- * @author xilio
+ * @author liuxin
  */
 public class TunnelServerStartup {
     private static TunnelServer tunnelServer;
@@ -39,16 +39,18 @@ public class TunnelServerStartup {
         //检查端口是否被占用
         Integer bindPort = Config.getInstance().getBindPort();
         if (PortChecker.isPortOccupied(bindPort)) {
-            AnsiLog.error("端口被占用...");
+            logger.error("{}端口已经被占用",bindPort);
+            AnsiLog.error("{}端口已经被占用",bindPort);
             return;
         }
         registerShutdownHook(tunnelServer);
         tunnelServer = new TunnelServer();
+        tunnelServer.setHost(Config.getInstance().getHost());
         tunnelServer.setPort(bindPort);
         tunnelServer.setSsl(Config.getInstance().isSsl());
 
         tunnelServer.start();
-        AnsiLog.info("代理服务启动成功...");
+        AnsiLog.info("代理服务端启动成功～");
         logger.info("代理服务启动成功，监听端口：{}", tunnelServer.getPort());
     }
 

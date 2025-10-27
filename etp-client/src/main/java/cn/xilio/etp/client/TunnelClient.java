@@ -3,7 +3,7 @@ package cn.xilio.etp.client;
 import cn.xilio.etp.client.handler.internal.RealChannelHandler;
 import cn.xilio.etp.client.handler.tunnel.TunnelChannelHandler;
 import cn.xilio.etp.common.ansi.AnsiLog;
-import cn.xilio.etp.core.EventLoopUtils;
+import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.protocol.TunnelMessage;
 import cn.xilio.etp.core.heart.IdleCheckHandler;
@@ -14,12 +14,18 @@ import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLEngine;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @author liuxin
+ */
 public class TunnelClient implements Lifecycle {
+    private final static Logger logger = LoggerFactory.getLogger(TunnelClient.class);
     private String serverAddr;
     private int serverPort;
     private String secretKey;
@@ -27,7 +33,7 @@ public class TunnelClient implements Lifecycle {
     /**
      * 初始化重连延迟时间 单位：秒
      */
-    private long initialDelaySec = 2;
+    private  long initialDelaySec = 2;
     /**
      * 最大重试次数 超过以后关闭workerGroup
      */
@@ -35,7 +41,7 @@ public class TunnelClient implements Lifecycle {
     /**
      * 最大延迟时间 如果超过了则取maxDelaySec为最大延迟时间 单位：秒
      */
-    private long maxDelaySec = 5;
+    private long maxDelaySec = 8;
     /**
      * 用于记录当前重试次数
      */
@@ -48,7 +54,9 @@ public class TunnelClient implements Lifecycle {
      * 隧道工作线程组
      */
     private EventLoopGroup tunnelWorkerGroup;
-
+    /**
+     * SSL加密上下文
+     */
     private SslContext sslContext;
 
     @Override
@@ -56,12 +64,12 @@ public class TunnelClient implements Lifecycle {
         try {
             tunnelBootstrap = new Bootstrap();
             Bootstrap realBootstrap = new Bootstrap();
-            EventLoopUtils.ClientConfig eventLoopConfig = EventLoopUtils.createClientEventLoopConfig();
-            realBootstrap.group(eventLoopConfig.workerGroup)
-                    .channel(eventLoopConfig.clientChannelClass)
+
+            realBootstrap.group(NettyEventLoopFactory.eventLoopGroup())
+                    .channel(NettyEventLoopFactory.socketChannelClass())
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
+                        protected void initChannel(SocketChannel ch) {
                             ch.pipeline().addLast(new RealChannelHandler());
                         }
                     });
@@ -69,13 +77,13 @@ public class TunnelClient implements Lifecycle {
             if (ssl) {
                 sslContext = new ClientSslContextFactory().createContext();
             }
-            tunnelWorkerGroup = eventLoopConfig.workerGroup;
+            tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             tunnelBootstrap.group(tunnelWorkerGroup)
-                    .channel(eventLoopConfig.clientChannelClass)
+                    .channel(NettyEventLoopFactory.socketChannelClass())
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            if (ssl){
+                            if (ssl) {
                                 SSLEngine engine = sslContext.newEngine(sc.alloc(), serverAddr, serverPort);
                                 engine.setUseClientMode(true);
                                 sc.pipeline().addLast("ssl", new SslHandler(engine));
@@ -85,7 +93,8 @@ public class TunnelClient implements Lifecycle {
                                     .addLast(new TunnelMessageEncoder())
                                     .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
                                     .addLast(new TunnelChannelHandler(realBootstrap, tunnelBootstrap, ctx -> {
-                                        retryCount.set(0); // 重置重试计数器
+                                        // 重置重试计数器
+                                        retryCount.set(0);
                                         //服务器断开 执行重试 重新连接
                                         scheduleReconnect();
                                     }));
@@ -94,7 +103,7 @@ public class TunnelClient implements Lifecycle {
             //连接到服务器
             connectTunnelServer();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -109,8 +118,8 @@ public class TunnelClient implements Lifecycle {
                         .setExt(secretKey)
                         .build();
                 future.channel().writeAndFlush(message);
-                retryCount.set(0); // 重置重试计数器
-                AnsiLog.info("etp客户端启动成功");
+                retryCount.set(0);
+                AnsiLog.info("已连接到服务端");
             } else {
                 //重新连接
                 scheduleReconnect();
@@ -120,19 +129,18 @@ public class TunnelClient implements Lifecycle {
 
     private void scheduleReconnect() {
         if (retryCount.get() >= maxRetries) {
-            System.err.println("达到最大重试次数，停止重连");
-            tunnelWorkerGroup.shutdownGracefully();
+            AnsiLog.error("达到最大重试次数，停止重连");
+            this.stop();
             return;
         }
-        // 计算退避时间 (2^n秒，最大不超过maxDelaySec)
+        // 计算退避时间 (最大不超过maxDelaySec)
         int retries = retryCount.getAndIncrement();
-        //指数计算，如果超过了最大延迟时间，则取最大延迟时间
-        // long delay = Math.min((1L << retries), maxDelaySec);
-        long delay = calculateDelay();//指数退避 + 随机抖动(±30%)
-        System.out.printf("[连接失败] 第%d次重连将在%d秒后执行%n", retries + 1, delay);
+        //指数退避
+        long delay = calculateDelay();
+        AnsiLog.error("连接失败，第{}次重连将在{}秒后执行", retries + 1, delay);
         // 调度重连任务
         tunnelWorkerGroup.schedule(() -> {
-            System.out.println("重连中...");
+            AnsiLog.info("重连中...");
             connectTunnelServer();
         }, delay, TimeUnit.SECONDS);
     }
@@ -155,7 +163,9 @@ public class TunnelClient implements Lifecycle {
 
     @Override
     public void stop() {
-        tunnelWorkerGroup.shutdownGracefully();
+        if (tunnelWorkerGroup != null) {
+            tunnelWorkerGroup.shutdownGracefully();
+        }
     }
 
     public String getServerAddr() {
