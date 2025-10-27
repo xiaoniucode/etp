@@ -5,6 +5,9 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author liuxin
+ */
 public class PortChecker {
     /**
      * 检查指定端口是否被占用
