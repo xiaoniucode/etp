@@ -110,8 +110,10 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()} etp xilio.cn`,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      //设置高亮语言
+      additionalLanguages: ['powershell',"java","protobuf","python"],
+      theme: prismThemes.oneDark,//白天主题
+      darkTheme: prismThemes.oneDark,//黑夜主题
     },
   } satisfies Preset.ThemeConfig,
 };

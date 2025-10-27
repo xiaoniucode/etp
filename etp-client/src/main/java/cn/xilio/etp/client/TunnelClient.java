@@ -3,7 +3,7 @@ package cn.xilio.etp.client;
 import cn.xilio.etp.client.handler.internal.RealChannelHandler;
 import cn.xilio.etp.client.handler.tunnel.TunnelChannelHandler;
 import cn.xilio.etp.common.ansi.AnsiLog;
-import cn.xilio.etp.core.EventLoopUtils;
+import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.protocol.TunnelMessage;
 import cn.xilio.etp.core.heart.IdleCheckHandler;
@@ -56,12 +56,12 @@ public class TunnelClient implements Lifecycle {
         try {
             tunnelBootstrap = new Bootstrap();
             Bootstrap realBootstrap = new Bootstrap();
-            EventLoopUtils.ClientConfig eventLoopConfig = EventLoopUtils.createClientEventLoopConfig();
-            realBootstrap.group(eventLoopConfig.workerGroup)
-                    .channel(eventLoopConfig.clientChannelClass)
+
+            realBootstrap.group(NettyEventLoopFactory.eventLoopGroup())
+                    .channel(NettyEventLoopFactory.socketChannelClass())
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
+                        protected void initChannel(SocketChannel ch) {
                             ch.pipeline().addLast(new RealChannelHandler());
                         }
                     });
@@ -69,13 +69,13 @@ public class TunnelClient implements Lifecycle {
             if (ssl) {
                 sslContext = new ClientSslContextFactory().createContext();
             }
-            tunnelWorkerGroup = eventLoopConfig.workerGroup;
+            tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             tunnelBootstrap.group(tunnelWorkerGroup)
-                    .channel(eventLoopConfig.clientChannelClass)
+                    .channel(NettyEventLoopFactory.socketChannelClass())
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            if (ssl){
+                            if (ssl) {
                                 SSLEngine engine = sslContext.newEngine(sc.alloc(), serverAddr, serverPort);
                                 engine.setUseClientMode(true);
                                 sc.pipeline().addLast("ssl", new SslHandler(engine));

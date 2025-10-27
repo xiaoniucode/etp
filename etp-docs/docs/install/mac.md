@@ -3,4 +3,5 @@ sidebar_position: 2
 ---
 
 # Mac
-✍️完善中...
+
+macos和Linux安装方式一样。

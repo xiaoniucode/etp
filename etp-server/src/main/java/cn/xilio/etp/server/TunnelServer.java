@@ -1,7 +1,7 @@
 package cn.xilio.etp.server;
 
 
-import cn.xilio.etp.core.EventLoopUtils;
+import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.heart.IdleCheckHandler;
 import cn.xilio.etp.core.protocol.TunnelMessageDecoder;
@@ -9,6 +9,7 @@ import cn.xilio.etp.core.protocol.TunnelMessageEncoder;
 import cn.xilio.etp.server.handler.TunnelChannelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslContext;
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author xiaoniucode
+ * @author liuxin
  */
 public class TunnelServer implements Lifecycle {
     private static final Logger LOGGER = LoggerFactory.getLogger(TunnelServer.class);
@@ -35,12 +36,11 @@ public class TunnelServer implements Lifecycle {
             if (ssl) {
                 sslContext = new ServerSslContextFactory().createContext();
             }
-            EventLoopUtils.ServerConfig config = EventLoopUtils.createServerEventLoopConfig();
-            tunnelBossGroup = config.bossGroup;
-            tunnelWorkerGroup = config.workerGroup;
+            tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
+            tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(tunnelBossGroup, tunnelWorkerGroup)
-                    .channel(config.serverChannelClass)
+                    .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {

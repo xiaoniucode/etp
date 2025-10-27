@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * 通道管理器
  *
- * @author xiaoniucode
+ * @author liuxin
  */
 public class ChannelManager {
     /**

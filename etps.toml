@@ -3,7 +3,7 @@ bindPort = 9527
 
 ssl = true
 [keystore]
-path = "cert/server.p12"
+path = "./cert/server.p12"
 keyPass = "3FbV8R8VW49O"
 storePass = "3FbV8R8VW49O"
 

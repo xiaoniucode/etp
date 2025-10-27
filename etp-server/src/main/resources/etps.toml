@@ -1,5 +1,11 @@
 #绑定端口
 bindPort = 9527
+#SSL安全加密传输配置
+#ssl = true
+#[keystore]
+#path = "cert/server.p12"
+#keyPass = "veHzlXBADiAr"
+#storePass = "veHzlXBADiAr"
 # 代理客户端配置
 [[clients]]
 name = "windows"
@@ -23,9 +29,4 @@ secretKey = "your secret key" #[必填]客户端认证秘钥，自定义
 #localPort = 8080
 #remotePort = 8085
 
-#SSL安全加密传输配置
-#ssl = true
-#[keystore]
-#path = "cert/server.p12"
-#keyPass = "veHzlXBADiAr"
-#storePass = "veHzlXBADiAr"
+
