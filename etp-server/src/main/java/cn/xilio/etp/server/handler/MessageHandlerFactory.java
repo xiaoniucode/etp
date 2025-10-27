@@ -9,6 +9,7 @@ import java.util.Map;
 
 /**
  * 隧道消息处理器工厂
+ * @author liuxin
  */
 public class MessageHandlerFactory {
     private static final Map<TunnelMessage.Message.Type, MessageHandler> handlers = new HashMap<>();
