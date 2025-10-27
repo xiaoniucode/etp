@@ -1,5 +1,6 @@
 package cn.xilio.etp.server;
 
+import cn.xilio.etp.common.PortFileUtil;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.server.handler.VisitorChannelHandler;
@@ -85,7 +86,7 @@ public class TcpProxyServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            sc.pipeline().addLast(new TrafficMetricsHandler());/*流量指标统计*/
+                            // sc.pipeline().addLast(new TrafficMetricsHandler());/*流量指标统计*/
                             sc.pipeline().addLast(new VisitorChannelHandler());/*公网访问者处理器*/
                         }
                     });
@@ -145,10 +146,9 @@ public class TcpProxyServer implements Lifecycle {
                         System.out.println("--------------------------代理端口--------------------------");
                         for (StringBuilder item : bindPorts) {
                             System.out.println(item.toString());
-                            LOGGER.info("绑定：|{}|", item);
                         }
                         System.out.println("----------------------------------------------------------");
-
+                        PortFileUtil.writePortsToFile(bindPorts);
                     }
 
                 }

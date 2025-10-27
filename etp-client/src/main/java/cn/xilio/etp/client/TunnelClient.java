@@ -33,7 +33,7 @@ public class TunnelClient implements Lifecycle {
     /**
      * 初始化重连延迟时间 单位：秒
      */
-    private long initialDelaySec = 2;
+    private  long initialDelaySec = 2;
     /**
      * 最大重试次数 超过以后关闭workerGroup
      */
@@ -130,7 +130,7 @@ public class TunnelClient implements Lifecycle {
     private void scheduleReconnect() {
         if (retryCount.get() >= maxRetries) {
             AnsiLog.error("达到最大重试次数，停止重连");
-            tunnelWorkerGroup.shutdownGracefully();
+            this.stop();
             return;
         }
         // 计算退避时间 (最大不超过maxDelaySec)
@@ -163,7 +163,9 @@ public class TunnelClient implements Lifecycle {
 
     @Override
     public void stop() {
-        tunnelWorkerGroup.shutdownGracefully();
+        if (tunnelWorkerGroup != null) {
+            tunnelWorkerGroup.shutdownGracefully();
+        }
     }
 
     public String getServerAddr() {
