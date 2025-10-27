@@ -9,6 +9,7 @@ import java.io.File;
 
 /**
  * 客户端SSL上下文工厂（单向认证）
+ * @author liuxin
  */
 public class ClientSslContextFactory extends AbstractSslContextFactory {
     private static final String TRUSTSTORE_PATH = System.getProperty("client.truststore.path");

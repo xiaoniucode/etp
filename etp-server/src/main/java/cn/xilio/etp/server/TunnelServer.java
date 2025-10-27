@@ -24,8 +24,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class TunnelServer implements Lifecycle {
     private static final Logger LOGGER = LoggerFactory.getLogger(TunnelServer.class);
+    /**
+     * 绑定地址
+     */
     private String host = "0.0.0.0";
+    /**
+     * 绑定端口
+     */
     private int port;
+    /**
+     * 是否开启SSL加密传输
+     */
     private boolean ssl;
     private EventLoopGroup tunnelBossGroup;
     private EventLoopGroup tunnelWorkerGroup;
