@@ -27,7 +27,6 @@ public class PortAllocator {
     private final Set<Integer> allocatedPorts = new HashSet<>(32);
 
     private PortAllocator() {
-        LOGGER.info("PortAllocator 单例实例初始化");
     }
 
     /**

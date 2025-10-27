@@ -1,11 +1,3 @@
-#你的etps所在服务器IP地址
-serverAddr = "x.x.x.x"
-#你的etps 绑定的端口
+serverAddr = "127.0.0.1"
 serverPort = 9527
-#认证密码[必填]
-secretKey = "your secret key"
-#TCP SSL安全加密密码配置
-#ssl = true
-#[truststore]
-#path = "cert/client.p12"
-#storePass = "JCAkB4X7G3T6"
+secretKey = "your-secret-key"
