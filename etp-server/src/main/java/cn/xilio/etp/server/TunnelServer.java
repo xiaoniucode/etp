@@ -16,6 +16,7 @@ import io.netty.handler.ssl.SslContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -59,8 +60,17 @@ public class TunnelServer implements Lifecycle {
             } else {
                 serverBootstrap.bind(port).sync();
             }
-            //启动所有端口映射服务
+            //绑定所有代理端口
             TcpProxyServer.getInstance().start();
+       /*     // 异步绑定代理所有端口
+            CompletableFuture.runAsync(() -> {
+                try {
+                    TcpProxyServer.getInstance().start();
+                    LOGGER.info("端口映射服务已成功启动");
+                } catch (Exception e) {
+                    LOGGER.error("启动端口映射服务失败: {}", e.getMessage(), e);
+                }
+            });*/
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
@@ -71,7 +81,7 @@ public class TunnelServer implements Lifecycle {
         try {
             tunnelBossGroup.shutdownGracefully().sync();
             tunnelWorkerGroup.shutdownGracefully().sync();
-            //关闭所有端口代理，释放资源
+            //关闭所有绑定的代理端口，释放资源
             TcpProxyServer.getInstance().stop();
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage());
