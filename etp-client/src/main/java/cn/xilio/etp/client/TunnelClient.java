@@ -137,7 +137,7 @@ public class TunnelClient implements Lifecycle {
         int retries = retryCount.getAndIncrement();
         //指数退避
         long delay = calculateDelay();
-        AnsiLog.error("连接失败],第{}次重连将在{}秒后执行", retries + 1, delay);
+        AnsiLog.error("连接失败，第{}次重连将在{}秒后执行", retries + 1, delay);
         // 调度重连任务
         tunnelWorkerGroup.schedule(() -> {
             AnsiLog.info("重连中...");
