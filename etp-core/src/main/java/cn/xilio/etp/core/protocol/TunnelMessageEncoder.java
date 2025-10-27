@@ -4,6 +4,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
+/**
+ * @author liuxin
+ */
 public class TunnelMessageEncoder extends MessageToByteEncoder<TunnelMessage.Message> {
     private static final int TYPE_SIZE = 1;
     private static final int SESSION_ID_SIZE = 8;

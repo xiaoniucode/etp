@@ -10,7 +10,7 @@ import java.io.File;
 
 /**
  * 服务端SSL上下文工厂（单向认证）
- * @author xiaoniucode
+ * @author liuxin
  */
 public class ServerSslContextFactory extends AbstractSslContextFactory {
     private static final String KEYSTORE_PATH = System.getProperty("server.keystore.path");

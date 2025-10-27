@@ -1,7 +1,10 @@
 package cn.xilio.etp.server;
 
+import cn.xilio.etp.common.PortFileUtil;
 import cn.xilio.etp.core.Lifecycle;
+import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.server.handler.VisitorChannelHandler;
+import cn.xilio.etp.server.metrics.TrafficMetricsHandler;
 import cn.xilio.etp.server.store.ClientInfo;
 import cn.xilio.etp.server.store.Config;
 import cn.xilio.etp.server.store.ProxyMapping;
@@ -25,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * TCP代理服务器类（单例模式），负责启动和管理TCP代理服务。
  *
- * @author xiaoniucode
+ * @author liuxin
  */
 public class TcpProxyServer implements Lifecycle {
     private static final Logger LOGGER = LoggerFactory.getLogger(TcpProxyServer.class);
@@ -74,16 +77,17 @@ public class TcpProxyServer implements Lifecycle {
     public void start() {
         lock.lock();
         try {
-            LOGGER.info("开始启动TCP代理服务器");
-            bossGroup = new NioEventLoopGroup();
-            workerGroup = new NioEventLoopGroup();
+            LOGGER.info("开始启动代理服务");
+            bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
+            workerGroup = NettyEventLoopFactory.eventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
+                    .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            sc.pipeline().addLast(new VisitorChannelHandler());
+                            // sc.pipeline().addLast(new TrafficMetricsHandler());/*流量指标统计*/
+                            sc.pipeline().addLast(new VisitorChannelHandler());/*公网访问者处理器*/
                         }
                     });
             try {
@@ -98,7 +102,7 @@ public class TcpProxyServer implements Lifecycle {
                                 Integer remotePort = proxy.getRemotePort();
                                 //如果用户没有指定远程端口，则由系统随机生成
                                 if (remotePort == null) {
-                                    //随机分配一个可用的端口⚠️
+                                    //随机分配一个可用的端口⚠
                                     int allocatePort = portAllocator.allocateAvailablePort();
                                     ChannelFuture future = serverBootstrap.bind(allocatePort).sync();
                                     StringBuilder portItem = new StringBuilder();
@@ -138,12 +142,13 @@ public class TcpProxyServer implements Lifecycle {
                         }
                     }
                     //打印已绑定的服务
-                    if (!bindPorts.isEmpty()){
-                        System.out.println("------------------------已绑定的端口------------------------");
+                    if (!bindPorts.isEmpty()) {
+                        System.out.println("--------------------------代理端口--------------------------");
                         for (StringBuilder item : bindPorts) {
                             System.out.println(item.toString());
                         }
                         System.out.println("----------------------------------------------------------");
+                        PortFileUtil.writePortsToFile(bindPorts);
                     }
 
                 }
