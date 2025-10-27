@@ -20,10 +20,11 @@ public class PortAllocator {
 
     private static volatile PortAllocator instance;
 
-    // 可重入锁，确保多线程环境下端口分配和缓存操作的线程安全
+    /**
+     *  可重入锁，确保多线程环境下端口分配和缓存操作的线程安全
+     */
     private final ReentrantLock lock = new ReentrantLock();
 
-    // 缓存已分配的端口
     private final Set<Integer> allocatedPorts = new HashSet<>(32);
 
     private PortAllocator() {
