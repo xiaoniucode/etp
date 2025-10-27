@@ -1,7 +1,7 @@
 #绑定端口
 bindPort = 9527
 
-ssl = true
+ssl = false
 [keystore]
 path = "./cert/server.p12"
 keyPass = "3FbV8R8VW49O"

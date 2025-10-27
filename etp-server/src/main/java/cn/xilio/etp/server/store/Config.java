@@ -6,7 +6,6 @@ import cn.xilio.etp.common.TomlUtils;
 
 import cn.xilio.etp.core.protocol.ProtocolType;
 import com.moandjiezana.toml.Toml;
-import io.netty.util.internal.ObjectUtil;
 import io.netty.util.internal.StringUtil;
 
 import java.util.*;
@@ -24,6 +23,7 @@ public class Config {
      */
     private static final String DEFAULT_PROXY_PATH = System.getProperty("user.home") + "/etp/" + "etps.toml";
 
+    private static String host;
     private static Integer bindPort;
     /**
      * 存储客户端信息，包括客户端的服务端口配置信息
@@ -89,6 +89,9 @@ public class Config {
         Toml toml = TomlUtils.readToml(proxyPath);
         if (toml.contains("bindPort")) {
             bindPort = toml.getLong("bindPort").intValue();
+        }
+        if (toml.contains("host")) {
+            host = toml.getString("host");
         }
         //SSL密钥
         Boolean sslValue = toml.getBoolean("ssl");
@@ -198,7 +201,7 @@ public class Config {
         return res != null ? res : new ArrayList<>();
     }
 
-    public  void addClientPublicNetworkPortMapping(String secretKey,Integer remotePort) {
+    public void addClientPublicNetworkPortMapping(String secretKey, Integer remotePort) {
         List<Integer> ports = clientPublicNetworkPortMapping.get(secretKey);
         ports.add(remotePort);
         clientPublicNetworkPortMapping.put(secretKey, ports);
@@ -226,11 +229,15 @@ public class Config {
         return ssl;
     }
 
-    public static KeystoreConfig getKeystoreConfig() {
+    public KeystoreConfig getKeystoreConfig() {
         return keystoreConfig;
     }
 
-    public  Map<Integer, Integer> getPortLocalServerMapping() {
+    public Map<Integer, Integer> getPortLocalServerMapping() {
         return portLocalServerMapping;
+    }
+
+    public String getHost() {
+        return host;
     }
 }

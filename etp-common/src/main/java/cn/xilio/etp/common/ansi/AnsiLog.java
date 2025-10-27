@@ -32,19 +32,19 @@ public abstract class AnsiLog {
     private static final int CYAN = 36;
     private static final int WHITE = 37;
 
-    private static final String TRACE_PREFIX = "[TRACE] ";
+    private static final String TRACE_PREFIX = "[追踪] ";
     private static final String TRACE_COLOR_PREFIX = "[" + colorStr("TRACE", GREEN) + "] ";
 
-    private static final String DEBUG_PREFIX = "[DEBUG] ";
+    private static final String DEBUG_PREFIX = "[调试] ";
     private static final String DEBUG_COLOR_PREFIX = "[" + colorStr("DEBUG", GREEN) + "] ";
 
-    private static final String INFO_PREFIX = "[INFO] ";
+    private static final String INFO_PREFIX = "[提示] ";
     private static final String INFO_COLOR_PREFIX = "[" + colorStr("INFO", GREEN) + "] ";
 
-    private static final String WARN_PREFIX = "[WARN] ";
+    private static final String WARN_PREFIX = "[警告] ";
     private static final String WARN_COLOR_PREFIX = "[" + colorStr("WARN", YELLOW) + "] ";
 
-    private static final String ERROR_PREFIX = "[ERROR] ";
+    private static final String ERROR_PREFIX = "[错误] ";
     private static final String ERROR_COLOR_PREFIX = "[" + colorStr("ERROR", RED) + "] ";
 
     static {

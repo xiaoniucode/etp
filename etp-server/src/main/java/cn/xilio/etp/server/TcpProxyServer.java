@@ -140,11 +140,13 @@ public class TcpProxyServer implements Lifecycle {
                     }
                     //打印已绑定的服务
                     if (!bindPorts.isEmpty()){
-                        System.out.println("------------------------已绑定的端口------------------------");
+                        System.out.println("--------------------------代理端口--------------------------");
                         for (StringBuilder item : bindPorts) {
                             System.out.println(item.toString());
+                            LOGGER.info("绑定：|{}|", item);
                         }
                         System.out.println("----------------------------------------------------------");
+
                     }
 
                 }
