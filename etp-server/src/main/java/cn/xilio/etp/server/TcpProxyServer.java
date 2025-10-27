@@ -1,6 +1,7 @@
 package cn.xilio.etp.server;
 
 import cn.xilio.etp.core.Lifecycle;
+import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.server.handler.VisitorChannelHandler;
 import cn.xilio.etp.server.store.ClientInfo;
 import cn.xilio.etp.server.store.Config;
@@ -25,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * TCP代理服务器类（单例模式），负责启动和管理TCP代理服务。
  *
- * @author xiaoniucode
+ * @author liuxin
  */
 public class TcpProxyServer implements Lifecycle {
     private static final Logger LOGGER = LoggerFactory.getLogger(TcpProxyServer.class);
@@ -75,11 +76,11 @@ public class TcpProxyServer implements Lifecycle {
         lock.lock();
         try {
             LOGGER.info("开始启动TCP代理服务器");
-            bossGroup = new NioEventLoopGroup();
-            workerGroup = new NioEventLoopGroup();
+            bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
+            workerGroup = NettyEventLoopFactory.eventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
+                    .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {

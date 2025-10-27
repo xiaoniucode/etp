@@ -14,6 +14,9 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * @author liuxin
+ */
 public class ChannelManager {
     /**
      * 保存一个访问者会话与内网真实服务通道的映射关系
@@ -57,7 +60,7 @@ public class ChannelManager {
         while (iterator.hasNext()) {
             Map.Entry<Long, Channel> entry = iterator.next();
             Channel channel = entry.getValue();
-            ChannelUtils.closeOnFlush(channel);//如果是存活的则关闭
+            ChannelUtils.closeOnFlush(channel);
             iterator.remove();//清除缓存
         }
     }
