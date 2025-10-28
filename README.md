@@ -50,11 +50,6 @@ Start the etp server on a Linux server with a public IP address for external acc
 nohup ./etps -c etps.toml &
 ```
 
-🔔 **Note**: Starting from version 1.0.4, if **etps.toml** is in the same directory as the executable, the **-c** flag is not required. You can start it as follows:
-```shell
-./etps # Or run in the background: nohup ./etps &
-```
-
 ### 💻 Client (etpc) Configuration
 
 > Edit the configuration file `etpc.toml`:
@@ -76,7 +71,6 @@ Start the client on the internal network computer, using a Unix-based system as 
 After successful startup, connect to MySQL using port **3307**.
 
 ## 🔒 SSL Configuration (Optional)
-> Starting from etp v1.0.3, TLS 1.3 encryption is supported and can be configured as needed.
 
 1️⃣ First, download the certificate generation command-line tool [generate_ssl_cert.sh](scripts/generate_ssl_cert.sh) to your local machine (alternatively, use JDK's keytool). For detailed usage, refer to the [certificate generation documentation](doc/code-gen.md). This tool currently requires a JDK environment.
 
