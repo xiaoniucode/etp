@@ -3,6 +3,9 @@ package cn.xilio.etp.core;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author liuxin
  */
@@ -16,5 +19,9 @@ public class EtpConstants {
     public static final AttributeKey<Channel> CONTROL_CHANNEL = AttributeKey.valueOf("etp.controlChannel");
     public static final AttributeKey<Channel> REAL_SERVER_CHANNEL = AttributeKey.valueOf("etp.realServerChannel");
     public static final AttributeKey<Channel> CLIENT_CHANNEL = AttributeKey.valueOf("etp.clientChannel");
+
+    // ====================== 其他 ======================
+    public static final AttributeKey<Map<Long, Channel>> CLIENT_CHANNELS = AttributeKey.newInstance("etp.clientChannels");
+    public static final AttributeKey<List<Integer>> CHANNEL_PORT = AttributeKey.valueOf("etp.channelPort");
 
 }

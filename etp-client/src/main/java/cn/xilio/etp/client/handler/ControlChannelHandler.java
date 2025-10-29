@@ -14,14 +14,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author liuxin
  */
-public class TunnelChannelHandler extends SimpleChannelInboundHandler<Message> {
-    private final Logger logger = LoggerFactory.getLogger(TunnelChannelHandler.class);
+public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> {
+    private final Logger logger = LoggerFactory.getLogger(ControlChannelHandler.class);
     /**
      * 连接断开的时候回调接口
      */
     private final ChannelStatusCallback channelStatusCallback;
 
-    public TunnelChannelHandler(ChannelStatusCallback channelStatusCallback) {
+    public ControlChannelHandler(ChannelStatusCallback channelStatusCallback) {
         this.channelStatusCallback = channelStatusCallback;
     }
 

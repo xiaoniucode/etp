@@ -17,14 +17,14 @@ public class ConnectHandler extends AbstractMessageHandler {
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
         long sessionId = msg.getSessionId();
         String secretKey = msg.getExt();
-        Channel controlChannel = ChannelManager.getControlTunnelChannel(secretKey);
-        Channel visitorChannel = ChannelManager.getVisitorChannel(controlChannel, sessionId);
+        Channel controlChannel = ChannelManager.getControlChannelBySecretKey(secretKey);
+        Channel clientChannel = ChannelManager.getClientChannel(controlChannel, sessionId);
         Channel dataChannel = ctx.channel();
-        dataChannel.attr(EtpConstants.CLIENT_CHANNEL).set(visitorChannel);
+        dataChannel.attr(EtpConstants.CLIENT_CHANNEL).set(clientChannel);
         dataChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
         dataChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
 
-        visitorChannel.attr(EtpConstants.DATA_CHANNEL).set(ctx.channel());
-        visitorChannel.config().setOption(ChannelOption.AUTO_READ, true);
+        clientChannel.attr(EtpConstants.DATA_CHANNEL).set(ctx.channel());
+        clientChannel.config().setOption(ChannelOption.AUTO_READ, true);
     }
 }

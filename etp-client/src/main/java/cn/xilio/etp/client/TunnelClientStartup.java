@@ -3,14 +3,10 @@ package cn.xilio.etp.client;
 import ch.qos.logback.classic.Level;
 import cn.xilio.etp.common.ConfigUtils;
 import cn.xilio.etp.common.LogbackConfigurator;
-import cn.xilio.etp.common.ansi.AnsiLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * @author liuxin

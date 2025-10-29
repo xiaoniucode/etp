@@ -5,13 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 支持代理的协议类型
+ * 支持的协议类型
+ *
+ * @author liuxin
  */
 public enum ProtocolType {
     TCP;
-    /**
-     * 用于缓存协议类型，提高性能
-     */
     private static final Map<String, ProtocolType> NAME_MAP;
 
     static {

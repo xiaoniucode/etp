@@ -11,7 +11,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
- * 隧道通道处理器
+ * 负责认证、消息分发
  * @author liuxin
  */
 public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
@@ -31,14 +31,14 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMes
         if (clientChannel!=null){
             String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
             Long sessionId = ctx.channel().attr(EtpConstants.SESSION_ID).get();
-            Channel controlTunnelChannel = ChannelManager.getControlTunnelChannel(secretKey);
+            Channel controlTunnelChannel = ChannelManager.getControlChannelBySecretKey(secretKey);
             if (controlTunnelChannel!=null) {
-                ChannelManager.removeVisitorChannelFromTunnelChannel(controlTunnelChannel, sessionId);
+                ChannelManager.removeClientChannelFromControlChannel(controlTunnelChannel, sessionId);
                 ChannelUtils.closeOnFlush(controlTunnelChannel);
                 clientChannel.close();
             }
         }else {
-            ChannelManager.removeTunnelAndBindRelationship(ctx.channel());
+            ChannelManager.clearControlChannel(ctx.channel());
         }
         super.channelInactive(ctx);
     }
