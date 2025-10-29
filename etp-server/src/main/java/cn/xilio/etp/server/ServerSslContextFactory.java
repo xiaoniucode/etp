@@ -9,7 +9,8 @@ import javax.net.ssl.KeyManagerFactory;
 import java.io.File;
 
 /**
- * 服务端SSL上下文工厂（单向认证）
+ * 服务端SSL上下文工厂
+ *
  * @author liuxin
  */
 public class ServerSslContextFactory extends AbstractSslContextFactory {
@@ -20,9 +21,7 @@ public class ServerSslContextFactory extends AbstractSslContextFactory {
 
     @Override
     public SslContext createContext() throws Exception {
-        // 调用父类方法加载密钥库
-        KeyManagerFactory serverKmf = loadKeyStore(SERVER_KEYSTORE, KEYSTORE_KEY_PASS,KEYSTORE_STORE_PASS);
-
+        KeyManagerFactory serverKmf = loadKeyStore(SERVER_KEYSTORE, KEYSTORE_KEY_PASS, KEYSTORE_STORE_PASS);
         return SslContextBuilder
                 .forServer(serverKmf)
                 .sslProvider(DEFAULT_SSL_PROVIDER)

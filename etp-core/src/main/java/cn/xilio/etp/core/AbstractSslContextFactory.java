@@ -13,7 +13,6 @@ import java.security.KeyStore;
  * @author liuxin
  */
 public abstract class AbstractSslContextFactory {
-    // 强制采用TLS1.3协议版本
     protected static final String PROTOCOL_TLS_1_3 = "TLSv1.3";
     protected static final SslProvider DEFAULT_SSL_PROVIDER = SslProvider.JDK;
 
@@ -63,7 +62,7 @@ public abstract class AbstractSslContextFactory {
     }
 
     /**
-     * 子类需实现的抽象方法：创建具体的SslContext
+     * 创建具体的SslContext
      */
     public abstract SslContext createContext() throws Exception;
 }

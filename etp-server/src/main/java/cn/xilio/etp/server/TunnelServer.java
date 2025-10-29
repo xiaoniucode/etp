@@ -3,38 +3,27 @@ package cn.xilio.etp.server;
 
 import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.core.Lifecycle;
-import cn.xilio.etp.core.heart.IdleCheckHandler;
+import cn.xilio.etp.core.IdleCheckHandler;
 import cn.xilio.etp.core.protocol.TunnelMessageDecoder;
 import cn.xilio.etp.core.protocol.TunnelMessageEncoder;
-import cn.xilio.etp.server.handler.TunnelChannelHandler;
+import cn.xilio.etp.server.handler.ControlChannelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author liuxin
  */
 public class TunnelServer implements Lifecycle {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TunnelServer.class);
-    /**
-     * 绑定地址
-     */
+    private static final Logger logger = LoggerFactory.getLogger(TunnelServer.class);
     private String host = "0.0.0.0";
-    /**
-     * 绑定端口
-     */
     private int port;
-    /**
-     * 是否开启SSL加密传输
-     */
     private boolean ssl;
     private EventLoopGroup tunnelBossGroup;
     private EventLoopGroup tunnelWorkerGroup;
@@ -58,30 +47,18 @@ public class TunnelServer implements Lifecycle {
                                 sc.pipeline().addLast("ssl", sslContext.newHandler(sc.alloc()));
                             }
                             sc.pipeline()
-                                    .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 4, 0, 0))
+                                    .addLast(new TunnelMessageDecoder())
                                     .addLast(new TunnelMessageEncoder())
                                     .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
-                                    .addLast(new TunnelChannelHandler());
+                                    .addLast(new ControlChannelHandler());
                         }
                     });
-            if (host != null) {
-                serverBootstrap.bind(host, port).sync();
-            } else {
-                serverBootstrap.bind(port).sync();
-            }
+            serverBootstrap.bind(host, port).sync();
             //绑定所有代理端口
             TcpProxyServer.getInstance().start();
-       /*     // 异步绑定代理所有端口
-            CompletableFuture.runAsync(() -> {
-                try {
-                    TcpProxyServer.getInstance().start();
-                    LOGGER.info("端口映射服务已成功启动");
-                } catch (Exception e) {
-                    LOGGER.error("启动端口映射服务失败: {}", e.getMessage(), e);
-                }
-            });*/
+            logger.info("代理服务启动成功:{}:{}", host, port);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -93,15 +70,18 @@ public class TunnelServer implements Lifecycle {
             //关闭所有绑定的代理端口，释放资源
             TcpProxyServer.getInstance().stop();
         } catch (InterruptedException e) {
-            LOGGER.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
+
     public String getHost() {
         return host;
     }
 
     public void setHost(String host) {
-        this.host = host;
+        if (host != null) {
+            this.host = host;
+        }
     }
 
     public int getPort() {

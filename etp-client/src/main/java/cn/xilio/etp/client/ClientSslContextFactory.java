@@ -8,7 +8,7 @@ import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
 
 /**
- * 客户端SSL上下文工厂（单向认证）
+ * 客户端SSL上下文工厂
  * @author liuxin
  */
 public class ClientSslContextFactory extends AbstractSslContextFactory {
@@ -18,7 +18,6 @@ public class ClientSslContextFactory extends AbstractSslContextFactory {
 
     @Override
     public SslContext createContext() throws Exception {
-        // 调用父类方法加载信任库
         TrustManagerFactory clientTmf = loadTrustStore(CLIENT_TRUSTSTORE, TRUSTSTORE_STORE_PASS);
         return SslContextBuilder
                 .forClient()

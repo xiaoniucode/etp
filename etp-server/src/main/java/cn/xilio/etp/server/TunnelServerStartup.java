@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Level;
 import cn.xilio.etp.common.ConfigUtils;
 import cn.xilio.etp.common.LogbackConfigurator;
 import cn.xilio.etp.common.PortChecker;
-import cn.xilio.etp.common.ansi.AnsiLog;
 import cn.xilio.etp.server.store.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class TunnelServerStartup {
         new LogbackConfigurator.LogbackConfigBuilder()
                 .setLogFilePath("logs" + File.separator + "etps.log")
                 .setArchiveFilePattern("logs" + File.separator + "etps.%d{yyyy-MM-dd}.log")
-                .setLogLevel(Level.WARN)
+                .setLogLevel(Level.INFO)
                 .build()
                 .configureLogback();
     }
@@ -40,7 +39,6 @@ public class TunnelServerStartup {
         Integer bindPort = Config.getInstance().getBindPort();
         if (PortChecker.isPortOccupied(bindPort)) {
             logger.error("{}端口已经被占用",bindPort);
-            AnsiLog.error("{}端口已经被占用",bindPort);
             return;
         }
         registerShutdownHook(tunnelServer);
@@ -50,8 +48,7 @@ public class TunnelServerStartup {
         tunnelServer.setSsl(Config.getInstance().isSsl());
 
         tunnelServer.start();
-        AnsiLog.info("代理服务端启动成功～");
-        logger.info("代理服务启动成功，监听端口：{}", tunnelServer.getPort());
+
     }
 
     private static void registerShutdownHook(TunnelServer tunnelServer) {

@@ -28,18 +28,22 @@ class EtpTestApplicationTests {
     @Test
     void testSingleInsert() {
         //1k 1w 5w 10w 20w
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < 30_0000; i++) {
-            User user = new User()
-                    .setUsername("linghuchong")
-                    .setPassword("joifmekohomeow1798319301nkldmlsdmlsd")
-                    .setRemark("一笑江湖")
-                    .setEmail("helloworld@gmail.com")
-                    .setNickname("令狐冲");
-            userRepository.save(user);
+        for (int i2 = 0; i2 < 10; i2++) {
+
+
+            long start = System.currentTimeMillis();
+            for (int i = 0; i < 1_0000; i++) {
+                User user = new User()
+                        .setUsername("linghuchong")
+                        .setPassword("joifmekohomeow1798319301nkldmlsdmlsd")
+                        .setRemark("一笑江湖")
+                        .setEmail("helloworld@gmail.com")
+                        .setNickname("令狐冲");
+                userRepository.save(user);
+            }
+            long end = System.currentTimeMillis();
+            System.out.println("time:" + (end - start));
         }
-        long end = System.currentTimeMillis();
-        System.out.println("time:" + (end - start));
     }
 
     @Test

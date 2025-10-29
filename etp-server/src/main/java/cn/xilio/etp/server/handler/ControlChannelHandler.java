@@ -12,8 +12,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * 隧道通道处理器
+ * @author liuxin
  */
-public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
+public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
         MessageHandler handler = MessageHandlerFactory.getHandler(msg.getType());
@@ -25,23 +26,18 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Channel visitorChannel = ctx.channel().attr(EtpConstants.NEXT_CHANNEL).get();
+        Channel clientChannel = ctx.channel().attr(EtpConstants.CLIENT_CHANNEL).get();
         //数据连接的断开
-        if (visitorChannel!=null){
+        if (clientChannel!=null){
             String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
             Long sessionId = ctx.channel().attr(EtpConstants.SESSION_ID).get();
-            //获取控制通道
             Channel controlTunnelChannel = ChannelManager.getControlTunnelChannel(secretKey);
             if (controlTunnelChannel!=null) {
-                //删除该隧道所有的用户连接
                 ChannelManager.removeVisitorChannelFromTunnelChannel(controlTunnelChannel, sessionId);
                 ChannelUtils.closeOnFlush(controlTunnelChannel);
-                visitorChannel.close();//关闭一个用户session连接
+                clientChannel.close();
             }
         }else {
-            //安全隧道的断开 相当于是客户端与服务器断开连接
-            //1、删除该客户端的安全隧道绑定的所有公网端口号
-            //2、清理掉所有绑定关系
             ChannelManager.removeTunnelAndBindRelationship(ctx.channel());
         }
         super.channelInactive(ctx);
@@ -49,7 +45,7 @@ public class TunnelChannelHandler extends SimpleChannelInboundHandler<TunnelMess
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        Channel visitorChannel = ctx.channel().attr(EtpConstants.NEXT_CHANNEL).get();
+        Channel visitorChannel = ctx.channel().attr(EtpConstants.CLIENT_CHANNEL).get();
         if (visitorChannel!=null) {
             visitorChannel.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
         }

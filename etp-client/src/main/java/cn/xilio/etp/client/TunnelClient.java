@@ -1,12 +1,12 @@
 package cn.xilio.etp.client;
 
-import cn.xilio.etp.client.handler.internal.RealChannelHandler;
-import cn.xilio.etp.client.handler.tunnel.TunnelChannelHandler;
+import cn.xilio.etp.client.handler.RealChannelHandler;
+import cn.xilio.etp.client.handler.TunnelChannelHandler;
 import cn.xilio.etp.common.ansi.AnsiLog;
 import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.protocol.TunnelMessage;
-import cn.xilio.etp.core.heart.IdleCheckHandler;
+import cn.xilio.etp.core.IdleCheckHandler;
 import cn.xilio.etp.core.protocol.TunnelMessageDecoder;
 import cn.xilio.etp.core.protocol.TunnelMessageEncoder;
 import io.netty.bootstrap.Bootstrap;
@@ -33,7 +33,7 @@ public class TunnelClient implements Lifecycle {
     /**
      * 初始化重连延迟时间 单位：秒
      */
-    private  long initialDelaySec = 2;
+    private long initialDelaySec = 2;
     /**
      * 最大重试次数 超过以后关闭workerGroup
      */
@@ -49,7 +49,7 @@ public class TunnelClient implements Lifecycle {
     /**
      * 隧道BootStrap
      */
-    private Bootstrap tunnelBootstrap;
+    private Bootstrap controlBootstrap;
     /**
      * 隧道工作线程组
      */
@@ -62,7 +62,7 @@ public class TunnelClient implements Lifecycle {
     @Override
     public void start() {
         try {
-            tunnelBootstrap = new Bootstrap();
+            controlBootstrap = new Bootstrap();
             Bootstrap realBootstrap = new Bootstrap();
 
             realBootstrap.group(NettyEventLoopFactory.eventLoopGroup())
@@ -78,7 +78,7 @@ public class TunnelClient implements Lifecycle {
                 sslContext = new ClientSslContextFactory().createContext();
             }
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
-            tunnelBootstrap.group(tunnelWorkerGroup)
+            controlBootstrap.group(tunnelWorkerGroup)
                     .channel(NettyEventLoopFactory.socketChannelClass())
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
@@ -89,10 +89,10 @@ public class TunnelClient implements Lifecycle {
                                 sc.pipeline().addLast("ssl", new SslHandler(engine));
                             }
                             sc.pipeline()
-                                    .addLast(new TunnelMessageDecoder(1024 * 1024, 0, 4, 0, 0))
+                                    .addLast(new TunnelMessageDecoder())
                                     .addLast(new TunnelMessageEncoder())
-                                    .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
-                                    .addLast(new TunnelChannelHandler(realBootstrap, tunnelBootstrap, ctx -> {
+                                    .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
+                                    .addLast(new TunnelChannelHandler(ctx -> {
                                         // 重置重试计数器
                                         retryCount.set(0);
                                         //服务器断开 执行重试 重新连接
@@ -100,6 +100,7 @@ public class TunnelClient implements Lifecycle {
                                     }));
                         }
                     });
+            ChannelManager.initBootstraps(controlBootstrap,realBootstrap);
             //连接到服务器
             connectTunnelServer();
         } catch (Exception e) {
@@ -108,11 +109,11 @@ public class TunnelClient implements Lifecycle {
     }
 
     private void connectTunnelServer() {
-        ChannelFuture future = tunnelBootstrap.connect(serverAddr, serverPort);
+        ChannelFuture future = controlBootstrap.connect(serverAddr, serverPort);
         future.addListener((ChannelFutureListener) channelFuture -> {
             if (channelFuture.isSuccess()) {
                 //缓存控制隧道
-                ChannelManager.setControlTunnelChannel(channelFuture.channel());
+                ChannelManager.setControlChannel(channelFuture.channel());
                 TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                         .setType(TunnelMessage.Message.Type.AUTH)
                         .setExt(secretKey)

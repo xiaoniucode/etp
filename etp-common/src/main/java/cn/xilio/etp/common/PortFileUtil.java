@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * 文件工具类
+ *
  * @author liuxin
  */
 public class PortFileUtil {
@@ -37,7 +38,7 @@ public class PortFileUtil {
                 writer.newLine();
             }
             writer.flush();
-            LOGGER.info("端口信息已写入文件：{}", file.getAbsolutePath());
+            LOGGER.info("代理端口配置信息已保存到文件：{}", PORT_FILE_NAME);
         } catch (IOException e) {
             LOGGER.error("写入端口文件失败", e);
         }

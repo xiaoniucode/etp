@@ -1,7 +1,7 @@
-package cn.xilio.etp.server.handler.tunnel;
+package cn.xilio.etp.server.handler;
 
 import cn.xilio.etp.core.EtpConstants;
-import cn.xilio.etp.core.protocol.TunnelMessage;
+import cn.xilio.etp.core.protocol.TunnelMessage.Message;
 import cn.xilio.etp.core.AbstractMessageHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -9,17 +9,19 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
- * 传输消息处理器
+ * 将从客户端代理接收到的数据转发给公网访问者
+ *
+ * @author liuxin
  */
 public class TransferHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx,
-                            TunnelMessage.Message msg) {
-        Channel visitorChannel = ctx.channel().attr(EtpConstants.NEXT_CHANNEL).get();
+                            Message msg) {
+        Channel visitorChannel = ctx.channel().attr(EtpConstants.CLIENT_CHANNEL).get();
         if (visitorChannel == null || !visitorChannel.isWritable()) {
             return;
         }
-        ByteBuf buf = Unpooled.wrappedBuffer(msg.getPayload().asReadOnlyByteBufferList().get(0));
-        visitorChannel.writeAndFlush(buf, visitorChannel.voidPromise());
+        ByteBuf buf = Unpooled.wrappedBuffer(msg.getPayload().asReadOnlyByteBuffer());
+        visitorChannel.writeAndFlush(buf);
     }
 }
