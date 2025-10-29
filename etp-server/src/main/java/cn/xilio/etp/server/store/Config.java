@@ -23,6 +23,7 @@ public class Config {
     private static volatile Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<>();
     private static boolean ssl;
     private static KeystoreConfig keystoreConfig;
+    private static String configPath;
 
     public record KeystoreConfig(String path, String keyPass, String storePass) {
     }
@@ -34,10 +35,11 @@ public class Config {
         return INSTANCE;
     }
 
-    public static void init(String proxyPath) {
+    public static void init(String path) {
+        configPath = path;
         clients = new ArrayList<>();
         clientSecretKeys = new HashSet<>();
-        Toml toml = TomlUtils.readToml(proxyPath);
+        Toml toml = TomlUtils.readToml(configPath);
         if (toml.contains("bindPort")) {
             bindPort = toml.getLong("bindPort").intValue();
         }
@@ -50,11 +52,11 @@ public class Config {
         if (ssl) {
             Toml keystore = toml.getTable("keystore");
             if (keystore != null) {
-                String path = keystore.getString("path");
+                String keyPath = keystore.getString("path");
                 String keyPass = keystore.getString("keyPass");
                 String storePass = keystore.getString("storePass");
-                if (path != null && keyPass != null && storePass != null) {
-                    keystoreConfig = new KeystoreConfig(path, keyPass, storePass);
+                if (keyPath != null && keyPass != null && storePass != null) {
+                    keystoreConfig = new KeystoreConfig(keyPath, keyPass, storePass);
                 }
                 if (keystoreConfig != null) {
                     // 清理可能存在的旧配置
@@ -173,5 +175,9 @@ public class Config {
 
     public String getHost() {
         return host;
+    }
+
+    public  String getConfigPath() {
+        return configPath;
     }
 }
