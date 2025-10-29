@@ -15,8 +15,7 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public class TransferHandler extends AbstractMessageHandler {
     @Override
-    protected void doHandle(ChannelHandlerContext ctx,
-                            Message msg) {
+    protected void doHandle(ChannelHandlerContext ctx, Message msg) {
         Channel visitorChannel = ctx.channel().attr(EtpConstants.CLIENT_CHANNEL).get();
         if (visitorChannel == null || !visitorChannel.isWritable()) {
             return;

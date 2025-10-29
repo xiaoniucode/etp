@@ -1,8 +1,7 @@
 package cn.xilio.etp.client;
 
 import cn.xilio.etp.client.handler.RealChannelHandler;
-import cn.xilio.etp.client.handler.TunnelChannelHandler;
-import cn.xilio.etp.common.ansi.AnsiLog;
+import cn.xilio.etp.client.handler.ControlChannelHandler;
 import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.protocol.TunnelMessage;
@@ -92,7 +91,7 @@ public class TunnelClient implements Lifecycle {
                                     .addLast(new TunnelMessageDecoder())
                                     .addLast(new TunnelMessageEncoder())
                                     .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
-                                    .addLast(new TunnelChannelHandler(ctx -> {
+                                    .addLast(new ControlChannelHandler(ctx -> {
                                         // 重置重试计数器
                                         retryCount.set(0);
                                         //服务器断开 执行重试 重新连接
@@ -100,7 +99,7 @@ public class TunnelClient implements Lifecycle {
                                     }));
                         }
                     });
-            ChannelManager.initBootstraps(controlBootstrap,realBootstrap);
+            ChannelManager.initBootstraps(controlBootstrap, realBootstrap);
             //连接到服务器
             connectTunnelServer();
         } catch (Exception e) {
@@ -120,7 +119,7 @@ public class TunnelClient implements Lifecycle {
                         .build();
                 future.channel().writeAndFlush(message);
                 retryCount.set(0);
-                AnsiLog.info("已连接到服务端");
+                logger.info("已连接到服务端");
             } else {
                 //重新连接
                 scheduleReconnect();
@@ -130,24 +129,18 @@ public class TunnelClient implements Lifecycle {
 
     private void scheduleReconnect() {
         if (retryCount.get() >= maxRetries) {
-            AnsiLog.error("达到最大重试次数，停止重连");
+            logger.error("达到最大重试次数，停止重连");
             this.stop();
             return;
         }
-        // 计算退避时间 (最大不超过maxDelaySec)
         int retries = retryCount.getAndIncrement();
-        //指数退避
         long delay = calculateDelay();
-        AnsiLog.error("连接失败，第{}次重连将在{}秒后执行", retries + 1, delay);
-        // 调度重连任务
-        tunnelWorkerGroup.schedule(() -> {
-            AnsiLog.info("重连中...");
-            connectTunnelServer();
-        }, delay, TimeUnit.SECONDS);
+        logger.error("连接失败，第{}次重连将在{}秒后执行", retries + 1, delay);
+        tunnelWorkerGroup.schedule(this::connectTunnelServer, delay, TimeUnit.SECONDS);
     }
 
     /**
-     * 计算延迟时间
+     * 指数退避算法，计算重连延迟时间
      *
      * @return 时间（秒）
      */

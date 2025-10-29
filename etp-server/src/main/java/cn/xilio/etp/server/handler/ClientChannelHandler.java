@@ -27,64 +27,61 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
-        Channel dataTunnelChannel = ctx.channel().attr(EtpConstants.DATA_CHANNEL).get();
+        Channel dataChannel = ctx.channel().attr(EtpConstants.DATA_CHANNEL).get();
         ByteString payload = ByteString.copyFrom(buf.nioBuffer());
         TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                 .setType(TunnelMessage.Message.Type.TRANSFER)
                 .setPayload(payload)
                 .build();
-        if (dataTunnelChannel.isWritable()) {
-            dataTunnelChannel.writeAndFlush(message);
+        if (dataChannel.isWritable()) {
+            dataChannel.writeAndFlush(message);
         }
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        Channel visitorChannel = ctx.channel();
-        InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
-        Channel controllTurnnelChannel = ChannelManager.getControlTunnelChannel(sa.getPort());
-        if (controllTurnnelChannel == null) {
-            visitorChannel.close();
+        Channel clientChannel = ctx.channel();
+        InetSocketAddress sa = (InetSocketAddress) clientChannel.localAddress();
+        Channel controllChannel = ChannelManager.getControlChannelByPort(sa.getPort());
+        if (controllChannel == null) {
+            clientChannel.close();
             return;
         } else {
             long nextSessionId = nextSessionId();
-            visitorChannel.config().setOption(ChannelOption.AUTO_READ, false);
+            clientChannel.config().setOption(ChannelOption.AUTO_READ, false);
             Integer localPort = Config.getInstance().getInternalServerInfo(sa.getPort());
-
-            ChannelManager.addVisitorChannelToTunnelChannel(visitorChannel, nextSessionId, controllTurnnelChannel);
-
-            TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
+            ChannelManager.addClientChannelToControlChannel(clientChannel, nextSessionId, controllChannel);
+            TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                     .setType(TunnelMessage.Message.Type.CONNECT)
                     .setSessionId(nextSessionId)
                     .setPort(localPort)
                     .build();
-            controllTurnnelChannel.writeAndFlush(tunnelMessage);
+            controllChannel.writeAndFlush(message);
         }
         super.channelActive(ctx);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Channel visitorChannel = ctx.channel();
-        InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
-        Channel controllTunnelChannel = ChannelManager.getControlTunnelChannel(sa.getPort());
-        if (controllTunnelChannel == null) {
+        Channel clientChannel = ctx.channel();
+        InetSocketAddress sa = (InetSocketAddress) clientChannel.localAddress();
+        Channel controlChannel = ChannelManager.getControlChannelByPort(sa.getPort());
+        if (controlChannel == null) {
             ctx.channel().close();
         } else {
-            Long sessionId = ChannelManager.getVisitorChannelSessionId(visitorChannel);
-            ChannelManager.removeVisitorChannelFromTunnelChannel(controllTunnelChannel, sessionId);
-            Channel dataTunnelChannel = visitorChannel.attr(EtpConstants.DATA_CHANNEL).get();
-            if (dataTunnelChannel != null && dataTunnelChannel.isActive()) {
-                dataTunnelChannel.attr(EtpConstants.REAL_SERVER_CHANNEL).remove();
-                dataTunnelChannel.attr(EtpConstants.SECRET_KEY).remove();
-                dataTunnelChannel.attr(EtpConstants.SESSION_ID).remove();
-
-                dataTunnelChannel.config().setOption(ChannelOption.AUTO_READ, true);
+            Long sessionId = ChannelManager.getSessionIdByClientChannel(clientChannel);
+            ChannelManager.removeClientChannelFromControlChannel(controlChannel, sessionId);
+            Channel dataChannel = clientChannel.attr(EtpConstants.DATA_CHANNEL).get();
+            if (dataChannel != null && dataChannel.isActive()) {
+                dataChannel.attr(EtpConstants.REAL_SERVER_CHANNEL).getAndSet(null);
+                dataChannel.attr(EtpConstants.SECRET_KEY).getAndSet(null);
+                dataChannel.attr(EtpConstants.SESSION_ID).getAndSet(null);
+                dataChannel.config().setOption(ChannelOption.AUTO_READ, true);
                 TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
                         .setType(TunnelMessage.Message.Type.DISCONNECT)
                         .setSessionId(sessionId)
                         .build();
-                dataTunnelChannel.writeAndFlush(tunnelMessage);
+                dataChannel.writeAndFlush(tunnelMessage);
             }
         }
         super.channelInactive(ctx);
@@ -98,15 +95,15 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        Channel visitorChannel = ctx.channel();
-        InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
-        Channel controlTunnelChannel = ChannelManager.getControlTunnelChannel(sa.getPort());
-        if (controlTunnelChannel == null) {
+        Channel clientChannel = ctx.channel();
+        InetSocketAddress sa = (InetSocketAddress) clientChannel.localAddress();
+        Channel controlChannel = ChannelManager.getControlChannelByPort(sa.getPort());
+        if (controlChannel == null) {
             ctx.channel().close();
         } else {
-            Channel dataTunnelChannel = visitorChannel.attr(EtpConstants.DATA_CHANNEL).get();
-            if (dataTunnelChannel != null) {
-                dataTunnelChannel.config().setOption(ChannelOption.AUTO_READ, visitorChannel.isWritable());
+            Channel dataChannel = clientChannel.attr(EtpConstants.DATA_CHANNEL).get();
+            if (dataChannel != null) {
+                dataChannel.config().setOption(ChannelOption.AUTO_READ, clientChannel.isWritable());
             }
         }
 

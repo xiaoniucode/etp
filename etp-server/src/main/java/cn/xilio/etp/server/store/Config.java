@@ -11,38 +11,17 @@ import io.netty.util.internal.StringUtil;
 import java.util.*;
 
 /**
- * 代理规则管理器
  * @author liuxin
  */
 public class Config {
-    /**
-     * 饿汉单例模式
-     */
     private static final Config INSTANCE = new Config();
-    /**
-     * 默认的代理配置信息存储路径，如果用户没有指定则采用默认的。
-     */
-    private static final String DEFAULT_PROXY_PATH = System.getProperty("user.home") + "/etp/" + "etps.toml";
-
     private static String host;
     private static Integer bindPort;
-    /**
-     * 存储客户端信息，包括客户端的服务端口配置信息
-     */
     private static List<ClientInfo> clients;
     private static Set<String> clientSecretKeys;
-    /**
-     * 公网端口与内网服务映射信息，内网服务包括内网的IP和PORT信息。
-     */
     private static volatile Map<Integer, Integer> portLocalServerMapping = new HashMap<>();
-    /**
-     * 客户端内网服务端口号列表 格式：[secretKey1:port1,secretKey2:port2]，用于用过客户端密钥获取客户端内网服务所有端口
-     */
-    private static volatile Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<String, List<Integer>>();
+    private static volatile Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<>();
     private static boolean ssl;
-    /**
-     * SSL密钥配置
-     */
     private static KeystoreConfig keystoreConfig;
 
     public record KeystoreConfig(String path, String keyPass, String storePass) {
@@ -55,15 +34,7 @@ public class Config {
         return INSTANCE;
     }
 
-    /**
-     * 初始化代理配置信息
-     *
-     * @param proxyPath 代理配置文件路径
-     */
     public static void init(String proxyPath) {
-        if (proxyPath == null) {
-            proxyPath = DEFAULT_PROXY_PATH;
-        }
         clients = new ArrayList<>();
         clientSecretKeys = new HashSet<>();
         Toml toml = TomlUtils.readToml(proxyPath);
@@ -152,11 +123,6 @@ public class Config {
         }
     }
 
-    /**
-     * 获取所有客户端的公网端口
-     *
-     * @return 公网端口列表
-     */
     public List<Integer> getAllPublicNetworkPort() {
         return new ArrayList<>(portLocalServerMapping.keySet());
     }
@@ -170,13 +136,7 @@ public class Config {
         return clientSecretKeys.contains(secretKey);
     }
 
-    /**
-     * 通过客户端密钥获取对应的内网服务对应的公网端口号列表
-     *
-     * @param secretKey 客户端的密钥
-     * @return 所有内网服务对应的公网端口号
-     */
-    public List<Integer> getClientPublicNetworkPorts(String secretKey) {
+    public List<Integer> getPublicNetworkPorts(String secretKey) {
         List<Integer> res = clientPublicNetworkPortMapping.get(secretKey);
         return res != null ? res : new ArrayList<>();
     }
@@ -187,12 +147,6 @@ public class Config {
         clientPublicNetworkPortMapping.put(secretKey, ports);
     }
 
-    /**
-     * 通过公网端口获取内网服务对应的内网服务器信息
-     *
-     * @param publicNetworkPort 公网端口
-     * @return 内网服务器信息
-     */
     public Integer getInternalServerInfo(int publicNetworkPort) {
         return portLocalServerMapping.get(publicNetworkPort);
     }

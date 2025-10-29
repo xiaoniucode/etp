@@ -17,19 +17,19 @@ public class DisconnectHandler extends AbstractMessageHandler {
         String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
         if (secretKey == null) {
             Long sessionId = msg.getSessionId();
-            Channel clientChannel = ChannelManager.removeVisitorChannelFromTunnelChannel(ctx.channel(), sessionId);
+            Channel clientChannel = ChannelManager.removeClientChannelFromControlChannel(ctx.channel(), sessionId);
             if (clientChannel != null) {
                 ChannelUtils.closeOnFlush(clientChannel);
             }
             return;
         }
 
-        Channel controlChannel = ChannelManager.getControlTunnelChannel(secretKey);
+        Channel controlChannel = ChannelManager.getControlChannelBySecretKey(secretKey);
         if (controlChannel == null) {
             return;
         }
 
-        Channel clientChannel = ChannelManager.removeVisitorChannelFromTunnelChannel(controlChannel, ctx.channel().attr(EtpConstants.SESSION_ID).get());
+        Channel clientChannel = ChannelManager.removeClientChannelFromControlChannel(controlChannel, ctx.channel().attr(EtpConstants.SESSION_ID).get());
         if (clientChannel != null) {
             ChannelUtils.closeOnFlush(clientChannel);
             ctx.channel().attr(EtpConstants.DATA_CHANNEL).getAndSet(null);//todo

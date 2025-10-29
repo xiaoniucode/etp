@@ -20,11 +20,11 @@ public class AuthHandler extends AbstractMessageHandler {
             ctx.channel().close();
             return;
         }
-        Channel controlChannel = ChannelManager.getControlTunnelChannel(secretKey);
+        Channel controlChannel = ChannelManager.getControlChannelBySecretKey(secretKey);
         if (controlChannel!=null) {
             ctx.channel().close();
         }
-        List<Integer> internalPorts = Config.getInstance().getClientPublicNetworkPorts(secretKey);
-        ChannelManager.addControlTunnelChannel(internalPorts, secretKey, ctx.channel());
+        List<Integer> remotePorts = Config.getInstance().getPublicNetworkPorts(secretKey);
+        ChannelManager.addControlChannel(remotePorts, secretKey, ctx.channel());
     }
 }
