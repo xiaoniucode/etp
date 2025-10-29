@@ -1,14 +1,20 @@
 package cn.xilio.etp.core;
 
-import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 
+/**
+ * @author liuxin
+ */
 public class EtpConstants {
-    public static final AttributeKey<Bootstrap> TUNNEL_BOOTSTRAP = AttributeKey.valueOf("tunnel_bootstrap");
-    public static final AttributeKey<Bootstrap> REAL_BOOTSTRAP = AttributeKey.valueOf("real_bootstrap");
-    public static final AttributeKey<Bootstrap> VISITOR_BOOTSTRAP = AttributeKey.valueOf("visitor_bootstrap");
-    public static final AttributeKey<Channel> NEXT_CHANNEL = AttributeKey.newInstance("nxt_channel");
-    public static final AttributeKey<Long> SESSION_ID = AttributeKey.newInstance("session_id");
-    public static final AttributeKey<String> SECRET_KEY = AttributeKey.newInstance("secret_key");
+    // ====================== 会话隧道 ======================
+    public static final AttributeKey<Long> SESSION_ID = AttributeKey.valueOf("etp.sessionId");
+    public static final AttributeKey<String> SECRET_KEY = AttributeKey.valueOf("etp.secretKey");
+
+    // ====================== 通道关联（双向绑定） ======================
+    public static final AttributeKey<Channel> DATA_CHANNEL = AttributeKey.valueOf("etp.dataChannel");
+    public static final AttributeKey<Channel> CONTROL_CHANNEL = AttributeKey.valueOf("etp.controlChannel");
+    public static final AttributeKey<Channel> REAL_SERVER_CHANNEL = AttributeKey.valueOf("etp.realServerChannel");
+    public static final AttributeKey<Channel> CLIENT_CHANNEL = AttributeKey.valueOf("etp.clientChannel");
+
 }

@@ -25,7 +25,7 @@ public class TunnelClientStartup {
                 .setLogDir("logs")
                 .setLogFilePath("logs" + File.separator + "etpc.log")
                 .setArchiveFilePattern("logs" + File.separator + "etpc.%d{yyyy-MM-dd}.log")
-                .setLogLevel(Level.WARN)
+                .setLogLevel(Level.DEBUG)
                 .build()
                 .configureLogback();
     }

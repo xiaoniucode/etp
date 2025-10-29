@@ -20,9 +20,6 @@ public class PortAllocator {
 
     private static volatile PortAllocator instance;
 
-    /**
-     *  可重入锁，确保多线程环境下端口分配和缓存操作的线程安全
-     */
     private final ReentrantLock lock = new ReentrantLock();
 
     private final Set<Integer> allocatedPorts = new HashSet<>(32);
@@ -30,11 +27,6 @@ public class PortAllocator {
     private PortAllocator() {
     }
 
-    /**
-     * 获取单例实例（双重检查锁定）
-     *
-     * @return PortAllocator 单例实例
-     */
     public static PortAllocator getInstance() {
         if (instance == null) {
             synchronized (PortAllocator.class) {
@@ -46,13 +38,6 @@ public class PortAllocator {
         return instance;
     }
 
-    /**
-     * 分配一个系统自动选择的可用端口（使用临时端口）。
-     * 检查缓存，避免重复分配已记录的端口。
-     *
-     * @return 分配的可用端口号
-     * @throws IOException 如果分配端口时发生I/O错误或无可用端口
-     */
     public int allocateAvailablePort() throws IOException {
         LOGGER.info("开始分配系统自动选择的可用端口");
         lock.lock();
@@ -77,34 +62,10 @@ public class PortAllocator {
         }
     }
 
-    /**
-     * 在指定范围内分配一个可用端口。
-     * 从minPort开始递增尝试，直到找到可用端口或达到maxPort。
-     * 检查缓存，避免重复分配已记录的端口。
-     *
-     * @param minPort 最小端口号（包含）
-     * @param maxPort 最大端口号（包含）
-     * @return 分配的可用端口号
-     * @throws IllegalArgumentException 如果端口范围无效
-     * @throws IOException              如果范围内无可用端口或发生I/O错误
-     */
     public int allocateAvailablePortInRange(int minPort, int maxPort) throws IOException {
         return allocateAvailablePortInRange(minPort, maxPort, false);
     }
 
-    /**
-     * 在指定范围内分配一个可用端口，支持重试机制。
-     * 从minPort开始递增尝试，直到找到可用端口或达到maxPort。
-     * 如果启用重试，端口被占用时会短暂等待后重试。
-     * 检查缓存，避免重复分配已记录的端口。
-     *
-     * @param minPort 最小端口号（包含）
-     * @param maxPort 最大端口号（包含）
-     * @param retry   是否启用重试机制
-     * @return 分配的可用端口号
-     * @throws IllegalArgumentException 如果端口范围无效
-     * @throws IOException              如果范围内无可用端口或发生I/O错误
-     */
     public int allocateAvailablePortInRange(int minPort, int maxPort, boolean retry) throws IOException {
         // 验证端口范围
         if (minPort > maxPort || minPort < 1024 || maxPort > 65535) {
@@ -153,12 +114,6 @@ public class PortAllocator {
         }
     }
 
-    /**
-     * 释放一个已分配的端口，从缓存中移除。
-     *
-     * @param port 要释放的端口号
-     * @return true 如果端口成功释放，false 如果端口未被分配
-     */
     public boolean releasePort(int port) {
         lock.lock();
         try {
@@ -174,12 +129,6 @@ public class PortAllocator {
         }
     }
 
-    /**
-     * 检查端口是否已被分配。
-     *
-     * @param port 要检查的端口号
-     * @return true 如果端口已被分配，false 否则
-     */
     public boolean isPortAllocated(int port) {
         lock.lock();
         try {
@@ -189,14 +138,6 @@ public class PortAllocator {
         }
     }
 
-    /**
-     * 检查指定端口是否真正可用。
-     * 端口可用需满足：未被本实例分配，且可成功绑定。
-     *
-     * @param port 要检查的端口号
-     * @return true 如果端口可用，false 如果端口不可用
-     * @throws IllegalArgumentException 如果端口号无效（不在1-65535范围内）
-     */
     public boolean isPortAvailable(int port) {
         // 验证端口号
         if (port < 1 || port > 65535) {
@@ -227,11 +168,6 @@ public class PortAllocator {
         }
     }
 
-    /**
-     * 获取当前已分配的端口数量。
-     *
-     * @return 已分配端口的总数
-     */
     public int getAllocatedPortCount() {
         lock.lock();
         try {

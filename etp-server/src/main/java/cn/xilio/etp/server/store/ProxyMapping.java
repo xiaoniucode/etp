@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 /**
  * 代理映射信息
+ * @author liuxin
  */
 public class ProxyMapping implements Serializable {
     /**

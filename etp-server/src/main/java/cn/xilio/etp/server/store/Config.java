@@ -12,6 +12,7 @@ import java.util.*;
 
 /**
  * 代理规则管理器
+ * @author liuxin
  */
 public class Config {
     /**
@@ -44,28 +45,7 @@ public class Config {
      */
     private static KeystoreConfig keystoreConfig;
 
-    public static final class KeystoreConfig {
-        private final String path;
-        private final String keyPass;
-        private final String storePass;
-
-        public KeystoreConfig(String path, String keyPass, String storePass) {
-            this.path = path;
-            this.keyPass = keyPass;
-            this.storePass = storePass;
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public String getKeyPass() {
-            return keyPass;
-        }
-
-        public String getStorePass() {
-            return storePass;
-        }
+    public record KeystoreConfig(String path, String keyPass, String storePass) {
     }
 
     private Config() {
@@ -111,9 +91,9 @@ public class Config {
                     System.clearProperty("server.keystore.keyPass");
                     System.clearProperty("server.keystore.storePass");
                     //添加到系统属性中
-                    System.setProperty("server.keystore.path", keystoreConfig.getPath());
-                    System.setProperty("server.keystore.keyPass", keystoreConfig.getKeyPass());
-                    System.setProperty("server.keystore.storePass", keystoreConfig.getStorePass());
+                    System.setProperty("server.keystore.path", keystoreConfig.path());
+                    System.setProperty("server.keystore.keyPass", keystoreConfig.keyPass());
+                    System.setProperty("server.keystore.storePass", keystoreConfig.storePass());
                 }
             }
         }

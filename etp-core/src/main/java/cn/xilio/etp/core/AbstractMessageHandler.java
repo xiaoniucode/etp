@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 /**
  * 抽象隧道消息处理器
+ * @author liuxin
  */
 public abstract class AbstractMessageHandler implements MessageHandler {
 
