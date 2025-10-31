@@ -1,0 +1,46 @@
+#绑定端口
+bindPort = 9527
+
+#ssl = false
+#[keystore]
+#path = "./cert/server.p12"
+#keyPass = "3FbV8R8VW49O"
+#storePass = "3FbV8R8VW49O"
+
+# 客户端1
+[[clients]]
+name = "windows"
+secretKey = "your-secret-key"
+[[clients.proxies]]
+name = "mysql"
+type = "tcp"
+localPort = 3306
+remotePort = 3307
+
+[[clients.proxies]]
+name = "redis"
+type = "tcp"
+localPort = 6379
+remotePort = 6380
+
+#[[clients.proxies]]
+#name = "web"
+#type = "tcp"
+#localPort = 8080
+#remotePort = 8085
+
+#客户端2
+#[[clients]]
+#name = "macos"
+#secretKey = "your-secret-key"
+#[[clients.proxies]]
+#name = "mysql"
+#type = "tcp"
+#localPort = 3306
+#remotePort = 3307
+#
+#[[clients.proxies]]
+#name = "redis"
+#type = "tcp"
+#localPort = 6379
+#remotePort = 6380
