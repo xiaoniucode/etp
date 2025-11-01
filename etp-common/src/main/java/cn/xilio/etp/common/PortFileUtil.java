@@ -38,9 +38,9 @@ public class PortFileUtil {
                 writer.newLine();
             }
             writer.flush();
-            LOGGER.info("代理端口配置信息已保存到文件：{}", PORT_FILE_NAME);
+            LOGGER.info("代理规则配置信息已保存到文件：{}", PORT_FILE_NAME);
         } catch (IOException e) {
-            LOGGER.error("写入端口文件失败", e);
+            LOGGER.error("写入代理规则文件失败", e);
         }
     }
 }
