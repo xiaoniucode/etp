@@ -16,12 +16,11 @@ public class TunnelClientStartup {
     private static final String DEFAULT_CONFIG_NAME = "etpc.toml";
 
     static {
-        //日志配置
         new LogbackConfigurator.LogbackConfigBuilder()
                 .setLogDir("logs")
                 .setLogFilePath("logs" + File.separator + "etpc.log")
                 .setArchiveFilePattern("logs" + File.separator + "etpc.%d{yyyy-MM-dd}.log")
-                .setLogLevel(Level.DEBUG)
+                .setLogLevel(Level.INFO)
                 .build()
                 .configureLogback();
     }

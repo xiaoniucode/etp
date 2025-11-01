@@ -79,9 +79,7 @@ After successful startup, connect to MySQL using port **3307**.
 ```shell
 sudo sh cert-gen.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k123456
 ```
-
-![cert-gen-1.png](doc/image/cert/cert-gen-1.png)
-
+![cert-gen-en.png](doc/image/cert/cert-gen-en.png)
 3️⃣ The script generates two key certificate files: **server.p12** for the server and **client.p12** for the client. Configure these in the respective toml files.
 
 ![result.png](doc/image/cert/result.png)
