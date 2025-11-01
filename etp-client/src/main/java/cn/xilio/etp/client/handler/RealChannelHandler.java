@@ -5,6 +5,8 @@ import cn.xilio.etp.core.EtpConstants;
 import cn.xilio.etp.core.protocol.TunnelMessage.Message;
 import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.CompositeByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
@@ -26,6 +28,7 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
             logger.warn("数据传输通道为空:{}", sessionId);
             return;
         }
+
         Message message = Message
                 .newBuilder()
                 .setSessionId(sessionId)

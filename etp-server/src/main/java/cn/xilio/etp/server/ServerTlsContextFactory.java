@@ -1,6 +1,6 @@
 package cn.xilio.etp.server;
 
-import cn.xilio.etp.core.AbstractSslContextFactory;
+import cn.xilio.etp.core.AbstractTlsContextFactory;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -13,7 +13,7 @@ import java.io.File;
  *
  * @author liuxin
  */
-public class ServerSslContextFactory extends AbstractSslContextFactory {
+public class ServerTlsContextFactory extends AbstractTlsContextFactory {
     private static final String KEYSTORE_PATH = System.getProperty("server.keystore.path");
     private static final String KEYSTORE_KEY_PASS = System.getProperty("server.keystore.keyPass");
     private static final String KEYSTORE_STORE_PASS = System.getProperty("server.keystore.storePass");
