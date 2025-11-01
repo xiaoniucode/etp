@@ -1,33 +1,33 @@
-#绑定端口
 bindPort = 9527
-
 ssl = false
+
 [keystore]
 path = "./cert/server.p12"
 keyPass = "3FbV8R8VW49O"
 storePass = "3FbV8R8VW49O"
 
-# 代理客户端配置
 [[clients]]
+secretKey = "4b0063baa5ae47c2910fc25265aae4b9"
 name = "windows"
-secretKey = "4b0063baa5ae47c2910fc25265aae4b9" #[必填]客户端秘钥，自定义
-[[clients.proxies]]
-name = "mysql" #代理名称 自定义
-type = "tcp" #代理类型 TCP HTTP 不区分大小写
-localPort = 3306 #内网服务的端口
-remotePort = 3307 #暴露在公网的端口
 
 [[clients.proxies]]
-name = "redis"
+localPort = 3306
+name = "mysql"
+remotePort = 3307
 type = "tcp"
+
+[[clients.proxies]]
 localPort = 6379
+name = "redis"
 remotePort = 6380
-
-#[[clients.proxies]]
-#name = "web"
-#type = "tcp"
-#localPort = 8080
-#remotePort = 8085
+type = "tcp"
 
 
 
+[dashboard]
+enable_tls = false
+password = "123456"
+port = 8080
+enable = true
+addr = "localhost"
+username = "admin"

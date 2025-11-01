@@ -5,30 +5,24 @@ import cn.xilio.etp.common.ConfigUtils;
 import cn.xilio.etp.common.LogbackConfigurator;
 import cn.xilio.etp.common.PortChecker;
 import cn.xilio.etp.server.store.Config;
-import cn.xilio.etp.server.store.ConfigManager;
-import cn.xilio.etp.server.store.dto.ClientDTO;
+import cn.xilio.etp.server.web.Api;
+import cn.xilio.etp.server.web.framework.NettyWebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * @author liuxin
  */
 public class TunnelServerStartup {
     private static TunnelServer tunnelServer;
+    private static NettyWebServer webServer;
     private static final String DEFAULT_CONFIG_NAME = "etps.toml";
     private static final Logger logger = LoggerFactory.getLogger(TunnelServerStartup.class);
 
-    // 初始化日志配置
     static {
-        new LogbackConfigurator.LogbackConfigBuilder()
-                .setLogFilePath("logs" + File.separator + "etps.log")
-                .setArchiveFilePattern("logs" + File.separator + "etps.%d{yyyy-MM-dd}.log")
-                .setLogLevel(Level.INFO)
-                .build()
-                .configureLogback();
+        System.setProperty("io.netty.leakDetection.level", "SIMPLE");
     }
 
     public static void main(String[] args) {
@@ -36,22 +30,37 @@ public class TunnelServerStartup {
         if (configPath == null) {
             return;
         }
-        //初始化代理配置信息
+        //加载配置文件
         Config.init(configPath);
-        //检查端口是否被占用
+        initLogback();/*初始化日志*/
         Integer bindPort = Config.getInstance().getBindPort();
         if (PortChecker.isPortOccupied(bindPort)) {
-            logger.error("{}端口已经被占用",bindPort);
+            logger.error("{}端口已经被占用", bindPort);
             return;
         }
         registerShutdownHook(tunnelServer);
-        tunnelServer = new TunnelServer();
-        tunnelServer.setHost(Config.getInstance().getHost());
-        tunnelServer.setPort(bindPort);
-        tunnelServer.setSsl(Config.getInstance().isSsl());
-
+        tunnelServer = ServerFactory.createTunnelServer();
+        tunnelServer.onSuccessListener(v -> {
+            //绑定所有代理端口
+            TcpProxyServer.getInstance().start();
+            //启动dashboard服务
+            if (Config.getInstance().getDashboard().getEnable()) {
+                webServer = ServerFactory.createWebServer();
+               // Api.initFilters(webServer.getFilters());/*web过滤器*/
+                Api.initRoutes(webServer.getRouter());/*web接口*/
+                webServer.start();
+            }
+        });
         tunnelServer.start();
+    }
 
+    private static void initLogback() {
+        new LogbackConfigurator.LogbackConfigBuilder()
+                .setLogFilePath("logs" + File.separator + "etps.log")
+                .setArchiveFilePattern("logs" + File.separator + "etps.%d{yyyy-MM-dd}.log")
+                .setLogLevel(Level.DEBUG)
+                .build()
+                .configureLogback();
     }
 
     private static void registerShutdownHook(TunnelServer tunnelServer) {
@@ -59,6 +68,10 @@ public class TunnelServerStartup {
             if (tunnelServer != null) {
                 tunnelServer.stop();
                 PortChecker.killPort(tunnelServer.getPort());
+                TcpProxyServer.getInstance().stop();
+            }
+            if (webServer != null) {
+                webServer.stop();
             }
         }));
     }

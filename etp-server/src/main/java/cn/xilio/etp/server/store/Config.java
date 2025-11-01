@@ -17,6 +17,7 @@ public class Config {
     private static final Config INSTANCE = new Config();
     private static String host;
     private static Integer bindPort;
+    private static Dashboard dashboard;
     private static List<ClientInfo> clients;
     private static Set<String> clientSecretKeys;
     private static volatile Map<Integer, Integer> portLocalServerMapping = new HashMap<>();
@@ -70,6 +71,18 @@ public class Config {
                 }
             }
         }
+        //dashboard
+        Toml dash = toml.getTable("dashboard");
+        if (dash != null) {
+            Boolean enable = dash.getBoolean("enable") != null && dash.getBoolean("enable");
+            String addr = dash.getString("addr");
+            Integer port = dash.getLong("port")==null?null:dash.getLong("port").intValue();
+            String username = dash.getString("username");
+            String password = dash.getString("password");
+            dashboard = new Dashboard(enable,username,password,addr,port);
+        }
+
+
         //代理端口
         for (Toml client : toml.getTables("clients")) {
             String name = client.getString("name");
@@ -177,7 +190,11 @@ public class Config {
         return host;
     }
 
-    public  String getConfigPath() {
+    public String getConfigPath() {
         return configPath;
+    }
+
+    public Dashboard getDashboard() {
+        return dashboard;
     }
 }

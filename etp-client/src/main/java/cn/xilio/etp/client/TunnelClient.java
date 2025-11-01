@@ -6,11 +6,13 @@ import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.protocol.TunnelMessage;
 import cn.xilio.etp.core.IdleCheckHandler;
-import cn.xilio.etp.core.protocol.TunnelMessageDecoder;
-import cn.xilio.etp.core.protocol.TunnelMessageEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
 import org.slf4j.Logger;
@@ -56,7 +58,17 @@ public class TunnelClient implements Lifecycle {
     /**
      * SSL加密上下文
      */
-    private SslContext sslContext;
+    private SslContext tlsContext;
+
+    public TunnelClient() {
+    }
+
+    public TunnelClient(String serverAddr, int serverPort, String secretKey, boolean ssl) {
+        this.serverAddr = serverAddr;
+        this.serverPort = serverPort;
+        this.secretKey = secretKey;
+        this.ssl = ssl;
+    }
 
     @Override
     public void start() {
@@ -74,7 +86,7 @@ public class TunnelClient implements Lifecycle {
                     });
 
             if (ssl) {
-                sslContext = new ClientSslContextFactory().createContext();
+                tlsContext = new ClientTlsContextFactory().createContext();
             }
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             controlBootstrap.group(tunnelWorkerGroup)
@@ -83,13 +95,15 @@ public class TunnelClient implements Lifecycle {
                         @Override
                         protected void initChannel(SocketChannel sc) {
                             if (ssl) {
-                                SSLEngine engine = sslContext.newEngine(sc.alloc(), serverAddr, serverPort);
+                                SSLEngine engine = tlsContext.newEngine(sc.alloc(), serverAddr, serverPort);
                                 engine.setUseClientMode(true);
-                                sc.pipeline().addLast("ssl", new SslHandler(engine));
+                                sc.pipeline().addLast("tls", new SslHandler(engine));
                             }
                             sc.pipeline()
-                                    .addLast(new TunnelMessageDecoder())
-                                    .addLast(new TunnelMessageEncoder())
+                                    .addLast(new ProtobufVarint32FrameDecoder())
+                                    .addLast(new ProtobufDecoder(TunnelMessage.Message.getDefaultInstance()))
+                                    .addLast(new ProtobufVarint32LengthFieldPrepender())
+                                    .addLast(new ProtobufEncoder())
                                     .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
                                     .addLast(new ControlChannelHandler(ctx -> {
                                         // 重置重试计数器

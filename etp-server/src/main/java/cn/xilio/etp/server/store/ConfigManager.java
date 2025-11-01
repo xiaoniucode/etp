@@ -3,25 +3,27 @@ package cn.xilio.etp.server.store;
 import cn.xilio.etp.common.TomlUtils;
 import cn.xilio.etp.server.store.dto.ClientDTO;
 import cn.xilio.etp.server.store.dto.ProxyDTO;
+import cn.xilio.etp.server.web.framework.BizException;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.util.*;
 
 /**
  * @author liuxin
  */
 public final class ConfigManager {
-    // private final static String configPath = "etps2.toml";
-    private final static String configPath = Config.getInstance().getConfigPath();
+    // private final static String configPath = "etps.toml";
+    private final static String CONFIG_PATH = Config.getInstance().getConfigPath();
 
     public static void addClient(String name, String secretKey) throws IOException {
-        Map<String, Object> config = TomlUtils.readMap(configPath);
+        Map<String, Object> config = TomlUtils.readMap(CONFIG_PATH);
         List<Map<String, Object>> clients = getClientList(config);
 
         // 检查秘钥是否已存在
         for (Map<String, Object> client : clients) {
-            if (secretKey.equals(client.get("secretKey"))) {
-                throw new IllegalArgumentException("客户端秘钥已存在: " + secretKey);
+            if (name.equals(client.get("name"))) {
+                throw new BizException("客户端名称已存在: " + name);
             }
         }
         // 创建新客户端
@@ -32,23 +34,23 @@ public final class ConfigManager {
 
         clients.add(newClient);
         config.put("clients", clients);
-        TomlUtils.write(config, configPath);
+        TomlUtils.write(config, CONFIG_PATH);
     }
 
     public static void deleteClient(String secretKey) throws IOException {
-        Map<String, Object> config = TomlUtils.readMap(configPath);
+        Map<String, Object> config = TomlUtils.readMap(CONFIG_PATH);
         List<Map<String, Object>> clients = getClientList(config);
         boolean removed = clients.removeIf(client -> secretKey.equals(client.get("secretKey")));
         if (removed) {
             config.put("clients", clients);
-            TomlUtils.write(config, configPath);
+            TomlUtils.write(config, CONFIG_PATH);
         } else {
-            throw new IllegalArgumentException("未找到秘钥对应的客户端: " + secretKey);
+            throw new BizException("未找到秘钥对应的客户端: " + secretKey);
         }
     }
 
     public static void addProxy(String secretKey, String name, String protocol, Long localPort, Long remotePort) throws IOException {
-        Map<String, Object> config = TomlUtils.readMap(configPath);
+        Map<String, Object> config = TomlUtils.readMap(CONFIG_PATH);
         List<Map<String, Object>> clients = getClientList(config);
         // 查找目标客户端
         Map<String, Object> targetClient = null;
@@ -60,7 +62,7 @@ public final class ConfigManager {
         }
 
         if (targetClient == null) {
-            throw new IllegalArgumentException("未找到秘钥对应的客户端: " + secretKey);
+            throw new BizException("未找到秘钥对应的客户端: " + secretKey);
         }
 
         List<Map<String, Object>> proxies = getProxiesList(targetClient);
@@ -79,7 +81,7 @@ public final class ConfigManager {
         proxies.add(newProxy);
         targetClient.put("proxies", proxies);
         config.put("clients", clients);
-        TomlUtils.write(config, configPath);
+        TomlUtils.write(config, CONFIG_PATH);
     }
 
     public static void updateProxy(String secretKey, String name, String protocol, Long localPort, Long remotePort) throws IOException {
@@ -88,7 +90,7 @@ public final class ConfigManager {
     }
 
     public static void deleteProxy(String secretKey, String proxyName) throws IOException {
-        Map<String, Object> config = TomlUtils.readMap(configPath);
+        Map<String, Object> config = TomlUtils.readMap(CONFIG_PATH);
         List<Map<String, Object>> clients = getClientList(config);
 
         boolean removed;
@@ -104,19 +106,19 @@ public final class ConfigManager {
                     client.put("proxies", proxies);
                     config.put("clients", clients);
                     // 从端口缓存中移除todo
-                    TomlUtils.write(config, configPath);
+                    TomlUtils.write(config, CONFIG_PATH);
                     return;
                 }
                 break;
             }
         }
-        throw new IllegalArgumentException("未找到秘钥 " + secretKey + " 对应的名称 " + proxyName + " 的代理");
+        throw new BindException("未找到秘钥 " + secretKey + " 对应的名称 " + proxyName + " 的代理");
     }
 
     @SuppressWarnings("unchecked")
     public static List<ClientDTO> clients() {
         List<ClientDTO> res = new ArrayList<>();
-        Map<String, Object> map = TomlUtils.readMap(configPath);
+        Map<String, Object> map = TomlUtils.readMap(CONFIG_PATH);
         Object clients = map.get("clients");
         if (Objects.isNull(clients)) {
             return res;
@@ -124,7 +126,9 @@ public final class ConfigManager {
         if (clients instanceof List) {
             List<Map<String, Object>> clientList = (List) clients;
             for (Map<String, Object> client : clientList) {
-                res.add(new ClientDTO((String) client.get("name"), (String) client.get("secretKey")));
+                String secretKey = (String) client.get("secretKey");
+                Integer status = 1;//todo 状态获取
+                res.add(new ClientDTO((String) client.get("name"), secretKey, status));
             }
         }
         return res;
@@ -133,7 +137,7 @@ public final class ConfigManager {
 
     public static List<ProxyDTO> proxies(String secretKey) {
         List<ProxyDTO> res = new ArrayList<>();
-        Map<String, Object> map = TomlUtils.readMap(configPath);
+        Map<String, Object> map = TomlUtils.readMap(CONFIG_PATH);
         List<Map<String, Object>> clients = getClientList(map);
         for (Map<String, Object> client : clients) {
             if (secretKey.equals(client.get("secretKey"))) {
@@ -173,11 +177,8 @@ public final class ConfigManager {
     }
 
     public static void main(String[] args) throws IOException {
-
-
         // ConfigManager.deleteProxy("123456", 323L);
         //  ConfigManager.addProxy("123456", "test3", "udp", 3365L, 323L);
-        ConfigManager.updateProxy("123456", "test3", "tcp", 3365L, 323L);
-
+        List<ClientDTO> clients = ConfigManager.clients();
     }
 }

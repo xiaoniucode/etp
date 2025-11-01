@@ -9,10 +9,10 @@ import java.io.FileInputStream;
 import java.security.KeyStore;
 
 /**
- * SSL上下文工厂抽象父类
+ * TLS上下文工厂抽象父类
  * @author liuxin
  */
-public abstract class AbstractSslContextFactory {
+public abstract class AbstractTlsContextFactory {
     protected static final String PROTOCOL_TLS_1_3 = "TLSv1.3";
     protected static final SslProvider DEFAULT_SSL_PROVIDER = SslProvider.JDK;
 
