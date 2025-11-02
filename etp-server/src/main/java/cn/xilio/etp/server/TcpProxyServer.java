@@ -4,6 +4,7 @@ import cn.xilio.etp.common.PortFileUtil;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.server.handler.ClientChannelHandler;
+import cn.xilio.etp.server.metrics.TrafficMetricsHandler;
 import cn.xilio.etp.server.store.ClientInfo;
 import cn.xilio.etp.server.store.Config;
 import cn.xilio.etp.server.store.ProxyMapping;
@@ -66,6 +67,7 @@ public class TcpProxyServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
+                            sc.pipeline().addLast(new TrafficMetricsHandler());
                             sc.pipeline().addLast(new ClientChannelHandler());/*公网访问者处理器*/
                         }
                     });
