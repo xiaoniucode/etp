@@ -1,5 +1,7 @@
 package cn.xilio.etp.server.web.framework;
 
+import cn.xilio.etp.common.StringUtils;
+
 /**
  * @author liuxin
  */
@@ -18,7 +20,7 @@ public class BizException extends RuntimeException {
     }
 
     public static void throwIfNull(Object value, String msg) {
-        if (null == value) {
+        if (value == null || !StringUtils.hasText(value.toString())) {
             throw new BizException(msg);
         }
     }

@@ -46,7 +46,7 @@ public class TunnelServerStartup {
             //启动dashboard服务
             if (Config.getInstance().getDashboard().getEnable()) {
                 webServer = ServerFactory.createWebServer();
-               // Api.initFilters(webServer.getFilters());/*web过滤器*/
+                Api.initFilters(webServer.getFilters());/*web过滤器*/
                 Api.initRoutes(webServer.getRouter());/*web接口*/
                 webServer.start();
             }
