@@ -48,10 +48,6 @@ remotePort = 3307 #[可选]公网服务端口，如果不填系统会随机分�
 ```shell
 nohup ./etps -c etps.toml &
 ```
-🔔备注：1.0.4版本后，如果**etps.toml**和可执行程序在同一个文件夹，可不用**-c**指定，可按以下方式启动：
-```shell
-./etps # 或后台运行：nohup ./etps &
-```
 ### 💻 客户端etpc配置
 
 > 编辑配置文件 `etpc.toml`
@@ -72,7 +68,6 @@ secretKey="你的客户端认证密钥" #和服务端配置保持一致
 启动成功后用 **3307** 端口去连接MySQL
 
 ## 🔒 配置SSL（可选）
-> etp v1.0.3及以后的版本增加了基于TLS1.3的安全加密功能，可根据需要配置。
 
 1️⃣ 首先需要下载项目提供的证书生成命令行工具[generate_ssl_cert.sh](scripts/generate_ssl_cert.sh) 到本地（也可以直接使用jdk的keytool生成），该工具详细使用教程请参考[证书生成文档](doc/code-gen.md),该工具目前依赖jdk，需要保证有该运行环境。
 

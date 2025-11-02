@@ -6,6 +6,7 @@ import io.netty.channel.ChannelFutureListener;
 
 /**
  * 通道工具类
+ * @author liuxin
  */
 public final class ChannelUtils {
 

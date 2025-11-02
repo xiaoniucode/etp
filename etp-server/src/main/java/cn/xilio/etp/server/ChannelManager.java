@@ -17,107 +17,93 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ChannelManager {
     /**
-     * 用于存储每个session连接对应的通道
+     * 内网代理客户端与控制通道映射
      */
-    private static final AttributeKey<Map<Long, Channel>> VISITOR_CHANNELS = AttributeKey.newInstance("user_channels");
+    private static final Map<String, Channel> controlChannels = new ConcurrentHashMap<>(4);
     /**
-     * 存储所有的客户端的控制通道
+     * 内网服务端口与控制通道映射
      */
-    private static final Map<String, Channel> tunnelChannels = new ConcurrentHashMap<>();
-    /**
-     * 端口和隧道映射
-     */
-    private static final Map<Integer, Channel> portTunnelChannelMapping = new ConcurrentHashMap<>(64);
-    private static final AttributeKey<List<Integer>> CHANNEL_PORT = AttributeKey.newInstance("channel_port");
-    private static final AttributeKey<String> CHANNEL_SECRET_KEY = AttributeKey.newInstance("channel_client_key");
-    private final static Lock lock = new ReentrantLock();
+    private static final Map<Integer, Channel> PORT_CONTROL_CHANNEL_MAPPING = new ConcurrentHashMap<>(64);
+    private final static Lock LOCK = new ReentrantLock();
 
-    /**
-     * @param internalPorts 客户端内网服务的端口号
-     * @param secretKey     客户端认证密钥
-     * @param channel       安全认证后的隧道-通道
-     */
-    public static void addControlTunnelChannel(List<Integer> internalPorts, String secretKey, Channel channel) {
-        lock.lock();
+    public static void addControlChannel(List<Integer> remotePorts, String secretKey, Channel controlChannel) {
+        LOCK.lock();
         try {
-            for (Integer port : internalPorts) {
-                portTunnelChannelMapping.put(port, channel);
+            for (Integer port : remotePorts) {
+                PORT_CONTROL_CHANNEL_MAPPING.put(port, controlChannel);
             }
+            controlChannel.attr(EtpConstants.CHANNEL_PORT).set(remotePorts);
+            controlChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
+            controlChannel.attr(EtpConstants.CLIENT_CHANNELS).set(new ConcurrentHashMap<>());
+            controlChannels.put(secretKey, controlChannel);
         } finally {
-            lock.unlock();
+            LOCK.unlock();
         }
-        //该通道上的代理服务端口
-        channel.attr(CHANNEL_PORT).set(internalPorts);
-        //该条通道对应的客户端
-        channel.attr(CHANNEL_SECRET_KEY).set(secretKey);
-        channel.attr(VISITOR_CHANNELS).set(new ConcurrentHashMap<>());
-        tunnelChannels.put(secretKey, channel);
     }
-
-    public static Channel getControlTunnelChannel(int port) {
-        return portTunnelChannelMapping.get(port);
-    }
-
-    public static Channel getControlTunnelChannel(String secretKey) {
-        return tunnelChannels.get(secretKey);
-    }
-
-    public static Channel getVisitorChannel(Channel tunnelChannel, Long sessionId) {
-        return tunnelChannel.attr(VISITOR_CHANNELS).get().get(sessionId);
-    }
-
-    public static void addVisitorChannelToTunnelChannel(Channel visitorChannel, Long sessionId, Channel turnnelChannel) {
-        turnnelChannel.attr(VISITOR_CHANNELS).get().put(sessionId, visitorChannel);
-        visitorChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
-    }
-
-    public static Channel removeVisitorChannelFromTunnelChannel(Channel tunnelChannel, Long sessionId) {
-        if (tunnelChannel.attr(VISITOR_CHANNELS).get() == null) {
-            return null;
-        }
-        return tunnelChannel.attr(VISITOR_CHANNELS).get().remove(sessionId);
-    }
-
-    public static void removeTunnelAndBindRelationship(Channel channel) {
-        if (channel.attr(CHANNEL_PORT).get() == null) {
+    public static void clearControlChannel(Channel controlChannel) {
+        if (controlChannel.attr(EtpConstants.CHANNEL_PORT).get() == null) {
             return;
         }
-        String clientKey = channel.attr(CHANNEL_SECRET_KEY).get();
-        Channel channel0 = tunnelChannels.remove(clientKey);
-        if (channel != channel0) {
-            tunnelChannels.put(clientKey, channel);
-        }
-
-        List<Integer> ports = channel.attr(CHANNEL_PORT).get();
-        for (int port : ports) {
-            Channel visitorTunnelChannel = portTunnelChannelMapping.remove(port);
-            if (visitorTunnelChannel == null) {
-                continue;
+        LOCK.lock();
+        try {
+            String secretKey = controlChannel.attr(EtpConstants.SECRET_KEY).get();
+            Channel existingChannel = controlChannels.get(secretKey);
+            if (controlChannel == existingChannel) {
+                controlChannels.remove(secretKey);
             }
-            if (visitorTunnelChannel != channel) {
-                portTunnelChannelMapping.put(port, visitorTunnelChannel);
+            List<Integer> remotePorts = controlChannel.attr(EtpConstants.CHANNEL_PORT).get();
+            if (remotePorts != null) {
+                for (int port : remotePorts) {
+                    PORT_CONTROL_CHANNEL_MAPPING.remove(port);
+                }
             }
+        } finally {
+            LOCK.unlock();
         }
-
-        if (channel.isActive()) {
-            channel.close();
+        if (controlChannel.isActive()) {
+            controlChannel.close();
         }
         //将该隧道上所有用户连接都给关闭掉
-        Map<Long, Channel> visitorChannels = getVisitorChannels(channel);
-        visitorChannels.keySet().forEach(sessionId -> {
-            Channel visitorChannel = visitorChannels.get(sessionId);
-            if (visitorChannel.isActive()) {
-                visitorChannel.close();
-            }
-        });
+        Map<Long, Channel> clientChannels = getClientChannelsByControlChannel(controlChannel);
+        if (clientChannels != null) {
+            clientChannels.keySet().forEach(sessionId -> {
+                Channel clientChannel = clientChannels.get(sessionId);
+                if (clientChannel.isActive()) {
+                    clientChannel.close();
+                }
+            });
+        }
 
     }
 
-    public static Map<Long, Channel> getVisitorChannels(Channel tunnelChannel) {
-        return tunnelChannel.attr(VISITOR_CHANNELS).get();
+    public static Channel getControlChannelByPort(int port) {
+        return PORT_CONTROL_CHANNEL_MAPPING.get(port);
     }
 
-    public static Long getVisitorChannelSessionId(Channel visitorChannel) {
-        return visitorChannel.attr(EtpConstants.SESSION_ID).get();
+    public static Channel getControlChannelBySecretKey(String secretKey) {
+        return controlChannels.get(secretKey);
+    }
+
+    public static Channel getClientChannel(Channel controlChannel, Long sessionId) {
+        return controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get().get(sessionId);
+    }
+
+    public static void addClientChannelToControlChannel(Channel clientChannel, Long sessionId, Channel controlChannel) {
+        controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get().put(sessionId, clientChannel);
+        clientChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
+    }
+
+    public static Channel removeClientChannelFromControlChannel(Channel controlChannel, Long sessionId) {
+        if (controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get() == null) {
+            return null;
+        }
+        return controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get().remove(sessionId);
+    }
+    public static Map<Long, Channel> getClientChannelsByControlChannel(Channel controlChannel) {
+        return controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get();
+    }
+
+    public static Long getSessionIdByClientChannel(Channel clientChannel) {
+        return clientChannel.attr(EtpConstants.SESSION_ID).get();
     }
 }

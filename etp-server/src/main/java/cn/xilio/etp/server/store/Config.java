@@ -11,61 +11,22 @@ import io.netty.util.internal.StringUtil;
 import java.util.*;
 
 /**
- * 代理规则管理器
+ * @author liuxin
  */
 public class Config {
-    /**
-     * 饿汉单例模式
-     */
     private static final Config INSTANCE = new Config();
-    /**
-     * 默认的代理配置信息存储路径，如果用户没有指定则采用默认的。
-     */
-    private static final String DEFAULT_PROXY_PATH = System.getProperty("user.home") + "/etp/" + "etps.toml";
-
     private static String host;
     private static Integer bindPort;
-    /**
-     * 存储客户端信息，包括客户端的服务端口配置信息
-     */
+    private static Dashboard dashboard;
     private static List<ClientInfo> clients;
     private static Set<String> clientSecretKeys;
-    /**
-     * 公网端口与内网服务映射信息，内网服务包括内网的IP和PORT信息。
-     */
     private static volatile Map<Integer, Integer> portLocalServerMapping = new HashMap<>();
-    /**
-     * 客户端内网服务端口号列表 格式：[secretKey1:port1,secretKey2:port2]，用于用过客户端密钥获取客户端内网服务所有端口
-     */
-    private static volatile Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<String, List<Integer>>();
+    private static volatile Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<>();
     private static boolean ssl;
-    /**
-     * SSL密钥配置
-     */
     private static KeystoreConfig keystoreConfig;
+    private static String configPath;
 
-    public static final class KeystoreConfig {
-        private final String path;
-        private final String keyPass;
-        private final String storePass;
-
-        public KeystoreConfig(String path, String keyPass, String storePass) {
-            this.path = path;
-            this.keyPass = keyPass;
-            this.storePass = storePass;
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public String getKeyPass() {
-            return keyPass;
-        }
-
-        public String getStorePass() {
-            return storePass;
-        }
+    public record KeystoreConfig(String path, String keyPass, String storePass) {
     }
 
     private Config() {
@@ -75,18 +36,11 @@ public class Config {
         return INSTANCE;
     }
 
-    /**
-     * 初始化代理配置信息
-     *
-     * @param proxyPath 代理配置文件路径
-     */
-    public static void init(String proxyPath) {
-        if (proxyPath == null) {
-            proxyPath = DEFAULT_PROXY_PATH;
-        }
+    public static void init(String path) {
+        configPath = path;
         clients = new ArrayList<>();
         clientSecretKeys = new HashSet<>();
-        Toml toml = TomlUtils.readToml(proxyPath);
+        Toml toml = TomlUtils.readToml(configPath);
         if (toml.contains("bindPort")) {
             bindPort = toml.getLong("bindPort").intValue();
         }
@@ -99,11 +53,11 @@ public class Config {
         if (ssl) {
             Toml keystore = toml.getTable("keystore");
             if (keystore != null) {
-                String path = keystore.getString("path");
+                String keyPath = keystore.getString("path");
                 String keyPass = keystore.getString("keyPass");
                 String storePass = keystore.getString("storePass");
-                if (path != null && keyPass != null && storePass != null) {
-                    keystoreConfig = new KeystoreConfig(path, keyPass, storePass);
+                if (keyPath != null && keyPass != null && storePass != null) {
+                    keystoreConfig = new KeystoreConfig(keyPath, keyPass, storePass);
                 }
                 if (keystoreConfig != null) {
                     // 清理可能存在的旧配置
@@ -111,12 +65,24 @@ public class Config {
                     System.clearProperty("server.keystore.keyPass");
                     System.clearProperty("server.keystore.storePass");
                     //添加到系统属性中
-                    System.setProperty("server.keystore.path", keystoreConfig.getPath());
-                    System.setProperty("server.keystore.keyPass", keystoreConfig.getKeyPass());
-                    System.setProperty("server.keystore.storePass", keystoreConfig.getStorePass());
+                    System.setProperty("server.keystore.path", keystoreConfig.path());
+                    System.setProperty("server.keystore.keyPass", keystoreConfig.keyPass());
+                    System.setProperty("server.keystore.storePass", keystoreConfig.storePass());
                 }
             }
         }
+        //dashboard
+        Toml dash = toml.getTable("dashboard");
+        if (dash != null) {
+            Boolean enable = dash.getBoolean("enable") != null && dash.getBoolean("enable");
+            String addr = dash.getString("addr");
+            Integer port = dash.getLong("port")==null?null:dash.getLong("port").intValue();
+            String username = dash.getString("username");
+            String password = dash.getString("password");
+            dashboard = new Dashboard(enable,username,password,addr,port);
+        }
+
+
         //代理端口
         for (Toml client : toml.getTables("clients")) {
             String name = client.getString("name");
@@ -172,11 +138,6 @@ public class Config {
         }
     }
 
-    /**
-     * 获取所有客户端的公网端口
-     *
-     * @return 公网端口列表
-     */
     public List<Integer> getAllPublicNetworkPort() {
         return new ArrayList<>(portLocalServerMapping.keySet());
     }
@@ -190,13 +151,7 @@ public class Config {
         return clientSecretKeys.contains(secretKey);
     }
 
-    /**
-     * 通过客户端密钥获取对应的内网服务对应的公网端口号列表
-     *
-     * @param secretKey 客户端的密钥
-     * @return 所有内网服务对应的公网端口号
-     */
-    public List<Integer> getClientPublicNetworkPorts(String secretKey) {
+    public List<Integer> getPublicNetworkPorts(String secretKey) {
         List<Integer> res = clientPublicNetworkPortMapping.get(secretKey);
         return res != null ? res : new ArrayList<>();
     }
@@ -207,12 +162,6 @@ public class Config {
         clientPublicNetworkPortMapping.put(secretKey, ports);
     }
 
-    /**
-     * 通过公网端口获取内网服务对应的内网服务器信息
-     *
-     * @param publicNetworkPort 公网端口
-     * @return 内网服务器信息
-     */
     public Integer getInternalServerInfo(int publicNetworkPort) {
         return portLocalServerMapping.get(publicNetworkPort);
     }
@@ -239,5 +188,13 @@ public class Config {
 
     public String getHost() {
         return host;
+    }
+
+    public String getConfigPath() {
+        return configPath;
+    }
+
+    public Dashboard getDashboard() {
+        return dashboard;
     }
 }
