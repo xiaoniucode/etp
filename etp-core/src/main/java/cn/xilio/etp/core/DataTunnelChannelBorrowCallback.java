@@ -2,6 +2,9 @@ package cn.xilio.etp.core;
 
 import io.netty.channel.Channel;
 
+/**
+ * @author liuxin
+ */
 public interface DataTunnelChannelBorrowCallback {
     /**
      * 成功获取到数据隧道通道

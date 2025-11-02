@@ -28,7 +28,7 @@ public final class NettyEventLoopFactory {
     }
 
     public static EventLoopGroup eventLoopGroup() {
-        //设置为0 netty会采用默认的
+        //设置为0 netty会采用默认的线程配置
         return eventLoopGroup(0);
     }
 

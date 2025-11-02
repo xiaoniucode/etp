@@ -3,7 +3,7 @@ package cn.xilio.etp.server;
 import cn.xilio.etp.common.PortFileUtil;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.NettyEventLoopFactory;
-import cn.xilio.etp.server.handler.VisitorChannelHandler;
+import cn.xilio.etp.server.handler.ClientChannelHandler;
 import cn.xilio.etp.server.metrics.TrafficMetricsHandler;
 import cn.xilio.etp.server.store.ClientInfo;
 import cn.xilio.etp.server.store.Config;
@@ -12,9 +12,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.ChannelInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,39 +24,25 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
- * TCP代理服务器类（单例模式），负责启动和管理TCP代理服务。
+ * 负责启动和管理TCP代理服务。
  *
  * @author liuxin
  */
 public class TcpProxyServer implements Lifecycle {
     private static final Logger LOGGER = LoggerFactory.getLogger(TcpProxyServer.class);
-    // 单例实例，volatile确保多线程可见性
     private static volatile TcpProxyServer instance;
-    // 可重入锁，确保端口绑定和资源管理的线程安全
     private final ReentrantLock lock = new ReentrantLock();
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    // 保存绑定的通道，用于优雅关闭
     private final List<Channel> boundChannels = new ArrayList<>();
-    // 动态端口分配器
     private final PortAllocator portAllocator;
-    // 默认端口范围
     private static final int DEFAULT_MIN_PORT = 8000;
     private static final int DEFAULT_MAX_PORT = 9000;
 
-    /**
-     * 私有构造函数，初始化端口分配器
-     */
     private TcpProxyServer() {
         this.portAllocator = PortAllocator.getInstance();
-        LOGGER.info("TcpProxyServer实例初始化");
     }
 
-    /**
-     * 获取单例实例（双重检查锁定）
-     *
-     * @return TcpProxyServer 单例实例
-     */
     public static TcpProxyServer getInstance() {
         if (instance == null) {
             synchronized (TcpProxyServer.class) {
@@ -70,9 +54,6 @@ public class TcpProxyServer implements Lifecycle {
         return instance;
     }
 
-    /**
-     * 启动TCP代理服务器，绑定到Config中的端口或动态分配的端口
-     */
     @Override
     public void start() {
         lock.lock();
@@ -86,8 +67,8 @@ public class TcpProxyServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            // sc.pipeline().addLast(new TrafficMetricsHandler());/*流量指标统计*/
-                            sc.pipeline().addLast(new VisitorChannelHandler());/*公网访问者处理器*/
+                            sc.pipeline().addLast(new TrafficMetricsHandler());
+                            sc.pipeline().addLast(new ClientChannelHandler());/*公网访问者处理器*/
                         }
                     });
             try {
@@ -141,13 +122,7 @@ public class TcpProxyServer implements Lifecycle {
                             }
                         }
                     }
-                    //打印已绑定的服务
                     if (!bindPorts.isEmpty()) {
-                        System.out.println("--------------------------代理端口--------------------------");
-                        for (StringBuilder item : bindPorts) {
-                            System.out.println(item.toString());
-                        }
-                        System.out.println("----------------------------------------------------------");
                         PortFileUtil.writePortsToFile(bindPorts);
                     }
 

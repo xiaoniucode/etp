@@ -2,6 +2,7 @@ package cn.xilio.etp.core;
 
 /**
  * Netty 容器服务生命周期
+ * @author liuxin
  */
 public interface Lifecycle {
     /**

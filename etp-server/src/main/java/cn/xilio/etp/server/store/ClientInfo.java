@@ -5,6 +5,7 @@ import java.util.List;
 
 /**
  * 客户端
+ * @author liuxin
  */
 public class ClientInfo implements Serializable {
     /**

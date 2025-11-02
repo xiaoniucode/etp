@@ -17,7 +17,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * @author liuxin
  */
-public class ChannelManager {
+public final class ChannelManager {
+    private volatile static Bootstrap realBootstrap;
+    private volatile static Bootstrap controlBootstrap;
     /**
      * 保存一个访问者会话与内网真实服务通道的映射关系
      * <sessionId, channel>
@@ -26,7 +28,7 @@ public class ChannelManager {
     /**
      * 当前控制隧道通道，每个客户端和远程代理服务器只有一条认证成功的控制隧道
      */
-    private static Channel controlTunnelChannel;
+    private static Channel controlChannel;
     /**
      * 最大数据隧道通道池大小，超过该大小则关闭当前的通道丢弃
      */
@@ -36,12 +38,25 @@ public class ChannelManager {
      */
     private static final Queue<Channel> dataTunnelChannelPool = new ConcurrentLinkedQueue<>();
 
-    public static Channel getControlTunnelChannel() {
-        return controlTunnelChannel;
+    public static void initBootstraps(Bootstrap control, Bootstrap real) {
+        controlBootstrap = control;
+        realBootstrap = real;
     }
 
-    public static void setControlTunnelChannel(Channel controlTunnelChannel) {
-        ChannelManager.controlTunnelChannel = controlTunnelChannel;
+    public static Bootstrap getRealBootstrap() {
+        return realBootstrap;
+    }
+
+    public static Bootstrap getControlBootstrap() {
+        return controlBootstrap;
+    }
+
+    public static Channel getControlChannel() {
+        return controlChannel;
+    }
+
+    public static void setControlChannel(Channel controlChannel) {
+        ChannelManager.controlChannel = controlChannel;
     }
 
     public static void removeRealServerChannel(Long sessionId) {
@@ -76,7 +91,7 @@ public class ChannelManager {
             dataTunnelChannel.close();
         } else {
             dataTunnelChannel.config().setOption(ChannelOption.AUTO_READ, true);
-            dataTunnelChannel.attr(EtpConstants.NEXT_CHANNEL).remove();
+            dataTunnelChannel.attr(EtpConstants.REAL_SERVER_CHANNEL).getAndSet(null);
             dataTunnelChannelPool.offer(dataTunnelChannel);
         }
     }
