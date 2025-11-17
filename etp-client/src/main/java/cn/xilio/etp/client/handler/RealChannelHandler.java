@@ -28,7 +28,6 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
             logger.warn("数据传输通道为空:{}", sessionId);
             return;
         }
-
         Message message = Message
                 .newBuilder()
                 .setSessionId(sessionId)
