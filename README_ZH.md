@@ -88,9 +88,9 @@ sudo sh cert-gen.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k
 ```properties
 ssl = true
 [keystore]
-path = "server.p12" #服务端证书路径
-keyPass = "veHzlXBADiAr" #私钥
-storePass = "veHzlXBADiAr" #服务端存储库密钥
+path = "你的服务端证书路径" #服务端证书路径
+keyPass = "你的私钥" #私钥
+storePass = "你的存储库密钥" #服务端存储库密钥
 ```
 
 - `etpc.toml` 配置文件需要增加如下内容
@@ -98,8 +98,8 @@ storePass = "veHzlXBADiAr" #服务端存储库密钥
 ```properties
 ssl = true
 [truststore]
-path = "client.p12" #证书路径
-storePass = "JCAkB4X7G3T6" #客户端存储库密钥
+path = "你的客户端证书路径" #证书路径
+storePass = "你的客户端存储库密钥" #客户端存储库密钥
 ```
 
 > ⚠️ 如果ssl设置为true，必须保证服务端和客户端都设置为true，否则会出错！

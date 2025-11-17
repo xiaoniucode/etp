@@ -89,9 +89,9 @@ sudo sh cert-gen.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k
 ```properties
 ssl = true
 [keystore]
-path = "server.p12" # Server certificate path
-keyPass = "veHzlXBADiAr" # Private key
-storePass = "veHzlXBADiAr" # Server keystore password
+path = "your-server-certificate-path" # Server certificate path
+keyPass = "your-private-key" # Private key
+storePass = "your-server-keystore-password" # Server keystore password
 ```
 
 - Add the following to the `etpc.toml` configuration file:
@@ -99,8 +99,8 @@ storePass = "veHzlXBADiAr" # Server keystore password
 ```properties
 ssl = true
 [truststore]
-path = "client.p12" # Certificate path
-storePass = "JCAkB4X7G3T6" # Client keystore password
+path = "your-client-certificate-path" # Certificate path
+storePass = "your-client-keystore-password" # Client keystore password
 ```
 
 > ⚠️ **Warning**: If `ssl` is set to `true`, both server and client must enable SSL, or an error will occur!
