@@ -2,7 +2,6 @@ package cn.xilio.etp.server;
 
 import cn.xilio.etp.core.EtpConstants;
 import io.netty.channel.Channel;
-import io.netty.util.AttributeKey;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ public class ChannelManager {
     /**
      * 内网代理客户端与控制通道映射
      */
-    private static final Map<String, Channel> controlChannels = new ConcurrentHashMap<>(4);
+    private static final Map<String, Channel> CONTROL_CHANNELS = new ConcurrentHashMap<>(4);
     /**
      * 内网服务端口与控制通道映射
      */
@@ -35,7 +34,7 @@ public class ChannelManager {
             controlChannel.attr(EtpConstants.CHANNEL_PORT).set(remotePorts);
             controlChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
             controlChannel.attr(EtpConstants.CLIENT_CHANNELS).set(new ConcurrentHashMap<>());
-            controlChannels.put(secretKey, controlChannel);
+            CONTROL_CHANNELS.put(secretKey, controlChannel);
         } finally {
             LOCK.unlock();
         }
@@ -47,9 +46,9 @@ public class ChannelManager {
         LOCK.lock();
         try {
             String secretKey = controlChannel.attr(EtpConstants.SECRET_KEY).get();
-            Channel existingChannel = controlChannels.get(secretKey);
+            Channel existingChannel = CONTROL_CHANNELS.get(secretKey);
             if (controlChannel == existingChannel) {
-                controlChannels.remove(secretKey);
+                CONTROL_CHANNELS.remove(secretKey);
             }
             List<Integer> remotePorts = controlChannel.attr(EtpConstants.CHANNEL_PORT).get();
             if (remotePorts != null) {
@@ -73,7 +72,6 @@ public class ChannelManager {
                 }
             });
         }
-
     }
 
     public static Channel getControlChannelByPort(int port) {
@@ -81,7 +79,7 @@ public class ChannelManager {
     }
 
     public static Channel getControlChannelBySecretKey(String secretKey) {
-        return controlChannels.get(secretKey);
+        return CONTROL_CHANNELS.get(secretKey);
     }
 
     public static Channel getClientChannel(Channel controlChannel, Long sessionId) {
