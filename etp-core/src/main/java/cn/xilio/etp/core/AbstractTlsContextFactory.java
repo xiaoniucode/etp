@@ -29,7 +29,7 @@ public abstract class AbstractTlsContextFactory {
     }
 
     /**
-     * 加载JKS格式的密钥库
+     * 加载PKCS格式的密钥库
      * @param keyStoreFile 密钥库文件
      * @param keyPass 私钥密码
      * @param storePass 存储库密码
@@ -46,7 +46,7 @@ public abstract class AbstractTlsContextFactory {
     }
 
     /**
-     * 加载JKS格式的信任库
+     * 加载PKCS格式的信任库
      * @param trustStoreFile 信任库文件
      * @param password 信任库密码
      */

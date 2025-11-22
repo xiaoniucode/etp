@@ -32,7 +32,7 @@ public final class ChannelManager {
     /**
      * 最大数据隧道通道池大小，超过该大小则关闭当前的通道丢弃
      */
-    private static final int MAX_DATA_TUNNEL_CHANNEL_POOL_SIZE = 100;
+    private static final int MAX_DATA_TUNNEL_CHANNEL_POOL_SIZE = 1000;
     /**
      *
      */
@@ -112,13 +112,11 @@ public final class ChannelManager {
      * @param callback        回调接口
      */
     public static void borrowDataTunnelChanel(Bootstrap tunnelBootstrap, DataTunnelChannelBorrowCallback callback) {
-        //从队列中压出一个通道
         Channel dataTunnelChannel = dataTunnelChannelPool.poll();
         if (dataTunnelChannel != null) {
             callback.success(dataTunnelChannel);
             return;
         }
-        //如果连接池没有，则新建一个连接
         tunnelBootstrap.connect(Config.getInstance().getServerAddr(), Config.getInstance().getServerPort()).addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 callback.success(future.channel());
