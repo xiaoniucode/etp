@@ -9,7 +9,7 @@
 ##  ✨ 介绍
 **etp**（Easy Tunnel Proxy）是一个轻量级的高性能隧道代理中间件，支持TCP、HTTP协议以及TCP上层协议且支持TLS1.3安全加密。用于将内网服务快速暴露为公网服务，便于开发测试，减少购买云服务器成本。
 
-📄[访问文档站点](https://xiaoniucode.github.io/etp)
+📄[查看文档](https://xiaoniucode.github.io/etp)
 ## 🌟 功能特性
 - 💻 支持TCP、HTTP/HTTPS等协议
 - 🔐 采用TLS1.3高效安全加密协议
@@ -19,7 +19,7 @@
 - 🔐 身份认证
 - 🐒 支持多客户端
 - 🧿 自动分配映射端口
-- 📺 跨平台支持且包括arm64和amd64架构
+- 📺 跨平台且支持arm64和amd64架构
 - 💨 轻量级，资源占用率低
 
 ## 🚀 快速开始
@@ -88,9 +88,9 @@ sudo sh cert-gen.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k
 ```properties
 ssl = true
 [keystore]
-path = "你的服务端证书路径" #服务端证书路径
-keyPass = "你的私钥" #私钥
-storePass = "你的存储库密钥" #服务端存储库密钥
+path = "你的服务端证书路径"
+keyPass = "你的私钥"
+storePass = "你的存储库密钥"
 ```
 
 - `etpc.toml` 配置文件需要增加如下内容
@@ -98,8 +98,8 @@ storePass = "你的存储库密钥" #服务端存储库密钥
 ```properties
 ssl = true
 [truststore]
-path = "你的客户端证书路径" #证书路径
-storePass = "你的客户端存储库密钥" #客户端存储库密钥
+path = "你的客户端证书路径"
+storePass = "你的客户端存储库密钥"
 ```
 
 > ⚠️ 如果ssl设置为true，必须保证服务端和客户端都设置为true，否则会出错！

@@ -9,7 +9,7 @@
 ## ✨ Introduction
 **etp** (Easy Tunnel Proxy) is a lightweight, high-performance tunnel proxy middleware that supports TCP, HTTP protocols, and upper-layer TCP protocols with TLS 1.3 encryption. It enables quick exposure of internal network services to the public internet, facilitating development and testing while reducing the need for cloud server purchases.
 
-📄 [Visit Documentation Site](https://xiaoniucode.github.io/etp)
+📄 [Document](https://xiaoniucode.github.io/etp)
 
 ## 🌟 Features
 - 💻 Supports TCP, HTTP/HTTPS protocols
@@ -89,9 +89,9 @@ sudo sh cert-gen.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k
 ```properties
 ssl = true
 [keystore]
-path = "your-server-certificate-path" # Server certificate path
-keyPass = "your-private-key" # Private key
-storePass = "your-server-keystore-password" # Server keystore password
+path = "your-server-certificate-path" 
+keyPass = "your-private-key"
+storePass = "your-server-keystore-password"
 ```
 
 - Add the following to the `etpc.toml` configuration file:
@@ -99,8 +99,8 @@ storePass = "your-server-keystore-password" # Server keystore password
 ```properties
 ssl = true
 [truststore]
-path = "your-client-certificate-path" # Certificate path
-storePass = "your-client-keystore-password" # Client keystore password
+path = "your-client-certificate-path"
+storePass = "your-client-keystore-password"
 ```
 
 > ⚠️ **Warning**: If `ssl` is set to `true`, both server and client must enable SSL, or an error will occur!
