@@ -29,3 +29,7 @@ port = 8080
 enable = true
 addr = "localhost"
 username = "admin"
+
+[log]
+level = "info"
+pattern = ""
