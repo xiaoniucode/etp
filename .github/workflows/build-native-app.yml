@@ -83,8 +83,8 @@ jobs:
           cp "etp-server/target/etp-server" "$RELEASE_NAME/etps"
           cp "etp-client/target/etp-client" "$RELEASE_NAME/etpc"
 
-          cp etp-server/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
-          cp etp-client/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
+          cp etp-server/target/classes/etps.toml "$RELEASE_NAME/" 2>/dev/null || true
+          cp etp-client/target/classes/etpc.toml "$RELEASE_NAME/" 2>/dev/null || true
 
           tar -czf "$RELEASE_NAME.tar.gz" "$RELEASE_NAME"
           echo "✅ Unix打包完成: $RELEASE_NAME.tar.gz"
@@ -100,8 +100,8 @@ jobs:
           Copy-Item "etp-server\target\etp-server.exe" "$RELEASE_NAME\etps.exe"
           Copy-Item "etp-client\target\etp-client.exe" "$RELEASE_NAME\etpc.exe"
 
-          Copy-Item "etp-server/target/classes/*.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
-          Copy-Item "etp-client/target/classes/*.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
+          Copy-Item "etp-server/target/classes/etps.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
+          Copy-Item "etp-client/target/classes/etpc.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
 
           Compress-Archive -Path "$RELEASE_NAME\*" -DestinationPath "$RELEASE_NAME.zip"
           Write-Host "✅ Windows打包完成: $RELEASE_NAME.zip"
@@ -147,8 +147,8 @@ jobs:
           cp "$SERVER_JAR" "$RELEASE_NAME/etps.jar"
           cp "$CLIENT_JAR" "$RELEASE_NAME/etpc.jar"
 
-          cp etp-server/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
-          cp etp-client/target/classes/*.toml "$RELEASE_NAME/" 2>/dev/null || true
+          cp etp-server/target/classes/etps.toml "$RELEASE_NAME/" 2>/dev/null || true
+          cp etp-client/target/classes/etpc.toml "$RELEASE_NAME/" 2>/dev/null || true
 
           zip -r "$RELEASE_NAME.zip" "$RELEASE_NAME"
           echo "✅ JAR包打包完成: $RELEASE_NAME.zip"

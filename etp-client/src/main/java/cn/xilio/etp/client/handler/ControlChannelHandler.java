@@ -28,7 +28,7 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
         if (Message.Type.HEARTBEAT.getNumber() == msg.getType().getNumber()) {
-            return;//客户端不处理心跳
+            return;
         }
         MessageHandler handler = MessageHandlerFactory.getHandler(msg.getType());
         handler.handle(ctx, msg);
