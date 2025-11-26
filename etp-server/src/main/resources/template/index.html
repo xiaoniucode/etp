@@ -12,15 +12,12 @@
         .layui-body {
             overflow: hidden;
         }
+
         /* iframe 高度铺满 */
         #mainFrame {
             width: 100%;
             height: 100%;
             border: none;
-        }
-        /* 选中菜单高亮 */
-        .layui-this a {
-            color: #fff !important;
         }
     </style>
 </head>
@@ -34,12 +31,20 @@
         </div>
         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
-                <a href="javascript:;">
+                <a>
                     <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img"> admin
                 </a>
                 <dl class="layui-nav-child">
-                    <dd><a href="javascript:;">账户设置</a></dd>
-                    <dd><a href="javascript:;">退出登陆</a></dd>
+                    <dd>
+                        <a id="openAccountSetting">
+                            <i class="layui-icon layui-icon-set"></i> 账户设置
+                        </a>
+                    </dd>
+                    <dd>
+                        <a id="logout">
+                            <i class="layui-icon layui-icon-logout"></i> 退出登录
+                        </a>
+                    </dd>
                 </dl>
             </li>
         </ul>
@@ -50,16 +55,20 @@
         <div class="layui-side-scroll">
             <ul class="layui-nav layui-nav-tree" lay-filter="leftMenu">
                 <li class="layui-nav-item layui-this">
-                    <a href="javascript:;" data-url="/monitor.html"><i class="layui-icon layui-icon-console"></i> 监控</a>
+                    <a data-url="/monitor.html"><i class="layui-icon layui-icon-console"></i>
+                        监控</a>
                 </li>
                 <li class="layui-nav-item">
-                    <a href="javascript:;" data-url="/mapping.html"><i class="layui-icon layui-icon-link"></i> 映射</a>
+                    <a data-url="/mapping.html"><i class="layui-icon layui-icon-link"></i> 映射</a>
                 </li>
                 <li class="layui-nav-item">
-                    <a href="javascript:;" data-url="/agent.html"><i class="layui-icon layui-icon-app"></i> 客户端</a>
+                    <a data-url="/agent.html"><i class="layui-icon layui-icon-app"></i> 客户端</a>
                 </li>
                 <li class="layui-nav-item">
-                    <a href="javascript:;" data-url="/stats.html"><i class="layui-icon layui-icon-chart"></i> 统计</a>
+                    <a data-url="/token.html"><i class="layui-icon layui-icon-link"></i> Token</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a data-url="/stats.html"><i class="layui-icon layui-icon-chart"></i> 统计</a>
                 </li>
             </ul>
         </div>
@@ -72,21 +81,22 @@
 
 <script src="/static/layui/layui.js"></script>
 <script>
-    layui.use(['element', 'layer'], function(){
-        var element = layui.element;
-        var layer = layui.layer;
-        var $ = layui.$;
+    layui.use(['element', 'layer'], function () {
+        const $ = layui.$;
         // 默认选中第一个
-        var $menuItems = $('.layui-nav-tree .layui-nav-item a');
+        const $menuItems = $('.layui-nav-tree .layui-nav-item a');
         // 点击左侧菜单切换页面
-        $menuItems.on('click', function(){
-            var url = $(this).data('url');
-            if(url && url !== ''){
+        $menuItems.on('click', function () {
+            const url = $(this).data('url');
+            if (url && url !== '') {
                 $('#mainFrame').attr('src', url);
                 // 高亮当前菜单
                 $menuItems.parent().removeClass('layui-this');
                 $(this).parent().addClass('layui-this');
             }
+        });
+        $('#openAccountSetting').on('click', function () {
+            $('#mainFrame').attr('src', '/account.html');
         });
     });
 </script>

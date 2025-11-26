@@ -43,7 +43,7 @@ public class StaticResourceHandler {
      */
     public static boolean isStaticResourceRequest(String path) {
         if (path == null || path.isEmpty() || "/".equals(path)) {
-            return true; // 根路径返回首页
+            return true;
         }
 
         for (String staticPath : STATIC_PATHS) {
