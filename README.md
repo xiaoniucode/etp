@@ -70,7 +70,7 @@ Start the client on the internal network computer, using a Unix-based system as 
 
 After successful startup, connect to MySQL using port **3307**.
 
-## 🔒 SSL Configuration (Optional)
+## 🔒 TLS Configuration (Optional)
 
 1️⃣ First, download the certificate generation command-line tool [generate_ssl_cert.sh](scripts/generate_ssl_cert.sh) to your local machine (alternatively, use JDK's keytool). For detailed usage, refer to the [certificate generation documentation](doc/code-gen.md). This tool currently requires a JDK environment.
 
@@ -87,7 +87,7 @@ sudo sh cert-gen.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k
 - Add the following to the `etps.toml` configuration file:
 
 ```properties
-ssl = true
+tls = true
 [keystore]
 path = "your-server-certificate-path" 
 keyPass = "your-private-key"
@@ -97,7 +97,7 @@ storePass = "your-server-keystore-password"
 - Add the following to the `etpc.toml` configuration file:
 
 ```properties
-ssl = true
+tls = true
 [truststore]
 path = "your-client-certificate-path"
 storePass = "your-client-keystore-password"

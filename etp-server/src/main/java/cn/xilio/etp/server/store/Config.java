@@ -22,7 +22,7 @@ public class Config {
     private static Set<String> clientSecretKeys;
     private static volatile Map<Integer, Integer> portLocalServerMapping = new HashMap<>();
     private static volatile Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<>();
-    private static boolean ssl;
+    private static boolean tls;
     private static KeystoreConfig keystoreConfig;
     private static String configPath;
 
@@ -48,9 +48,9 @@ public class Config {
             host = toml.getString("host");
         }
         //SSL密钥
-        Boolean sslValue = toml.getBoolean("ssl");
-        ssl = (sslValue != null) ? sslValue : false;
-        if (ssl) {
+        Boolean tlsValue = toml.getBoolean("tls");
+        tls = (tlsValue != null) ? tlsValue : false;
+        if (tls) {
             Toml keystore = toml.getTable("keystore");
             if (keystore != null) {
                 String keyPath = keystore.getString("path");
@@ -175,7 +175,7 @@ public class Config {
     }
 
     public boolean isSsl() {
-        return ssl;
+        return tls;
     }
 
     public KeystoreConfig getKeystoreConfig() {

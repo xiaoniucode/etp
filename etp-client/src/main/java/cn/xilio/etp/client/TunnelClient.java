@@ -31,7 +31,7 @@ public class TunnelClient implements Lifecycle {
     private String serverAddr;
     private int serverPort;
     private String secretKey;
-    private boolean ssl;
+    private boolean tls;
     /**
      * 初始化重连延迟时间 单位：秒
      */
@@ -64,11 +64,11 @@ public class TunnelClient implements Lifecycle {
     public TunnelClient() {
     }
 
-    public TunnelClient(String serverAddr, int serverPort, String secretKey, boolean ssl) {
+    public TunnelClient(String serverAddr, int serverPort, String secretKey, boolean tls) {
         this.serverAddr = serverAddr;
         this.serverPort = serverPort;
         this.secretKey = secretKey;
-        this.ssl = ssl;
+        this.tls = tls;
     }
 
     @SuppressWarnings("all")
@@ -88,7 +88,7 @@ public class TunnelClient implements Lifecycle {
                         }
                     });
 
-            if (ssl) {
+            if (tls) {
                 tlsContext = new ClientTlsContextFactory().createContext();
             }
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
@@ -104,7 +104,7 @@ public class TunnelClient implements Lifecycle {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            if (ssl) {
+                            if (tls) {
                                 SSLEngine engine = tlsContext.newEngine(sc.alloc(), serverAddr, serverPort);
                                 engine.setUseClientMode(true);
                                 sc.pipeline().addLast("tls", new SslHandler(engine));
@@ -210,7 +210,7 @@ public class TunnelClient implements Lifecycle {
         this.secretKey = secretKey;
     }
 
-    public void setSsl(boolean ssl) {
-        this.ssl = ssl;
+    public void setTls(boolean tls) {
+        this.tls = tls;
     }
 }

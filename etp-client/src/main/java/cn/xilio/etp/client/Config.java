@@ -35,12 +35,12 @@ public final class Config {
     private final String secretKey;
 
     /**
-     * 是否启用SSL
+     * 是否启用TLS
      */
-    private final boolean ssl;
+    private final boolean tls;
 
     /**
-     * SSL信任库配置
+     * TLS信任库配置
      */
     private final TruststoreConfig truststore;
 
@@ -69,11 +69,11 @@ public final class Config {
      * 私有构造方法
      */
     private Config(String serverAddr, int serverPort, String secretKey,
-                   boolean ssl, TruststoreConfig truststore) {
+                   boolean tls, TruststoreConfig truststore) {
         this.serverAddr = Objects.requireNonNull(serverAddr, "服务器地址不能为空");
         this.serverPort = validatePort(serverPort);
         this.secretKey = Objects.requireNonNull(secretKey, "密钥不能为空");
-        this.ssl = ssl;
+        this.tls = tls;
         this.truststore = truststore;
     }
 
@@ -112,15 +112,14 @@ public final class Config {
     private static Config createConfig(String configPath) {
         try {
             Toml toml = TomlUtils.readToml(configPath);
-
             String serverAddr = Objects.requireNonNull(toml.getString("serverAddr"), "serverAddr配置不能为空");
             Long port = Objects.requireNonNull(toml.getLong("serverPort"), "serverPort配置不能为空");
             int serverPort = port.intValue();
             String secretKey = Objects.requireNonNull(toml.getString("secretKey"), "secretKey配置不能为空");
-            Boolean sslEnabled = toml.getBoolean("ssl");
-            boolean ssl = sslEnabled != null ? sslEnabled : false;
+            Boolean tlsEnabled = toml.getBoolean("tls");
+            boolean tls = tlsEnabled != null ? tlsEnabled : false;
             TruststoreConfig truststoreConfig = null;
-            if (ssl) {
+            if (tls) {
                 Toml truststoreTable = toml.getTable("truststore");
                 if (truststoreTable != null) {
                     String path = truststoreTable.getString("path");
@@ -140,7 +139,7 @@ public final class Config {
                 }
             }
 
-            return new Config(serverAddr, serverPort, secretKey, ssl, truststoreConfig);
+            return new Config(serverAddr, serverPort, secretKey, tls, truststoreConfig);
 
         } catch (Exception e) {
             throw new IllegalStateException("配置文件解析失败: " + configPath, e);
@@ -170,8 +169,8 @@ public final class Config {
         return secretKey;
     }
 
-    public boolean isSsl() {
-        return ssl;
+    public boolean isTls() {
+        return tls;
     }
 
     public TruststoreConfig getTruststore() {
@@ -182,6 +181,6 @@ public final class Config {
      * 检查SSL配置是否完整
      */
     public boolean isSslConfigured() {
-        return ssl && truststore != null;
+        return tls && truststore != null;
     }
 }

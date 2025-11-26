@@ -13,7 +13,6 @@ import java.util.*;
  * @author liuxin
  */
 public final class ConfigManager {
-    // private final static String configPath = "etps.toml";
     private final static String CONFIG_PATH = Config.getInstance().getConfigPath();
 
     public static void addClient(String name, String secretKey) throws IOException {
@@ -174,11 +173,5 @@ public final class ConfigManager {
             client.put("proxies", proxies);
         }
         return proxies;
-    }
-
-    public static void main(String[] args) throws IOException {
-        // ConfigManager.deleteProxy("123456", 323L);
-        //  ConfigManager.addProxy("123456", "test3", "udp", 3365L, 323L);
-        List<ClientDTO> clients = ConfigManager.clients();
     }
 }

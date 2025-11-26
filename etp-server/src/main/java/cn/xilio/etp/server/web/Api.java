@@ -11,7 +11,7 @@ import java.util.List;
  * @author liuxin
  */
 public class Api {
-    private static String token;
+    private static String authToken;
 
     public static void initFilters(List<Filter> filters) {
         filters.add(new Filter() {
@@ -19,7 +19,6 @@ public class Api {
             public void doFilter(RequestContext context, FilterChain chain) throws Exception {
                 chain.doFilter();
             }
-
             @Override
             public int getOrder() {
                 return 0;

@@ -36,7 +36,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
             String path = getNormalPath(request.uri());
 
-            // 新增：检查是否为静态资源请求
+            // 检查是否为静态资源请求
             if (StaticResourceHandler.isStaticResourceRequest(path)) {
                 StaticResourceHandler.handleStaticResource(context);
             } else {
@@ -49,7 +49,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                     handler.handle(context);
                 }
             }
-
             sendResponse(context);
         } catch (Exception e) {
             handleError(ctx, context, e);

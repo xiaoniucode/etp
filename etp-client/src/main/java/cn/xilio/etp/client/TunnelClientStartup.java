@@ -30,7 +30,7 @@ public class TunnelClientStartup {
         initLogback();
         Config config = Config.getInstance();
         registerShutdownHook();
-        tunnelClient = new TunnelClient(config.getServerAddr(), config.getServerPort(), config.getSecretKey(), config.isSsl());
+        tunnelClient = new TunnelClient(config.getServerAddr(), config.getServerPort(), config.getSecretKey(), config.isTls());
         tunnelClient.start();
     }
 

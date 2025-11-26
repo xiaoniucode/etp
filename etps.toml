@@ -1,5 +1,5 @@
 bindPort = 9527
-ssl = false
+tls = true
 
 [keystore]
 path = "./cert/server.p12"
@@ -21,8 +21,6 @@ localPort = 6379
 name = "redis"
 remotePort = 6380
 type = "tcp"
-
-
 
 [dashboard]
 enable_tls = false
