@@ -31,6 +31,7 @@ port = 8080
 enable = true
 addr = "localhost"
 username = "admin"
+
 [[clients]]
 secretKey = "4b0063baa5ae47c2910fc25265aae4109"
 name = "macos"
