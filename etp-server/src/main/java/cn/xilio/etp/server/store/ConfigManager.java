@@ -145,13 +145,14 @@ public final class ConfigManager {
                 String protocol = (String) proxy.get("type");
                 Long localPort = (Long) proxy.get("localPort");
                 Long remotePort = (Long) proxy.get("remotePort");
+                Long status = (Long) proxy.get("status");
                 res.add(new ProxyDTO(client.get("name").toString(),
                         client.get("secretKey").toString(),
                         name,
                         protocol.toLowerCase(Locale.ROOT),
                         localPort.intValue(),
                         remotePort == null ? null : remotePort.intValue(),
-                        1));
+                        status.intValue()));
             }
             return res;
         }

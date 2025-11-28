@@ -137,6 +137,92 @@ public class Config {
         }
     }
 
+    /**
+     * 添加代理映射
+     *
+     * @param secretKey    客户端密钥
+     * @param proxyMapping 代理映射信息
+     * @return 是否添加成功
+     */
+    public boolean addProxyMapping(String secretKey, ProxyMapping proxyMapping) {
+        return true;
+    }
+
+    /**
+     * 删除代理映射
+     *
+     * @param secretKey  客户端密钥
+     * @param remotePort 公网端口
+     * @return 是否删除成功
+     */
+    public boolean deleteProxyMapping(String secretKey, Integer remotePort) {
+        return true;
+    }
+
+    /**
+     * 更新代理映射信息
+     *
+     * @param secretKey    客户端密钥
+     * @param proxyMapping 需要更新的代理映射信息
+     * @return 是否更新成功
+     */
+    public boolean updateProxyMapping(String secretKey, ProxyMapping proxyMapping) {
+        return true;
+    }
+
+    /**
+     * 更新代理映射的状态，只有开启才能使用该代理
+     *
+     * @param secretKey  客户端密钥
+     * @param remotePort 公网端口
+     * @param status     需要更新的状态
+     * @return 是否更新成功
+     */
+    public boolean updateProxyMappingStatus(String secretKey, Integer remotePort, Integer status) {
+        return true;
+    }
+
+    /**
+     * 更新管理界面用户信息
+     *
+     * @param username 用户名
+     * @param password 密码
+     * @return 是否更新成功
+     */
+    public boolean updateDashboard(String username, String password) {
+        return true;
+    }
+
+    /**
+     * 新增客户端
+     *
+     * @param c 客户端信息
+     */
+    public boolean addClient(ClientInfo c) {
+        //todo
+        return true;
+    }
+
+    /**
+     * 更新客户端
+     *
+     * @param c 客户端信息
+     */
+    public boolean updateClient(ClientInfo c) {
+        //todo
+        return true;
+    }
+
+    /**
+     * 删除客户端
+     *
+     * @param secretKey 客户端密钥
+     */
+    public boolean deleteClient(String secretKey) {
+        //todo
+        return true;
+    }
+
     public List<Integer> getAllPublicNetworkPort() {
         return new ArrayList<>(portLocalServerMapping.keySet());
     }

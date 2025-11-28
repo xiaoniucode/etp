@@ -15,14 +15,14 @@ localPort = 3306
 name = "mysql"
 remotePort = 3307
 type = "tcp"
-status=1
+status=1 #默认是1
 
 [[clients.proxies]]
 localPort = 6379
 name = "redis"
 remotePort = 6380
 type = "tcp"
-status=1
+status=0
 
 [dashboard]
 enable_tls = false
