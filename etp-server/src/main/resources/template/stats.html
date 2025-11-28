@@ -10,6 +10,11 @@
 <blockquote class="layui-elem-quote">
    统计信息目前尚未做持久化！
 </blockquote>
+<script type="text/html" id="statsToolbar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="flushTable">刷新</button>
+    </div>
+</script>
 <table class="layui-hide" id="test" lay-filter="test"></table>
 <script type="text/html" id="post_table_tool">
     <div class="layui-clear-space">
@@ -25,7 +30,7 @@
             text: "空空如也",
             skin: "line",
             url: '/metrics',
-            toolbar: '#toolbarDemo',
+            toolbar: '#statsToolbar',
             cellMinWidth: 80,
             cols: [[
                 {field: 'remotePort', fixed: 'left', width: 120, title: '公网端口', sort: true},
@@ -35,7 +40,6 @@
                 {field: 'writeBytes', sort: true, title: '写字节数'},
                 {field: 'channels', sort: true, title: '连接数'},
                 {field: 'time', sort: true, title: '时间'},
-                {fixed: 'right', title: '操作', width: 124, minWidth: 110, templet: '#post_table_tool'}
             ]],
             error: function (res, msg) {
                 console.log(res, msg)

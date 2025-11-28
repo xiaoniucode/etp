@@ -7,153 +7,53 @@
     <link href="/static/layui/css/layui.css" rel="stylesheet">
 </head>
 <body>
-<table class="layui-hide" id="test" lay-filter="test"></table>
-<script type="text/html" id="toolbarDemo">
-    <div class="d-flex align-items-center">
-        <div class="layui-btn-container">
-            <button class="layui-btn layui-btn-sm" id="dropdownButton">
-                操作选项
-                <i class="layui-icon layui-icon-down layui-font-12"></i>
-            </button>
-        </div>
+<table class="layui-hide" id="mappingTable" lay-filter="mappingTable"></table>
+<script type="text/html" id="mappingToolbar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="addMapping">新增</button>
+        <button class="layui-btn layui-btn-sm" lay-event="flushTable">刷新</button>
     </div>
 </script>
 <script type="text/html" id="post_table_tool">
     <div class="layui-clear-space">
         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-        <a class="layui-btn layui-btn-xs" lay-event="view">浏览</a>
     </div>
 </script>
 <script src="/static/layui/layui.js"></script>
 <script>
     layui.use(['form', 'table', 'dropdown'], function () {
         const table = layui.table;
-        const form = layui.form;
-        const dropdown = layui.dropdown;
-
-        // 创建渲染实例
         table.render({
-            elem: '#test',
+            elem: '#mappingTable',
             text: "空空如也",
             skin: "line",
             url: '/proxies',
-            toolbar: '#toolbarDemo',
+            toolbar: '#mappingToolbar',
             cellMinWidth: 80,
             cols: [[
                 {field: 'client', fixed: 'left', width: 150, title: '客户端', sort: true},
                 {field: 'name', title: '名称'},
                 {
-                    field: 'protocol', width: 120, title: '协议', sort: true, templet: function (d) {
-                        if (d.protocol ==="tcp") {
+                    field: 'protocol', title: '协议', sort: true, templet: function (d) {
+                        if (d.protocol === "tcp") {
                             return ' <span class="layui-badge layui-bg-green">TCP</span>';
                         } else if (d.protocol === "http") {
                             return '<span class="layui-badge">HTTP</span>';
                         }
                     }
                 },
-                {field: 'remotePort', sort: true, title: '公网端口', width: 190},
-                {field: 'localPort', sort: true, title: '内网端口', width: 190},
+                {field: 'remotePort', sort: true, title: '公网端口'},
+                {field: 'localPort', sort: true, title: '内网端口'},
                 {
                     field: 'status', width: 120, title: '状态', sort: true, templet: function (d) {
-                        if (d.status === 1) {
-                            return ' <span class="layui-badge layui-bg-blue">开启</span>';
-                        } else if (d.status === 0) {
-                            return '<span class="layui-badge-gray">关闭</span>';
-                        }
+                        const isChecked = d.status === 1 ? 'checked' : '';
+                        return '<input type="checkbox" lay-skin="switch" lay-text="ON|OFF" lay-filter="statusSwitch" ' + isChecked + '>';
                     }
                 },
                 {fixed: 'right', title: '操作', width: 134, minWidth: 125, templet: '#post_table_tool'}
             ]],
-            done: function () {
-                var id = this.id;
-                // 下拉按钮测试
-                dropdown.render({
-                    elem: '#dropdownButton',
-                    data: [{
-                        id: 'mark_public',
-                        title: '标记为公开'
-                    }, {
-                        id: 'mark_privacy',
-                        title: '标记为私密'
-                    }, {
-                        id: 'batch_delete',
-                        title: '批量删除'
-                    }],
-                    // 菜单被点击的事件
-                    click: function (obj) {
-                        var checkStatus = table.checkStatus(id)
-                        var data = checkStatus.data;
-                        var ids = checkStatus.data.map(function (item) {
-                            return item.id;
-                        });
-                        const selectTip = "请至少选择一条记录"
-                        switch (obj.id) {
-
-                            case 'mark_public':
-                                if (data.length === 0) return layer.msg(selectTip);
-                                batchMarkStatus(ids, 1)
-                                break;
-                            case 'mark_privacy':
-                                if (data.length === 0) return layer.msg(selectTip);
-                                batchMarkStatus(ids, 2)
-                                break;
-                            case 'batch_delete':
-                                if (data.length === 0) {
-                                    return layer.msg(selectTip);
-                                }
-                                layer.confirm('您确认要删除选中的文章吗？', function (index) {
-                                    $.ajax({
-                                        url: '/admin/content/batch-delete-post',
-                                        type: 'delete',
-                                        contentType: 'application/json',
-                                        data: JSON.stringify(ids),
-                                        success: function () {
-                                            table.reloadData('test', {
-                                                where: {
-                                                    status: undefined,
-                                                },
-                                                scrollPos: 'fixed',
-                                                page: {curr: 1, limit: 20}
-                                            });
-                                        }
-                                    });
-                                    layer.close(index);
-                                })
-                                break;
-                        }
-                    }
-                });
-            },
             error: function (res, msg) {
                 console.log(res, msg)
-            }
-        });
-        //批量标记内容的状态
-        function batchMarkStatus(ids, status) {
-            $.ajax({
-                url: '/admin/content/mark-post-status',
-                type: 'put',
-                contentType: 'application/json',
-                data: JSON.stringify({ids: ids, status: status}),
-                success: function () {
-                    table.reloadData('test', {
-                        where: {
-                            status: undefined,
-                        },
-                        scrollPos: 'fixed',
-                        page: {curr: 1, limit: 20}
-                    });
-
-                }
-            });
-        }
-        // 触发单元格工具事件
-        table.on('tool(test)', function (obj) {
-            const data = obj.data;
-            if (obj.event === 'edit') {
-                window.location.href = "/admin/content/write-post/" + data.id
-            } else if (obj.event === 'view') {
-                window.location.href = "/post/" + data.id
             }
         });
     });
