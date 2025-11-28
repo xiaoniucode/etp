@@ -1,6 +1,7 @@
 package cn.xilio.etp.server.store;
 
 
+import cn.xilio.etp.common.StringUtils;
 import cn.xilio.etp.common.TomlUtils;
 
 
@@ -76,10 +77,10 @@ public class Config {
         if (dash != null) {
             Boolean enable = dash.getBoolean("enable") != null && dash.getBoolean("enable");
             String addr = dash.getString("addr");
-            Integer port = dash.getLong("port")==null?null:dash.getLong("port").intValue();
+            Integer port = dash.getLong("port") == null ? null : dash.getLong("port").intValue();
             String username = dash.getString("username");
             String password = dash.getString("password");
-            dashboard = new Dashboard(enable,username,password,addr,port);
+            dashboard = new Dashboard(enable, username, password, addr, port);
         }
 
 
@@ -106,15 +107,13 @@ public class Config {
                     String type = proxy.getString("type");
                     Long localPort = proxy.getLong("localPort");
                     Long remotePort = proxy.getLong("remotePort");
-
+                    Long status = proxy.getLong("status");
+                    proxyMapping.setStatus(status == null ? 1 : status.intValue());
                     if (Objects.isNull(localPort)) {
                         throw new IllegalArgumentException("必须指定内网服务端口");
                     }
-                    if (StringUtil.isNullOrEmpty(proxyName)) {
-                        //如果没有设置名字采用内网端口号标识
-                        proxyMapping.setName(String.valueOf(localPort));
-                    }
-                    proxyMapping.setName(proxyName);
+                    //如果没有设置名字采用内网端口作为名字
+                    proxyMapping.setName(StringUtils.hasText(proxyName) ? proxyName : String.valueOf(localPort));
                     proxyMapping.setType(ProtocolType.getType(type));
                     proxyMapping.setLocalPort(localPort.intValue());
                     if (!Objects.isNull(remotePort)) {

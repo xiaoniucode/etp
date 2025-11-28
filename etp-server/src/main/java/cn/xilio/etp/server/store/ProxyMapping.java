@@ -25,6 +25,10 @@ public class ProxyMapping implements Serializable {
      * 远程服务端口
      */
     private Integer remotePort;
+    /**
+     * 状态：1表示正常开启、0表示关闭，用户无法连接
+     */
+    private Integer status;
 
     public String getName() {
         return name;
@@ -56,5 +60,13 @@ public class ProxyMapping implements Serializable {
 
     public void setRemotePort(Integer remotePort) {
         this.remotePort = remotePort;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }
