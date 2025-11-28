@@ -19,7 +19,7 @@
         <div class="layui-panel">
             <div style="padding: 32px;">
                 <div>客户端总数</div>
-                <div>2</div>
+                <div id="clientTotal"></div>
             </div>
         </div>
     </div>
@@ -27,7 +27,7 @@
         <div class="layui-panel">
             <div style="padding: 32px;">
                 <div>在线客户端数</div>
-                <div>2</div>
+                <div id="onlineClient"></div>
             </div>
         </div>
     </div>
@@ -35,7 +35,7 @@
         <div class="layui-panel">
             <div style="padding: 32px;">
                 <div>映射总数</div>
-                <div>2</div>
+                <div id="mappingTotal"></div>
             </div>
         </div>
     </div>
@@ -43,11 +43,35 @@
         <div class="layui-panel">
             <div style="padding: 32px;">
                 <div>已启动映射数</div>
-                <div>2</div>
+                <div id="startMapping"></div>
             </div>
         </div>
     </div>
 </div>
 <script src="/static/layui/layui.js"></script>
+<script>
+    layui.use(['jquery'], function(){
+        var $ = layui.jquery;
+        $(function(){
+            $.ajax({
+                url: '/stats',
+                type: 'GET',
+                success: function(res) {
+                    if(res.code === 0) {
+                        $('#clientTotal').text(res.data.clientTotal);
+                        $('#onlineClient').text(res.data.onlineClient);
+                        $('#mappingTotal').text(res.data.mappingTotal);
+                        $('#startMapping').text(res.data.startMapping);
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log(error)
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

@@ -27,11 +27,7 @@
             url: '/metrics',
             toolbar: '#toolbarDemo',
             cellMinWidth: 80,
-            page: true,
-            limits: [10, 20, 30, 50, 100],
-            limit: 20,
             cols: [[
-                {type: 'checkbox', fixed: 'left'},
                 {field: 'remotePort', fixed: 'left', width: 120, title: '公网端口', sort: true},
                 {field: 'readMsgs', title: '读取消息条数'},
                 {field: 'writeMsgs', sort: true, title: '写消息条数'},

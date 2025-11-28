@@ -2,13 +2,9 @@ package cn.xilio.etp.server.web;
 
 import cn.xilio.etp.server.metrics.MetricsCollector;
 import cn.xilio.etp.server.store.ConfigManager;
-import cn.xilio.etp.server.store.dto.ClientDTO;
-import cn.xilio.etp.server.store.dto.ProxyDTO;
 import cn.xilio.etp.server.web.framework.*;
 import io.netty.handler.codec.http.HttpMethod;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -35,5 +31,12 @@ public class Api {
         router.addRoute(HttpMethod.GET, "/clients", context -> context.setResponseContent(ResponseEntity.of(ConfigManager.clients()).toJsonString()));
         router.addRoute(HttpMethod.GET, "/proxies", context -> context.setResponseContent(ResponseEntity.of(ConfigManager.proxies()).toJsonString()));
         router.addRoute(HttpMethod.GET, "/metrics", context -> context.setResponseContent(ResponseEntity.of(MetricsCollector.getAllMetrics()).toJsonString()));
+        router.addRoute(HttpMethod.GET, "/stats", context -> {
+            int clientTotal = ConfigManager.clients().size();
+            long onlineClient = ConfigManager.clients().stream().filter(c -> c.status() == 1).count();
+            int mappingTotal = ConfigManager.proxies().size();
+            long startMapping = ConfigManager.proxies().stream().filter(c -> c.status() == 1).count();
+            context.setResponseContent(ResponseEntity.of(new StatsCount(clientTotal, (int) onlineClient, mappingTotal, (int) startMapping)).toJsonString());
+        });
     }
 }
