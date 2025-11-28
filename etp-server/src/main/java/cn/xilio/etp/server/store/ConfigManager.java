@@ -134,24 +134,27 @@ public final class ConfigManager {
     }
 
 
-    public static List<ProxyDTO> proxies(String secretKey) {
+    public static List<ProxyDTO> proxies() {
         List<ProxyDTO> res = new ArrayList<>();
         Map<String, Object> map = TomlUtils.readMap(CONFIG_PATH);
         List<Map<String, Object>> clients = getClientList(map);
         for (Map<String, Object> client : clients) {
-            if (secretKey.equals(client.get("secretKey"))) {
-                List<Map<String, Object>> proxiesList = getProxiesList(client);
-                for (Map<String, Object> proxy : proxiesList) {
-                    String name = (String) proxy.get("name");
-                    String protocol = (String) proxy.get("type");
-                    Long localPort = (Long) proxy.get("localPort");
-                    Long remotePort = (Long) proxy.get("remotePort");
-                    res.add(new ProxyDTO(name, protocol, localPort.intValue(), remotePort == null ? null : remotePort.intValue()));
-                }
-                return res;
+            List<Map<String, Object>> proxiesList = getProxiesList(client);
+            for (Map<String, Object> proxy : proxiesList) {
+                String name = (String) proxy.get("name");
+                String protocol = (String) proxy.get("type");
+                Long localPort = (Long) proxy.get("localPort");
+                Long remotePort = (Long) proxy.get("remotePort");
+                res.add(new ProxyDTO(client.get("name").toString(),
+                        client.get("secretKey").toString(),
+                        name,
+                        protocol.toLowerCase(Locale.ROOT),
+                        localPort.intValue(),
+                        remotePort == null ? null : remotePort.intValue(),
+                        1));
             }
+            return res;
         }
-
         return res;
     }
 

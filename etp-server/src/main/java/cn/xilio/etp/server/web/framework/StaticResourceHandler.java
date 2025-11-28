@@ -17,11 +17,15 @@ import java.nio.file.Paths;
 public class StaticResourceHandler {
     private static final Logger logger = LoggerFactory.getLogger(StaticResourceHandler.class);
 
-    // 支持的静态文件类型
+    /**
+     * 支持的静态文件类型
+     */
     private static final String[] STATIC_PATHS = {"/static/", "/template/"};
     private static final String WEB_ROOT = "src/main/resources";
 
-    // 文件类型映射
+    /**
+     * 文件类型映射
+     */
     private static final String[][] MIME_TYPES = {
         {".html", "text/html; charset=utf-8"},
         {".htm", "text/html; charset=utf-8"},
@@ -111,9 +115,8 @@ public class StaticResourceHandler {
     /**
      * 服务首页
      */
-    private static void serveIndexPage(RequestContext context) throws IOException {
+    private static void serveIndexPage(RequestContext context) {
         String[] indexFiles = {"index.html", "index.htm"};
-
         for (String indexFile : indexFiles) {
             String resourcePath = "template/" + indexFile;
             byte[] fileContent = readResourceFile(resourcePath);
@@ -130,22 +133,8 @@ public class StaticResourceHandler {
                 return;
             }
         }
-
-        // 如果没有找到首页文件，返回默认欢迎页面
-        String welcomePage = "<html><body><h1>ETP 内网穿透服务</h1><p>欢迎使用ETP内网穿透管理系统</p></body></html>";
-        FullHttpResponse response = new DefaultFullHttpResponse(
-            HttpVersion.HTTP_1_1,
-            HttpResponseStatus.OK,
-            io.netty.buffer.Unpooled.copiedBuffer(welcomePage, io.netty.util.CharsetUtil.UTF_8)
-        );
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=utf-8");
-        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, welcomePage.getBytes().length);
-        context.setHttpResponse(response);
     }
 
-    /**
-     * 获取资源文件路径
-     */
     /**
      * 获取资源文件路径
      */
@@ -224,7 +213,7 @@ public class StaticResourceHandler {
     }
 
     /**
-     * 规范化路径（从您的原始代码复制）
+     * 规范化路径
      */
     private static String getNormalPath(String uri) {
         int idx = uri.indexOf('?');

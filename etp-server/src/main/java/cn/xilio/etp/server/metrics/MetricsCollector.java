@@ -1,5 +1,7 @@
 package cn.xilio.etp.server.metrics;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +71,9 @@ public class MetricsCollector {
         metrics.setWriteBytes(writeBytes.sum());
         metrics.setReadMsgs(readMsgs.sum());
         metrics.setWriteMsgs(writeMsgs.sum());
-        metrics.setTimestamp(System.currentTimeMillis());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String time = LocalDateTime.now().format(formatter);
+        metrics.setTime(time);
         return metrics;
     }
 
@@ -95,7 +99,9 @@ public class MetricsCollector {
         Metrics m = new Metrics();
         m.setRemotePort(remotePort);
         m.setChannels(channels.get());
-        m.setTimestamp(System.currentTimeMillis());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String time = LocalDateTime.now().format(formatter);
+        m.setTime(time);
         m.setReadBytes(readBytes.sumThenReset());
         m.setWriteBytes(writeBytes.sumThenReset());
         m.setReadMsgs(readMsgs.sumThenReset());

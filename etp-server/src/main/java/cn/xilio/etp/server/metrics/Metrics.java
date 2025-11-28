@@ -16,7 +16,7 @@ public class Metrics implements Serializable {
     private long readBytes;
     private long writeBytes;
     private int channels;
-    private long timestamp;
+    private String time;
 
     public int getRemotePort() {
         return remotePort;
@@ -66,11 +66,11 @@ public class Metrics implements Serializable {
         this.channels = channels;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public String getTime() {
+        return time;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setTime(String time) {
+        this.time = time;
     }
 }
