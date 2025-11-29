@@ -2,6 +2,7 @@ package cn.xilio.etp.server.store;
 
 import cn.xilio.etp.common.TomlUtils;
 import cn.xilio.etp.core.protocol.ProtocolType;
+import cn.xilio.etp.server.PortAllocator;
 import cn.xilio.etp.server.TcpProxyServer;
 import cn.xilio.etp.server.store.dto.ClientDTO;
 import cn.xilio.etp.server.store.dto.ProxyDTO;
@@ -10,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.BindException;
 import java.util.*;
 
 /**
@@ -38,6 +38,13 @@ public final class ConfigManager {
 
         clients.add(newClient);
         config.put("clients", clients);
+        ClientInfo clientInfo = new ClientInfo();
+        clientInfo.setName(name);
+        clientInfo.setSecretKey(secretKey);
+        clientInfo.setProxyMappings(new ArrayList<>());
+        //添加到配置类
+        Config.getInstance().addClient(clientInfo);
+        //持久化
         TomlUtils.write(config, CONFIG_PATH);
     }
 
@@ -46,6 +53,13 @@ public final class ConfigManager {
         List<Map<String, Object>> clients = getClientList(config);
         boolean removed = clients.removeIf(client -> secretKey.equals(client.get("secretKey")));
         if (removed) {
+            //删除客户端映射信息
+            Config.getInstance().deleteClient(secretKey);
+            //关闭该客户端所有运行状态的代理服务
+            Config.getInstance().getPublicNetworkPorts(secretKey).forEach(remotePort -> {
+                TcpProxyServer.getInstance().stopRemotePort(remotePort, true);
+            });
+            //持久化到文件
             config.put("clients", clients);
             TomlUtils.write(config, CONFIG_PATH);
         } else {
@@ -70,7 +84,7 @@ public final class ConfigManager {
         }
 
         List<Map<String, Object>> proxies = getProxiesList(targetClient);
-        if (Config.getInstance().existRemotePort(remotePort)) {
+        if (PortAllocator.getInstance().isPortAllocated(remotePort)) {
             throw new BizException("公网端口已经被使用");
         }
         // 创建新代理配置
@@ -96,16 +110,10 @@ public final class ConfigManager {
         if (status == 1) {
             TcpProxyServer.getInstance().startRemotePort(remotePort);
         }
+        //将公网端口添加到已分配缓存
+        PortAllocator.getInstance().addRemotePort(remotePort);
         //持久化到文件
         TomlUtils.write(config, CONFIG_PATH);
-    }
-
-    public static void updateProxy(String secretKey, String name, String protocol, Integer localPort, Integer remotePort, Integer status) throws IOException {
-        deleteProxy(secretKey, remotePort);//todo
-        addProxy(secretKey, name, protocol, localPort, remotePort, status);
-        if (status == 0) {
-            TcpProxyServer.getInstance().stopRemotePort(remotePort, false);
-        }
     }
 
     public static void deleteProxy(String secretKey, Integer remotePort) throws IOException {
@@ -236,5 +244,9 @@ public final class ConfigManager {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    public static void updateClient(String secretKey, String name) {
+
     }
 }

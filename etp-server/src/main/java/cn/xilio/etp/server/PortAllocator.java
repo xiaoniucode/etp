@@ -17,11 +17,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PortAllocator {
     private static final Logger LOGGER = LoggerFactory.getLogger(PortAllocator.class.getName());
-
     private static volatile PortAllocator instance;
-
     private final ReentrantLock lock = new ReentrantLock();
-
     private final Set<Integer> allocatedPorts = new HashSet<>(32);
 
     private PortAllocator() {
@@ -61,59 +58,6 @@ public class PortAllocator {
             lock.unlock();
         }
     }
-
-    public int allocateAvailablePortInRange(int minPort, int maxPort) throws IOException {
-        return allocateAvailablePortInRange(minPort, maxPort, false);
-    }
-
-    public int allocateAvailablePortInRange(int minPort, int maxPort, boolean retry) throws IOException {
-        // 验证端口范围
-        if (minPort > maxPort || minPort < 1024 || maxPort > 65535) {
-            String errorMsg = String.format("无效端口范围: minPort=%d, maxPort=%d，必须在1024到65535之间，且minPort <= maxPort",
-                    minPort, maxPort);
-            LOGGER.error(errorMsg);
-            throw new IllegalArgumentException(errorMsg);
-        }
-
-        LOGGER.info("开始分配端口，范围: {} 到 {1}, 重试: {2}",
-                new Object[]{minPort, maxPort, retry});
-
-        lock.lock();
-        try {
-            for (int port = minPort; port <= maxPort; port++) {
-                if (allocatedPorts.contains(port)) {
-                    LOGGER.warn("端口 {} 已分配，跳过", port);
-                    continue;
-                }
-                // 如果启用重试，尝试3次
-                int attempts = retry ? 3 : 1;
-                for (int i = 0; i < attempts; i++) {
-                    try (ServerSocket socket = new ServerSocket(port)) {
-                        allocatedPorts.add(port);
-                        LOGGER.info("成功分配端口: {}", port);
-                        return port;
-                    } catch (IOException e) {
-                        LOGGER.warn("端口 {} 被占用，尝试次数: {1}/{2}", new Object[]{port, i + 1, attempts});
-                        if (i < attempts - 1) {
-                            try {
-                                // 等待100ms后重试
-                                Thread.sleep(100);
-                            } catch (InterruptedException ie) {
-                                Thread.currentThread().interrupt();
-                                throw new IOException("端口分配被中断", ie);
-                            }
-                        }
-                    }
-                }
-            }
-            String errorMsg = String.format("范围内无可用端口: %d 到 %d", minPort, maxPort);
-            LOGGER.error(errorMsg);
-            throw new IOException(errorMsg);
-        } finally {
-            lock.unlock();
-        }
-    }
-
     public boolean releasePort(int port) {
         lock.lock();
         try {
@@ -168,16 +112,7 @@ public class PortAllocator {
         }
     }
 
-    public int getAllocatedPortCount() {
-        lock.lock();
-        try {
-            return allocatedPorts.size();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public void addPort(Integer port) {
+    public void addRemotePort(Integer port) {
         allocatedPorts.add(port);
     }
 }

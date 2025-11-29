@@ -39,6 +39,12 @@ public class ChannelManager {
             LOCK.unlock();
         }
     }
+
+    public static void closeControlChannelByClient(String secretKey) {
+        Channel channel = CONTROL_CHANNELS.get(secretKey);
+        clearControlChannel(channel);
+    }
+
     public static void removeRemotePortToControlChannel(String secretKey, int remotePort) {
         CONTROL_CHANNELS.remove(secretKey);
         PORT_CONTROL_CHANNEL_MAPPING.remove(remotePort);

@@ -99,7 +99,7 @@ public class TcpProxyServer implements Lifecycle {
                                     bindPorts.add(portItem);
                                     remotePortChannelMapping.put(allocatePort, future.channel());
                                     //将新分配的端口记录到分配器缓存
-                                    portAllocator.addPort(allocatePort);
+                                    portAllocator.addRemotePort(allocatePort);
                                     //将远程端口和内网端口映射信息记录到全局配置
                                     proxy.setRemotePort(allocatePort);
                                     Config.getInstance().addClientPublicNetworkPortMapping(client.getSecretKey(), allocatePort);
@@ -149,7 +149,7 @@ public class TcpProxyServer implements Lifecycle {
             if (!remotePortChannelMapping.containsKey(remotePort)) {
                 ChannelFuture future = serverBootstrap.bind(remotePort).sync();
                 remotePortChannelMapping.put(remotePort, future.channel());
-                portAllocator.addPort(remotePort);
+                portAllocator.addRemotePort(remotePort);
                 LOGGER.info("{}服务启动成功", remotePort);
             }
         } catch (InterruptedException e) {

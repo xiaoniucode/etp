@@ -3,13 +3,14 @@ package cn.xilio.etp.server.web;
 import cn.xilio.etp.common.JsonUtils;
 import cn.xilio.etp.server.metrics.MetricsCollector;
 import cn.xilio.etp.server.store.ConfigManager;
-import cn.xilio.etp.server.web.dto.AddProxyReq;
-import cn.xilio.etp.server.web.dto.DeleteProxyReq;
-import cn.xilio.etp.server.web.dto.UpdateProxyStatusReq;
+import cn.xilio.etp.server.web.dto.*;
 import cn.xilio.etp.server.web.framework.*;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * Dashboard 管理、认证接口
@@ -61,22 +62,26 @@ public class Api {
             DeleteProxyReq req = JsonUtils.toBean(context.getRequestBody(), DeleteProxyReq.class);
             assert req != null;
             ConfigManager.deleteProxy(req.getSecretKey(), req.getRemotePort());
-
             context.setResponseContent(ResponseEntity.of("ok").toJsonString());
         });
-        router.addRoute(HttpMethod.DELETE, "/update-proxy", context -> {
-
+        router.addRoute(HttpMethod.POST, "/add-client", context -> {
+            Map<String, Object> req = JsonUtils.toMap(context.getRequestBody());
+            assert req != null;
+            String secretKey = UUID.randomUUID().toString().replaceAll("-", "");
+            ConfigManager.addClient((String) req.get("name"), secretKey);
             context.setResponseContent(ResponseEntity.of("ok").toJsonString());
         });
-
-        router.addRoute(HttpMethod.DELETE, "/add-client", context -> {
+        router.addRoute(HttpMethod.PUT, "/update-client", context -> {
+            Map<String, Object> req = JsonUtils.toMap(context.getRequestBody());
+            assert req != null;
+            ConfigManager.updateClient((String) req.get("secretKey"), (String) req.get("name"));
             context.setResponseContent(ResponseEntity.of("ok").toJsonString());
-        });
-        router.addRoute(HttpMethod.DELETE, "/update-client", context -> {
-
         });
         router.addRoute(HttpMethod.DELETE, "/delete-client", context -> {
-
+            Map<String, Object> req = JsonUtils.toMap(context.getRequestBody());
+            assert req != null;
+            ConfigManager.deleteClient((String) req.get("secretKey"));
+            context.setResponseContent(ResponseEntity.of("ok").toJsonString());
         });
     }
 }

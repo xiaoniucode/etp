@@ -7,79 +7,6 @@ keyPass = "3FbV8R8VW49O"
 storePass = "3FbV8R8VW49O"
 
 [[clients]]
-secretKey = "4b0063baa5ae47c2910fc25265aae4b9"
-name = "windows"
-
-[[clients.proxies]]
-localPort = 3306
-name = "mysql"
-remotePort = 3307
-type = "tcp"
-status = 1
-
-[[clients.proxies]]
-localPort = 6379
-name = "redis"
-remotePort = 6380
-type = "tcp"
-status = 0
-
-[[clients.proxies]]
-localPort = 3306
-name = "123456"
-remotePort = 9878
-type = "tcp"
-
-[[clients.proxies]]
-localPort = 3306
-name = "123456"
-remotePort = 9839
-type = "tcp"
-status = 9839
-
-[[clients.proxies]]
-localPort = 3306
-name = "123456"
-remotePort = 9139
-type = "tcp"
-status = 9139
-
-[[clients.proxies]]
-localPort = 3306
-name = "123456"
-remotePort = 9137
-type = "tcp"
-status = 9137
-
-[[clients.proxies]]
-localPort = 3306
-name = "123456"
-remotePort = 9147
-type = "tcp"
-status = 9147
-
-[[clients.proxies]]
-localPort = 3306
-name = "123456"
-remotePort = 9123
-type = "tcp"
-status = 9123
-
-[[clients.proxies]]
-localPort = 3306
-name = "123456"
-remotePort = 9023
-type = "tcp"
-status = 9023
-
-[[clients.proxies]]
-name = "123456"
-type = "tcp"
-localPort = 3306
-remotePort = 9021
-status = 1
-
-[[clients]]
 secretKey = "4b0063baa5ae47c2910fc25265aae4109"
 name = "macos"
 
@@ -102,6 +29,16 @@ name = "123456"
 remotePort = 9829
 type = "tcp"
 status = 9829
+
+[[clients]]
+secretKey = "7db0f680b996426eb969e357f77a6f81"
+name = "dooor"
+proxies = []
+
+[[clients]]
+secretKey = "f5e3226f6a754709949703377588f8c0"
+name = "deer"
+proxies = []
 
 [log]
 level = "info"

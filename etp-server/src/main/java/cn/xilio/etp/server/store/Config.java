@@ -23,11 +23,11 @@ public class Config {
     private static Dashboard dashboard;
     private static List<ClientInfo> clients;
     private static Set<String> clientSecretKeys;
-    private static volatile Map<Integer, Integer> portLocalServerMapping = new HashMap<>();
+    private static final Map<Integer, Integer> portLocalServerMapping = new HashMap<>();
     /**
      * 客户端与对应的所有公网端口映射
      */
-    private static volatile Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<>();
+    private static final Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<>();
     private static boolean tls;
     private static KeystoreConfig keystoreConfig;
     private static String configPath;
@@ -97,9 +97,9 @@ public class Config {
                 throw new IllegalArgumentException("客户端密钥冲突，不能存在重复的密钥！");
             }
             //创建一个客户端
-            ClientInfo c = new ClientInfo();
-            c.setName(name);
-            c.setSecretKey(secretKey);
+            ClientInfo clientInfo = new ClientInfo();
+            clientInfo.setName(name);
+            clientInfo.setSecretKey(secretKey);
             List<Toml> proxies = client.getTables("proxies");
             if (proxies != null) {
                 //代理信息配置
@@ -135,9 +135,9 @@ public class Config {
                         remotePorts.add(remotePort.intValue());
                     }
                 }
-                c.setProxyMappings(proxyMappings);
+                clientInfo.setProxyMappings(proxyMappings);
             }
-            clients.add(c);
+            clients.add(clientInfo);
             clientSecretKeys.add(secretKey);
         }
     }
@@ -236,20 +236,24 @@ public class Config {
     /**
      * 新增客户端
      *
-     * @param c 客户端信息
+     * @param clientInfo 客户端信息
      */
-    public boolean addClient(ClientInfo c) {
-        //todo
+    public boolean addClient(ClientInfo clientInfo) {
+        clients.add(clientInfo);
+        clientSecretKeys.add(clientInfo.getSecretKey());
         return true;
     }
 
     /**
      * 更新客户端
      *
-     * @param c 客户端信息
+     * @param secretKey  密钥
+     * @param clientName 客户端信息
      */
-    public boolean updateClient(ClientInfo c) {
-        //todo
+    public boolean updateClient(String secretKey, String clientName) {
+        clients.stream().filter(c -> c.getSecretKey().equals(secretKey)).findFirst().ifPresent(c -> {
+            c.setName(clientName);
+        });
         return true;
     }
 
@@ -259,7 +263,10 @@ public class Config {
      * @param secretKey 客户端密钥
      */
     public boolean deleteClient(String secretKey) {
-        //todo
+        ClientInfo clientInfo = clients.stream().filter(c -> c.getSecretKey().equals(secretKey)).findFirst().orElse(null);
+        ChannelManager.closeControlChannelByClient(secretKey);
+        clients.remove(clientInfo);
+        clientSecretKeys.remove(secretKey);
         return true;
     }
 
