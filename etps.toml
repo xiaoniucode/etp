@@ -73,10 +73,10 @@ type = "tcp"
 status = 9023
 
 [[clients.proxies]]
-localPort = 3306
 name = "123456"
-remotePort = 9021
 type = "tcp"
+localPort = 3306
+remotePort = 9021
 status = 1
 
 [[clients]]

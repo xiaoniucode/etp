@@ -39,18 +39,9 @@ public class ChannelManager {
             LOCK.unlock();
         }
     }
-
-    /**
-     * 将公网端口添加到已建立连接客户端
-     *
-     * @param secretKey  客户端密钥
-     * @param remotePort 公网端口
-     */
-    public static void addRemotePortToControlChannel(String secretKey, int remotePort) {
-        Channel controlChannel = CONTROL_CHANNELS.get(secretKey);
-        if (controlChannel != null) {
-            PORT_CONTROL_CHANNEL_MAPPING.put(remotePort, controlChannel);
-        }
+    public static void removeRemotePortToControlChannel(String secretKey, int remotePort) {
+        CONTROL_CHANNELS.remove(secretKey);
+        PORT_CONTROL_CHANNEL_MAPPING.remove(remotePort);
     }
 
     public static void clearControlChannel(Channel controlChannel) {

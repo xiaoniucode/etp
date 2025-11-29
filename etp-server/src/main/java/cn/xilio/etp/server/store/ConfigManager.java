@@ -79,7 +79,7 @@ public final class ConfigManager {
         newProxy.put("type", protocol.toLowerCase());
         newProxy.put("localPort", localPort);
         newProxy.put("remotePort", remotePort);
-        newProxy.put("status", remotePort);
+        newProxy.put("status", status);
 
         proxies.add(newProxy);
         targetClient.put("proxies", proxies);
@@ -101,14 +101,14 @@ public final class ConfigManager {
     }
 
     public static void updateProxy(String secretKey, String name, String protocol, Integer localPort, Integer remotePort, Integer status) throws IOException {
-        deleteProxy(secretKey, name);
+        deleteProxy(secretKey, remotePort);//todo
         addProxy(secretKey, name, protocol, localPort, remotePort, status);
         if (status == 0) {
             TcpProxyServer.getInstance().stopRemotePort(remotePort, false);
         }
     }
 
-    public static void deleteProxy(String secretKey, String proxyName) throws IOException {
+    public static void deleteProxy(String secretKey, Integer remotePort) throws IOException {
         Map<String, Object> config = TomlUtils.readMap(CONFIG_PATH);
         List<Map<String, Object>> clients = getClientList(config);
 
@@ -117,21 +117,24 @@ public final class ConfigManager {
             if (secretKey.equals(client.get("secretKey"))) {
                 List<Map<String, Object>> proxies = getProxiesList(client);
                 removed = proxies.removeIf(proxy -> {
-                    String name = (String) proxy.get("name");
-                    return name != null && name.equals(proxyName);
+                    Long port = (Long) proxy.get("remotePort");
+                    return port != null && port.intValue() == (remotePort);
                 });
-
                 if (removed) {
                     client.put("proxies", proxies);
                     config.put("clients", clients);
-                    // 从端口缓存中移除todo
+                    //删除内存中的映射信息
+                    Config.getInstance().deleteProxyMapping(secretKey, remotePort);
+                    //停掉运行的服务并释放端口
+                    TcpProxyServer.getInstance().stopRemotePort(remotePort, true);
+                    //持久化到文件
                     TomlUtils.write(config, CONFIG_PATH);
                     return;
                 }
                 break;
             }
         }
-        throw new BindException("未找到秘钥 " + secretKey + " 对应的名称 " + proxyName + " 的代理");
+        throw new BizException("未找到秘钥 " + secretKey + " 对应的端口 " + remotePort + " 的代理");
     }
 
     @SuppressWarnings("unchecked")

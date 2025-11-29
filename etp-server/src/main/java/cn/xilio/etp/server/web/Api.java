@@ -4,6 +4,7 @@ import cn.xilio.etp.common.JsonUtils;
 import cn.xilio.etp.server.metrics.MetricsCollector;
 import cn.xilio.etp.server.store.ConfigManager;
 import cn.xilio.etp.server.web.dto.AddProxyReq;
+import cn.xilio.etp.server.web.dto.DeleteProxyReq;
 import cn.xilio.etp.server.web.dto.UpdateProxyStatusReq;
 import cn.xilio.etp.server.web.framework.*;
 import io.netty.handler.codec.http.HttpMethod;
@@ -11,6 +12,8 @@ import io.netty.handler.codec.http.HttpMethod;
 import java.util.List;
 
 /**
+ * Dashboard 管理、认证接口
+ *
  * @author liuxin
  */
 public class Api {
@@ -51,7 +54,29 @@ public class Api {
         router.addRoute(HttpMethod.PUT, "/update-proxy-status", context -> {
             UpdateProxyStatusReq req = JsonUtils.toBean(context.getRequestBody(), UpdateProxyStatusReq.class);
             assert req != null;
-            ConfigManager.switchProxyStatus(req.getSecretKey(),req.getRemotePort(),req.getStatus());
+            ConfigManager.switchProxyStatus(req.getSecretKey(), req.getRemotePort(), req.getStatus());
+            context.setResponseContent(ResponseEntity.of("ok").toJsonString());
+        });
+        router.addRoute(HttpMethod.DELETE, "/delete-proxy", context -> {
+            DeleteProxyReq req = JsonUtils.toBean(context.getRequestBody(), DeleteProxyReq.class);
+            assert req != null;
+            ConfigManager.deleteProxy(req.getSecretKey(), req.getRemotePort());
+
+            context.setResponseContent(ResponseEntity.of("ok").toJsonString());
+        });
+        router.addRoute(HttpMethod.DELETE, "/update-proxy", context -> {
+
+            context.setResponseContent(ResponseEntity.of("ok").toJsonString());
+        });
+
+        router.addRoute(HttpMethod.DELETE, "/add-client", context -> {
+            context.setResponseContent(ResponseEntity.of("ok").toJsonString());
+        });
+        router.addRoute(HttpMethod.DELETE, "/update-client", context -> {
+
+        });
+        router.addRoute(HttpMethod.DELETE, "/delete-client", context -> {
+
         });
     }
 }

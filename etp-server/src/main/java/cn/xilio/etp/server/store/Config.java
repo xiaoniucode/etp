@@ -24,6 +24,9 @@ public class Config {
     private static List<ClientInfo> clients;
     private static Set<String> clientSecretKeys;
     private static volatile Map<Integer, Integer> portLocalServerMapping = new HashMap<>();
+    /**
+     * 客户端与对应的所有公网端口映射
+     */
     private static volatile Map<String, List<Integer>> clientPublicNetworkPortMapping = new HashMap<>();
     private static boolean tls;
     private static KeystoreConfig keystoreConfig;
@@ -154,8 +157,8 @@ public class Config {
             clientInfo.getProxyMappings().add(proxyMapping);
             //公网端口与内网端口建立映射
             portLocalServerMapping.put(proxyMapping.getRemotePort(), proxyMapping.getLocalPort());
-            //将公网端口添加到已认证客户端
-            ChannelManager.addRemotePortToControlChannel(secretKey, proxyMapping.getRemotePort());
+            //将公网端口添加到客户端中
+            clientPublicNetworkPortMapping.get(secretKey).add(proxyMapping.getRemotePort());
         }
         return false;
     }
@@ -168,6 +171,20 @@ public class Config {
      * @return 是否删除成功
      */
     public boolean deleteProxyMapping(String secretKey, Integer remotePort) {
+        List<Integer> remotePorts = clientPublicNetworkPortMapping.get(secretKey);
+        remotePorts.remove(remotePort);
+        ClientInfo clientInfo = clients.stream().filter(c -> c.getSecretKey().equals(secretKey)).findFirst().orElse(null);
+        if (clientInfo != null) {
+            clientInfo.getProxyMappings()
+                    .stream()
+                    .filter(proxyMapping -> proxyMapping.getRemotePort().equals(remotePort))
+                    .findFirst()
+                    .ifPresent(mapping -> clientInfo.getProxyMappings().remove(mapping));
+            //公网端口与内网端口建立映射
+            portLocalServerMapping.remove(remotePort);
+            //删除公网端口与已认证客户端的绑定
+            ChannelManager.removeRemotePortToControlChannel(secretKey, remotePort);
+        }
         return true;
     }
 
