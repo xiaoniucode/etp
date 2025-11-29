@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -34,10 +36,12 @@ public class TcpProxyServer implements Lifecycle {
     private final ReentrantLock lock = new ReentrantLock();
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private final List<Channel> boundChannels = new ArrayList<>();
+    /**
+     * 公网端口和启动的服务channel映射，用于通过端口快速找到对应的channel
+     */
+    private final Map<Integer, Channel> remotePortChannelMapping = new ConcurrentHashMap<>();
     private final PortAllocator portAllocator;
-    private static final int DEFAULT_MIN_PORT = 8000;
-    private static final int DEFAULT_MAX_PORT = 9000;
+    private ServerBootstrap serverBootstrap;
 
     private TcpProxyServer() {
         this.portAllocator = PortAllocator.getInstance();
@@ -61,7 +65,7 @@ public class TcpProxyServer implements Lifecycle {
             LOGGER.info("开始启动代理服务");
             bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             workerGroup = NettyEventLoopFactory.eventLoopGroup();
-            ServerBootstrap serverBootstrap = new ServerBootstrap();
+            serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -83,7 +87,7 @@ public class TcpProxyServer implements Lifecycle {
                                 Integer remotePort = proxy.getRemotePort();
                                 //如果用户没有指定远程端口，则由系统随机生成
                                 if (remotePort == null) {
-                                    //随机分配一个可用的端口⚠
+                                    //随机分配一个可用的端口
                                     int allocatePort = portAllocator.allocateAvailablePort();
                                     ChannelFuture future = serverBootstrap.bind(allocatePort).sync();
                                     StringBuilder portItem = new StringBuilder();
@@ -93,7 +97,7 @@ public class TcpProxyServer implements Lifecycle {
                                             .append(proxy.getLocalPort()).append("\t")
                                             .append(allocatePort);
                                     bindPorts.add(portItem);
-                                    boundChannels.add(future.channel());
+                                    remotePortChannelMapping.put(allocatePort, future.channel());
                                     //将新分配的端口记录到分配器缓存
                                     portAllocator.addPort(allocatePort);
                                     //将远程端口和内网端口映射信息记录到全局配置
@@ -105,7 +109,7 @@ public class TcpProxyServer implements Lifecycle {
                                     //检查用户指定的端口是否可用，如果不可用抛出异常信息，不影响其他代理端口的启动
                                     if (portAllocator.isPortAvailable(remotePort)) {
                                         ChannelFuture future = serverBootstrap.bind(remotePort).sync();
-                                        boundChannels.add(future.channel());
+                                        remotePortChannelMapping.put(remotePort, future.channel());
                                         StringBuilder portItem = new StringBuilder();
                                         portItem.append(client.getName()).append("\t")
                                                 .append(proxy.getName()).append("\t")
@@ -136,6 +140,56 @@ public class TcpProxyServer implements Lifecycle {
     }
 
     /**
+     * 启动一个指定的公网端口服务
+     *
+     * @param remotePort 需要启动的公网端口
+     */
+    public void startRemotePort(Integer remotePort) {
+        try {
+            ChannelFuture future = serverBootstrap.bind(remotePort).sync();
+            remotePortChannelMapping.put(remotePort, future.channel());
+            portAllocator.addPort(remotePort);
+            LOGGER.info("{}服务启动成功", remotePort);
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 停掉一个指定的公网端口服务
+     *
+     * @param remotePort  需要停止的公网端口
+     * @param releasePort 是否释放remotePort端口
+     */
+    public void stopRemotePort(Integer remotePort, boolean releasePort) {
+        lock.lock();
+        try {
+            Channel channel = remotePortChannelMapping.get(remotePort);
+            if (channel != null) {
+                try {
+                    // 关闭通道
+                    channel.close().sync();
+                    // 释放端口资源
+                    if (releasePort) {
+                        portAllocator.releasePort(remotePort);
+                        LOGGER.info("成功停止并释放公网端口: {}", remotePort);
+                    }
+                } catch (InterruptedException e) {
+                    LOGGER.error("停止端口 {} 失败: {}", remotePort, e.getMessage(), e);
+                    Thread.currentThread().interrupt();
+                } finally {
+                    // 从映射中移除
+                    remotePortChannelMapping.remove(remotePort);
+                }
+            } else {
+                LOGGER.warn("未找到绑定在端口 {} 的服务", remotePort);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
      * 停止TCP代理服务器，关闭所有绑定通道并释放资源
      */
     @Override
@@ -144,7 +198,7 @@ public class TcpProxyServer implements Lifecycle {
         try {
             LOGGER.info("开始停止TCP代理服务器");
             // 关闭所有绑定的通道
-            for (Channel channel : boundChannels) {
+            for (Channel channel : remotePortChannelMapping.values()) {
                 try {
                     channel.close().sync();
                     int port = channel.localAddress() != null ? ((InetSocketAddress) channel.localAddress()).getPort() : -1;
@@ -156,7 +210,7 @@ public class TcpProxyServer implements Lifecycle {
                     LOGGER.error("关闭通道失败: {}", e.getMessage());
                 }
             }
-            boundChannels.clear();
+            remotePortChannelMapping.clear();
             // 优雅关闭事件循环组
             if (bossGroup != null) {
                 bossGroup.shutdownGracefully();

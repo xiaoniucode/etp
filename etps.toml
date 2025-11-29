@@ -1,5 +1,5 @@
-bindPort = 9527
 tls = true
+bindPort = 9527
 
 [keystore]
 path = "./cert/server.p12"
@@ -15,14 +15,83 @@ localPort = 3306
 name = "mysql"
 remotePort = 3307
 type = "tcp"
-status=1 #默认是1
+status = 1
 
 [[clients.proxies]]
 localPort = 6379
 name = "redis"
 remotePort = 6380
 type = "tcp"
-status=0
+status = 0
+
+[[clients.proxies]]
+localPort = 3306
+name = "123456"
+remotePort = 9878
+type = "tcp"
+
+[[clients.proxies]]
+localPort = 3306
+name = "123456"
+remotePort = 9839
+type = "tcp"
+status = 9839
+
+[[clients.proxies]]
+localPort = 3306
+name = "123456"
+remotePort = 9139
+type = "tcp"
+status = 9139
+
+[[clients.proxies]]
+localPort = 3306
+name = "123456"
+remotePort = 9137
+type = "tcp"
+status = 9137
+
+[[clients.proxies]]
+localPort = 3306
+name = "123456"
+remotePort = 9147
+type = "tcp"
+status = 9147
+
+[[clients.proxies]]
+name = "123456"
+type = "tcp"
+localPort = 3306
+remotePort = 9123
+status = 9123
+
+[[clients]]
+secretKey = "4b0063baa5ae47c2910fc25265aae4109"
+name = "macos"
+
+[[clients.proxies]]
+localPort = 3306
+name = "123456"
+remotePort = 9879
+type = "tcp"
+
+[[clients.proxies]]
+localPort = 3306
+name = "123456"
+remotePort = 9889
+type = "tcp"
+status = 9889
+
+[[clients.proxies]]
+localPort = 3306
+name = "123456"
+remotePort = 9829
+type = "tcp"
+status = 9829
+
+[log]
+level = "info"
+pattern = ""
 
 [dashboard]
 enable_tls = false
@@ -31,10 +100,3 @@ port = 8080
 enable = true
 addr = "localhost"
 username = "admin"
-
-[[clients]]
-secretKey = "4b0063baa5ae47c2910fc25265aae4109"
-name = "macos"
-[log]
-level = "info"
-pattern = ""

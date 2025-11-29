@@ -39,6 +39,20 @@ public class ChannelManager {
             LOCK.unlock();
         }
     }
+
+    /**
+     * 将公网端口添加到已建立连接客户端
+     *
+     * @param secretKey  客户端密钥
+     * @param remotePort 公网端口
+     */
+    public static void addRemotePortToControlChannel(String secretKey, int remotePort) {
+        Channel controlChannel = CONTROL_CHANNELS.get(secretKey);
+        if (controlChannel != null) {
+            PORT_CONTROL_CHANNEL_MAPPING.put(remotePort, controlChannel);
+        }
+    }
+
     public static void clearControlChannel(Channel controlChannel) {
         if (controlChannel.attr(EtpConstants.CHANNEL_PORT).get() == null) {
             return;
@@ -97,6 +111,7 @@ public class ChannelManager {
         }
         return controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get().remove(sessionId);
     }
+
     public static Map<Long, Channel> getClientChannelsByControlChannel(Channel controlChannel) {
         return controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get();
     }

@@ -1,15 +1,20 @@
 package cn.xilio.etp.server.web;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+
 
 /**
  * @author liuxin
  */
 public class ResponseEntity implements Serializable {
+    @SerializedName("code")
     private int code;
+    @SerializedName("message")
     private String message;
+    @SerializedName("data")
     private Object data;
     private final static int OK_CODE = 0;
     private final static int ERROR_CODE = 0;

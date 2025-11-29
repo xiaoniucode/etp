@@ -1,11 +1,14 @@
 package cn.xilio.etp.server.web;
 
+import cn.xilio.etp.common.JsonUtils;
 import cn.xilio.etp.server.metrics.MetricsCollector;
 import cn.xilio.etp.server.store.ConfigManager;
+import cn.xilio.etp.server.web.dto.AddProxyDTO;
 import cn.xilio.etp.server.web.framework.*;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author liuxin
@@ -37,6 +40,13 @@ public class Api {
             int mappingTotal = ConfigManager.proxies().size();
             long startMapping = ConfigManager.proxies().stream().filter(c -> c.status() == 1).count();
             context.setResponseContent(ResponseEntity.of(new StatsCount(clientTotal, (int) onlineClient, mappingTotal, (int) startMapping)).toJsonString());
+        });
+        router.addRoute(HttpMethod.POST, "/addProxy", context -> {
+            String requestBody = context.getRequestBody();
+            AddProxyDTO bean = JsonUtils.toBean(requestBody, AddProxyDTO.class);
+            assert bean != null;
+            ConfigManager.addProxy(bean.getSecretKey(), bean.getName(), bean.getProtocol(), bean.getLocalPort(), bean.getRemotePort(), bean.getStatus());
+            context.setResponseContent(ResponseEntity.of("ok").toJsonString());
         });
     }
 }

@@ -6,10 +6,12 @@ import cn.xilio.etp.common.TomlUtils;
 
 
 import cn.xilio.etp.core.protocol.ProtocolType;
+import cn.xilio.etp.server.ChannelManager;
 import com.moandjiezana.toml.Toml;
 import io.netty.util.internal.StringUtil;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * @author liuxin
@@ -145,7 +147,17 @@ public class Config {
      * @return 是否添加成功
      */
     public boolean addProxyMapping(String secretKey, ProxyMapping proxyMapping) {
-        return true;
+        List<Integer> remotePorts = clientPublicNetworkPortMapping.get(secretKey);
+        remotePorts.add(proxyMapping.getRemotePort());
+        ClientInfo clientInfo = clients.stream().filter(c -> c.getSecretKey().equals(secretKey)).findFirst().orElse(null);
+        if (clientInfo != null) {
+            clientInfo.getProxyMappings().add(proxyMapping);
+            //公网端口与内网端口建立映射
+            portLocalServerMapping.put(proxyMapping.getRemotePort(), proxyMapping.getLocalPort());
+            //将公网端口添加到已认证客户端
+            ChannelManager.addRemotePortToControlChannel(secretKey, proxyMapping.getRemotePort());
+        }
+        return false;
     }
 
     /**
@@ -223,6 +235,16 @@ public class Config {
         return true;
     }
 
+    /**
+     * 判断公网端口是否已经被分配
+     *
+     * @param remotePort 公网端口
+     * @return 是否被使用
+     */
+    public boolean existRemotePort(Integer remotePort) {
+        return portLocalServerMapping.containsKey(remotePort.intValue());
+    }
+
     public List<Integer> getAllPublicNetworkPort() {
         return new ArrayList<>(portLocalServerMapping.keySet());
     }
@@ -247,8 +269,8 @@ public class Config {
         clientPublicNetworkPortMapping.put(secretKey, ports);
     }
 
-    public Integer getInternalServerInfo(int publicNetworkPort) {
-        return portLocalServerMapping.get(publicNetworkPort);
+    public Integer getInternalServerInfo(int remotePort) {
+        return portLocalServerMapping.get(remotePort);
     }
 
     public List<ClientInfo> getClients() {
