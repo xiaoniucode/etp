@@ -59,11 +59,25 @@ type = "tcp"
 status = 9147
 
 [[clients.proxies]]
-name = "123456"
-type = "tcp"
 localPort = 3306
+name = "123456"
 remotePort = 9123
+type = "tcp"
 status = 9123
+
+[[clients.proxies]]
+localPort = 3306
+name = "123456"
+remotePort = 9023
+type = "tcp"
+status = 9023
+
+[[clients.proxies]]
+localPort = 3306
+name = "123456"
+remotePort = 9021
+type = "tcp"
+status = 1
 
 [[clients]]
 secretKey = "4b0063baa5ae47c2910fc25265aae4109"

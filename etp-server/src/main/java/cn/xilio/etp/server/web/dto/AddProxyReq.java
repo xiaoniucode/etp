@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * @author liuxin
  */
-public class AddProxyDTO implements Serializable {
+public class AddProxyReq implements Serializable {
     private String secretKey;
     private String name;
     private String protocol;

@@ -6,6 +6,8 @@ import cn.xilio.etp.server.TcpProxyServer;
 import cn.xilio.etp.server.store.dto.ClientDTO;
 import cn.xilio.etp.server.store.dto.ProxyDTO;
 import cn.xilio.etp.server.web.framework.BizException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.BindException;
@@ -15,6 +17,7 @@ import java.util.*;
  * @author liuxin
  */
 public final class ConfigManager {
+    private static final Logger logger = LoggerFactory.getLogger(ConfigManager.class);
     private final static String CONFIG_PATH = Config.getInstance().getConfigPath();
 
     public static void addClient(String name, String secretKey) throws IOException {
@@ -193,5 +196,42 @@ public final class ConfigManager {
             client.put("proxies", proxies);
         }
         return proxies;
+    }
+
+    /**
+     * 切换代理映射的状态
+     *
+     * @param secretKey  所属客户端
+     * @param remotePort 公网端口
+     * @param status     切换状态：1开启、0关闭
+     */
+    public static void switchProxyStatus(String secretKey, Integer remotePort, Integer status) {
+        try {
+            Config.getInstance().updateProxyMappingStatus(secretKey, remotePort, status);
+            if (status == 1) {
+                TcpProxyServer.getInstance().startRemotePort(remotePort);
+            } else {
+                TcpProxyServer.getInstance().stopRemotePort(remotePort, false);
+            }
+            //持久化
+            Map<String, Object> config = TomlUtils.readMap(CONFIG_PATH);
+            List<Map<String, Object>> clients = getClientList(config);
+            for (Map<String, Object> client : clients) {
+                if (secretKey.equals(client.get("secretKey"))) {
+                    List<Map<String, Object>> proxies = getProxiesList(client);
+                    for (Map<String, Object> proxy : proxies) {
+                        Long port = (Long) proxy.get("remotePort");
+                        if (port != null && port.intValue() == remotePort) {
+                            proxy.put("status", status);
+                            break;
+                        }
+                    }
+                }
+            }
+            TomlUtils.write(config, CONFIG_PATH);
+            logger.info("状态切换成功");
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 }

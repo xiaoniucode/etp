@@ -191,6 +191,17 @@ public class Config {
      * @return 是否更新成功
      */
     public boolean updateProxyMappingStatus(String secretKey, Integer remotePort, Integer status) {
+        ClientInfo clientInfo = clients.stream().filter(c -> c.getSecretKey().equals(secretKey)).findFirst().orElse(null);
+        if (clientInfo != null) {
+            List<ProxyMapping> proxyMappings = clientInfo.getProxyMappings();
+            if (proxyMappings != null) {
+                for (ProxyMapping proxyMapping : proxyMappings) {
+                    if (proxyMapping.getRemotePort().equals(remotePort)) {
+                        proxyMapping.setStatus(status == null ? 1 : status);
+                    }
+                }
+            }
+        }
         return true;
     }
 

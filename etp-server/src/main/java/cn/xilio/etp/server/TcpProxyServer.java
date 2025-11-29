@@ -146,10 +146,12 @@ public class TcpProxyServer implements Lifecycle {
      */
     public void startRemotePort(Integer remotePort) {
         try {
-            ChannelFuture future = serverBootstrap.bind(remotePort).sync();
-            remotePortChannelMapping.put(remotePort, future.channel());
-            portAllocator.addPort(remotePort);
-            LOGGER.info("{}服务启动成功", remotePort);
+            if (!remotePortChannelMapping.containsKey(remotePort)) {
+                ChannelFuture future = serverBootstrap.bind(remotePort).sync();
+                remotePortChannelMapping.put(remotePort, future.channel());
+                portAllocator.addPort(remotePort);
+                LOGGER.info("{}服务启动成功", remotePort);
+            }
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
         }
