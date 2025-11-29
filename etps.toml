@@ -32,7 +32,7 @@ status = 9829
 
 [[clients]]
 secretKey = "7db0f680b996426eb969e357f77a6f81"
-name = "dooor"
+name = "admin"
 proxies = []
 
 [[clients]]

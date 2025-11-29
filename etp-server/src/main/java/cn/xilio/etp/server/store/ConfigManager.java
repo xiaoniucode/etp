@@ -247,6 +247,24 @@ public final class ConfigManager {
     }
 
     public static void updateClient(String secretKey, String name) {
-
+        try {
+            //更新配置
+            Config.getInstance().updateClient(secretKey, name);
+            //持久化
+            Map<String, Object> config = TomlUtils.readMap(CONFIG_PATH);
+            List<Map<String, Object>> clients = getClientList(config);
+            // 检查秘钥是否已存在
+            for (Map<String, Object> client : clients) {
+                if (secretKey.equals(client.get("secretKey"))) {
+                    client.put("name", name);
+                    break;
+                }
+            }
+            config.put("clients", clients);
+            //持久化
+            TomlUtils.write(config, CONFIG_PATH);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 }
