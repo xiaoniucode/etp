@@ -6,39 +6,16 @@ path = "./cert/server.p12"
 keyPass = "3FbV8R8VW49O"
 storePass = "3FbV8R8VW49O"
 
-[[clients]]
-secretKey = "4b0063baa5ae47c2910fc25265aae4109"
-name = "macos"
-
-[[clients.proxies]]
-localPort = 3306
-name = "123456"
-remotePort = 9879
-type = "tcp"
-
-[[clients.proxies]]
-localPort = 3306
-name = "123456"
-remotePort = 9889
-type = "tcp"
-status = 9889
-
-[[clients.proxies]]
-localPort = 3306
-name = "123456"
-remotePort = 9829
-type = "tcp"
-status = 9829
-
-[[clients]]
-secretKey = "7db0f680b996426eb969e357f77a6f81"
-name = "admin"
-proxies = []
-
-[[clients]]
-secretKey = "f5e3226f6a754709949703377588f8c0"
-name = "deer"
-proxies = []
+#[[clients]]
+#secretKey = "4b0063baa5ae47c2910fc25265aae4109"
+#name = "macos"
+#
+#[[clients.proxies]]
+#localPort = 3306
+#name = "123456"
+#remotePort = 9879
+#type = "tcp"
+#
 
 [log]
 level = "info"

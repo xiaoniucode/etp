@@ -50,8 +50,7 @@
         <div class="layui-form-item" pane>
             <label class="layui-form-label">状态</label>
             <div class="layui-input-inline">
-                <input type="hidden" name="status" value="0">
-                <input type="checkbox" name="status" value="1"
+                <input type="checkbox" name="status" value="1" lay-value="1"
                        lay-skin="switch" lay-text="开启|关闭" checked>
             </div>
         </div>
@@ -67,7 +66,7 @@
 <script src="/static/ajax.js"></script>
 <script>
     layui.use(['form', 'jquery'], function () {
-        var form = layui.form;
+        const form = layui.form;
         const $ = layui.$;
 
         //渲染客户端下拉框
@@ -80,15 +79,24 @@
                 if (res.code === 0) {
                     const data = res.data || [];
                     const $select = $('select[name="client"]');
+                    const $submitBtn = $('button[lay-filter="demo1"]');  // 提交按钮
                     // 清空旧选项（除了第一个"请选择"）
                     $select.find('option:gt(0)').remove();
-                    // 动态添加新选项
-                    data.forEach(function (item) {
-                        $select.append(
-                            '<option value="' + item.id + '|' + item.secretKey + '">'+item.name + '</option>'
-                        );
-                    });
-                    $select.val(data[0].id);
+                    if (data.length > 0) {
+                        // 动态添加新选项
+                        data.forEach(function (item) {
+                            $select.append(
+                                '<option value="' + item.id + '|' + item.secretKey + '">' + item.name + '</option>'
+                            );
+                        });
+                        $select.val(data[0].id + '|' + data[0].secretKey);
+                        $select.prop('disabled', false);
+                        $submitBtn.removeClass('layui-btn-disabled').prop('disabled', false);
+                    } else {
+                        $select.prop('disabled', true);
+                        $submitBtn.addClass('layui-btn-disabled').prop('disabled', true);
+                        layer.msg('暂无可用客户端，请先添加客户端', {icon: 2, time: 2000});
+                    }
                     form.render('select');
                 }
             },
@@ -101,6 +109,7 @@
                 field.secretKey = secretKey || '';
                 delete field.client;
             }
+            field.status = field.status ? 1 : 0;
             $.ajax({
                 url: '/proxy/add',
                 type: 'post',

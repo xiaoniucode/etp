@@ -39,7 +39,7 @@
             toolbar: '#headerToolbar',
             height: 'full-35',
             cols: [[
-                {field: 'name', fixed: 'left', width: 150, title: '客户端名'},
+                {field: 'name', fixed: 'left', width: 150, title: '客户端'},
                 {field: 'secretKey', title: 'Token'},
                 {
                     field: 'status', title: '状态', sort: true, templet: function (d) {
@@ -74,21 +74,30 @@
                     }
                 });
             } else if (obj.event === 'delete') {
-                $.ajax({
-                    url: '/client/del',
-                    type: 'delete',
-                    contentType: 'application/json',
-                    data: JSON.stringify({id: data.id}),
-                    headers: {},
-                    success: function (res) {
-                        if (res.code === 0) {
-                            table.reload('client')
-                            layer.msg("删除成功", {time: 2000});
-                        } else {
-                            layer.msg(res.message, {time: 2000});
-                        }
-                    },
+                layer.confirm('确定删除「' + data.name + '」客户端吗？<br>此操作将会删除所有代理，包括运行中的代理！',
+                    {
+                        icon: 2,
+                        title:'危险操作确认',
+                        skin: 'layui-layer-molv',
+                        btn: ['确认删除', '我再想想'],
+                    }, function(index){
+                    $.ajax({
+                        url: '/client/del',
+                        type: 'delete',
+                        contentType: 'application/json',
+                        data: JSON.stringify({id: data.id}),
+                        headers: {},
+                        success: function (res) {
+                            if (res.code === 0) {
+                                table.reload('client')
+                                layer.msg("删除成功", {time: 2000});
+                            } else {
+                                layer.msg(res.message, {time: 2000});
+                            }
+                        },
+                    });
                 });
+
             } else if (obj.event === 'kickout') {
                 $.ajax({
                     url: '/client/kickout',

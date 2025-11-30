@@ -43,6 +43,26 @@ public final class ChannelManager {
         }
     }
 
+    /**
+     * 如果客户端已经启动并认证成功，将新增加的远程端口附加到控制隧道。如果没有启动，客户端启动的时候会执行addControlChannel添加所有端口。
+     *
+     * @param secretKey  客户端密钥
+     * @param remotePort 需要新添加的端口
+     */
+    public static void addPortToControlChannelIfOnline(String secretKey, Integer remotePort) {
+        LOCK.lock();
+        try {
+            Channel controlChannel = CONTROL_CHANNELS.get(secretKey);
+            if (null == controlChannel) {
+                return;
+            }
+            PORT_CONTROL_CHANNEL_MAPPING.put(remotePort, controlChannel);
+            controlChannel.attr(EtpConstants.CHANNEL_PORT).get().add(remotePort);
+        } finally {
+            LOCK.unlock();
+        }
+    }
+
     public static boolean clientIsOnline(String secretKey) {
         return CONTROL_CHANNELS.get(secretKey) != null;
     }

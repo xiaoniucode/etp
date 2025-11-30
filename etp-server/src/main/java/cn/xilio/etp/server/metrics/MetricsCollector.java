@@ -1,9 +1,12 @@
 package cn.xilio.etp.server.metrics;
 
+
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -57,24 +60,22 @@ public class MetricsCollector {
     public static MetricsCollector getCollector(Integer remotePort) {
         return COLLECTORS.computeIfAbsent(remotePort, MetricsCollector::new);
     }
-
     /**
      * 获取当前端口对应的指标
      *
      * @return 指标数据
      */
-    public Metrics getMetrics() {
-        Metrics metrics = new Metrics();
-        metrics.setRemotePort(remotePort);
-        metrics.setChannels(channels.get());
-        metrics.setReadBytes(readBytes.sum());
-        metrics.setWriteBytes(writeBytes.sum());
-        metrics.setReadMsgs(readMsgs.sum());
-        metrics.setWriteMsgs(writeMsgs.sum());
+    public JSONObject getMetrics() {
+        JSONObject json = new JSONObject();
+        json.put("remotePort", remotePort);
+        json.put("channels", channels.get());
+        json.put("readBytes", readBytes.sum());
+        json.put("writeBytes", writeBytes.sum());
+        json.put("readMsgs", readMsgs.sum());
+        json.put("writeMsgs", writeMsgs.sum());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String time = LocalDateTime.now().format(formatter);
-        metrics.setTime(time);
-        return metrics;
+        json.put("time", LocalDateTime.now().format(formatter));
+        return json;
     }
 
     /**
@@ -82,33 +83,13 @@ public class MetricsCollector {
      *
      * @return 指标数据
      */
-    public static List<Metrics> getAllMetrics() {
-        List<Metrics> res = new ArrayList<>(COLLECTORS.size());
+    public static JSONArray getAllMetrics() {
+        JSONArray res = new JSONArray();
         for (MetricsCollector c : COLLECTORS.values()) {
-            res.add(c.getMetrics());
+            res.put(c.getMetrics());
         }
         return res;
     }
-
-    /**
-     * 获取指标模型并重置当前端口服务的指标统计
-     *
-     * @return 指标模型
-     */
-    public Metrics getAndResetMetrics() {
-        Metrics m = new Metrics();
-        m.setRemotePort(remotePort);
-        m.setChannels(channels.get());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String time = LocalDateTime.now().format(formatter);
-        m.setTime(time);
-        m.setReadBytes(readBytes.sumThenReset());
-        m.setWriteBytes(writeBytes.sumThenReset());
-        m.setReadMsgs(readMsgs.sumThenReset());
-        m.setWriteMsgs(writeMsgs.sumThenReset());
-        return m;
-    }
-
     public void incReadBytes(long bytes) {
         if (bytes > 0) {
             readBytes.add(bytes);

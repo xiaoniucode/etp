@@ -33,7 +33,7 @@ public class DashboardApi {
         router.addRoute(HttpMethod.GET, "/client/get", context ->
                 context.setResponseContent(ResponseEntity.ok(ConfigService.getClient(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
         router.addRoute(HttpMethod.GET, "/proxy/get", context ->
-                context.setResponseContent(ResponseEntity.ok(ConfigService.getProxy(JsonUtils.toJsonObject(context.getRequestBody()))).toJson()));
+                context.setResponseContent(ResponseEntity.ok(ConfigService.getProxy(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
         router.addRoute(HttpMethod.GET, "/proxy/list", context ->
                 context.setResponseContent(ResponseEntity.ok(ConfigService.proxies()).toJson()));
         router.addRoute(HttpMethod.GET, "/metrics", context ->

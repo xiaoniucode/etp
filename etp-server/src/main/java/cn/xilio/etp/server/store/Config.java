@@ -87,10 +87,12 @@ public class Config {
             String password = dash.getString("password");
             dashboard = new Dashboard(enable, username, password, addr, port);
         }
-
-
         //代理端口
-        for (Toml client : toml.getTables("clients")) {
+        List<Toml> readClients = toml.getTables("clients");
+        if (readClients == null) {
+            return;
+        }
+        for (Toml client : readClients) {
             String name = client.getString("name");
             String secretKey = client.getString("secretKey");
             if (clientPublicNetworkPortMapping.containsKey(secretKey)) {
@@ -159,6 +161,8 @@ public class Config {
             portLocalServerMapping.put(proxyMapping.getRemotePort(), proxyMapping.getLocalPort());
             //将公网端口添加到客户端中
             clientPublicNetworkPortMapping.get(secretKey).add(proxyMapping.getRemotePort());
+            //如果客户度已经启动认证
+            ChannelManager.addPortToControlChannelIfOnline(secretKey, proxyMapping.getRemotePort());
         }
         return false;
     }

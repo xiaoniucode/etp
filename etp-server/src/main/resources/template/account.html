@@ -1,10 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>账号设置</title>
+    <link href="/static/layui/css/layui.css" rel="stylesheet">
 </head>
 <body>
-账号设置
+<div class="layui-container" style="padding-top: 15px">
+    <form class="layui-form layui-form-pane" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="username" autocomplete="off" placeholder="请输入用户名" lay-verify="required"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密 码</label>
+            <div class="layui-input-inline">
+                <input type="password" name="password" placeholder="请输入密码" lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: left;">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="demo1">保存</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="/static/layui/layui.js"></script>
+<script src="/static/ajax.js"></script>
+<script>
+    layui.use(['form', 'jquery'], function () {
+        var form = layui.form;
+        const $ = layui.$;
+
+        //渲染客户端下拉框
+        // $.ajax({
+        //     url: '/client/list',
+        //     type: 'get',
+        //     contentType: 'application/json',
+        //     headers: {},
+        //     success: function (res) {
+        //         if (res.code === 0) {
+        //
+        //         }
+        //     },
+        // });
+        form.on('submit(demo1)', function (data) {
+            const field = data.field;
+            if (field.client) {
+                const [clientId, secretKey] = field.client.split('|', 2);
+                field.clientId = Number(clientId) || 0;
+                field.secretKey = secretKey || '';
+                delete field.client;
+            }
+            $.ajax({
+                url: '/user/update',
+                type: 'put',
+                contentType: 'application/json',
+                data: JSON.stringify(field),
+                headers: {},
+                success: function (res) {
+                    if (res.code === 0) {
+                        layer.msg('创建成功', {icon: 1, time: 400,}, () => {
+                            parent.layer.close(parent.layer.getFrameIndex(window.name));
+                        });
+                    } else {
+                        layer.msg(res.message, {time: 1000});
+                    }
+                },
+            });
+            return false;
+        });
+    });
+</script>
+
 </body>
 </html>

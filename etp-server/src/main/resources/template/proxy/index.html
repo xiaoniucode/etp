@@ -34,7 +34,7 @@
             cellMinWidth: 80,
             cols: [[
                 {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
-                {field: 'name', title: '名称'},
+                {field: 'name', title: '代理名称'},
                 {
                     field: 'type', title: '协议', sort: true, templet: function (d) {
                         if (d.type === "tcp") {
@@ -76,21 +76,31 @@
                     }
                 });
             } else if (obj.event === 'delete') {
-                $.ajax({
-                    url: '/proxy/del',
-                    type: 'delete',
-                    contentType: 'application/json',
-                    data: JSON.stringify({id: data.id,secretKey:data.secretKey}),
-                    headers: {},
-                    success: function (res) {
-                        if (res.code === 0) {
-                            table.reload('proxy')
-                            layer.msg("删除成功", {time: 2000});
-                        } else {
-                            layer.msg(res.message, {time: 2000});
-                        }
-                    },
-                });
+                 layer.confirm('确定删除「' + data.name + '」代理吗？<br>此操作将会关闭已经建立的连接！',
+                     {
+                         icon: 2,
+                         title:'危险操作确认',
+                         skin: 'layui-layer-molv',
+                         btn: ['确认删除', '我再想想'],
+                     }, function(index){
+                         $.ajax({
+                             url: '/proxy/del',
+                             type: 'delete',
+                             contentType: 'application/json',
+                             data: JSON.stringify({id: data.id,secretKey:data.secretKey}),
+                             headers: {},
+                             success: function (res) {
+                                 if (res.code === 0) {
+                                     table.reload('proxy')
+                                     layer.msg("删除成功", {time: 2000});
+                                 } else {
+                                     layer.msg(res.message, {time: 2000});
+                                 }
+                             },
+                         });
+
+                     })
+
             }
         })
         //操作工具栏
