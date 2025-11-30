@@ -7,6 +7,8 @@ import cn.xilio.etp.server.TcpProxyServer;
 import cn.xilio.etp.server.store.dto.ClientDTO;
 import cn.xilio.etp.server.store.dto.ProxyDTO;
 import cn.xilio.etp.server.web.framework.BizException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,23 +147,48 @@ public final class ConfigManager {
         throw new BizException("未找到秘钥 " + secretKey + " 对应的端口 " + remotePort + " 的代理");
     }
 
-    @SuppressWarnings("unchecked")
-    public static List<ClientDTO> clients() {
-        List<ClientDTO> res = new ArrayList<>();
-        Map<String, Object> map = TomlUtils.readMap(CONFIG_PATH);
-        Object clients = map.get("clients");
-        if (Objects.isNull(clients)) {
-            return res;
+    public static JSONArray clients() {
+        JSONArray result = new JSONArray();
+        Map<String, Object> config = TomlUtils.readMap(CONFIG_PATH);
+        if (config == null) {
+            return result;
         }
-        if (clients instanceof List) {
-            List<Map<String, Object>> clientList = (List) clients;
-            for (Map<String, Object> client : clientList) {
-                String secretKey = (String) client.get("secretKey");
-                Integer status = 1;//todo 状态获取
-                res.add(new ClientDTO((String) client.get("name"), secretKey, status));
+        Object clientsObj = config.get("clients");
+        if (clientsObj == null || !(clientsObj instanceof List)) {
+            return result;
+        }
+        List<?> rawList = (List<?>) clientsObj;
+        for (Object item : rawList) {
+            if (!(item instanceof Map)) {
+                continue;
             }
+            @SuppressWarnings("unchecked")
+            Map<String, Object> client = (Map<String, Object>) item;
+
+            JSONObject jsonObj = new JSONObject();
+
+            // 必填字段
+            jsonObj.put("name", Objects.toString(client.get("name"), null));
+            jsonObj.put("secretKey", Objects.toString(client.get("secretKey"), null));
+
+            // status：优先取配置中的值，没有就默认 1
+            Object statusObj = client.get("status");
+            int status = 1;
+            if (statusObj instanceof Number) {
+                status = ((Number) statusObj).intValue();
+            } else if (statusObj != null) {
+                try {
+                    status = Integer.parseInt(statusObj.toString());
+                } catch (NumberFormatException ignored) {
+                    // 解析失败仍使用默认值 1
+                }
+            }
+            jsonObj.put("status", status);
+
+            result.put(jsonObj);
         }
-        return res;
+
+        return result;
     }
 
 

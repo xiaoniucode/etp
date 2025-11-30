@@ -78,7 +78,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         logger.error(e.getMessage(), e);
         if (e instanceof BizException biz) {
             String msg = "".equals(biz.getMessage()) ? "error" : biz.getMessage();
-            ByteBuf buffer = Unpooled.copiedBuffer(ResponseEntity.of(1, msg).toJsonString(), CharsetUtil.UTF_8);
+            ByteBuf buffer = Unpooled.copiedBuffer(ResponseEntity.error(1, msg).toJson(), CharsetUtil.UTF_8);
             FullHttpResponse response = new DefaultFullHttpResponse(
                     HttpVersion.HTTP_1_1,
                     context.getResponseStatus(),

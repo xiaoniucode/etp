@@ -5,7 +5,7 @@ import cn.xilio.etp.common.ConfigUtils;
 import cn.xilio.etp.common.LogbackConfigurator;
 import cn.xilio.etp.common.PortChecker;
 import cn.xilio.etp.server.store.Config;
-import cn.xilio.etp.server.web.Api;
+import cn.xilio.etp.server.web.DashboardApi;
 import cn.xilio.etp.server.web.framework.NettyWebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +46,8 @@ public class TunnelServerStartup {
             //启动dashboard服务
             if (Config.getInstance().getDashboard().getEnable()) {
                 webServer = ServerFactory.createWebServer();
-                Api.initFilters(webServer.getFilters());/*web过滤器*/
-                Api.initRoutes(webServer.getRouter());/*web接口*/
+                DashboardApi.initFilters(webServer.getFilters());/*web过滤器*/
+                DashboardApi.initRoutes(webServer.getRouter());/*web接口*/
                 webServer.start();
             }
         });
