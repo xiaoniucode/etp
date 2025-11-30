@@ -14,20 +14,10 @@ public final class SQLiteUtils {
     private final static Logger logger = LoggerFactory.getLogger(SQLiteUtils.class);
     private static final String DB_URL = "jdbc:sqlite:etp.db";
 
-    /**
-     * 创建表
-     */
     public static void createTable(String sql) {
         execute(sql);
     }
 
-    /**
-     * 查询单条记录
-     *
-     * @param sql    带 ? 占位符的 SQL
-     * @param params 参数数组（可变参数）
-     * @return JSONObject 或 null（没查到）
-     */
     public static JSONObject get(String sql, Object... params) {
         JSONArray result = list(sql, params);
         if (result.isEmpty()) {
@@ -36,13 +26,6 @@ public final class SQLiteUtils {
         return result.getJSONObject(0);
     }
 
-    /**
-     * 查询多条记录
-     *
-     * @param sql    带 ? 占位符的 SQL
-     * @param params 参数数组（可变参数）
-     * @return JSONArray
-     */
     public static JSONArray list(String sql, Object... params) {
         JSONArray array = new JSONArray();
         try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -72,11 +55,57 @@ public final class SQLiteUtils {
         return array;
     }
 
-    /**
-     * 根据表名删除表
-     *
-     * @param tableName 表名
-     */
+    public static long insert(String sql, Object... params) {
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
+            }
+            int affected = pstmt.executeUpdate();
+            if (affected == 0) {
+                logger.warn("插入失败：{}", sql);
+                return -1L;
+            }
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    long id = rs.getLong(1);
+                    logger.debug("插入成功，ID = {}", id);
+                    return id;
+                }
+            }
+            return -1L;
+        } catch (SQLException e) {
+            logger.error("插入失败：{} → {}", sql, e.getMessage(), e);
+            return -1L;
+        }
+    }
+
+    public static int update(String sql, Object... params) {
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
+            }
+
+            int affected = pstmt.executeUpdate();
+            if (affected > 0) {
+                logger.debug("更新成功，影响 {} 行，SQL: {}", affected, sql);
+            } else {
+                logger.info("更新未影响到任何行，SQL: {}", sql);
+            }
+            return affected;
+
+        } catch (SQLException e) {
+            logger.error("更新失败：{} → {}", sql, e.getMessage(), e);
+            return 0;
+        }
+    }
+
+    public static int delete(String sql, Object... params) {
+        return update(sql, params);
+    }
+
     public static void dropTable(String tableName) {
         String sql = "DROP TABLE IF EXISTS " + tableName;
         execute(sql);

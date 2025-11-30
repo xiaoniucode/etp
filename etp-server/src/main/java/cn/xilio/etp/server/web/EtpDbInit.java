@@ -3,7 +3,7 @@ package cn.xilio.etp.server.web;
 /**
  * @author liuxin
  */
-public final class DBInit {
+public final class EtpDbInit {
     public static void initTable() {
         createClient();
         createProxyMapping();
@@ -19,10 +19,9 @@ public final class DBInit {
                     remotePort INTEGER NOT NULL,                     -- 远程服务端口（对外暴露的端口）
                     status      INTEGER NOT NULL DEFAULT 1,           -- 状态：1=开启，0=关闭
                     createdAt  TEXT DEFAULT (datetime('now')),       -- 创建时间
-                    updatedat  TEXT DEFAULT (datetime('now'))        -- 更新时间
+                    updatedAt  TEXT DEFAULT (datetime('now'))        -- 更新时间
                 );
                 """;
-
         SQLiteUtils.createTable(sql);
     }
 
