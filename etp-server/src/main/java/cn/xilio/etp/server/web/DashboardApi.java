@@ -2,16 +2,10 @@ package cn.xilio.etp.server.web;
 
 import cn.xilio.etp.common.JsonUtils;
 import cn.xilio.etp.server.metrics.MetricsCollector;
-import cn.xilio.etp.server.store.ConfigManager;
-import cn.xilio.etp.server.web.dto.*;
 import cn.xilio.etp.server.web.framework.*;
 import io.netty.handler.codec.http.HttpMethod;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Dashboard 管理、认证接口
@@ -19,8 +13,6 @@ import java.util.UUID;
  * @author liuxin
  */
 public class DashboardApi {
-    private static String authToken;
-
     public static void initFilters(List<Filter> filters) {
         filters.add(new Filter() {
             @Override
@@ -41,39 +33,27 @@ public class DashboardApi {
         router.addRoute(HttpMethod.GET, "/metrics", context -> context.setResponseContent(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
         router.addRoute(HttpMethod.GET, "/stats", context -> context.setResponseContent(ResponseEntity.ok(ConfigService.countStats()).toJson()));
         router.addRoute(HttpMethod.POST, "/add-proxy", context -> {
-            String requestBody = context.getRequestBody();
-            AddProxyReq bean = JsonUtils.toBean(requestBody, AddProxyReq.class);
-            assert bean != null;
-            ConfigManager.addProxy(bean.getSecretKey(), bean.getName(), bean.getProtocol(), bean.getLocalPort(), bean.getRemotePort(), bean.getStatus());
+            ConfigService.addProxy(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok("ok").toJson());
         });
-        router.addRoute(HttpMethod.PUT, "/update-proxy-status", context -> {
-            UpdateProxyStatusReq req = JsonUtils.toBean(context.getRequestBody(), UpdateProxyStatusReq.class);
-            assert req != null;
-            ConfigManager.switchProxyStatus(req.getSecretKey(), req.getRemotePort(), req.getStatus());
+        router.addRoute(HttpMethod.PUT, "/switch-proxy-status", context -> {
+            ConfigService.switchProxyStatus(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok("ok").toJson());
         });
         router.addRoute(HttpMethod.DELETE, "/delete-proxy", context -> {
-            DeleteProxyReq req = JsonUtils.toBean(context.getRequestBody(), DeleteProxyReq.class);
-            assert req != null;
-            ConfigManager.deleteProxy(req.getSecretKey(), req.getRemotePort());
+            ConfigService.deleteProxy(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok("ok").toJson());
         });
         router.addRoute(HttpMethod.POST, "/add-client", context -> {
-            JSONObject req = JsonUtils.toJsonObject(context.getRequestBody());
-            ConfigService.addClient(req);
+            ConfigService.addClient(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok("ok").toJson());
         });
         router.addRoute(HttpMethod.PUT, "/update-client", context -> {
-            Map<String, Object> req = JsonUtils.toMap(context.getRequestBody());
-            assert req != null;
-            ConfigManager.updateClient((String) req.get("secretKey"), (String) req.get("name"));
+            ConfigService.updateClient(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok("ok").toJson());
         });
         router.addRoute(HttpMethod.DELETE, "/delete-client", context -> {
-            Map<String, Object> req = JsonUtils.toMap(context.getRequestBody());
-            assert req != null;
-            ConfigManager.deleteClient((String) req.get("secretKey"));
+            ConfigService.deleteClient(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok("ok").toJson());
         });
     }

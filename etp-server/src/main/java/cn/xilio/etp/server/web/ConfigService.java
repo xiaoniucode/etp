@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
+ * 配置服务
  * @author liuxin
  */
 public final class ConfigService {
@@ -67,5 +68,25 @@ public final class ConfigService {
 
     public static JSONArray proxies() {
         return configStore.listAllProxies();
+    }
+
+    public static void addProxy(JSONObject jsonObject) {
+
+    }
+
+    public static void switchProxyStatus(JSONObject jsonObject) {
+
+    }
+
+    public static void deleteProxy(JSONObject jsonObject) {
+
+    }
+
+    public static void updateClient(JSONObject jsonObject) {
+
+    }
+
+    public static void deleteClient(JSONObject jsonObject) {
+
     }
 }
