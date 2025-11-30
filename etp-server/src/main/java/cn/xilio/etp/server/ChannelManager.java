@@ -14,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author liuxin
  */
-public class ChannelManager {
+public final class ChannelManager {
     /**
      * 内网代理客户端与控制通道映射
      */
@@ -38,6 +38,10 @@ public class ChannelManager {
         } finally {
             LOCK.unlock();
         }
+    }
+
+    public static boolean clientIsOnline(String secretKey) {
+        return CONTROL_CHANNELS.get(secretKey) != null;
     }
 
     public static void closeControlChannelByClient(String secretKey) {

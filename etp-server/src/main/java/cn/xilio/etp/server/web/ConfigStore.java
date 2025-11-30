@@ -2,9 +2,6 @@ package cn.xilio.etp.server.web;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +11,6 @@ import java.util.List;
  * @author liuxin
  */
 public final class ConfigStore {
-    private static final Logger LOG = LoggerFactory.getLogger(ConfigStore.class);
-
     /**
      * 新增客户端
      */

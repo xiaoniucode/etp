@@ -1,4 +1,4 @@
-tls = true
+tls = false
 bindPort = 9527
 
 [keystore]

@@ -6,6 +6,7 @@ import cn.xilio.etp.server.store.ConfigManager;
 import cn.xilio.etp.server.web.dto.*;
 import cn.xilio.etp.server.web.framework.*;
 import io.netty.handler.codec.http.HttpMethod;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -37,8 +38,8 @@ public class DashboardApi {
     public static void initRoutes(Router router) {
         router.addRoute(HttpMethod.GET, "/clients",
                 context -> {
-
-                    context.setResponseContent(ResponseEntity.ok(ConfigManager.clients()).toJson());
+                    JSONArray clients=ConfigService.clients();
+                    context.setResponseContent(ResponseEntity.ok(clients).toJson());
                 });
         router.addRoute(HttpMethod.GET, "/proxies", context -> context.setResponseContent(ResponseEntity.ok(ConfigManager.proxies()).toJson()));
         router.addRoute(HttpMethod.GET, "/metrics", context -> context.setResponseContent(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
