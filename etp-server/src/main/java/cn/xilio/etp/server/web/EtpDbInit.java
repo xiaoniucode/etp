@@ -16,6 +16,8 @@ public final class EtpDbInit {
         logger.debug("开始初始化数据库表");
         createClient();
         createProxyMapping();
+        //todo 将Toml中的配置信息加载到数据库
+        //todo 将数据库中的信息设置到Config，需要梳理优化
         logger.debug("数据库表初始化完毕");
     }
 

@@ -69,7 +69,7 @@
                     shade: false,
                     area: ['40%', '30%'],
                     content: '/client/edit.html?id=' + data.id,
-                    end: function(){
+                    end: function () {
                         layui.table.reload('client');
                     }
                 });
@@ -81,15 +81,30 @@
                     data: JSON.stringify({id: data.id}),
                     headers: {},
                     success: function (res) {
-                        table.reload('client')
-                        layer.msg("删除成功", {time: 2000});
-                        if (res.code === 1) {
+                        if (res.code === 0) {
+                            table.reload('client')
+                            layer.msg("删除成功", {time: 2000});
+                        } else {
                             layer.msg(res.message, {time: 2000});
                         }
                     },
                 });
-            } else if (obj.event === 'flush') {
-
+            } else if (obj.event === 'kickout') {
+                $.ajax({
+                    url: '/client/kickout',
+                    type: 'delete',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: data.id}),
+                    headers: {},
+                    success: function (res) {
+                        if (res.code === 0) {
+                            table.reload('client')
+                            layer.msg("已跌掉", {time: 2000});
+                        } else {
+                            layer.msg(res.message, {time: 2000});
+                        }
+                    },
+                });
             }
         })
         //操作工具栏
@@ -102,7 +117,7 @@
                     shade: false,
                     area: ['40%', '30%'],
                     content: '/client/add.html',
-                    end: function(){
+                    end: function () {
                         layui.table.reload('client');
                     }
                 });

@@ -85,7 +85,7 @@ public class ConfigStore {
     /**
      * 查询单个
      */
-    public JSONObject getProxy(int id) {
+    public JSONObject getProxyById(int id) {
         return SQLiteUtils.get("SELECT * FROM proxies WHERE id = ?", id);
     }
 

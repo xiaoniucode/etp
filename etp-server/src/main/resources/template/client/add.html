@@ -7,17 +7,22 @@
     <link href="/static/layui/css/layui.css" rel="stylesheet">
 </head>
 <body>
-<form class="layui-form" action="">
-    <div class="layui-form-item">
-        <input type="text" name="name" lay-verify="required" placeholder="请输入一个简短的名字" autocomplete="off"
-               class="layui-input">
-    </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button type="submit" class="layui-btn" lay-submit lay-filter="demo1">创建</button>
+<div class="layui-container" style="padding-top: 15px">
+    <form class="layui-form layui-form-pane" >
+        <div class="layui-form-item">
+            <label class="layui-form-label">名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" lay-verify="required" placeholder="请输入一个简短的客户端名" autocomplete="off"
+                       class="layui-input">
+            </div>
         </div>
-    </div>
-</form>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="demo1">创建</button>
+            </div>
+        </div>
+    </form>
+</div>
 <script src="/static/layui/layui.js"></script>
 <script src="/static/ajax.js"></script>
 <script>

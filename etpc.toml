@@ -1,7 +1,7 @@
 serverAddr = "127.0.0.1"
 serverPort = 9527
 #认证密码[必填]
-secretKey = "4b0063baa5ae47c2910fc25265aae4109"
+secretKey = "f23985d4e17c4acab805066b29ab1479"
 #TCP SSL安全加密密码配置
 tls =false
 [truststore]

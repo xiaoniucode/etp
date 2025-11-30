@@ -6,7 +6,6 @@ import cn.xilio.etp.server.web.framework.*;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Dashboard 管理、认证接口
@@ -29,10 +28,18 @@ public class DashboardApi {
     }
 
     public static void initRoutes(Router router) {
-        router.addRoute(HttpMethod.GET, "/client/list", context -> context.setResponseContent(ResponseEntity.ok(ConfigService.clients()).toJson()));
-        router.addRoute(HttpMethod.GET, "/proxy/list", context -> context.setResponseContent(ResponseEntity.ok(ConfigService.proxies()).toJson()));
-        router.addRoute(HttpMethod.GET, "/metrics", context -> context.setResponseContent(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
-        router.addRoute(HttpMethod.GET, "/stats", context -> context.setResponseContent(ResponseEntity.ok(ConfigService.countStats()).toJson()));
+        router.addRoute(HttpMethod.GET, "/client/list", context ->
+                context.setResponseContent(ResponseEntity.ok(ConfigService.clients()).toJson()));
+        router.addRoute(HttpMethod.GET, "/client/get", context ->
+                context.setResponseContent(ResponseEntity.ok(ConfigService.getClient(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
+        router.addRoute(HttpMethod.GET, "/proxy/get", context ->
+                context.setResponseContent(ResponseEntity.ok(ConfigService.getProxy(JsonUtils.toJsonObject(context.getRequestBody()))).toJson()));
+        router.addRoute(HttpMethod.GET, "/proxy/list", context ->
+                context.setResponseContent(ResponseEntity.ok(ConfigService.proxies()).toJson()));
+        router.addRoute(HttpMethod.GET, "/metrics", context ->
+                context.setResponseContent(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
+        router.addRoute(HttpMethod.GET, "/stats", context ->
+                context.setResponseContent(ResponseEntity.ok(ConfigService.countStats()).toJson()));
         router.addRoute(HttpMethod.POST, "/proxy/add", context -> {
             ConfigService.saveProxy(JsonUtils.toJsonObject(context.getRequestBody()), false);
             context.setResponseContent(ResponseEntity.ok("ok").toJson());
@@ -53,7 +60,6 @@ public class DashboardApi {
             ConfigService.addClient(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok("ok").toJson());
         });
-        router.addRoute(HttpMethod.GET, "/client/get", context -> context.setResponseContent(ResponseEntity.ok(ConfigService.getClient(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
         router.addRoute(HttpMethod.PUT, "/client/update", context -> {
             ConfigService.updateClient(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok("ok").toJson());

@@ -88,7 +88,7 @@ public final class ConfigService {
         proxyMapping.setLocalPort(req.getInt("localPort"));
         proxyMapping.setRemotePort(req.getInt("remotePort"));
         if (update) {
-            JSONObject proxy = configStore.getProxy(req.getInt("id"));
+            JSONObject proxy = configStore.getProxyById(req.getInt("id"));
             Config.getInstance().updateProxyMapping(req.getString("secretKey"), proxy.getInt("remotePort"), proxyMapping);
         } else {
             Config.getInstance().addProxyMapping(req.getString("secretKey"), proxyMapping);
@@ -104,7 +104,7 @@ public final class ConfigService {
 
 
     public static void switchProxyStatus(JSONObject req) {
-        JSONObject proxy = configStore.getProxy(req.getInt("id"));
+        JSONObject proxy = configStore.getProxyById(req.getInt("id"));
         int status = proxy.getInt("status");
         String secretKey = req.getString("secretKey");
         int remotePort = proxy.getInt("remotePort");
@@ -122,7 +122,7 @@ public final class ConfigService {
 
     public static void deleteProxy(JSONObject req) {
         int id = req.getInt("id");
-        JSONObject proxy = configStore.getProxy(id);
+        JSONObject proxy = configStore.getProxyById(id);
         String secretKey = req.getString("secretKey");
         int remotePort = proxy.getInt("remotePort");
         //删除内存中的映射信息
@@ -162,5 +162,9 @@ public final class ConfigService {
 
     public static JSONObject getClient(JSONObject req) {
         return configStore.getClientById(req.getInt("id"));
+    }
+
+    public static JSONObject getProxy(JSONObject req) {
+        return configStore.getProxyById(req.getInt("id"));
     }
 }

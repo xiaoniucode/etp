@@ -7,15 +7,16 @@
     <link href="/static/layui/css/layui.css" rel="stylesheet">
 </head>
 <body>
-<table class="layui-hide" id="mappingTable" lay-filter="mappingTable"></table>
-<script type="text/html" id="mappingToolbar">
+<table class="layui-hide" id="proxy" lay-filter="proxy"></table>
+<script type="text/html" id="headerToobar">
     <div class="layui-btn-container">
-        <button class="layui-btn layui-btn-sm" lay-event="addMapping">新增</button>
-        <button class="layui-btn layui-btn-sm" lay-event="flushTable">刷新</button>
+        <button class="layui-btn layui-btn-sm" lay-event="add">新增</button>
+        <button class="layui-btn layui-btn-sm" lay-event="flush">刷新</button>
     </div>
 </script>
 <script type="text/html" id="post_table_tool">
     <div class="layui-clear-space">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
         <a class="layui-btn layui-btn-xs" lay-event="delete">删除</a>
     </div>
 </script>
@@ -24,11 +25,11 @@
     layui.use(['form', 'table', 'dropdown'], function () {
         const table = layui.table;
         table.render({
-            elem: '#mappingTable',
+            elem: '#proxy',
             text: "空空如也",
             skin: "line",
             url: '/proxy/list',
-            toolbar: '#mappingToolbar',
+            toolbar: '#headerToobar',
             cellMinWidth: 80,
             cols: [[
                 {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
@@ -47,7 +48,7 @@
                 {
                     field: 'status', width: 120, title: '状态', sort: true, templet: function (d) {
                         const isChecked = d.status === 1 ? 'checked' : '';
-                        return '<input type="checkbox" lay-skin="switch" lay-text="ON|OFF" lay-filter="statusSwitch" ' + isChecked + '>';
+                        return '<input type="checkbox" lay-skin="switch" lay-text="启动|关闭" lay-filter="statusSwitch" ' + isChecked + '>';
                     }
                 },
                 {fixed: 'right', title: '操作', width: 134, minWidth: 125, templet: '#post_table_tool'}
@@ -56,6 +57,62 @@
                 console.log(res, msg)
             }
         });
+
+
+        //单元格操作事件
+        table.on('tool(proxy)', function (obj) {
+            const data = obj.data;
+            if (obj.event === 'kickout') {
+
+            } else if (obj.event === 'edit') {
+                layer.open({
+                    title: '编辑',
+                    type: 2,
+                    offset: '30px',
+                    shade: false,
+                    area: ['40%', '30%'],
+                    content: '/proxy/edit.html?id=' + data.id,
+                    end: function () {
+                        layui.table.reload('client');
+                    }
+                });
+            } else if (obj.event === 'delete') {
+                $.ajax({
+                    url: '/proxy/del',
+                    type: 'delete',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: data.id}),
+                    headers: {},
+                    success: function (res) {
+                        if (res.code === 0) {
+                            table.reload('client')
+                            layer.msg("删除成功", {time: 2000});
+                        } else {
+                            layer.msg(res.message, {time: 2000});
+                        }
+                    },
+                });
+            }
+        })
+        //操作工具栏
+        table.on('toolbar(proxy)', function (obj) {
+            if (obj.event === 'add') {
+                layer.open({
+                    title: '新增映射',
+                    type: 2,
+                    offset: '30px',
+                    shade: false,
+                    area: ['60%', '60%'],
+                    content: '/proxy/add.html',
+                    end: function () {
+                        layui.table.reload('client');
+                    }
+                });
+            } else if (obj.event === 'flush') {
+                table.reload('proxy')
+            }
+        })
+
     });
 </script>
 </body>
