@@ -152,5 +152,11 @@ public final class ConfigService {
         configStore.deleteProxiesByClient(client.getInt("id"));
     }
 
-
+    /**
+     * todo 将在线的客户端踢下线
+     */
+    public static void kickoutClient(JSONObject req) {
+        String secretKey = req.getString("secretKey");
+        //关闭客户端隧道，同时关闭所有连接
+    }
 }

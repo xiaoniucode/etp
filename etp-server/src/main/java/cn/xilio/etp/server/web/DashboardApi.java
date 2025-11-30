@@ -60,5 +60,11 @@ public class DashboardApi {
             ConfigService.deleteClient(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok("ok").toJson());
         });
+        router.addRoute(HttpMethod.DELETE, "/kickout-client", context -> {
+            ConfigService.kickoutClient(JsonUtils.toJsonObject(context.getRequestBody()));
+            context.setResponseContent(ResponseEntity.ok("ok").toJson());
+        });
+
+
     }
 }
