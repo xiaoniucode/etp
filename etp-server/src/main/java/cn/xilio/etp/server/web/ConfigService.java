@@ -1,17 +1,19 @@
 package cn.xilio.etp.server.web;
 
+import cn.xilio.etp.core.protocol.ProtocolType;
 import cn.xilio.etp.server.ChannelManager;
+import cn.xilio.etp.server.PortAllocator;
 import cn.xilio.etp.server.TcpProxyServer;
 import cn.xilio.etp.server.store.ClientInfo;
 import cn.xilio.etp.server.store.Config;
+import cn.xilio.etp.server.store.ProxyMapping;
+import cn.xilio.etp.server.web.framework.BizException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
 
 /**
  * 配置服务
@@ -23,6 +25,10 @@ public final class ConfigService {
     private final static ConfigStore configStore = new ConfigStore();
 
     public static void addClient(JSONObject client) {
+        JSONObject existClient = configStore.getClientByName(client.getString("name"));
+        if (existClient != null) {
+            throw new BizException("名称不能重复");
+        }
         String secretKey = UUID.randomUUID().toString().replaceAll("-", "");
         client.put("secretKey", secretKey);
         //添加到数据库
@@ -33,14 +39,6 @@ public final class ConfigService {
         clientInfo.setProxyMappings(new ArrayList<>());
         //添加到配置
         Config.getInstance().addClient(clientInfo);
-        //同步到Toml文件
-        CompletableFuture.runAsync(() -> {
-            try {
-
-            } catch (Exception e) {
-                logger.error("TOML 同步失败", e);
-            }
-        });
     }
 
 
@@ -71,18 +69,39 @@ public final class ConfigService {
         return configStore.listAllProxies();
     }
 
-    public static void addProxy(JSONObject jsonObject) {
-
-        //检查端口是否合法
-
+    public static void saveProxy(JSONObject req, boolean update) {
         //检查公网端口是否被占用
-
-        //如果状态是1，需要启动代理服务
-
+        if (!PortAllocator.getInstance().isPortAvailable(req.getInt("remotePort"))) {
+            throw new BizException("公网端口不可用");
+        }
         //保存到数据库
-
-        //持久化到Toml
+        if (update) {
+            configStore.updateProxy(req);
+        } else {
+            configStore.addProxy(req);
+        }
+        //添加到Config内存
+        ProxyMapping proxyMapping = new ProxyMapping();
+        proxyMapping.setName(req.getString("name"));
+        proxyMapping.setType(ProtocolType.getType(req.getString("type")));
+        proxyMapping.setStatus(req.getInt("status"));
+        proxyMapping.setLocalPort(req.getInt("localPort"));
+        proxyMapping.setRemotePort(req.getInt("remotePort"));
+        if (update) {
+            JSONObject proxy = configStore.getProxy(req.getInt("id"));
+            Config.getInstance().updateProxyMapping(req.getString("secretKey"),proxy.getInt("remotePort"), proxyMapping);
+        } else {
+            Config.getInstance().addProxyMapping(req.getString("secretKey"), proxyMapping);
+        }
+        //如果状态是1，需要启动代理服务
+        if (req.getInt("status") == 1) {
+            TcpProxyServer.getInstance().startRemotePort(req.getInt("remotePort"));
+        } else {
+            //将公网端口添加到已分配缓存
+            PortAllocator.getInstance().addRemotePort(req.getInt("remotePort"));
+        }
     }
+
 
     public static void switchProxyStatus(JSONObject req) {
         JSONObject proxy = configStore.getProxy(req.getInt("id"));
@@ -99,7 +118,6 @@ public final class ConfigService {
         //持久化数据库
         proxy.putOpt("status", updateStatus);
         configStore.updateProxy(proxy);
-        //同步到Toml
     }
 
     public static void deleteProxy(JSONObject req) {
@@ -133,4 +151,6 @@ public final class ConfigService {
         //删除客户端所有的代理映射
         configStore.deleteProxiesByClient(client.getInt("id"));
     }
+
+
 }

@@ -195,8 +195,27 @@ public class Config {
      * @param proxyMapping 需要更新的代理映射信息
      * @return 是否更新成功
      */
-    public boolean updateProxyMapping(String secretKey, ProxyMapping proxyMapping) {
-        return true;
+    public boolean updateProxyMapping(String secretKey, int oldRemotePort, ProxyMapping proxyMapping) {
+        List<Integer> remotePorts = clientPublicNetworkPortMapping.get(secretKey);
+        remotePorts.remove(oldRemotePort);
+        remotePorts.add(proxyMapping.getRemotePort());
+        ClientInfo clientInfo = clients.stream().filter(c -> c.getSecretKey().equals(secretKey)).findFirst().orElse(null);
+        if (clientInfo != null) {
+            List<ProxyMapping> proxyMappings = clientInfo.getProxyMappings();
+            ProxyMapping old = proxyMappings.stream().filter(pm -> pm.getRemotePort().equals(oldRemotePort)).findFirst().orElse(null);
+            if (Objects.nonNull(old)) {
+                proxyMappings.remove(old);
+                proxyMappings.add(proxyMapping);
+                //公网端口与内网端口建立映射
+                portLocalServerMapping.remove(oldRemotePort);
+                portLocalServerMapping.put(proxyMapping.getRemotePort(), proxyMapping.getLocalPort());
+                //将公网端口添加到客户端中
+                clientPublicNetworkPortMapping.get(secretKey).remove(oldRemotePort);
+                clientPublicNetworkPortMapping.get(secretKey).add(proxyMapping.getRemotePort());
+            }
+
+        }
+        return false;
     }
 
     /**
@@ -241,6 +260,7 @@ public class Config {
     public boolean addClient(ClientInfo clientInfo) {
         clients.add(clientInfo);
         clientSecretKeys.add(clientInfo.getSecretKey());
+        clientPublicNetworkPortMapping.put(clientInfo.getSecretKey(), new ArrayList<>());
         return true;
     }
 
