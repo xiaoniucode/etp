@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * 配置服务
+ *
  * @author liuxin
  */
 public final class ConfigService {
@@ -72,21 +73,64 @@ public final class ConfigService {
 
     public static void addProxy(JSONObject jsonObject) {
 
+        //检查端口是否合法
+
+        //检查公网端口是否被占用
+
+        //如果状态是1，需要启动代理服务
+
+        //保存到数据库
+
+        //持久化到Toml
     }
 
-    public static void switchProxyStatus(JSONObject jsonObject) {
-
+    public static void switchProxyStatus(JSONObject req) {
+        JSONObject proxy = configStore.getProxy(req.getInt("id"));
+        int status = proxy.getInt("status");
+        String secretKey = req.getString("secretKey");
+        int remotePort = proxy.getInt("remotePort");
+        int updateStatus = status == 1 ? 0 : 1;
+        Config.getInstance().updateProxyMappingStatus(secretKey, remotePort, updateStatus);
+        if (status == 1) {
+            TcpProxyServer.getInstance().startRemotePort(remotePort);
+        } else {
+            TcpProxyServer.getInstance().stopRemotePort(remotePort, false);
+        }
+        //持久化数据库
+        proxy.putOpt("status", updateStatus);
+        configStore.updateProxy(proxy);
+        //同步到Toml
     }
 
-    public static void deleteProxy(JSONObject jsonObject) {
-
+    public static void deleteProxy(JSONObject req) {
+        int id = req.getInt("id");
+        JSONObject proxy = configStore.getProxy(id);
+        String secretKey = req.getString("secretKey");
+        int remotePort = proxy.getInt("remotePort");
+        //删除内存中的映射信息
+        Config.getInstance().deleteProxyMapping(secretKey, remotePort);
+        //停掉运行的服务并释放端口
+        TcpProxyServer.getInstance().stopRemotePort(remotePort, true);
+        configStore.deleteProxy(id);
     }
 
-    public static void updateClient(JSONObject jsonObject) {
-
+    public static void updateClient(JSONObject req) {
+        JSONObject client = configStore.getClientById(req.getInt("id"));
+        Config.getInstance().updateClient(client.getString("secretKey"), req.getString("name"));
+        configStore.updateClient(req.getInt("id"), req.getString("name"));
     }
 
-    public static void deleteClient(JSONObject jsonObject) {
-
+    public static void deleteClient(JSONObject req) {
+        JSONObject client = configStore.getClientById(req.getInt("id"));
+        String secretKey = client.getString("secretKey");
+        //删除客户端映射信息
+        Config.getInstance().deleteClient(secretKey);
+        //关闭该客户端所有运行状态的代理服务
+        Config.getInstance().getPublicNetworkPorts(secretKey).forEach(remotePort -> {
+            TcpProxyServer.getInstance().stopRemotePort(remotePort, true);
+        });
+        configStore.deleteClient(client.getInt("id"));
+        //删除客户端所有的代理映射
+        configStore.deleteProxiesByClient(client.getInt("id"));
     }
 }

@@ -85,7 +85,7 @@ public class ConfigStore {
     /**
      * 查询单个
      */
-    public JSONObject getProxy(long id) {
+    public JSONObject getProxy(int id) {
         return SQLiteUtils.get("SELECT * FROM proxies WHERE id = ?", id);
     }
 
@@ -165,12 +165,23 @@ public class ConfigStore {
                     p.status,
                     p.createdAt,
                     p.updatedAt,
-                    c.name AS clientName
+                    c.name AS clientName,
+                    c.secretKey
                 FROM
                     proxies p
                 LEFT JOIN clients c ON p.clientId = c.id
                 """;
         return SQLiteUtils.list(sql);
+    }
+
+    /**
+     * 删除客户端所有的代理配置
+     *
+     * @param clientId 客户端ID
+     * @return 删除条数
+     */
+    public int deleteProxiesByClient(int clientId) {
+        return SQLiteUtils.delete("DELETE FROM proxies WHERE clientId = ?", clientId);
     }
 }
 

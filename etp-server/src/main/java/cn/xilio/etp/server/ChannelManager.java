@@ -2,6 +2,8 @@ package cn.xilio.etp.server;
 
 import cn.xilio.etp.core.EtpConstants;
 import io.netty.channel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author liuxin
  */
 public final class ChannelManager {
+    private static Logger logger = LoggerFactory.getLogger(ChannelManager.class);
     /**
      * 内网代理客户端与控制通道映射
      */
@@ -46,6 +49,10 @@ public final class ChannelManager {
 
     public static void closeControlChannelByClient(String secretKey) {
         Channel channel = CONTROL_CHANNELS.get(secretKey);
+        if (channel == null) {
+            logger.warn("client channel is null");
+            return;
+        }
         clearControlChannel(channel);
     }
 

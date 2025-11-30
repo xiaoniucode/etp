@@ -21,6 +21,7 @@
 </script>
 <script type="text/html" id="clientToolbar">
     <div class="layui-clear-space">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">踢掉</a>
         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
         <a class="layui-btn layui-btn-xs" lay-event="delete">删除</a>
     </div>
@@ -46,7 +47,7 @@
                         }
                     }
                 },
-                {fixed: 'right', title: '操作', width: 134, minWidth: 125, templet: '#clientToolbar'}
+                {fixed: 'right', title: '操作',width:200, templet: '#clientToolbar'}
             ]],
             error: function (res, msg) {
                 console.log(res, msg)
