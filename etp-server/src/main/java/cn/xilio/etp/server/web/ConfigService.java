@@ -1,6 +1,7 @@
 package cn.xilio.etp.server.web;
 
 import cn.xilio.etp.server.ChannelManager;
+import cn.xilio.etp.server.TcpProxyServer;
 import cn.xilio.etp.server.store.ClientInfo;
 import cn.xilio.etp.server.store.Config;
 import org.json.JSONArray;
@@ -46,10 +47,12 @@ public final class ConfigService {
      */
     public static JSONObject countStats() {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("clientTotal", 0);
-        jsonObject.put("onlineClient", 0);
-        jsonObject.put("mappingTotal", 0);
-        jsonObject.put("startMapping", 0);
+        JSONArray clients = clients();
+        JSONArray proxies = proxies();
+        jsonObject.put("clientTotal", clients.length());
+        jsonObject.put("onlineClient", ChannelManager.onlineClientCount());
+        jsonObject.put("mappingTotal", proxies.length());
+        jsonObject.put("startMapping", TcpProxyServer.getInstance().runningPortCount());
         return jsonObject;
     }
 
@@ -60,5 +63,9 @@ public final class ConfigService {
             client.put("status", ChannelManager.clientIsOnline(client.getString("secretKey")) ? 1 : 0);
         }
         return clients;
+    }
+
+    public static JSONArray proxies() {
+        return configStore.listAllProxies();
     }
 }

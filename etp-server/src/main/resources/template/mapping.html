@@ -31,13 +31,13 @@
             toolbar: '#mappingToolbar',
             cellMinWidth: 80,
             cols: [[
-                {field: 'client', fixed: 'left', width: 150, title: '客户端', sort: true},
+                {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
                 {field: 'name', title: '名称'},
                 {
-                    field: 'protocol', title: '协议', sort: true, templet: function (d) {
-                        if (d.protocol === "tcp") {
+                    field: 'type', title: '协议', sort: true, templet: function (d) {
+                        if (d.type === "tcp") {
                             return ' <span class="layui-badge layui-bg-green">TCP</span>';
-                        } else if (d.protocol === "http") {
+                        } else if (d.type === "http") {
                             return '<span class="layui-badge">HTTP</span>';
                         }
                     }

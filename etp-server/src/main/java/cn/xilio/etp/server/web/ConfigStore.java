@@ -2,6 +2,7 @@ package cn.xilio.etp.server.web;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  *
  * @author liuxin
  */
-public final class ConfigStore {
+public class ConfigStore {
     /**
      * 新增客户端
      */
@@ -152,5 +153,24 @@ public final class ConfigStore {
         return SQLiteUtils.delete("DELETE FROM proxies WHERE id = ?", id) > 0;
     }
 
+    public JSONArray listAllProxies() {
+        String sql = """
+                SELECT
+                    p.id,
+                    p.clientId,
+                    p.name,
+                    p.type,
+                    p.localPort,
+                    p.remotePort,
+                    p.status,
+                    p.createdAt,
+                    p.updatedAt,
+                    c.name AS clientName
+                FROM
+                    proxies p
+                LEFT JOIN clients c ON p.clientId = c.id
+                """;
+        return SQLiteUtils.list(sql);
+    }
 }
 

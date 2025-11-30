@@ -158,6 +158,13 @@ public class TcpProxyServer implements Lifecycle {
     }
 
     /**
+     * 获取正在运行的服务数量
+     */
+    public int runningPortCount() {
+        return remotePortChannelMapping.size();
+    }
+
+    /**
      * 停掉一个指定的公网端口服务
      *
      * @param remotePort  需要停止的公网端口

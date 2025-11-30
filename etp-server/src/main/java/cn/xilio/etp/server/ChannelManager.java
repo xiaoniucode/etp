@@ -120,4 +120,11 @@ public final class ChannelManager {
     public static Long getSessionIdByClientChannel(Channel clientChannel) {
         return clientChannel.attr(EtpConstants.SESSION_ID).get();
     }
+
+    /**
+     * 获取在线客户端数量
+     */
+    public static int onlineClientCount() {
+        return CONTROL_CHANNELS.size();
+    }
 }

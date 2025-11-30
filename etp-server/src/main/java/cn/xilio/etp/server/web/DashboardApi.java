@@ -36,20 +36,10 @@ public class DashboardApi {
     }
 
     public static void initRoutes(Router router) {
-        router.addRoute(HttpMethod.GET, "/clients",
-                context -> {
-                    JSONArray clients=ConfigService.clients();
-                    context.setResponseContent(ResponseEntity.ok(clients).toJson());
-                });
-        router.addRoute(HttpMethod.GET, "/proxies", context -> context.setResponseContent(ResponseEntity.ok(ConfigManager.proxies()).toJson()));
+        router.addRoute(HttpMethod.GET, "/clients", context -> context.setResponseContent(ResponseEntity.ok(ConfigService.clients()).toJson()));
+        router.addRoute(HttpMethod.GET, "/proxies", context -> context.setResponseContent(ResponseEntity.ok(ConfigService.proxies()).toJson()));
         router.addRoute(HttpMethod.GET, "/metrics", context -> context.setResponseContent(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
-        router.addRoute(HttpMethod.GET, "/stats", context -> {
-//            int clientTotal = ConfigManager.clients();
-//            long onlineClient = ConfigManager.clients().stream().filter(c -> c.status() == 1).count();
-//            int mappingTotal = ConfigManager.proxies().size();
-//            long startMapping = ConfigManager.proxies().stream().filter(c -> c.status() == 1).count();
-//            context.setResponseContent(ResponseEntity.ok(new StatsCount(clientTotal, (int) onlineClient, mappingTotal, (int) startMapping)).toJson());
-        });
+        router.addRoute(HttpMethod.GET, "/stats", context -> context.setResponseContent(ResponseEntity.ok(ConfigService.countStats()).toJson()));
         router.addRoute(HttpMethod.POST, "/add-proxy", context -> {
             String requestBody = context.getRequestBody();
             AddProxyReq bean = JsonUtils.toBean(requestBody, AddProxyReq.class);
