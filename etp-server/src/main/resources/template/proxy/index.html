@@ -22,8 +22,9 @@
 </script>
 <script src="/static/layui/layui.js"></script>
 <script>
-    layui.use(['form', 'table', 'dropdown'], function () {
+    layui.use(['form', 'table', 'dropdown','jquery'], function () {
         const table = layui.table;
+        const $ = layui.$;
         table.render({
             elem: '#proxy',
             text: "空空如也",
@@ -62,18 +63,16 @@
         //单元格操作事件
         table.on('tool(proxy)', function (obj) {
             const data = obj.data;
-            if (obj.event === 'kickout') {
-
-            } else if (obj.event === 'edit') {
+             if (obj.event === 'edit') {
                 layer.open({
                     title: '编辑',
                     type: 2,
                     offset: '30px',
                     shade: false,
-                    area: ['40%', '30%'],
+                    area: ['60%', '60%'],
                     content: '/proxy/edit.html?id=' + data.id,
                     end: function () {
-                        layui.table.reload('client');
+                        layui.table.reload('proxy');
                     }
                 });
             } else if (obj.event === 'delete') {
@@ -81,11 +80,11 @@
                     url: '/proxy/del',
                     type: 'delete',
                     contentType: 'application/json',
-                    data: JSON.stringify({id: data.id}),
+                    data: JSON.stringify({id: data.id,secretKey:data.secretKey}),
                     headers: {},
                     success: function (res) {
                         if (res.code === 0) {
-                            table.reload('client')
+                            table.reload('proxy')
                             layer.msg("删除成功", {time: 2000});
                         } else {
                             layer.msg(res.message, {time: 2000});
@@ -105,7 +104,7 @@
                     area: ['60%', '60%'],
                     content: '/proxy/add.html',
                     end: function () {
-                        layui.table.reload('client');
+                        layui.table.reload('proxy');
                     }
                 });
             } else if (obj.event === 'flush') {

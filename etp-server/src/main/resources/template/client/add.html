@@ -39,7 +39,7 @@
                 headers: {},
                 success: function (res) {
                     if (res.code === 0) {
-                        layer.msg('创建成功', {icon: 1, time: 500,}, () => {
+                        layer.msg('创建成功', {icon: 1, time: 400,}, () => {
                             parent.layer.close(parent.layer.getFrameIndex(window.name));
                         });
                     } else {

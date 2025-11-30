@@ -12,10 +12,8 @@
         <div class="layui-form-item">
             <label class="layui-form-label">客户端</label>
             <div class="layui-input-inline">
-                <select name="clientId" lay-filter="aihao">
-                    <option value=""></option>
-                    <option value="0">macos</option>
-                    <option value="1" selected>windows</option>
+                <select name="client" lay-filter="clientSelect">
+                    <option value="">请选择客户端</option>
                 </select>
             </div>
         </div>
@@ -30,7 +28,7 @@
 
         <div class="layui-form-item" pane>
             <label class="layui-form-label">协议</label>
-            <div class="layui-input-block">
+            <div class="layui-input-inline">
                 <input type="radio" name="type" value="tcp" title="TCP" checked>
             </div>
         </div>
@@ -38,22 +36,23 @@
             <div class="layui-inline">
                 <label class="layui-form-label">公网端口</label>
                 <div class="layui-input-block">
-                    <input type="text" name="remotePort" id="remotePort" autocomplete="off" class="layui-input">
+                    <input type="text" placeholder="不填自动分配" name="remotePort" id="remotePort" autocomplete="off"
+                           class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">内网端口</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="localPort" autocomplete="off" class="layui-input">
+                    <input type="text" placeholder="请输入" name="localPort" autocomplete="off" class="layui-input">
                 </div>
             </div>
         </div>
-
         <div class="layui-form-item" pane>
             <label class="layui-form-label">状态</label>
-            <div class="layui-input-block">
-                <input type="checkbox" checked name="status" lay-skin="switch" lay-filter="switchTest"
-                       title="启动|关闭">
+            <div class="layui-input-inline">
+                <input type="hidden" name="status" value="0">
+                <input type="checkbox" name="status" value="1"
+                       lay-skin="switch" lay-text="开启|关闭" checked>
             </div>
         </div>
 
@@ -70,17 +69,47 @@
     layui.use(['form', 'jquery'], function () {
         var form = layui.form;
         const $ = layui.$;
+
+        //渲染客户端下拉框
+        $.ajax({
+            url: '/client/list',
+            type: 'get',
+            contentType: 'application/json',
+            headers: {},
+            success: function (res) {
+                if (res.code === 0) {
+                    const data = res.data || [];
+                    const $select = $('select[name="client"]');
+                    // 清空旧选项（除了第一个"请选择"）
+                    $select.find('option:gt(0)').remove();
+                    // 动态添加新选项
+                    data.forEach(function (item) {
+                        $select.append(
+                            '<option value="' + item.id + '|' + item.secretKey + '">'+item.name + '</option>'
+                        );
+                    });
+                    $select.val(data[0].id);
+                    form.render('select');
+                }
+            },
+        });
         form.on('submit(demo1)', function (data) {
             const field = data.field;
+            if (field.client) {
+                const [clientId, secretKey] = field.client.split('|', 2);
+                field.clientId = Number(clientId) || 0;
+                field.secretKey = secretKey || '';
+                delete field.client;
+            }
             $.ajax({
-                url: '/client/add',
+                url: '/proxy/add',
                 type: 'post',
                 contentType: 'application/json',
                 data: JSON.stringify(field),
                 headers: {},
                 success: function (res) {
                     if (res.code === 0) {
-                        layer.msg('创建成功', {icon: 1, time: 500,}, () => {
+                        layer.msg('创建成功', {icon: 1, time: 400,}, () => {
                             parent.layer.close(parent.layer.getFrameIndex(window.name));
                         });
                     } else {
