@@ -1,13 +1,24 @@
 package cn.xilio.etp.server.web;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author liuxin
  */
 public final class EtpDbInit {
+    private static Logger logger = LoggerFactory.getLogger(EtpDbInit.class);
+
+    /**
+     * 只有不存在的时候才会创建表
+     */
     public static void initTable() {
+        logger.debug("开始初始化数据库表");
         createClient();
         createProxyMapping();
+        logger.debug("数据库表初始化完毕");
     }
+
     private static void createProxyMapping() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS proxies (

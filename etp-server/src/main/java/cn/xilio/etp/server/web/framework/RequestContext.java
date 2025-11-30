@@ -19,7 +19,7 @@ public class RequestContext {
     private String uri;
     private HttpVersion version;
     private final Map<String, String> headers = new HashMap<>();
-    private final Map<String, String> queryParams = new HashMap<>();
+    private final Map<String, Object> queryParams = new HashMap<>();
     private final Map<String, String> formParams = new HashMap<>();
     private final Map<String, Object> attributes = new HashMap<>();
     private String requestBody;
@@ -142,14 +142,14 @@ public class RequestContext {
     /**
      * 获取查询参数
      */
-    public String getQueryParam(String name) {
+    public Object getQueryParam(String name) {
         return queryParams.get(name);
     }
 
     /**
      * 获取所有查询参数
      */
-    public Map<String, String> getQueryParams() {
+    public Map<String, Object> getQueryParams() {
         return new HashMap<>(queryParams);
     }
 

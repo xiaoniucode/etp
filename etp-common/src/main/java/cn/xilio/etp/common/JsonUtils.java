@@ -22,9 +22,15 @@ public class JsonUtils {
             throw new RuntimeException("JSON 转换失败: " + e.getMessage(), e);
         }
     }
+
     public static JSONObject toJsonObject(String jsonString) {
         return new JSONObject(jsonString);
     }
+
+    public static JSONObject toJsonObject(Map<String, Object> map) {
+        return new JSONObject(map);
+    }
+
     public static <T> T toBean(String jsonString, Class<T> beanClass) {
         try {
             if (jsonString == null || jsonString.trim().isEmpty()) {

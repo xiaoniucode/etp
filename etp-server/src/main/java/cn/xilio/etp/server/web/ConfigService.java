@@ -89,7 +89,7 @@ public final class ConfigService {
         proxyMapping.setRemotePort(req.getInt("remotePort"));
         if (update) {
             JSONObject proxy = configStore.getProxy(req.getInt("id"));
-            Config.getInstance().updateProxyMapping(req.getString("secretKey"),proxy.getInt("remotePort"), proxyMapping);
+            Config.getInstance().updateProxyMapping(req.getString("secretKey"), proxy.getInt("remotePort"), proxyMapping);
         } else {
             Config.getInstance().addProxyMapping(req.getString("secretKey"), proxyMapping);
         }
@@ -158,5 +158,9 @@ public final class ConfigService {
     public static void kickoutClient(JSONObject req) {
         String secretKey = req.getString("secretKey");
         //关闭客户端隧道，同时关闭所有连接
+    }
+
+    public static JSONObject getClient(JSONObject req) {
+        return configStore.getClientById(req.getInt("id"));
     }
 }

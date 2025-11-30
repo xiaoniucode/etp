@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>编辑客户端</title>
+  <link href="/static/layui/css/layui.css" rel="stylesheet">
+</head>
+<body>
+<form class="layui-form" lay-filter="editForm">
+  <div class="layui-form-item">
+    <input type="text" name="name" lay-verify="required" placeholder="请输入一个简短的名字" autocomplete="off"
+           class="layui-input">
+  </div>
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <button type="submit" class="layui-btn" lay-submit lay-filter="demo1">保存更新</button>
+    </div>
+  </div>
+</form>
+<script src="/static/layui/layui.js"></script>
+<script src="/static/ajax.js"></script>
+<script>
+  function getQueryParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return decodeURIComponent(r[2]);
+    return null;
+  }
+  layui.use(['form', 'jquery'], function () {
+    var form = layui.form;
+    const $ = layui.$;
+    var id = getQueryParam("id");
+
+    $.ajax({
+      url: '/client/get?id='+id,
+      type: 'get',
+      contentType: 'application/json',
+      headers: {},
+      success: function (res) {
+        if (res.code === 0) {
+          form.val('editForm',res.data);
+        } else {
+          layer.msg(res.message, {time: 1000});
+        }
+      },
+    });
+    form.on('submit(demo1)', function (data) {
+      const field = data.field;
+      $.ajax({
+        url: '/client/update',
+        type: 'put',
+        contentType: 'application/json',
+        data: JSON.stringify({id:id,name:field.name}),
+        headers: {},
+        success: function (res) {
+          if (res.code === 0) {
+            layer.msg('更新成功', {icon: 1, time: 500,}, () => {
+              parent.layer.close(parent.layer.getFrameIndex(window.name));
+            });
+          } else {
+            layer.msg(res.message, {time: 1000});
+          }
+        },
+      });
+      return false;
+    });
+  });
+</script>
+
+</body>
+</html>
