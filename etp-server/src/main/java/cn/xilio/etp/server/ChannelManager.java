@@ -23,24 +23,26 @@ public final class ChannelManager {
      */
     private static final Map<String, Channel> CONTROL_CHANNELS = new ConcurrentHashMap<>(4);
     /**
-     * 内网服务端口与控制通道映射
+     * 公网服务端口与控制通道映射
      */
     private static final Map<Integer, Channel> PORT_CONTROL_CHANNEL_MAPPING = new ConcurrentHashMap<>(64);
     private final static Lock LOCK = new ReentrantLock();
 
+    /**
+     * 只会在客户端认证的时候执行一次
+     *
+     * @param remotePorts    公网端口列表
+     * @param secretKey      客户端密钥
+     * @param controlChannel 控制隧道
+     */
     public static void addControlChannel(List<Integer> remotePorts, String secretKey, Channel controlChannel) {
-        LOCK.lock();
-        try {
-            for (Integer port : remotePorts) {
-                PORT_CONTROL_CHANNEL_MAPPING.put(port, controlChannel);
-            }
-            controlChannel.attr(EtpConstants.CHANNEL_PORT).set(remotePorts);
-            controlChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
-            controlChannel.attr(EtpConstants.CLIENT_CHANNELS).set(new ConcurrentHashMap<>());
-            CONTROL_CHANNELS.put(secretKey, controlChannel);
-        } finally {
-            LOCK.unlock();
+        for (Integer remotePort : remotePorts) {
+            PORT_CONTROL_CHANNEL_MAPPING.put(remotePort, controlChannel);
         }
+        controlChannel.attr(EtpConstants.CHANNEL_PORT).set(remotePorts);
+        controlChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
+        controlChannel.attr(EtpConstants.CLIENT_CHANNELS).set(new ConcurrentHashMap<>());
+        CONTROL_CHANNELS.put(secretKey, controlChannel);
     }
 
     /**
@@ -116,8 +118,8 @@ public final class ChannelManager {
         }
     }
 
-    public static Channel getControlChannelByPort(int port) {
-        return PORT_CONTROL_CHANNEL_MAPPING.get(port);
+    public static Channel getControlChannelByPort(int remotePort) {
+        return PORT_CONTROL_CHANNEL_MAPPING.get(remotePort);
     }
 
     public static Channel getControlChannelBySecretKey(String secretKey) {

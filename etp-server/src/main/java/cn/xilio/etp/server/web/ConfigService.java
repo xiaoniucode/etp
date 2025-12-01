@@ -5,9 +5,10 @@ import cn.xilio.etp.core.protocol.ProtocolType;
 import cn.xilio.etp.server.ChannelManager;
 import cn.xilio.etp.server.PortAllocator;
 import cn.xilio.etp.server.TcpProxyServer;
+import cn.xilio.etp.server.store.AppConfig;
 import cn.xilio.etp.server.store.ClientInfo;
-import cn.xilio.etp.server.store.Config;
 import cn.xilio.etp.server.store.ProxyMapping;
+import cn.xilio.etp.server.store.RuntimeState;
 import cn.xilio.etp.server.web.framework.BizException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,6 +25,8 @@ import java.util.*;
 public final class ConfigService {
     private static Logger logger = LoggerFactory.getLogger(ConfigService.class);
     private final static ConfigStore configStore = new ConfigStore();
+    private final static AppConfig config = AppConfig.get();
+    private final static RuntimeState state = RuntimeState.get();
 
     public static void addClient(JSONObject client) {
         JSONObject existClient = configStore.getClientByName(client.getString("name"));
@@ -34,12 +37,10 @@ public final class ConfigService {
         client.put("secretKey", secretKey);
         //添加到数据库
         configStore.addClient(client);
-        ClientInfo clientInfo = new ClientInfo();
+        ClientInfo clientInfo = new ClientInfo(client.getString("secretKey"));
         clientInfo.setName(client.getString("name"));
-        clientInfo.setSecretKey(client.getString("secretKey"));
-        clientInfo.setProxyMappings(new ArrayList<>());
-        //添加到配置
-        Config.getInstance().addClient(clientInfo);
+        //注册客户端
+        state.registerClient(clientInfo);
     }
 
 
@@ -53,7 +54,7 @@ public final class ConfigService {
         jsonObject.put("clientTotal", clients.length());
         jsonObject.put("onlineClient", ChannelManager.onlineClientCount());
         jsonObject.put("mappingTotal", proxies.length());
-        jsonObject.put("startMapping", TcpProxyServer.getInstance().runningPortCount());
+        jsonObject.put("startMapping", TcpProxyServer.get().runningPortCount());
         return jsonObject;
     }
 
@@ -82,11 +83,13 @@ public final class ConfigService {
             req.put("remotePort", allocatePort);
         }
         configStore.addProxy(req);
-        //添加到Config内存
-        Config.getInstance().addProxyMapping(req.getString("secretKey"), createProxyMapping(req));
+        //注册端口映射
+        state.registerProxy(req.getString("secretKey"), createProxyMapping(req));
+        //如果客户度已经启动认证
+        ChannelManager.addPortToControlChannelIfOnline(req.getString("secretKey"), req.getInt("remotePort"));
         //如果状态是1，需要启动代理服务
         if (req.getInt("status") == 1) {
-            TcpProxyServer.getInstance().startRemotePort(req.getInt("remotePort"));
+            TcpProxyServer.get().startRemotePort(req.getInt("remotePort"));
         } else {
             //将公网端口添加到已分配缓存
             PortAllocator.getInstance().addRemotePort(req.getInt("remotePort"));
@@ -111,23 +114,24 @@ public final class ConfigService {
         configStore.updateProxy(req);
         //添加到Config内存
         JSONObject proxy = configStore.getProxyById(req.getInt("id"));
-        Config.getInstance().updateProxyMapping(req.getString("secretKey"), proxy.getInt("remotePort"), createProxyMapping(req));
+        //删除已经注册的映射
+        state.removeProxy(req.getString("secretKey"), proxy.getInt("remotePort"));
+        //重新注册更新后的映射
+        state.registerProxy(req.getString("secretKey"), createProxyMapping(req));
         //如果状态是1，需要启动代理服务
         if (req.getInt("status") == 1) {
-            TcpProxyServer.getInstance().startRemotePort(req.getInt("remotePort"));
+            TcpProxyServer.get().startRemotePort(req.getInt("remotePort"));
         } else {
             //停止对应端口的代理映射服务
-            TcpProxyServer.getInstance().stopRemotePort(req.getInt("remotePort"), false);
+            TcpProxyServer.get().stopRemotePort(req.getInt("remotePort"), false);
         }
     }
 
     private static ProxyMapping createProxyMapping(JSONObject req) {
-        ProxyMapping proxyMapping = new ProxyMapping();
+        ProxyMapping proxyMapping = new ProxyMapping(ProtocolType.getType(req.getString("type")),req.getInt("localPort"),req.getInt("remotePort"));
+        proxyMapping.setProxyId(req.getInt("clientId"));
         proxyMapping.setName(req.getString("name"));
-        proxyMapping.setType(ProtocolType.getType(req.getString("type")));
         proxyMapping.setStatus(req.getInt("status"));
-        proxyMapping.setLocalPort(req.getInt("localPort"));
-        proxyMapping.setRemotePort(req.getInt("remotePort"));
         return proxyMapping;
     }
 
@@ -140,11 +144,11 @@ public final class ConfigService {
         String secretKey = req.getString("secretKey");
         int remotePort = proxy.getInt("remotePort");
         int updateStatus = status == 1 ? 0 : 1;
-        Config.getInstance().updateProxyMappingStatus(secretKey, remotePort, updateStatus);
+        state.updateProxyStatus(secretKey, remotePort, updateStatus);
         if (updateStatus == 1) {
-            TcpProxyServer.getInstance().startRemotePort(remotePort);
+            TcpProxyServer.get().startRemotePort(remotePort);
         } else {
-            TcpProxyServer.getInstance().stopRemotePort(remotePort, false);
+            TcpProxyServer.get().stopRemotePort(remotePort, false);
         }
         //持久化数据库
         proxy.put("status", updateStatus);
@@ -156,27 +160,31 @@ public final class ConfigService {
         JSONObject proxy = configStore.getProxyById(id);
         String secretKey = req.getString("secretKey");
         int remotePort = proxy.getInt("remotePort");
-        //删除内存中的映射信息
-        Config.getInstance().deleteProxyMapping(secretKey, remotePort);
+        //删除注册的端口映射
+        state.removeProxy(secretKey, remotePort);
+        //删除公网端口与已认证客户端的绑定
+        ChannelManager.removeRemotePortToControlChannel(secretKey, remotePort);
         //停掉运行的服务并释放端口
-        TcpProxyServer.getInstance().stopRemotePort(remotePort, true);
+        TcpProxyServer.get().stopRemotePort(remotePort, true);
         configStore.deleteProxy(id);
     }
 
     public static void updateClient(JSONObject req) {
         JSONObject client = configStore.getClientById(req.getInt("id"));
-        Config.getInstance().updateClient(client.getString("secretKey"), req.getString("name"));
+        state.updateClientName(client.getString("secretKey"), req.getString("name"));
         configStore.updateClient(req.getInt("id"), req.getString("name"));
     }
 
     public static void deleteClient(JSONObject req) {
         JSONObject client = configStore.getClientById(req.getInt("id"));
         String secretKey = client.getString("secretKey");
-        //删除客户端映射信息
-        Config.getInstance().deleteClient(secretKey);
+
+        state.removeClient(secretKey);
+        ChannelManager.closeControlChannelByClient(secretKey);
+
         //关闭该客户端所有运行状态的代理服务
-        Config.getInstance().getPublicNetworkPorts(secretKey).forEach(remotePort -> {
-            TcpProxyServer.getInstance().stopRemotePort(remotePort, true);
+        state.getClientRemotePorts(secretKey).forEach(remotePort -> {
+            TcpProxyServer.get().stopRemotePort(remotePort, true);
         });
         configStore.deleteClient(client.getInt("id"));
         //删除客户端所有的代理映射

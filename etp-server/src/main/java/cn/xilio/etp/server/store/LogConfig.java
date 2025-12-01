@@ -1,5 +1,8 @@
 package cn.xilio.etp.server.store;
 
+/**
+ * @author liuxin
+ */
 public class LogConfig {
     private String path;
     private String level;

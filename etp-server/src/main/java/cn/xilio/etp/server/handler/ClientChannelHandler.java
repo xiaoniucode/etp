@@ -3,7 +3,7 @@ package cn.xilio.etp.server.handler;
 import cn.xilio.etp.core.EtpConstants;
 import cn.xilio.etp.core.protocol.TunnelMessage;
 import cn.xilio.etp.server.ChannelManager;
-import cn.xilio.etp.server.store.Config;
+import cn.xilio.etp.server.store.RuntimeState;
 import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ClientChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final Logger logger = LoggerFactory.getLogger(ClientChannelHandler.class);
     private static final AtomicLong SESSION_ID_PRODUCER = new AtomicLong(0);
+    private RuntimeState runtimeState = RuntimeState.get();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
@@ -49,7 +50,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
         } else {
             long nextSessionId = nextSessionId();
             clientChannel.config().setOption(ChannelOption.AUTO_READ, false);
-            Integer localPort = Config.getInstance().getInternalServerInfo(sa.getPort());
+            int localPort = runtimeState.getLocalPort(sa.getPort());
             ChannelManager.addClientChannelToControlChannel(clientChannel, nextSessionId, controllChannel);
             TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                     .setType(TunnelMessage.Message.Type.CONNECT)

@@ -1,5 +1,6 @@
 package cn.xilio.etp.server.store;
 
+import cn.xilio.etp.common.StringUtils;
 import cn.xilio.etp.common.TomlUtils;
 import cn.xilio.etp.core.protocol.ProtocolType;
 import com.moandjiezana.toml.Toml;
@@ -103,26 +104,24 @@ public final class AppConfig {
         Set<Integer> portTemp = new HashSet<>();
         List<ProxyMapping> proxyMappings = new ArrayList<>();
         for (Toml proxy : proxies) {
-            ProxyMapping proxyMapping = new ProxyMapping();
-            String proxyName = proxy.getString("name");
             String type = proxy.getString("type");
+            String proxyName = proxy.getString("name");
             Long localPort = proxy.getLong("localPort");
             Long remotePort = proxy.getLong("remotePort");
             Long status = proxy.getLong("status");
-            proxyMapping.setStatus(status == null ? 1 : status.intValue());
-            if (Objects.isNull(localPort)) {
-                throw new IllegalArgumentException("必须指定内网端口");
-            }
-            proxyMapping.setName(proxyName);
-            proxyMapping.setType(ProtocolType.getType(type));
-            proxyMapping.setLocalPort(localPort.intValue());
             if (!Objects.isNull(remotePort)) {
                 if (portTemp.contains(remotePort.intValue())) {
                     throw new IllegalArgumentException("公网端口不能重复！" + remotePort.intValue());
                 }
-                proxyMapping.setRemotePort(remotePort.intValue());
                 portTemp.add(remotePort.intValue());
             }
+            if (Objects.isNull(localPort)) {
+                throw new IllegalArgumentException("必须指定内网端口");
+            }
+            ProxyMapping proxyMapping = new ProxyMapping(ProtocolType.getType(type), localPort.intValue(), remotePort == null ? null : remotePort.intValue());
+            proxyMapping.setName(proxyName);
+            proxyMapping.setStatus(status == null ? 1 : status.intValue());
+            proxyMapping.setLocalPort(localPort.intValue());
             proxyMappings.add(proxyMapping);
         }
         return proxyMappings;

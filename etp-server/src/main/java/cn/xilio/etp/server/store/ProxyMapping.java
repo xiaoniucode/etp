@@ -35,6 +35,12 @@ public class ProxyMapping {
      */
     private Integer status;
 
+    public ProxyMapping(ProtocolType type, Integer localPort, Integer remotePort) {
+        this.type = type;
+        this.localPort = localPort;
+        this.remotePort = remotePort;
+    }
+
     public String getName() {
         return name;
     }
@@ -73,5 +79,13 @@ public class ProxyMapping {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Integer getProxyId() {
+        return proxyId;
+    }
+
+    public void setProxyId(Integer proxyId) {
+        this.proxyId = proxyId;
     }
 }

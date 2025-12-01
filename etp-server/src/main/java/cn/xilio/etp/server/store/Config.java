@@ -99,9 +99,8 @@
 //                throw new IllegalArgumentException("客户端密钥冲突，不能存在重复的密钥！");
 //            }
 //            //创建一个客户端
-//            ClientInfo clientInfo = new ClientInfo();
+//            ClientInfo clientInfo = new ClientInfo(secretKey);
 //            clientInfo.setName(name);
-//            clientInfo.setSecretKey(secretKey);
 //            List<Toml> proxies = client.getTables("proxies");
 //            if (proxies != null) {
 //                //代理信息配置
@@ -186,8 +185,7 @@
 //                    .ifPresent(mapping -> clientInfo.getProxyMappings().remove(mapping));
 //            //公网端口与内网端口建立映射
 //            portLocalServerMapping.remove(remotePort);
-//            //删除公网端口与已认证客户端的绑定
-//            ChannelManager.removeRemotePortToControlChannel(secretKey, remotePort);
+//
 //        }
 //        return true;
 //    }

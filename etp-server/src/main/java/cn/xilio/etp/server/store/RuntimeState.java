@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 运行时各种配置信息状态管理
+ * 用于统一管理运行时各种配置信息
  *
  * @author liuxin
  */
@@ -18,10 +18,18 @@ public final class RuntimeState {
         return INSTANCE;
     }
 
-    // secretKey -> 客户端运行时信息
+    /**
+     * secretKey -> 客户端运行时信息
+     */
     private final Map<String, ClientInfo> clients = new ConcurrentHashMap<>();
-    // 公网端口 -> 代理映射
-    private final Map<Integer, ProxyMapping> portMapping = new ConcurrentHashMap<>();
+    /**
+     * 公网端口 -> 内网端口
+     */
+    private final Map<Integer, Integer> portMapping = new ConcurrentHashMap<>();
+    /**
+     * secretKey -> remotePorts 用于客户端与其所有公网端口的映射，实现快速查找
+     */
+    private final Map<String, List<Integer>> clientRemotePorts = new ConcurrentHashMap<>();
 
     /**
      * 注册客户端
@@ -29,6 +37,23 @@ public final class RuntimeState {
      */
     public void registerClient(ClientInfo client) {
         clients.putIfAbsent(client.getSecretKey(), client);
+    }
+
+    public void updateClientName(String secretKey, String name) {
+        ClientInfo client = clients.get(secretKey);
+        if (client != null) {
+            client.setName(name);
+        }
+    }
+
+    /**
+     * 用于判断客户端是否存在与系统中，在认证授权的时候会用到
+     *
+     * @param secretKey 认证密钥
+     * @return 是否存在
+     */
+    public boolean hasClient(String secretKey) {
+        return clients.containsKey(secretKey);
     }
 
     /**
@@ -49,7 +74,15 @@ public final class RuntimeState {
      * 获取所有客户端信息
      */
     public Collection<ClientInfo> allClients() {
-        return Collections.unmodifiableCollection(clients.values());
+        Collection<ClientInfo> clientInfos = Collections.unmodifiableCollection(clients.values());
+        if (clientInfos.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return clientInfos;
+    }
+
+    public List<Integer> getClientRemotePorts(String secretKey) {
+        return clientRemotePorts.getOrDefault(secretKey, new ArrayList<>());
     }
 
     /**
@@ -58,9 +91,8 @@ public final class RuntimeState {
      * @param remotePort 公网端口
      * @return 如果没找到返回空
      */
-    public Integer getLocalPort(Integer remotePort) {
-        ProxyMapping proxyMapping = portMapping.get(remotePort);
-        return Objects.isNull(proxyMapping) ? null : proxyMapping.getLocalPort();
+    public int getLocalPort(Integer remotePort) {
+        return portMapping.get(remotePort);
     }
 
     /**
@@ -83,6 +115,8 @@ public final class RuntimeState {
         ClientInfo client = clients.get(secretKey);
         if (!Objects.isNull(client) && isPortOccupied(proxy.getRemotePort())) {
             client.getProxies().add(proxy);
+            clientRemotePorts.getOrDefault(secretKey, new ArrayList<>()).add(proxy.getRemotePort());
+            portMapping.put(proxy.getRemotePort(),proxy.getLocalPort());
             return true;
         }
         return false;
@@ -100,6 +134,30 @@ public final class RuntimeState {
         if (!Objects.isNull(client)) {
             List<ProxyMapping> proxies = client.getProxies();
             proxies.removeIf(proxy -> proxy.getRemotePort().equals(remotePort));
+            clientRemotePorts.getOrDefault(secretKey, new ArrayList<>()).remove(remotePort);
+            portMapping.remove(remotePort);
+        }
+        return false;
+    }
+
+    /**
+     * 更新端口映射的状态
+     *
+     * @param secretKey  客户端密钥
+     * @param remotePort 公网端口
+     * @param status     更新状态值
+     * @return 是否更新成功
+     */
+    public boolean updateProxyStatus(String secretKey, Integer remotePort, Integer status) {
+        ClientInfo client = clients.get(secretKey);
+        if (!Objects.isNull(client)) {
+            List<ProxyMapping> proxies = client.getProxies();
+            for (ProxyMapping proxy : proxies) {
+                if (proxy.getRemotePort().equals(remotePort)) {
+                    proxy.setStatus(status);
+                    return true;
+                }
+            }
         }
         return false;
     }

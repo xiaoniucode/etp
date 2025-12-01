@@ -43,7 +43,7 @@ public class TunnelServerStartup {
         tunnelServer = ServerFactory.createTunnelServer();
         tunnelServer.onSuccessListener(v -> {
             //绑定所有代理端口
-            TcpProxyServer.getInstance().start();
+            TcpProxyServer.get().start();
             //启动dashboard服务
             if (config.getDashboard().getEnable()) {
                 webServer = ServerFactory.createWebServer();
@@ -70,7 +70,7 @@ public class TunnelServerStartup {
             if (tunnelServer != null) {
                 tunnelServer.stop();
                 PortChecker.killPort(tunnelServer.getPort());
-                TcpProxyServer.getInstance().stop();
+                TcpProxyServer.get().stop();
             }
             if (webServer != null) {
                 webServer.stop();
