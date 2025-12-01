@@ -76,10 +76,7 @@
                     offset: '30px',
                     shade: false,
                     area: ['60%', '60%'],
-                    content: '/proxy/edit.html?id=' + data.id,
-                    end: function () {
-                        layui.table.reload('proxy');
-                    }
+                    content: '/proxy/edit.html?id=' + data.id
                 });
             } else if (obj.event === 'delete') {
                 layer.confirm('确定删除「' + data.name + '」代理吗？<br>此操作将会断开用户已经建立的连接！',
@@ -140,10 +137,7 @@
                     offset: '30px',
                     shade: false,
                     area: ['60%', '60%'],
-                    content: '/proxy/add.html',
-                    end: function () {
-                        layui.table.reload('proxy');
-                    }
+                    content: '/proxy/add.html'
                 });
             } else if (obj.event === 'flush') {
                 table.reload('proxy')

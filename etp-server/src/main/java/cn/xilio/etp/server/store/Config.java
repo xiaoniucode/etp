@@ -215,7 +215,7 @@ public class Config {
                 portLocalServerMapping.remove(oldRemotePort);
                 portLocalServerMapping.put(proxyMapping.getRemotePort(), proxyMapping.getLocalPort());
                 //将公网端口添加到客户端中
-                clientPublicNetworkPortMapping.get(secretKey).remove(oldRemotePort);
+                clientPublicNetworkPortMapping.get(secretKey).remove(Integer.valueOf(oldRemotePort));
                 clientPublicNetworkPortMapping.get(secretKey).add(proxyMapping.getRemotePort());
             }
         }
