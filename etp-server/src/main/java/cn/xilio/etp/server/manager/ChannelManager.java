@@ -5,8 +5,7 @@ import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,13 +18,18 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class ChannelManager {
     private static Logger logger = LoggerFactory.getLogger(ChannelManager.class);
     /**
-     * 内网代理客户端与控制通道映射
+     * 客户端与控制通道映射
      */
-    private static final Map<String, Channel> CONTROL_CHANNELS = new ConcurrentHashMap<>(4);
+    private static final Map<String, Channel> clientControlChannelMapping = new ConcurrentHashMap<>();
     /**
      * 公网服务端口与控制通道映射
      */
-    private static final Map<Integer, Channel> PORT_CONTROL_CHANNEL_MAPPING = new ConcurrentHashMap<>(64);
+    private static final Map<Integer, Channel> portControlChannelMapping = new ConcurrentHashMap<>();
+    /**
+     * 用于记录每个公网端口下有哪些活跃的连接channel
+     */
+    private static Map<Integer, Set<Channel>> activeChannels = new ConcurrentHashMap<>();
+
     private final static Lock LOCK = new ReentrantLock();
 
     /**
@@ -37,12 +41,12 @@ public final class ChannelManager {
      */
     public static void addControlChannel(List<Integer> remotePorts, String secretKey, Channel controlChannel) {
         for (Integer remotePort : remotePorts) {
-            PORT_CONTROL_CHANNEL_MAPPING.put(remotePort, controlChannel);
+            portControlChannelMapping.put(remotePort, controlChannel);
         }
         controlChannel.attr(EtpConstants.CHANNEL_PORT).set(remotePorts);
         controlChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
         controlChannel.attr(EtpConstants.CLIENT_CHANNELS).set(new ConcurrentHashMap<>());
-        CONTROL_CHANNELS.put(secretKey, controlChannel);
+        clientControlChannelMapping.put(secretKey, controlChannel);
     }
 
     /**
@@ -54,11 +58,11 @@ public final class ChannelManager {
     public static void addPortToControlChannelIfOnline(String secretKey, Integer remotePort) {
         LOCK.lock();
         try {
-            Channel controlChannel = CONTROL_CHANNELS.get(secretKey);
+            Channel controlChannel = clientControlChannelMapping.get(secretKey);
             if (null == controlChannel) {
                 return;
             }
-            PORT_CONTROL_CHANNEL_MAPPING.put(remotePort, controlChannel);
+            portControlChannelMapping.put(remotePort, controlChannel);
             controlChannel.attr(EtpConstants.CHANNEL_PORT).get().add(remotePort);
         } finally {
             LOCK.unlock();
@@ -66,11 +70,11 @@ public final class ChannelManager {
     }
 
     public static boolean clientIsOnline(String secretKey) {
-        return CONTROL_CHANNELS.get(secretKey) != null;
+        return clientControlChannelMapping.get(secretKey) != null;
     }
 
     public static void closeControlChannelByClient(String secretKey) {
-        Channel channel = CONTROL_CHANNELS.get(secretKey);
+        Channel channel = clientControlChannelMapping.get(secretKey);
         if (channel == null) {
             logger.warn("client channel is null");
             return;
@@ -79,8 +83,8 @@ public final class ChannelManager {
     }
 
     public static void removeRemotePortToControlChannel(String secretKey, int remotePort) {
-        CONTROL_CHANNELS.remove(secretKey);
-        PORT_CONTROL_CHANNEL_MAPPING.remove(remotePort);
+        clientControlChannelMapping.remove(secretKey);
+        portControlChannelMapping.remove(remotePort);
     }
 
     public static void clearControlChannel(Channel controlChannel) {
@@ -90,14 +94,14 @@ public final class ChannelManager {
         LOCK.lock();
         try {
             String secretKey = controlChannel.attr(EtpConstants.SECRET_KEY).get();
-            Channel existingChannel = CONTROL_CHANNELS.get(secretKey);
+            Channel existingChannel = clientControlChannelMapping.get(secretKey);
             if (controlChannel == existingChannel) {
-                CONTROL_CHANNELS.remove(secretKey);
+                clientControlChannelMapping.remove(secretKey);
             }
             List<Integer> remotePorts = controlChannel.attr(EtpConstants.CHANNEL_PORT).get();
             if (remotePorts != null) {
                 for (int port : remotePorts) {
-                    PORT_CONTROL_CHANNEL_MAPPING.remove(port);
+                    portControlChannelMapping.remove(port);
                 }
             }
         } finally {
@@ -119,11 +123,11 @@ public final class ChannelManager {
     }
 
     public static Channel getControlChannelByPort(int remotePort) {
-        return PORT_CONTROL_CHANNEL_MAPPING.get(remotePort);
+        return portControlChannelMapping.get(remotePort);
     }
 
     public static Channel getControlChannelBySecretKey(String secretKey) {
-        return CONTROL_CHANNELS.get(secretKey);
+        return clientControlChannelMapping.get(secretKey);
     }
 
     public static Channel getClientChannel(Channel controlChannel, Long sessionId) {
@@ -135,11 +139,25 @@ public final class ChannelManager {
         clientChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
     }
 
-    public static Channel removeClientChannelFromControlChannel(Channel controlChannel, Long sessionId) {
-        if (controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get() == null) {
-            return null;
+    public static void registerActiveConnection(int remotePort, Channel channel) {
+        activeChannels.computeIfAbsent(remotePort, k -> ConcurrentHashMap.newKeySet()).add(channel);
+    }
+
+    public static void unregisterActiveConnection(int remotePort, Channel channel) {
+        Set<Channel> set = activeChannels.get(remotePort);
+        if (set != null) {
+            set.remove(channel);
+            if (set.isEmpty()) {
+                activeChannels.remove(remotePort);
+            }
         }
-        return controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get().remove(sessionId);
+    }
+
+    public static Channel removeClientChannelFromControlChannel(Channel controlChannel, Long sessionId) {
+        if (controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get() != null) {
+            return controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get().remove(sessionId);
+        }
+        return null;
     }
 
     public static Map<Long, Channel> getClientChannelsByControlChannel(Channel controlChannel) {
@@ -154,6 +172,25 @@ public final class ChannelManager {
      * 获取在线客户端数量
      */
     public static int onlineClientCount() {
-        return CONTROL_CHANNELS.size();
+        return clientControlChannelMapping.size();
+    }
+
+    /**
+     * 获取公网端口所有的用户连接
+     *
+     * @param remotePort 公网端口
+     * @return 所有活跃的连接
+     */
+    public static Set<Channel> getActiveChannels(Integer remotePort) {
+        return activeChannels.get(remotePort);
+    }
+
+    /**
+     * 将公网端口用户连接完全删除
+     *
+     * @param remotePort 公网端口
+     */
+    public static void removeActiveChannels(Integer remotePort) {
+        activeChannels.remove(remotePort);
     }
 }

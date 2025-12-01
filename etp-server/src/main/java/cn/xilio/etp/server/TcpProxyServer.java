@@ -5,6 +5,7 @@ import cn.xilio.etp.common.PortFileUtil;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.server.handler.ClientChannelHandler;
+import cn.xilio.etp.server.manager.ChannelManager;
 import cn.xilio.etp.server.manager.PortAllocator;
 import cn.xilio.etp.server.manager.RuntimeState;
 import cn.xilio.etp.server.metrics.TrafficMetricsHandler;
@@ -19,10 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -71,6 +69,9 @@ public final class TcpProxyServer implements Lifecycle {
         bindAllProxyPort();
     }
 
+    /**
+     * 如果端口映射的status=1则启动
+     */
     private void bindAllProxyPort() {
         try {
             Collection<ClientInfo> clients = state.allClients();
@@ -78,20 +79,22 @@ public final class TcpProxyServer implements Lifecycle {
             for (ClientInfo client : clients) {
                 List<ProxyMapping> proxyMappings = client.getProxies();
                 for (ProxyMapping proxy : proxyMappings) {
-                    Integer remotePort = proxy.getRemotePort();
-                    if (portAllocator.isPortAvailable(remotePort)) {
-                        ChannelFuture future = serverBootstrap.bind(remotePort).sync();
-                        remotePortChannelMapping.put(remotePort, future.channel());
-                        StringBuilder portItem = new StringBuilder();
-                        portItem.append(client.getName()).append("\t")
-                                .append(proxy.getName()).append("\t")
-                                .append(proxy.getType().name()).append("\t")
-                                .append(proxy.getLocalPort()).append("\t")
-                                .append(remotePort);
-                        bindPorts.add(portItem);
-                        LOGGER.info("成功绑定端口: {}", remotePort);
-                    } else {
-                        LOGGER.warn("remotePort:{}端口正在被占用！", remotePort);
+                    if (proxy.getStatus() == 1) {
+                        Integer remotePort = proxy.getRemotePort();
+                        if (portAllocator.isPortAvailable(remotePort)) {
+                            ChannelFuture future = serverBootstrap.bind(remotePort).sync();
+                            remotePortChannelMapping.put(remotePort, future.channel());
+                            StringBuilder portItem = new StringBuilder();
+                            portItem.append(client.getName()).append("\t")
+                                    .append(proxy.getName()).append("\t")
+                                    .append(proxy.getType().name()).append("\t")
+                                    .append(proxy.getLocalPort()).append("\t")
+                                    .append(remotePort);
+                            bindPorts.add(portItem);
+                            LOGGER.info("成功绑定端口: {}", remotePort);
+                        } else {
+                            LOGGER.warn("remotePort:{}端口正在被占用！", remotePort);
+                        }
                     }
                 }
                 if (!bindPorts.isEmpty()) {
@@ -129,34 +132,37 @@ public final class TcpProxyServer implements Lifecycle {
     }
 
     /**
-     * 停掉一个指定的公网端口服务
+     * 停掉一个指定的公网端口服务,停止继续监听，后面无法再连接
      *
      * @param remotePort  需要停止的公网端口
      * @param releasePort 是否释放remotePort端口
      */
     public void stopRemotePort(Integer remotePort, boolean releasePort) {
         try {
-            Channel channel = remotePortChannelMapping.get(remotePort);
-            if (channel != null) {
-                try {
-                    // 关闭通道
-                    channel.close().sync();
-                    // 是否释放端口资源
-                    if (releasePort) {
-                        portAllocator.releasePort(remotePort);
-                        LOGGER.info("成功停止并释放公网端口: {}", remotePort);
-                    }
-                    LOGGER.info("{} 端口映射服务已停止", remotePort);
-                } catch (InterruptedException e) {
-                    LOGGER.error("停止端口 {} 失败: {}", remotePort, e.getMessage(), e);
-                    Thread.currentThread().interrupt();
-                } finally {
-                    remotePortChannelMapping.remove(remotePort);
+            // 1. 先关闭所有已建立的连接
+            Set<Channel> connections = ChannelManager.getActiveChannels(remotePort);
+            if (connections != null) {
+                for (Channel ch : connections) {
+                    ch.close();
                 }
-            } else {
-                LOGGER.warn("未找到绑定在端口 {} 的服务", remotePort);
+                LOGGER.info("已关闭 {} 个活跃连接", connections.size());
+                ChannelManager.removeActiveChannels(remotePort);
             }
-        } finally {
+            // 2. 再关闭监听通道
+            Channel serverChannel = remotePortChannelMapping.get(remotePort);
+            if (serverChannel != null) {
+                serverChannel.close().sync();
+                remotePortChannelMapping.remove(remotePort);
+            }
+            // 3. 释放端口
+            if (releasePort) {
+                portAllocator.releasePort(remotePort);
+                LOGGER.info("成功停止并释放公网端口: {}", remotePort);
+            } else {
+                LOGGER.info("{} 端口映射服务已停止（保留端口）", remotePort);
+            }
+        } catch (Exception e) {
+            LOGGER.error("停止端口 {} 失败", remotePort, e);
         }
     }
 

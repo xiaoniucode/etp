@@ -52,6 +52,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
             clientChannel.config().setOption(ChannelOption.AUTO_READ, false);
             int localPort = runtimeState.getLocalPort(sa.getPort());
             ChannelManager.addClientChannelToControlChannel(clientChannel, nextSessionId, controllChannel);
+            ChannelManager.registerActiveConnection(sa.getPort(), clientChannel);
             TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                     .setType(TunnelMessage.Message.Type.CONNECT)
                     .setSessionId(nextSessionId)
@@ -72,6 +73,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
         } else {
             Long sessionId = ChannelManager.getSessionIdByClientChannel(clientChannel);
             ChannelManager.removeClientChannelFromControlChannel(controlChannel, sessionId);
+            ChannelManager.unregisterActiveConnection(sa.getPort(), clientChannel);
             Channel dataChannel = clientChannel.attr(EtpConstants.DATA_CHANNEL).get();
             if (dataChannel != null && dataChannel.isActive()) {
                 dataChannel.attr(EtpConstants.REAL_SERVER_CHANNEL).getAndSet(null);
