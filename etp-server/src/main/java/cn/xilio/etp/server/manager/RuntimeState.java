@@ -1,4 +1,9 @@
-package cn.xilio.etp.server.store;
+package cn.xilio.etp.server.manager;
+
+import cn.xilio.etp.server.config.ClientInfo;
+import cn.xilio.etp.server.config.ProxyMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author liuxin
  */
 public final class RuntimeState {
+    private Logger logger = LoggerFactory.getLogger(RuntimeState.class);
     private static final RuntimeState INSTANCE = new RuntimeState();
 
     private RuntimeState() {
@@ -37,6 +43,7 @@ public final class RuntimeState {
      */
     public void registerClient(ClientInfo client) {
         clients.putIfAbsent(client.getSecretKey(), client);
+        clientRemotePorts.put(client.getSecretKey(), new ArrayList<>());
     }
 
     public void updateClientName(String secretKey, String name) {
@@ -113,10 +120,11 @@ public final class RuntimeState {
      */
     public boolean registerProxy(String secretKey, ProxyMapping proxy) {
         ClientInfo client = clients.get(secretKey);
-        if (!Objects.isNull(client) && isPortOccupied(proxy.getRemotePort())) {
+        if (!Objects.isNull(client) && !isPortOccupied(proxy.getRemotePort())) {
             client.getProxies().add(proxy);
             clientRemotePorts.getOrDefault(secretKey, new ArrayList<>()).add(proxy.getRemotePort());
-            portMapping.put(proxy.getRemotePort(),proxy.getLocalPort());
+            portMapping.put(proxy.getRemotePort(), proxy.getLocalPort());
+            logger.info("映射{} - {} 已经被注册", proxy.getName(), proxy.getRemotePort());
             return true;
         }
         return false;

@@ -1,4 +1,4 @@
-package cn.xilio.etp.server;
+package cn.xilio.etp.server.manager;
 
 import cn.xilio.etp.core.EtpConstants;
 import io.netty.channel.Channel;

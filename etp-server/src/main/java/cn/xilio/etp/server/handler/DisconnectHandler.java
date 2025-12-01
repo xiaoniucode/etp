@@ -4,7 +4,7 @@ import cn.xilio.etp.core.AbstractMessageHandler;
 import cn.xilio.etp.core.ChannelUtils;
 import cn.xilio.etp.core.EtpConstants;
 import cn.xilio.etp.core.protocol.TunnelMessage;
-import cn.xilio.etp.server.ChannelManager;
+import cn.xilio.etp.server.manager.ChannelManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 

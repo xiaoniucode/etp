@@ -1,6 +1,5 @@
-package cn.xilio.etp.server.store;
+package cn.xilio.etp.server.config;
 
-import cn.xilio.etp.common.StringUtils;
 import cn.xilio.etp.common.TomlUtils;
 import cn.xilio.etp.core.protocol.ProtocolType;
 import com.moandjiezana.toml.Toml;

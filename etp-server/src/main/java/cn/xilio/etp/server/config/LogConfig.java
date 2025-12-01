@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.store;
+package cn.xilio.etp.server.config;
 
 /**
  * @author liuxin

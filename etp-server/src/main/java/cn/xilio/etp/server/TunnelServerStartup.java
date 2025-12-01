@@ -4,9 +4,8 @@ import ch.qos.logback.classic.Level;
 import cn.xilio.etp.common.ConfigUtils;
 import cn.xilio.etp.common.LogbackConfigurator;
 import cn.xilio.etp.common.PortChecker;
-import cn.xilio.etp.server.store.AppConfig;
+import cn.xilio.etp.server.config.AppConfig;
 import cn.xilio.etp.server.web.DashboardApi;
-import cn.xilio.etp.server.web.EtpDbInit;
 import cn.xilio.etp.server.web.framework.NettyWebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,16 +41,16 @@ public class TunnelServerStartup {
         registerShutdownHook(tunnelServer);
         tunnelServer = ServerFactory.createTunnelServer();
         tunnelServer.onSuccessListener(v -> {
-            //绑定所有代理端口
-            TcpProxyServer.get().start();
             //启动dashboard服务
             if (config.getDashboard().getEnable()) {
                 webServer = ServerFactory.createWebServer();
                 DashboardApi.initFilters(webServer.getFilters());/*web过滤器*/
                 DashboardApi.initRoutes(webServer.getRouter());/*web接口*/
-                EtpDbInit.initTable();/*初始化数据库表*/
+                EtpInitialize.init();
                 webServer.start();
             }
+            //绑定所有代理端口
+            TcpProxyServer.get().start();
         });
         tunnelServer.start();
     }

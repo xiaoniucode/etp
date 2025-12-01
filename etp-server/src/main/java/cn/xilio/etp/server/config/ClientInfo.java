@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.store;
+package cn.xilio.etp.server.config;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package cn.xilio.etp.server;
 
-import cn.xilio.etp.server.store.AppConfig;
+import cn.xilio.etp.server.config.AppConfig;
 import cn.xilio.etp.server.web.framework.NettyWebServer;
 
 /**

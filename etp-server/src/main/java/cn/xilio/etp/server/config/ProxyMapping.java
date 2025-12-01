@@ -1,8 +1,6 @@
-package cn.xilio.etp.server.store;
+package cn.xilio.etp.server.config;
 
 import cn.xilio.etp.core.protocol.ProtocolType;
-
-import java.io.Serializable;
 
 /**
  * 端口映射信息

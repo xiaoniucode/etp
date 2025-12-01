@@ -2,8 +2,8 @@ package cn.xilio.etp.server.handler;
 
 import cn.xilio.etp.core.EtpConstants;
 import cn.xilio.etp.core.protocol.TunnelMessage;
-import cn.xilio.etp.server.ChannelManager;
-import cn.xilio.etp.server.store.RuntimeState;
+import cn.xilio.etp.server.manager.ChannelManager;
+import cn.xilio.etp.server.manager.RuntimeState;
 import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
