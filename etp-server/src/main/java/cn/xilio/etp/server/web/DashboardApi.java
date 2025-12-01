@@ -43,7 +43,7 @@ public class DashboardApi {
             context.setResponseContent(ResponseEntity.ok(data).toJson());
         });
         router.addRoute(HttpMethod.DELETE, "/user/logout", context -> {
-
+            context.setResponseContent(ResponseEntity.ok().toJson());
         });
         router.addRoute(HttpMethod.GET, "/user/info", context -> {
 
