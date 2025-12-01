@@ -10,19 +10,27 @@
 <table class="layui-hide" id="proxy" lay-filter="proxy"></table>
 <script type="text/html" id="headerToobar">
     <div class="layui-btn-container">
-        <button class="layui-btn layui-btn-sm" lay-event="add">新增</button>
-        <button class="layui-btn layui-btn-sm" lay-event="flush">刷新</button>
+        <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add">
+            <i class="layui-icon layui-icon-add-1"></i> 新增
+        </button>
+        <button class="layui-btn layui-btn-sm" lay-event="flush">
+            <i class="layui-icon layui-icon-refresh"></i> 刷新
+        </button>
     </div>
 </script>
 <script type="text/html" id="post_table_tool">
     <div class="layui-clear-space">
-        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-        <a class="layui-btn layui-btn-xs" lay-event="delete">删除</a>
+        <a class="layui-btn layui-btn-xs " lay-event="edit" title="编辑">
+            <i class="layui-icon layui-icon-edit"></i> 编辑
+        </a>
+        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete" title="删除">
+            <i class="layui-icon layui-icon-delete"></i> 删除
+        </a>
     </div>
 </script>
 <script src="/static/layui/layui.js"></script>
 <script>
-    layui.use(['form', 'table', 'dropdown','jquery'], function () {
+    layui.use(['form', 'table', 'dropdown', 'jquery'], function () {
         const table = layui.table;
         const $ = layui.$;
         table.render({
@@ -52,7 +60,7 @@
                         return '<input type="checkbox" lay-skin="switch" lay-text="开启|关闭" lay-event="statusSwitch" ' + isChecked + '>';
                     }
                 },
-                {fixed: 'right', title: '操作', width: 134, minWidth: 125, templet: '#post_table_tool'}
+                {fixed: 'right', title: '操作', width: 180, templet: '#post_table_tool'}
             ]],
             error: function (res, msg) {
                 console.log(res, msg)
@@ -61,7 +69,7 @@
         //单元格操作事件
         table.on('tool(proxy)', function (obj) {
             const data = obj.data;
-             if (obj.event === 'edit') {
+            if (obj.event === 'edit') {
                 layer.open({
                     title: '编辑',
                     type: 2,
@@ -74,54 +82,54 @@
                     }
                 });
             } else if (obj.event === 'delete') {
-                 layer.confirm('确定删除「' + data.name + '」代理吗？<br>此操作将会关闭已经建立的连接！',
-                     {
-                         icon: 2,
-                         title:'危险操作确认',
-                         skin: 'layui-layer-molv',
-                         btn: ['确认删除', '我再想想'],
-                     }, function(index){
-                         $.ajax({
-                             url: '/proxy/del',
-                             type: 'delete',
-                             contentType: 'application/json',
-                             data: JSON.stringify({id: data.id,secretKey:data.secretKey}),
-                             headers: {},
-                             success: function (res) {
-                                 if (res.code === 0) {
-                                     table.reload('proxy')
-                                     layer.msg("删除成功", {time: 2000});
-                                 } else {
-                                     layer.msg(res.message, {time: 2000});
-                                 }
-                             },
-                         });
-                     })
+                layer.confirm('确定删除「' + data.name + '」代理吗？<br>此操作将会断开用户已经建立的连接！',
+                    {
+                        icon: 2,
+                        title: '危险操作确认',
+                        skin: 'layui-layer-molv',
+                        btn: ['确认删除', '我再想想'],
+                    }, function (index) {
+                        $.ajax({
+                            url: '/proxy/del',
+                            type: 'delete',
+                            contentType: 'application/json',
+                            data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
+                            headers: {},
+                            success: function (res) {
+                                if (res.code === 0) {
+                                    table.reload('proxy')
+                                    layer.msg("删除成功", {time: 2000});
+                                } else {
+                                    layer.msg(res.message, {time: 2000});
+                                }
+                            },
+                        });
+                    })
 
-            }else if (obj.event==='statusSwitch'){
-                 const loading = layer.msg('正在切换...', {icon: 16, shade: 0.3, time: 0});
-                 $.ajax({
-                     url: '/proxy/switch-proxy-status',
-                     type: 'put',
-                     contentType: 'application/json',
-                     data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
-                     success: function (res) {
-                         layer.close(loading);
-                         if (res.code === 0) {
-                             layer.msg('切换成功', {icon: 1});
-                         } else {
-                             layer.msg(res.message, {icon: 2});
-                             obj.update({ status: data.status });//回滚状态
-                         }
-                     },
-                     error: function () {
-                         layer.close(loading);
-                         layer.msg('网络错误', {icon: 2});
-                         obj.update({ status: data.status }); // 回滚
-                     }
-                 });
+            } else if (obj.event === 'statusSwitch') {
+                const loading = layer.msg('正在切换...', {icon: 16, shade: 0.3, time: 0});
+                $.ajax({
+                    url: '/proxy/switch-proxy-status',
+                    type: 'put',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
+                    success: function (res) {
+                        layer.close(loading);
+                        if (res.code === 0) {
+                            layer.msg('切换成功', {icon: 1});
+                        } else {
+                            layer.msg(res.message, {icon: 2});
+                            obj.update({status: data.status});//回滚状态
+                        }
+                    },
+                    error: function () {
+                        layer.close(loading);
+                        layer.msg('网络错误', {icon: 2});
+                        obj.update({status: data.status}); // 回滚
+                    }
+                });
 
-             }
+            }
         })
         //操作工具栏
         table.on('toolbar(proxy)', function (obj) {

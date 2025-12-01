@@ -200,6 +200,7 @@ public class Config {
      * @return 是否更新成功
      */
     public boolean updateProxyMapping(String secretKey, int oldRemotePort, ProxyMapping proxyMapping) {
+       //todo 有严重bug 需要修复
         List<Integer> remotePorts = clientPublicNetworkPortMapping.get(secretKey);
         remotePorts.remove(Integer.valueOf(oldRemotePort));
         remotePorts.add(proxyMapping.getRemotePort());
@@ -217,7 +218,6 @@ public class Config {
                 clientPublicNetworkPortMapping.get(secretKey).remove(oldRemotePort);
                 clientPublicNetworkPortMapping.get(secretKey).add(proxyMapping.getRemotePort());
             }
-
         }
         return false;
     }

@@ -8,14 +8,16 @@
 </head>
 <body>
 <blockquote class="layui-elem-quote">
-   统计信息目前尚未做持久化，未来版本会完善！
+    统计信息目前尚未做持久化，未来版本会完善！
 </blockquote>
 <script type="text/html" id="statsToolbar">
     <div class="layui-btn-container">
-        <button class="layui-btn layui-btn-sm" lay-event="flushTable">刷新</button>
+        <button class="layui-btn layui-btn-sm" lay-event="flush">
+            <i class="layui-icon layui-icon-refresh"></i> 刷新
+        </button>
     </div>
 </script>
-<table class="layui-hide" id="test" lay-filter="test"></table>
+<table class="layui-hide" id="metrics" lay-filter="metrics"></table>
 <script type="text/html" id="post_table_tool">
     <div class="layui-clear-space">
         <a class="layui-btn layui-btn-xs" lay-event="view">详细</a>
@@ -26,7 +28,7 @@
     layui.use(['form', 'table', 'dropdown'], function () {
         const table = layui.table;
         table.render({
-            elem: '#test',
+            elem: '#metrics',
             text: "空空如也",
             skin: "line",
             url: '/metrics',
@@ -45,6 +47,13 @@
                 console.log(res, msg)
             }
         });
+
+        //操作工具栏
+        table.on('toolbar(metrics)', function (obj) {
+            if (obj.event === 'flush') {
+                table.reload('metrics')
+            }
+        })
     });
 </script>
 </body>

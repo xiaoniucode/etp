@@ -116,8 +116,8 @@ public final class ConfigService {
         if (req.getInt("status") == 1) {
             TcpProxyServer.getInstance().startRemotePort(req.getInt("remotePort"));
         } else {
-            //将公网端口添加到已分配缓存
-            PortAllocator.getInstance().addRemotePort(req.getInt("remotePort"));
+            //停止对应端口的代理映射服务
+            TcpProxyServer.getInstance().stopRemotePort(req.getInt("remotePort"),false);
         }
     }
 

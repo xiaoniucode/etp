@@ -150,7 +150,7 @@ public class TcpProxyServer implements Lifecycle {
                 ChannelFuture future = serverBootstrap.bind(remotePort).sync();
                 remotePortChannelMapping.put(remotePort, future.channel());
                 portAllocator.addRemotePort(remotePort);
-                LOGGER.info("{}服务启动成功", remotePort);
+                LOGGER.info("{} 服务启动成功", remotePort);
             }
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
@@ -178,16 +178,16 @@ public class TcpProxyServer implements Lifecycle {
                 try {
                     // 关闭通道
                     channel.close().sync();
-                    // 释放端口资源
+                    // 是否释放端口资源
                     if (releasePort) {
                         portAllocator.releasePort(remotePort);
                         LOGGER.info("成功停止并释放公网端口: {}", remotePort);
                     }
+                    LOGGER.info("{} 端口映射服务已停止", remotePort);
                 } catch (InterruptedException e) {
                     LOGGER.error("停止端口 {} 失败: {}", remotePort, e.getMessage(), e);
                     Thread.currentThread().interrupt();
                 } finally {
-                    // 从映射中移除
                     remotePortChannelMapping.remove(remotePort);
                 }
             } else {
