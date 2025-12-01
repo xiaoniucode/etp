@@ -1,6 +1,6 @@
 package cn.xilio.etp.server;
 
-import cn.xilio.etp.server.store.Config;
+import cn.xilio.etp.server.store.AppConfig;
 import cn.xilio.etp.server.web.framework.NettyWebServer;
 
 /**
@@ -9,14 +9,14 @@ import cn.xilio.etp.server.web.framework.NettyWebServer;
 public final class ServerFactory {
     public static TunnelServer createTunnelServer() {
         TunnelServer tunnelServer = new TunnelServer();
-        tunnelServer.setHost(Config.getInstance().getHost());
-        tunnelServer.setPort(Config.getInstance().getBindPort());
-        tunnelServer.setSsl(Config.getInstance().isSsl());
+        tunnelServer.setHost(AppConfig.get().getHost());
+        tunnelServer.setPort(AppConfig.get().getBindPort());
+        tunnelServer.setSsl(AppConfig.get().isTls());
         return tunnelServer;
     }
 
     public static NettyWebServer createWebServer() {
-        Config config = Config.getInstance();
+        AppConfig config = AppConfig.get();
         NettyWebServer web = new NettyWebServer();
         if (config.getDashboard().getPort() != null) {
             web.setPort(config.getDashboard().getPort());

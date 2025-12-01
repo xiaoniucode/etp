@@ -1,6 +1,5 @@
 package cn.xilio.etp.server.store;
 
-import cn.xilio.etp.common.StringUtils;
 import cn.xilio.etp.common.TomlUtils;
 import cn.xilio.etp.core.protocol.ProtocolType;
 import com.moandjiezana.toml.Toml;
@@ -18,7 +17,7 @@ public final class AppConfig {
     private AppConfig() {
     }
 
-    public AppConfig get() {
+    public static AppConfig get() {
         return INSTANCE;
     }
 
@@ -26,10 +25,11 @@ public final class AppConfig {
     private int bindPort;
     private boolean tls;
     private KeystoreConfig keystoreConfig;
+    private LogConfig logConfig;
     private Dashboard dashboard;
-    private List<ClientInfo> clients = new ArrayList<>();
+    private final List<ClientInfo> clients = new ArrayList<>();
 
-    public void load(String path) {
+    public AppConfig load(String path) {
         //顺序解析下面各种配置
         Toml root = TomlUtils.readToml(path);
         //解析Root配置
@@ -42,17 +42,30 @@ public final class AppConfig {
         parseClient(root);
         //解析日志配置
         parseLogConfig(root);
+        return this;
+    }
+
+    private void parseRoot(Toml root) {
+        if (root.contains("bindPort")) {
+            bindPort = root.getLong("bindPort").intValue();
+        }
+        if (root.contains("host")) {
+            host = root.getString("host");
+        }
+        Boolean tlsValue = root.getBoolean("tls");
+        tls = (tlsValue != null) ? tlsValue : false;
     }
 
     private void parseLogConfig(Toml root) {
-
+        Toml log = root.getTable("log");
+        if (log != null) {
+            String level = log.getString("level");
+            String pattern = log.getString("pattern");
+            String path = log.getString("path");
+            logConfig = new LogConfig(path, level, pattern);
+        }
     }
 
-    /**
-     * 解析客户端配置信息
-     *
-     * @param root Toml根节点
-     */
     private void parseClient(Toml root) {
         List<Toml> readClients = root.getTables("clients");
         if (readClients == null) {
@@ -149,14 +162,31 @@ public final class AppConfig {
         }
     }
 
-    private void parseRoot(Toml root) {
-        if (root.contains("bindPort")) {
-            bindPort = root.getLong("bindPort").intValue();
-        }
-        if (root.contains("host")) {
-            host = root.getString("host");
-        }
-        Boolean tlsValue = root.getBoolean("tls");
-        tls = (tlsValue != null) ? tlsValue : false;
+    public String getHost() {
+        return host;
+    }
+
+    public int getBindPort() {
+        return bindPort;
+    }
+
+    public boolean isTls() {
+        return tls;
+    }
+
+    public KeystoreConfig getKeystoreConfig() {
+        return keystoreConfig;
+    }
+
+    public LogConfig getLogConfig() {
+        return logConfig;
+    }
+
+    public Dashboard getDashboard() {
+        return dashboard;
+    }
+
+    public List<ClientInfo> getClients() {
+        return clients;
     }
 }

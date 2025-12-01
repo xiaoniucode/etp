@@ -4,7 +4,7 @@ import ch.qos.logback.classic.Level;
 import cn.xilio.etp.common.ConfigUtils;
 import cn.xilio.etp.common.LogbackConfigurator;
 import cn.xilio.etp.common.PortChecker;
-import cn.xilio.etp.server.store.Config;
+import cn.xilio.etp.server.store.AppConfig;
 import cn.xilio.etp.server.web.DashboardApi;
 import cn.xilio.etp.server.web.EtpDbInit;
 import cn.xilio.etp.server.web.framework.NettyWebServer;
@@ -32,9 +32,9 @@ public class TunnelServerStartup {
             return;
         }
         //加载配置文件
-        Config.init(configPath);
+        AppConfig config = AppConfig.get().load(configPath);
         initLogback();/*初始化日志*/
-        Integer bindPort = Config.getInstance().getBindPort();
+        int bindPort = config.getBindPort();
         if (PortChecker.isPortOccupied(bindPort)) {
             logger.error("{}端口已经被占用", bindPort);
             return;
@@ -45,7 +45,7 @@ public class TunnelServerStartup {
             //绑定所有代理端口
             TcpProxyServer.getInstance().start();
             //启动dashboard服务
-            if (Config.getInstance().getDashboard().getEnable()) {
+            if (config.getDashboard().getEnable()) {
                 webServer = ServerFactory.createWebServer();
                 DashboardApi.initFilters(webServer.getFilters());/*web过滤器*/
                 DashboardApi.initRoutes(webServer.getRouter());/*web接口*/
