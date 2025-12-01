@@ -5,9 +5,7 @@ import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.NettyEventLoopFactory;
 import cn.xilio.etp.server.handler.ClientChannelHandler;
 import cn.xilio.etp.server.metrics.TrafficMetricsHandler;
-import cn.xilio.etp.server.store.ClientInfo;
-import cn.xilio.etp.server.store.Config;
-import cn.xilio.etp.server.store.ProxyMapping;
+import cn.xilio.etp.server.store.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -19,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,7 +41,7 @@ public class TcpProxyServer implements Lifecycle {
     private final Map<Integer, Channel> remotePortChannelMapping = new ConcurrentHashMap<>();
     private final PortAllocator portAllocator;
     private ServerBootstrap serverBootstrap;
-
+    private final RuntimeState state = RuntimeState.get();
     private TcpProxyServer() {
         this.portAllocator = PortAllocator.getInstance();
     }
@@ -77,11 +76,11 @@ public class TcpProxyServer implements Lifecycle {
                     });
             try {
                 //绑定所有客户端端口代理
-                List<ClientInfo> clients = Config.getInstance().getClients();
+                Collection<ClientInfo> clients = state.allClients();
                 List<StringBuilder> bindPorts = new ArrayList<>();
-                if (clients != null && !clients.isEmpty()) {
+                if (!clients.isEmpty()) {
                     for (ClientInfo client : clients) {
-                        List<ProxyMapping> proxyMappings = client.getProxyMappings();
+                        List<ProxyMapping> proxyMappings = client.getProxies();
                         if (proxyMappings != null && !proxyMappings.isEmpty()) {
                             for (ProxyMapping proxy : proxyMappings) {
                                 Integer remotePort = proxy.getRemotePort();

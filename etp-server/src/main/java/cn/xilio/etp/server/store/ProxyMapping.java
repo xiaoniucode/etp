@@ -5,10 +5,15 @@ import cn.xilio.etp.core.protocol.ProtocolType;
 import java.io.Serializable;
 
 /**
- * 代理映射信息
+ * 端口映射信息
+ *
  * @author liuxin
  */
-public class ProxyMapping implements Serializable {
+public class ProxyMapping {
+    /**
+     * 端口映射ID，管理面板使用
+     */
+    private Integer proxyId;
     /**
      * 代理名称 自定义
      */
@@ -22,7 +27,7 @@ public class ProxyMapping implements Serializable {
      */
     private Integer localPort;
     /**
-     * 远程服务端口
+     * 公网服务端口，在对应IP范围内具备全局唯一性
      */
     private Integer remotePort;
     /**

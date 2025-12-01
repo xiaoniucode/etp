@@ -1,32 +1,30 @@
 package cn.xilio.etp.server.store;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 客户端
  * @author liuxin
  */
-public class ClientInfo implements Serializable {
+public class ClientInfo {
     /**
-     * 客户端名称
+     * 客户端名字
      */
     private String name;
     /**
-     * 客户端密钥，用于与代理服务器通信认证
+     * 客户端认证密钥
      */
     private String secretKey;
     /**
-     * 代理映射信息，一个内网服务端口对应一个外网服务端口
+     * 客户端ID，用于管理面板快速获取ID
      */
-    private List<ProxyMapping> proxyMappings;
+    private Integer clientId;
+    //客户端所有的端口映射信息
+    private  List<ProxyMapping> proxies = new ArrayList<>();
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public ClientInfo(String secretKey) {
+        this.secretKey = secretKey;
     }
 
     public String getSecretKey() {
@@ -37,11 +35,28 @@ public class ClientInfo implements Serializable {
         this.secretKey = secretKey;
     }
 
-    public List<ProxyMapping> getProxyMappings() {
-        return proxyMappings;
+    public Integer getClientId() {
+        return clientId;
     }
 
-    public void setProxyMappings(List<ProxyMapping> proxyMappings) {
-        this.proxyMappings = proxyMappings;
+    public void setClientId(Integer clientId) {
+        this.clientId = clientId;
+    }
+
+    public List<ProxyMapping> getProxies() {
+        return proxies;
+    }
+
+    public void setProxies(List<ProxyMapping> proxies) {
+        this.proxies = proxies;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
+

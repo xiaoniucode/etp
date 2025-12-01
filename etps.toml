@@ -16,15 +16,16 @@ storePass = "3FbV8R8VW49O"
 #remotePort = 9879
 #type = "tcp"
 #
-
+#---------------------------日志--------------------------------#
 [log]
 level = "info"
 pattern = ""
 
 [dashboard]
-enable_tls = false
-password = "123456"
-port = 8080
 enable = true
 addr = "localhost"
+port = 8080
 username = "admin"
+password = "123456"
+
+
