@@ -10,11 +10,11 @@ storePass = "3FbV8R8VW49O"
 secretKey = "4b0063baa5ae47c2910fc25265aae4132"
 name = "静态客户端"
 
-[[clients.proxies]]
-localPort = 3306
-name = "静态配置"
-remotePort = 9879
-type = "tcp"
+#[[clients.proxies]]
+#localPort = 3306
+#name = "静态配置"
+#remotePort = 9879
+#type = "tcp"
 #
 #---------------------------日志--------------------------------#
 [log]

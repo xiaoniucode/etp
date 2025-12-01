@@ -128,7 +128,7 @@ public final class RuntimeState {
             client.getProxies().add(proxy);
             clientRemotePorts.getOrDefault(secretKey, new ArrayList<>()).add(proxy.getRemotePort());
             portMapping.put(proxy.getRemotePort(), proxy.getLocalPort());
-            logger.info("映射{} - {} 已经被注册", proxy.getName(), proxy.getRemotePort());
+            logger.info("映射{} - {} 注册成功", proxy.getName(), proxy.getRemotePort());
             return true;
         }
         return false;
