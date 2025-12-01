@@ -181,7 +181,7 @@ public final class ChannelManager {
      * @param remotePort 公网端口
      * @return 所有活跃的连接
      */
-    public static Set<Channel> getActiveChannels(Integer remotePort) {
+    public static Set<Channel> getActiveChannelsByRemotePort(Integer remotePort) {
         return activeChannels.get(remotePort);
     }
 

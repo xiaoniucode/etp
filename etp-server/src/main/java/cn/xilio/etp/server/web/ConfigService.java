@@ -98,26 +98,33 @@ public final class ConfigService {
 
     public static void updateProxy(JSONObject req) {
         JSONObject oldProxy = configStore.getProxyById(req.getInt("id"));
+        int oldRemotePort = oldProxy.getInt("remotePort");
         //如果没有设置公网端口，自动分配一个
+        boolean remotePortChanged = false;
         if (!StringUtils.hasText(req.getString("remotePort"))) {
             int allocatePort = PortAllocator.getInstance().allocateAvailablePort();
             req.put("remotePort", allocatePort);
+            remotePortChanged = true;
         } else {
             //如果有公网端口，如果发生改变，需要判断端口是否可用
-            int oldRemotePort = oldProxy.getInt("remotePort");
             if (req.getInt("remotePort") != oldRemotePort) {
+                remotePortChanged = true;
                 if (!PortAllocator.getInstance().isPortAvailable(req.getInt("remotePort"))) {
                     throw new BizException("公网端口不可用");
                 }
             }
         }
         configStore.updateProxy(req);
-        //添加到Config内存
-        JSONObject proxy = configStore.getProxyById(req.getInt("id"));
         //删除已经注册的映射
-        state.removeProxy(req.getString("secretKey"), proxy.getInt("remotePort"));
+        state.removeProxy(req.getString("secretKey"), oldProxy.getInt("remotePort"));
         //重新注册更新后的映射
         state.registerProxy(req.getString("secretKey"), createProxyMapping(req));
+        //如果客户度已经启动认证
+        ChannelManager.addPortToControlChannelIfOnline(req.getString("secretKey"), req.getInt("remotePort"));
+        //公网端口发生更新，需要停掉之前的服务连接
+        if (remotePortChanged) {
+            TcpProxyServer.get().stopRemotePort(oldRemotePort, true);
+        }
         //如果状态是1，需要启动代理服务
         if (req.getInt("status") == 1) {
             TcpProxyServer.get().startRemotePort(req.getInt("remotePort"));
@@ -128,7 +135,7 @@ public final class ConfigService {
     }
 
     private static ProxyMapping createProxyMapping(JSONObject req) {
-        ProxyMapping proxyMapping = new ProxyMapping(ProtocolType.getType(req.getString("type")),req.getInt("localPort"),req.getInt("remotePort"));
+        ProxyMapping proxyMapping = new ProxyMapping(ProtocolType.getType(req.getString("type")), req.getInt("localPort"), req.getInt("remotePort"));
         proxyMapping.setProxyId(req.getInt("clientId"));
         proxyMapping.setName(req.getString("name"));
         proxyMapping.setStatus(req.getInt("status"));

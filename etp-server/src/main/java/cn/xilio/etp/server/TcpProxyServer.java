@@ -1,6 +1,5 @@
 package cn.xilio.etp.server;
 
-import cn.xilio.etp.common.PortChecker;
 import cn.xilio.etp.common.PortFileUtil;
 import cn.xilio.etp.core.Lifecycle;
 import cn.xilio.etp.core.NettyEventLoopFactory;
@@ -140,7 +139,7 @@ public final class TcpProxyServer implements Lifecycle {
     public void stopRemotePort(Integer remotePort, boolean releasePort) {
         try {
             // 1. 先关闭所有已建立的连接
-            Set<Channel> connections = ChannelManager.getActiveChannels(remotePort);
+            Set<Channel> connections = ChannelManager.getActiveChannelsByRemotePort(remotePort);
             if (connections != null) {
                 for (Channel ch : connections) {
                     ch.close();
@@ -187,7 +186,6 @@ public final class TcpProxyServer implements Lifecycle {
                 }
             }
             remotePortChannelMapping.clear();
-            // 优雅关闭事件循环组
             if (bossGroup != null) {
                 bossGroup.shutdownGracefully();
             }
@@ -197,7 +195,6 @@ public final class TcpProxyServer implements Lifecycle {
             LOGGER.info("TCP代理服务器已停止");
         } catch (Exception e) {
             LOGGER.error("TCP代理服务器停止失败", e);
-        } finally {
         }
     }
 }
