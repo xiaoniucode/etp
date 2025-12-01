@@ -41,15 +41,14 @@ public class TunnelServerStartup {
         registerShutdownHook(tunnelServer);
         tunnelServer = ServerFactory.createTunnelServer();
         tunnelServer.onSuccessListener(v -> {
+            EtpInitialize.initDataConfig();
             //启动dashboard服务
             if (config.getDashboard().getEnable()) {
                 webServer = ServerFactory.createWebServer();
                 DashboardApi.initFilters(webServer.getFilters());/*web过滤器*/
                 DashboardApi.initRoutes(webServer.getRouter());/*web接口*/
-                EtpInitialize.init();
                 webServer.start();
             }
-            //绑定所有代理端口
             TcpProxyServer.get().start();
         });
         tunnelServer.start();

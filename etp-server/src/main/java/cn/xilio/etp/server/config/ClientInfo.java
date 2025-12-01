@@ -26,6 +26,11 @@ public class ClientInfo {
         this.secretKey = secretKey;
     }
 
+    public ClientInfo(String name, String secretKey) {
+        this.name = name;
+        this.secretKey = secretKey;
+    }
+
     public String getSecretKey() {
         return secretKey;
     }

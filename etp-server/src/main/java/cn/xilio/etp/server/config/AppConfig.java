@@ -1,5 +1,6 @@
 package cn.xilio.etp.server.config;
 
+import cn.xilio.etp.common.StringUtils;
 import cn.xilio.etp.common.TomlUtils;
 import cn.xilio.etp.core.protocol.ProtocolType;
 import com.moandjiezana.toml.Toml;
@@ -77,6 +78,9 @@ public final class AppConfig {
         for (Toml client : readClients) {
             String name = client.getString("name");
             String secretKey = client.getString("secretKey");
+            if (!StringUtils.hasText(name)) {
+                throw new IllegalArgumentException("必须制定客户端的名称！");
+            }
             if (tokenTemp.contains(secretKey)) {
                 throw new IllegalArgumentException("客户端[密钥]冲突，不能存在重复的密钥！ " + secretKey);
             }

@@ -42,6 +42,10 @@ public final class RuntimeState {
      * secretKey不能为空，否则无法注册
      */
     public void registerClient(ClientInfo client) {
+        if (clients.containsKey(client.getSecretKey())) {
+            logger.warn("改客户端已经被注册！");
+            return;
+        }
         clients.putIfAbsent(client.getSecretKey(), client);
         clientRemotePorts.put(client.getSecretKey(), new ArrayList<>());
     }
@@ -128,6 +132,18 @@ public final class RuntimeState {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 判断时候已经注册了相同的端口映射
+     *
+     * @param secretKey  客户端密钥
+     * @param remotePort 公网端口
+     * @return 是否已经注册
+     */
+    public boolean hasProxy(String secretKey, Integer remotePort) {
+        List<Integer> remotePorts = clientRemotePorts.get(secretKey);
+        return remotePorts.contains(remotePort);
     }
 
     /**

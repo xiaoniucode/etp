@@ -1,16 +1,20 @@
 package cn.xilio.etp.server;
 
 import cn.xilio.etp.core.protocol.ProtocolType;
+import cn.xilio.etp.server.config.AppConfig;
 import cn.xilio.etp.server.config.ClientInfo;
 import cn.xilio.etp.server.config.ProxyMapping;
 import cn.xilio.etp.server.manager.RuntimeState;
-import cn.xilio.etp.server.web.ConfigService;
 import cn.xilio.etp.server.web.ConfigStore;
 import cn.xilio.etp.server.web.SQLiteUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author liuxin
@@ -19,16 +23,73 @@ public final class EtpInitialize {
     private static Logger logger = LoggerFactory.getLogger(EtpInitialize.class);
     private final static ConfigStore configStore = new ConfigStore();
     private final static RuntimeState runtimeState = RuntimeState.get();
+    private final static AppConfig config = AppConfig.get();
 
-    public static void init() {
-        //如果数据库和表不存在则创建
-        initTable();
-        //注册所有客户端配置
-        registerClientConfig();
-        //注册所有端口映射配置
-        registerProxyConfig();
+    /**
+     * 需要先初始化SQLite配置，如果存在和toml中相同的配置，则不同步到SQLite，否则进行同步
+     */
+    public static void initDataConfig() {
+        //只有管理面板启动才初始化动态数据
+        if (config.getDashboard().getEnable()) {
+            //如果数据库和表不存在则创建
+            initDBTable();
+            //注册所有客户端配置
+            registerDBClientConfig();
+            //注册所有端口映射配置
+            registerDBProxyConfig();
+        }
+        //注册和同步Toml静态配
+        registerTomlConfig();
     }
-    private static void registerClientConfig() {
+
+    private static void registerTomlConfig() {
+        Boolean enableDashboard = config.getDashboard().getEnable();
+        List<ClientInfo> clients = AppConfig.get().getClients();
+        clients.forEach(clientInfo -> {
+            String secretKey = clientInfo.getSecretKey();
+            String name = clientInfo.getName();
+            if (!runtimeState.hasClient(secretKey)) {
+                //注册客户端
+                runtimeState.registerClient(clientInfo);
+                //如果开启了管理面板，需要将客户端配置同步到数据库
+                if (enableDashboard) {
+                    JSONObject save = new JSONObject();
+                    save.put("secretKey", secretKey);
+                    save.put("name", name);
+                    configStore.addClient(save);
+                    logger.info("成功将客户端配置「{}」同步到数据库", name);
+                }
+                List<ProxyMapping> proxies = clientInfo.getProxies();
+                proxies.forEach(proxy -> {
+                    Integer remotePort = proxy.getRemotePort();
+                    if (!runtimeState.hasProxy(secretKey, remotePort)) {
+                        //注册端口映射
+                        runtimeState.registerProxy(secretKey, proxy);
+                        //如果开启了管理面板，需要将映射配置同步到数据库
+                        if (enableDashboard) {
+                            JSONObject existClient = configStore.getClientBySecretKey(secretKey);
+                            JSONObject save = new JSONObject();
+                            save.put("clientId", existClient.getInt("id"));
+                            save.put("name", proxy.getName());
+                            save.put("localPort", proxy.getLocalPort());
+                            save.put("remotePort", proxy.getRemotePort());
+                            save.put("status", proxy.getStatus());
+                            save.put("type", proxy.getType().name().toLowerCase(Locale.ROOT));
+                            configStore.addProxy(save);
+                            logger.info("客户端 {}-映射名 {}-公网端口 {} 已经同步到数据库", existClient.get("id"), proxy.getName(), proxy.getRemotePort());
+                        }
+                    } else {
+                        logger.warn("该客户端公网端口「{}-{}」已经被注册", name, remotePort);
+                    }
+
+                });
+            } else {
+                logger.warn("「{}」 客户端已经被注册", name);
+            }
+        });
+    }
+
+    private static void registerDBClientConfig() {
         JSONArray clients = configStore.listClients();
         if (clients != null) {
             for (int i = 0; i < clients.length(); i++) {
@@ -43,7 +104,7 @@ public final class EtpInitialize {
         }
     }
 
-    private static void registerProxyConfig() {
+    private static void registerDBProxyConfig() {
         JSONArray proxies = configStore.listAllProxies();
         if (proxies != null) {
             for (int i = 0; i < proxies.length(); i++) {
@@ -64,7 +125,7 @@ public final class EtpInitialize {
     /**
      * 只有不存在的时候才会创建表
      */
-    private static void initTable() {
+    private static void initDBTable() {
         logger.debug("开始初始化数据库表");
         createClient();
         createProxyMapping();
@@ -93,7 +154,7 @@ public final class EtpInitialize {
                 CREATE TABLE IF NOT EXISTS clients (
                     id         INTEGER PRIMARY KEY AUTOINCREMENT,   -- 自增ID
                     name       TEXT    NOT NULL UNIQUE,             -- 客户端名称，唯一
-                    secretKey  TEXT    NOT NULL,                    -- 密钥
+                    secretKey  TEXT    NOT NULL UNIQUE,                    -- 密钥
                     createdAt TEXT    DEFAULT (datetime('now')),   -- 创建时间
                     updatedAt TEXT    DEFAULT (datetime('now'))    -- 更新时间
                 );

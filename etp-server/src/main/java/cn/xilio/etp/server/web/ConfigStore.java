@@ -41,6 +41,15 @@ public class ConfigStore {
                 name
         );
     }
+    /**
+     * 根据名称查询
+     */
+    public JSONObject getClientBySecretKey(String secretKey) {
+        return SQLiteUtils.get(
+                "SELECT * FROM clients WHERE secretKey = ?",
+                secretKey
+        );
+    }
 
     /**
      * 查询所有客户端
