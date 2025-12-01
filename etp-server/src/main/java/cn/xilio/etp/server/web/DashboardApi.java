@@ -41,11 +41,11 @@ public class DashboardApi {
         router.addRoute(HttpMethod.GET, "/stats", context ->
                 context.setResponseContent(ResponseEntity.ok(ConfigService.countStats()).toJson()));
         router.addRoute(HttpMethod.POST, "/proxy/add", context -> {
-            ConfigService.saveProxy(JsonUtils.toJsonObject(context.getRequestBody()), false);
+            ConfigService.addProxy(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok("ok").toJson());
         });
         router.addRoute(HttpMethod.PUT, "/proxy/update", context -> {
-            ConfigService.saveProxy(JsonUtils.toJsonObject(context.getRequestBody()), true);
+            ConfigService.updateProxy(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok("ok").toJson());
         });
         router.addRoute(HttpMethod.PUT, "/proxy/switch-proxy-status", context -> {

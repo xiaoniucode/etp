@@ -49,7 +49,7 @@
                 {
                     field: 'status', width: 120, title: '状态', sort: true, templet: function (d) {
                         const isChecked = d.status === 1 ? 'checked' : '';
-                        return '<input type="checkbox" lay-skin="switch" lay-text="启动|关闭" lay-filter="statusSwitch" ' + isChecked + '>';
+                        return '<input type="checkbox" lay-skin="switch" lay-text="开启|关闭" lay-event="statusSwitch" ' + isChecked + '>';
                     }
                 },
                 {fixed: 'right', title: '操作', width: 134, minWidth: 125, templet: '#post_table_tool'}
@@ -58,8 +58,6 @@
                 console.log(res, msg)
             }
         });
-
-
         //单元格操作事件
         table.on('tool(proxy)', function (obj) {
             const data = obj.data;
@@ -98,10 +96,32 @@
                                  }
                              },
                          });
-
                      })
 
-            }
+            }else if (obj.event==='statusSwitch'){
+                 const loading = layer.msg('正在切换...', {icon: 16, shade: 0.3, time: 0});
+                 $.ajax({
+                     url: '/proxy/switch-proxy-status',
+                     type: 'put',
+                     contentType: 'application/json',
+                     data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
+                     success: function (res) {
+                         layer.close(loading);
+                         if (res.code === 0) {
+                             layer.msg('切换成功', {icon: 1});
+                         } else {
+                             layer.msg(res.message, {icon: 2});
+                             obj.update({ status: data.status });//回滚状态
+                         }
+                     },
+                     error: function () {
+                         layer.close(loading);
+                         layer.msg('网络错误', {icon: 2});
+                         obj.update({ status: data.status }); // 回滚
+                     }
+                 });
+
+             }
         })
         //操作工具栏
         table.on('toolbar(proxy)', function (obj) {
@@ -121,7 +141,6 @@
                 table.reload('proxy')
             }
         })
-
     });
 </script>
 </body>

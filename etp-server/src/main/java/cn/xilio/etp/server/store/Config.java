@@ -201,7 +201,7 @@ public class Config {
      */
     public boolean updateProxyMapping(String secretKey, int oldRemotePort, ProxyMapping proxyMapping) {
         List<Integer> remotePorts = clientPublicNetworkPortMapping.get(secretKey);
-        remotePorts.remove(oldRemotePort);
+        remotePorts.remove(Integer.valueOf(oldRemotePort));
         remotePorts.add(proxyMapping.getRemotePort());
         ClientInfo clientInfo = clients.stream().filter(c -> c.getSecretKey().equals(secretKey)).findFirst().orElse(null);
         if (clientInfo != null) {

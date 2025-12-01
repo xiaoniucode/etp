@@ -1,5 +1,6 @@
 package cn.xilio.etp.server.web;
 
+import cn.xilio.etp.common.StringUtils;
 import cn.xilio.etp.core.protocol.ProtocolType;
 import cn.xilio.etp.server.ChannelManager;
 import cn.xilio.etp.server.PortAllocator;
@@ -69,30 +70,20 @@ public final class ConfigService {
         return configStore.listAllProxies();
     }
 
-    public static void saveProxy(JSONObject req, boolean update) {
-        //检查公网端口是否被占用
-        if (!PortAllocator.getInstance().isPortAvailable(req.getInt("remotePort"))) {
+
+    public static void addProxy(JSONObject req) {
+        String remotePort = req.getString("remotePort");
+        //检查公网端口是否可用
+        if (StringUtils.hasText(remotePort) && !PortAllocator.getInstance().isPortAvailable(req.getInt("remotePort"))) {
             throw new BizException("公网端口不可用");
         }
-        //保存到数据库
-        if (update) {
-            configStore.updateProxy(req);
-        } else {
-            configStore.addProxy(req);
+        if (!StringUtils.hasText(req.getString("remotePort"))) {
+            int allocatePort = PortAllocator.getInstance().allocateAvailablePort();
+            req.put("remotePort", allocatePort);
         }
+        configStore.addProxy(req);
         //添加到Config内存
-        ProxyMapping proxyMapping = new ProxyMapping();
-        proxyMapping.setName(req.getString("name"));
-        proxyMapping.setType(ProtocolType.getType(req.getString("type")));
-        proxyMapping.setStatus(req.getInt("status"));
-        proxyMapping.setLocalPort(req.getInt("localPort"));
-        proxyMapping.setRemotePort(req.getInt("remotePort"));
-        if (update) {
-            JSONObject proxy = configStore.getProxyById(req.getInt("id"));
-            Config.getInstance().updateProxyMapping(req.getString("secretKey"), proxy.getInt("remotePort"), proxyMapping);
-        } else {
-            Config.getInstance().addProxyMapping(req.getString("secretKey"), proxyMapping);
-        }
+        Config.getInstance().addProxyMapping(req.getString("secretKey"), createProxyMapping(req));
         //如果状态是1，需要启动代理服务
         if (req.getInt("status") == 1) {
             TcpProxyServer.getInstance().startRemotePort(req.getInt("remotePort"));
@@ -102,6 +93,43 @@ public final class ConfigService {
         }
     }
 
+    public static void updateProxy(JSONObject req) {
+        JSONObject oldProxy = configStore.getProxyById(req.getInt("id"));
+        //如果没有设置公网端口，自动分配一个
+        if (!StringUtils.hasText(req.getString("remotePort"))) {
+            int allocatePort = PortAllocator.getInstance().allocateAvailablePort();
+            req.put("remotePort", allocatePort);
+        } else {
+            //如果有公网端口，如果发生改变，需要判断端口是否可用
+            int oldRemotePort = oldProxy.getInt("remotePort");
+            if (req.getInt("remotePort") != oldRemotePort) {
+                if (!PortAllocator.getInstance().isPortAvailable(req.getInt("remotePort"))) {
+                    throw new BizException("公网端口不可用");
+                }
+            }
+        }
+        configStore.updateProxy(req);
+        //添加到Config内存
+        JSONObject proxy = configStore.getProxyById(req.getInt("id"));
+        Config.getInstance().updateProxyMapping(req.getString("secretKey"), proxy.getInt("remotePort"), createProxyMapping(req));
+        //如果状态是1，需要启动代理服务
+        if (req.getInt("status") == 1) {
+            TcpProxyServer.getInstance().startRemotePort(req.getInt("remotePort"));
+        } else {
+            //将公网端口添加到已分配缓存
+            PortAllocator.getInstance().addRemotePort(req.getInt("remotePort"));
+        }
+    }
+
+    private static ProxyMapping createProxyMapping(JSONObject req) {
+        ProxyMapping proxyMapping = new ProxyMapping();
+        proxyMapping.setName(req.getString("name"));
+        proxyMapping.setType(ProtocolType.getType(req.getString("type")));
+        proxyMapping.setStatus(req.getInt("status"));
+        proxyMapping.setLocalPort(req.getInt("localPort"));
+        proxyMapping.setRemotePort(req.getInt("remotePort"));
+        return proxyMapping;
+    }
 
     public static void switchProxyStatus(JSONObject req) {
         JSONObject proxy = configStore.getProxyById(req.getInt("id"));
@@ -110,13 +138,13 @@ public final class ConfigService {
         int remotePort = proxy.getInt("remotePort");
         int updateStatus = status == 1 ? 0 : 1;
         Config.getInstance().updateProxyMappingStatus(secretKey, remotePort, updateStatus);
-        if (status == 1) {
+        if (updateStatus == 1) {
             TcpProxyServer.getInstance().startRemotePort(remotePort);
         } else {
             TcpProxyServer.getInstance().stopRemotePort(remotePort, false);
         }
         //持久化数据库
-        proxy.putOpt("status", updateStatus);
+        proxy.put("status", updateStatus);
         configStore.updateProxy(proxy);
     }
 

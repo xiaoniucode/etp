@@ -12,7 +12,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">客户端</label>
             <div class="layui-input-inline">
-                <select name="client" lay-filter="clientSelect">
+                <select name="client" lay-filter="clientSelect" disabled>
                     <option value="">请选择客户端</option>
                 </select>
             </div>
@@ -36,14 +36,14 @@
             <div class="layui-inline">
                 <label class="layui-form-label">公网端口</label>
                 <div class="layui-input-block">
-                    <input type="text" placeholder="不填自动分配" name="remotePort" id="remotePort" autocomplete="off"
+                    <input type="number" lay-verify="number" placeholder="不填自动分配" name="remotePort" id="remotePort" autocomplete="off"
                            class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">内网端口</label>
                 <div class="layui-input-inline">
-                    <input type="text" placeholder="请输入" name="localPort" autocomplete="off" class="layui-input">
+                    <input type="number" lay-verify="number" placeholder="请输入" name="localPort" autocomplete="off" class="layui-input">
                 </div>
             </div>
         </div>

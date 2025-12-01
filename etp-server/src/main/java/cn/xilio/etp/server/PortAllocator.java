@@ -35,7 +35,7 @@ public class PortAllocator {
         return instance;
     }
 
-    public int allocateAvailablePort() throws IOException {
+    public int allocateAvailablePort()   {
         LOGGER.info("开始分配系统自动选择的可用端口");
         lock.lock();
         try {
@@ -52,11 +52,15 @@ public class PortAllocator {
                     LOGGER.warn("系统端口分配失败，重试: {}/10", i + 1);
                 }
             }
+
             LOGGER.error("无法分配系统端口，尝试次数耗尽");
-            throw new IOException("无法分配系统端口：无可用端口");
-        } finally {
+        }catch (Exception e) {
+            LOGGER.error(e.getMessage(),e);
+        }
+        finally {
             lock.unlock();
         }
+        return -1;
     }
     public boolean releasePort(int port) {
         lock.lock();
