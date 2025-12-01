@@ -84,7 +84,7 @@
                             url: '/client/kickout',
                             type: 'delete',
                             contentType: 'application/json',
-                            data: JSON.stringify({id: data.id}),
+                            data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
                             headers: {},
                             success: function (res) {
                                 if (res.code === 0) {

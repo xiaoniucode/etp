@@ -117,7 +117,7 @@ public final class ConfigService {
             TcpProxyServer.getInstance().startRemotePort(req.getInt("remotePort"));
         } else {
             //停止对应端口的代理映射服务
-            TcpProxyServer.getInstance().stopRemotePort(req.getInt("remotePort"),false);
+            TcpProxyServer.getInstance().stopRemotePort(req.getInt("remotePort"), false);
         }
     }
 
@@ -131,6 +131,9 @@ public final class ConfigService {
         return proxyMapping;
     }
 
+    /**
+     * 切换端口映射状态
+     */
     public static void switchProxyStatus(JSONObject req) {
         JSONObject proxy = configStore.getProxyById(req.getInt("id"));
         int status = proxy.getInt("status");
@@ -181,11 +184,13 @@ public final class ConfigService {
     }
 
     /**
-     * todo 将在线的客户端踢下线
+     * 将在线的客户端踢下线
      */
     public static void kickoutClient(JSONObject req) {
         String secretKey = req.getString("secretKey");
         //关闭客户端隧道，同时关闭所有连接
+        ChannelManager.closeControlChannelByClient(secretKey);
+        //todo 需要优化，踢掉前需要发送消息通知客户端，避免断线重连
     }
 
     public static JSONObject getClient(JSONObject req) {
