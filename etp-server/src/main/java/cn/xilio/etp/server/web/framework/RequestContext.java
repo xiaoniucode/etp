@@ -23,11 +23,12 @@ public class RequestContext {
     private final Map<String, String> formParams = new HashMap<>();
     private final Map<String, Object> attributes = new HashMap<>();
     private String requestBody;
-
+    private byte[] responseData;
+    private String responseContentType;
     private boolean abort = false;
     private String responseContent;
     private HttpResponseStatus responseStatus = HttpResponseStatus.OK;
-
+    private final Map<String, String> responseHeaders = new HashMap<>();
     public RequestContext(ChannelHandlerContext ctx, FullHttpRequest request) {
         this.ctx = ctx;
         this.request = request;
@@ -239,7 +240,17 @@ public class RequestContext {
     public String getResponseContent() {
         return responseContent;
     }
+    public void setResponseData(byte[] data, String contentType) {
+        this.responseData = data;
+        this.responseContentType = contentType;
+    }
+    public byte[] getResponseData() {
+        return responseData;
+    }
 
+    public String getResponseContentType() {
+        return responseContentType;
+    }
     public void setResponseContent(String responseContent) {
         this.responseContent = responseContent;
     }
@@ -259,4 +270,12 @@ public class RequestContext {
     public void setHttpResponse(FullHttpResponse httpResponse) {
         this.httpResponse = httpResponse;
     }
+    public void addResponseHeader(String name, String value) {
+        this.responseHeaders.put(name, value);
+    }
+
+    public Map<String, String> getResponseHeaders() {
+        return responseHeaders;
+    }
+
 }

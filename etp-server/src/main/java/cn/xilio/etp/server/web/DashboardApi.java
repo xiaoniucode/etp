@@ -8,9 +8,11 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
 
+import javax.imageio.ImageIO;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Dashboard 管理、认证接口
@@ -18,7 +20,7 @@ import java.util.UUID;
  * @author liuxin
  */
 public class DashboardApi {
-    private static final Set<String> WHITE_LIST = Set.of("/api/user/login", "/login.html", "/layui/");
+    private static final Set<String> WHITE_LIST = Set.of("/api/user/login", "/login.html", "/api/captcha", "/layui/");
 
     public static void initFilters(List<Filter> filters) {
         filters.add(new Filter() {
@@ -64,6 +66,8 @@ public class DashboardApi {
         router.setRoutePrefix("/api");
         router.addRoute(HttpMethod.POST, "/user/login", context -> {
             JSONObject req = JsonUtils.toJsonObject(context.getRequestBody());
+            Map<String, String> headers = context.getHeaders();
+            req.put("captchaId", headers.get("captchaId"));
             context.setResponseContent(ResponseEntity.ok(ConfigService.login(req)).toJson());
         });
         router.addRoute(HttpMethod.PUT, "/user/flush-token", context -> {
@@ -86,8 +90,22 @@ public class DashboardApi {
         router.addRoute(HttpMethod.GET, "/user/info", context -> {
 
         });
+        router.addRoute(HttpMethod.GET, "/captcha", context -> {
+            try {
+                CaptchaGenerator generator = new CaptchaGenerator();
+                CaptchaGenerator.CaptchaResult result = generator.generateCaptcha();
+                String captchaId = CaptchaHolder.put(result.code(), 300);  // 5分钟有效
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(result.image(), "JPEG", baos);
+                byte[] imageData = baos.toByteArray();
+                context.addResponseHeader("captchaId", captchaId);
+                context.setResponseData(imageData, "image/jpeg");
+            } catch (Exception e) {
+                throw new RuntimeException("生成验证码失败", e);
+            }
+        });
         router.addRoute(HttpMethod.PUT, "/user/update", context -> {
-            ConfigService.updateUser((Integer) context.getAttribute("userId"), JsonUtils.toJsonObject(context.getRequestBody()));
+            ConfigService.updateUserPassword((Integer) context.getAttribute("userId"), JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseContent(ResponseEntity.ok().toJson());
         });
         router.addRoute(HttpMethod.GET, "/client/list", context ->

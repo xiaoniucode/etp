@@ -217,10 +217,10 @@ public class ConfigStore {
         return SQLiteUtils.get("SELECT * FROM users WHERE id = ?", userId);
     }
 
-    public void updateUser(int userId, String username, String password) {
+    public void updateUserPassword(int userId,  String password) {
         SQLiteUtils.update(
-                "UPDATE users SET username = ?, password =?  WHERE id = ?",
-                username, password, userId);
+                "UPDATE users SET password =?  WHERE id = ?",
+                 password, userId);
     }
 }
 

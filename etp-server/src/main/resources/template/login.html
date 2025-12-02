@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>ETP 代理管理平台 - 登录</title>
+    <title>ETP 内网穿透管理平台 - 登录</title>
     <link rel="stylesheet" href="/static/layui/css/layui.css">
     <style>
         body {
@@ -36,7 +36,6 @@
             }
         }
 
-        /* 登录卡片 */
         .login-wrapper {
             position: relative;
             z-index: 10;
@@ -198,15 +197,14 @@
                         <div class="layui-col-xs5">
                             <div style="margin-left: 10px;">
                                 <img src="https://www.oschina.net/action/user/captcha" class="captcha-img"
-                                     onclick="this.src='https://www.oschina.net/action/user/captcha?t='+Date.now()">
+                                     onclick="this.src='/api/user/captcha?t='+Date.now()">
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="layui-form-item">
-                    <input type="checkbox" name="remember" lay-skin="primary" title="记住我">
-                </div>
+<!--                <div class="layui-form-item">-->
+<!--                    <input type="checkbox" name="remember" lay-skin="primary" title="记住我">-->
+<!--                </div>-->
 
                 <div class="layui-form-item">
                     <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="demo-login">
@@ -282,11 +280,8 @@
                 }
             });
         }
-
-        // 页面打开立即尝试一次
         trySilentRefresh();
 
-        // ==================== 登录表单提交 ====================
         form.on('submit(demo-login)', function (data) {
             var field = data.field;
 
@@ -302,13 +297,8 @@
                 success: function (res) {
                     if (res.code === 0 && res.data) {
                         const {userId, username, auth_token} = res.data
-                        // 记住我
-                        if (field.remember === 'on') {
-                            setToken(auth_token);
-                            setUser(userId, username)
-                        } else {
-                            removeToken();
-                        }
+                        setToken(auth_token);
+                        setUser(userId, username)
                         layer.msg('登录成功', {icon: 1, time: 600}, function () {
                             location.href = '/index.html';
                         });
@@ -327,7 +317,7 @@
             return false;
         });
         $(document).on('click', '.captcha-img', function () {
-            this.src = 'https://www.oschina.net/action/user/captcha?t=' + Date.now();
+            this.src = '/api/captcha?t=' + Date.now();
         });
     });
 </script>

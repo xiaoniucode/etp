@@ -242,6 +242,11 @@ public final class ConfigService {
     }
 
     public static JSONObject login(JSONObject req) {
+        String captchaId = req.optString("captchaId");
+        String code = req.optString("code");
+        if (!CaptchaHolder.verifyAndRemove(captchaId, code)) {
+            throw new BizException("验证码错误或过期");
+        }
         String username = req.optString("username");
         String password = req.optString("password");
         JSONObject user = configStore.getUserByUsername(username);
@@ -268,14 +273,17 @@ public final class ConfigService {
         configStore.deleteAllUser();
     }
 
-    public static void updateUser(Integer userId, JSONObject req) {
-        int id = req.getInt("uid");
+    public static void updateUserPassword(Integer userId, JSONObject req) {
+        int id = req.getInt("userId");
+        String oldPassword = req.getString("oldPassword");
+        String newPassword = req.getString("password");
         if (userId != id) {
             throw new BizException(401, "未登录");
         }
         JSONObject user = configStore.getUserById(userId);
-        if (user != null) {
-            configStore.updateUser(id, req.getString("username"), req.getString("password"));
+        if (!user.getString("password").equals(oldPassword)) {
+            throw new BizException("原密码不正确");
         }
+        configStore.updateUserPassword(id, newPassword);
     }
 }

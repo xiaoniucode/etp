@@ -10,21 +10,22 @@
 <div class="layui-container" style="padding-top: 15px">
     <form class="layui-form layui-form-pane" action="">
         <div class="layui-form-item">
-            <label class="layui-form-label">用户名</label>
+            <label class="layui-form-label">旧密码</label>
             <div class="layui-input-inline">
-                <input type="text" name="username" autocomplete="off" placeholder="请输入用户名" lay-verify="required"
-                       class="layui-input">
+                <input type="password" name="oldPassword" placeholder="请输入旧密码" lay-verify="required"
+                       autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">密 码</label>
+            <label class="layui-form-label">新密码</label>
             <div class="layui-input-inline">
-                <input type="password" name="password" placeholder="请输入密码" lay-verify="required" autocomplete="off" class="layui-input">
+                <input type="password" name="password" placeholder="请输入新密码" lay-verify="required"
+                       autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item" style="text-align: left;">
             <div class="layui-input-block">
-                <button type="submit" class="layui-btn" lay-submit lay-filter="demo1">保存</button>
+                <button type="submit" class="layui-btn" lay-submit lay-filter="demo1">更新密码</button>
             </div>
         </div>
     </form>
@@ -32,52 +33,36 @@
 <script src="/static/layui/layui.js"></script>
 <script src="/static/js/ajax.js"></script>
 <script>
-    layui.use(['form', 'jquery'], function () {
+    layui.use(['form', 'jquery', 'layer'], function () {
         var form = layui.form;
-        const $ = layui.$;
-
-        //渲染客户端下拉框
-        // $.ajax({
-        //     url: '/client/list',
-        //     type: 'get',
-        //     contentType: 'application/json',
-        //     headers: {},
-        //     success: function (res) {
-        //         if (res.code === 0) {
-        //
-        //         }
-        //     },
-        // });
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var user = JSON.parse( localStorage.getItem("user"));
         form.on('submit(demo1)', function (data) {
-            const field = data.field;
-            if (field.client) {
-                const [clientId, secretKey] = field.client.split('|', 2);
-                field.clientId = Number(clientId) || 0;
-                field.secretKey = secretKey || '';
-                delete field.client;
-            }
+            var field = data.field;
+            field.userId=user.userId
             $.ajax({
-                url: '/user/update',
-                type: 'put',
+                url: '/api/user/update',
+                type: 'PUT',
                 contentType: 'application/json',
                 data: JSON.stringify(field),
                 headers: {
-                    'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
                 },
                 success: function (res) {
                     if (res.code === 0) {
-                        layer.msg('创建成功', {icon: 1, time: 400,}, () => {
-                            parent.layer.close(parent.layer.getFrameIndex(window.name));
-                        });
+                        layer.msg('密码修改成功', {icon: 1})
                     } else {
-                        layer.msg(res.message, {time: 1000});
+                        layer.msg(res.message, {icon: 2});
                     }
                 },
+                error: function () {
+                    layer.msg('网络异常，请稍后重试', {icon: 2});
+                }
             });
             return false;
         });
     });
 </script>
-
 </body>
 </html>
