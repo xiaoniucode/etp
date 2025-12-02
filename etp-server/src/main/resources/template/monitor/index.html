@@ -7,47 +7,130 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/static/layui/css/layui.css" rel="stylesheet">
+
     <style>
-        .padding-right15 {
-            padding-right: 15px;
+        body {
+            background: #f5f7fa;
+            padding: 20px;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
         }
+
+        .dashboard-card {
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            transition: all .2s;
+            cursor: pointer;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 左边图标 */
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #eef2ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+        }
+        .card-icon img {
+            width: 28px;
+            height: 28px;
+        }
+
+        /* 右边文字内容 */
+        .card-content {
+            text-align: left;
+        }
+
+        .card-title {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 6px;
+        }
+
+        .card-value {
+            font-size: 30px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .padding-right15 { padding-right: 15px; }
+
+        @media (max-width: 768px) {
+            .padding-right15 { padding-right: 0; margin-bottom: 15px; }
+            .dashboard-card { height: auto; padding: 16px; }
+        }
+
     </style>
 </head>
 <body>
+
 <div class="layui-row" style="text-align: center">
+
+    <!-- 1 -->
     <div class="layui-col-sm3 padding-right15">
-        <div class="layui-panel">
-            <div style="padding: 32px;">
-                <div>客户端总数</div>
-                <div id="clientTotal"></div>
+        <div class="dashboard-card">
+            <div class="card-icon">
+                <img src="/static/icons/client.svg" alt="">
+            </div>
+            <div class="card-content">
+                <div class="card-title">客户端总数</div>
+                <div class="card-value" id="clientTotal">--</div>
             </div>
         </div>
     </div>
+
+    <!-- 2 -->
     <div class="layui-col-sm3 padding-right15">
-        <div class="layui-panel">
-            <div style="padding: 32px;">
-                <div>在线客户端数</div>
-                <div id="onlineClient"></div>
+        <div class="dashboard-card">
+            <div class="card-icon">
+                <img src="/static/icons/online.svg" alt="">
+            </div>
+            <div class="card-content">
+                <div class="card-title">在线客户端数</div>
+                <div class="card-value" id="onlineClient">--</div>
             </div>
         </div>
     </div>
+
+    <!-- 3 -->
     <div class="layui-col-sm3 padding-right15">
-        <div class="layui-panel">
-            <div style="padding: 32px;">
-                <div>映射总数</div>
-                <div id="mappingTotal"></div>
+        <div class="dashboard-card">
+            <div class="card-icon">
+                <img src="/static/icons/connect.svg" alt="">
+            </div>
+            <div class="card-content">
+                <div class="card-title">映射总数</div>
+                <div class="card-value" id="mappingTotal">--</div>
             </div>
         </div>
     </div>
+
+    <!-- 4 -->
     <div class="layui-col-sm3">
-        <div class="layui-panel">
-            <div style="padding: 32px;">
-                <div>已启动映射数</div>
-                <div id="startMapping"></div>
+        <div class="dashboard-card">
+            <div class="card-icon">
+                <img src="/static/icons/running.svg" alt="">
+            </div>
+            <div class="card-content">
+                <div class="card-title">已启动映射数</div>
+                <div class="card-value" id="startMapping">--</div>
             </div>
         </div>
     </div>
+
 </div>
+
 <script src="/static/layui/layui.js"></script>
 <script>
     layui.use(['jquery'], function () {
@@ -57,7 +140,7 @@
                 url: '/api/stats',
                 type: 'GET',
                 headers: {
-                    'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
                 },
                 success: function (res) {
                     if (res.code === 0) {
@@ -68,9 +151,6 @@
                     } else {
                         layer.msg(res.msg);
                     }
-                },
-                error: function (xhr, status, error) {
-                    console.log(error)
                 }
             });
         });
