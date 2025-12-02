@@ -50,14 +50,17 @@
 </div>
 <script src="/static/layui/layui.js"></script>
 <script>
-    layui.use(['jquery'], function(){
+    layui.use(['jquery'], function () {
         var $ = layui.jquery;
-        $(function(){
+        $(function () {
             $.ajax({
                 url: '/stats',
                 type: 'GET',
-                success: function(res) {
-                    if(res.code === 0) {
+                headers: {
+                    'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                },
+                success: function (res) {
+                    if (res.code === 0) {
                         $('#clientTotal').text(res.data.clientTotal);
                         $('#onlineClient').text(res.data.onlineClient);
                         $('#mappingTotal').text(res.data.mappingTotal);
@@ -66,7 +69,7 @@
                         layer.msg(res.msg);
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.log(error)
                 }
             });

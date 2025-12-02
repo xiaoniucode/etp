@@ -226,49 +226,91 @@
         var layer = layui.layer;
         var $ = layui.jquery;
 
-        // ============页面加载时自动尝试「静默登录」 ============
-        function tryAutoLogin() {
-            var rememberToken = localStorage.getItem('auth_token');
-            if (!rememberToken) return;
+        const TokenKey = 'auth_token';
+        const UserKey = 'user';
+
+        function getToken() {
+            return localStorage.getItem(TokenKey);
+        }
+
+        function setToken(token) {
+            if (token) localStorage.setItem(TokenKey, token);
+        }
+
+        function setUser(userId, username) {
+            localStorage.setItem(UserKey, JSON.stringify({userId: userId, username: username}))
+        }
+
+        function removeToken() {
+            localStorage.removeItem(TokenKey);
+        }
+
+        $.ajaxSetup({
+            headers: {
+                'Authorization': 'Bearer ' + getToken()
+            },
+            statusCode: {
+                401: function () {
+                    removeToken();
+                    layer.msg('登录已过期，请重新登录', {icon: 2}, function () {
+                        location.href = '/login.html';
+                    });
+                }
+            }
+        });
+
+        function trySilentRefresh() {
+            var token = getToken();
+            if (!token) return;
 
             $.ajax({
                 url: '/user/flush-token',
-                type: 'put',
-                data: {token: rememberToken},
-                contentType: 'application/json',
+                type: 'PUT',
+                timeout: 8000,
                 success: function (res) {
-                    if (res.code === 0) {
-                        location.href = '/index.html'
+                    if (res.code === 0 && res.data) {
+                        const {userId, username, auth_token} = res.data
+                        setToken(auth_token);
+                        setUser(userId, username)
+                        location.href = '/index.html';
                     } else {
-                        localStorage.removeItem('auth_token');
+                        removeToken();
                     }
                 },
                 error: function () {
-                    localStorage.removeItem('auth_token');
+                    removeToken();
                 }
             });
         }
 
-        // 页面打开就尝试一次静默登录
-        tryAutoLogin();
+        // 页面打开立即尝试一次
+        trySilentRefresh();
 
+        // ==================== 登录表单提交 ====================
         form.on('submit(demo-login)', function (data) {
             var field = data.field;
+
             $.ajax({
                 url: '/user/login',
                 type: 'POST',
-                data: JSON.stringify(field),
                 contentType: 'application/json',
+                data: JSON.stringify({
+                    username: field.username,
+                    password: field.password,
+                    captcha: field.captcha
+                }),
                 success: function (res) {
-                    if (res.code === 0) {
+                    if (res.code === 0 && res.data) {
+                        const {userId, username, auth_token} = res.data
+                        // 记住我
                         if (field.remember === 'on') {
-                            localStorage.setItem('auth_token', res.data.auth_token);
+                            setToken(auth_token);
+                            setUser(userId, username)
                         } else {
-                            localStorage.removeItem('auth_token');
+                            removeToken();
                         }
-
-                        layer.msg('登录成功', {icon: 1}, function () {
-                            location.href = "/index.html";
+                        layer.msg('登录成功', {icon: 1, time: 600}, function () {
+                            location.href = '/index.html';
                         });
                     } else {
                         layer.msg(res.message || '登录失败', {icon: 2});
@@ -277,12 +319,18 @@
                     }
                 },
                 error: function () {
-                    layer.msg('网络异常', {icon: 2});
+                    layer.msg('网络异常，请重试', {icon: 2});
+                    $('.captcha-img').click();
                 }
             });
+
             return false;
+        });
+        $(document).on('click', '.captcha-img', function () {
+            this.src = 'https://www.oschina.net/action/user/captcha?t=' + Date.now();
         });
     });
 </script>
+>
 </body>
 </html>

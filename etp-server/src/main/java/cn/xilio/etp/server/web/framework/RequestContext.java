@@ -24,7 +24,7 @@ public class RequestContext {
     private final Map<String, Object> attributes = new HashMap<>();
     private String requestBody;
 
-    private boolean shouldContinue = true;
+    private boolean abort = false;
     private String responseContent;
     private HttpResponseStatus responseStatus = HttpResponseStatus.OK;
 
@@ -226,14 +226,14 @@ public class RequestContext {
     /**
      * 中止请求并设置响应
      */
-    public void abortWithResponse(HttpResponseStatus status, String message) {
-        this.shouldContinue = false;
+    public void abortWithResponse(HttpResponseStatus status, String responseContext) {
+        this.abort = true;
         this.responseStatus = status;
-        this.responseContent = message;
+        this.responseContent = responseContext;
     }
 
-    public boolean shouldContinue() {
-        return shouldContinue;
+    public boolean isAborted() {
+        return abort;
     }
 
     public String getResponseContent() {

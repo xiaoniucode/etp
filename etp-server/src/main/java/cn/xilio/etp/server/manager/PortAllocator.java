@@ -11,33 +11,23 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
- * 端口分配器，用于动态分配用户指定范围内的可用端口，并缓存已分配端口。
+ * 端口分配器
  *
  * @author liuxin
  */
 public class PortAllocator {
     private static final Logger LOGGER = LoggerFactory.getLogger(PortAllocator.class.getName());
-    private static volatile PortAllocator instance;
-    private final ReentrantLock lock = new ReentrantLock();
+    private static final PortAllocator instance=new PortAllocator();
     private final Set<Integer> allocatedPorts = new HashSet<>(32);
 
     private PortAllocator() {
     }
 
-    public static PortAllocator getInstance() {
-        if (instance == null) {
-            synchronized (PortAllocator.class) {
-                if (instance == null) {
-                    instance = new PortAllocator();
-                }
-            }
-        }
+    public static PortAllocator get() {
         return instance;
     }
-
     public int allocateAvailablePort()   {
         LOGGER.info("开始分配系统自动选择的可用端口");
-        lock.lock();
         try {
             // 最多尝试10次，避免无限循环
             for (int i = 0; i < 10; i++) {
@@ -52,40 +42,21 @@ public class PortAllocator {
                     LOGGER.warn("系统端口分配失败，重试: {}/10", i + 1);
                 }
             }
-
             LOGGER.error("无法分配系统端口，尝试次数耗尽");
         }catch (Exception e) {
             LOGGER.error(e.getMessage(),e);
         }
-        finally {
-            lock.unlock();
-        }
         return -1;
     }
     public boolean releasePort(int port) {
-        lock.lock();
-        try {
-            if (allocatedPorts.remove(port)) {
-                LOGGER.info("成功释放端口: {}", port);
-                return true;
-            } else {
-                LOGGER.warn("尝试释放未分配的端口: {}", port);
-                return false;
-            }
-        } finally {
-            lock.unlock();
+        if (allocatedPorts.remove(port)) {
+            LOGGER.info("成功释放端口: {}", port);
+            return true;
+        } else {
+            LOGGER.warn("尝试释放未分配的端口: {}", port);
+            return false;
         }
     }
-
-    public boolean isPortAllocated(int port) {
-        lock.lock();
-        try {
-            return allocatedPorts.contains(port);
-        } finally {
-            lock.unlock();
-        }
-    }
-
     public boolean isPortAvailable(int port) {
         // 验证端口号
         if (port < 1 || port > 65535) {
@@ -93,26 +64,19 @@ public class PortAllocator {
             LOGGER.error(errorMsg);
             throw new IllegalArgumentException(errorMsg);
         }
-
         LOGGER.info("开始检查端口可用性: {}", port);
-        lock.lock();
-        try {
-            // 检查是否已被本实例分配
-            if (allocatedPorts.contains(port)) {
-                LOGGER.info("端口 {} 已被分配，不可使用", port);
-                return false;
-            }
-
-            // 尝试绑定端口
-            try (ServerSocket socket = new ServerSocket(port)) {
-                LOGGER.info("端口 {} 可用", port);
-                return true;
-            } catch (IOException e) {
-                LOGGER.warn("端口 {} 不可用: {1}", new Object[]{port, e.getMessage()});
-                return false;
-            }
-        } finally {
-            lock.unlock();
+        // 检查是否已被本实例分配
+        if (allocatedPorts.contains(port)) {
+            LOGGER.info("端口 {} 已被分配，不可使用", port);
+            return false;
+        }
+        // 尝试绑定端口
+        try (ServerSocket socket = new ServerSocket(port)) {
+            LOGGER.info("端口 {} 可用", port);
+            return true;
+        } catch (IOException e) {
+            LOGGER.warn("端口 {} 不可用: {1}", new Object[]{port, e.getMessage()});
+            return false;
         }
     }
 

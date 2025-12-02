@@ -41,6 +41,7 @@ public class ConfigStore {
                 name
         );
     }
+
     /**
      * 根据名称查询
      */
@@ -191,6 +192,35 @@ public class ConfigStore {
      */
     public int deleteProxiesByClient(int clientId) {
         return SQLiteUtils.delete("DELETE FROM proxies WHERE clientId = ?", clientId);
+    }
+
+    public JSONObject getProxyByName(String name) {
+        return SQLiteUtils.get("SELECT * FROM proxies WHERE name = ?", name);
+    }
+
+    public JSONObject getUserByUsername(String username) {
+        return SQLiteUtils.get("SELECT * FROM users WHERE username = ?", username);
+    }
+
+    public void deleteAllUser() {
+        SQLiteUtils.delete("DELETE FROM users");
+    }
+
+    public void addUser(JSONObject user) {
+        SQLiteUtils.insert(
+                "INSERT INTO users (username, password) VALUES (?, ?)",
+                user.getString("username"), user.getString("password")
+        );
+    }
+
+    public JSONObject getUserById(Integer userId) {
+        return SQLiteUtils.get("SELECT * FROM users WHERE id = ?", userId);
+    }
+
+    public void updateUser(int userId, String username, String password) {
+        SQLiteUtils.update(
+                "UPDATE users SET username = ?, password =?  WHERE id = ?",
+                username, password, userId);
     }
 }
 

@@ -40,6 +40,9 @@
             url: '/proxy/list',
             toolbar: '#headerToobar',
             cellMinWidth: 80,
+            headers: {
+                'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+            },
             cols: [[
                 {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
                 {field: 'name', title: '代理名称'},
@@ -91,7 +94,9 @@
                             type: 'delete',
                             contentType: 'application/json',
                             data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
-                            headers: {},
+                            headers: {
+                                'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                            },
                             success: function (res) {
                                 if (res.code === 0) {
                                     table.reload('proxy')
@@ -109,6 +114,9 @@
                     url: '/proxy/switch-proxy-status',
                     type: 'put',
                     contentType: 'application/json',
+                    headers: {
+                        'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                    },
                     data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
                     success: function (res) {
                         layer.close(loading);

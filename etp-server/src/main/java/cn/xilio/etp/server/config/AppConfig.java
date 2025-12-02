@@ -136,9 +136,11 @@ public final class AppConfig {
             Boolean enable = dash.getBoolean("enable") != null && dash.getBoolean("enable");
             String addr = dash.getString("addr");
             Integer port = dash.getLong("port") == null ? null : dash.getLong("port").intValue();
+            Boolean reset = dash.getBoolean("reset", false);
             String username = dash.getString("username");
             String password = dash.getString("password");
             dashboard = new Dashboard(enable, username, password, addr, port);
+            dashboard.setReset(reset);
         }
     }
 

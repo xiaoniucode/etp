@@ -37,7 +37,9 @@
                 type: 'post',
                 contentType: 'application/json',
                 data: JSON.stringify(field),
-                headers: {},
+                headers: {
+                    'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                },
                 success: function (res) {
                     if (res.code === 0) {
                         layer.msg('创建成功', {icon: 1, time: 400,}, () => {
@@ -46,7 +48,7 @@
                             parent.layer.close(parent.layer.getFrameIndex(window.name));
                         });
                     } else {
-                        layer.msg(res.message, {time: 1000});
+                        layer.msg(res.message, {icon:2,time: 1000});
                     }
                 },
             });

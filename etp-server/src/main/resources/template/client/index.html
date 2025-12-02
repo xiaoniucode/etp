@@ -51,6 +51,9 @@
             url: '/client/list',
             toolbar: '#headerToolbar',
             height: 'full-35',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+            },
             cols: [[
                 {field: 'name', fixed: 'left', width: 150, title: '客户端'},
                 {field: 'secretKey', title: 'Token'},
@@ -85,7 +88,9 @@
                             type: 'delete',
                             contentType: 'application/json',
                             data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
-                            headers: {},
+                            headers: {
+                                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+                            },
                             success: function (res) {
                                 if (res.code === 0) {
                                     table.reload('client')
@@ -118,7 +123,9 @@
                             type: 'delete',
                             contentType: 'application/json',
                             data: JSON.stringify({id: data.id}),
-                            headers: {},
+                            headers: {
+                                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+                            },
                             success: function (res) {
                                 if (res.code === 0) {
                                     table.reload('client')

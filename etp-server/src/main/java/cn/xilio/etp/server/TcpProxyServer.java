@@ -47,7 +47,7 @@ public final class TcpProxyServer implements Lifecycle {
     private final RuntimeState state = RuntimeState.get();
 
     private TcpProxyServer() {
-        this.portAllocator = PortAllocator.getInstance();
+        this.portAllocator = PortAllocator.get();
     }
 
     @Override

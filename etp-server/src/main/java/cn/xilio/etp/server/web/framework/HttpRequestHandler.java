@@ -30,27 +30,26 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         RequestContext context = new RequestContext(ctx, request);
         try {
-            FilterChain filterChain = new FilterChain(context);
-            filters.forEach(filterChain::addFilter);
-            filterChain.doFilter();
-
             String path = getNormalPath(request.uri());
-
             // 检查是否为静态资源请求
             if (StaticResourceHandler.isStaticResourceRequest(path)) {
                 StaticResourceHandler.handleStaticResource(context);
+            }
+            FilterChain filterChain = new FilterChain(context);
+            filters.forEach(filterChain::addFilter);
+            filterChain.doFilter();
+            if (context.isAborted()) {
+                sendResponse(context);
+                return;
+            }
+            RequestHandler handler = router.match(request.method(), path);
+            if (handler == null) {
+                context.abortWithResponse(HttpResponseStatus.NOT_FOUND, "{\"error\":\"资源不存在\",\"path\":\"" + path + "\"}");
             } else {
-                // 原有的API路由逻辑
-                RequestHandler handler = router.match(request.method(), path);
-                if (handler == null) {
-                    context.abortWithResponse(HttpResponseStatus.NOT_FOUND,
-                            "{\"error\":\"接口不存在\",\"path\":\"" + path + "\"}");
-                } else {
-                    handler.handle(context);
-                }
+                handler.handle(context);
             }
             sendResponse(context);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             handleError(ctx, context, e);
             logger.error(e.getMessage(), e);
         }
@@ -62,7 +61,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             return;
         }
 
-        // 原有的API响应逻辑
         String content = context.getResponseContent();
         FullHttpResponse response = new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1,
@@ -74,7 +72,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         context.getCtx().writeAndFlush(response);
     }
 
-    private void handleError(ChannelHandlerContext ctx, RequestContext context, Exception e) {
+    private void handleError(ChannelHandlerContext ctx, RequestContext context, Throwable e) {
         logger.error(e.getMessage(), e);
         if (e instanceof BizException biz) {
             String msg = "".equals(biz.getMessage()) ? "error" : biz.getMessage();
@@ -87,7 +85,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
             ctx.writeAndFlush(response);
         } else {
-            //todo other
+            //todo other exception
         }
     }
 

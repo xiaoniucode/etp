@@ -22,7 +22,7 @@ public class FilterChain {
     }
 
     public void doFilter() throws Exception {
-        if (index < filters.size() && context.shouldContinue()) {
+        if (index < filters.size() && !context.isAborted()) {
             Filter filter = filters.get(index++);
             filter.doFilter(context, this);
         }
