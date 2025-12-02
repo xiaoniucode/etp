@@ -32,17 +32,18 @@ public class DashboardApi {
                 }
                 String auth = context.getHeader("Authorization");
                 if (auth == null || !auth.startsWith("Bearer ")) {
-                    context.abortWithResponse(HttpResponseStatus.UNAUTHORIZED,ResponseEntity.error(401, "未登录").toJson());
+                    context.abortWithResponse(HttpResponseStatus.UNAUTHORIZED, ResponseEntity.error(401, "未登录").toJson());
                     return;
                 }
                 String token = auth.substring(7);
-                Integer userId = TokenAuthService.validateToken(token);
-                if (userId == null) {
-                    context.setResponseContent(ResponseEntity.error(401, "登录已过期或无效").toJson());
+                JSONObject authtoken = TokenAuthService.validateToken(token);
+                if (authtoken == null) {
+                    context.abortWithResponse(HttpResponseStatus.UNAUTHORIZED, ResponseEntity.error(401, "登录过期").toJson());
                     return;
                 }
                 // 把用户信息放进上下文，后面业务方便用
-                context.setAttribute("userId", userId);
+                context.setAttribute("userId", authtoken.getInt("uid"));
+                context.setAttribute("username", authtoken.getString("username"));
                 context.setAttribute("auth_token", token);
                 chain.doFilter();
             }
@@ -80,7 +81,8 @@ public class DashboardApi {
 
         });
         router.addRoute(HttpMethod.PUT, "/user/update", context -> {
-
+            ConfigService.updateUser((Integer) context.getAttribute("userId"), JsonUtils.toJsonObject(context.getRequestBody()));
+            context.setResponseContent(ResponseEntity.ok().toJson());
         });
         router.addRoute(HttpMethod.GET, "/client/list", context ->
                 context.setResponseContent(ResponseEntity.ok(ConfigService.clients()).toJson()));

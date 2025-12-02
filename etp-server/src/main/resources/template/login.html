@@ -228,6 +228,7 @@
         var $ = layui.jquery;
 
         const TokenKey = 'auth_token';
+        const UserKey = 'user';
 
         function getToken() {
             return localStorage.getItem(TokenKey);
@@ -235,6 +236,10 @@
 
         function setToken(token) {
             if (token) localStorage.setItem(TokenKey, token);
+        }
+
+        function setUser(userId, username) {
+            localStorage.setItem(UserKey, JSON.stringify({userId: userId, username: username}))
         }
 
         function removeToken() {
@@ -264,8 +269,10 @@
                 type: 'PUT',
                 timeout: 8000,
                 success: function (res) {
-                    if (res.code === 0 && res.data && res.data.auth_token) {
-                        setToken(res.data.auth_token);
+                    if (res.code === 0 && res.data) {
+                        const {userId, username, auth_token} = res.data
+                        setToken(auth_token);
+                        setUser(userId, username)
                         location.href = '/index.html';
                     } else {
                         removeToken();
@@ -294,10 +301,12 @@
                     captcha: field.captcha
                 }),
                 success: function (res) {
-                    if (res.code === 0 && res.data && res.data.auth_token) {
+                    if (res.code === 0 && res.data) {
+                        const {userId, username, auth_token} = res.data
                         // 记住我
                         if (field.remember === 'on') {
-                            setToken(res.data.auth_token);
+                            setToken(auth_token);
+                            setUser(userId, username)
                         } else {
                             removeToken();
                         }

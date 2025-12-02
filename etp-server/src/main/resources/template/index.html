@@ -101,6 +101,7 @@
 
         $('#logout').on('click', function () {
             const authToken = localStorage.getItem("auth_token");
+            localStorage.removeItem("user")
             localStorage.removeItem("auth_token")
             $.ajax({
                 url: '/user/logout',

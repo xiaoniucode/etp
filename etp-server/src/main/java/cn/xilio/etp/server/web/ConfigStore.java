@@ -212,5 +212,15 @@ public class ConfigStore {
                 user.getString("username"), user.getString("password")
         );
     }
+
+    public JSONObject getUserById(Integer userId) {
+        return SQLiteUtils.get("SELECT * FROM users WHERE id = ?", userId);
+    }
+
+    public void updateUser(int userId, String username, String password) {
+        SQLiteUtils.update(
+                "UPDATE users SET username = ?, password =?  WHERE id = ?",
+                username, password, userId);
+    }
 }
 

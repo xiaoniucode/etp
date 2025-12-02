@@ -65,23 +65,20 @@ public class TokenAuthService {
         String sql = "INSERT INTO auth_tokens (token, uid, username, expiredAt) VALUES (?, ?, ?, ?)";
         SQLiteUtils.insert(sql, token, userId, username, expiresAt);
         JSONObject res = new JSONObject();
-        res.put("id", username);
+        res.put("userId", userId);
         res.put("username", username);
         res.put("auth_token", token);
         res.put("expired_in", expiresAt);
         return res;
     }
 
-    public static Integer validateToken(String token) {
+    public static JSONObject validateToken(String token) {
         if (!StringUtils.hasText(token)) {
             return null;
         }
-        String sql = "SELECT uid FROM auth_tokens WHERE token = ? AND expiredAt > strftime('%s', 'now')";
-        JSONObject one = SQLiteUtils.get(sql, token);
-        if (one != null) {
-            return one.getInt("uid");
-        }
-        return null;
+        String sql = "SELECT uid,username FROM auth_tokens WHERE token = ? AND expiredAt > strftime('%s', 'now')";
+        return SQLiteUtils.get(sql, token);
+
     }
 
     public static void invalidateToken(String token) {

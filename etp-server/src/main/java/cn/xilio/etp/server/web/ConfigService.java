@@ -42,6 +42,7 @@ public final class ConfigService {
         //注册客户端
         state.registerClient(clientInfo);
     }
+
     /**
      * 数据统计
      */
@@ -265,5 +266,16 @@ public final class ConfigService {
 
     public static void deleteAll() {
         configStore.deleteAllUser();
+    }
+
+    public static void updateUser(Integer userId, JSONObject req) {
+        int id = req.getInt("uid");
+        if (userId != id) {
+            throw new BizException(401, "未登录");
+        }
+        JSONObject user = configStore.getUserById(userId);
+        if (user != null) {
+            configStore.updateUser(id, req.getString("username"), req.getString("password"));
+        }
     }
 }
