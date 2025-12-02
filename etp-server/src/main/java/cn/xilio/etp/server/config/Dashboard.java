@@ -9,6 +9,10 @@ public class Dashboard implements Serializable {
     private Boolean enable;
     private String username;
     private String password;
+    /**
+     * 是否重置数据库中的登录信息
+     */
+    private Boolean reset;
     private String addr;
     private Integer port;
 
@@ -61,5 +65,13 @@ public class Dashboard implements Serializable {
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    public Boolean getReset() {
+        return reset;
+    }
+
+    public void setReset(Boolean reset) {
+        this.reset = reset;
     }
 }

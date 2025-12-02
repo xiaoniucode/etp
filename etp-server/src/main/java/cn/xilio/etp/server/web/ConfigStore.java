@@ -41,6 +41,7 @@ public class ConfigStore {
                 name
         );
     }
+
     /**
      * 根据名称查询
      */
@@ -195,6 +196,21 @@ public class ConfigStore {
 
     public JSONObject getProxyByName(String name) {
         return SQLiteUtils.get("SELECT * FROM proxies WHERE name = ?", name);
+    }
+
+    public JSONObject getUserByUsername(String username) {
+        return SQLiteUtils.get("SELECT * FROM users WHERE username = ?", username);
+    }
+
+    public void deleteAllUser() {
+        SQLiteUtils.delete("DELETE FROM users");
+    }
+
+    public void addUser(JSONObject user) {
+        SQLiteUtils.insert(
+                "INSERT INTO users (username, password) VALUES (?, ?)",
+                user.getString("username"), user.getString("password")
+        );
     }
 }
 

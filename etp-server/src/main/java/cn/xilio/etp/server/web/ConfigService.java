@@ -73,76 +73,94 @@ public final class ConfigService {
 
 
     public static void addProxy(JSONObject req) {
-        String remotePort = req.getString("remotePort");
-        //检查公网端口是否可用
-        if (StringUtils.hasText(remotePort) && state.isPortOccupied(req.getInt("remotePort")) || !PortAllocator.get().isPortAvailable(req.getInt("remotePort"))) {
-            throw new BizException("公网端口不可用");
+        String remotePortString = req.getString("remotePort");
+        String secretKey = req.getString("secretKey");
+        if (StringUtils.hasText(remotePortString) && state.isPortOccupied(req.getInt("remotePort"))) {
+            throw new BizException("公网端口已被占用");
+        }
+
+        if (StringUtils.hasText(remotePortString) && !PortAllocator.get().isPortAvailable(req.getInt("remotePort"))) {
+            throw new BizException("公网端口无效");
         }
         if (configStore.getProxyByName(req.getString("name")) != null) {
             throw new BizException("已存在相同名称的映射");
         }
-        if (!StringUtils.hasText(req.getString("remotePort"))) {
+        if (!StringUtils.hasText(remotePortString)) {
             int allocatePort = PortAllocator.get().allocateAvailablePort();
             req.put("remotePort", allocatePort);
         }
         configStore.addProxy(req);
+        int remotePortInt = req.getInt("remotePort");
         //注册端口映射
-        state.registerProxy(req.getString("secretKey"), createProxyMapping(req));
+        state.registerProxy(secretKey, createProxyMapping(req));
         //如果客户度已经启动认证
-        ChannelManager.addPortToControlChannelIfOnline(req.getString("secretKey"), req.getInt("remotePort"));
+        ChannelManager.addPortToControlChannelIfOnline(secretKey, remotePortInt);
         //如果状态是1，需要启动代理服务
         if (req.getInt("status") == 1) {
-            TcpProxyServer.get().startRemotePort(req.getInt("remotePort"));
+            TcpProxyServer.get().startRemotePort(remotePortInt);
         } else {
             //将公网端口添加到已分配缓存
-            PortAllocator.get().addRemotePort(req.getInt("remotePort"));
+            PortAllocator.get().addRemotePort(remotePortInt);
         }
     }
 
     public static void updateProxy(JSONObject req) {
+        String newRemotePortString = req.getString("remotePort");
+        int newRemotePortInt;
+
         JSONObject oldProxy = configStore.getProxyById(req.getInt("id"));
         int oldRemotePort = oldProxy.getInt("remotePort");
         //如果没有设置公网端口，自动分配一个
         boolean remotePortChanged = false;
-        if (!StringUtils.hasText(req.getString("remotePort"))) {
+        if (!StringUtils.hasText(newRemotePortString)) {
             int allocatePort = PortAllocator.get().allocateAvailablePort();
             req.put("remotePort", allocatePort);
+            newRemotePortInt = allocatePort;
             remotePortChanged = true;
         } else {
+            newRemotePortInt = req.getInt("remotePort");
             //如果有公网端口，如果发生改变，需要判断端口是否可用
-            if (req.getInt("remotePort") != oldRemotePort) {
+            if (newRemotePortInt != oldRemotePort) {
                 remotePortChanged = true;
-                if (state.isPortOccupied(req.getInt("remotePort")) || !PortAllocator.get().isPortAvailable(req.getInt("remotePort"))) {
-                    throw new BizException("公网端口不可用");
+                if (state.isPortOccupied(newRemotePortInt)) {
+                    throw new BizException("公网端口已被占用");
+                }
+                if (!PortAllocator.get().isPortAvailable(newRemotePortInt)) {
+                    throw new BizException("公网端口无效");
                 }
             }
         }
         //检查名称
-        if (!oldProxy.getString("name").equals(req.getString("name")) && (configStore.getProxyByName(req.getString("name")) != null)) {
+        String oldName = oldProxy.getString("name");
+        String newName = req.getString("name");
+        String secretKey = req.getString("secretKey");
+        if (!oldName.equals(newName) && (configStore.getProxyByName(newName) != null)) {
             throw new BizException("映射名称已经存在");
         }
         configStore.updateProxy(req);
         //删除已经注册的映射
-        state.removeProxy(req.getString("secretKey"), oldProxy.getInt("remotePort"));
+        state.removeProxy(secretKey, oldRemotePort);
         //重新注册更新后的映射
-        state.registerProxy(req.getString("secretKey"), createProxyMapping(req));
+        state.registerProxy(secretKey, createProxyMapping(req));
         //如果客户度已经启动认证
-        ChannelManager.addPortToControlChannelIfOnline(req.getString("secretKey"), req.getInt("remotePort"));
+        ChannelManager.addPortToControlChannelIfOnline(secretKey, newRemotePortInt);
         //公网端口发生更新，需要停掉之前的服务连接
         if (remotePortChanged) {
             TcpProxyServer.get().stopRemotePort(oldRemotePort, true);
         }
         //如果状态是1，需要启动代理服务
         if (req.getInt("status") == 1) {
-            TcpProxyServer.get().startRemotePort(req.getInt("remotePort"));
+            TcpProxyServer.get().startRemotePort(newRemotePortInt);
         } else {
             //停止对应端口的代理映射服务
-            TcpProxyServer.get().stopRemotePort(req.getInt("remotePort"), false);
+            TcpProxyServer.get().stopRemotePort(newRemotePortInt, false);
         }
     }
 
     private static ProxyMapping createProxyMapping(JSONObject req) {
-        ProxyMapping proxyMapping = new ProxyMapping(ProtocolType.getType(req.getString("type")), req.getInt("localPort"), req.getInt("remotePort"));
+        ProxyMapping proxyMapping = new ProxyMapping(ProtocolType.getType(req.getString("type")),
+                req.getInt("localPort"),
+                req.getInt("remotePort"));
         proxyMapping.setProxyId(req.getInt("clientId"));
         proxyMapping.setName(req.getString("name"));
         proxyMapping.setStatus(req.getInt("status"));
@@ -184,13 +202,16 @@ public final class ConfigService {
     }
 
     public static void updateClient(JSONObject req) {
-        JSONObject client = configStore.getClientById(req.getInt("id"));
-        state.updateClientName(client.getString("secretKey"), req.getString("name"));
-        configStore.updateClient(req.getInt("id"), req.getString("name"));
+        int id = req.getInt("id");
+        String name = req.getString("name");
+        JSONObject client = configStore.getClientById(id);
+        state.updateClientName(client.getString("secretKey"), name);
+        configStore.updateClient(id, name);
     }
 
     public static void deleteClient(JSONObject req) {
         JSONObject client = configStore.getClientById(req.getInt("id"));
+        int id = client.getInt("id");
         String secretKey = client.getString("secretKey");
 
         state.removeClient(secretKey);
@@ -199,9 +220,9 @@ public final class ConfigService {
         state.getClientRemotePorts(secretKey).forEach(remotePort -> {
             TcpProxyServer.get().stopRemotePort(remotePort, true);
         });
-        configStore.deleteClient(client.getInt("id"));
+        configStore.deleteClient(id);
         //删除客户端所有的代理映射
-        configStore.deleteProxiesByClient(client.getInt("id"));
+        configStore.deleteProxiesByClient(id);
     }
 
     /**
@@ -219,5 +240,32 @@ public final class ConfigService {
 
     public static JSONObject getProxy(JSONObject req) {
         return configStore.getProxyById(req.getInt("id"));
+    }
+
+    public static JSONObject login(JSONObject req) {
+        String username = req.optString("username");
+        String password = req.optString("password");
+        JSONObject user = configStore.getUserByUsername(username);
+        if (user == null) {
+            throw new BizException(401, "用户不存在！");
+        }
+        //检查密码 todo 暂时不加密
+        if (!password.equals(user.optString("password"))) {
+            throw new BizException(401, "密码错误");
+        }
+        //创建登录令牌
+        return TokenAuthService.createToken(user.getInt("id"), username);
+    }
+
+    public static JSONObject getUserByUsername(String username) {
+        return configStore.getUserByUsername(username);
+    }
+
+    public static void registerUser(JSONObject user) {
+        configStore.addUser(user);
+    }
+
+    public static void deleteAll() {
+        configStore.deleteAllUser();
     }
 }

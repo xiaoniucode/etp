@@ -3,8 +3,10 @@ package cn.xilio.etp.server;
 import cn.xilio.etp.core.protocol.ProtocolType;
 import cn.xilio.etp.server.config.AppConfig;
 import cn.xilio.etp.server.config.ClientInfo;
+import cn.xilio.etp.server.config.Dashboard;
 import cn.xilio.etp.server.config.ProxyMapping;
 import cn.xilio.etp.server.manager.RuntimeState;
+import cn.xilio.etp.server.web.ConfigService;
 import cn.xilio.etp.server.web.ConfigStore;
 import cn.xilio.etp.server.web.SQLiteUtils;
 import org.json.JSONArray;
@@ -14,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * @author liuxin
@@ -37,9 +38,36 @@ public final class EtpInitialize {
             registerDBClientConfig();
             //注册所有端口映射配置
             registerDBProxyConfig();
+            //将Toml中的用户信息同步到数据库
+            syncDashboardUser();
         }
         //注册和同步Toml静态配
         registerTomlConfig();
+    }
+
+    private static void syncDashboardUser() {
+        Dashboard dashboard = config.getDashboard();
+        Boolean reset = dashboard.getReset();
+        String username = dashboard.getUsername();
+        String password = dashboard.getPassword();
+        JSONObject save = new JSONObject();
+        save.put("username", username);
+        save.put("password", password);
+        JSONObject user = ConfigService.getUserByUsername(username);
+        //没有直接添加用户
+        if (user == null) {
+            ConfigService.registerUser(save);
+            logger.info("注册用户 {}", username);
+            return;
+        }
+        //如果数据库已经存在用户了，如果reset=true则重置
+        if (reset) {
+            //删除所有用户
+            ConfigService.deleteAll();
+            //重新注册
+            ConfigService.registerUser(save);
+            logger.info("重置面板用户登录信息 {}", username);
+        }
     }
 
     private static void registerTomlConfig() {
@@ -127,12 +155,40 @@ public final class EtpInitialize {
      */
     private static void initDBTable() {
         logger.debug("开始初始化数据库表");
-        createClient();
-        createProxyMapping();
+        createAuthTokenTable();
+        createUserTable();
+        createClientTable();
+        createProxiesTable();
         logger.debug("数据库表初始化完毕");
     }
 
-    private static void createProxyMapping() {
+    private static void createAuthTokenTable() {
+        String sql = """
+                CREATE TABLE IF NOT EXISTS auth_tokens (
+                    token TEXT PRIMARY KEY,
+                    uid INTEGER NOT NULL,
+                    username TEXT NOT NULL,
+                    expiredAt INTEGER NOT NULL,         -- unix 时间戳（秒）
+                    createdAt INTEGER DEFAULT (strftime('%s','now')),
+                    FOREIGN KEY (uid) REFERENCES users(id)
+                );
+                CREATE INDEX IF NOT EXISTS idx_auth_tokens_expires_at ON auth_tokens(expires_at);
+                """;
+        SQLiteUtils.createTable(sql);
+    }
+
+    private static void createUserTable() {
+        String sql = """
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL
+                );
+                """;
+        SQLiteUtils.createTable(sql);
+    }
+
+    private static void createProxiesTable() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS proxies (
                     id          INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增主键
@@ -149,7 +205,7 @@ public final class EtpInitialize {
         SQLiteUtils.createTable(sql);
     }
 
-    private static void createClient() {
+    private static void createClientTable() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS clients (
                     id         INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增ID

@@ -108,6 +108,9 @@
             $.ajax({
                 url: '/user/logout',
                 type: 'delete',
+                headers: {
+                    Authorization: localStorage.getItem("auth_token")
+                },
                 contentType: 'application/json',
                 timeout: 5000,
                 success: function (res) {

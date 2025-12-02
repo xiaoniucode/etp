@@ -1,12 +1,14 @@
 package cn.xilio.etp.server.web;
 
 import cn.xilio.etp.common.JsonUtils;
+import cn.xilio.etp.common.StringUtils;
 import cn.xilio.etp.server.metrics.MetricsCollector;
 import cn.xilio.etp.server.web.framework.*;
 import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -15,34 +17,62 @@ import java.util.UUID;
  * @author liuxin
  */
 public class DashboardApi {
+    private static final Set<String> WHITE_LIST = Set.of("/user/login", "/static/", "/template/", "/favicon.ico");
+
     public static void initFilters(List<Filter> filters) {
         filters.add(new Filter() {
             @Override
             public void doFilter(RequestContext context, FilterChain chain) throws Exception {
+                String path = context.getRequest().uri();
+                // 白名单直接放行
+                if (WHITE_LIST.stream().anyMatch(path::startsWith)) {
+                    chain.doFilter();
+                    return;
+                }
+                String auth = context.getHeader("Authorization");
+                if (auth == null || !auth.startsWith("Bearer ")) {
+                    context.setResponseContent(ResponseEntity.error(401, "未登录").toJson());
+                    return;
+                }
+                String token = auth.substring(7);
+                Integer userId = TokenAuthService.validateToken(token);
+                if (userId == null) {
+                    context.setResponseContent(ResponseEntity.error(401, "登录已过期或无效").toJson());
+                    return;
+                }
+                // 把用户信息放进上下文，后面业务方便用
+                context.setAttribute("userId", userId);
+                context.setAttribute("auth_token", token);
                 chain.doFilter();
             }
 
             @Override
             public int getOrder() {
-                return 0;
+                return -999;
             }
         });
     }
 
     public static void initRoutes(Router router) {
         router.addRoute(HttpMethod.POST, "/user/login", context -> {
-            String requestBody = context.getRequestBody();
-            JSONObject jsonObject = JsonUtils.toJsonObject(requestBody);
-            JSONObject data = new JSONObject();
-            data.put("auth_token", UUID.randomUUID().toString());
-            context.setResponseContent(ResponseEntity.ok(data).toJson());
+            JSONObject req = JsonUtils.toJsonObject(context.getRequestBody());
+            context.setResponseContent(ResponseEntity.ok(ConfigService.login(req)).toJson());
         });
         router.addRoute(HttpMethod.PUT, "/user/flush-token", context -> {
-            JSONObject data = new JSONObject();
-            data.put("auth_token", UUID.randomUUID().toString());
-            context.setResponseContent(ResponseEntity.ok(data).toJson());
+            String auth = context.getHeader("Authorization");
+            String oldToken = (StringUtils.hasText(auth) && auth.startsWith("Bearer ")) ? auth.substring(7) : null;
+            JSONObject newToken = TokenAuthService.refreshToken(oldToken);
+            if (newToken != null) {
+                context.setResponseContent(ResponseEntity.ok(newToken).toJson());
+            } else {
+                context.setResponseContent(ResponseEntity.error(401, "无效的token").toJson());
+            }
         });
         router.addRoute(HttpMethod.DELETE, "/user/logout", context -> {
+            String auth = context.getHeader("Authorization");
+            if (StringUtils.hasText(auth) && auth.startsWith("Bearer ")) {
+                TokenAuthService.invalidateToken(auth.substring(7));
+            }
             context.setResponseContent(ResponseEntity.ok().toJson());
         });
         router.addRoute(HttpMethod.GET, "/user/info", context -> {
