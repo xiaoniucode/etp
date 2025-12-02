@@ -8,7 +8,7 @@
 </head>
 <body>
 <blockquote class="layui-elem-quote">
-    统计信息目前尚未做持久化，未来版本会完善！
+    统计信息目前尚未做持久化！
 </blockquote>
 <script type="text/html" id="statsToolbar">
     <div class="layui-btn-container">
@@ -35,28 +35,50 @@
             toolbar: '#statsToolbar',
             cellMinWidth: 80,
             headers: {
-                'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
             },
             cols: [[
                 {field: 'remotePort', fixed: 'left', width: 120, title: '公网端口', sort: true},
-                {field: 'readMsgs', title: '读取消息条数'},
-                {field: 'writeMsgs', sort: true, title: '写消息条数'},
-                {field: 'readBytes', sort: true, title: '读取字节数'},
-                {field: 'writeBytes', sort: true, title: '写字节数'},
-                {field: 'channels', sort: true, title: '连接数'},
-                {field: 'time', sort: true, title: '时间'},
+                {field: 'channels',  title: '连接数', sort: true, align: 'center'},
+
+                // 上行（外网 → 你服务器）
+                {
+                    field: 'readBytes', title: '上行流量', sort: true,
+                    templet: d => formatBytes(d.readBytes)
+                },
+                {field: 'readMsgs', title: '接收消息数', sort: true},
+
+                // 下行（你服务器 → 外网）
+                {
+                    field: 'writeBytes', title: '<strong>下行流量</strong>', sort: true,
+                    templet: d => '<strong style="color:#16baaa;">' + formatBytes(d.writeBytes) + '</strong>'
+                },
+                {field: 'writeMsgs', title: '发送消息数', sort: true},
+
+                {
+                    field: 'time', title: '统计时间', sort: true, width: 180,
+                    templet: d => layui.util.toDateString(d.time, 'yyyy-MM-dd HH:mm')
+                }
             ]],
             error: function (res, msg) {
                 console.log(res, msg)
             }
         });
 
-        //操作工具栏
+        // 自动把字节数转成 B/KB/MB/GB/TB
+        function formatBytes(bytes) {
+            if (!bytes || bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
         table.on('toolbar(metrics)', function (obj) {
             if (obj.event === 'flush') {
-                table.reload('metrics')
+                table.reload('metrics');
             }
-        })
+        });
     });
 </script>
 </body>

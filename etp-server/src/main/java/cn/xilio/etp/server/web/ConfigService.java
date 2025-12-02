@@ -194,7 +194,7 @@ public final class ConfigService {
         //删除注册的端口映射
         state.removeProxy(secretKey, remotePort);
         //删除公网端口与已认证客户端的绑定
-        ChannelManager.removeRemotePortToControlChannel(secretKey, remotePort);
+        ChannelManager.removeRemotePortToControlChannel(remotePort);
         //停掉连接的服务并释放端口
         TcpProxyServer.get().stopRemotePort(remotePort, true);
         configStore.deleteProxy(id);

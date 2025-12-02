@@ -82,8 +82,7 @@ public final class ChannelManager {
         clearControlChannel(channel);
     }
 
-    public static void removeRemotePortToControlChannel(String secretKey, int remotePort) {
-        clientControlChannelMapping.remove(secretKey);
+    public static void removeRemotePortToControlChannel(int remotePort) {
         portControlChannelMapping.remove(remotePort);
     }
 

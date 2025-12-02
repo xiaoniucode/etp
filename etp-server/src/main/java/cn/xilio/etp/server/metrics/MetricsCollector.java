@@ -1,7 +1,6 @@
 package cn.xilio.etp.server.metrics;
 
 
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -60,6 +59,16 @@ public class MetricsCollector {
     public static MetricsCollector getCollector(Integer remotePort) {
         return COLLECTORS.computeIfAbsent(remotePort, MetricsCollector::new);
     }
+
+    /**
+     * 删除对应端口的流量收集器
+     *
+     * @param remotePort 公网端口
+     */
+    public static void removeCollector(Integer remotePort) {
+        COLLECTORS.remove(remotePort);
+    }
+
     /**
      * 获取当前端口对应的指标
      *
@@ -90,6 +99,7 @@ public class MetricsCollector {
         }
         return res;
     }
+
     public void incReadBytes(long bytes) {
         if (bytes > 0) {
             readBytes.add(bytes);

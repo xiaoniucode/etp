@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
@@ -13,12 +15,15 @@ import java.net.InetSocketAddress;
  * @author liuxin
  */
 public class TrafficMetricsHandler extends ChannelDuplexHandler {
+    private final Logger logger = LoggerFactory.getLogger(TrafficMetricsHandler.class);
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         InetSocketAddress sa = (InetSocketAddress) ctx.channel().localAddress();
         MetricsCollector collector = MetricsCollector.getCollector(sa.getPort());
         collector.incReadMsgs(1);
-        collector.incReadBytes(((ByteBuf) msg).readableBytes());
+        if (msg instanceof ByteBuf byteBuf) {
+            collector.incReadBytes((byteBuf).readableBytes());
+        }
         super.channelRead(ctx, msg);
     }
 
@@ -27,7 +32,9 @@ public class TrafficMetricsHandler extends ChannelDuplexHandler {
         InetSocketAddress sa = (InetSocketAddress) ctx.channel().localAddress();
         MetricsCollector collector = MetricsCollector.getCollector(sa.getPort());
         collector.incWriteMsgs(1);
-        collector.incWriteBytes(((ByteBuf) msg).readableBytes());
+        if (msg instanceof ByteBuf byteBuf) {
+            collector.incWriteBytes((byteBuf).readableBytes());
+        }
         super.write(ctx, msg, promise);
     }
 
@@ -45,6 +52,12 @@ public class TrafficMetricsHandler extends ChannelDuplexHandler {
         MetricsCollector collector = MetricsCollector.getCollector(sa.getPort());
         collector.decChannels();
         super.channelInactive(ctx);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        logger.warn("流量指标收集出错",cause);
+        super.exceptionCaught(ctx, cause);
     }
 }
 
