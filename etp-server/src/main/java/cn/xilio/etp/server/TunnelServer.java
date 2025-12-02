@@ -54,21 +54,9 @@ public class TunnelServer implements Lifecycle {
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(tunnelBossGroup, tunnelWorkerGroup)
-                    // 1. 连接参数调优
-                    .option(ChannelOption.SO_BACKLOG, 1024)          // 全连接队列大小
-                    .option(ChannelOption.SO_REUSEADDR, true)        // 地址重用，快速重启
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000) // 连接超时(毫秒)
-
-                    // 2. 子通道参数调优
                     .childOption(ChannelOption.TCP_NODELAY, true)    // 禁用Nagle算法，降低延迟
                     .childOption(ChannelOption.SO_KEEPALIVE, true)   // 启用TCP心跳检测
-                    .childOption(ChannelOption.SO_LINGER, 0)         // 关闭时立即返回
-
-                    // 3. 内存分配调优
                     .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) // 使用内存池
-                    .childOption(ChannelOption.RCVBUF_ALLOCATOR, new AdaptiveRecvByteBufAllocator(64, 1024, 65536)) // 自适应接收缓冲区
-                    .childOption(ChannelOption.SO_RCVBUF, 64 * 1024) // 接收缓冲区大小
-                    .childOption(ChannelOption.SO_SNDBUF, 64 * 1024) // 发送缓冲区大小
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override

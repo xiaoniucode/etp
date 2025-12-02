@@ -94,13 +94,9 @@ public class TunnelClient implements Lifecycle {
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             controlBootstrap.group(tunnelWorkerGroup)
                     .channel(NettyEventLoopFactory.socketChannelClass())
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000) // 连接超时
                     .option(ChannelOption.TCP_NODELAY, true) // 禁用Nagle算法
                     .option(ChannelOption.SO_KEEPALIVE, true) // TCP保活
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) // 内存池
-                    .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT) // 自适应缓冲区
-                    .option(ChannelOption.SO_SNDBUF, 64 * 1024) // 发送缓冲区
-                    .option(ChannelOption.SO_RCVBUF, 64 * 1024) // 接收缓冲区
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
