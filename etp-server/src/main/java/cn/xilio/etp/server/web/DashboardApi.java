@@ -5,6 +5,7 @@ import cn.xilio.etp.common.StringUtils;
 import cn.xilio.etp.server.metrics.MetricsCollector;
 import cn.xilio.etp.server.web.framework.*;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.UUID;
  * @author liuxin
  */
 public class DashboardApi {
-    private static final Set<String> WHITE_LIST = Set.of("/user/login", "/static/", "/template/", "/favicon.ico");
+    private static final Set<String> WHITE_LIST = Set.of("/user/login");
 
     public static void initFilters(List<Filter> filters) {
         filters.add(new Filter() {
@@ -31,7 +32,7 @@ public class DashboardApi {
                 }
                 String auth = context.getHeader("Authorization");
                 if (auth == null || !auth.startsWith("Bearer ")) {
-                    context.setResponseContent(ResponseEntity.error(401, "未登录").toJson());
+                    context.abortWithResponse(HttpResponseStatus.UNAUTHORIZED,ResponseEntity.error(401, "未登录").toJson());
                     return;
                 }
                 String token = auth.substring(7);

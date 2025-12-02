@@ -42,8 +42,6 @@ public final class ConfigService {
         //注册客户端
         state.registerClient(clientInfo);
     }
-
-
     /**
      * 数据统计
      */

@@ -58,7 +58,9 @@
                 type: 'put',
                 contentType: 'application/json',
                 data: JSON.stringify({id: id, name: field.name}),
-                headers: {},
+                headers: {
+                    'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                },
                 success: function (res) {
                     if (res.code === 0) {
                         layer.msg('更新成功', {icon: 1, time: 400,}, () => {

@@ -34,6 +34,9 @@
             url: '/metrics',
             toolbar: '#statsToolbar',
             cellMinWidth: 80,
+            headers: {
+                'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+            },
             cols: [[
                 {field: 'remotePort', fixed: 'left', width: 120, title: '公网端口', sort: true},
                 {field: 'readMsgs', title: '读取消息条数'},

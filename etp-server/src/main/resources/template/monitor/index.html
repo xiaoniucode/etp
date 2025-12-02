@@ -57,7 +57,7 @@
                 url: '/stats',
                 type: 'GET',
                 headers: {
-                    Authorization: localStorage.getItem("auth_token")
+                    'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
                 },
                 success: function (res) {
                     if (res.code === 0) {

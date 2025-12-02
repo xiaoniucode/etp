@@ -83,10 +83,6 @@
 <script>
     layui.use(['element', 'layer'], function () {
         const $ = layui.$;
-        if (!localStorage.getItem("auth_token")){
-            location.href="/login.html"
-        }
-
         // 默认选中第一个
         const $menuItems = $('.layui-nav-tree .layui-nav-item a');
         // 点击左侧菜单切换页面
@@ -104,12 +100,13 @@
         });
 
         $('#logout').on('click', function () {
+            const authToken = localStorage.getItem("auth_token");
             localStorage.removeItem("auth_token")
             $.ajax({
                 url: '/user/logout',
                 type: 'delete',
                 headers: {
-                    Authorization: localStorage.getItem("auth_token")
+                    'Authorization': 'Bearer ' + authToken
                 },
                 contentType: 'application/json',
                 timeout: 5000,

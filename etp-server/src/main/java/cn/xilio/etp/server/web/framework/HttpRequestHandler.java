@@ -30,24 +30,23 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         RequestContext context = new RequestContext(ctx, request);
         try {
-            FilterChain filterChain = new FilterChain(context);
-            filters.forEach(filterChain::addFilter);
-            filterChain.doFilter();
-
             String path = getNormalPath(request.uri());
-
             // 检查是否为静态资源请求
             if (StaticResourceHandler.isStaticResourceRequest(path)) {
                 StaticResourceHandler.handleStaticResource(context);
+            }
+            FilterChain filterChain = new FilterChain(context);
+            filters.forEach(filterChain::addFilter);
+            filterChain.doFilter();
+            if (context.isAborted()) {
+                sendResponse(context);
+                return;
+            }
+            RequestHandler handler = router.match(request.method(), path);
+            if (handler == null) {
+                context.abortWithResponse(HttpResponseStatus.NOT_FOUND, "{\"error\":\"资源不存在\",\"path\":\"" + path + "\"}");
             } else {
-                // 原有的API路由逻辑
-                RequestHandler handler = router.match(request.method(), path);
-                if (handler == null) {
-                    context.abortWithResponse(HttpResponseStatus.NOT_FOUND,
-                            "{\"error\":\"接口不存在\",\"path\":\"" + path + "\"}");
-                } else {
-                    handler.handle(context);
-                }
+                handler.handle(context);
             }
             sendResponse(context);
         } catch (Throwable e) {
@@ -62,7 +61,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             return;
         }
 
-        // 原有的API响应逻辑
         String content = context.getResponseContent();
         FullHttpResponse response = new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1,
