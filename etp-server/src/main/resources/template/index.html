@@ -83,6 +83,10 @@
 <script>
     layui.use(['element', 'layer'], function () {
         const $ = layui.$;
+        if (!localStorage.getItem("auth_token")){
+            location.href="/login.html"
+        }
+
         // 默认选中第一个
         const $menuItems = $('.layui-nav-tree .layui-nav-item a');
         // 点击左侧菜单切换页面
@@ -98,6 +102,28 @@
         $('#openAccountSetting').on('click', function () {
             $('#mainFrame').attr('src', '/account.html');
         });
+
+        $('#logout').on('click', function () {
+            localStorage.removeItem("auth_token")
+            $.ajax({
+                url: '/user/logout',
+                type: 'delete',
+                contentType: 'application/json',
+                timeout: 5000,
+                success: function (res) {
+                    layer.msg('已退出登录', {icon: 1, time: 3000}, function () {
+                        window.location.href = '/login.html';
+                    });
+                },
+                error: function () {
+                    layer.msg('已退出', {icon: 1});
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 800);
+                }
+            });
+        });
+
     });
 </script>
 </body>

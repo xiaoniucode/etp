@@ -4,8 +4,10 @@ import cn.xilio.etp.common.JsonUtils;
 import cn.xilio.etp.server.metrics.MetricsCollector;
 import cn.xilio.etp.server.web.framework.*;
 import io.netty.handler.codec.http.HttpMethod;
+import org.json.JSONObject;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Dashboard 管理、认证接口
@@ -28,6 +30,27 @@ public class DashboardApi {
     }
 
     public static void initRoutes(Router router) {
+        router.addRoute(HttpMethod.POST, "/user/login", context -> {
+            String requestBody = context.getRequestBody();
+            JSONObject jsonObject = JsonUtils.toJsonObject(requestBody);
+            JSONObject data = new JSONObject();
+            data.put("auth_token", UUID.randomUUID().toString());
+            context.setResponseContent(ResponseEntity.ok(data).toJson());
+        });
+        router.addRoute(HttpMethod.PUT, "/user/flush-token", context -> {
+            JSONObject data = new JSONObject();
+            data.put("auth_token", UUID.randomUUID().toString());
+            context.setResponseContent(ResponseEntity.ok(data).toJson());
+        });
+        router.addRoute(HttpMethod.DELETE, "/user/logout", context -> {
+            context.setResponseContent(ResponseEntity.ok().toJson());
+        });
+        router.addRoute(HttpMethod.GET, "/user/info", context -> {
+
+        });
+        router.addRoute(HttpMethod.PUT, "/user/update", context -> {
+
+        });
         router.addRoute(HttpMethod.GET, "/client/list", context ->
                 context.setResponseContent(ResponseEntity.ok(ConfigService.clients()).toJson()));
         router.addRoute(HttpMethod.GET, "/client/get", context ->
