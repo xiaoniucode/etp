@@ -34,17 +34,18 @@
         </div>
         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
-                <a>
-                    <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img"> admin
+                <a href="javascript:;">
+                    <img src="/static/image/logo.jpg" class="layui-nav-img">
+                    <span id="username">加载中...</span>
                 </a>
                 <dl class="layui-nav-child">
                     <dd>
-                        <a id="openAccountSetting">
+                        <a id="openAccountSetting" href="javascript:;">
                             <i class="layui-icon layui-icon-set"></i> 账户设置
                         </a>
                     </dd>
                     <dd>
-                        <a id="logout">
+                        <a id="logout" href="javascript:;">
                             <i class="layui-icon layui-icon-logout"></i> 退出登录
                         </a>
                     </dd>
@@ -58,17 +59,17 @@
         <div class="layui-side-scroll">
             <ul class="layui-nav layui-nav-tree" lay-filter="leftMenu">
                 <li class="layui-nav-item layui-this">
-                    <a data-url="/monitor/index.html"><i class="layui-icon layui-icon-console"></i>
+                    <a href="javascript:;" data-url="/monitor/index.html"><i class="layui-icon layui-icon-console"></i>
                         监控</a>
                 </li>
                 <li class="layui-nav-item">
-                    <a data-url="/proxy/index.html"><i class="layui-icon layui-icon-link"></i> 映射</a>
+                    <a href="javascript:;" data-url="/proxy/index.html"><i class="layui-icon layui-icon-link"></i> 映射</a>
                 </li>
                 <li class="layui-nav-item">
-                    <a data-url="/client/index.html"><i class="layui-icon layui-icon-app"></i> 客户端</a>
+                    <a href="javascript:;" data-url="/client/index.html"><i class="layui-icon layui-icon-app"></i> 客户端</a>
                 </li>
                 <li class="layui-nav-item">
-                    <a data-url="/stats/index.html"><i class="layui-icon layui-icon-chart"></i> 统计</a>
+                    <a href="javascript:;" data-url="/stats/index.html"><i class="layui-icon layui-icon-chart"></i> 统计</a>
                 </li>
             </ul>
         </div>
@@ -81,12 +82,12 @@
 
 <script src="/static/layui/layui.js"></script>
 <script>
-    layui.use(['element', 'layer'], function () {
+    layui.use(['element', 'layer', 'jquery'], function () {
         const $ = layui.$;
-        // 默认选中第一个
-        const $menuItems = $('.layui-nav-tree .layui-nav-item a');
-        // 点击左侧菜单切换页面
-        $menuItems.on('click', function () {
+        setLoginInfo()
+
+        // 左侧菜单切换页面
+        $('.layui-nav-tree .layui-nav-item a').on('click', function () {
             const url = $(this).data('url');
             if (url && url !== '') {
                 $('#mainFrame').attr('src', url);
@@ -121,6 +122,20 @@
                 }
             });
         });
+
+        function setLoginInfo() {
+            try {
+                const userStr = localStorage.getItem("user");
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    if (user && user.username) {
+                        $("#username").text(user.username);
+                    }
+                }
+            } catch (e) {
+                console.warn("解析用户信息失败", e);
+            }
+        }
     });
 </script>
 </body>
