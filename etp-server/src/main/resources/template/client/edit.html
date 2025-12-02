@@ -39,7 +39,7 @@
         var id = getQueryParam("id");
 
         $.ajax({
-            url: '/client/get?id=' + id,
+            url: '/api/client/get?id=' + id,
             type: 'get',
             contentType: 'application/json',
             headers: {},
@@ -54,7 +54,7 @@
         form.on('submit(demo1)', function (data) {
             const field = data.field;
             $.ajax({
-                url: '/client/update',
+                url: '/api/client/update',
                 type: 'put',
                 contentType: 'application/json',
                 data: JSON.stringify({id: id, name: field.name}),

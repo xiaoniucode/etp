@@ -71,7 +71,7 @@
 
         //渲染客户端下拉框
         $.ajax({
-            url: '/client/list',
+            url: '/api/client/list',
             type: 'get',
             contentType: 'application/json',
             headers: {
@@ -113,7 +113,7 @@
             }
             field.status = field.status ? 1 : 0;
             $.ajax({
-                url: '/proxy/add',
+                url: '/api/proxy/add',
                 type: 'post',
                 contentType: 'application/json',
                 data: JSON.stringify(field),

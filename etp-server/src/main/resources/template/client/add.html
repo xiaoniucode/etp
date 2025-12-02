@@ -33,7 +33,7 @@
         form.on('submit(demo1)', function (data) {
             const field = data.field;
             $.ajax({
-                url: '/client/add',
+                url: '/api/client/add',
                 type: 'post',
                 contentType: 'application/json',
                 data: JSON.stringify(field),

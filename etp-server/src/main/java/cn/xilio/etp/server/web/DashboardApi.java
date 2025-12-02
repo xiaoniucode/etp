@@ -18,7 +18,7 @@ import java.util.UUID;
  * @author liuxin
  */
 public class DashboardApi {
-    private static final Set<String> WHITE_LIST = Set.of("/user/login");
+    private static final Set<String> WHITE_LIST = Set.of("/api/user/login", "/login.html", "/layui/");
 
     public static void initFilters(List<Filter> filters) {
         filters.add(new Filter() {
@@ -27,6 +27,11 @@ public class DashboardApi {
                 String path = context.getRequest().uri();
                 // 白名单直接放行
                 if (WHITE_LIST.stream().anyMatch(path::startsWith)) {
+                    chain.doFilter();
+                    return;
+                }
+                //只有接口才检查登录
+                if (!path.startsWith("/api")) {
                     chain.doFilter();
                     return;
                 }
@@ -56,6 +61,7 @@ public class DashboardApi {
     }
 
     public static void initRoutes(Router router) {
+        router.setRoutePrefix("/api");
         router.addRoute(HttpMethod.POST, "/user/login", context -> {
             JSONObject req = JsonUtils.toJsonObject(context.getRequestBody());
             context.setResponseContent(ResponseEntity.ok(ConfigService.login(req)).toJson());

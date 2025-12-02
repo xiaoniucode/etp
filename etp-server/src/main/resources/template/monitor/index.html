@@ -54,7 +54,7 @@
         var $ = layui.jquery;
         $(function () {
             $.ajax({
-                url: '/stats',
+                url: '/api/stats',
                 type: 'GET',
                 headers: {
                     'Authorization': 'Bearer ' +localStorage.getItem("auth_token")

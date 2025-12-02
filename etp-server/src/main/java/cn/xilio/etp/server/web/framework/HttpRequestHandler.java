@@ -30,11 +30,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         RequestContext context = new RequestContext(ctx, request);
         try {
-            String path = getNormalPath(request.uri());
-            // 检查是否为静态资源请求
-            if (StaticResourceHandler.isStaticResourceRequest(path)) {
-                StaticResourceHandler.handleStaticResource(context);
-            }
             FilterChain filterChain = new FilterChain(context);
             filters.forEach(filterChain::addFilter);
             filterChain.doFilter();
@@ -42,6 +37,12 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 sendResponse(context);
                 return;
             }
+            String path = getNormalPath(request.uri());
+            // 检查是否为静态资源请求
+            if (StaticResourceHandler.isStaticResourceRequest(path)) {
+                StaticResourceHandler.handleStaticResource(context);
+            }
+
             RequestHandler handler = router.match(request.method(), path);
             if (handler == null) {
                 context.abortWithResponse(HttpResponseStatus.NOT_FOUND, "{\"error\":\"资源不存在\",\"path\":\"" + path + "\"}");

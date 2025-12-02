@@ -37,7 +37,7 @@
             elem: '#proxy',
             text: "空空如也",
             skin: "line",
-            url: '/proxy/list',
+            url: '/api/proxy/list',
             toolbar: '#headerToobar',
             cellMinWidth: 80,
             headers: {
@@ -90,7 +90,7 @@
                         btn: ['确认删除', '我再想想'],
                     }, function (index) {
                         $.ajax({
-                            url: '/proxy/del',
+                            url: '/api/proxy/del',
                             type: 'delete',
                             contentType: 'application/json',
                             data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
@@ -111,7 +111,7 @@
             } else if (obj.event === 'statusSwitch') {
                 const loading = layer.msg('正在切换...', {icon: 16, shade: 0.3, time: 0});
                 $.ajax({
-                    url: '/proxy/switch-proxy-status',
+                    url: '/api/proxy/switch-proxy-status',
                     type: 'put',
                     contentType: 'application/json',
                     headers: {

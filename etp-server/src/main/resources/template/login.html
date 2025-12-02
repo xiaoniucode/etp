@@ -264,7 +264,7 @@
             if (!token) return;
 
             $.ajax({
-                url: '/user/flush-token',
+                url: '/api/user/flush-token',
                 type: 'PUT',
                 timeout: 8000,
                 success: function (res) {
@@ -291,7 +291,7 @@
             var field = data.field;
 
             $.ajax({
-                url: '/user/login',
+                url: '/api/user/login',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({

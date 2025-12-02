@@ -104,7 +104,7 @@
             localStorage.removeItem("user")
             localStorage.removeItem("auth_token")
             $.ajax({
-                url: '/user/logout',
+                url: '/api/user/logout',
                 type: 'delete',
                 headers: {
                     'Authorization': 'Bearer ' + authToken

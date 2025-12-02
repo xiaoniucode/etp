@@ -11,6 +11,7 @@ import java.util.List;
  * @author liuxin
  */
 public class Router {
+    private String routePrefix;
     private final List<Route> routes = new ArrayList<>();
 
     /**
@@ -21,7 +22,7 @@ public class Router {
      * @param handler 处理器
      */
     public void addRoute(HttpMethod method, String path, RequestHandler handler) {
-        routes.add(new Route(method, path, handler));
+        routes.add(new Route(method, routePrefix + path, handler));
     }
 
     public RequestHandler match(HttpMethod method, String uri) {
@@ -31,6 +32,14 @@ public class Router {
             }
         }
         return null;
+    }
+
+    public String getRoutePrefix() {
+        return routePrefix;
+    }
+
+    public void setRoutePrefix(String routePrefix) {
+        this.routePrefix = routePrefix;
     }
 }
 
