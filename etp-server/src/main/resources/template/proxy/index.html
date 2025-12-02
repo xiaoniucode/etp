@@ -41,7 +41,7 @@
             toolbar: '#headerToobar',
             cellMinWidth: 80,
             headers: {
-                'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
             },
             cols: [[
                 {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
@@ -55,7 +55,20 @@
                         }
                     }
                 },
-                {field: 'remotePort', sort: true, title: '公网端口'},
+                {
+                    field: 'remotePort', sort: true, title: '公网端口',
+                    templet: function (d) {
+                        return `
+                         <div style="display:flex; align-items:center; gap:2px; font-size:14px; font-weight:600;">
+                           <span>${d.remotePort}</span>
+                          <a href="javascript:;" lay-event="copyPort" class="layui-btn layui-btn-xs layui-btn-primary"
+                              style="border:none; background:transparent; " title="点击复制端口号">
+                             <i class="layui-icon layui-icon-file" style="color:#16baaa; font-size:16px;"></i>
+                           </a>
+                        </div>
+                    `;
+                    }
+                },
                 {field: 'localPort', sort: true, title: '内网端口'},
                 {
                     field: 'status', width: 120, title: '状态', sort: true, templet: function (d) {
@@ -95,7 +108,7 @@
                             contentType: 'application/json',
                             data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
                             headers: {
-                                'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
                             },
                             success: function (res) {
                                 if (res.code === 0) {
@@ -115,7 +128,7 @@
                     type: 'put',
                     contentType: 'application/json',
                     headers: {
-                        'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                        'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
                     },
                     data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
                     success: function (res) {
@@ -134,6 +147,13 @@
                     }
                 });
 
+            } else if (obj.event === 'copyPort') {
+                const port = obj.data.remotePort + '';
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(port).then(() => {
+                        layer.msg('已复制公网端口', {icon: 1, time: 1200});
+                    })
+                }
             }
         })
         //操作工具栏

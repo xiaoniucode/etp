@@ -41,7 +41,7 @@
     </div>
 </script>
 <script src="/static/layui/layui.js"></script>
-<script src="/static/ajax.js"></script>
+<script src="/static/js/ajax.js"></script>
 <script>
     layui.use(['table', 'dropdown', 'jquery'], function () {
         var table = layui.table;
@@ -56,7 +56,21 @@
             },
             cols: [[
                 {field: 'name', fixed: 'left', width: 150, title: '客户端'},
-                {field: 'secretKey', title: 'Token'},
+                {
+                    field: 'secretKey',
+                    title: 'Token',
+                    templet: function (d) {
+                        return `
+                         <div style="display:flex; align-items:center; gap:2px; font-size:14px; font-weight:600;">
+                           <span>${d.secretKey}</span>
+                          <a href="javascript:;" lay-event="copyToken" class="layui-btn layui-btn-xs layui-btn-primary"
+                              style="border:none; background:transparent; " title="点击复制Token">
+                             <i class="layui-icon layui-icon-file" style="color:#16baaa; font-size:16px;"></i>
+                           </a>
+                        </div>
+                    `;
+                    }
+                },
                 {
                     field: 'status', title: '状态', sort: true, templet: function (d) {
                         if (d.status === 1) {
@@ -137,6 +151,13 @@
                         });
                     });
 
+            } else if (obj.event === 'copyToken') {
+                const token = data.secretKey + '';
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(token).then(() => {
+                        layer.msg('已复制Token', {icon: 1, time: 1200});
+                    })
+                }
             }
         })
         //操作工具栏
@@ -154,6 +175,8 @@
                 table.reload('client')
             }
         })
+
+
     })
 </script>
 </body>
