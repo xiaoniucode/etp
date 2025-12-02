@@ -1,8 +1,8 @@
 serverAddr = "127.0.0.1"
 serverPort = 9527
 secretKey = "your-secret-key"
-#TCP SSL安全加密密码配置
-#ssl = false
+#################TLS加密配置#################
+#tls = false
 #[truststore]
-#path = "cert/client.p12"
-#storePass = "jesjH9JNLKY3"
+#path = "/path/cert/client.p12"
+#storePass = "your-store-pass"
