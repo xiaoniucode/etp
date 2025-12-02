@@ -36,14 +36,16 @@
             <div class="layui-inline">
                 <label class="layui-form-label">公网端口</label>
                 <div class="layui-input-block">
-                    <input type="number" lay-verify="number" placeholder="不填自动分配" name="remotePort" id="remotePort" autocomplete="off"
+                    <input type="number" lay-verify="number" placeholder="不填自动分配" name="remotePort"
+                           id="remotePort" autocomplete="off"
                            class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">内网端口</label>
                 <div class="layui-input-inline">
-                    <input type="number" lay-verify="number" placeholder="请输入" name="localPort" autocomplete="off" class="layui-input">
+                    <input type="number" lay-verify="number" placeholder="请输入" name="localPort" autocomplete="off"
+                           class="layui-input">
                 </div>
             </div>
         </div>
@@ -82,7 +84,9 @@
             url: '/api/client/list',
             type: 'get',
             contentType: 'application/json',
-            headers: {},
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+            },
             success: function (res) {
                 if (res.code === 0) {
                     clientList = res.data || [];
@@ -104,7 +108,7 @@
             type: 'get',
             contentType: 'application/json',
             headers: {
-                'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
             },
             success: function (res) {
                 if (res.code === 0) {
@@ -138,7 +142,7 @@
                 contentType: 'application/json',
                 data: JSON.stringify(field),
                 headers: {
-                    'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
                 },
                 success: function (res) {
                     if (res.code === 0) {
@@ -148,7 +152,7 @@
                             parent.layer.close(parent.layer.getFrameIndex(window.name));
                         });
                     } else {
-                        layer.msg(res.message, {icon:2,time: 1000});
+                        layer.msg(res.message, {icon: 2, time: 1000});
                     }
                 },
             });

@@ -18,8 +18,9 @@ name = "静态客户端"
 #
 #---------------------------日志--------------------------------#
 [log]
-level = "info"
-pattern = ""
+level = "debug"
+#pattern = ""
+#path=""
 
 [dashboard]
 enable = true

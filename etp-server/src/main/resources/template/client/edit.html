@@ -42,7 +42,9 @@
             url: '/api/client/get?id=' + id,
             type: 'get',
             contentType: 'application/json',
-            headers: {},
+            headers: {
+                'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
+            },
             success: function (res) {
                 if (res.code === 0) {
                     form.val('editForm', res.data);
