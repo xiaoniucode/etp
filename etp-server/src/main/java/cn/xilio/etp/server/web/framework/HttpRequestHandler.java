@@ -50,7 +50,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 }
             }
             sendResponse(context);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             handleError(ctx, context, e);
             logger.error(e.getMessage(), e);
         }
@@ -74,7 +74,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         context.getCtx().writeAndFlush(response);
     }
 
-    private void handleError(ChannelHandlerContext ctx, RequestContext context, Exception e) {
+    private void handleError(ChannelHandlerContext ctx, RequestContext context, Throwable e) {
         logger.error(e.getMessage(), e);
         if (e instanceof BizException biz) {
             String msg = "".equals(biz.getMessage()) ? "error" : biz.getMessage();
@@ -87,7 +87,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
             ctx.writeAndFlush(response);
         } else {
-            //todo other
+            //todo other exception
         }
     }
 

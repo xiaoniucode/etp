@@ -24,7 +24,7 @@ public class PortAllocator {
     private PortAllocator() {
     }
 
-    public static PortAllocator getInstance() {
+    public static PortAllocator get() {
         if (instance == null) {
             synchronized (PortAllocator.class) {
                 if (instance == null) {

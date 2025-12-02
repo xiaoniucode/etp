@@ -136,14 +136,14 @@ public final class EtpInitialize {
         String sql = """
                 CREATE TABLE IF NOT EXISTS proxies (
                     id          INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增主键
-                    clientId   INTEGER NOT NULL,                     -- 所属客户端ID
-                    name        TEXT NOT NULL,                        -- 代理名称
-                    type        TEXT NOT NULL,                        -- 协议类型（如 "TCP"、"HTTP"）
-                    localPort  INTEGER NOT NULL,                     -- 内网端口（如 3389）
-                    remotePort INTEGER NOT NULL,                     -- 远程服务端口（对外暴露的端口）
-                    status      INTEGER NOT NULL DEFAULT 1,           -- 状态：1=开启，0=关闭
-                    createdAt  TEXT DEFAULT (datetime('now')),       -- 创建时间
-                    updatedAt  TEXT DEFAULT (datetime('now'))        -- 更新时间
+                    clientId   INTEGER NOT NULL,                    -- 所属客户端ID
+                    name        TEXT NOT NULL UNIQUE,               -- 代理名称
+                    type        TEXT NOT NULL,                      -- 协议类型（如 "TCP"、"HTTP"）
+                    localPort  INTEGER NOT NULL,                    -- 内网端口（如 3306）
+                    remotePort INTEGER NOT NULL UNIQUE,             -- 远程服务端口（对外暴露的端口）
+                    status      INTEGER NOT NULL DEFAULT 1,         -- 状态：1=开启，0=关闭
+                    createdAt  TEXT DEFAULT (datetime('now')),      -- 创建时间
+                    updatedAt  TEXT DEFAULT (datetime('now'))       -- 更新时间
                 );
                 """;
         SQLiteUtils.createTable(sql);
@@ -152,9 +152,9 @@ public final class EtpInitialize {
     private static void createClient() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS clients (
-                    id         INTEGER PRIMARY KEY AUTOINCREMENT,   -- 自增ID
-                    name       TEXT    NOT NULL UNIQUE,             -- 客户端名称，唯一
-                    secretKey  TEXT    NOT NULL UNIQUE,                    -- 密钥
+                    id         INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增ID
+                    name       TEXT    NOT NULL UNIQUE,            -- 客户端名称
+                    secretKey  TEXT    NOT NULL UNIQUE,            -- 密钥
                     createdAt TEXT    DEFAULT (datetime('now')),   -- 创建时间
                     updatedAt TEXT    DEFAULT (datetime('now'))    -- 更新时间
                 );

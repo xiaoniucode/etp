@@ -42,7 +42,7 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> 
             //清除当前控制通道
             ChannelManager.setControlChannel(null);
             ChannelManager.clearAllRealServerChannel();
-            //控制通道断开回调，如果代理客户端没有断开，可发起重连
+            //控制通道断开回调
             channelStatusCallback.channelInactive(ctx);
         } else {
             //当前传输数据的通道断开

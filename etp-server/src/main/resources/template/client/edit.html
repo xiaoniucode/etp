@@ -47,7 +47,7 @@
                 if (res.code === 0) {
                     form.val('editForm', res.data);
                 } else {
-                    layer.msg(res.message, {time: 1000});
+                    layer.msg(res.message, {icon:1,time: 1000});
                 }
             },
         });
@@ -67,7 +67,7 @@
                             parent.layer.close(parent.layer.getFrameIndex(window.name));
                         });
                     } else {
-                        layer.msg(res.message, {time: 1000});
+                        layer.msg(res.message, {icon:2,time: 1000});
                     }
                 },
             });

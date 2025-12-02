@@ -75,11 +75,14 @@ public final class ConfigService {
     public static void addProxy(JSONObject req) {
         String remotePort = req.getString("remotePort");
         //检查公网端口是否可用
-        if (StringUtils.hasText(remotePort) && !PortAllocator.getInstance().isPortAvailable(req.getInt("remotePort"))) {
+        if (StringUtils.hasText(remotePort) && state.isPortOccupied(req.getInt("remotePort")) || !PortAllocator.get().isPortAvailable(req.getInt("remotePort"))) {
             throw new BizException("公网端口不可用");
         }
+        if (configStore.getProxyByName(req.getString("name")) != null) {
+            throw new BizException("已存在相同名称的映射");
+        }
         if (!StringUtils.hasText(req.getString("remotePort"))) {
-            int allocatePort = PortAllocator.getInstance().allocateAvailablePort();
+            int allocatePort = PortAllocator.get().allocateAvailablePort();
             req.put("remotePort", allocatePort);
         }
         configStore.addProxy(req);
@@ -92,7 +95,7 @@ public final class ConfigService {
             TcpProxyServer.get().startRemotePort(req.getInt("remotePort"));
         } else {
             //将公网端口添加到已分配缓存
-            PortAllocator.getInstance().addRemotePort(req.getInt("remotePort"));
+            PortAllocator.get().addRemotePort(req.getInt("remotePort"));
         }
     }
 
@@ -102,17 +105,21 @@ public final class ConfigService {
         //如果没有设置公网端口，自动分配一个
         boolean remotePortChanged = false;
         if (!StringUtils.hasText(req.getString("remotePort"))) {
-            int allocatePort = PortAllocator.getInstance().allocateAvailablePort();
+            int allocatePort = PortAllocator.get().allocateAvailablePort();
             req.put("remotePort", allocatePort);
             remotePortChanged = true;
         } else {
             //如果有公网端口，如果发生改变，需要判断端口是否可用
             if (req.getInt("remotePort") != oldRemotePort) {
                 remotePortChanged = true;
-                if (!PortAllocator.getInstance().isPortAvailable(req.getInt("remotePort"))) {
+                if (state.isPortOccupied(req.getInt("remotePort")) || !PortAllocator.get().isPortAvailable(req.getInt("remotePort"))) {
                     throw new BizException("公网端口不可用");
                 }
             }
+        }
+        //检查名称
+        if (!oldProxy.getString("name").equals(req.getString("name")) && (configStore.getProxyByName(req.getString("name")) != null)) {
+            throw new BizException("映射名称已经存在");
         }
         configStore.updateProxy(req);
         //删除已经注册的映射
@@ -202,9 +209,8 @@ public final class ConfigService {
      */
     public static void kickoutClient(JSONObject req) {
         String secretKey = req.getString("secretKey");
-        //关闭客户端隧道，同时关闭所有连接
+        //关闭客户端控制隧道，同时关闭所有连接
         ChannelManager.closeControlChannelByClient(secretKey);
-        //todo 需要优化，踢掉前需要发送消息通知客户端，避免断线重连
     }
 
     public static JSONObject getClient(JSONObject req) {

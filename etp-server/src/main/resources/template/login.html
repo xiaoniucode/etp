@@ -267,8 +267,7 @@
                         } else {
                             localStorage.removeItem('auth_token');
                         }
-
-                        layer.msg('登录成功', {icon: 1}, function () {
+                        layer.msg('登录成功', {icon: 1,time:500}, function () {
                             location.href = "/index.html";
                         });
                     } else {

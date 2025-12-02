@@ -192,5 +192,9 @@ public class ConfigStore {
     public int deleteProxiesByClient(int clientId) {
         return SQLiteUtils.delete("DELETE FROM proxies WHERE clientId = ?", clientId);
     }
+
+    public JSONObject getProxyByName(String name) {
+        return SQLiteUtils.get("SELECT * FROM proxies WHERE name = ?", name);
+    }
 }
 
