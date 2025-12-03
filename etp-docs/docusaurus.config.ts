@@ -75,10 +75,10 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'etp',
+      title: '首页',
       logo: {
         alt: 'etp',
-        src: 'img/logo.jpeg',
+        src: 'img/logo.png',
       },
       items: [
         {

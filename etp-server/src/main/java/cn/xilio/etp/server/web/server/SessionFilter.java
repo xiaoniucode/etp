@@ -40,7 +40,7 @@ public class SessionFilter implements Filter {
         if (cookieHeader == null) {
             return null;
         }
-        Set<Cookie> cookies = ServerCookieDecoder.STRICT.decode(cookieHeader);
+        Set<Cookie> cookies = ServerCookieDecoder.LAX.decode(cookieHeader);
         for (Cookie cookie : cookies) {
             if (COOKIE_NAME.equals(cookie.name())) {
                 return cookie.value();

@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 
 /**
  * 静态资源处理器
+ *
  * @author liuxin
  */
 public class StaticResourceHandler {
@@ -27,19 +28,19 @@ public class StaticResourceHandler {
      * 文件类型映射
      */
     private static final String[][] MIME_TYPES = {
-        {".html", "text/html; charset=utf-8"},
-        {".htm", "text/html; charset=utf-8"},
-        {".css", "text/css; charset=utf-8"},
-        {".js", "application/javascript; charset=utf-8"},
-        {".json", "application/json; charset=utf-8"},
-        {".png", "image/png"},
-        {".jpg", "image/jpeg"},
-        {".jpeg", "image/jpeg"},
-        {".gif", "image/gif"},
-        {".ico", "image/x-icon"},
-        {".svg", "image/svg+xml"},
-        {".txt", "text/plain; charset=utf-8"},
-        {".pdf", "application/pdf"}
+            {".html", "text/html; charset=utf-8"},
+            {".htm", "text/html; charset=utf-8"},
+            {".css", "text/css; charset=utf-8"},
+            {".js", "application/javascript; charset=utf-8"},
+            {".json", "application/json; charset=utf-8"},
+            {".png", "image/png"},
+            {".jpg", "image/jpeg"},
+            {".jpeg", "image/jpeg"},
+            {".gif", "image/gif"},
+            {".ico", "image/x-icon"},
+            {".svg", "image/svg+xml"},
+            {".txt", "text/plain; charset=utf-8"},
+            {".pdf", "application/pdf"}
     };
 
     /**
@@ -85,16 +86,16 @@ public class StaticResourceHandler {
 
             if (fileContent == null) {
                 context.abortWithResponse(HttpResponseStatus.NOT_FOUND,
-                    "{\"error\":\"资源不存在\",\"path\":\"" + path + "\"}");
+                        "{\"error\":\"资源不存在\",\"path\":\"" + path + "\"}");
                 return;
             }
 
             // 设置响应
             String mimeType = getMimeType(path);
             FullHttpResponse response = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1,
-                HttpResponseStatus.OK,
-                io.netty.buffer.Unpooled.copiedBuffer(fileContent)
+                    HttpVersion.HTTP_1_1,
+                    HttpResponseStatus.OK,
+                    io.netty.buffer.Unpooled.copiedBuffer(fileContent)
             );
 
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, mimeType);
@@ -106,7 +107,7 @@ public class StaticResourceHandler {
         } catch (Exception e) {
             logger.error("处理静态资源失败: {}", path, e);
             context.abortWithResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR,
-                "{\"error\":\"服务器内部错误\"}");
+                    "{\"error\":\"服务器内部错误\"}");
         }
     }
 
@@ -121,9 +122,9 @@ public class StaticResourceHandler {
 
             if (fileContent != null) {
                 FullHttpResponse response = new DefaultFullHttpResponse(
-                    HttpVersion.HTTP_1_1,
-                    HttpResponseStatus.OK,
-                    io.netty.buffer.Unpooled.copiedBuffer(fileContent)
+                        HttpVersion.HTTP_1_1,
+                        HttpResponseStatus.OK,
+                        io.netty.buffer.Unpooled.copiedBuffer(fileContent)
                 );
                 response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=utf-8");
                 response.headers().set(HttpHeaderNames.CONTENT_LENGTH, fileContent.length);
@@ -200,29 +201,28 @@ public class StaticResourceHandler {
      * 设置缓存头
      */
     private static void setCacheHeaders(FullHttpResponse response, String path) {
-        // 静态资源缓存策略
-        if (path.endsWith(".css") || path.endsWith(".js") || path.endsWith(".png") ||
-            path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".gif") ||
-            path.endsWith(".ico") || path.endsWith(".svg")) {
-            response.headers().set(HttpHeaderNames.CACHE_CONTROL, "public, max-age=3600");
-        } else {
-            response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache");
-        }
-
         if (DEV_MODE) {
-            // 开发环境,禁用缓存
+            //【开发环境】所有静态资源强制不缓存
             response.headers().set(HttpHeaderNames.CACHE_CONTROL,
                     "no-store, no-cache, must-revalidate, max-age=0");
             response.headers().set(HttpHeaderNames.PRAGMA, "no-cache");
             response.headers().set(HttpHeaderNames.EXPIRES, "0");
+            // 让浏览器 100% 认为每次都是新文件
+            response.headers().set(HttpHeaderNames.ETAG, "\"" + System.nanoTime() + "\"");
+            return;
+        }
+
+        // 【生产环境】精细化缓存策略
+        if (path.matches(".*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot|otf)(\\?v=.*)?$")) {
+            //上线时文件名带 hash 或 ?v=20251203，这种文件可以永久缓存
+            response.headers().set(HttpHeaderNames.CACHE_CONTROL,
+                    "public, max-age=31536000, immutable");
+        } else if (path.endsWith(".html") || path.endsWith(".htm")) {
+            // HTML 页面不要缓存
+            response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache");
         } else {
-            // 生产环境
-            if (path.matches(".*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff2?|ttf)$")) {
-                response.headers().set(HttpHeaderNames.CACHE_CONTROL,
-                        "public, max-age=31536000, immutable");
-            } else {
-                response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache");
-            }
+            // 其他资源（json、txt 等）短缓存或不缓存
+            response.headers().set(HttpHeaderNames.CACHE_CONTROL, "max-age=600");
         }
     }
 
