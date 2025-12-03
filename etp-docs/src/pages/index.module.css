@@ -1,23 +1,219 @@
-/**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
- */
-
 .heroBanner {
-  padding: 4rem 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+    padding: 5rem 0 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-top: -8rem !important;
+    padding-top: calc(5rem + var(--ifm-navbar-height)) !important;
+    background: linear-gradient(135deg,
+    var(--ifm-background-color) 0%,
+    var(--ifm-hero-background-color, var(--ifm-background-color)) 100%
+    );
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
-  }
+.heroBanner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 25% 75%, var(--ifm-color-primary) 0%, transparent 30%),
+    radial-gradient(circle at 75% 25%, var(--ifm-color-primary) 0%, transparent 30%);
+    opacity: 0.06;
+    pointer-events: none;
+}
+
+.heroTitle {
+    font-size: 4.2rem;
+    font-weight: 900;
+    margin: 0 0 0.8rem;
+    color: var(--ifm-heading-color);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+}
+
+.heroTagline {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--ifm-color-emphasis-800);
+    margin: 0 0 1rem;
+    opacity: 0.95;
+}
+
+.heroSubtitle {
+    font-size: 1.32rem;
+    max-width: 860px;
+    margin: 1.4rem auto 2.6rem;
+    color: var(--ifm-color-emphasis-700);
+    line-height: 1.75;
+    font-weight: 400;
 }
 
 .buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    gap: 1.2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2.6rem 0;
+}
+
+.buttonPrimary {
+    background: var(--ifm-color-primary);
+    color: white !important;
+    border: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.9rem 2.4rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px var(--ifm-color-primary-alpha-30, rgba(0, 0, 0, 0.2));
+    transition: all 0.25s ease;
+}
+
+.buttonPrimary:hover {
+    background: var(--ifm-color-primary-hover, var(--ifm-color-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px var(--ifm-color-primary-alpha-40, rgba(0, 0, 0, 0.3));
+}
+
+.buttonSecondary {
+    background: var(--ifm-button-background-color, transparent);
+    color: var(--ifm-color-emphasis-900);
+    border: 1.5px solid var(--ifm-button-border-color);
+    font-weight: 600;
+    padding: 0.9rem 2rem;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+}
+
+.buttonSecondary:hover {
+    border-color: var(--ifm-color-primary);
+    color: var(--ifm-color-primary);
+    background: var(--ifm-color-primary-alpha-05, rgba(0, 0, 0, 0.05));
+    transform: translateY(-2px);
+}
+
+.githubIcon {
+    margin-right: 0.5rem;
+    position: relative;
+    top: 2px;
+}
+
+.features {
+    padding: 1.5rem 0 5rem;
+    background: var(--ifm-background-color);
+    margin-top: -5rem !important;
+    position: relative;
+    z-index: 1;
+}
+
+.features::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: var(--ifm-color-primary);
+    border-radius: 2px;
+    opacity: 0.8;
+}
+
+.featureCard {
+    margin-bottom: 2.5rem;
+}
+
+.featureCard .card {
+    height: 100%;
+    padding: 2rem 1.6rem;
+    border-radius: 12px;
+    background: var(--ifm-card-background-color);
+    border: 1px solid var(--ifm-card-border-color);
+    box-shadow: 0 4px 16px var(--ifm-shadow-color, rgba(0, 0, 0, 0.08));
+    transition: all 0.3s ease;
+}
+
+.featureCard .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 32px var(--ifm-shadow-color, rgba(0, 0, 0, 0.15));
+    border-color: var(--ifm-color-primary-alpha-30);
+}
+
+.featureCard h3 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--ifm-heading-color);
+    margin-bottom: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.featureCard h3::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: var(--ifm-color-primary);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.featureCard p {
+    color: var(--ifm-color-content-secondary);
+    line-height: 1.7;
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+@media (max-width: 966px) {
+    .heroTitle {
+        font-size: 3.3rem;
+    }
+
+    .heroTagline {
+        font-size: 1.5rem;
+    }
+
+    .heroSubtitle {
+        font-size: 1.2rem;
+        padding: 0 1rem;
+    }
+
+    .buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .buttonPrimary,
+    .buttonSecondary {
+        width: 260px;
+    }
+
+    .features {
+        margin-top: -3rem !important;
+        padding: 4rem 0;
+    }
+}
+
+@media (max-width: 640px) {
+    .heroBanner {
+        padding-top: calc(4rem + var(--ifm-navbar-height)) !important;
+    }
+
+    .heroTitle {
+        font-size: 2.9rem;
+    }
+}
+
+.heroLogoWrapper {
+    text-align: center;
+    margin: 1.5rem 0 2.5rem;
+    padding: 0;
+    line-height: 0;
+}
+
+.heroLogo {
+    height: 108px;
+    width: auto;
+    max-width: 90vw;
+    display: inline-block;
 }
