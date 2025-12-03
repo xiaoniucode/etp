@@ -256,7 +256,7 @@ public class RequestContext {
         return responseContentType;
     }
 
-    public void setResponseContent(String responseContent) {
+    public void setResponseJson(String responseContent) {
         this.responseContent = responseContent;
     }
 

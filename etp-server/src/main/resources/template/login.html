@@ -196,15 +196,19 @@
                         </div>
                         <div class="layui-col-xs5">
                             <div style="margin-left: 10px;">
-                                <img src="/api/captcha" class="captcha-img"
-                                     onclick="this.src='/api/user/captcha?t='+Date.now()">
+                                <!--                                <img src="/api/captcha" class="captcha-img"-->
+                                <!--                                     onclick="this.src='/api/user/captcha?t='+Date.now()">-->
+                                <canvas id="captchaCanvas" width="120" height="40"
+                                        class="captcha-img"
+                                        style="border:1px solid #e6e6e6;border-radius:6px;cursor:pointer;"
+                                        title="点击刷新"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-<!--                <div class="layui-form-item">-->
-<!--                    <input type="checkbox" name="remember" lay-skin="primary" title="记住我">-->
-<!--                </div>-->
+                <!--                <div class="layui-form-item">-->
+                <!--                    <input type="checkbox" name="remember" lay-skin="primary" title="记住我">-->
+                <!--                </div>-->
 
                 <div class="layui-form-item">
                     <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="demo-login">
@@ -235,7 +239,7 @@
         }
 
         function setUser(userId, username) {
-            localStorage.setItem(UserKey, JSON.stringify({userId: userId, username: username}))
+            localStorage.setItem(UserKey, JSON.stringify({userId, username}));
         }
 
         function removeToken() {
@@ -243,15 +247,11 @@
         }
 
         $.ajaxSetup({
-            headers: {
-                'Authorization': 'Bearer ' + getToken()
-            },
+            headers: {'Authorization': 'Bearer ' + getToken()},
             statusCode: {
                 401: function () {
                     removeToken();
-                    layer.msg('登录已过期，请重新登录', {icon: 2}, function () {
-                        location.href = '/login.html';
-                    });
+                    layer.msg('登录已过期，请重新登录', {icon: 2});
                 }
             }
         });
@@ -259,31 +259,88 @@
         function trySilentRefresh() {
             var token = getToken();
             if (!token) return;
-
             $.ajax({
-                url: '/api/user/flush-token',
-                type: 'PUT',
-                timeout: 8000,
+                url: '/api/user/flush-token', type: 'PUT', timeout: 8000,
                 success: function (res) {
                     if (res.code === 0 && res.data) {
-                        const {userId, username, auth_token} = res.data
-                        setToken(auth_token);
-                        setUser(userId, username)
+                        setToken(res.data.auth_token);
+                        setUser(res.data.userId, res.data.username);
                         location.href = '/index.html';
-                    } else {
-                        removeToken();
-                    }
+                    } else removeToken();
                 },
-                error: function () {
-                    removeToken();
-                }
+                error: removeToken
             });
         }
-        trySilentRefresh();
 
+        trySilentRefresh();
+        let captchaId = '';
+
+        // 绘制验证码
+        function drawCaptcha(code) {
+            const canvas = document.getElementById('captchaCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            // 清空 + 白色背景
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            // 干扰线
+            for (let i = 0; i < 6; i++) {
+                ctx.strokeStyle = `rgb(${100 + Math.random() * 100 | 0}, ${100 + Math.random() * 100 | 0}, ${100 + Math.random() * 100 | 0})`;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(Math.random() * w, Math.random() * h);
+                ctx.lineTo(Math.random() * w, Math.random() * h);
+                ctx.stroke();
+            }
+
+            // 文字（带旋转 + 颜色）
+            ctx.font = 'bold 26px Arial';
+            ctx.textBaseline = 'middle';
+            for (let i = 0; i < code.length; i++) {
+                const x = 15 + i * 26;
+                const y = h / 2;
+                // ±17°
+                const angle = (Math.random() - 0.5) * 0.6;
+
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle);
+                ctx.fillStyle = `hsl(${i * 60}, 70%, 40%)`;
+                ctx.fillText(code[i].toUpperCase(), 0, 0);
+                ctx.restore();
+            }
+
+            // 噪点
+            for (let i = 0; i < 40; i++) {
+                ctx.fillStyle = `rgb(${Math.random() * 255 | 0}, ${Math.random() * 255 | 0}, ${Math.random() * 255 | 0})`;
+                ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
+            }
+        }
+
+        // 刷新验证码
+        function refreshCaptcha() {
+            $.get('/api/captcha', function (res) {
+                if (res.code === 0 && res.data) {
+                    captchaId = res.data.captchaId;
+                    drawCaptcha(res.data.code);
+                } else {
+                    layer.msg('验证码获取失败', {icon: 2});
+                }
+            }).fail(function () {
+                layer.msg('网络错误', {icon: 2});
+            });
+        }
+
+        // 页面加载 + 点击刷新
+        $(function () {
+            refreshCaptcha();
+            $('#captchaCanvas').on('click', refreshCaptcha);
+        });
+
+        // ==================== 登录提交==================
         form.on('submit(demo-login)', function (data) {
             var field = data.field;
-
             $.ajax({
                 url: '/api/user/login',
                 type: 'POST',
@@ -291,35 +348,30 @@
                 data: JSON.stringify({
                     username: field.username,
                     password: field.password,
+                    captchaId: captchaId,
                     code: field.captcha
                 }),
                 success: function (res) {
                     if (res.code === 0 && res.data) {
-                        const {userId, username, auth_token} = res.data
-                        setToken(auth_token);
-                        setUser(userId, username)
-                        layer.msg('登录成功', {icon: 1, time: 600}, function () {
+                        setToken(res.data.auth_token);
+                        setUser(res.data.userId, res.data.username);
+                        layer.msg('登录成功', {icon: 1,time:1000}, function () {
                             location.href = '/index.html';
                         });
                     } else {
                         layer.msg(res.message || '登录失败', {icon: 2});
-                        // 刷新验证码
-                        $('.captcha-img').click();
+                        refreshCaptcha();
                     }
                 },
                 error: function () {
-                    layer.msg('网络异常，请重试', {icon: 2});
-                    $('.captcha-img').click();
+                    layer.msg('网络异常', {icon: 2});
+                    refreshCaptcha();
                 }
             });
-
             return false;
-        });
-        $(document).on('click', '.captcha-img', function () {
-            this.src = '/api/captcha?t=' + Date.now();
         });
     });
 </script>
->
+
 </body>
 </html>

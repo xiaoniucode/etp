@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author liuxin
  */
 public final class RuntimeState {
-    private Logger logger = LoggerFactory.getLogger(RuntimeState.class);
+    private final Logger logger = LoggerFactory.getLogger(RuntimeState.class);
     private static final RuntimeState INSTANCE = new RuntimeState();
 
     private RuntimeState() {

@@ -75,6 +75,7 @@ public final class ConfigService {
 
 
     public static void addProxy(JSONObject req) {
+        //todo int clientId = req.getInt("clientId");
         String remotePortString = req.getString("remotePort");
         String secretKey = req.getString("secretKey");
         if (StringUtils.hasText(remotePortString) && state.isPortOccupied(req.getInt("remotePort"))) {
@@ -284,9 +285,10 @@ public final class ConfigService {
             throw new BizException(401, "未登录");
         }
         JSONObject user = configStore.getUserById(userId);
-        if (!DigestUtil.encode(user.getString("password"), user.getString("username")).equals(oldPassword)) {
+        String username = user.getString("username");
+        if (!user.getString("password").equals(DigestUtil.encode(oldPassword, username))) {
             throw new BizException("原密码不正确");
         }
-        configStore.updateUserPassword(id, newPassword);
+        configStore.updateUserPassword(id, DigestUtil.encode(newPassword, username));
     }
 }

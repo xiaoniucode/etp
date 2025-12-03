@@ -1,13 +1,14 @@
 package cn.xilio.etp.client.handler;
 
 import cn.xilio.etp.client.ChannelManager;
-import cn.xilio.etp.core.ChannelStatusCallback;
 import cn.xilio.etp.core.EtpConstants;
 import cn.xilio.etp.core.MessageHandler;
 import cn.xilio.etp.core.protocol.TunnelMessage.Message;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.function.Consumer;
 
 /**
  * 控制通道netty处理器
@@ -17,11 +18,11 @@ import org.slf4j.LoggerFactory;
 public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> {
     private final Logger logger = LoggerFactory.getLogger(ControlChannelHandler.class);
     /**
-     * 连接断开的时候回调接口
+     * 连接断开的时候回调
      */
-    private final ChannelStatusCallback channelStatusCallback;
+    private final Consumer<ChannelHandlerContext> channelStatusCallback;
 
-    public ControlChannelHandler(ChannelStatusCallback channelStatusCallback) {
+    public ControlChannelHandler(Consumer<ChannelHandlerContext> channelStatusCallback) {
         this.channelStatusCallback = channelStatusCallback;
     }
 
@@ -43,7 +44,7 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> 
             ChannelManager.setControlChannel(null);
             ChannelManager.clearAllRealServerChannel();
             //控制通道断开回调
-            channelStatusCallback.channelInactive(ctx);
+            channelStatusCallback.accept(ctx);
         } else {
             //当前传输数据的通道断开
             ChannelManager.removeDataTunnelChanel(ctx.channel());

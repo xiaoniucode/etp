@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ClientChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final Logger logger = LoggerFactory.getLogger(ClientChannelHandler.class);
     private static final AtomicLong SESSION_ID_PRODUCER = new AtomicLong(0);
-    private RuntimeState runtimeState = RuntimeState.get();
+    private final RuntimeState runtimeState = RuntimeState.get();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {

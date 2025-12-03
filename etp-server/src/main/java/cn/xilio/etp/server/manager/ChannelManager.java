@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author liuxin
  */
 public final class ChannelManager {
-    private static Logger logger = LoggerFactory.getLogger(ChannelManager.class);
+    private final static Logger logger = LoggerFactory.getLogger(ChannelManager.class);
     /**
      * 客户端与控制通道映射
      */

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 客户端信息
  * @author liuxin
  */
 public class ClientInfo {
@@ -16,7 +17,7 @@ public class ClientInfo {
      */
     private String secretKey;
     /**
-     * 客户端ID，用于管理面板快速获取ID
+     * 客户端ID
      */
     private Integer clientId;
     //客户端所有的端口映射信息
