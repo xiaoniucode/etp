@@ -87,7 +87,7 @@ const config: Config = {
           position: 'left',
           label: '文档',
         },
-        {to: '/blog', label: '更新日志', position: 'right'},
+        {to: '/blog', label: '博客', position: 'right'},
         {
           href: 'https://github.com/xiaoniucode/etp/issues',
           label: '问题反馈',
