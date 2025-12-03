@@ -74,7 +74,7 @@
 }
 
 .buttonSecondary {
-    background: var(--ifm-button-background-color, transparent);
+    background: var(--ifm-color-primary-alpha-05, rgba(0, 0, 0, 0.05));
     color: var(--ifm-color-emphasis-900);
     border: 1.5px solid var(--ifm-button-border-color);
     font-weight: 600;
