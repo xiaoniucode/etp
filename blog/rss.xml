@@ -4,7 +4,7 @@
         <title>etp Blog</title>
         <link>https://etp.github.io/etp/blog</link>
         <description>etp Blog</description>
-        <lastBuildDate>Tue, 28 Oct 2025 05:25:10 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 03 Dec 2025 10:55:20 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
@@ -12,7 +12,7 @@
             <title><![CDATA[index]]></title>
             <link>https://etp.github.io/etp/blog/index</link>
             <guid>https://etp.github.io/etp/blog/index</guid>
-            <pubDate>Tue, 28 Oct 2025 05:25:10 GMT</pubDate>
+            <pubDate>Wed, 03 Dec 2025 10:55:20 GMT</pubDate>
             <description><![CDATA[.]]></description>
             <content:encoded><![CDATA[<p>.</p>]]></content:encoded>
         </item>

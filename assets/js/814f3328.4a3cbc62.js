@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkdocusaurus_classic_typescript=globalThis.webpackChunkdocusaurus_classic_typescript||[]).push([[472],{5513:s=>{s.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"index","permalink":"/etp/blog/index","unlisted":false,"date":"2025-12-03T10:55:20.000Z"}]}')}}]);
