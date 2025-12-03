@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.web.framework;
+package cn.xilio.etp.server.web.server;
 
 import io.netty.handler.codec.http.*;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,8 +7,9 @@ import io.netty.util.CharsetUtil;
 import java.util.*;
 
 /**
- * 完整的 HTTP 请求上下文对象
+ * HTTP 请求上下文对象
  * 包含请求行、请求头、请求参数、请求体等所有信息
+ *
  * @author liuxin
  */
 public class RequestContext {
@@ -29,6 +30,7 @@ public class RequestContext {
     private String responseContent;
     private HttpResponseStatus responseStatus = HttpResponseStatus.OK;
     private final Map<String, String> responseHeaders = new HashMap<>();
+
     public RequestContext(ChannelHandlerContext ctx, FullHttpRequest request) {
         this.ctx = ctx;
         this.request = request;
@@ -240,10 +242,12 @@ public class RequestContext {
     public String getResponseContent() {
         return responseContent;
     }
+
     public void setResponseData(byte[] data, String contentType) {
         this.responseData = data;
         this.responseContentType = contentType;
     }
+
     public byte[] getResponseData() {
         return responseData;
     }
@@ -251,6 +255,7 @@ public class RequestContext {
     public String getResponseContentType() {
         return responseContentType;
     }
+
     public void setResponseContent(String responseContent) {
         this.responseContent = responseContent;
     }
@@ -270,6 +275,7 @@ public class RequestContext {
     public void setHttpResponse(FullHttpResponse httpResponse) {
         this.httpResponse = httpResponse;
     }
+
     public void addResponseHeader(String name, String value) {
         this.responseHeaders.put(name, value);
     }

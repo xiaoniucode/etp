@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.web.framework;
+package cn.xilio.etp.server.web.server;
 
 /**
  * @author liuxin

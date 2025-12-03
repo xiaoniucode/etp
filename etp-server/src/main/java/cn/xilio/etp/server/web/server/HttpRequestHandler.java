@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.web.framework;
+package cn.xilio.etp.server.web.server;
 
 import cn.xilio.etp.server.web.ResponseEntity;
 import io.netty.buffer.ByteBuf;
@@ -7,7 +7,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
-import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Netty HTTP请求处理器
  * @author liuxin
  */
 public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -78,7 +78,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 buffer
         );
 
-        // 设置正确的图片 Content-Type
+        // 设置正确的图片Content-Type
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, buffer.readableBytes());
         // 设置通用响应头

@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.web.framework;
+package cn.xilio.etp.server.web.server;
 
 import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
@@ -99,10 +99,8 @@ public class StaticResourceHandler {
 
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, mimeType);
             response.headers().set(HttpHeaderNames.CONTENT_LENGTH, fileContent.length);
-
             // 缓存控制
             setCacheHeaders(response, path);
-
             context.setHttpResponse(response);
 
         } catch (Exception e) {
@@ -206,7 +204,7 @@ public class StaticResourceHandler {
         if (path.endsWith(".css") || path.endsWith(".js") || path.endsWith(".png") ||
             path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".gif") ||
             path.endsWith(".ico") || path.endsWith(".svg")) {
-            response.headers().set(HttpHeaderNames.CACHE_CONTROL, "public, max-age=3600"); // 1小时缓存
+            response.headers().set(HttpHeaderNames.CACHE_CONTROL, "public, max-age=3600");
         } else {
             response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache");
         }

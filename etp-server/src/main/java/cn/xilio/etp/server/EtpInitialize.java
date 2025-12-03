@@ -9,6 +9,7 @@ import cn.xilio.etp.server.manager.RuntimeState;
 import cn.xilio.etp.server.web.ConfigService;
 import cn.xilio.etp.server.web.ConfigStore;
 import cn.xilio.etp.server.web.SQLiteUtils;
+import cn.xilio.etp.server.web.digest.DigestUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public final class EtpInitialize {
         String password = dashboard.getPassword();
         JSONObject save = new JSONObject();
         save.put("username", username);
-        save.put("password", password);
+        save.put("password", DigestUtil.encode(password, username));
         JSONObject user = ConfigService.getUserByUsername(username);
         //没有直接添加用户
         if (user == null) {

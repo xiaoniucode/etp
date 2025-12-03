@@ -8,7 +8,7 @@ import cn.xilio.etp.common.StringUtils;
 import cn.xilio.etp.server.config.AppConfig;
 import cn.xilio.etp.server.config.LogConfig;
 import cn.xilio.etp.server.web.DashboardApi;
-import cn.xilio.etp.server.web.framework.NettyWebServer;
+import cn.xilio.etp.server.web.server.NettyWebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

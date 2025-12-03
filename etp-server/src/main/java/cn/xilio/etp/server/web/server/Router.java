@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.web.framework;
+package cn.xilio.etp.server.web.server;
 
 import io.netty.handler.codec.http.HttpMethod;
 
@@ -21,7 +21,7 @@ public class Router {
      * @param path    路由，精确匹配
      * @param handler 处理器
      */
-    public void addRoute(HttpMethod method, String path, RequestHandler handler) {
+    public void route(HttpMethod method, String path, RequestHandler handler) {
         routes.add(new Route(method, routePrefix + path, handler));
     }
 

@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.web;
+package cn.xilio.etp.server.web.manager;
 
 import java.util.Map;
 import java.util.UUID;
@@ -7,15 +7,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 验证码管理
+ *
+ * @author liuxin
+ */
 public class CaptchaHolder {
-    private static final Map<String, CaptchaEntry> MAP = new ConcurrentHashMap<>();
+    private static final Map<String, CaptchaEntry> cache = new ConcurrentHashMap<>();
     private static final ScheduledExecutorService CLEANER = Executors.newSingleThreadScheduledExecutor();
 
     static {
         // 每分钟清理一次过期验证码
         CLEANER.scheduleAtFixedRate(() -> {
             long now = System.currentTimeMillis();
-            MAP.entrySet().removeIf(entry -> entry.getValue().expireAt <= now);
+            cache.entrySet().removeIf(entry -> entry.getValue().expireAt <= now);
         }, 1, 1, TimeUnit.MINUTES);
     }
 
@@ -27,11 +32,11 @@ public class CaptchaHolder {
     }
 
     /**
-     * 存放验证码，返回一个唯一的 captchaId（稍后前端要带回来）
+     * 存放验证码，返回一个唯一的 captchaId
      */
     public static String put(String code, int expireSeconds) {
         String captchaId = UUID.randomUUID().toString().replaceAll("-", "");
-        MAP.put(captchaId, new CaptchaEntry(code.toUpperCase(), System.currentTimeMillis() + expireSeconds * 1000L));
+        cache.put(captchaId, new CaptchaEntry(code.toUpperCase(), System.currentTimeMillis() + expireSeconds * 1000L));
         return captchaId;
     }
 
@@ -42,7 +47,7 @@ public class CaptchaHolder {
         if (captchaId == null || userInput == null) {
             return false;
         }
-        CaptchaEntry entry = MAP.remove(captchaId);
+        CaptchaEntry entry = cache.remove(captchaId);
         if (entry == null) {
             return false;
         }
@@ -53,7 +58,7 @@ public class CaptchaHolder {
      * 只校验（不删除），允许重复校验
      */
     public static boolean verify(String captchaId, String userInput) {
-        CaptchaEntry entry = MAP.get(captchaId);
+        CaptchaEntry entry = cache.get(captchaId);
         if (entry == null) {
             return false;
         }

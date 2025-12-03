@@ -9,7 +9,10 @@ import cn.xilio.etp.server.config.AppConfig;
 import cn.xilio.etp.server.config.ClientInfo;
 import cn.xilio.etp.server.config.ProxyMapping;
 import cn.xilio.etp.server.manager.RuntimeState;
-import cn.xilio.etp.server.web.framework.BizException;
+import cn.xilio.etp.server.web.digest.DigestUtil;
+import cn.xilio.etp.server.web.manager.CaptchaHolder;
+import cn.xilio.etp.server.web.manager.TokenAuthService;
+import cn.xilio.etp.server.web.server.BizException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -245,7 +248,7 @@ public final class ConfigService {
         String captchaId = req.optString("captchaId");
         String code = req.optString("code");
         if (!CaptchaHolder.verifyAndRemove(captchaId, code)) {
-            throw new BizException("验证码错误或过期");
+            throw new BizException("验证码过期");
         }
         String username = req.optString("username");
         String password = req.optString("password");
@@ -253,8 +256,8 @@ public final class ConfigService {
         if (user == null) {
             throw new BizException(401, "用户不存在！");
         }
-        //检查密码 todo 暂时不加密
-        if (!password.equals(user.optString("password"))) {
+        //检查密码
+        if (!DigestUtil.encode(password, username).equals(user.optString("password"))) {
             throw new BizException(401, "密码错误");
         }
         //创建登录令牌
@@ -281,7 +284,7 @@ public final class ConfigService {
             throw new BizException(401, "未登录");
         }
         JSONObject user = configStore.getUserById(userId);
-        if (!user.getString("password").equals(oldPassword)) {
+        if (!DigestUtil.encode(user.getString("password"), user.getString("username")).equals(oldPassword)) {
             throw new BizException("原密码不正确");
         }
         configStore.updateUserPassword(id, newPassword);

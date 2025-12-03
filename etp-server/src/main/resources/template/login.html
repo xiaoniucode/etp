@@ -196,7 +196,7 @@
                         </div>
                         <div class="layui-col-xs5">
                             <div style="margin-left: 10px;">
-                                <img src="https://www.oschina.net/action/user/captcha" class="captcha-img"
+                                <img src="/api/captcha" class="captcha-img"
                                      onclick="this.src='/api/user/captcha?t='+Date.now()">
                             </div>
                         </div>
@@ -211,7 +211,6 @@
                         立即登录
                     </button>
                 </div>
-
             </form>
         </div>
     </div>
@@ -292,7 +291,7 @@
                 data: JSON.stringify({
                     username: field.username,
                     password: field.password,
-                    captcha: field.captcha
+                    code: field.captcha
                 }),
                 success: function (res) {
                     if (res.code === 0 && res.data) {

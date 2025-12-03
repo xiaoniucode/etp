@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.web.framework;
+package cn.xilio.etp.server.web.server;
 
 import cn.xilio.etp.core.NettyEventLoopFactory;
 import io.netty.bootstrap.ServerBootstrap;
@@ -16,6 +16,8 @@ import java.util.List;
 
 
 /**
+ * Web容器服务
+ *
  * @author liuxin
  */
 public class NettyWebServer implements WebServer {
@@ -30,6 +32,7 @@ public class NettyWebServer implements WebServer {
     public NettyWebServer() {
         bossEventLoopGroup = NettyEventLoopFactory.eventLoopGroup(1);
         workerEventLoopGroup = NettyEventLoopFactory.eventLoopGroup(1);
+        filters.add(new SessionFilter());
     }
 
     @Override
@@ -87,6 +90,10 @@ public class NettyWebServer implements WebServer {
 
     public void setFilters(List<Filter> filters) {
         this.filters = filters;
+    }
+
+    public void addFilter(Filter filter) {
+        this.filters.add(filter);
     }
 
     public void setRouter(Router router) {
