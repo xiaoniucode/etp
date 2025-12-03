@@ -48,7 +48,7 @@ layui.define(['layer', 'jquery'], function (exports) {
                             layer.msg('登录已过期，正在跳转...', {icon: 2});
                             setTimeout(() => {
                                 window.parent.parent.location.href = '/login.html';
-                            }, 1200);
+                            }, 1000);
                             reject(new Error('未授权'));
                             return;
                         }

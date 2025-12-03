@@ -44,6 +44,11 @@
             field.userId = user.userId
             Rest.put('/api/user/update', field).then(data => {
                 layer.msg('密码修改成功', {icon: 1})
+                localStorage.removeItem("auth_token");
+                localStorage.removeItem("user");
+                setTimeout(() => {
+                    window.parent.parent.location.href = '/login.html';
+                }, 1000);
             })
             return false;
         });
