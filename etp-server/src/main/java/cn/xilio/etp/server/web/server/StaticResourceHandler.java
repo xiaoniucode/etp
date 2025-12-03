@@ -23,7 +23,8 @@ public class StaticResourceHandler {
      */
     private static final String[] STATIC_PATHS = {"/static/", "/template/"};
     private static final String WEB_ROOT = "src/main/resources";
-    private static final boolean DEV_MODE = true;
+    //todo 是否开启开发环境模式
+    private static final boolean DEV_MODE = false;
     /**
      * 文件类型映射
      */
@@ -202,7 +203,7 @@ public class StaticResourceHandler {
      */
     private static void setCacheHeaders(FullHttpResponse response, String path) {
         if (DEV_MODE) {
-            //【开发环境】所有静态资源强制不缓存
+            //开发环境，所有静态资源强制不缓存
             response.headers().set(HttpHeaderNames.CACHE_CONTROL,
                     "no-store, no-cache, must-revalidate, max-age=0");
             response.headers().set(HttpHeaderNames.PRAGMA, "no-cache");
@@ -212,16 +213,16 @@ public class StaticResourceHandler {
             return;
         }
 
-        // 【生产环境】精细化缓存策略
+        //生产环境，精细化缓存策略
         if (path.matches(".*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot|otf)(\\?v=.*)?$")) {
             //上线时文件名带 hash 或 ?v=20251203，这种文件可以永久缓存
             response.headers().set(HttpHeaderNames.CACHE_CONTROL,
                     "public, max-age=31536000, immutable");
         } else if (path.endsWith(".html") || path.endsWith(".htm")) {
-            // HTML 页面不要缓存
+            // HTML页面不要缓存
             response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache");
         } else {
-            // 其他资源（json、txt 等）短缓存或不缓存
+            // 其他资源json、txt等短缓存或不缓存
             response.headers().set(HttpHeaderNames.CACHE_CONTROL, "max-age=600");
         }
     }
