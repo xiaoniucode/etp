@@ -12,7 +12,8 @@
         <div class="layui-form-item">
             <label class="layui-form-label">名称</label>
             <div class="layui-input-block">
-                <input type="text" name="name" lay-verify="required" placeholder="请输入一个简短的客户端名" autocomplete="off"
+                <input type="text" name="name" lay-verify="required" placeholder="请输入一个简短的客户端名"
+                       autocomplete="off"
                        class="layui-input">
             </div>
         </div>
@@ -24,61 +25,35 @@
     </form>
 </div>
 <script src="/static/layui/layui.js"></script>
-<script src="/static/ajax.js"></script>
+<script src="/static/js/ajax.js"></script>
 <script>
     function getQueryParam(name) {
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-        var r = window.location.search.substr(1).match(reg);
+        const reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        const r = window.location.search.substr(1).match(reg);
         if (r != null) return decodeURIComponent(r[2]);
         return null;
     }
 
-    layui.use(['form', 'jquery'], function () {
-        var form = layui.form;
+    layui.use(['form', 'jquery', 'Rest'], function () {
+        const form = layui.form;
+        const Rest = layui.Rest;
         const $ = layui.$;
-        var id = getQueryParam("id");
-
-        $.ajax({
-            url: '/api/client/get?id=' + id,
-            type: 'get',
-            contentType: 'application/json',
-            headers: {
-                'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
-            },
-            success: function (res) {
-                if (res.code === 0) {
-                    form.val('editForm', res.data);
-                } else {
-                    layer.msg(res.message, {icon:1,time: 1000});
-                }
-            },
-        });
+        const id = getQueryParam("id");
+        Rest.get('/api/client/get?id=' + id).then(data => {
+            form.val('editForm', data);
+        })
         form.on('submit(demo1)', function (data) {
             const field = data.field;
-            $.ajax({
-                url: '/api/client/update',
-                type: 'put',
-                contentType: 'application/json',
-                data: JSON.stringify({id: id, name: field.name}),
-                headers: {
-                    'Authorization': 'Bearer ' +localStorage.getItem("auth_token")
-                },
-                success: function (res) {
-                    if (res.code === 0) {
-                        layer.msg('更新成功', {icon: 1, time: 400,}, () => {
-                            const parentTable = parent.layui.table;
-                            parentTable.reload('client');
-                            parent.layer.close(parent.layer.getFrameIndex(window.name));
-                        });
-                    } else {
-                        layer.msg(res.message, {icon:2,time: 1000});
-                    }
-                },
-            });
+            Rest.put('/api/client/update', {id: id, name: field.name}).then(res => {
+                layer.msg('更新成功', {icon: 1, time: 400,}, () => {
+                    const parentTable = parent.layui.table;
+                    parentTable.reload('client');
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            })
             return false;
         });
     });
 </script>
-
 </body>
 </html>

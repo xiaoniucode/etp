@@ -33,33 +33,18 @@
 <script src="/static/layui/layui.js"></script>
 <script src="/static/js/ajax.js"></script>
 <script>
-    layui.use(['form', 'jquery', 'layer'], function () {
-        var form = layui.form;
-        var $ = layui.jquery;
-        var layer = layui.layer;
-        var user = JSON.parse( localStorage.getItem("user"));
+    layui.use(['form', 'jquery', 'layer', 'Rest'], function () {
+        const form = layui.form;
+        const Rest = layui.Rest;
+        const $ = layui.$;
+        const layer = layui.layer;
+        const user = JSON.parse(localStorage.getItem("user"));
         form.on('submit(demo1)', function (data) {
-            var field = data.field;
-            field.userId=user.userId
-            $.ajax({
-                url: '/api/user/update',
-                type: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(field),
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
-                },
-                success: function (res) {
-                    if (res.code === 0) {
-                        layer.msg('密码修改成功', {icon: 1})
-                    } else {
-                        layer.msg(res.message, {icon: 2});
-                    }
-                },
-                error: function () {
-                    layer.msg('网络异常，请稍后重试', {icon: 2});
-                }
-            });
+            const field = data.field;
+            field.userId = user.userId
+            Rest.put('/api/user/update', field).then(data => {
+                layer.msg('密码修改成功', {icon: 1})
+            })
             return false;
         });
     });

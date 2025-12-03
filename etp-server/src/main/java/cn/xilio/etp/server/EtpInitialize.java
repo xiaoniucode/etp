@@ -194,7 +194,7 @@ public final class EtpInitialize {
                 CREATE TABLE IF NOT EXISTS proxies (
                     id          INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增主键
                     clientId   INTEGER NOT NULL,                    -- 所属客户端ID
-                    name        TEXT NOT NULL UNIQUE,               -- 代理名称
+                    name        TEXT NOT NULL,                      -- 代理名称
                     type        TEXT NOT NULL,                      -- 协议类型（如 "TCP"、"HTTP"）
                     localPort  INTEGER NOT NULL,                    -- 内网端口（如 3306）
                     remotePort INTEGER NOT NULL UNIQUE,             -- 远程服务端口（对外暴露的端口）

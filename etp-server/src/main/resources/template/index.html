@@ -81,11 +81,12 @@
 </div>
 
 <script src="/static/layui/layui.js"></script>
+<script src="/static/js/ajax.js"></script>
 <script>
-    layui.use(['element', 'layer', 'jquery'], function () {
+    layui.use(['element', 'layer', 'jquery','Rest'], function () {
+        const Rest = layui.Rest;
         const $ = layui.$;
         setLoginInfo()
-
         // 左侧菜单切换页面
         $('.layui-nav-tree .layui-nav-item a').on('click', function () {
             const url = $(this).data('url');
@@ -101,28 +102,14 @@
         });
 
         $('#logout').on('click', function () {
-            const authToken = localStorage.getItem("auth_token");
             localStorage.removeItem("user")
             localStorage.removeItem("auth_token")
-            $.ajax({
-                url: '/api/user/logout',
-                type: 'delete',
-                headers: {
-                    'Authorization': 'Bearer ' + authToken
-                },
-                contentType: 'application/json',
-                timeout: 5000,
-                success: function (res) {
-                    layer.msg('退出成功', {icon: 1, time: 800}, function () {
-                        window.location.href = '/login.html';
-                    });
-                },
-                error: function () {
+            Rest.delete('/api/user/logout').then(data=>{
+                layer.msg('退出成功', {icon: 1, time: 800}, function () {
                     window.location.href = '/login.html';
-                }
-            });
+                });
+            })
         });
-
         function setLoginInfo() {
             try {
                 const userStr = localStorage.getItem("user");

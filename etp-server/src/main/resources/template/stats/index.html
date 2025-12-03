@@ -30,9 +30,12 @@
     </div>
 </script>
 <script src="/static/layui/layui.js"></script>
+<script src="/static/js/ajax.js"></script>
 <script>
-    layui.use(['form', 'table', 'dropdown'], function () {
+    layui.use(['form', 'table', 'dropdown','Rest'], function () {
         const table = layui.table;
+        var Rest = layui.Rest;
+        const $ = layui.$;
         table.render({
             elem: '#metrics',
             text: "空空如也",

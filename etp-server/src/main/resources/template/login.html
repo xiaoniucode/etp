@@ -221,9 +221,11 @@
 </div>
 
 <script src="/static/layui/layui.js"></script>
+<script src="/static/js/ajax.js"></script>
 <script>
-    layui.use(['form', 'layer', 'jquery'], function () {
+    layui.use(['form', 'layer', 'jquery','Rest'], function () {
         var form = layui.form;
+        var Rest = layui.Rest;
         var layer = layui.layer;
         var $ = layui.jquery;
 
@@ -259,17 +261,13 @@
         function trySilentRefresh() {
             var token = getToken();
             if (!token) return;
-            $.ajax({
-                url: '/api/user/flush-token', type: 'PUT', timeout: 8000,
-                success: function (res) {
-                    if (res.code === 0 && res.data) {
-                        setToken(res.data.auth_token);
-                        setUser(res.data.userId, res.data.username);
-                        location.href = '/index.html';
-                    } else removeToken();
-                },
-                error: removeToken
-            });
+            Rest.put('/api/user/flush-token').then(data=>{
+                setToken(data.auth_token);
+                setUser(data.userId, data.username);
+                location.href = '/index.html';
+            }).then(err=>{
+                removeToken();
+            })
         }
 
         trySilentRefresh();
@@ -320,16 +318,10 @@
 
         // 刷新验证码
         function refreshCaptcha() {
-            $.get('/api/captcha', function (res) {
-                if (res.code === 0 && res.data) {
-                    captchaId = res.data.captchaId;
-                    drawCaptcha(res.data.code);
-                } else {
-                    layer.msg('验证码获取失败', {icon: 2});
-                }
-            }).fail(function () {
-                layer.msg('网络错误', {icon: 2});
-            });
+            Rest.get('/api/captcha').then(data=>{
+                captchaId = data.captchaId;
+                drawCaptcha(data.code);
+            })
         }
 
         // 页面加载 + 点击刷新
@@ -341,33 +333,21 @@
         // ==================== 登录提交==================
         form.on('submit(demo-login)', function (data) {
             var field = data.field;
-            $.ajax({
-                url: '/api/user/login',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    username: field.username,
-                    password: field.password,
-                    captchaId: captchaId,
-                    code: field.captcha
-                }),
-                success: function (res) {
-                    if (res.code === 0 && res.data) {
-                        setToken(res.data.auth_token);
-                        setUser(res.data.userId, res.data.username);
-                        layer.msg('登录成功', {icon: 1,time:1000}, function () {
-                            location.href = '/index.html';
-                        });
-                    } else {
-                        layer.msg(res.message || '登录失败', {icon: 2});
-                        refreshCaptcha();
-                    }
-                },
-                error: function () {
-                    layer.msg('网络异常', {icon: 2});
-                    refreshCaptcha();
-                }
-            });
+            const loginBody={
+                username: field.username,
+                password: field.password,
+                captchaId: captchaId,
+                code: field.captcha
+            }
+            Rest.post( '/api/user/login',loginBody).then(data=>{
+                setToken(data.auth_token);
+                setUser(data.userId, data.username);
+                layer.msg('登录成功', {icon: 1,time:1000}, function () {
+                    location.href = '/index.html';
+                });
+            }).catch(err=>{
+                refreshCaptcha();
+            })
             return false;
         });
     });

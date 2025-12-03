@@ -217,10 +217,14 @@ public class ConfigStore {
         return SQLiteUtils.get("SELECT * FROM users WHERE id = ?", userId);
     }
 
-    public void updateUserPassword(int userId,  String password) {
+    public void updateUserPassword(int userId, String password) {
         SQLiteUtils.update(
                 "UPDATE users SET password =?  WHERE id = ?",
-                 password, userId);
+                password, userId);
+    }
+
+    public JSONObject getProxy(int clientId, String name) {
+        return SQLiteUtils.get("SELECT * FROM proxies WHERE clientId = ? and name=?", clientId, name);
     }
 }
 

@@ -75,18 +75,16 @@ public final class ConfigService {
 
 
     public static void addProxy(JSONObject req) {
-        //todo int clientId = req.getInt("clientId");
         String remotePortString = req.getString("remotePort");
         String secretKey = req.getString("secretKey");
         if (StringUtils.hasText(remotePortString) && state.isPortOccupied(req.getInt("remotePort"))) {
             throw new BizException("公网端口已被占用");
         }
-
         if (StringUtils.hasText(remotePortString) && !PortAllocator.get().isPortAvailable(req.getInt("remotePort"))) {
             throw new BizException("公网端口无效");
         }
-        if (configStore.getProxyByName(req.getString("name")) != null) {
-            throw new BizException("已存在相同名称的映射");
+        if (configStore.getProxy(req.getInt("clientId"),req.getString("name")) != null) {
+            throw new BizException("该客户端已存在同名映射");
         }
         if (!StringUtils.hasText(remotePortString)) {
             int allocatePort = PortAllocator.get().allocateAvailablePort();
@@ -137,8 +135,8 @@ public final class ConfigService {
         String oldName = oldProxy.getString("name");
         String newName = req.getString("name");
         String secretKey = req.getString("secretKey");
-        if (!oldName.equals(newName) && (configStore.getProxyByName(newName) != null)) {
-            throw new BizException("映射名称已经存在");
+        if (!oldName.equals(newName) && (configStore.getProxy(req.getInt("clientId"),newName) != null)) {
+            throw new BizException("该客户端存在同名映射");
         }
         configStore.updateProxy(req);
         //删除已经注册的映射
@@ -208,6 +206,12 @@ public final class ConfigService {
         int id = req.getInt("id");
         String name = req.getString("name");
         JSONObject client = configStore.getClientById(id);
+        if (!client.getString("name").equals(name)) {
+            JSONObject oldClient = configStore.getClientByName(name);
+            if (oldClient != null) {
+                throw new BizException("客户端名不能重复");
+            }
+        }
         state.updateClientName(client.getString("secretKey"), name);
         configStore.updateClient(id, name);
     }

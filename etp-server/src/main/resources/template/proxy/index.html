@@ -29,9 +29,11 @@
     </div>
 </script>
 <script src="/static/layui/layui.js"></script>
+<script src="/static/js/ajax.js"></script>
 <script>
-    layui.use(['form', 'table', 'dropdown', 'jquery'], function () {
+    layui.use(['form', 'table', 'dropdown', 'jquery', 'Rest'], function () {
         const table = layui.table;
+        var Rest = layui.Rest;
         const $ = layui.$;
         table.render({
             elem: '#proxy',
@@ -102,51 +104,21 @@
                         skin: 'layui-layer-molv',
                         btn: ['确认删除', '我再想想'],
                     }, function (index) {
-                        $.ajax({
-                            url: '/api/proxy/del',
-                            type: 'delete',
-                            contentType: 'application/json',
-                            data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
-                            headers: {
-                                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
-                            },
-                            success: function (res) {
-                                if (res.code === 0) {
-                                    table.reload('proxy')
-                                    layer.msg("删除成功", {time: 2000});
-                                } else {
-                                    layer.msg(res.message, {time: 2000});
-                                }
-                            },
-                        });
+                        Rest.delete('/api/proxy/del', {id: data.id, secretKey: data.secretKey}).then(data => {
+                            table.reload('proxy')
+                            layer.msg("删除成功", {time: 2000});
+                        })
                     })
 
             } else if (obj.event === 'statusSwitch') {
                 const loading = layer.msg('正在切换...', {icon: 16, shade: 0.3, time: 0});
-                $.ajax({
-                    url: '/api/proxy/switch-proxy-status',
-                    type: 'put',
-                    contentType: 'application/json',
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
-                    },
-                    data: JSON.stringify({id: data.id, secretKey: data.secretKey}),
-                    success: function (res) {
-                        layer.close(loading);
-                        if (res.code === 0) {
-                            layer.msg('切换成功', {icon: 1});
-                        } else {
-                            layer.msg(res.message, {icon: 2});
-                            obj.update({status: data.status});//回滚状态
-                        }
-                    },
-                    error: function () {
-                        layer.close(loading);
-                        layer.msg('网络错误', {icon: 2});
-                        obj.update({status: data.status}); // 回滚
-                    }
-                });
-
+                Rest.put('/api/proxy/switch-proxy-status', {id: data.id, secretKey: data.secretKey}).then(data => {
+                    layer.close(loading);
+                    layer.msg('切换成功', {icon: 1});
+                }).catch(err=>{
+                    layer.msg("切换失败", {icon: 2});
+                    obj.update({status: data.status});//回滚状态
+                })
             } else if (obj.event === 'copyPort') {
                 const port = obj.data.remotePort + '';
                 if (navigator.clipboard && window.isSecureContext) {

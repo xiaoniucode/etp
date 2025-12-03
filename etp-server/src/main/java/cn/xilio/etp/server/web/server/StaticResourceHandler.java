@@ -22,7 +22,7 @@ public class StaticResourceHandler {
      */
     private static final String[] STATIC_PATHS = {"/static/", "/template/"};
     private static final String WEB_ROOT = "src/main/resources";
-
+    private static final boolean DEV_MODE = true;
     /**
      * 文件类型映射
      */
@@ -207,6 +207,22 @@ public class StaticResourceHandler {
             response.headers().set(HttpHeaderNames.CACHE_CONTROL, "public, max-age=3600");
         } else {
             response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache");
+        }
+
+        if (DEV_MODE) {
+            // 开发环境,禁用缓存
+            response.headers().set(HttpHeaderNames.CACHE_CONTROL,
+                    "no-store, no-cache, must-revalidate, max-age=0");
+            response.headers().set(HttpHeaderNames.PRAGMA, "no-cache");
+            response.headers().set(HttpHeaderNames.EXPIRES, "0");
+        } else {
+            // 生产环境
+            if (path.matches(".*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff2?|ttf)$")) {
+                response.headers().set(HttpHeaderNames.CACHE_CONTROL,
+                        "public, max-age=31536000, immutable");
+            } else {
+                response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache");
+            }
         }
     }
 
