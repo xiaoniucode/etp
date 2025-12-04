@@ -51,7 +51,7 @@ public class TunnelServerStartup {
                 DashboardApi.initFilters(webServer.getFilters());/*web过滤器*/
                 DashboardApi.initRoutes(webServer.getRouter());/*web接口*/
                 webServer.start();
-                logger.info("Dashboard启动成功，浏览器访问：{}:{}", webServer.getAddr(), webServer.getPort());
+                logger.info("Dashboard图形面板启动成功，浏览器访问：{}:{}", webServer.getAddr(), webServer.getPort());
             }
             TcpProxyServer.get().start();
         });

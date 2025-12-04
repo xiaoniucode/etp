@@ -51,7 +51,7 @@ public class MetricsCollector {
     }
 
     /**
-     * 高性能懒加载（线程安全、无锁竞争）
+     * 获取对应公网端口的数据指标收集器
      *
      * @param remotePort 公网端口
      * @return 当前端口对应的指标收集器

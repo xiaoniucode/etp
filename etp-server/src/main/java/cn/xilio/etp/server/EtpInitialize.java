@@ -87,7 +87,7 @@ public final class EtpInitialize {
                     save.put("secretKey", secretKey);
                     save.put("name", name);
                     configStore.addClient(save);
-                    logger.info("成功将客户端配置「{}」同步到数据库", name);
+                    logger.info("同步静态配置客户端「{}」到数据库", name);
                 }
                 List<ProxyMapping> proxies = clientInfo.getProxies();
                 proxies.forEach(proxy -> {
@@ -106,10 +106,10 @@ public final class EtpInitialize {
                             save.put("status", proxy.getStatus());
                             save.put("type", proxy.getType().name().toLowerCase(Locale.ROOT));
                             configStore.addProxy(save);
-                            logger.info("客户端 {}-映射名 {}-公网端口 {} 已经同步到数据库", existClient.get("id"), proxy.getName(), proxy.getRemotePort());
+                            logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", existClient.get("id"), proxy.getName(), proxy.getRemotePort());
                         }
                     } else {
-                        logger.warn("该客户端公网端口「{}-{}」已经被注册", name, remotePort);
+                        logger.warn("同步取消，该客户端公网端口「{}-{}」已经被注册", name, remotePort);
                     }
 
                 });
