@@ -30,6 +30,7 @@
 </script>
 <script src="/static/layui/layui.js"></script>
 <script src="/static/js/ajax.js"></script>
+<script src="/static/js/copy.js"></script>
 <script>
     layui.use(['form', 'table', 'dropdown', 'jquery', 'Rest'], function () {
         const table = layui.table;
@@ -115,17 +116,15 @@
                 Rest.put('/api/proxy/switch-proxy-status', {id: data.id, secretKey: data.secretKey}).then(data => {
                     layer.close(loading);
                     layer.msg('切换成功', {icon: 1});
-                }).catch(err=>{
+                }).catch(err => {
                     layer.msg("切换失败", {icon: 2});
                     obj.update({status: data.status});//回滚状态
                 })
             } else if (obj.event === 'copyPort') {
                 const port = obj.data.remotePort + '';
-                if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(port).then(() => {
-                        layer.msg('已复制公网端口', {icon: 1, time: 1200});
-                    })
-                }
+                ClipMaster.copy(port, function () {
+                    layer.msg('已复制公网端口', {icon: 1, time: 1200});
+                });
             }
         })
         //操作工具栏

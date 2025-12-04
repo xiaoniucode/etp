@@ -60,6 +60,7 @@
 </script>
 <script src="/static/layui/layui.js"></script>
 <script src="/static/js/ajax.js"></script>
+<script src="/static/js/copy.js"></script>
 <script>
     layui.use(['table', 'dropdown', 'jquery', 'Rest'], function () {
         var table = layui.table;
@@ -154,12 +155,7 @@
                     });
 
             } else if (obj.event === 'copyToken') {
-                const token = data.secretKey + '';
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(token).then(() => {
-                        layer.msg('已复制Token', {icon: 1, time: 1200});
-                    })
-                }
+                ClipMaster.copy(data.secretKey);
             }
         })
         //操作工具栏
