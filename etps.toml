@@ -1,10 +1,10 @@
-tls = false
-bindPort = 9527
-
-[keystore]
-path = "cert/server.p12"
-keyPass = "3FbV8R8VW49O"
-storePass = "3FbV8R8VW49O"
+#tls = false
+#bindPort = 9527
+#
+#[keystore]
+#path = "cert/server.p12"
+#keyPass = "3FbV8R8VW49O"
+#storePass = "3FbV8R8VW49O"
 #
 [[clients]]
 secretKey = "4b0063baa5ae47c2910fc25265aae4132"
@@ -25,7 +25,7 @@ level = "debug"
 [dashboard]
 enable = true
 #addr = "localhost"
-#port = 8080
+port = 8030
 #reset=true
 username = "admin"
 password = "123456"
