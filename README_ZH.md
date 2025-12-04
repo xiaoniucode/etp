@@ -1,30 +1,49 @@
-[![GitHub Stars](https://img.shields.io/github/stars/xiaoniucode/etp?style=for-the-badge&logo=github)](https://github.com/xiaoniucode/etp)
-[![GitHub Forks](https://img.shields.io/github/forks/xiaoniucode/etp?style=for-the-badge&logo=github)](https://github.com/xiaoniucode/etp)
-[![Open Issues](https://img.shields.io/github/issues/xiaoniucode/etp?style=for-the-badge)](https://github.com/xiaoniucode/etp/issues)
-[![License](https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge)](https://github.com/xiaoniucode/etp/blob/main/LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/xiaoniucode/etp?style=for-the-badge)](https://github.com/xiaoniucode/etp/commits)
+<p align="center">
+  <img src="doc/logo.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
+</p>
 
-[README](README.md) | [中文文档](README_ZH.md)
+<p align="center">
+  <a href="https://github.com/xiaoniucode/etp">
+    <img src="https://img.shields.io/github/stars/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Stars"/>
+  </a>
+  <a href="https://github.com/xiaoniucode/etp">
+    <img src="https://img.shields.io/github/forks/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Forks"/>
+  </a>
+  <a href="https://github.com/xiaoniucode/etp/issues">
+    <img src="https://img.shields.io/github/issues/xiaoniucode/etp?style=for-the-badge" alt="Open Issues"/>
+  </a>
+  <a href="https://github.com/xiaoniucode/etp/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge" alt="License"/>
+  </a>
+  <a href="https://github.com/xiaoniucode/etp/commits">
+    <img src="https://img.shields.io/github/last-commit/xiaoniucode/etp?style=for-the-badge" alt="Last Commit"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="README.md"><strong>README</strong></a> &nbsp;|&nbsp;
+  <a href="README_ZH.md"><strong>中文文档</strong></a> &nbsp;|&nbsp;
+  <a href="https://xiaoniucode.github.io/etp"><strong>文档地址</strong></a>
+</p>
 
 ## ✨ 介绍
 
-**etp**（Easy Tunnel Proxy）是一个轻量级的高性能隧道代理中间件，支持TCP、HTTP协议以及TCP上层协议且支持TLS1.3安全加密。用于将内网服务快速暴露为公网服务，便于开发测试，减少购买云服务器成本。
+**etp**（Easy Tunnel Proxy）是一个轻量级的高性能隧道代理中间件，支持TCP、HTTP协议以及TCP上层协议，支持TLS1.3高效安全加密协议，支持纯Toml静态配置或管理界面动态配置使用。用于将内网服务快速暴露为公网服务，便于开发测试，减少购买云服务器成本。
 
-📄[查看文档](https://xiaoniucode.github.io/etp)
 
 ## 🌟 功能特性
 
 - 📡 支持TCP、HTTP等协议
 - 🔐 采用TLS1.3高效安全加密协议
 - 🖥️ 提供易于操作的管理界面
-- 🛜 高性能数据传输
+- 🛜 高性能数据传输，延迟低
 - 🚀 毫秒级启动
 - 🔗 断线重连
 - 🔐 身份认证
 - 🐒 支持多客户端
 - 🧿 自动分配映射端口
 - 📄 支持纯Toml配置或管理界面使用
-- 📺 跨平台且支持arm64和amd64架构
+- 📺 跨平台，兼容arm64和amd64架构
 - 💨 轻量级，资源占用率低
 
 ## 🚀 快速开始
@@ -40,11 +59,11 @@
 ```toml 
 bindPort = 9527
 [[clients]]
-name = "Mac" #客户端名称
-secretKey = "你的客户端认证密钥" #[必填]自定义32位密钥
+name = "Mac" #[必填]自定义客户端名称
+secretKey = "你的客户端认证密钥" #[必填]自定义密钥
 
 [[clients.proxies]]
-name = "mysql" #[可选]服务名字
+name = "mysql" #服务名字
 type = "tcp" #[必填]网络传输协议
 localPort = 3306 #[必填]内网服务的端口
 remotePort = 3307 #[可选]公网服务端口，如果不填系统会随机分配一个端口
@@ -62,7 +81,7 @@ nohup ./etps -c etps.toml &
 
 ```toml
 serverAddr = "x.x.x.x" #etps部署服务器IP地址
-serverPort = 9527 #服务端的bindPort端口
+serverPort = 9527 #服务端bindPort端口
 secretKey = "你的客户端认证密钥" #和服务端配置保持一致
 ```
 
