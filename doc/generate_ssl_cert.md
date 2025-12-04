@@ -147,7 +147,7 @@ ssl-config/                  ← 输出目录（可自定义）
 
 ### **8.1 `etps.toml`（服务端）**
 ```toml
-ssl = true
+tls = true
 [keystore]
 path = "server.p12"
 keyPass = "Key@2025"
@@ -156,7 +156,7 @@ storePass = "Server@2025"
 
 ### **8.2 `etpc.toml`（客户端）**
 ```toml
-ssl = true
+tls = true
 [truststore]
 path = "client.p12"
 storePass = "Client@2025"

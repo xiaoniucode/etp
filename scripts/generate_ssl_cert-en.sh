@@ -2,7 +2,6 @@
 
 # =============================================
 # SSL Certificate Auto-Generation Script
-# Suitable for Intranet Penetration Project PKCS12 Format Certificate Generation
 # =============================================
 
 set -e  # Exit immediately if a command exits with a non-zero status
@@ -214,7 +213,7 @@ keytool -list -v -keystore "$CERT_DIR/$TRUSTSTORE_FILE" -storepass "$CLIENT_STOR
 # Generate server configuration file etps.toml
 echo -e "${YELLOW}Generating server configuration file $SERVER_CONFIG_FILE ...${NC}"
 cat > "$CERT_DIR/$SERVER_CONFIG_FILE" << EOF
-ssl = true
+tls = true
 [keystore]
 path = "$KEYSTORE_FILE"
 keyPass = "$KEYPASS"
@@ -224,7 +223,7 @@ EOF
 # Generate client configuration file etpc.toml
 echo -e "${YELLOW}Generating client configuration file $CLIENT_CONFIG_FILE ...${NC}"
 cat > "$CERT_DIR/$CLIENT_CONFIG_FILE" << EOF
-ssl = true
+tls = true
 [truststore]
 path = "$TRUSTSTORE_FILE"
 storePass = "$CLIENT_STOREPASS"

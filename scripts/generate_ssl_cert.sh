@@ -2,7 +2,6 @@
 
 # =============================================
 # SSL证书自动生成脚本
-# 适用于内网穿透项目PKCS12格式证书生成
 # =============================================
 
 set -e  # 遇到错误立即退出
@@ -14,7 +13,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 PURPLE='\033[0;35m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 # 默认配置
 DEFAULT_ALIAS="serverkey"
@@ -214,7 +213,7 @@ keytool -list -v -keystore "$CERT_DIR/$TRUSTSTORE_FILE" -storepass "$CLIENT_STOR
 # 生成服务端配置文件 etps.toml
 echo -e "${YELLOW}生成服务端配置文件 $SERVER_CONFIG_FILE ...${NC}"
 cat > "$CERT_DIR/$SERVER_CONFIG_FILE" << EOF
-ssl = true
+tls = true
 [keystore]
 path = "$KEYSTORE_FILE"
 keyPass = "$KEYPASS"
@@ -224,7 +223,7 @@ EOF
 # 生成客户端配置文件 etpc.toml
 echo -e "${YELLOW}生成客户端配置文件 $CLIENT_CONFIG_FILE ...${NC}"
 cat > "$CERT_DIR/$CLIENT_CONFIG_FILE" << EOF
-ssl = true
+tls = true
 [truststore]
 path = "$TRUSTSTORE_FILE"
 storePass = "$CLIENT_STOREPASS"
