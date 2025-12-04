@@ -1,8 +1,8 @@
 ---
 sidebar_position: 1
 ---
+## 介绍
 
-# 访问内网TCP服务
 下面介绍如何将局域网的MySQL服务暴露到公网
 ### 🖥️服务端
 编辑`etps.toml`配置文件
