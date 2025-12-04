@@ -3,7 +3,7 @@
   <img src="doc/logo.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
 </p>
 <p align="center" style="font-size:18px;color:#555;margin-top:-10px;margin-bottom:24px;">
-  基于Netty实现的轻量级高性能内网穿透反向代理应用。
+  基于Netty实现的轻量级内网穿透反向代理应用
 </p>
 <p align="center">
   <a href="https://github.com/xiaoniucode/etp">
@@ -47,6 +47,48 @@
 - 📺 跨平台，兼容arm64和amd64架构
 - 💨 轻量级，资源占用率低
 
+## 🎨 面板截图
+
+etp 除了支持纯 Toml 静态配置使用以外，还支持图形化界面管理操作，管理使用成本低，功能也更丰富。
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="doc/image/screeshot/登录.png" alt="登录" width="360"/>
+      <br/>
+      <sub>登录界面</sub>
+    </td>
+    <td align="center">
+      <img src="doc/image/screeshot/监控面板.png" alt="监控面板" width="360"/>
+      <br/>
+      <sub>监控面板</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="doc/image/screeshot/客户端列表.png" alt="客户端列表" width="360"/>
+      <br/>
+      <sub>客户端列表</sub>
+    </td>
+    <td align="center">
+      <img src="doc/image/screeshot/添加映射2.png" alt="添加映射" width="360"/>
+      <br/>
+      <sub>添加映射</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="doc/image/screeshot/映射列表.png" alt="映射列表" width="360"/>
+      <br/>
+      <sub>映射列表</sub>
+    </td>
+    <td align="center">
+      <img src="doc/image/screeshot/流量统计.png" alt="流量统计" width="360"/>
+      <br/>
+      <sub>流量统计</sub>
+    </td>
+  </tr>
+</table>
 ## 🚀 快速开始
 
 根据操作系统下载对应的[发行版本](https://github.com/xiaoniucode/etp/releases)安装包，服务端一般部署在具备公网IP的服务器上。
