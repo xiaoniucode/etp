@@ -29,15 +29,13 @@ class EtpTestApplicationTests {
     void testSingleInsert() {
         //1k 1w 5w 10w 20w
         for (int i2 = 0; i2 < 10; i2++) {
-
-
             long start = System.currentTimeMillis();
             for (int i = 0; i < 1_0000; i++) {
                 User user = new User()
-                        .setUsername("linghuchong")
-                        .setPassword("joifmekohomeow1798319301nkldmlsdmlsd")
+                        .setUsername("xiaoniucode")
+                        .setPassword("4b0063baa5ae47c2910fc25265aae4132")
                         .setRemark("一笑江湖")
-                        .setEmail("helloworld@gmail.com")
+                        .setEmail("xiaoniucode@gmail.com")
                         .setNickname("令狐冲");
                 userRepository.save(user);
             }
@@ -52,10 +50,10 @@ class EtpTestApplicationTests {
         long start = System.currentTimeMillis();
         for (int i = 0; i < 10_0000; i++) {
             User2 user = new User2()
-                    .setUsername("linghuchong")
-                    .setPassword("joifmekohomeow1798319301nkldmlsdmlsd")
+                    .setUsername("xiaoniucode")
+                    .setPassword("4b0063baa5ae47c2910fc25265aae4132")
                     .setRemark("一笑江湖")
-                    .setEmail("helloworld@gmail.com")
+                    .setEmail("xiaoniucode@gmail.com")
                     .setNickname("令狐冲");
             user2Repository.save(user);
         }
