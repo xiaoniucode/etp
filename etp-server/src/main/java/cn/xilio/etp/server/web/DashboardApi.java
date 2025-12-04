@@ -36,13 +36,13 @@ public class DashboardApi {
             }
             String auth = context.getHeader("Authorization");
             if (auth == null || !auth.startsWith("Bearer ")) {
-                context.abortWithResponse(HttpResponseStatus.UNAUTHORIZED, ResponseEntity.error(401, "未登录").toJson());
+                context.abortWithResponse(ResponseEntity.error(401, "未登录").toJson());
                 return;
             }
             String token = auth.substring(7);
             JSONObject authtoken = TokenAuthService.validateToken(token);
             if (authtoken == null) {
-                context.abortWithResponse(HttpResponseStatus.UNAUTHORIZED, ResponseEntity.error(401, "登录过期").toJson());
+                context.abortWithResponse(ResponseEntity.error(401, "登录过期，请重新登录").toJson());
                 return;
             }
             // 把用户信息放进上下文，后面业务方便用
@@ -61,16 +61,6 @@ public class DashboardApi {
             String captchaId = session.getAttribute("captchaId");
             req.put("captchaId", captchaId);
             context.setResponseJson(ResponseEntity.ok(ConfigService.login(req)).toJson());
-        });
-        router.route(HttpMethod.PUT, "/user/flush-token", context -> {
-            String auth = context.getHeader("Authorization");
-            String oldToken = (StringUtils.hasText(auth) && auth.startsWith("Bearer ")) ? auth.substring(7) : null;
-            JSONObject newToken = TokenAuthService.refreshToken(oldToken);
-            if (newToken != null) {
-                context.setResponseJson(ResponseEntity.ok(newToken).toJson());
-            } else {
-                context.setResponseJson(ResponseEntity.error(401, "无效的token").toJson());
-            }
         });
         router.route(HttpMethod.DELETE, "/user/logout", context -> {
             String auth = context.getHeader("Authorization");

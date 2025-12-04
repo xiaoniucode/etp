@@ -23,8 +23,7 @@ public class StaticResourceHandler {
      */
     private static final String[] STATIC_PATHS = {"/static/", "/template/"};
     private static final String WEB_ROOT = "src/main/resources";
-    //todo 是否开启开发环境模式
-    private static final boolean DEV_MODE = false;
+    private static final boolean DEV_MODE = true;
     /**
      * 文件类型映射
      */
@@ -73,9 +72,7 @@ public class StaticResourceHandler {
      */
     public static void handleStaticResource(RequestContext context) {
         String path = getNormalPath(context.getRequest().uri());
-
         try {
-            // 处理根路径，返回首页
             if ("/".equals(path) || path.isEmpty()) {
                 serveIndexPage(context);
                 return;
@@ -90,7 +87,6 @@ public class StaticResourceHandler {
                         "{\"error\":\"资源不存在\",\"path\":\"" + path + "\"}");
                 return;
             }
-
             // 设置响应
             String mimeType = getMimeType(path);
             FullHttpResponse response = new DefaultFullHttpResponse(
@@ -98,10 +94,8 @@ public class StaticResourceHandler {
                     HttpResponseStatus.OK,
                     io.netty.buffer.Unpooled.copiedBuffer(fileContent)
             );
-
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, mimeType);
             response.headers().set(HttpHeaderNames.CONTENT_LENGTH, fileContent.length);
-            // 缓存控制
             setCacheHeaders(response, path);
             context.setHttpResponse(response);
 
@@ -111,7 +105,6 @@ public class StaticResourceHandler {
                     "{\"error\":\"服务器内部错误\"}");
         }
     }
-
     /**
      * 服务首页
      */
@@ -120,7 +113,6 @@ public class StaticResourceHandler {
         for (String indexFile : indexFiles) {
             String resourcePath = "template/" + indexFile;
             byte[] fileContent = readResourceFile(resourcePath);
-
             if (fileContent != null) {
                 FullHttpResponse response = new DefaultFullHttpResponse(
                         HttpVersion.HTTP_1_1,
@@ -129,6 +121,7 @@ public class StaticResourceHandler {
                 );
                 response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=utf-8");
                 response.headers().set(HttpHeaderNames.CONTENT_LENGTH, fileContent.length);
+                setCacheHeaders(response, context.getRequest().uri());
                 context.setHttpResponse(response);
                 return;
             }
@@ -143,12 +136,10 @@ public class StaticResourceHandler {
         if (requestPath.startsWith("/")) {
             requestPath = requestPath.substring(1);
         }
-
         // 处理绝对路径引用
         if (requestPath.startsWith("static/") || requestPath.startsWith("template/")) {
             return requestPath;
         }
-
         // 如果请求的是模板目录，但路径中没有指定，自动添加到template目录
         if (!requestPath.startsWith("static/") && !requestPath.startsWith("template/")) {
             // 根据文件类型判断放置的目录
@@ -158,7 +149,6 @@ public class StaticResourceHandler {
                 return "static/" + requestPath;
             }
         }
-
         return requestPath;
     }
 
@@ -203,26 +193,17 @@ public class StaticResourceHandler {
      */
     private static void setCacheHeaders(FullHttpResponse response, String path) {
         if (DEV_MODE) {
-            //开发环境，所有静态资源强制不缓存
-            response.headers().set(HttpHeaderNames.CACHE_CONTROL,
-                    "no-store, no-cache, must-revalidate, max-age=0");
+            response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-store, no-cache, must-revalidate, max-age=0");
             response.headers().set(HttpHeaderNames.PRAGMA, "no-cache");
             response.headers().set(HttpHeaderNames.EXPIRES, "0");
-            // 让浏览器 100% 认为每次都是新文件
             response.headers().set(HttpHeaderNames.ETAG, "\"" + System.nanoTime() + "\"");
             return;
         }
-
-        //生产环境，精细化缓存策略
         if (path.matches(".*\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot|otf)(\\?v=.*)?$")) {
-            //上线时文件名带 hash 或 ?v=20251203，这种文件可以永久缓存
-            response.headers().set(HttpHeaderNames.CACHE_CONTROL,
-                    "public, max-age=31536000, immutable");
+            response.headers().set(HttpHeaderNames.CACHE_CONTROL, "public, max-age=31536000, immutable");
         } else if (path.endsWith(".html") || path.endsWith(".htm")) {
-            // HTML页面不要缓存
             response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache");
         } else {
-            // 其他资源json、txt等短缓存或不缓存
             response.headers().set(HttpHeaderNames.CACHE_CONTROL, "max-age=600");
         }
     }

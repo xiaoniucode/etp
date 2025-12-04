@@ -15,6 +15,7 @@ import java.util.Map;
 
 /**
  * Netty HTTP请求处理器
+ *
  * @author liuxin
  */
 public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -39,11 +40,9 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 return;
             }
             String path = getNormalPath(request.uri());
-            // 检查是否为静态资源请求
             if (StaticResourceHandler.isStaticResourceRequest(path)) {
                 StaticResourceHandler.handleStaticResource(context);
             }
-
             RequestHandler handler = router.match(request.method(), path);
             if (handler == null) {
                 context.abortWithResponse(HttpResponseStatus.NOT_FOUND, "{\"error\":\"资源不存在\",\"path\":\"" + path + "\"}");
@@ -56,20 +55,20 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             logger.error(e.getMessage(), e);
         }
     }
+
     /**
      * 设置通用的响应头
      */
     private void setCommonResponseHeaders(FullHttpResponse response, RequestContext context) {
-        // 设置基础的安全头部
         response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
         response.headers().set(HttpHeaderNames.PRAGMA, "no-cache");
         response.headers().set(HttpHeaderNames.EXPIRES, "0");
-        // 设置自定义响应头
         Map<String, String> headers = context.getResponseHeaders();
         for (Map.Entry<String, String> entry : headers.entrySet()) {
             response.headers().set(entry.getKey(), entry.getValue());
         }
     }
+
     private void sendImageResponse(RequestContext context, byte[] imageData, String contentType) {
         ByteBuf buffer = Unpooled.copiedBuffer(imageData);
         FullHttpResponse response = new DefaultFullHttpResponse(
@@ -77,20 +76,17 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 context.getResponseStatus() != null ? context.getResponseStatus() : HttpResponseStatus.OK,
                 buffer
         );
-
-        // 设置正确的图片Content-Type
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, buffer.readableBytes());
-        // 设置通用响应头
         setCommonResponseHeaders(response, context);
         context.getCtx().writeAndFlush(response);
     }
+
     private void sendResponse(RequestContext context) {
         if (context.getHttpResponse() != null) {
             context.getCtx().writeAndFlush(context.getHttpResponse());
             return;
         }
-        // 检查是否是二进制数据响应
         if (context.getResponseData() != null) {
             sendImageResponse(context, context.getResponseData(), context.getResponseContentType());
             return;
@@ -103,7 +99,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         );
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-        // 设置通用响应头
         setCommonResponseHeaders(response, context);
         context.getCtx().writeAndFlush(response);
     }
@@ -119,11 +114,9 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                     buffer);
             response.headers().set(HttpHeaderNames.CONTENT_LENGTH, buffer.readableBytes());
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
-            // 设置通用响应头
             setCommonResponseHeaders(response, context);
             ctx.writeAndFlush(response);
         } else {
-            //todo other exception
         }
     }
 

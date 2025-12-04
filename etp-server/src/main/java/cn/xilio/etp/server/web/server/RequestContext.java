@@ -13,9 +13,9 @@ import java.util.*;
  * @author liuxin
  */
 public class RequestContext {
-    private ChannelHandlerContext ctx;
+    private final ChannelHandlerContext ctx;
     private FullHttpResponse httpResponse;
-    private FullHttpRequest request;
+    private final FullHttpRequest request;
     private HttpMethod method;
     private String uri;
     private HttpVersion version;
@@ -45,16 +45,12 @@ public class RequestContext {
         this.method = request.method();
         this.uri = request.uri();
         this.version = request.protocolVersion();
-
         // 解析请求头
         parseHeaders();
-
         // 解析查询参数 (URL 参数)
         parseQueryParams();
-
         // 解析请求体
         parseRequestBody();
-
         // 解析表单参数 (如果是表单提交)
         if (isFormUrlEncoded()) {
             parseFormParams();
@@ -213,7 +209,7 @@ public class RequestContext {
     }
 
     /**
-     * 设置属性 (用于过滤器间传递数据)
+     * 设置属性
      */
     public void setAttribute(String name, Object value) {
         attributes.put(name, value);
@@ -232,6 +228,11 @@ public class RequestContext {
     public void abortWithResponse(HttpResponseStatus status, String responseContext) {
         this.abort = true;
         this.responseStatus = status;
+        this.responseContent = responseContext;
+    }
+
+    public void abortWithResponse(String responseContext) {
+        this.abort = true;
         this.responseContent = responseContext;
     }
 

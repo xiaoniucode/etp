@@ -169,7 +169,8 @@
                         <div class="layui-input-prefix">
                             <i class="layui-icon layui-icon-username"></i>
                         </div>
-                        <input value="admin" type="text" name="username" lay-verify="required" placeholder="用户名" autocomplete="off"
+                        <input type="text" name="username" lay-verify="required" placeholder="用户名"
+                               autocomplete="off"
                                class="layui-input" lay-affix="clear">
                     </div>
                 </div>
@@ -179,7 +180,7 @@
                         <div class="layui-input-prefix">
                             <i class="layui-icon layui-icon-password"></i>
                         </div>
-                        <input value="123456" type="password" name="password" lay-verify="required" placeholder="密码"
+                        <input type="password" name="password" lay-verify="required" placeholder="密码"
                                autocomplete="off" class="layui-input" lay-affix="eye">
                     </div>
                 </div>
@@ -197,8 +198,6 @@
                         </div>
                         <div class="layui-col-xs5">
                             <div style="margin-left: 10px;">
-                                <!--                                <img src="/api/captcha" class="captcha-img"-->
-                                <!--                                     onclick="this.src='/api/user/captcha?t='+Date.now()">-->
                                 <canvas id="captchaCanvas" width="120" height="40"
                                         class="captcha-img"
                                         style="border:1px solid #e6e6e6;border-radius:6px;cursor:pointer;"
@@ -228,12 +227,15 @@
         var Rest = layui.Rest;
         var layer = layui.layer;
         var $ = layui.jquery;
+
         function setToken(token) {
             if (token) localStorage.setItem('auth_token', token);
         }
+
         function setUser(userId, username) {
             localStorage.setItem('user', JSON.stringify({userId, username}));
         }
+
         let captchaId = '';
 
         // 绘制验证码
