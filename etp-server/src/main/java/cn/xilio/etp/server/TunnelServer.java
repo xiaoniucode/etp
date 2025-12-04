@@ -75,9 +75,9 @@ public class TunnelServer implements Lifecycle {
                     });
             serverBootstrap.bind(host == null ? DEFAULT_HOST : host, port).sync();
             onSuccessCallback.accept(null);
-            logger.info("代理服务启动成功:{}:{}", host, port);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.info("ETP服务启动成功:{}:{}", host, port);
+        } catch (Throwable e) {
+            logger.error("服务启动失败",e);
         }
     }
 

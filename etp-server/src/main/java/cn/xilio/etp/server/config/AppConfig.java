@@ -6,6 +6,7 @@ import cn.xilio.etp.core.protocol.ProtocolType;
 import com.moandjiezana.toml.Toml;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 解析Toml配置文件内容
@@ -22,13 +23,13 @@ public final class AppConfig {
         return INSTANCE;
     }
 
-    private String host;
-    private int bindPort;
-    private boolean tls;
+    private String host = "0.0.0.0";
+    private int bindPort = 9527;
+    private boolean tls = false;
     private KeystoreConfig keystoreConfig;
     private LogConfig logConfig;
     private Dashboard dashboard;
-    private final List<ClientInfo> clients = new ArrayList<>();
+    private final List<ClientInfo> clients = new CopyOnWriteArrayList<>();
 
     public AppConfig load(String path) {
         //顺序解析下面各种配置
@@ -48,13 +49,21 @@ public final class AppConfig {
 
     private void parseRoot(Toml root) {
         if (root.contains("bindPort")) {
-            bindPort = root.getLong("bindPort").intValue();
+            Long bindPortValue = root.getLong("bindPort");
+            if (bindPortValue != null) {
+                bindPort = bindPortValue.intValue();
+            }
         }
         if (root.contains("host")) {
-            host = root.getString("host");
+            String hostValue = root.getString("host");
+            if (StringUtils.hasText(hostValue)) {
+                host = hostValue;
+            }
         }
         Boolean tlsValue = root.getBoolean("tls");
-        tls = (tlsValue != null) ? tlsValue : false;
+        if (tlsValue != null) {
+            tls = tlsValue;
+        }
     }
 
     private void parseLogConfig(Toml root) {
@@ -64,6 +73,8 @@ public final class AppConfig {
             String pattern = log.getString("pattern");
             String path = log.getString("path");
             logConfig = new LogConfig(path, level, pattern);
+        } else {
+            logConfig = new LogConfig();
         }
     }
 
@@ -141,6 +152,8 @@ public final class AppConfig {
             String password = dash.getString("password");
             dashboard = new Dashboard(enable, username, password, addr, port);
             dashboard.setReset(reset);
+        } else {
+            dashboard = new Dashboard();
         }
     }
 
@@ -159,10 +172,12 @@ public final class AppConfig {
                 System.clearProperty("server.keystore.keyPass");
                 System.clearProperty("server.keystore.storePass");
                 //添加到系统属性中
-                System.setProperty("server.keystore.path", keystoreConfig.path());
-                System.setProperty("server.keystore.keyPass", keystoreConfig.keyPass());
-                System.setProperty("server.keystore.storePass", keystoreConfig.storePass());
+                System.setProperty("server.keystore.path", keystoreConfig.getPath());
+                System.setProperty("server.keystore.keyPass", keystoreConfig.getKeyPass());
+                System.setProperty("server.keystore.storePass", keystoreConfig.getStorePass());
             }
+        } else {
+            keystoreConfig = new KeystoreConfig();
         }
     }
 

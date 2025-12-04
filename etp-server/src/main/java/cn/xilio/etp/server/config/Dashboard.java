@@ -6,13 +6,13 @@ import java.io.Serializable;
  * @author liuxin
  */
 public class Dashboard implements Serializable {
-    private Boolean enable;
+    private Boolean enable = false;
     private String username;
     private String password;
     /**
      * 是否重置数据库中的登录信息，如果设置为true，如果用户之前登录过管理界面，用户信息将会重置
      */
-    private Boolean reset;
+    private Boolean reset = false;
     private String addr;
     private Integer port;
 

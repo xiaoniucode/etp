@@ -59,14 +59,13 @@ public class TunnelServerStartup {
 
     private static void initLogback() {
         LogConfig log = AppConfig.get().getLogConfig();
-        String level = log.getLevel();
-        Level levelEnum = Level.valueOf(level);
+        String leve = log.getLevel();
         String path = log.getPath();
         String pattern = log.getPattern();
         new LogbackConfigurator.LogbackConfigBuilder()
                 .setLogFilePath(StringUtils.hasText(path) ? path : ("logs" + File.separator + "etps.log"))
                 .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : ("logs" + File.separator + "etps.%d{yyyy-MM-dd}.log"))
-                .setLogLevel(levelEnum == null ? Level.INFO : levelEnum)
+                .setLogLevel(!StringUtils.hasText(leve) ? Level.INFO : Level.toLevel(leve, Level.INFO))
                 .build()
                 .configureLogback();
     }
