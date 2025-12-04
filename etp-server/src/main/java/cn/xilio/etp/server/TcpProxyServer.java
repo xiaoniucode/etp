@@ -53,7 +53,6 @@ public final class TcpProxyServer implements Lifecycle {
 
     @Override
     public void start() {
-        LOGGER.info("开始启动代理服务");
         bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
         workerGroup = NettyEventLoopFactory.eventLoopGroup();
         serverBootstrap = new ServerBootstrap();
@@ -67,6 +66,7 @@ public final class TcpProxyServer implements Lifecycle {
                     }
                 });
         bindAllProxyPort();
+        LOGGER.info("端口映射启动完成");
     }
 
     /**

@@ -139,7 +139,7 @@ public class TunnelClient implements Lifecycle {
                         .build();
                 future.channel().writeAndFlush(message);
                 retryCount.set(0);
-                logger.info("已连接到服务端");
+                logger.info("已连接到ETP服务端: {}:{}", serverAddr, serverPort);
             } else {
                 //重新连接
                 scheduleReconnect();
