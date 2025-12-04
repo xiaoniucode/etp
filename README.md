@@ -55,32 +55,32 @@ In addition to supporting pure Toml static configuration, etp also provides a gr
   <table width="100%">
     <tr>
       <td align="center" width="50%" style="vertical-align:top;">
-        <img src="doc/image/screeshot/登录.png" alt="登录" style="max-width:95%;height:auto;"/><br/>
-        <sub>登录界面</sub>
+        <img src="doc/image/screeshot/登录.png" alt="Login" style="max-width:95%;height:auto;"/><br/>
+        <sub>Login Page</sub>
       </td>
       <td align="center" width="50%" style="vertical-align:top;">
-        <img src="doc/image/screeshot/监控面板.png" alt="监控面板" style="max-width:95%;height:auto;"/><br/>
-        <sub>监控面板</sub>
-      </td>
-    </tr>
-    <tr>
-      <td align="center" width="50%" style="vertical-align:top;">
-        <img src="doc/image/screeshot/客户端列表.png" alt="客户端列表" style="max-width:95%;height:auto;"/><br/>
-        <sub>客户端列表</sub>
-      </td>
-      <td align="center" width="50%" style="vertical-align:top;">
-        <img src="doc/image/screeshot/添加映射2.png" alt="添加映射" style="max-width:95%;height:auto;"/><br/>
-        <sub>添加映射</sub>
+        <img src="doc/image/screeshot/监控面板.png" alt="Dashboard" style="max-width:95%;height:auto;"/><br/>
+        <sub>Monitoring Dashboard</sub>
       </td>
     </tr>
     <tr>
       <td align="center" width="50%" style="vertical-align:top;">
-        <img src="doc/image/screeshot/映射列表.png" alt="映射列表" style="max-width:95%;height:auto;"/><br/>
-        <sub>映射列表</sub>
+        <img src="doc/image/screeshot/客户端列表.png" alt="Client List" style="max-width:95%;height:auto;"/><br/>
+        <sub>Client List</sub>
       </td>
       <td align="center" width="50%" style="vertical-align:top;">
-        <img src="doc/image/screeshot/流量统计.png" alt="流量统计" style="max-width:95%;height:auto;"/><br/>
-        <sub>流量统计</sub>
+        <img src="doc/image/screeshot/添加映射2.png" alt="Add Mapping" style="max-width:95%;height:auto;"/><br/>
+        <sub>Add Mapping</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%" style="vertical-align:top;">
+        <img src="doc/image/screeshot/映射列表.png" alt="Mapping List" style="max-width:95%;height:auto;"/><br/>
+        <sub>Mapping List</sub>
+      </td>
+      <td align="center" width="50%" style="vertical-align:top;">
+        <img src="doc/image/screeshot/流量统计.png" alt="Traffic Statistics" style="max-width:95%;height:auto;"/><br/>
+        <sub>Traffic Statistics</sub>
       </td>
     </tr>
   </table>
