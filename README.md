@@ -47,7 +47,7 @@ A lightweight NAT traversal reverse proxy application implemented with Netty.
 - 📺 Cross-platform, compatible with arm64 and amd64 architectures
 - 💨 Lightweight with low resource consumption
 
-## 🎨 面板截图
+## 🎨 Dashboard Screenshots
 
 In addition to supporting pure Toml static configuration, etp also provides a graphical management interface for easy operation. This greatly reduces management and usage costs while offering more comprehensive features.
 
