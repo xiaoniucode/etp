@@ -169,7 +169,7 @@
                         <div class="layui-input-prefix">
                             <i class="layui-icon layui-icon-username"></i>
                         </div>
-                        <input type="text" name="username" lay-verify="required" placeholder="用户名" autocomplete="off"
+                        <input value="admin" type="text" name="username" lay-verify="required" placeholder="用户名" autocomplete="off"
                                class="layui-input" lay-affix="clear">
                     </div>
                 </div>
@@ -179,7 +179,7 @@
                         <div class="layui-input-prefix">
                             <i class="layui-icon layui-icon-password"></i>
                         </div>
-                        <input type="password" name="password" lay-verify="required" placeholder="密码"
+                        <input value="123456" type="password" name="password" lay-verify="required" placeholder="密码"
                                autocomplete="off" class="layui-input" lay-affix="eye">
                     </div>
                 </div>
@@ -220,58 +220,20 @@
         </div>
     </div>
 </div>
-
 <script src="/static/layui/layui.js"></script>
 <script src="/static/js/ajax.js"></script>
 <script>
-    layui.use(['form', 'layer', 'jquery','Rest'], function () {
+    layui.use(['form', 'layer', 'jquery', 'Rest'], function () {
         var form = layui.form;
         var Rest = layui.Rest;
         var layer = layui.layer;
         var $ = layui.jquery;
-
-        const TokenKey = 'auth_token';
-        const UserKey = 'user';
-
-        function getToken() {
-            return localStorage.getItem(TokenKey);
-        }
-
         function setToken(token) {
-            if (token) localStorage.setItem(TokenKey, token);
+            if (token) localStorage.setItem('auth_token', token);
         }
-
         function setUser(userId, username) {
-            localStorage.setItem(UserKey, JSON.stringify({userId, username}));
+            localStorage.setItem('user', JSON.stringify({userId, username}));
         }
-
-        function removeToken() {
-            localStorage.removeItem(TokenKey);
-        }
-
-        $.ajaxSetup({
-            headers: {'Authorization': 'Bearer ' + getToken()},
-            statusCode: {
-                401: function () {
-                    removeToken();
-                    layer.msg('登录已过期，请重新登录', {icon: 2});
-                }
-            }
-        });
-
-        function trySilentRefresh() {
-            var token = getToken();
-            if (!token) return;
-            Rest.put('/api/user/flush-token').then(data=>{
-                setToken(data.auth_token);
-                setUser(data.userId, data.username);
-                location.href = '/index.html';
-            }).then(err=>{
-                removeToken();
-            })
-        }
-
-        trySilentRefresh();
         let captchaId = '';
 
         // 绘制验证码
@@ -319,7 +281,7 @@
 
         // 刷新验证码
         function refreshCaptcha() {
-            Rest.get('/api/captcha').then(data=>{
+            Rest.get('/api/captcha').then(data => {
                 captchaId = data.captchaId;
                 drawCaptcha(data.code);
             })
@@ -334,25 +296,24 @@
         // ==================== 登录提交==================
         form.on('submit(demo-login)', function (data) {
             var field = data.field;
-            const loginBody={
+            const loginBody = {
                 username: field.username,
                 password: field.password,
                 captchaId: captchaId,
                 code: field.captcha
             }
-            Rest.post( '/api/user/login',loginBody).then(data=>{
+            Rest.post('/api/user/login', loginBody).then(data => {
                 setToken(data.auth_token);
                 setUser(data.userId, data.username);
-                layer.msg('登录成功', {icon: 1,time:1000}, function () {
+                layer.msg('登录成功', {icon: 1, time: 1000}, function () {
                     location.href = '/index.html';
                 });
-            }).catch(err=>{
+            }).catch(err => {
                 refreshCaptcha();
             })
             return false;
         });
     });
 </script>
-
 </body>
 </html>
