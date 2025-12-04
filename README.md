@@ -17,8 +17,8 @@ A lightweight NAT traversal reverse proxy application implemented with Netty.
   <a href="https://github.com/xiaoniucode/etp/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge" alt="License"/>
   </a>
-  <a href="https://github.com/xiaoniucode/etp/commits">
-    <img src="https://img.shields.io/github/last-commit/xiaoniucode/etp?style=for-the-badge" alt="Last Commit"/>
+  <a href="https://github.com/xiaoniucode/etp/releases/tag/0.2.0">
+    <img src="https://img.shields.io/badge/etp-0.2.0-blue?style=for-the-badge" alt="etp:0.2.0"/>
   </a>
 </div>
 
