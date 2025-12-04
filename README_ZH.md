@@ -1,11 +1,11 @@
 
-<p align="center">
+<div align="center">
   <img src="doc/logo.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
-</p>
+</div>
 <p align="center" style="font-size:18px;color:#555;margin-top:-10px;margin-bottom:24px;">
   基于Netty实现的轻量级内网穿透反向代理应用
 </p>
-<p align="center">
+<div align="center">
   <a href="https://github.com/xiaoniucode/etp">
     <img src="https://img.shields.io/github/stars/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Stars"/>
   </a>
@@ -21,13 +21,13 @@
   <a href="https://github.com/xiaoniucode/etp/commits">
     <img src="https://img.shields.io/github/last-commit/xiaoniucode/etp?style=for-the-badge" alt="Last Commit"/>
   </a>
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <a href="README.md"><strong>README</strong></a> &nbsp;|&nbsp;
   <a href="README_ZH.md"><strong>中文文档</strong></a> &nbsp;|&nbsp;
   <a href="https://xiaoniucode.github.io/etp"><strong>文档地址</strong></a>
-</p>
+</div>
 
 ## ✨ 介绍
 
@@ -51,44 +51,41 @@
 
 etp 除了支持纯 Toml 静态配置使用以外，还支持图形化界面管理操作，管理使用成本低，功能也更丰富。
 
-<table>
-  <tr>
-    <td align="center">
-      <img src="doc/image/screeshot/登录.png" alt="登录" width="360"/>
-      <br/>
-      <sub>登录界面</sub>
-    </td>
-    <td align="center">
-      <img src="doc/image/screeshot/监控面板.png" alt="监控面板" width="360"/>
-      <br/>
-      <sub>监控面板</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="doc/image/screeshot/客户端列表.png" alt="客户端列表" width="360"/>
-      <br/>
-      <sub>客户端列表</sub>
-    </td>
-    <td align="center">
-      <img src="doc/image/screeshot/添加映射2.png" alt="添加映射" width="360"/>
-      <br/>
-      <sub>添加映射</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="doc/image/screeshot/映射列表.png" alt="映射列表" width="360"/>
-      <br/>
-      <sub>映射列表</sub>
-    </td>
-    <td align="center">
-      <img src="doc/image/screeshot/流量统计.png" alt="流量统计" width="360"/>
-      <br/>
-      <sub>流量统计</sub>
-    </td>
-  </tr>
-</table>
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <img src="doc/image/screeshot/登录.png" alt="登录" width="360"/><br/>
+        <sub>登录界面</sub>
+      </td>
+      <td align="center">
+        <img src="doc/image/screeshot/监控面板.png" alt="监控面板" width="360"/><br/>
+        <sub>监控面板</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="doc/image/screeshot/客户端列表.png" alt="客户端列表" width="360"/><br/>
+        <sub>客户端列表</sub>
+      </td>
+      <td align="center">
+        <img src="doc/image/screeshot/添加映射2.png" alt="添加映射" width="360"/><br/>
+        <sub>添加映射</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="doc/image/screeshot/映射列表.png" alt="映射列表" width="360"/><br/>
+        <sub>映射列表</sub>
+      </td>
+      <td align="center">
+        <img src="doc/image/screeshot/流量统计.png" alt="流量统计" width="360"/><br/>
+        <sub>流量统计</sub>
+      </td>
+    </tr>
+  </table>
+</div>
+
 ## 🚀 快速开始
 
 根据操作系统下载对应的[发行版本](https://github.com/xiaoniucode/etp/releases)安装包，服务端一般部署在具备公网IP的服务器上。
