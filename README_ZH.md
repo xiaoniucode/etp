@@ -52,34 +52,34 @@
 etp 除了支持纯 Toml 静态配置使用以外，还支持图形化界面管理操作，管理使用成本低，功能也更丰富。
 
 <div align="center">
-  <table>
+  <table width="100%">
     <tr>
-      <td align="center">
-        <img src="doc/image/screeshot/登录.png" alt="登录" width="360"/><br/>
+      <td align="center" width="50%" style="vertical-align:top;">
+        <img src="doc/image/screeshot/登录.png" alt="登录" style="max-width:95%;height:auto;"/><br/>
         <sub>登录界面</sub>
       </td>
-      <td align="center">
-        <img src="doc/image/screeshot/监控面板.png" alt="监控面板" width="360"/><br/>
+      <td align="center" width="50%" style="vertical-align:top;">
+        <img src="doc/image/screeshot/监控面板.png" alt="监控面板" style="max-width:95%;height:auto;"/><br/>
         <sub>监控面板</sub>
       </td>
     </tr>
     <tr>
-      <td align="center">
-        <img src="doc/image/screeshot/客户端列表.png" alt="客户端列表" width="360"/><br/>
+      <td align="center" width="50%" style="vertical-align:top;">
+        <img src="doc/image/screeshot/客户端列表.png" alt="客户端列表" style="max-width:95%;height:auto;"/><br/>
         <sub>客户端列表</sub>
       </td>
-      <td align="center">
-        <img src="doc/image/screeshot/添加映射2.png" alt="添加映射" width="360"/><br/>
+      <td align="center" width="50%" style="vertical-align:top;">
+        <img src="doc/image/screeshot/添加映射2.png" alt="添加映射" style="max-width:95%;height:auto;"/><br/>
         <sub>添加映射</sub>
       </td>
     </tr>
     <tr>
-      <td align="center">
-        <img src="doc/image/screeshot/映射列表.png" alt="映射列表" width="360"/><br/>
+      <td align="center" width="50%" style="vertical-align:top;">
+        <img src="doc/image/screeshot/映射列表.png" alt="映射列表" style="max-width:95%;height:auto;"/><br/>
         <sub>映射列表</sub>
       </td>
-      <td align="center">
-        <img src="doc/image/screeshot/流量统计.png" alt="流量统计" width="360"/><br/>
+      <td align="center" width="50%" style="vertical-align:top;">
+        <img src="doc/image/screeshot/流量统计.png" alt="流量统计" style="max-width:95%;height:auto;"/><br/>
         <sub>流量统计</sub>
       </td>
     </tr>
