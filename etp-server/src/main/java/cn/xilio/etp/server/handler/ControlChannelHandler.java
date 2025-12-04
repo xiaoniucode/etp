@@ -12,6 +12,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * 负责认证、消息分发
+ *
  * @author liuxin
  */
 public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
@@ -28,16 +29,16 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMes
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel clientChannel = ctx.channel().attr(EtpConstants.CLIENT_CHANNEL).get();
         //数据连接的断开
-        if (clientChannel!=null){
+        if (clientChannel != null) {
             String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
             Long sessionId = ctx.channel().attr(EtpConstants.SESSION_ID).get();
             Channel controlTunnelChannel = ChannelManager.getControlChannelBySecretKey(secretKey);
-            if (controlTunnelChannel!=null) {
+            if (controlTunnelChannel != null) {
                 ChannelManager.removeClientChannelFromControlChannel(controlTunnelChannel, sessionId);
                 ChannelUtils.closeOnFlush(controlTunnelChannel);
                 clientChannel.close();
             }
-        }else {
+        } else {
             ChannelManager.clearControlChannel(ctx.channel());
         }
         super.channelInactive(ctx);
@@ -46,7 +47,7 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMes
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel visitorChannel = ctx.channel().attr(EtpConstants.CLIENT_CHANNEL).get();
-        if (visitorChannel!=null) {
+        if (visitorChannel != null) {
             visitorChannel.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
         }
 

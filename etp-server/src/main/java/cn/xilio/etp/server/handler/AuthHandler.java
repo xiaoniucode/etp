@@ -6,6 +6,8 @@ import cn.xilio.etp.core.AbstractMessageHandler;
 import cn.xilio.etp.server.manager.RuntimeState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -15,6 +17,7 @@ import java.util.List;
  * @author liuxin
  */
 public class AuthHandler extends AbstractMessageHandler {
+    private final Logger logger = LoggerFactory.getLogger(AuthHandler.class);
     private final RuntimeState state = RuntimeState.get();
 
     @Override
@@ -22,6 +25,7 @@ public class AuthHandler extends AbstractMessageHandler {
         String secretKey = msg.getExt();
         //检查密钥是否存在
         if (!state.hasClient(secretKey)) {
+            logger.error("secretKey认证密钥未授权");
             ctx.channel().close();
             return;
         }
@@ -31,5 +35,6 @@ public class AuthHandler extends AbstractMessageHandler {
         }
         List<Integer> remotePorts = state.getClientRemotePorts(secretKey);
         ChannelManager.addControlChannel(remotePorts, secretKey, ctx.channel());
+        logger.debug("客户端认证成功");
     }
 }

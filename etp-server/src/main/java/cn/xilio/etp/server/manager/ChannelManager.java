@@ -1,5 +1,6 @@
 package cn.xilio.etp.server.manager;
 
+import cn.xilio.etp.common.StringUtils;
 import cn.xilio.etp.core.EtpConstants;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -126,7 +127,10 @@ public final class ChannelManager {
     }
 
     public static Channel getControlChannelBySecretKey(String secretKey) {
-        return clientControlChannelMapping.get(secretKey);
+        if (!StringUtils.hasText(secretKey)) {
+            return null;
+        }
+        return clientControlChannelMapping.getOrDefault(secretKey, null);
     }
 
     public static Channel getClientChannel(Channel controlChannel, Long sessionId) {
