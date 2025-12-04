@@ -2,7 +2,9 @@
 <p align="center">
   <img src="doc/logo.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
 </p>
-
+<p align="center" style="font-size:18px;color:#555;margin-top:-10px;margin-bottom:24px;">
+  基于Netty实现的轻量级高性能内网穿透反向代理应用。
+</p>
 <p align="center">
   <a href="https://github.com/xiaoniucode/etp">
     <img src="https://img.shields.io/github/stars/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Stars"/>
@@ -29,7 +31,7 @@
 
 ## ✨ 介绍
 
-**etp**（Easy Tunnel Proxy）是一个轻量级的高性能内网穿透反向代理应用，支持TCP、HTTP协议以及TCP上层协议，支持TLS1.3高效安全加密协议，支持纯Toml静态配置或管理界面动态配置使用。用于将内网服务快速暴露为公网服务，便于开发测试，减少购买云服务器成本。
+**etp**（Easy Tunnel Proxy）是一个轻量级的高性能内网穿透反向代理应用，支持TCP、HTTP协议以及TCP上层协议，支持TLS1.3高效安全加密协议，支持纯Toml静态配置或管理界面动态配置使用。用于将内网服务快速暴露为公网服务，供公网用户访问以及开发测试，减少购买云服务器成本。
 ## 🌟 功能特性
 
 - 📡 支持TCP、HTTP等协议
