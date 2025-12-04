@@ -174,7 +174,7 @@ public final class EtpInitialize {
                     createdAt INTEGER DEFAULT (strftime('%s','now')),
                     FOREIGN KEY (uid) REFERENCES users(id)
                 );
-                CREATE INDEX IF NOT EXISTS idx_auth_tokens_expires_at ON auth_tokens(expires_at);
+                CREATE INDEX IF NOT EXISTS idx_auth_tokens_expiredAt ON auth_tokens(expiredAt);
                 """;
         SQLiteUtils.createTable(sql);
     }
@@ -216,6 +216,7 @@ public final class EtpInitialize {
                     createdAt TEXT    DEFAULT (datetime('now')),   -- 创建时间
                     updatedAt TEXT    DEFAULT (datetime('now'))    -- 更新时间
                 );
+                 CREATE INDEX IF NOT EXISTS idx_clients_name_secretkey ON clients (name, secretKey);
                 """;
         SQLiteUtils.createTable(sql);
     }
