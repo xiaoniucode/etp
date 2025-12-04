@@ -117,7 +117,7 @@ public final class ChannelManager {
             callback.success(dataTunnelChannel);
             return;
         }
-        tunnelBootstrap.connect(Config.getInstance().getServerAddr(), Config.getInstance().getServerPort()).addListener((ChannelFutureListener) future -> {
+        tunnelBootstrap.connect(Config.get().getServerAddr(), Config.get().getServerPort()).addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 callback.success(future.channel());
             } else {

@@ -3,6 +3,7 @@ package cn.xilio.etp.client;
 import ch.qos.logback.classic.Level;
 import cn.xilio.etp.common.ConfigUtils;
 import cn.xilio.etp.common.LogbackConfigurator;
+import cn.xilio.etp.common.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,24 +23,27 @@ public class TunnelClientStartup {
 
     public static void main(String[] args) {
         String configPath = ConfigUtils.getConfigPath(args, DEFAULT_CONFIG_NAME);
-        if (configPath == null) {
+        if (!StringUtils.hasText(configPath)) {
             System.out.println("请指定系统配置文件");
             return;
         }
         Config.init(configPath);
         initLogback();
-        Config config = Config.getInstance();
+        Config config = Config.get();
         registerShutdownHook();
         tunnelClient = new TunnelClient(config.getServerAddr(), config.getServerPort(), config.getSecretKey(), config.isTls());
         tunnelClient.start();
     }
 
     private static void initLogback() {
+        Config config = Config.get();
+        String leve = config.getLogLevel();
+        String path = config.getLogPath();
+        String pattern = config.getLogPattern();
         new LogbackConfigurator.LogbackConfigBuilder()
-                .setLogDir("logs")
-                .setLogFilePath("logs" + File.separator + "etpc.log")
-                .setArchiveFilePattern("logs" + File.separator + "etpc.%d{yyyy-MM-dd}.log")
-                .setLogLevel(Level.DEBUG)
+                .setLogFilePath(StringUtils.hasText(path) ? path : ("logs" + File.separator + "etps.log"))
+                .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : ("logs" + File.separator + "etps.%d{yyyy-MM-dd}.log"))
+                .setLogLevel(!StringUtils.hasText(leve) ? Level.INFO : Level.toLevel(leve, Level.INFO))
                 .build()
                 .configureLogback();
     }

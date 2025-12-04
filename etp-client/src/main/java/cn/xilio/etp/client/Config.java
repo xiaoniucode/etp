@@ -1,5 +1,6 @@
 package cn.xilio.etp.client;
 
+import cn.xilio.etp.common.StringUtils;
 import cn.xilio.etp.common.TomlUtils;
 import com.moandjiezana.toml.Toml;
 
@@ -17,32 +18,40 @@ public final class Config {
     /**
      * 配置单例实例
      */
-    private static volatile Config instance;
+    private static final Config instance = new Config();
+    private static final String DEFAULT_SERVER_ADDR = "127.0.0.1";
+
+    private static final int DEFAULT_SERVER_PORT = 9527;
+    private static final boolean DEFAULT_TLS = false;
+    /**
+     * 代理服务器地址
+     */
+    private static String serverAddr = DEFAULT_SERVER_ADDR;
 
     /**
-     * 代理服务器IP地址
+     * ETP服务端端口号
      */
-    private final String serverAddr;
+    private static int serverPort = DEFAULT_SERVER_PORT;
 
-    /**
-     * 代理服务器隧道端口号
-     */
-    private final int serverPort;
 
     /**
      * 用于与代理服务器通信认证的密钥
      */
-    private final String secretKey;
+    private static String secretKey;
 
     /**
      * 是否启用TLS
      */
-    private final boolean tls;
+    private static boolean tls = DEFAULT_TLS;
 
     /**
      * TLS信任库配置
      */
-    private final TruststoreConfig truststore;
+    private static TruststoreConfig truststore;
+
+    private static String logPath;
+    private static String logLevel;
+    private static String logPattern;
 
     /**
      * SSL信任库配置内部类
@@ -65,66 +74,78 @@ public final class Config {
         }
     }
 
-    /**
-     * 私有构造方法
-     */
-    private Config(String serverAddr, int serverPort, String secretKey,
-                   boolean tls, TruststoreConfig truststore) {
-        this.serverAddr = Objects.requireNonNull(serverAddr, "服务器地址不能为空");
-        this.serverPort = validatePort(serverPort);
-        this.secretKey = Objects.requireNonNull(secretKey, "密钥不能为空");
-        this.tls = tls;
-        this.truststore = truststore;
-    }
 
     /**
-     * 初始化配置（线程安全）
+     * 初始化配置
      *
      * @param configPath 配置文件路径
      * @throws IllegalStateException 如果配置初始化失败
      */
-    public static void init(String configPath) {
-        if (instance == null) {
-            synchronized (Config.class) {
-                if (instance == null) {
-                    instance = createConfig(configPath);
-                }
-            }
-        }
+    public static Config init(String configPath) {
+        createConfig(configPath);
+        return instance;
     }
 
     /**
      * 获取配置实例
      *
      * @return 配置实例
-     * @throws IllegalStateException 如果配置未初始化
      */
-    public static Config getInstance() {
-        if (instance == null) {
-            throw new IllegalStateException("配置未初始化，请先调用init方法");
-        }
+    public static Config get() {
         return instance;
     }
 
     /**
      * 创建配置实例
      */
-    private static Config createConfig(String configPath) {
+    private static void createConfig(String configPath) {
         try {
-            Toml toml = TomlUtils.readToml(configPath);
-            String serverAddr = Objects.requireNonNull(toml.getString("serverAddr"), "serverAddr配置不能为空");
-            Long port = Objects.requireNonNull(toml.getLong("serverPort"), "serverPort配置不能为空");
-            int serverPort = port.intValue();
-            String secretKey = Objects.requireNonNull(toml.getString("secretKey"), "secretKey配置不能为空");
-            Boolean tlsEnabled = toml.getBoolean("tls");
-            boolean tls = tlsEnabled != null ? tlsEnabled : false;
+            Toml root = TomlUtils.readToml(configPath);
+            String serverAddrValue = root.getString("serverAddr");
+            Long serverPortValue = root.getLong("serverPort");
+            String secretKeyValue = root.getString("secretKey");
+            Boolean tlsValue = root.getBoolean("tls");
+
+            if (StringUtils.hasText(serverAddrValue)) {
+                serverAddr = serverAddrValue.trim();
+            }
+            if (serverPortValue != null) {
+                validatePort(serverPortValue.intValue());
+                serverPort = serverPortValue.intValue();
+            }
+            if (StringUtils.hasText(secretKeyValue)) {
+                secretKey = secretKeyValue.trim();
+            }else {
+                throw new IllegalArgumentException("必须配置认证密钥secretKey");
+            }
+            if (tlsValue != null) {
+                tls = tlsValue;
+            }
+
+            //----------------------------------------------//
+            Toml log = root.getTable("log");
+            if (log != null) {
+                String level = log.getString("level");
+                String pattern = log.getString("pattern");
+                String path = log.getString("path");
+                if (StringUtils.hasText(level)) {
+                    logLevel = level;
+                }
+                if (StringUtils.hasText(pattern)) {
+                    logPattern = pattern;
+                }
+                if (StringUtils.hasText(path)) {
+                    logPath = path;
+                }
+            }
+            //----------------------------------------------//
             TruststoreConfig truststoreConfig = null;
             if (tls) {
-                Toml truststoreTable = toml.getTable("truststore");
+                Toml truststoreTable = root.getTable("truststore");
                 if (truststoreTable != null) {
                     String path = truststoreTable.getString("path");
                     String password = truststoreTable.getString("storePass");
-                    if (path != null && password != null) {
+                    if (StringUtils.hasText(path) && StringUtils.hasText(password)) {
                         truststoreConfig = new TruststoreConfig(path, password);
                     }
                     if (truststoreConfig != null) {
@@ -138,13 +159,11 @@ public final class Config {
 
                 }
             }
-
-            return new Config(serverAddr, serverPort, secretKey, tls, truststoreConfig);
-
         } catch (Exception e) {
-            throw new IllegalStateException("配置文件解析失败: " + configPath, e);
+            throw new IllegalStateException("配置文件加载失败: " + configPath, e);
         }
     }
+
 
     /**
      * 验证端口号有效性
@@ -156,7 +175,6 @@ public final class Config {
         return port;
     }
 
-    // Getter方法
     public String getServerAddr() {
         return serverAddr;
     }
@@ -182,5 +200,17 @@ public final class Config {
      */
     public boolean isSslConfigured() {
         return tls && truststore != null;
+    }
+
+    public String getLogPath() {
+        return logPath;
+    }
+
+    public String getLogLevel() {
+        return logLevel;
+    }
+
+    public String getLogPattern() {
+        return logPattern;
     }
 }

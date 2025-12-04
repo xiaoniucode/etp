@@ -19,14 +19,6 @@ public class Dashboard implements Serializable {
     public Dashboard() {
     }
 
-    public Dashboard(Boolean enable, String username, String password, String addr, Integer port) {
-        this.enable = enable;
-        this.username = username;
-        this.password = password;
-        this.addr = addr;
-        this.port = port;
-    }
-
     public Boolean getEnable() {
         return enable;
     }

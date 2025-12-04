@@ -8,7 +8,6 @@ import cn.xilio.etp.core.protocol.TunnelMessage;
 import cn.xilio.etp.server.handler.ControlChannelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.AdaptiveRecvByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -31,10 +30,9 @@ import java.util.function.Consumer;
  */
 public class TunnelServer implements Lifecycle {
     private static final Logger logger = LoggerFactory.getLogger(TunnelServer.class);
-    private final static String DEFAULT_HOST = "0.0.0.0";
     private String host;
     private int port;
-    private boolean ssl;
+    private boolean tls;
     private EventLoopGroup tunnelBossGroup;
     private EventLoopGroup tunnelWorkerGroup;
     private SslContext tlsContext;
@@ -47,22 +45,24 @@ public class TunnelServer implements Lifecycle {
     @Override
     public void start() {
         try {
-            if (ssl) {
+            logger.debug("正在启动ETP服务");
+            if (tls) {
                 tlsContext = new ServerTlsContextFactory().createContext();
             }
             tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(tunnelBossGroup, tunnelWorkerGroup)
-                    .childOption(ChannelOption.TCP_NODELAY, true)    // 禁用Nagle算法，降低延迟
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)   // 启用TCP心跳检测
-                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) // 使用内存池
+                    .childOption(ChannelOption.TCP_NODELAY, true)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            if (ssl) {
+                            if (tls) {
                                 sc.pipeline().addLast("tls", tlsContext.newHandler(sc.alloc()));
+                                logger.debug("TLS加密处理器添加成功");
                             }
                             sc.pipeline()
                                     .addLast(new ProtobufVarint32FrameDecoder())
@@ -73,11 +73,11 @@ public class TunnelServer implements Lifecycle {
                                     .addLast(new ControlChannelHandler());
                         }
                     });
-            serverBootstrap.bind(host == null ? DEFAULT_HOST : host, port).sync();
+            serverBootstrap.bind(host, port).sync();
             onSuccessCallback.accept(null);
             logger.info("ETP服务启动成功:{}:{}", host, port);
         } catch (Throwable e) {
-            logger.error("服务启动失败",e);
+            logger.error("ETP服务启动失败", e);
         }
     }
 
@@ -116,7 +116,7 @@ public class TunnelServer implements Lifecycle {
         this.port = port;
     }
 
-    public void setSsl(boolean ssl) {
-        this.ssl = ssl;
+    public void setTls(boolean tls) {
+        this.tls = tls;
     }
 }

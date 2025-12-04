@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 解析Toml配置文件内容
+ * 解析Toml配置文件内容以及管理系统所有客户端、映射等全局配置信息
  *
  * @author liuxin
  */
@@ -23,12 +23,38 @@ public final class AppConfig {
         return INSTANCE;
     }
 
-    private String host = "0.0.0.0";
-    private int bindPort = 9527;
+    private final static String DEFAULT_HOST = "0.0.0.0";
+    private final static int DEFAULT_BIND_PORT = 9527;
+    private final static String DEFAULT_DASHBOARD_HOST = "0.0.0.0";
+    private final static int DEFAULT_DASHBOARD_PORT = 8020;
+    /**
+     * ETP服务端绑定的地址，默认0.0.0.0，允许所有用户连接
+     */
+    private String host = DEFAULT_HOST;
+
+    /**
+     * ETP服务端绑定端口，默认9527
+     */
+    private int bindPort = DEFAULT_BIND_PORT;
+    /**
+     * 是否开启TLS加密，默认关闭
+     */
     private boolean tls = false;
+    /**
+     * 密钥库配置管理
+     */
     private KeystoreConfig keystoreConfig;
+    /**
+     * 系统日志自定义配置
+     */
     private LogConfig logConfig;
+    /**
+     * 管理界面面板配置信息
+     */
     private Dashboard dashboard;
+    /**
+     * 存储所有客户端
+     */
     private final List<ClientInfo> clients = new CopyOnWriteArrayList<>();
 
     public AppConfig load(String path) {
@@ -49,20 +75,14 @@ public final class AppConfig {
 
     private void parseRoot(Toml root) {
         if (root.contains("bindPort")) {
-            Long bindPortValue = root.getLong("bindPort");
-            if (bindPortValue != null) {
-                bindPort = bindPortValue.intValue();
-            }
+            Long bindPortValue = root.getLong("bindPort", (long)DEFAULT_BIND_PORT);
+            bindPort = bindPortValue.intValue();
         }
         if (root.contains("host")) {
-            String hostValue = root.getString("host");
-            if (StringUtils.hasText(hostValue)) {
-                host = hostValue;
-            }
+            host = root.getString("host", DEFAULT_HOST);
         }
-        Boolean tlsValue = root.getBoolean("tls");
-        if (tlsValue != null) {
-            tls = tlsValue;
+        if (root.contains("tls")) {
+            tls = root.getBoolean("tls", true);
         }
     }
 
@@ -98,11 +118,13 @@ public final class AppConfig {
             if (nameTemp.contains(name)) {
                 throw new IllegalArgumentException("客户端[名称]冲突，不能存在重复的名称！ " + name);
             }
-            //解析客户端的所有端口映射信息
-            List<ProxyMapping> proxies = parseProxes(client);
+
             //创建一个客户端
             ClientInfo clientInfo = new ClientInfo(secretKey);
+            //解析客户端的所有端口映射信息
+            List<ProxyMapping> proxies = parseProxes(clientInfo.getProxies(), client);
             clientInfo.setName(name);
+
             clientInfo.setProxies(proxies);
             clients.add(clientInfo);
             tokenTemp.add(secretKey);
@@ -110,13 +132,12 @@ public final class AppConfig {
         }
     }
 
-    private List<ProxyMapping> parseProxes(Toml client) {
+    private List<ProxyMapping> parseProxes(List<ProxyMapping> proxyMappings, Toml client) {
         List<Toml> proxies = client.getTables("proxies");
         if (proxies == null) {
-            return new ArrayList<>();
+            return proxyMappings;
         }
         Set<Integer> portTemp = new HashSet<>();
-        List<ProxyMapping> proxyMappings = new ArrayList<>();
         for (Toml proxy : proxies) {
             String type = proxy.getString("type");
             String proxyName = proxy.getString("name");
@@ -143,17 +164,28 @@ public final class AppConfig {
 
     private void parseDashboard(Toml root) {
         Toml dash = root.getTable("dashboard");
+        dashboard = new Dashboard();
         if (dash != null) {
-            Boolean enable = dash.getBoolean("enable") != null && dash.getBoolean("enable");
-            String addr = dash.getString("addr");
-            Integer port = dash.getLong("port") == null ? null : dash.getLong("port").intValue();
-            Boolean reset = dash.getBoolean("reset", false);
-            String username = dash.getString("username");
-            String password = dash.getString("password");
-            dashboard = new Dashboard(enable, username, password, addr, port);
-            dashboard.setReset(reset);
-        } else {
-            dashboard = new Dashboard();
+            Boolean enable = dash.getBoolean("enable", false);
+            if (enable) {
+                dashboard.setEnable(true);
+                String addr = dash.getString("addr", DEFAULT_DASHBOARD_HOST);
+                dashboard.setAddr(addr);
+                Long port = dash.getLong("port", (long)DEFAULT_DASHBOARD_PORT);
+                dashboard.setPort(port.intValue());
+                String username = dash.getString("username");
+                String password = dash.getString("password");
+                if (!StringUtils.hasText(username)) {
+                    throw new IllegalArgumentException("请配置Dashboard用户名");
+                }
+                if (!StringUtils.hasText(password)) {
+                    throw new IllegalArgumentException("请配置Dashboard密码");
+                }
+                dashboard.setUsername(username);
+                dashboard.setPassword(password);
+                Boolean reset = dash.getBoolean("reset", false);
+                dashboard.setReset(reset);
+            }
         }
     }
 

@@ -44,6 +44,7 @@ public final class EtpInitialize {
         }
         //注册和同步Toml静态配
         registerTomlConfig();
+        logger.debug("数据初始化完毕");
     }
 
     private static void syncDashboardUser() {
