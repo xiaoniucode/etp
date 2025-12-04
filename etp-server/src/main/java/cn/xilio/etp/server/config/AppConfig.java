@@ -122,10 +122,8 @@ public final class AppConfig {
             //创建一个客户端
             ClientInfo clientInfo = new ClientInfo(secretKey);
             //解析客户端的所有端口映射信息
-            List<ProxyMapping> proxies = parseProxes(clientInfo.getProxies(), client);
+            parseProxes(clientInfo.getProxies(), client);
             clientInfo.setName(name);
-
-            clientInfo.setProxies(proxies);
             clients.add(clientInfo);
             tokenTemp.add(secretKey);
             nameTemp.add(name);

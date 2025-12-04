@@ -85,11 +85,7 @@ public final class RuntimeState {
      * 获取所有客户端信息
      */
     public Collection<ClientInfo> allClients() {
-        Collection<ClientInfo> clientInfos = Collections.unmodifiableCollection(clients.values());
-        if (clientInfos.isEmpty()) {
-            return Collections.emptySet();
-        }
-        return clientInfos;
+        return clients.values();
     }
 
     public List<Integer> getClientRemotePorts(String secretKey) {
@@ -125,7 +121,7 @@ public final class RuntimeState {
     public boolean registerProxy(String secretKey, ProxyMapping proxy) {
         ClientInfo client = clients.get(secretKey);
         if (!Objects.isNull(client) && !isPortOccupied(proxy.getRemotePort())) {
-            client.getProxies().add(proxy);
+             client.getProxies().add(proxy);
             clientRemotePorts.getOrDefault(secretKey, new ArrayList<>()).add(proxy.getRemotePort());
             portMapping.put(proxy.getRemotePort(), proxy.getLocalPort());
             logger.info("映射{} - {} 注册成功", proxy.getName(), proxy.getRemotePort());

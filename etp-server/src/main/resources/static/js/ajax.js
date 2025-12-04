@@ -2,25 +2,21 @@ layui.define(['layer', 'jquery'], function (exports) {
     const layer = layui.layer;
     const $ = layui.jquery;
 
-    // ==================== 核心：Token 自动刷新逻辑（只加这几行）=================
     let isRefreshing = false;
-    let retryQueue = []; // 存放等待重试的请求
+    let retryQueue = [];
 
-    // 执行队列里的所有重试
     function processRetryQueue(newToken) {
         retryQueue.forEach(item => {
             item.resolve(newToken);
         });
         retryQueue = [];
     }
-    // =====================================================================
-// ====================== 刷新 Token 时自动携带旧 Token ======================
+
     function refreshTokenWithOld() {
         layer.msg('flush，', {icon: 2});
 
         const oldToken = localStorage.getItem('auth_token');
         if (!oldToken) {
-            // 连旧 token 都没有，直接跳登录
             localStorage.clear();
             layer.msg('登录已过期，请重新登录', {icon: 2});
             setTimeout(() => {
@@ -35,7 +31,7 @@ layui.define(['layer', 'jquery'], function (exports) {
                 type: 'PUT',
                 contentType: 'application/json;charset=UTF-8',
                 headers: {
-                    'Authorization': 'Bearer ' + oldToken   // 关键：携带旧 Token
+                    'Authorization': 'Bearer ' + oldToken
                 },
                 timeout: 10000,
                 success: (res) => {
@@ -51,7 +47,7 @@ layui.define(['layer', 'jquery'], function (exports) {
             });
         });
     }
-// =====================================================================
+
     class RestAPI {
         static token() {
             return localStorage.getItem('auth_token');
@@ -82,7 +78,7 @@ layui.define(['layer', 'jquery'], function (exports) {
                         } else {
                             const msg = res?.message || '操作失败';
                             if (options.silent !== true) {
-                                layer.msg(msg, {icon: 2, time: 1000});
+                                layer.msg(msg, {icon: 2, time: 1500});
                             }
                             const err = new Error(msg);
                             err.response = res;
@@ -93,12 +89,10 @@ layui.define(['layer', 'jquery'], function (exports) {
                     },
 
                     error: (xhr) => {
-                        // ================ 核心：401 时自动刷新 Token（携带旧 Token）================
                         if (xhr.status === 401) {
                             if (isRefreshing) {
-                                // 正在刷新 → 排队
                                 const waiter = new Promise((res) => {
-                                    retryQueue.push({ resolve: res });
+                                    retryQueue.push({resolve: res});
                                 });
                                 waiter.then(() => {
                                     this.request(method, url, params, options).then(resolve).catch(reject);
@@ -127,11 +121,9 @@ layui.define(['layer', 'jquery'], function (exports) {
                                 reject(new Error('未授权'));
                             });
 
-                            return; // 阻止你原来的 401 跳转逻辑
+                            return;
                         }
-                        // =====================================================================
 
-                        // 你原来的其他错误处理完全不动
                         let msg = '网络异常';
                         if (xhr.responseJSON?.message) {
                             msg = xhr.responseJSON.message;
@@ -152,17 +144,24 @@ layui.define(['layer', 'jquery'], function (exports) {
                 });
             })
                 .then(data => {
-                    return data; // 你原来的 .then 完全保留
+                    return data;
                 });
         }
     }
 
     const Rest = {
-        get(url, params = {}, options = {}) { return RestAPI.request('GET', url, params, options); },
-        post(url, data = {}, options = {}) { return RestAPI.request('POST', url, data, options); },
-        put(url, data = {}, options = {}) { return RestAPI.request('PUT', url, data, options); },
-        delete(url, params = {}, options = {}) { return RestAPI.request('DELETE', url, params, options); }
+        get(url, params = {}, options = {}) {
+            return RestAPI.request('GET', url, params, options);
+        },
+        post(url, data = {}, options = {}) {
+            return RestAPI.request('POST', url, data, options);
+        },
+        put(url, data = {}, options = {}) {
+            return RestAPI.request('PUT', url, data, options);
+        },
+        delete(url, params = {}, options = {}) {
+            return RestAPI.request('DELETE', url, params, options);
+        }
     };
-
     exports('Rest', Rest);
 });

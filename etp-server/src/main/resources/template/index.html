@@ -102,13 +102,14 @@
         });
 
         $('#logout').on('click', function () {
-            localStorage.removeItem("user")
-            localStorage.removeItem("auth_token")
             Rest.delete('/api/user/logout').then(data => {
-                layer.msg('退出成功', {icon: 1, time: 800}, function () {
+                localStorage.removeItem("user")
+                localStorage.removeItem("auth_token")
+                layer.msg('退出成功', {icon: 1, time: 1000}, function () {
                     window.location.href = '/login.html';
                 });
             })
+
         });
 
         function setLoginInfo() {

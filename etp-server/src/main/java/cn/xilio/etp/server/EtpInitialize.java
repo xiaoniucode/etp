@@ -89,33 +89,34 @@ public final class EtpInitialize {
                     configStore.addClient(save);
                     logger.info("同步静态配置客户端「{}」到数据库", name);
                 }
-                List<ProxyMapping> proxies = clientInfo.getProxies();
-                proxies.forEach(proxy -> {
-                    Integer remotePort = proxy.getRemotePort();
-                    if (!runtimeState.hasProxy(secretKey, remotePort)) {
-                        //注册端口映射
-                        runtimeState.registerProxy(secretKey, proxy);
-                        //如果开启了管理面板，需要将映射配置同步到数据库
-                        if (enableDashboard) {
-                            JSONObject existClient = configStore.getClientBySecretKey(secretKey);
-                            JSONObject save = new JSONObject();
-                            save.put("clientId", existClient.getInt("id"));
-                            save.put("name", proxy.getName());
-                            save.put("localPort", proxy.getLocalPort());
-                            save.put("remotePort", proxy.getRemotePort());
-                            save.put("status", proxy.getStatus());
-                            save.put("type", proxy.getType().name().toLowerCase(Locale.ROOT));
-                            configStore.addProxy(save);
-                            logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", existClient.get("id"), proxy.getName(), proxy.getRemotePort());
-                        }
-                    } else {
-                        logger.warn("同步取消，该客户端公网端口「{}-{}」已经被注册", name, remotePort);
-                    }
-
-                });
             } else {
-                logger.warn("「{}」 客户端已经被注册", name);
+                logger.warn("客户端「{}」 注册失败，已经在数据库被注册", name);
             }
+            List<ProxyMapping> proxies = clientInfo.getProxies();
+            proxies.forEach(proxy -> {
+                Integer remotePort = proxy.getRemotePort();
+                if (!runtimeState.hasProxy(secretKey, remotePort)) {
+                    //注册端口映射
+                    runtimeState.registerProxy(secretKey, proxy);
+                    //如果开启了管理面板，需要将映射配置同步到数据库
+                    if (enableDashboard) {
+                        JSONObject existClient = configStore.getClientBySecretKey(secretKey);
+                        JSONObject save = new JSONObject();
+                        save.put("clientId", existClient.getInt("id"));
+                        save.put("name", proxy.getName());
+                        save.put("localPort", proxy.getLocalPort());
+                        save.put("remotePort", proxy.getRemotePort());
+                        save.put("status", proxy.getStatus());
+                        save.put("type", proxy.getType().name().toLowerCase(Locale.ROOT));
+                        configStore.addProxy(save);
+                        logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", existClient.get("id"), proxy.getName(), proxy.getRemotePort());
+                    }
+                } else {
+                    logger.warn("同步取消，该客户端公网端口「{}-{}」已经被注册", name, remotePort);
+                }
+
+            });
+
         });
     }
 

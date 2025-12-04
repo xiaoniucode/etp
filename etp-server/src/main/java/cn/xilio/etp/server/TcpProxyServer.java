@@ -93,7 +93,7 @@ public final class TcpProxyServer implements Lifecycle {
                             bindPorts.add(portItem);
                             LOGGER.info("成功绑定端口: {}", remotePort);
                         } else {
-                            LOGGER.warn("remotePort:{}端口正在被占用！", remotePort);
+                            LOGGER.warn("未成功启动服务，remotePort:{}端口不可用！", remotePort);
                         }
                     }
                 }

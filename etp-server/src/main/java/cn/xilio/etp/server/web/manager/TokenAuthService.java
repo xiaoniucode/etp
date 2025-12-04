@@ -5,6 +5,7 @@ import cn.xilio.etp.server.web.SQLiteUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,8 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TokenAuthService {
     private final static Logger logger = LoggerFactory.getLogger(TokenAuthService.class);
-//    private static final long TOKEN_EXPIRE_SECONDS = 24 * 60 * 60;
-    private static final long TOKEN_EXPIRE_SECONDS = 30;
+    private static final long TOKEN_EXPIRE_SECONDS = 24 * 60 * 60;
     // 清理时间点（小时, 分钟）
     private static final LocalTime CLEANUP_TIME = LocalTime.of(1, 0);
 
