@@ -12,7 +12,7 @@ etp强制采用`TLSv1.3`协议
 - 下载对应操作系统的密钥生成工具: [keytool](https://github.com/xiaoniucode/etp/tree/main/scripts/tls)
 - 下载自动生成密钥命令行脚本：[tls.sh](https://github.com/xiaoniucode/etp/tree/main/scripts/tls/tls.sh)
 
-将上面下载的两个文件都放在同一个文件夹，然后运行脚本文件快速生成密钥配置
+将上面下载的两个文件都放在同一个文件夹，去掉keytool的后缀（如keytool_arm，去掉_arm），然后运行脚本文件快速生成密钥配置
 ```shell
 sh tls.sh 
 ```

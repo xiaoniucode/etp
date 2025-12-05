@@ -3,12 +3,12 @@ sidebar_position: 1
 ---
 
 # Linux
-`etp`服务端一般安装在具有`公网IP`的Linux服务器上。
+`etp`服务端一般安装在具有`公网IP`的Linux服务器上，本文介绍Linux
 ## 方法一：采用nohup
 服务端配置：
 ```js
 etps.toml
-
+host="0.0.0.0"
 bindPort = 9527
 ```
 客户端配置：
@@ -73,3 +73,6 @@ sudo systemctl restart etps
 # 查看状态
 sudo systemctl status etps
 ```
+## 方法三：采用Docker容器化部署
+
+从发行版本中将下载下来的`jar`文件构建为`docker`镜像安装即可。
