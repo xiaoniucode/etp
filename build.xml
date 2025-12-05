@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.xilio</groupId>
     <artifactId>etp</artifactId>
-    <version>0.2.0-alpha</version>
+    <version>0.2.0</version>
     <packaging>pom</packaging>
     <properties>
         <java.version>21</java.version>
