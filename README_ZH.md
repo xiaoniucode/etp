@@ -140,10 +140,10 @@ secretKey = "你的客户端认证密钥" #和服务端配置保持一致
 1️⃣ 首先需要下载项目提供的证书生成命令行工具[tls.sh](scripts/tls/tls.sh)
 到本地，根据自己的操作系统去[地址](scripts/tls)下载对应版本的keytool，去掉后缀后放到与tls.sh脚本同级目录。
 
-2️⃣ 脚本下载本地后，在终端执行如下命令生成证书和密钥，如果嫌麻烦也可以不带任何参数，脚本会自动生成复杂的密钥。(以Linux为例)
+2️⃣ 脚本下载本地后，在终端执行如下命令生成证书和密钥，脚本会自动生成密钥。(以Linux为例)
 
 ```shell
-sudo sh tls.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k123456
+sudo sh tls.sh 
 ```
 
 ![tls_1.png](doc/image/cert/tls_1.png)

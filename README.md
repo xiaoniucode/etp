@@ -139,10 +139,10 @@ After a successful startup, connect to MySQL using port **3307**.
 
 1️⃣ First, download the certificate generation CLI tool [tls.sh](scripts/tls/tls.sh) from the project. Download the appropriate keytool version for your OS from [this directory](scripts/tls), remove the extension, and place it in the same directory as the `tls.sh` script.
 
-2️⃣ Once downloaded, execute the following command in your terminal to generate certificates and keys. If you prefer, you can run the script without any parameters and it will automatically generate complex keys. (Linux example)
+After downloading the script locally, run the following command in the terminal to generate the certificate and key. The script will automatically generate the keys. (Linux example)
 
 ```shell
-sudo sh tls.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k123456
+sudo sh tls.sh 
 ```
 
 ![tls_1.png](doc/image/cert/tls_1.png)

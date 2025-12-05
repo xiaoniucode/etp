@@ -2,61 +2,52 @@
 sidebar_position: 3
 ---
 
-
+:::success
 etp强制采用`TLSv1.3`协议
+:::
+
+本文以Linux/MacOS操作系统为例介绍如何配置TLS，实现数据加密传输。
 
 ## 密钥生成
-- 下载密钥生成工具: [keytool](https://github.com/xiaoniucode/etp/tree/main/scripts/keytool)
-- 下载命令行脚本：[generate_ssl_cert.sh](https://github.com/xiaoniucode/etp/tree/main/scripts/generate_ssl_cert.sh)
+- 下载对应操作系统的密钥生成工具: [keytool](https://github.com/xiaoniucode/etp/tree/main/scripts/tls)
+- 下载自动生成密钥命令行脚本：[tls.sh](https://github.com/xiaoniucode/etp/tree/main/scripts/tls/tls.sh)
 
 将上面下载的两个文件都放在同一个文件夹，然后运行脚本文件快速生成密钥配置
-```js
-./generate_ssl_cert.sh 
+```shell
+sh tls.sh 
 ```
-下面是自动生成的配置，如果需要自定义，请参考[文档](https://github.com/xiaoniucode/etp/blob/main/doc/code-gen.md)
 
 输入y以后会自动生成服务端和客户端的密钥和证书
-
-对应的密钥配置和证书也会在当前目录下生成。
+![tls_1.png](img/tls_1.png)
+对应的密钥配置和证书也会在当前目录cert下生成。
+![tls_2.png](img/tls_2.png)
 
 
 ## ✍️配置
 
+将上面生成的证书和密钥分别客户端和服务端进行配置。
+
+![tls_res.png](img/tls_res.png)
+
 ### 🖥️服务端
 ```js
-bindPort = 9527
-
 ssl = true
 [keystore]
 path = "/path/cert/server.p12"
 keyPass = "your-keypass"
 storePass = "your-storepass"
-    
-[[clients]]
-name = "macos"
-secretKey = "your-secret-key"
-   
-[[clients.proxies]]
-name = "MySQL"
-type = "tcp"
-localPort = 3306
-remotePort = 3307
-
-[[clients.proxies]]
-name = "Redis"
-type = "tcp"
-localPort = 6379
-remotePort = 6380 
 ```
 ### 💻客户端
 ```js
-serverAddr = "x.x.x.x"
-serverPort = 9527
-secretKey = "your-secret-key"
-
 ssl = true
 [truststore]
 path = "/path/cert/client.p12"
 storePass = "your-storepass"
 ```
-⚠️ `ssl=true / ssl=false`必须在服务端和客户端同时设置并保持一致！
+⚠️ `tls=true / tls=false`必须在服务端和客户端同时设置并保持一致！
+
+---
+
+`tls.sh`脚本详细用法可以加上`-h`参数查看
+
+![tls_help.png](img/tls_help.png)
