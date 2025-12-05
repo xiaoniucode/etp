@@ -8,11 +8,22 @@
     <subtitle>etp Blog</subtitle>
     <icon>https://etp.github.io/etp/img/favicon.ico</icon>
     <entry>
-        <title type="html"><![CDATA[index]]></title>
+        <title type="html"><![CDATA[etp v0.2.0发布]]></title>
         <id>https://etp.github.io/etp/blog/index</id>
         <link href="https://etp.github.io/etp/blog/index"/>
         <updated>2025-12-03T10:55:20.000Z</updated>
-        <summary type="html"><![CDATA[.]]></summary>
-        <content type="html"><![CDATA[<p>.</p>]]></content>
+        <summary type="html"><![CDATA[✨ 新功能]]></summary>
+        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_Xi3w" id="-新功能">✨ 新功能<a href="https://etp.github.io/etp/blog/index#-%E6%96%B0%E5%8A%9F%E8%83%BD" class="hash-link" aria-label="Direct link to ✨ 新功能" title="Direct link to ✨ 新功能" translate="no">​</a></h2>
+<ul>
+<li>新增易于操作的图形化管理界面。</li>
+<li>新增支持日志自定义规则配置。</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_Xi3w" id="️-配置变更">⚙️ 配置变更<a href="https://etp.github.io/etp/blog/index#%EF%B8%8F-%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4" class="hash-link" aria-label="Direct link to ⚙️ 配置变更" title="Direct link to ⚙️ 配置变更" translate="no">​</a></h2>
+<ul>
+<li>配置文件中的证书配置属性由 <code>ssl</code> 更名为 <code>tls</code>。</li>
+<li>端口映射增加status状态字段，用于控制映射的开启状态。</li>
+</ul>
+<hr>
+<p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.2.0" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>]]></content>
     </entry>
 </feed>
