@@ -6,3 +6,9 @@ secretKey = "your-secret-key"
 #[truststore]
 #path = "/path/cert/client.p12"
 #storePass = "your-store-pass"
+
+#################日志配置#################
+#[log]
+#level = "info" #默认为info
+#pattern = ""
+#path=""
