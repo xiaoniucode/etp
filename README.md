@@ -88,95 +88,92 @@ In addition to supporting pure Toml static configuration, etp also provides a gr
 
 ## 🚀 Quick Start
 
-Download the appropriate [release](https://github.com/xiaoniucode/etp/releases) package for your OS. The server should run on a machine with a public IP address.
+Download the appropriate [release package](https://github.com/xiaoniucode/etp/releases) for your operating system. The server is typically deployed on a machine with a public IP address.
 
-### 🖥️ Server
+### 🖥️ Server Setup
 
-Here's how to expose an internal MySQL service to public port 3307.
+This section demonstrates how to expose an internal MySQL service to the public on port 3307.
 
-> Edit your configuration file `etps.toml` and add:
+> Edit the configuration file `etps.toml` and add the following content:
 
-```toml 
+```toml
 bindPort = 9527
 [[clients]]
-name = "Mac"             # [Required] Custom client name
-secretKey = "YourSecret" # [Required] Custom secret key
+name = "Mac" # [Required] Custom client name
+secretKey = "your client authentication key" # [Required] Custom key
 
 [[clients.proxies]]
-name = "mysql"           # Service name
-type = "tcp"             # [Required] Protocol type
-localPort = 3306         # [Required] Internal service port
-remotePort = 3307        # [Optional] Public service port, auto-assigned if omitted
+name = "mysql" # Service name
+type = "tcp" # [Required] Network transport protocol
+localPort = 3306 # [Required] Internal service port
+remotePort = 3307 # [Optional] Public service port; if not specified, a port will be randomly assigned by the system
 ```
 
-Start etp server on Linux; an external/public IP address is required for public access.
+Start the etp server on a Linux server. For external access, make sure to deploy it on a machine with a public IP address.
 
 ```shell
 nohup ./etps -c etps.toml &
 ```
 
-### 💻 Client (etpc) Configuration
+### 💻 Client etpc Configuration
 
-> Edit your configuration file `etpc.toml`:
+> Edit the configuration file `etpc.toml`:
 
 ```toml
-serverAddr = "x.x.x.x"   # IP address of the etps server deployment
-serverPort = 9527        # bindPort from server configuration
-secretKey = "YourSecret" # Must match the server configuration
+serverAddr = "x.x.x.x" # IP address of the server where etps is deployed
+serverPort = 9527 # bindPort port of the server
+secretKey = "your client authentication key" # Must match the server configuration
 ```
 
-Launch the client on your internal network machine (example for Unix):
+Start the client on an internal computer (Unix example):
 
 ```shell
-./etpc -c etpc.toml        # Or run in background: nohup ./etpc -c etpc.toml &
+./etpc -c etpc.toml # Or run in the background: nohup ./etpc -c etpc.toml &
 ```
 
-🔔 **Note:** If the config file and executable are in the same folder, you can omit the `-c` flag.
+🔔 **Note**: If the configuration file and executable are in the same folder, you **do not need to use -c** to specify the configuration.
 
-Once started, use port **3307** to connect to your MySQL service.
+After a successful startup, connect to MySQL using port **3307**.
 
 ## 🔒 TLS Configuration (Optional)
 
-1️⃣ Download the project's certificate-generation script [generate_ssl_cert-en.sh](scripts/generate_ssl_cert-en.sh) (you may also use JDK's keytool). Usage details can be found in the [certificate generation guide](doc/code-gen.md). This script depends on JDK.
+1️⃣ First, download the certificate generation CLI tool [tls.sh](scripts/tls/tls.sh) from the project. Download the appropriate keytool version for your OS from [this directory](scripts/tls), remove the extension, and place it in the same directory as the `tls.sh` script.
 
-2️⃣ After downloading, generate certificates with:
+2️⃣ Once downloaded, execute the following command in your terminal to generate certificates and keys. If you prefer, you can run the script without any parameters and it will automatically generate complex keys. (Linux example)
 
 ```shell
-sudo sh cert-gen.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k123456
+sudo sh tls.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k123456
 ```
+![tls_1.png](doc/image/cert/tls_1.png)
 
-![cert-gen-1.png](doc/image/cert/cert-gen-en.png)
+3️⃣ Upon execution, the script will generate two important certificate files: **server.p12** (for deployment on the server), and **client.p12** (for deployment on the client). Configuration details should be added to the respective toml files.
 
-3️⃣ The script generates two main certificates: use **server.p12** for the server, and **client.p12** for the client. Configure their paths in your respective toml files.
+![tls_2.png](doc/image/cert/tls_2.png)
 
-![result.png](doc/image/cert/result.png)
+- Add the following content to the `etps.toml` server configuration file:
 
-- Add to `etps.toml`:
-
-```toml
+```properties
 tls = true
 [keystore]
-path = "path/to/server.p12"
-keyPass = "yourKeyPassword"
-storePass = "yourStorePassword"
+path = "Path to your server certificate"
+keyPass = "Your private key"
+storePass = "Your keystore password"
 ```
 
-- Add to `etpc.toml`:
+- Add the following content to the `etpc.toml` client configuration file:
 
-```toml
+```properties
 tls = true
 [truststore]
-path = "path/to/client.p12"
-storePass = "yourClientStorePassword"
+path = "Path to your client certificate"
+storePass = "Your client keystore password"
 ```
 
-> ⚠️ If SSL/TLS is enabled, you must set it to `true` on both server and client, or otherwise it will not work!
+> ⚠️ If you set `tls` to `true`, you must ensure `tls` is set to `true` on both server and client; otherwise, errors will occur!
 
-For details, check the [certificate configuration guide](doc/code-gen.md).
+## Feedback
 
-## Issues and Feedback
-
-Submit issues: [issues](https://github.com/xiaoniucode/etp/issues)
+To report issues: [issues](https://github.com/xiaoniucode/etp/issues)
 
 ## 📈 Project Trends
 

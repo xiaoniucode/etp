@@ -137,20 +137,19 @@ secretKey = "你的客户端认证密钥" #和服务端配置保持一致
 
 ## 🔒 配置TLS（可选）
 
-1️⃣ 首先需要下载项目提供的证书生成命令行工具[generate_ssl_cert.sh](scripts/generate_ssl_cert.sh)
-到本地（也可以直接使用jdk的keytool生成），该工具详细使用教程请参考[证书生成文档](doc/code-gen.md),该工具目前依赖jdk，需要保证有该运行环境。
+1️⃣ 首先需要下载项目提供的证书生成命令行工具[tls-en.sh](scripts/tls/tls.sh)
+到本地，根据自己的操作系统去[地址](scripts/tls)下载对应版本的keytool，去掉后缀后放到与tls.sh脚本同级目录。
 
-2️⃣ 脚本下载本地后，在终端执行如下命令生成证书和密钥，如果嫌麻烦也可以不带任何参数，脚本会自动生成复杂的密钥。
+2️⃣ 脚本下载本地后，在终端执行如下命令生成证书和密钥，如果嫌麻烦也可以不带任何参数，脚本会自动生成复杂的密钥。(以Linux为例)
 
 ```shell
-sudo sh cert-gen.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k123456
+sudo sh tls.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k123456
 ```
-
-![cert-gen-1.png](doc/image/cert/cert-gen-1.png)
+![tls_1.png](doc/image/cert/tls_1.png)
 
 3️⃣ 脚本执行后会生成两个重要的证书文件，**server.p12** 需要部署到服务端，而 **client.p12** 部署在客户端，配置信息在对应的toml文件里。
 
-![result.png](doc/image/cert/result.png)
+![tls_2.png](doc/image/cert/tls_2.png)
 
 - `etps.toml` 配置文件增加如下内容
 
@@ -171,9 +170,8 @@ path="你的客户端证书路径"
 storePass="你的客户端存储库密钥"
 ```
 
-> ⚠️ 如果ssl设置为true，必须保证服务端和客户端都设置为true，否则会出错！
+> ⚠️ 如果tls设置为true，必须保证服务端和客户端都设置为true，否则会出错！
 
-具体细节请查看[证书配置文档](doc/code-gen.md)！
 
 ## 问题反馈
 
