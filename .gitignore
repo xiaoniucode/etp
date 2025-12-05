@@ -17,4 +17,7 @@ etp-server/dependency-reduced-pom.xml
 etp-client/dependency-reduced-pom.xml
 etps.log
 etpc.log
-cert
+/scripts/cert
+.idea
+/cert/
+etp.db
