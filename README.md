@@ -144,6 +144,7 @@ After a successful startup, connect to MySQL using port **3307**.
 ```shell
 sudo sh tls.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k123456
 ```
+
 ![tls_1.png](doc/image/cert/tls_1.png)
 
 3️⃣ Upon execution, the script will generate two important certificate files: **server.p12** (for deployment on the server), and **client.p12** (for deployment on the client). Configuration details should be added to the respective toml files.

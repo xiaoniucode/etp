@@ -137,7 +137,7 @@ secretKey = "你的客户端认证密钥" #和服务端配置保持一致
 
 ## 🔒 配置TLS（可选）
 
-1️⃣ 首先需要下载项目提供的证书生成命令行工具[tls-en.sh](scripts/tls/tls.sh)
+1️⃣ 首先需要下载项目提供的证书生成命令行工具[tls.sh](scripts/tls/tls.sh)
 到本地，根据自己的操作系统去[地址](scripts/tls)下载对应版本的keytool，去掉后缀后放到与tls.sh脚本同级目录。
 
 2️⃣ 脚本下载本地后，在终端执行如下命令生成证书和密钥，如果嫌麻烦也可以不带任何参数，脚本会自动生成复杂的密钥。(以Linux为例)
@@ -145,6 +145,7 @@ secretKey = "你的客户端认证密钥" #和服务端配置保持一致
 ```shell
 sudo sh tls.sh -serverStorePass s123456 -clientStorePass c123456 -keypass k123456
 ```
+
 ![tls_1.png](doc/image/cert/tls_1.png)
 
 3️⃣ 脚本执行后会生成两个重要的证书文件，**server.p12** 需要部署到服务端，而 **client.p12** 部署在客户端，配置信息在对应的toml文件里。
