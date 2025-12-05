@@ -3,7 +3,7 @@ sidebar_position: 1
 ---
 
 # Linux
-`etp`服务端一般安装在具有`公网IP`的Linux服务器上，本文介绍Linux
+`etp`服务端一般安装在具有`公网IP`的Linux服务器上，本文介绍基于Linux环境的安装教程。
 ## 方法一：采用nohup
 服务端配置：
 ```js
