@@ -46,7 +46,7 @@ function HomepageHeader() {
 const features = [
     {title: '管理面板', description: '提供直观易与操作的高颜值Web管理界面，简化配置操作，功能丰富，提供实时流量观测统计'},
     {title: '高性能传输', description: '基于Netty零拷贝机制、ProtoBuf等技术实现高性能数据传输，GraalVM原生编译实现毫秒级启动'},
-    {title: '协议支持', description: '支持TCP/HTTP协议以及TCP上层协议代理, TLS1.3高效加密协议，提供端到端的PKCS12密钥加密'},
+    {title: '协议支持', description: '支持TCP/HTTP协议以及TCP上层协议代理, TLS1.3高效加密协议，采用PKCS12格式密钥加密'},
     {title: '轻量小巧', description: '聚焦核心，资源占用少，无外部存储服务，即装即用, 支持纯Toml静态配置或管理界面动态配置使用'},
     {title: '跨平台支持', description: 'Linux / Windows / macOS / ARM64 / AMD64 / Docker / Kubernetes 全平台支持'},
     {title: '功能丰富', description: '支持断线重连、流量观测统计、动态启停代理服务、自动分配公网端口、多客户端、客户端踢除等'},

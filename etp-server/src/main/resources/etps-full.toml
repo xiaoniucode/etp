@@ -42,7 +42,7 @@ remotePort = 6380
 #name = "mysql"
 #type = "tcp"
 #localPort = 3306
-#remotePort = 3307
+#remotePort = 3308
 
 #################日志配置#################
 #[log]

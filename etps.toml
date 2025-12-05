@@ -18,9 +18,9 @@ type = "tcp"
 ##
 ##---------------------------日志--------------------------------#
 [log]
-level = "debug"
+level = "OFF"
 ##pattern = ""
-##path=""
+path="logg/etps.log"
 #
 [dashboard]
 enable = true
