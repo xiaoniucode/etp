@@ -1,4 +1,4 @@
-package cn.xilio.etptest.entity;
+package com.xiaoniucode.etptest.entity;
 
 
 import jakarta.persistence.*;

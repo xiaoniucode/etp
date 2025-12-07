@@ -1,9 +1,9 @@
-package cn.xilio.etp.client;
+package com.xiaoniucode.etp.client;
 
 import ch.qos.logback.classic.Level;
-import cn.xilio.etp.common.ConfigUtils;
-import cn.xilio.etp.common.LogbackConfigurator;
-import cn.xilio.etp.common.StringUtils;
+import com.xiaoniucode.etp.common.ConfigUtils;
+import com.xiaoniucode.etp.common.LogbackConfigurator;
+import com.xiaoniucode.etp.common.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

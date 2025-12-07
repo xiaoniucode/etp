@@ -1,11 +1,11 @@
-package cn.xilio.etp.server.web;
+package com.xiaoniucode.etp.server.web;
 
-import cn.xilio.etp.common.JsonUtils;
-import cn.xilio.etp.common.StringUtils;
-import cn.xilio.etp.server.metrics.MetricsCollector;
-import cn.xilio.etp.server.web.manager.CaptchaHolder;
-import cn.xilio.etp.server.web.manager.TokenAuthService;
-import cn.xilio.etp.server.web.server.*;
+import com.xiaoniucode.etp.common.JsonUtils;
+import com.xiaoniucode.etp.common.StringUtils;
+import com.xiaoniucode.etp.server.metrics.MetricsCollector;
+import com.xiaoniucode.etp.server.web.manager.CaptchaHolder;
+import com.xiaoniucode.etp.server.web.manager.TokenAuthService;
+import com.xiaoniucode.etp.server.web.server.*;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;

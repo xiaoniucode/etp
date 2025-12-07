@@ -1,6 +1,6 @@
-package cn.xilio.etptest.repository;
+package com.xiaoniucode.etptest.repository;
 
-import cn.xilio.etptest.entity.User2;
+import com.xiaoniucode.etptest.entity.User2;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

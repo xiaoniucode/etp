@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.web;
+package com.xiaoniucode.etp.server.web;
 
 import java.util.Random;
 

@@ -1,6 +1,6 @@
-package cn.xilio.etp.server.web.server;
+package com.xiaoniucode.etp.server.web.server;
 
-import cn.xilio.etp.core.NettyEventLoopFactory;
+import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;

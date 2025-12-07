@@ -1,6 +1,6 @@
-package cn.xilio.etp.core;
+package com.xiaoniucode.etp.core;
 
-import cn.xilio.etp.core.protocol.TunnelMessage;
+import com.xiaoniucode.etp.core.protocol.TunnelMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;

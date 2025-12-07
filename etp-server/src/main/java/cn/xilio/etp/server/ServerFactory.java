@@ -1,7 +1,7 @@
-package cn.xilio.etp.server;
+package com.xiaoniucode.etp.server;
 
-import cn.xilio.etp.server.config.AppConfig;
-import cn.xilio.etp.server.web.server.NettyWebServer;
+import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.web.server.NettyWebServer;
 
 /**
  * @author liuxin

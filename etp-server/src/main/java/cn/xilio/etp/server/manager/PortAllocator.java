@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.manager;
+package com.xiaoniucode.etp.server.manager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

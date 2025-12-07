@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.config;
+package com.xiaoniucode.etp.server.config;
 
 import java.io.Serializable;
 

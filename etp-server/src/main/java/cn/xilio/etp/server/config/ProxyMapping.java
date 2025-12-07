@@ -1,6 +1,6 @@
-package cn.xilio.etp.server.config;
+package com.xiaoniucode.etp.server.config;
 
-import cn.xilio.etp.core.protocol.ProtocolType;
+import com.xiaoniucode.etp.core.protocol.ProtocolType;
 
 /**
  * 端口映射信息

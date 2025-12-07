@@ -1,12 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>cn.xilio</groupId>
+    <groupId>com.xiaoniucode</groupId>
     <artifactId>etp</artifactId>
-    <version>0.2.0  </version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <properties>
         <java.version>21</java.version>
+        <revision>2.0.0-SNAPSHOT</revision>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -93,22 +94,22 @@
             </dependency>
             <!--项目模块-->
             <dependency>
-                <groupId>cn.xilio</groupId>
+                <groupId>com.xiaoniucode</groupId>
                 <artifactId>etp-core</artifactId>
-                <version>${project.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>cn.xilio</groupId>
+                <groupId>com.xiaoniucode</groupId>
                 <artifactId>etp-common</artifactId>
-                <version>${project.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>cn.xilio</groupId>
+                <groupId>com.xiaoniucode</groupId>
                 <artifactId>etp-client</artifactId>
-                <version>${project.version}</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>cn.xilio</groupId>
+                <groupId>com.xiaoniucode</groupId>
                 <artifactId>etp-server</artifactId>
                 <version>${project.version}</version>
             </dependency>

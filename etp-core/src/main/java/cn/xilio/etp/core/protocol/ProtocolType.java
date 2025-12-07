@@ -1,4 +1,4 @@
-package cn.xilio.etp.core.protocol;
+package com.xiaoniucode.etp.core.protocol;
 
 import java.util.Collections;
 import java.util.HashMap;

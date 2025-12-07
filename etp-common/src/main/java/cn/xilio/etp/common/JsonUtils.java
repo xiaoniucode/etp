@@ -1,4 +1,4 @@
-package cn.xilio.etp.common;
+package com.xiaoniucode.etp.common;
 
 import org.json.JSONObject;
 import java.util.Map;

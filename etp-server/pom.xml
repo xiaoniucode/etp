@@ -2,19 +2,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>cn.xilio</groupId>
+        <groupId>com.xiaoniucode</groupId>
         <artifactId>etp</artifactId>
-        <version>0.2.0  </version>
+        <version>${revision}</version>
     </parent>
     <artifactId>etp-server</artifactId>
     <packaging>jar</packaging>
     <name>etp-server</name>
     <properties>
-        <shade.mainClass>cn.xilio.etp.server.TunnelServerStartup</shade.mainClass>
+        <shade.mainClass>com.xiaoniucode.etp.server.TunnelServerStartup</shade.mainClass>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>cn.xilio</groupId>
+            <groupId>com.xiaoniucode</groupId>
             <artifactId>etp-core</artifactId>
         </dependency>
         <dependency>
@@ -50,7 +50,7 @@
                         <artifactId>native-maven-plugin</artifactId>
                         <version>0.10.6</version>
                         <configuration>
-                            <mainClass>cn.xilio.etp.server.TunnelServerStartup</mainClass>
+                            <mainClass>com.xiaoniucode.etp.server.TunnelServerStartup</mainClass>
                             <imageName>etp-server</imageName>
                         </configuration>
                         <executions>

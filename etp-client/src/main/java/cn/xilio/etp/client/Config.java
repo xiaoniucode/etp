@@ -1,7 +1,7 @@
-package cn.xilio.etp.client;
+package com.xiaoniucode.etp.client;
 
-import cn.xilio.etp.common.StringUtils;
-import cn.xilio.etp.common.TomlUtils;
+import com.xiaoniucode.etp.common.StringUtils;
+import com.xiaoniucode.etp.common.TomlUtils;
 import com.moandjiezana.toml.Toml;
 
 import java.util.Objects;

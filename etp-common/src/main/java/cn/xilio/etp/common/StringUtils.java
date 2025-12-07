@@ -1,4 +1,4 @@
-package cn.xilio.etp.common;
+package com.xiaoniucode.etp.common;
 
 /**
  * 字符串相关工具函数

@@ -1,7 +1,7 @@
-package cn.xilio.etp.server.manager;
+package com.xiaoniucode.etp.server.manager;
 
-import cn.xilio.etp.common.StringUtils;
-import cn.xilio.etp.core.EtpConstants;
+import com.xiaoniucode.etp.common.StringUtils;
+import com.xiaoniucode.etp.core.EtpConstants;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

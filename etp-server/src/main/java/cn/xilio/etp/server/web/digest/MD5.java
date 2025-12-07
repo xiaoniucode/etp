@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.web.digest;
+package com.xiaoniucode.etp.server.web.digest;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

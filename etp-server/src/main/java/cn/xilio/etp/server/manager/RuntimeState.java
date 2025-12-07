@@ -1,7 +1,7 @@
-package cn.xilio.etp.server.manager;
+package com.xiaoniucode.etp.server.manager;
 
-import cn.xilio.etp.server.config.ClientInfo;
-import cn.xilio.etp.server.config.ProxyMapping;
+import com.xiaoniucode.etp.server.config.ClientInfo;
+import com.xiaoniucode.etp.server.config.ProxyMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

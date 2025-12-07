@@ -1,4 +1,4 @@
-package cn.xilio.etp.client;
+package com.xiaoniucode.etp.client;
 
 /**
  * 用于获取当前操作系统信息

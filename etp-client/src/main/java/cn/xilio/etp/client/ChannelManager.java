@@ -1,8 +1,8 @@
-package cn.xilio.etp.client;
+package com.xiaoniucode.etp.client;
 
-import cn.xilio.etp.core.ChannelUtils;
-import cn.xilio.etp.core.DataTunnelChannelBorrowCallback;
-import cn.xilio.etp.core.EtpConstants;
+import com.xiaoniucode.etp.core.ChannelUtils;
+import com.xiaoniucode.etp.core.DataTunnelChannelBorrowCallback;
+import com.xiaoniucode.etp.core.EtpConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;

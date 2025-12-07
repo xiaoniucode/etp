@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.web.manager;
+package com.xiaoniucode.etp.server.web.manager;
 
 import java.util.Map;
 import java.util.UUID;

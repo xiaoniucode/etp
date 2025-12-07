@@ -1,6 +1,6 @@
-package cn.xilio.etp.server;
+package com.xiaoniucode.etp.server;
 
-import cn.xilio.etp.core.AbstractTlsContextFactory;
+import com.xiaoniucode.etp.core.AbstractTlsContextFactory;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;

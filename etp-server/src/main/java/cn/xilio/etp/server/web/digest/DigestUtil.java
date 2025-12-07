@@ -1,4 +1,4 @@
-package cn.xilio.etp.server.web.digest;
+package com.xiaoniucode.etp.server.web.digest;
 
 /**
  * @author liuxin

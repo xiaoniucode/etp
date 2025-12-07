@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3307/etp-test?useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://124.221.53.234:3307/etp-test?useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -12,3 +12,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 1000
+        order_updates: true
