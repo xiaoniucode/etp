@@ -12,9 +12,6 @@
   <a href="https://github.com/xiaoniucode/etp">
     <img src="https://img.shields.io/github/forks/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Forks"/>
   </a>
-  <a href="https://github.com/xiaoniucode/etp/issues">
-    <img src="https://img.shields.io/github/issues/xiaoniucode/etp?style=for-the-badge" alt="Open Issues"/>
-  </a>
   <a href="https://github.com/xiaoniucode/etp/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge" alt="License"/>
   </a>
