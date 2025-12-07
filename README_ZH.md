@@ -21,6 +21,10 @@
   <a href="https://github.com/xiaoniucode/etp/commits">
     <img src="https://img.shields.io/github/last-commit/xiaoniucode/etp?style=for-the-badge" alt="Last Commit"/>
   </a>
+<a href="https://github.com/xiaoniucode/etp/releases">
+  <img src="https://img.shields.io/github/downloads/xiaoniucode/etp/total?style=for-the-badge" alt="Downloads"/>
+</a>
+
 </div>
 
 <div align="center">
