@@ -57,7 +57,8 @@ public class SQLiteTransactionManager {
         if (conn != null) {
             try {
                 conn.close();
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }
