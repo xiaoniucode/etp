@@ -47,6 +47,10 @@ public class SQLiteTransactionManager {
         }
     }
 
+    /**
+     * 关闭数据库连接
+     * 释放当前线程数据库连接资源
+     */
     private void close() {
         Connection conn = SQLiteConnectionHolder.get();
         SQLiteConnectionHolder.clear();

@@ -9,6 +9,13 @@ public class SQLiteTransactionTemplate {
 
     private final SQLiteTransactionManager txManager = new SQLiteTransactionManager();
 
+    /**
+     * 执行事务
+     *
+     * @param callback 回调接口，用于执行业务逻辑
+     * @param <T>      业务执行成功返回值类型
+     * @return 业务返回结果
+     */
     public <T> T execute(TransactionCallback<T> callback) {
         txManager.begin();
         try {
