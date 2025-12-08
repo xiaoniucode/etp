@@ -30,6 +30,7 @@ public class TunnelServerStartup {
     public static void main(String[] args) {
         String configPath = ConfigUtils.getConfigPath(args, DEFAULT_CONFIG_NAME);
         if (configPath == null) {
+            System.err.println("请指定配置文件路径！");
             return;
         }
         //1.加载配置文件

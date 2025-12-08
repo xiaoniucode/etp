@@ -1,12 +1,11 @@
 package com.xiaoniucode.etp.server.config;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 客户端信息
+ *
  * @author liuxin
  */
 public class ClientInfo {
@@ -22,8 +21,10 @@ public class ClientInfo {
      * 客户端ID
      */
     private Integer clientId;
-    //客户端所有的端口映射信息
-    private  List<ProxyMapping> proxies = new CopyOnWriteArrayList<>();
+    /**
+     * 存储客户端所有的端口映射信息
+     */
+    private List<ProxyMapping> proxies = new CopyOnWriteArrayList<>();
 
     public ClientInfo(String secretKey) {
         this.secretKey = secretKey;
@@ -51,7 +52,7 @@ public class ClientInfo {
     }
 
     public List<ProxyMapping> getProxies() {
-        return  proxies;
+        return proxies;
     }
 
     public void setProxies(List<ProxyMapping> proxies) {

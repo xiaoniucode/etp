@@ -22,8 +22,8 @@ import java.util.List;
  */
 public class NettyWebServer implements WebServer {
     private final Logger logger = LoggerFactory.getLogger(NettyWebServer.class);
-    private String addr = "0.0.0.0";
-    private Integer port = 5300;
+    private String addr;
+    private Integer port;
     private List<Filter> filters = new ArrayList<>();
     private Router router = new Router();
     private final EventLoopGroup bossEventLoopGroup;
@@ -51,7 +51,7 @@ public class NettyWebServer implements WebServer {
                                     .addLast(new HttpRequestHandler(filters, router));
                         }
                     });
-            serverBootstrap.bind(addr, port).sync();
+            serverBootstrap.bind(getAddr(), getPort()).sync();
         } catch (Exception e) {
             logger.error("管理界面服务启动失败:{}", e.getMessage());
         }

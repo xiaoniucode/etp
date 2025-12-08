@@ -24,7 +24,7 @@ public class TunnelClientStartup {
     public static void main(String[] args) {
         String configPath = ConfigUtils.getConfigPath(args, DEFAULT_CONFIG_NAME);
         if (!StringUtils.hasText(configPath)) {
-            System.out.println("请指定系统配置文件");
+            System.err.println("请指定配置文件路径！");
             return;
         }
         Config.init(configPath);

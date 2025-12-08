@@ -1,4 +1,5 @@
 bindPort = 9527
+
 [[clients]]
 name = "windows"
 secretKey = "your-secret-key"
