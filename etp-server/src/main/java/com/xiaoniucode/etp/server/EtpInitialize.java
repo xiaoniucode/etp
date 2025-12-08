@@ -10,6 +10,7 @@ import com.xiaoniucode.etp.server.web.ConfigService;
 import com.xiaoniucode.etp.server.web.ConfigStore;
 import com.xiaoniucode.etp.server.web.SQLiteUtils;
 import com.xiaoniucode.etp.server.web.digest.DigestUtil;
+import com.xiaoniucode.etp.server.web.transaction.SQLiteTransactionTemplate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ public final class EtpInitialize {
     private final static ConfigStore configStore = new ConfigStore();
     private final static RuntimeState runtimeState = RuntimeState.get();
     private final static AppConfig config = AppConfig.get();
+    private static final SQLiteTransactionTemplate TX = new SQLiteTransactionTemplate();
 
     /**
      * 需要先初始化SQLite配置，如果存在和toml中相同的配置，则不同步到SQLite，否则进行同步
@@ -48,75 +50,78 @@ public final class EtpInitialize {
     }
 
     private static void syncDashboardUser() {
-        Dashboard dashboard = config.getDashboard();
-        Boolean reset = dashboard.getReset();
-        String username = dashboard.getUsername();
-        String password = dashboard.getPassword();
-        JSONObject save = new JSONObject();
-        save.put("username", username);
-        save.put("password", DigestUtil.encode(password, username));
-        JSONObject user = ConfigService.getUserByUsername(username);
-        //没有直接添加用户
-        if (user == null) {
-            ConfigService.registerUser(save);
-            logger.info("注册用户 {}", username);
-            return;
-        }
-        //如果数据库已经存在用户了，如果reset=true则重置
-        if (reset) {
-            //删除所有用户
-            ConfigService.deleteAll();
-            //重新注册
-            ConfigService.registerUser(save);
-            logger.info("重置面板用户登录信息 {}", username);
-        }
+        TX.execute(() -> {
+            Dashboard dashboard = config.getDashboard();
+            Boolean reset = dashboard.getReset();
+            String username = dashboard.getUsername();
+            String password = dashboard.getPassword();
+            JSONObject save = new JSONObject();
+            save.put("username", username);
+            save.put("password", DigestUtil.encode(password, username));
+            JSONObject user = ConfigService.getUserByUsername(username);
+            //没有直接添加用户
+            if (user == null) {
+                ConfigService.registerUser(save);
+                logger.info("注册用户 {}", username);
+            }
+            //如果数据库已经存在用户了，如果reset=true则重置
+            if (reset) {
+                //删除所有用户
+                ConfigService.deleteAll();
+                //重新注册
+                ConfigService.registerUser(save);
+                logger.info("重置面板用户登录信息 {}", username);
+            }
+            return null;
+        });
     }
 
     private static void registerTomlConfig() {
-        Boolean enableDashboard = config.getDashboard().getEnable();
-        List<ClientInfo> clients = AppConfig.get().getClients();
-        clients.forEach(clientInfo -> {
-            String secretKey = clientInfo.getSecretKey();
-            String name = clientInfo.getName();
-            if (!runtimeState.hasClient(secretKey)) {
-                //注册客户端
-                runtimeState.registerClient(clientInfo);
-                //如果开启了管理面板，需要将客户端配置同步到数据库
-                if (enableDashboard) {
-                    JSONObject save = new JSONObject();
-                    save.put("secretKey", secretKey);
-                    save.put("name", name);
-                    configStore.addClient(save);
-                    logger.info("同步静态配置客户端「{}」到数据库", name);
-                }
-            } else {
-                logger.warn("客户端「{}」 注册失败，已经在数据库被注册", name);
-            }
-            List<ProxyMapping> proxies = clientInfo.getProxies();
-            proxies.forEach(proxy -> {
-                Integer remotePort = proxy.getRemotePort();
-                if (!runtimeState.hasProxy(secretKey, remotePort)) {
-                    //注册端口映射
-                    runtimeState.registerProxy(secretKey, proxy);
-                    //如果开启了管理面板，需要将映射配置同步到数据库
+        TX.execute(() -> {
+            Boolean enableDashboard = config.getDashboard().getEnable();
+            List<ClientInfo> clients = AppConfig.get().getClients();
+            clients.forEach(clientInfo -> {
+                String secretKey = clientInfo.getSecretKey();
+                String name = clientInfo.getName();
+                if (!runtimeState.hasClient(secretKey)) {
+                    //注册客户端
+                    runtimeState.registerClient(clientInfo);
+                    //如果开启了管理面板，需要将客户端配置同步到数据库
                     if (enableDashboard) {
-                        JSONObject existClient = configStore.getClientBySecretKey(secretKey);
                         JSONObject save = new JSONObject();
-                        save.put("clientId", existClient.getInt("id"));
-                        save.put("name", proxy.getName());
-                        save.put("localPort", proxy.getLocalPort());
-                        save.put("remotePort", proxy.getRemotePort());
-                        save.put("status", proxy.getStatus());
-                        save.put("type", proxy.getType().name().toLowerCase(Locale.ROOT));
-                        configStore.addProxy(save);
-                        logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", existClient.get("id"), proxy.getName(), proxy.getRemotePort());
+                        save.put("secretKey", secretKey);
+                        save.put("name", name);
+                        configStore.addClient(save);
+                        logger.info("同步静态配置客户端「{}」到数据库", name);
                     }
                 } else {
-                    logger.warn("同步取消，该客户端公网端口「{}-{}」已经被注册", name, remotePort);
+                    logger.warn("客户端「{}」 注册失败，已经在数据库被注册", name);
                 }
-
+                List<ProxyMapping> proxies = clientInfo.getProxies();
+                proxies.forEach(proxy -> {
+                    Integer remotePort = proxy.getRemotePort();
+                    if (!runtimeState.hasProxy(secretKey, remotePort)) {
+                        //注册端口映射
+                        runtimeState.registerProxy(secretKey, proxy);
+                        //如果开启了管理面板，需要将映射配置同步到数据库
+                        if (enableDashboard) {
+                            JSONObject existClient = configStore.getClientBySecretKey(secretKey);
+                            JSONObject save = new JSONObject();
+                            save.put("clientId", existClient.getInt("id"));
+                            save.put("name", proxy.getName());
+                            save.put("localPort", proxy.getLocalPort());
+                            save.put("remotePort", proxy.getRemotePort());
+                            save.put("status", proxy.getStatus());
+                            save.put("type", proxy.getType().name().toLowerCase(Locale.ROOT));
+                            configStore.addProxy(save);
+                            logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", existClient.get("id"), proxy.getName(), proxy.getRemotePort());
+                        }
+                    } else {
+                        logger.warn("同步取消，该客户端公网端口「{}-{}」已经被注册", name, remotePort);
+                    }
+                });
             });
-
+            return null;
         });
     }
 

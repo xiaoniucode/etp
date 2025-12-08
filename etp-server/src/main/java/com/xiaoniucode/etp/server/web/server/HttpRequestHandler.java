@@ -29,7 +29,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
         RequestContext context = new RequestContext(ctx, request);
         try {
             FilterChain filterChain = new FilterChain(context);
@@ -105,7 +105,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     private void handleError(ChannelHandlerContext ctx, RequestContext context, Throwable e) {
         logger.error(e.getMessage(), e);
-        if (e instanceof BizException biz) {
+        if (e.getCause() instanceof BizException biz) {
             String msg = "".equals(biz.getMessage()) ? "error" : biz.getMessage();
             ByteBuf buffer = Unpooled.copiedBuffer(ResponseEntity.error(1, msg).toJson(), CharsetUtil.UTF_8);
             FullHttpResponse response = new DefaultFullHttpResponse(
@@ -117,6 +117,16 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             setCommonResponseHeaders(response, context);
             ctx.writeAndFlush(response);
         } else {
+            String msg = e.getCause().getMessage();
+            ByteBuf buffer = Unpooled.copiedBuffer(ResponseEntity.error(500, msg).toJson(), CharsetUtil.UTF_8);
+            FullHttpResponse response = new DefaultFullHttpResponse(
+                    HttpVersion.HTTP_1_1,
+                    HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                    buffer);
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, buffer.readableBytes());
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=UTF-8");
+            setCommonResponseHeaders(response, context);
+            ctx.writeAndFlush(response);
         }
     }
 

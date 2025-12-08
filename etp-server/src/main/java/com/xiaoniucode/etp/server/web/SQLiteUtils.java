@@ -1,5 +1,7 @@
 package com.xiaoniucode.etp.server.web;
 
+import com.xiaoniucode.etp.server.Constants;
+import com.xiaoniucode.etp.server.web.transaction.SQLiteConnectionHolder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -8,11 +10,42 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 
 /**
+ * SQLite 工具类
+ *
  * @author liuxin
  */
 public final class SQLiteUtils {
     private final static Logger logger = LoggerFactory.getLogger(SQLiteUtils.class);
-    private static final String DB_URL = "jdbc:sqlite:etp.db";
+
+    /**
+     * 获取连接：如果有事务连接，则返回事务连接
+     */
+    private static Connection getConnection() throws SQLException {
+        Connection conn = SQLiteConnectionHolder.get();
+        if (conn != null) {
+            return conn;
+        }
+        return DriverManager.getConnection(Constants.SQLITE_DB_URL);
+    }
+
+    /**
+     * 是否是事务连接
+     */
+    private static boolean isTransactional(Connection conn) {
+        return conn == SQLiteConnectionHolder.get();
+    }
+
+    /**
+     * 关闭非事务连接
+     */
+    private static void closeIfNonTransactional(Connection conn) {
+        if (!isTransactional(conn)) {
+            try {
+                conn.close();
+            } catch (Exception ignored) {
+            }
+        }
+    }
 
     public static void createTable(String sql) {
         execute(sql);
@@ -28,77 +61,88 @@ public final class SQLiteUtils {
 
     public static JSONArray list(String sql, Object... params) {
         JSONArray array = new JSONArray();
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            // 设置参数
-            for (int i = 0; i < params.length; i++) {
-                pstmt.setObject(i + 1, params[i]);
-            }
-            try (ResultSet rs = pstmt.executeQuery()) {
-                ResultSetMetaData meta = rs.getMetaData();
-                int columnCount = meta.getColumnCount();
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-                while (rs.next()) {
-                    JSONObject row = new JSONObject();
-                    for (int i = 1; i <= columnCount; i++) {
-                        String columnName = meta.getColumnLabel(i);
-                        Object value = rs.getObject(i);
-                        row.put(columnName, value == null ? JSONObject.NULL : value);
+                for (int i = 0; i < params.length; i++) {
+                    pstmt.setObject(i + 1, params[i]);
+                }
+
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    ResultSetMetaData meta = rs.getMetaData();
+                    int columnCount = meta.getColumnCount();
+
+                    while (rs.next()) {
+                        JSONObject row = new JSONObject();
+                        for (int i = 1; i <= columnCount; i++) {
+                            Object value = rs.getObject(i);
+                            row.put(meta.getColumnLabel(i), value == null ? JSONObject.NULL : value);
+                        }
+                        array.put(row);
                     }
-                    array.put(row);
                 }
             }
             logger.debug("SQL 查询成功 → {} 条记录", array.length());
         } catch (SQLException e) {
-            logger.error("SQL 查询失败：{}  →  {}", sql, e.getMessage(), e);
+            throw new RuntimeException("SQL 查询失败：" + sql + " → " + e.getMessage(), e);
+        } finally {
+            closeIfNonTransactional(conn);
         }
         return array;
     }
 
     public static long insert(String sql, Object... params) {
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            for (int i = 0; i < params.length; i++) {
-                pstmt.setObject(i + 1, params[i]);
-            }
-            int affected = pstmt.executeUpdate();
-            if (affected == 0) {
-                logger.warn("插入失败：{}", sql);
-                return -1L;
-            }
-            try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    long id = rs.getLong(1);
-                    logger.debug("插入成功，ID = {}", id);
-                    return id;
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+                for (int i = 0; i < params.length; i++) {
+                    pstmt.setObject(i + 1, params[i]);
+                }
+
+                int affected = pstmt.executeUpdate();
+                if (affected == 0) {
+                    throw new RuntimeException("插入失败：" + sql);
+                }
+
+                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        long id = rs.getLong(1);
+                        logger.debug("插入成功，ID = {}", id);
+                        return id;
+                    } else {
+                        throw new RuntimeException("插入成功但未返回主键：" + sql);
+                    }
                 }
             }
-            return -1L;
         } catch (SQLException e) {
-            logger.error("插入失败：{} → {}", sql, e.getMessage(), e);
-            return -1L;
+            throw new RuntimeException("SQL 插入失败：" + sql + " → " + e.getMessage(), e);
+        } finally {
+            closeIfNonTransactional(conn);
         }
     }
 
     public static int update(String sql, Object... params) {
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            for (int i = 0; i < params.length; i++) {
-                pstmt.setObject(i + 1, params[i]);
+                for (int i = 0; i < params.length; i++) {
+                    pstmt.setObject(i + 1, params[i]);
+                }
+
+                int affected = pstmt.executeUpdate();
+                logger.debug("更新完成，影响 {} 行，SQL: {}", affected, sql);
+                return affected;
             }
-
-            int affected = pstmt.executeUpdate();
-            if (affected > 0) {
-                logger.debug("更新成功，影响 {} 行，SQL: {}", affected, sql);
-            } else {
-                logger.info("更新未影响到任何行，SQL: {}", sql);
-            }
-            return affected;
-
         } catch (SQLException e) {
-            logger.error("更新失败：{} → {}", sql, e.getMessage(), e);
-            return 0;
+            throw new RuntimeException("SQL 更新失败：" + sql + " → " + e.getMessage(), e);
+        } finally {
+            closeIfNonTransactional(conn);
         }
     }
 
@@ -107,18 +151,22 @@ public final class SQLiteUtils {
     }
 
     public static void dropTable(String tableName) {
-        String sql = "DROP TABLE IF EXISTS " + tableName;
-        execute(sql);
+        execute("DROP TABLE IF EXISTS " + tableName);
         logger.info("表 {} 已成功删除", tableName);
     }
 
     private static void execute(String sql) {
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
-            logger.debug("SQL 执行成功：{}", sql.trim());
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute(sql);
+                logger.debug("SQL 执行成功：{}", sql.trim());
+            }
         } catch (SQLException e) {
-            logger.error("SQL 执行失败：{}  →  {}", sql.trim(), e.getMessage(), e);
+            throw new RuntimeException("SQL 执行失败：" + sql.trim() + " → " + e.getMessage(), e);
+        } finally {
+            closeIfNonTransactional(conn);
         }
     }
 }

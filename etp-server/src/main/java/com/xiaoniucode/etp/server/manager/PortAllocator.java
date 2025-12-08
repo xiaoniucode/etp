@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.manager;
 
+import com.xiaoniucode.etp.server.web.server.BizException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public class PortAllocator {
         if (port < 1 || port > 65535) {
             String errorMsg = String.format("无效端口号: %d，必须在1到65535之间", port);
             LOGGER.error(errorMsg);
-            throw new IllegalArgumentException(errorMsg);
+            throw new BizException(errorMsg);
         }
         LOGGER.info("开始检查端口可用性: {}", port);
         // 检查是否已被本实例分配
