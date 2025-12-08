@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.web.server;
 
+import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.server.web.ResponseEntity;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -103,10 +104,14 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         context.getCtx().writeAndFlush(response);
     }
 
+    /**
+     * 统一处理错误响应
+     */
     private void handleError(ChannelHandlerContext ctx, RequestContext context, Throwable e) {
         logger.error(e.getMessage(), e);
-        if (e.getCause() instanceof BizException biz) {
-            String msg = "".equals(biz.getMessage()) ? "error" : biz.getMessage();
+        Throwable cause = e instanceof BizException ? e : e.getCause();
+        if (cause instanceof BizException biz) {
+            String msg = !StringUtils.hasText(biz.getMessage()) ? "error" : biz.getMessage();
             ByteBuf buffer = Unpooled.copiedBuffer(ResponseEntity.error(1, msg).toJson(), CharsetUtil.UTF_8);
             FullHttpResponse response = new DefaultFullHttpResponse(
                     HttpVersion.HTTP_1_1,
@@ -117,7 +122,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             setCommonResponseHeaders(response, context);
             ctx.writeAndFlush(response);
         } else {
-            String msg = e.getCause().getMessage();
+            String msg = e.getMessage() != null ? e.getMessage() : "Internal Server Error";
             ByteBuf buffer = Unpooled.copiedBuffer(ResponseEntity.error(500, msg).toJson(), CharsetUtil.UTF_8);
             FullHttpResponse response = new DefaultFullHttpResponse(
                     HttpVersion.HTTP_1_1,
