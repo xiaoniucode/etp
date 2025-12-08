@@ -5,16 +5,16 @@
 A lightweight NAT traversal reverse proxy application implemented with Netty.
 </div>
 <div align="center">
-  <a href="https://github.com/xiaoniucode/etp">
+  <a href="https://github.com/xiaoniucode/etp/stargazers">
     <img src="https://img.shields.io/github/stars/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Stars"/>
   </a>
-  <a href="https://github.com/xiaoniucode/etp">
+  <a href="https://github.com/xiaoniucode/etp/forks">
     <img src="https://img.shields.io/github/forks/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Forks"/>
   </a>
   <a href="https://github.com/xiaoniucode/etp/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge" alt="License"/>
   </a>
-  <a href="https://github.com/xiaoniucode/etp/releases/tag/0.2.0">
+  <a href="https://github.com/xiaoniucode/etp/releases/v0.2.0">
     <img src="https://img.shields.io/badge/etp-0.2.0-blue?style=for-the-badge" alt="etp:0.2.0"/>
   </a>
 <a href="https://somsubhra.github.io/github-release-stats/?username=xiaoniucode&repository=etp">
