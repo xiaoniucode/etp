@@ -5,8 +5,6 @@ import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage.Message;
 import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.CompositeByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;

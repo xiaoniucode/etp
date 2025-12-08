@@ -59,7 +59,7 @@
 
         <div class="layui-form-item" style="text-align: left;">
             <div class="layui-input-block">
-                <button type="submit" class="layui-btn" lay-submit lay-filter="demo1">保存更新</button>
+                <button type="submit" class="layui-btn" lay-submit lay-filter="proxyForm">保存更新</button>
             </div>
         </div>
     </form>
@@ -105,7 +105,7 @@
                 form.render('select');
             }
         })
-        form.on('submit(demo1)', function (data) {
+        form.on('submit(proxyForm)', function (data) {
             const field = data.field;
             if (field.client) {
                 const [clientId, secretKey] = field.client.split('|', 2);

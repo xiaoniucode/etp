@@ -7,7 +7,6 @@ import com.xiaoniucode.etp.server.web.manager.CaptchaHolder;
 import com.xiaoniucode.etp.server.web.manager.TokenAuthService;
 import com.xiaoniucode.etp.server.web.server.*;
 import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import org.json.JSONObject;
 
 import java.util.List;

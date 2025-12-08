@@ -57,7 +57,7 @@
 
         <div class="layui-form-item" style="text-align: left;">
             <div class="layui-input-block">
-                <button type="submit" class="layui-btn" lay-submit lay-filter="demo1">立即创建</button>
+                <button type="submit" class="layui-btn" lay-submit lay-filter="proxyForm">立即创建</button>
             </div>
         </div>
     </form>
@@ -72,8 +72,8 @@
         //渲染客户端下拉框
         Rest.get('/api/client/list').then(data=>{
             const $select = $('select[name="client"]');
-            const $submitBtn = $('button[lay-filter="demo1"]');
-            // 清空旧选项（除了第一个"请选择"）
+            const $submitBtn = $('button[lay-filter="proxyForm"]');
+            // 清空旧选项
             $select.find('option:gt(0)').remove();
             if (data.length > 0) {
                 // 动态添加新选项
@@ -92,7 +92,7 @@
             }
             form.render('select');
         })
-        form.on('submit(demo1)', function (data) {
+        form.on('submit(proxyForm)', function (data) {
             const field = data.field;
             if (field.client) {
                 const [clientId, secretKey] = field.client.split('|', 2);

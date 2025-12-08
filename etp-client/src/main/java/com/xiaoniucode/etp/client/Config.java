@@ -4,8 +4,6 @@ import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.common.TomlUtils;
 import com.moandjiezana.toml.Toml;
 
-import java.util.Objects;
-
 /**
  * 客户端配置类
  * 使用单例模式管理全局配置
