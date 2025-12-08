@@ -162,7 +162,7 @@ public final class AppConfig {
 
     private void parseDashboard(Toml root) {
         Toml dash = root.getTable("dashboard");
-        dashboard = new Dashboard();
+        dashboard = new Dashboard(false);
         if (dash != null) {
             Boolean enable = dash.getBoolean("enable", false);
             if (enable) {
