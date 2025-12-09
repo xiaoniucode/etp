@@ -12,10 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * 连接断开，释放资源
+ *
  * @author liuxin
  */
 public class DisconnectHandler extends AbstractMessageHandler {
     private final Logger logger = LoggerFactory.getLogger(DisconnectHandler.class);
+
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
         String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
@@ -33,9 +36,9 @@ public class DisconnectHandler extends AbstractMessageHandler {
             return;
         }
 
-        Channel clientChannel = ChannelManager.removeClientChannelFromControlChannel(controlChannel, ctx.channel().attr(EtpConstants.SESSION_ID).get());
-        if (clientChannel != null) {
-            ChannelUtils.closeOnFlush(clientChannel);
+        Channel visitorChannel = ChannelManager.removeClientChannelFromControlChannel(controlChannel, ctx.channel().attr(EtpConstants.SESSION_ID).get());
+        if (visitorChannel != null) {
+            ChannelUtils.closeOnFlush(visitorChannel);
             ctx.channel().attr(EtpConstants.DATA_CHANNEL).getAndSet(null);
             ctx.channel().attr(EtpConstants.SECRET_KEY).getAndSet(null);
             ctx.channel().attr(EtpConstants.SESSION_ID).getAndSet(null);

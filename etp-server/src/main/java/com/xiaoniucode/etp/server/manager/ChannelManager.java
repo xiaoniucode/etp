@@ -44,9 +44,9 @@ public final class ChannelManager {
         for (Integer remotePort : remotePorts) {
             portControlChannelMapping.put(remotePort, controlChannel);
         }
-        controlChannel.attr(EtpConstants.CHANNEL_PORT).set(remotePorts);
+        controlChannel.attr(EtpConstants.CHANNEL_REMOTE_PORT).set(remotePorts);
         controlChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
-        controlChannel.attr(EtpConstants.CLIENT_CHANNELS).set(new ConcurrentHashMap<>());
+        controlChannel.attr(EtpConstants.VISITOR_CHANNELS).set(new ConcurrentHashMap<>());
         clientControlChannelMapping.put(secretKey, controlChannel);
     }
 
@@ -64,7 +64,7 @@ public final class ChannelManager {
                 return;
             }
             portControlChannelMapping.put(remotePort, controlChannel);
-            controlChannel.attr(EtpConstants.CHANNEL_PORT).get().add(remotePort);
+            controlChannel.attr(EtpConstants.CHANNEL_REMOTE_PORT).get().add(remotePort);
         } finally {
             LOCK.unlock();
         }
@@ -88,7 +88,7 @@ public final class ChannelManager {
     }
 
     public static void clearControlChannel(Channel controlChannel) {
-        if (controlChannel.attr(EtpConstants.CHANNEL_PORT).get() == null) {
+        if (controlChannel.attr(EtpConstants.CHANNEL_REMOTE_PORT).get() == null) {
             return;
         }
         LOCK.lock();
@@ -98,7 +98,7 @@ public final class ChannelManager {
             if (controlChannel == existingChannel) {
                 clientControlChannelMapping.remove(secretKey);
             }
-            List<Integer> remotePorts = controlChannel.attr(EtpConstants.CHANNEL_PORT).get();
+            List<Integer> remotePorts = controlChannel.attr(EtpConstants.CHANNEL_REMOTE_PORT).get();
             if (remotePorts != null) {
                 for (int port : remotePorts) {
                     portControlChannelMapping.remove(port);
@@ -134,22 +134,22 @@ public final class ChannelManager {
     }
 
     public static Channel getClientChannel(Channel controlChannel, Long sessionId) {
-        return controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get().get(sessionId);
+        return controlChannel.attr(EtpConstants.VISITOR_CHANNELS).get().get(sessionId);
     }
 
-    public static void addClientChannelToControlChannel(Channel clientChannel, Long sessionId, Channel controlChannel) {
-        controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get().put(sessionId, clientChannel);
-        clientChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
+    public static void addClientChannelToControlChannel(Channel visitorChannel, Long sessionId, Channel controlChannel) {
+        controlChannel.attr(EtpConstants.VISITOR_CHANNELS).get().put(sessionId, visitorChannel);
+        visitorChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
     }
 
-    public static void registerActiveConnection(int remotePort, Channel channel) {
-        activeChannels.computeIfAbsent(remotePort, k -> ConcurrentHashMap.newKeySet()).add(channel);
+    public static void registerActiveConnection(int remotePort, Channel visitorChannel) {
+        activeChannels.computeIfAbsent(remotePort, k -> ConcurrentHashMap.newKeySet()).add(visitorChannel);
     }
 
-    public static void unregisterActiveConnection(int remotePort, Channel channel) {
+    public static void unregisterActiveConnection(int remotePort, Channel visitorChannel) {
         Set<Channel> set = activeChannels.get(remotePort);
         if (set != null) {
-            set.remove(channel);
+            set.remove(visitorChannel);
             if (set.isEmpty()) {
                 activeChannels.remove(remotePort);
             }
@@ -157,18 +157,18 @@ public final class ChannelManager {
     }
 
     public static Channel removeClientChannelFromControlChannel(Channel controlChannel, Long sessionId) {
-        if (controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get() != null) {
-            return controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get().remove(sessionId);
+        if (controlChannel.attr(EtpConstants.VISITOR_CHANNELS).get() != null) {
+            return controlChannel.attr(EtpConstants.VISITOR_CHANNELS).get().remove(sessionId);
         }
         return null;
     }
 
     public static Map<Long, Channel> getClientChannelsByControlChannel(Channel controlChannel) {
-        return controlChannel.attr(EtpConstants.CLIENT_CHANNELS).get();
+        return controlChannel.attr(EtpConstants.VISITOR_CHANNELS).get();
     }
 
-    public static Long getSessionIdByClientChannel(Channel clientChannel) {
-        return clientChannel.attr(EtpConstants.SESSION_ID).get();
+    public static Long getSessionIdByClientChannel(Channel visitorChannel) {
+        return visitorChannel.attr(EtpConstants.SESSION_ID).get();
     }
 
     /**

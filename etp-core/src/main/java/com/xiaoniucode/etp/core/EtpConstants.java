@@ -18,10 +18,9 @@ public class EtpConstants {
     public static final AttributeKey<Channel> DATA_CHANNEL = AttributeKey.valueOf("etp.dataChannel");
     public static final AttributeKey<Channel> CONTROL_CHANNEL = AttributeKey.valueOf("etp.controlChannel");
     public static final AttributeKey<Channel> REAL_SERVER_CHANNEL = AttributeKey.valueOf("etp.realServerChannel");
-    public static final AttributeKey<Channel> CLIENT_CHANNEL = AttributeKey.valueOf("etp.clientChannel");
+    public static final AttributeKey<Channel> VISITOR_CHANNEL = AttributeKey.valueOf("etp.visitorChannel");
 
     // ====================== 其他 ======================
-    public static final AttributeKey<Map<Long, Channel>> CLIENT_CHANNELS = AttributeKey.newInstance("etp.clientChannels");
-    public static final AttributeKey<List<Integer>> CHANNEL_PORT = AttributeKey.valueOf("etp.channelPort");
-
+    public static final AttributeKey<Map<Long, Channel>> VISITOR_CHANNELS = AttributeKey.newInstance("etp.visitorChannels");
+    public static final AttributeKey<List<Integer>> CHANNEL_REMOTE_PORT = AttributeKey.valueOf("etp.channelRemotePort");
 }

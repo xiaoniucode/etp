@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * 将从内网真实服务接收到的数据通过数据隧道发送到代理服务器
+ *
  * @author liuxin
  */
 public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {

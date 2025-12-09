@@ -16,11 +16,10 @@ import io.netty.channel.ChannelHandlerContext;
 public class TransferHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, Message msg) {
-        Channel visitorChannel = ctx.channel().attr(EtpConstants.CLIENT_CHANNEL).get();
-        if (visitorChannel == null || !visitorChannel.isWritable()) {
-            return;
+        Channel visitorChannel = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
+        if (visitorChannel != null) {
+            ByteBuf buf = Unpooled.wrappedBuffer(msg.getPayload().asReadOnlyByteBuffer());
+            visitorChannel.writeAndFlush(buf);
         }
-        ByteBuf buf = Unpooled.wrappedBuffer(msg.getPayload().asReadOnlyByteBuffer());
-        visitorChannel.writeAndFlush(buf);
     }
 }

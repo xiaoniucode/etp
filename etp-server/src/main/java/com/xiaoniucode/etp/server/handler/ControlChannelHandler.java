@@ -27,7 +27,7 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMes
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Channel clientChannel = ctx.channel().attr(EtpConstants.CLIENT_CHANNEL).get();
+        Channel clientChannel = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
         //数据连接的断开
         if (clientChannel != null) {
             String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
@@ -46,7 +46,7 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMes
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        Channel visitorChannel = ctx.channel().attr(EtpConstants.CLIENT_CHANNEL).get();
+        Channel visitorChannel = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
         if (visitorChannel != null) {
             visitorChannel.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
         }
