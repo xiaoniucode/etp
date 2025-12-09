@@ -23,7 +23,7 @@ level = "debug"
 path="logg/etps.log"
 #
 [dashboard]
-enable = false
+enable = true
 #addr = "localhost"
 port = 8030
 reset=true

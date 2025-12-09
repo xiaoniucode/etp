@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author liuxin
  */
-public class ClientChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
-    private final Logger logger = LoggerFactory.getLogger(ClientChannelHandler.class);
+public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
+    private final Logger logger = LoggerFactory.getLogger(VisitorChannelHandler.class);
     private static final AtomicLong SESSION_ID_PRODUCER = new AtomicLong(0);
     private final RuntimeState runtimeState = RuntimeState.get();
 
@@ -41,18 +41,18 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        Channel clientChannel = ctx.channel();
-        InetSocketAddress sa = (InetSocketAddress) clientChannel.localAddress();
+        Channel visitorChannel = ctx.channel();
+        InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
         Channel controllChannel = ChannelManager.getControlChannelByPort(sa.getPort());
         if (controllChannel == null) {
-            clientChannel.close();
+            visitorChannel.close();
             return;
         } else {
             long nextSessionId = nextSessionId();
-            clientChannel.config().setOption(ChannelOption.AUTO_READ, false);
+            visitorChannel.config().setOption(ChannelOption.AUTO_READ, false);
             int localPort = runtimeState.getLocalPort(sa.getPort());
-            ChannelManager.addClientChannelToControlChannel(clientChannel, nextSessionId, controllChannel);
-            ChannelManager.registerActiveConnection(sa.getPort(), clientChannel);
+            ChannelManager.addClientChannelToControlChannel(visitorChannel, nextSessionId, controllChannel);
+            ChannelManager.registerActiveConnection(sa.getPort(), visitorChannel);
             TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                     .setType(TunnelMessage.Message.Type.CONNECT)
                     .setSessionId(nextSessionId)
@@ -65,16 +65,16 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Channel clientChannel = ctx.channel();
-        InetSocketAddress sa = (InetSocketAddress) clientChannel.localAddress();
+        Channel visitorChannel = ctx.channel();
+        InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
         Channel controlChannel = ChannelManager.getControlChannelByPort(sa.getPort());
         if (controlChannel == null) {
             ctx.channel().close();
         } else {
-            Long sessionId = ChannelManager.getSessionIdByClientChannel(clientChannel);
+            Long sessionId = ChannelManager.getSessionIdByClientChannel(visitorChannel);
             ChannelManager.removeClientChannelFromControlChannel(controlChannel, sessionId);
-            ChannelManager.unregisterActiveConnection(sa.getPort(), clientChannel);
-            Channel dataChannel = clientChannel.attr(EtpConstants.DATA_CHANNEL).get();
+            ChannelManager.unregisterActiveConnection(sa.getPort(), visitorChannel);
+            Channel dataChannel = visitorChannel.attr(EtpConstants.DATA_CHANNEL).get();
             if (dataChannel != null && dataChannel.isActive()) {
                 dataChannel.attr(EtpConstants.REAL_SERVER_CHANNEL).getAndSet(null);
                 dataChannel.attr(EtpConstants.SECRET_KEY).getAndSet(null);
@@ -98,15 +98,15 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        Channel clientChannel = ctx.channel();
-        InetSocketAddress sa = (InetSocketAddress) clientChannel.localAddress();
+        Channel visitorChannel = ctx.channel();
+        InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
         Channel controlChannel = ChannelManager.getControlChannelByPort(sa.getPort());
         if (controlChannel == null) {
             ctx.channel().close();
         } else {
-            Channel dataChannel = clientChannel.attr(EtpConstants.DATA_CHANNEL).get();
+            Channel dataChannel = visitorChannel.attr(EtpConstants.DATA_CHANNEL).get();
             if (dataChannel != null) {
-                dataChannel.config().setOption(ChannelOption.AUTO_READ, clientChannel.isWritable());
+                dataChannel.config().setOption(ChannelOption.AUTO_READ, visitorChannel.isWritable());
             }
         }
 

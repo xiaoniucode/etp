@@ -6,19 +6,13 @@ import com.moandjiezana.toml.Toml;
 
 /**
  * 客户端配置类
- * 使用单例模式管理全局配置
  *
  * @author liuxin
  * @since 2025
  */
 public final class Config {
-
-    /**
-     * 配置单例实例
-     */
     private static final Config instance = new Config();
     private static final String DEFAULT_SERVER_ADDR = "127.0.0.1";
-
     private static final int DEFAULT_SERVER_PORT = 9527;
     private static final boolean DEFAULT_TLS = false;
     /**
@@ -113,7 +107,7 @@ public final class Config {
             }
             if (StringUtils.hasText(secretKeyValue)) {
                 secretKey = secretKeyValue.trim();
-            }else {
+            } else {
                 throw new IllegalArgumentException("必须配置认证密钥secretKey");
             }
             if (tlsValue != null) {

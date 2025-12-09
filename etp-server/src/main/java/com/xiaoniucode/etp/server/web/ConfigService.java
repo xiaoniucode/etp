@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * 配置服务
+ * 配置服务：客户端、端口映射、用户信息的管理、登录认证
  *
  * @author liuxin
  */

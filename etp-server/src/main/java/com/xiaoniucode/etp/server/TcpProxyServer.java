@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server;
 import com.xiaoniucode.etp.common.PortFileUtil;
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
-import com.xiaoniucode.etp.server.handler.ClientChannelHandler;
+import com.xiaoniucode.etp.server.handler.VisitorChannelHandler;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.PortAllocator;
 import com.xiaoniucode.etp.server.manager.RuntimeState;
@@ -62,7 +62,7 @@ public final class TcpProxyServer implements Lifecycle {
                     @Override
                     protected void initChannel(SocketChannel sc) {
                         sc.pipeline().addLast(new TrafficMetricsHandler());
-                        sc.pipeline().addLast(new ClientChannelHandler());/*公网访问者处理器*/
+                        sc.pipeline().addLast(new VisitorChannelHandler());
                     }
                 });
         bindAllProxyPort();
