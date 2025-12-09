@@ -4,10 +4,22 @@
         <title>etp Blog</title>
         <link>https://etp.github.io/etp/blog</link>
         <description>etp Blog</description>
-        <lastBuildDate>Mon, 08 Dec 2025 07:38:34 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 09 Dec 2025 09:51:21 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[etp v0.3.1发布]]></title>
+            <link>https://etp.github.io/etp/blog/etp v0.3.1发布</link>
+            <guid>https://etp.github.io/etp/blog/etp v0.3.1发布</guid>
+            <pubDate>Tue, 09 Dec 2025 09:51:21 GMT</pubDate>
+            <description><![CDATA[🐛 问题修复]]></description>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_Xi3w" id="-问题修复">🐛 问题修复<a href="https://etp.github.io/etp/blog/etp%20v0.3.1%E5%8F%91%E5%B8%83#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="Direct link to 🐛 问题修复" title="Direct link to 🐛 问题修复" translate="no">​</a></h2>
+<ul>
+<li>修复TCP协议无法加载HTTP服务WEB页面问题‼️</li>
+</ul>
+<p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.3.1" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>]]></content:encoded>
+        </item>
         <item>
             <title><![CDATA[etp v0.3.0发布]]></title>
             <link>https://etp.github.io/etp/blog/etp v0.3.0发布</link>
