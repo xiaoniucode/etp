@@ -1,4 +1,3 @@
-
 <div align="center">
   <img src="doc/logo.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
 </div>
@@ -32,7 +31,9 @@
 
 ## ✨ 介绍
 
-**etp**（Easy Tunnel Proxy）是一个轻量级的高性能内网穿透反向代理应用，支持TCP、HTTP协议以及TCP上层协议，支持TLS1.3高效安全加密协议，支持纯Toml静态配置或管理界面动态配置使用。用于将内网服务快速暴露为公网服务，供公网用户访问以及开发测试，减少购买云服务器成本。
+**etp**（Easy Tunnel
+Proxy）是一个轻量级的高性能内网穿透反向代理应用，支持TCP、HTTP协议以及TCP上层协议，支持TLS1.3高效安全加密协议，支持纯Toml静态配置或管理界面动态配置使用。用于将内网服务快速暴露为公网服务，供公网用户访问以及开发测试，减少购买云服务器成本。
+
 ## 🌟 功能特性
 
 - 📡 支持TCP、HTTP等协议
@@ -135,45 +136,6 @@ secretKey = "你的客户端认证密钥" #和服务端配置保持一致
 🔔**备注**：如果配置文件和可执行程序在同一个文件夹可**不用用-c**指定配置。
 
 启动成功后用 **3307** 端口去连接MySQL
-
-## 🔒 配置TLS（可选）
-
-1️⃣ 首先需要下载项目提供的证书生成命令行工具[tls.sh](scripts/tls/tls.sh)
-到本地，根据自己的操作系统去[地址](scripts/tls)下载对应版本的keytool，去掉后缀后放到与tls.sh脚本同级目录。
-
-2️⃣ 脚本下载本地后，在终端执行如下命令生成证书和密钥，脚本会自动生成密钥。(以Linux为例)
-
-```shell
-sudo sh tls.sh 
-```
-
-![tls_1.png](doc/image/cert/tls_1.png)
-
-3️⃣ 脚本执行后会生成两个重要的证书文件，**server.p12** 需要部署到服务端，而 **client.p12** 部署在客户端，配置信息在对应的toml文件里。
-
-![tls_2.png](doc/image/cert/tls_2.png)
-
-- `etps.toml` 配置文件增加如下内容
-
-```properties
-tls=true
-[keystore]
-path="你的服务端证书路径"
-keyPass="你的私钥"
-storePass="你的存储库密钥"
-```
-
-- `etpc.toml` 配置文件需要增加如下内容
-
-```properties
-tls=true
-[truststore]
-path="你的客户端证书路径"
-storePass="你的客户端存储库密钥"
-```
-
-> ⚠️ 如果tls设置为true，必须保证服务端和客户端都设置为true，否则会出错！
-
 
 ## 问题反馈
 

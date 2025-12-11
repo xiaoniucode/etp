@@ -135,43 +135,6 @@ Start the client on an internal computer (Unix example):
 
 After a successful startup, connect to MySQL using port **3307**.
 
-## 🔒 TLS Configuration (Optional)
-
-1️⃣ First, download the certificate generation CLI tool [tls.sh](scripts/tls/tls.sh) from the project. Download the appropriate keytool version for your OS from [this directory](scripts/tls), remove the extension, and place it in the same directory as the `tls.sh` script.
-
-After downloading the script locally, run the following command in the terminal to generate the certificate and key. The script will automatically generate the keys. (Linux example)
-
-```shell
-sudo sh tls.sh 
-```
-
-![tls_1.png](doc/image/cert/tls_1.png)
-
-3️⃣ Upon execution, the script will generate two important certificate files: **server.p12** (for deployment on the server), and **client.p12** (for deployment on the client). Configuration details should be added to the respective toml files.
-
-![tls_2.png](doc/image/cert/tls_2.png)
-
-- Add the following content to the `etps.toml` server configuration file:
-
-```properties
-tls = true
-[keystore]
-path = "Path to your server certificate"
-keyPass = "Your private key"
-storePass = "Your keystore password"
-```
-
-- Add the following content to the `etpc.toml` client configuration file:
-
-```properties
-tls = true
-[truststore]
-path = "Path to your client certificate"
-storePass = "Your client keystore password"
-```
-
-> ⚠️ If you set `tls` to `true`, you must ensure `tls` is set to `true` on both server and client; otherwise, errors will occur!
-
 ## Feedback
 
 To report issues: [issues](https://github.com/xiaoniucode/etp/issues)
