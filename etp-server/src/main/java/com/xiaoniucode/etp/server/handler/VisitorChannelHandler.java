@@ -109,7 +109,6 @@ public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> 
                 dataChannel.config().setOption(ChannelOption.AUTO_READ, visitorChannel.isWritable());
             }
         }
-
         super.channelWritabilityChanged(ctx);
     }
 

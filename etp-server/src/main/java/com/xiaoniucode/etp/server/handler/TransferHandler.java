@@ -9,15 +9,17 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
- * 将从客户端代理接收到的数据转发给公网访问者
+ * 将从客户端接收到的数据转发给公网访问者
  *
  * @author liuxin
  */
 public class TransferHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, Message msg) {
-        Channel visitorChannel = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
+        Channel dataChannel = ctx.channel();
+        Channel visitorChannel = dataChannel.attr(EtpConstants.VISITOR_CHANNEL).get();
         if (visitorChannel != null) {
+            dataChannel.config().setAutoRead(visitorChannel.isWritable());
             ByteBuf buf = Unpooled.wrappedBuffer(msg.getPayload().asReadOnlyByteBuffer());
             visitorChannel.writeAndFlush(buf);
         }

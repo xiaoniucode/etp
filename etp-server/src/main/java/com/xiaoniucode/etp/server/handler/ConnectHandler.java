@@ -9,7 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 
 /**
- * 连接消息处理器
+ * 数据隧道，连接消息处理器
  *
  * @author liuxin
  */
@@ -24,11 +24,11 @@ public class ConnectHandler extends AbstractMessageHandler {
         }
         Channel visitorChannel = ChannelManager.getClientChannel(controlChannel, sessionId);
         Channel dataChannel = ctx.channel();
-        dataChannel.attr(EtpConstants.VISITOR_CHANNEL).set(visitorChannel);
         dataChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
         dataChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
-
-        visitorChannel.attr(EtpConstants.DATA_CHANNEL).set(ctx.channel());
+        //访问者channel与数据隧道channel双向绑定
+        dataChannel.attr(EtpConstants.VISITOR_CHANNEL).set(visitorChannel);
+        visitorChannel.attr(EtpConstants.DATA_CHANNEL).set(dataChannel);
         visitorChannel.config().setOption(ChannelOption.AUTO_READ, true);
     }
 }
