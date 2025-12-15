@@ -180,6 +180,12 @@ Communication group：QQ-1061026558
 
 <img src="doc/image/qq.JPG" alt="QQ交流群" width="200" height="200" />
 
+## Future Work
+
+- Natively supports HTTP/HTTPS protocols with port multiplexing
+- IP Allowlist and Blocklist
+- Rate Limiting
+
 ## 📈 Project Trends
 
 <p align="center">

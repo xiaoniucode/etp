@@ -183,6 +183,12 @@ storePass="你的客户端存储库密钥"
 
 <img src="doc/image/qq.JPG" alt="QQ交流群" width="200" height="200" />
 
+## 未来规划
+
+- 原生支持HTTP/HTTPS协议，端口复用
+- IP黑白名单
+- 限流
+
 ## 📈 项目趋势
 
 <p align="center">
