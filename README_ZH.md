@@ -179,6 +179,10 @@ storePass="你的客户端存储库密钥"
 
 反馈问题:[issues](https://github.com/xiaoniucode/etp/issues)
 
+交流&反馈QQ群：1061026558
+
+<img src="doc/image/qq.JPG" alt="QQ交流群" width="200" height="200" />
+
 ## 📈 项目趋势
 
 <p align="center">

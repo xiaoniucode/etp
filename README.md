@@ -176,6 +176,10 @@ storePass = "Your client keystore password"
 
 To report issues: [issues](https://github.com/xiaoniucode/etp/issues)
 
+Communication group：QQ-1061026558
+
+<img src="doc/image/qq.JPG" alt="QQ交流群" width="200" height="200" />
+
 ## 📈 Project Trends
 
 <p align="center">
