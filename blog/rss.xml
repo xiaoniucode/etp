@@ -14,7 +14,7 @@
             <guid>https://etp.github.io/etp/blog/etp v0.3.1发布</guid>
             <pubDate>Tue, 09 Dec 2025 09:51:21 GMT</pubDate>
             <description><![CDATA[🐛 问题修复]]></description>
-            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_Xi3w" id="-问题修复">🐛 问题修复<a href="https://etp.github.io/etp/blog/etp%20v0.3.1%E5%8F%91%E5%B8%83#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="Direct link to 🐛 问题修复" title="Direct link to 🐛 问题修复" translate="no">​</a></h2>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复">🐛 问题修复<a href="https://etp.github.io/etp/blog/etp%20v0.3.1%E5%8F%91%E5%B8%83#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="Direct link to 🐛 问题修复" title="Direct link to 🐛 问题修复" translate="no">​</a></h2>
 <ul>
 <li>修复TCP协议无法加载HTTP服务WEB页面问题‼️</li>
 </ul>
@@ -26,11 +26,11 @@
             <guid>https://etp.github.io/etp/blog/etp v0.3.0发布</guid>
             <pubDate>Mon, 08 Dec 2025 07:38:34 GMT</pubDate>
             <description><![CDATA[✨ 新功能]]></description>
-            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_Xi3w" id="-新功能">✨ 新功能<a href="https://etp.github.io/etp/blog/etp%20v0.3.0%E5%8F%91%E5%B8%83#-%E6%96%B0%E5%8A%9F%E8%83%BD" class="hash-link" aria-label="Direct link to ✨ 新功能" title="Direct link to ✨ 新功能" translate="no">​</a></h2>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_iX64" id="-新功能">✨ 新功能<a href="https://etp.github.io/etp/blog/etp%20v0.3.0%E5%8F%91%E5%B8%83#-%E6%96%B0%E5%8A%9F%E8%83%BD" class="hash-link" aria-label="Direct link to ✨ 新功能" title="Direct link to ✨ 新功能" translate="no">​</a></h2>
 <ul>
 <li>增加SQLite事务管理机制</li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_Xi3w" id="-问题修复">🐛 问题修复<a href="https://etp.github.io/etp/blog/etp%20v0.3.0%E5%8F%91%E5%B8%83#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="Direct link to 🐛 问题修复" title="Direct link to 🐛 问题修复" translate="no">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复">🐛 问题修复<a href="https://etp.github.io/etp/blog/etp%20v0.3.0%E5%8F%91%E5%B8%83#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="Direct link to 🐛 问题修复" title="Direct link to 🐛 问题修复" translate="no">​</a></h2>
 <ul>
 <li>修复统一异常处理无法处理所有类型异常问题</li>
 <li>完善管理面板接口业务逻辑，添加事务支持</li>
@@ -43,12 +43,12 @@
             <guid>https://etp.github.io/etp/blog/index</guid>
             <pubDate>Wed, 03 Dec 2025 10:55:20 GMT</pubDate>
             <description><![CDATA[✨ 新功能]]></description>
-            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_Xi3w" id="-新功能">✨ 新功能<a href="https://etp.github.io/etp/blog/index#-%E6%96%B0%E5%8A%9F%E8%83%BD" class="hash-link" aria-label="Direct link to ✨ 新功能" title="Direct link to ✨ 新功能" translate="no">​</a></h2>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_iX64" id="-新功能">✨ 新功能<a href="https://etp.github.io/etp/blog/index#-%E6%96%B0%E5%8A%9F%E8%83%BD" class="hash-link" aria-label="Direct link to ✨ 新功能" title="Direct link to ✨ 新功能" translate="no">​</a></h2>
 <ul>
 <li>新增易于操作的图形化管理界面。</li>
 <li>新增支持日志自定义规则配置。</li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_Xi3w" id="️-配置变更">⚙️ 配置变更<a href="https://etp.github.io/etp/blog/index#%EF%B8%8F-%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4" class="hash-link" aria-label="Direct link to ⚙️ 配置变更" title="Direct link to ⚙️ 配置变更" translate="no">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_iX64" id="️-配置变更">⚙️ 配置变更<a href="https://etp.github.io/etp/blog/index#%EF%B8%8F-%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4" class="hash-link" aria-label="Direct link to ⚙️ 配置变更" title="Direct link to ⚙️ 配置变更" translate="no">​</a></h2>
 <ul>
 <li>配置文件中的证书配置属性由 <code>ssl</code> 更名为 <code>tls</code>。</li>
 <li>端口映射增加status状态字段，用于控制映射的开启状态。</li>
