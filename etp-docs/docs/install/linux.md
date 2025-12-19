@@ -73,6 +73,3 @@ sudo systemctl restart etps
 # 查看状态
 sudo systemctl status etps
 ```
-## 方法三：采用Docker容器化部署
-
-从发行版本中将下载下来的`jar`文件构建为`docker`镜像安装即可。
