@@ -14,8 +14,8 @@ A lightweight NAT traversal reverse proxy application implemented with Netty.
   <a href="https://github.com/xiaoniucode/etp/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge" alt="License"/>
   </a>
-  <a href="https://github.com/xiaoniucode/etp/releases/v0.2.0">
-    <img src="https://img.shields.io/badge/etp-0.2.0-blue?style=for-the-badge" alt="etp:0.2.0"/>
+  <a href="https://github.com/xiaoniucode/etp/releases/v0.3.1">
+    <img src="https://img.shields.io/badge/etp-0.3.1-blue?style=for-the-badge" alt="etp:0.3.1"/>
   </a>
 <a href="https://somsubhra.github.io/github-release-stats/?username=xiaoniucode&repository=etp">
   <img src="https://img.shields.io/github/downloads/xiaoniucode/etp/total?style=for-the-badge" alt="Downloads"/>
@@ -138,6 +138,16 @@ After a successful startup, connect to MySQL using port **3307**.
 ## Feedback
 
 To report issues: [issues](https://github.com/xiaoniucode/etp/issues)
+
+Communication group：QQ-1061026558
+
+<img src="doc/image/qq.JPG" alt="QQ交流群" width="200" height="200" />
+
+## Future Work
+
+- Natively supports HTTP/HTTPS protocols with port multiplexing
+- IP Allowlist and Blocklist
+- Rate Limiting
 
 ## 📈 Project Trends
 
