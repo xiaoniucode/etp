@@ -1,0 +1,16 @@
+@keyframes breath {
+    0%, 100% {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.12);
+        text-shadow: 0 0 10px #00baff;
+    }
+}
+
+.status-breath {
+    animation: breath 2.6s ease-in-out infinite;
+    display: inline-block;
+}

@@ -1,27 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
     <title>etp - 内网穿透</title>
+    <meta charset="utf-8">
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/static/layui/css/layui.css" rel="stylesheet">
+    <link href="/static/css/index.css" rel="stylesheet">
     <link rel="icon" href="/static/image/favicon.ico">
-    <style>
-        .layui-body {
-            overflow: hidden;
-            margin: 15px;
-        }
-        #mainFrame {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        html {
-            background-color: #f2f2f2;
-        }
-    </style>
 </head>
 <body class="layui-layout-body">
 
@@ -74,7 +61,7 @@
             </ul>
         </div>
     </div>
-    <!-- 主体内容（使用 iframe） -->
+    <!-- 主体内容 -->
     <div class="layui-body">
         <iframe id="mainFrame" src="/monitor/index.html" frameborder="0"></iframe>
     </div>

@@ -1,94 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
     <title>监控</title>
+    <meta charset="utf-8">
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/static/layui/css/layui.css" rel="stylesheet">
-
-    <style>
-        body {
-            background: #f5f7fa;
-            padding: 20px;
-            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-        }
-
-        .dashboard-card {
-            background: #ffffff;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            transition: all .2s;
-            cursor: pointer;
-            height: 120px;
-            display: flex;
-            align-items: center;
-            padding: 0 24px;
-        }
-
-        .dashboard-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        /* 左边图标 */
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: #eef2ff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 20px;
-        }
-
-        .card-icon img {
-            width: 28px;
-            height: 28px;
-        }
-
-        /* 右边文字内容 */
-        .card-content {
-            text-align: left;
-        }
-
-        .card-title {
-            font-size: 15px;
-            color: #6b7280;
-            margin-bottom: 6px;
-        }
-
-        .card-value {
-            font-size: 30px;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .padding-right15 {
-            padding-right: 15px;
-        }
-
-        @media (max-width: 768px) {
-            .padding-right15 {
-                padding-right: 0;
-                margin-bottom: 15px;
-            }
-
-            .dashboard-card {
-                height: auto;
-                padding: 16px;
-            }
-        }
-
-    </style>
+    <link href="/static/css/monitor.css" rel="stylesheet">
 </head>
 <body>
 
 <div class="layui-row" style="text-align: center">
-
-    <!-- 1 -->
     <div class="layui-col-sm3 padding-right15">
         <div class="dashboard-card">
             <div class="card-icon">
@@ -101,7 +24,6 @@
         </div>
     </div>
 
-    <!-- 2 -->
     <div class="layui-col-sm3 padding-right15">
         <div class="dashboard-card">
             <div class="card-icon">
@@ -114,7 +36,6 @@
         </div>
     </div>
 
-    <!-- 3 -->
     <div class="layui-col-sm3 padding-right15">
         <div class="dashboard-card">
             <div class="card-icon">
@@ -127,7 +48,6 @@
         </div>
     </div>
 
-    <!-- 4 -->
     <div class="layui-col-sm3">
         <div class="dashboard-card">
             <div class="card-icon">

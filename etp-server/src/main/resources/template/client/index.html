@@ -1,37 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
     <title>客户端</title>
+    <meta charset="utf-8">
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/static/layui/css/layui.css" rel="stylesheet">
-    <style>
-        @keyframes breath {
-            0%, 100% {
-                opacity: 0.7;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.12);
-                text-shadow: 0 0 10px #00baff;
-            }
-        }
-
-        .status-breath {
-            animation: breath 2.6s ease-in-out infinite;
-            display: inline-block;
-        }
-    </style>
+    <link href="/static/css/client-index.css" rel="stylesheet">
 </head>
 <body>
-<blockquote class="layui-elem-quote">
-    Token唯一标识一个客户端，用于与etp服务端建立连接，请妥善保管，不要泄露！
-</blockquote>
 <table class="layui-hide" id="client" lay-filter="client"></table>
-
 <script type="text/html" id="headerToolbar">
     <div class="layui-btn-container">
         <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add">
