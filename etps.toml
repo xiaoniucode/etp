@@ -7,7 +7,7 @@
 #storePass = "3FbV8R8VW49O"
 #
 [[clients]]
-secretKey = "4b0063baa5ae47c2910fc25265aae4132"
+secretKey = "6da0416e526e44e48ac6e1b61bc0c14f"
 name = "静态客户端"
 #
 #[[clients.proxies]]

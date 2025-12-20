@@ -69,7 +69,7 @@
         var Rest = layui.Rest;
         const $ = layui.$;
         $(function () {
-            Rest.get('/api/stats').then(data => {
+            Rest.get('/api/monitor/stats').then(data => {
                 $('#clientTotal').text(data.clientTotal);
                 $('#onlineClient').text(data.onlineClient);
                 $('#mappingTotal').text(data.mappingTotal);

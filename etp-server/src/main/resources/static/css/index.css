@@ -10,3 +10,7 @@
 html {
     background-color: #f2f2f2;
 }
+
+.layui-layout-admin .layui-body {
+    padding-bottom: 0 !important;
+}

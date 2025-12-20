@@ -65,6 +65,11 @@ public final class ConfigService {
         return jsonObject;
     }
 
+    public static JSONObject getMonitorServer() {
+        Server server = new Server();
+        return server.getServerInfo();
+    }
+
     public static JSONArray clients() {
         JSONArray clients = configStore.listClients();
         for (int i = 0; i < clients.length(); i++) {

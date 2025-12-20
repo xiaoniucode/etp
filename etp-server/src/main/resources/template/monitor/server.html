@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>系统监控</title>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/layui/css/layui.css" rel="stylesheet">
+    <link href="/static/css/monitor-server.css" rel="stylesheet">
+
+
+    <style>
+        /* 刷新按钮样式 - 毛玻璃效果 */
+        .refresh-fab {
+            position: fixed;
+            right: 24px;
+            top: 24px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #333;
+            box-shadow:
+                    0 4px 20px rgba(0, 0, 0, 0.08),
+                    0 1px 3px rgba(0, 0, 0, 0.05),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            outline: none;
+            overflow: hidden;
+        }
+
+        .refresh-fab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.4) 0%,
+            rgba(255, 255, 255, 0.1) 100%);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .refresh-fab:hover {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow:
+                    0 8px 30px rgba(0, 0, 0, 0.12),
+                    0 2px 6px rgba(0, 0, 0, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .refresh-fab:hover::before {
+            opacity: 1;
+        }
+
+        .refresh-fab:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow:
+                    0 2px 10px rgba(0, 0, 0, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .refresh-fab i {
+            font-size: 20px;
+            position: relative;
+            z-index: 1;
+            color: #555;
+            transition: color 0.3s ease;
+        }
+
+        .refresh-fab:hover i {
+            color: #1E9FFF;
+        }
+
+        /* 旋转动画 - 更流畅 */
+        .refreshing {
+            animation: rotate 0.8s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 按钮波纹效果 */
+        .refresh-fab::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(30, 159, 255, 0.1);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.6s ease;
+        }
+
+        .refresh-fab:active::after {
+            opacity: 1;
+            transform: scale(2);
+            transition: 0s;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .refresh-fab {
+                width: 44px;
+                height: 44px;
+                right: 16px;
+                top: 16px;
+            }
+
+            .refresh-fab i {
+                font-size: 18px;
+            }
+        }
+
+        /* 暗色模式适配 */
+        @media (prefers-color-scheme: dark) {
+            .refresh-fab {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            .refresh-fab i {
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            .refresh-fab:hover {
+                background: rgba(255, 255, 255, 0.15);
+            }
+
+            .refresh-fab:active {
+                background: rgba(255, 255, 255, 0.12);
+            }
+        }
+
+        /* 按钮呼吸效果（可选） */
+        .refresh-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
+            50% { box-shadow: 0 4px 20px rgba(30, 159, 255, 0.2); }
+            100% { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
+        }
+    </style>
+</head>
+<body>
+<button class="refresh-fab refresh-pulse" id="refreshBtn" title="刷新数据">
+    <i class="layui-icon layui-icon-refresh-3"></i>
+</button>
+<div class="layui-row" style="padding: 20px ;">
+    <div class="layui-row layui-col-space15 row-space15">
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="card-header">CPU状态</div>
+                <div class="layui-card-body">
+                    <div class="card-content">
+                        <div>
+                            <span class="info-label">核心数：</span>
+                            <span class="info-value" id="cpuNum">-</span>
+                        </div>
+                        <div>
+                            <span class="info-label">用户使用率：</span>
+                            <span class="info-value" id="cpuUsage">-</span>
+                        </div>
+                        <div>
+                            <span class="info-label">系统使用率：</span>
+                            <span class="info-value" id="cpuSys">-</span>
+                        </div>
+                        <div>
+                            <span class="info-label">等待率：</span>
+                            <span class="info-value" id="cpuWait">-</span>
+                        </div>
+                        <div>
+                            <span class="info-label">空闲率：</span>
+                            <span class="info-value" id="cpuFree">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="card-header">内存状态</div>
+                <div class="layui-card-body">
+                    <div class="card-content">
+                        <table class="layui-table memory-table" style="margin: 0; border: none;">
+                            <thead>
+                            <tr>
+                                <th>属性</th>
+                                <th>内存</th>
+                                <th>JVM</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><span class="info-label">总内存</span></td>
+                                <td><span class="info-value" id="memTotal">-</span></td>
+                                <td><span class="info-value" id="jvmTotal">-</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="info-label">已用内存</span></td>
+                                <td><span class="info-value" id="memUsed">-</span></td>
+                                <td><span class="info-value" id="jvmUsed">-</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="info-label">剩余内存</span></td>
+                                <td><span class="info-value" id="memFree">-</span></td>
+                                <td><span class="info-value" id="jvmFree">-</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="info-label">使用率</span></td>
+                                <td><span class="info-value" id="memUsage">-</span></td>
+                                <td><span class="info-value" id="jvmUsage">-</span></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row row-space15">
+        <div class="layui-card">
+            <div class="card-header">服务器信息</div>
+            <div class="layui-card-body">
+                <div class="layui-row">
+                    <div class="layui-col-md6">
+                        <div class="card-content">
+                            <div>
+                                <span class="info-label">服务器名：</span>
+                                <span class="info-value" id="computerName">-</span>
+                            </div>
+                            <div>
+                                <span class="info-label">服务器IP：</span>
+                                <span class="info-value" id="computerIp">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md6">
+                        <div class="card-content">
+                            <div>
+                                <span class="info-label">操作系统：</span>
+                                <span class="info-value" id="osName">-</span>
+                            </div>
+                            <div>
+                                <span class="info-label">系统架构：</span>
+                                <span class="info-value" id="osArch">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row row-space15">
+        <div class="layui-card">
+            <div class="card-header">Java虚拟机</div>
+            <div class="layui-card-body">
+                <table class="layui-table custom-table">
+                    <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>详细信息</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><span class="info-label">Java名字</span></td>
+                        <td><span class="info-value" id="jdkName">-</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="info-label">Java版本</span></td>
+                        <td><span class="info-value" id="jvmVersion">-</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="info-label">启动时间</span></td>
+                        <td><span class="info-value" id="startTime">-</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><span class="info-label">运行时长</span></td>
+                        <td><span class="info-value" id="runTime">-</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="info-label">项目路径</span></td>
+                        <td><span class="info-value" id="userDir">-</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="info-label">JDK路径</span></td>
+                        <td><span class="info-value" id="jvmHome">-</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="info-label">运行参数</span></td>
+                        <td><span class="info-value" id="inputArgs">-</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="layui-row">
+        <div class="layui-card">
+            <div class="card-header">磁盘状态</div>
+            <div class="layui-card-body">
+                <table class="layui-table disk-table">
+                    <thead>
+                    <tr>
+                        <th>磁盘名称</th>
+                        <th>挂载点</th>
+                        <th>文件系统</th>
+                        <th>总空间</th>
+                        <th>已使用</th>
+                        <th>空闲</th>
+                        <th>使用率</th>
+                    </tr>
+                    </thead>
+                    <tbody id="diskTable">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/layui/layui.js"></script>
+<script src="/static/js/ajax.js"></script>
+<script>
+    layui.use(['jquery', 'Rest'], function () {
+        var Rest = layui.Rest;
+        const $ = layui.$;
+
+        // 根据使用率添加样式
+        function getUsageClass(usage) {
+            usage = parseFloat(usage);
+            if (usage >= 90) return 'usage-high';
+            if (usage >= 70) return 'usage-warning';
+            return 'usage-normal';
+        }
+
+        function loadMonitorServer() {
+            Rest.get('/api/monitor/server').then(data => {
+                const monitor = data;
+                // CPU
+                $('#cpuNum').text(monitor.cpu.cpuNum);
+                const cpuUsage = monitor.cpu.used
+                $('#cpuUsage').text(cpuUsage + '%').addClass(getUsageClass(cpuUsage));
+                $('#cpuSys').text(monitor.cpu.sys + '%');
+                $('#cpuWait').text(monitor.cpu.wait + '%');
+                $('#cpuFree').text(monitor.cpu.free + '%');
+
+                // 内存
+                $('#memTotal').text(monitor.mem.total + 'G');
+                $('#memUsed').text(monitor.mem.used + 'G');
+                $('#memFree').text(monitor.mem.free + 'G');
+                const memUsage = monitor.mem.usage
+                $('#memUsage').text(memUsage + '%').addClass(getUsageClass(memUsage));
+
+                // JVM
+                $('#jdkName').text(monitor.jvm.jdkName);
+                $('#jvmVersion').text(monitor.jvm.version);
+                $('#jvmHome').text(monitor.jvm.home);
+                $('#jvmMax').text(monitor.jvm.max + 'M');
+                $('#jvmTotal').text(monitor.jvm.total + 'M');
+                $('#jvmFree').text(monitor.jvm.free + 'M');
+                $('#startTime').text(monitor.jvm.startTime);
+                $('#runTime').text(monitor.jvm.runTime);
+                $('#inputArts').text(monitor.jvm.inputArts);
+
+                $('#jvmUsed').text(monitor.jvm.used + 'M');
+                const jvmUsage = monitor.jvm.usage;
+                $('#jvmUsage').text(jvmUsage + '%').addClass(getUsageClass(jvmUsage));
+
+                // 服务器
+                $('#computerName').text(monitor.sys.computerName);
+                $('#computerIp').text(monitor.sys.computerIp);
+                $('#osName').text(monitor.sys.osName);
+                $('#osArch').text(monitor.sys.osArch);
+                $('#userDir').text(monitor.sys.userDir);
+
+                // 磁盘
+                let diskHtml = '';
+                monitor.sysFiles.forEach(disk => {
+                    const usageClass = getUsageClass(disk.usage);
+                    diskHtml += `
+                        <tr>
+                            <td>${disk.typeName}</td>
+                            <td>${disk.dirName}</td>
+                            <td>${disk.sysTypeName}</td>
+                            <td>${disk.total}</td>
+                            <td>${disk.used}</td>
+                            <td>${disk.free}</td>
+                            <td><span class="${usageClass}">${disk.usage}%</span></td>
+                        </tr>
+                    `;
+                });
+                $('#diskTable').html(diskHtml);
+
+                // 停止旋转动画
+                $('#refreshBtn i').removeClass('refreshing');
+                // 5秒后重新添加呼吸效果
+                setTimeout(() => {
+                    $('#refreshBtn').addClass('refresh-pulse');
+                }, 5000);
+            }).catch(error => {
+                console.error('加载监控数据失败:', error);
+                layer.msg('加载监控数据失败', {icon: 2});
+                // 停止旋转动画
+                $('#refreshBtn i').removeClass('refreshing');
+                setTimeout(() => {
+                    $('#refreshBtn').addClass('refresh-pulse');
+                }, 3000);
+            });
+        }
+
+        $(function () {
+            loadMonitorServer()
+            $('#refreshBtn').click(function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                // 开始旋转动画
+                $('#refreshBtn i').addClass('refreshing');
+                // 移除呼吸效果
+                $(this).removeClass('refresh-pulse');
+                // 加载数据
+                loadMonitorServer();
+            });
+        });
+    });
+</script>
+</body>
+</html>

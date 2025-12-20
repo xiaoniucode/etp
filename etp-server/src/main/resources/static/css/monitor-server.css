@@ -1,0 +1,161 @@
+.row-space15 {
+    margin-bottom: 15px;
+}
+
+.card-content {
+    padding: 15px;
+    line-height: 32px;
+}
+
+.card-content div {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 5px 0;
+}
+
+.card-content div:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: #666;
+    font-weight: normal;
+}
+
+.info-value {
+    color: #333;
+    text-align: right;
+    font-weight: 500;
+}
+
+.disk-table {
+    margin: 0;
+}
+
+.disk-table .layui-table th,
+.disk-table .layui-table td {
+    padding: 10px 15px;
+}
+
+.usage-high {
+    color: #ff5722;
+    font-weight: bold;
+}
+
+.usage-normal {
+    color: #5fb878;
+}
+
+.usage-warning {
+    color: #ffb800;
+}
+
+.card-header {
+    font-weight: bold;
+    font-size: 16px;
+    padding: 15px;
+    background: #f8f8f8;
+}
+
+.memory-table {
+    border: none;
+}
+
+.memory-table th,
+.memory-table td {
+    border: none !important;
+    padding: 8px 15px !important;
+    text-align: center;
+}
+
+.memory-table th {
+    background: transparent;
+    font-weight: bold;
+    color: #333;
+}
+
+.memory-table td:first-child {
+    text-align: left;
+    color: #666;
+    font-weight: normal;
+}
+
+.memory-table tr {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.memory-table tr:last-child {
+    border-bottom: none;
+}
+
+/* 确保CPU和内存卡片等高 */
+.layui-row.layui-col-space15 .layui-col-md6 {
+    display: flex;
+}
+
+.layui-row.layui-col-space15 .layui-col-md6 .layui-card {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.layui-row.layui-col-space15 .layui-col-md6 .layui-card-body {
+    flex: 1;
+}
+
+.memory-table tr {
+    height: 42px;
+    line-height: 32px;
+}
+
+.memory-table td {
+    vertical-align: middle;
+}
+
+.custom-table,
+.memory-table,
+.disk-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.custom-table tr,
+.memory-table tr,
+.disk-table tr {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.custom-table th, .custom-table td,
+.memory-table th, .memory-table td,
+.disk-table th, .disk-table td {
+    border: none;
+    padding: 10px 15px;
+}
+
+.custom-table th,
+.memory-table th,
+.disk-table th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+    text-align: left;
+}
+
+
+.custom-table td,
+.memory-table td,
+.disk-table td {
+    text-align: left;
+}
+
+.custom-table td:first-child,
+.memory-table td:first-child,
+.disk-table td:first-child {
+    text-align: left;
+}
+
+.custom-table tr:last-child,
+.memory-table tr:last-child,
+.disk-table tr:last-child {
+    border-bottom: none;
+}
