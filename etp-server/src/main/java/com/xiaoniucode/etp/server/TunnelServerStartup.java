@@ -7,7 +7,6 @@ import com.xiaoniucode.etp.common.PortChecker;
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.LogConfig;
-import com.xiaoniucode.etp.server.http.HttpProxyServer;
 import com.xiaoniucode.etp.server.web.DashboardApi;
 import com.xiaoniucode.etp.server.web.server.NettyWebServer;
 import org.slf4j.Logger;
@@ -56,7 +55,6 @@ public class TunnelServerStartup {
                 logger.info("Dashboard图形面板启动成功，浏览器访问：{}:{}", webServer.getAddr(), webServer.getPort());
             }
             TcpProxyServer.get().start();
-            new HttpProxyServer().start();
         });
         tunnelServer.start();
     }

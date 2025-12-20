@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+/**
+ * @author liuxin
+ */
 @Data
 @Entity
 @Table(name = "user")

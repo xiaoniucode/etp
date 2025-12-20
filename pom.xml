@@ -32,6 +32,7 @@
         <module>etp-common</module>
         <module>etp-server</module>
         <module>etp-client</module>
+        <module>etp-test</module>
     </modules>
 
     <dependencyManagement>

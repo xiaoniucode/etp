@@ -15,6 +15,9 @@ etps.toml
 etpc.toml
 etp-server/dependency-reduced-pom.xml
 etp-client/dependency-reduced-pom.xml
+/etp-test/dependency-reduced-pom.xml
+/etp-common/dependency-reduced-pom.xml
+/etp-core/dependency-reduced-pom.xml
 etps.log
 etpc.log
 /scripts/cert

@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+/**
+ * @author liuxin
+ */
 @Data
 @Entity
 @Table(name = "user2")
