@@ -83,6 +83,7 @@
         var Rest = layui.Rest;
         var layer = layui.layer;
         var $ = layui.jquery;
+        let captchaId = '';
 
         function setToken(token) {
             if (token) localStorage.setItem('auth_token', token);
@@ -92,18 +93,14 @@
             localStorage.setItem('user', JSON.stringify({userId, username}));
         }
 
-        let captchaId = '';
-
         // 绘制验证码
         function drawCaptcha(code) {
             const canvas = document.getElementById('captchaCanvas');
             const ctx = canvas.getContext('2d');
             const w = canvas.width, h = canvas.height;
-            // 清空 + 白色背景
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, w, h);
 
-            // 干扰线
             for (let i = 0; i < 6; i++) {
                 ctx.strokeStyle = `rgb(${100 + Math.random() * 100 | 0}, ${100 + Math.random() * 100 | 0}, ${100 + Math.random() * 100 | 0})`;
                 ctx.lineWidth = 1.5;
@@ -113,15 +110,12 @@
                 ctx.stroke();
             }
 
-            // 文字（带旋转 + 颜色）
             ctx.font = 'bold 26px Arial';
             ctx.textBaseline = 'middle';
             for (let i = 0; i < code.length; i++) {
                 const x = 15 + i * 26;
                 const y = h / 2;
-                // ±17°
                 const angle = (Math.random() - 0.5) * 0.6;
-
                 ctx.save();
                 ctx.translate(x, y);
                 ctx.rotate(angle);
@@ -130,7 +124,6 @@
                 ctx.restore();
             }
 
-            // 噪点
             for (let i = 0; i < 40; i++) {
                 ctx.fillStyle = `rgb(${Math.random() * 255 | 0}, ${Math.random() * 255 | 0}, ${Math.random() * 255 | 0})`;
                 ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
@@ -145,13 +138,13 @@
             })
         }
 
-        // 页面加载 + 点击刷新
+        // 页面加载、点击刷新
         $(function () {
             refreshCaptcha();
             $('#captchaCanvas').on('click', refreshCaptcha);
         });
 
-        // ==================== 登录提交==================
+        //登录提交
         form.on('submit(demo-login)', function (data) {
             var field = data.field;
             const loginBody = {
