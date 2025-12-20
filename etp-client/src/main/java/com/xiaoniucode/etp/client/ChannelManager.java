@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
+ * 连接池管理、channel管理、Bootstrap管理
  * @author liuxin
  */
 public final class ChannelManager {

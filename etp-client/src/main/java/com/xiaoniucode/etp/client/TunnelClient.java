@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 客户端服务容器
  * @author liuxin
  */
 public class TunnelClient implements Lifecycle {

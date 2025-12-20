@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.core.protocol.ProtocolType;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.PortAllocator;
-import com.xiaoniucode.etp.server.TcpProxyServer;
+import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ClientInfo;
 import com.xiaoniucode.etp.server.config.ProxyMapping;

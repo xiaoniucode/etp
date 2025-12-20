@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 客户端信息
+ * 客户端配置
  *
  * @author liuxin
  */

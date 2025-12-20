@@ -9,7 +9,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.*;
 
 /**
- * 根据不同的操作系统创建 EventLoop
+ * 根据不同的操作系统创建 EventLoop，Linux采用Epoll、MacOS采用KQueue、Windows/其他采用NIO
  *
  * @author liuxin
  */

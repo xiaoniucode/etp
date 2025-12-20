@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.config;
 import com.xiaoniucode.etp.core.protocol.ProtocolType;
 
 /**
- * 端口映射信息
+ * 端口映射信息配置
  *
  * @author liuxin
  */

@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server;
 
 /**
+ * 常量
  * @author liuxin
  */
 public class Constants {

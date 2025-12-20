@@ -1,9 +1,9 @@
-package com.xiaoniucode.etp.server;
+package com.xiaoniucode.etp.server.proxy;
 
 import com.xiaoniucode.etp.common.PortFileUtil;
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
-import com.xiaoniucode.etp.server.handler.VisitorChannelHandler;
+import com.xiaoniucode.etp.server.handler.TcpVisitorChannelHandler;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.PortAllocator;
 import com.xiaoniucode.etp.server.manager.RuntimeState;
@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class TcpProxyServer implements Lifecycle {
     private static final Logger LOGGER = LoggerFactory.getLogger(TcpProxyServer.class);
-    private static volatile TcpProxyServer instance = new TcpProxyServer();
+    private static final TcpProxyServer instance = new TcpProxyServer();
 
     public static TcpProxyServer get() {
         return instance;
@@ -61,7 +61,7 @@ public final class TcpProxyServer implements Lifecycle {
                 @Override
                 protected void initChannel(SocketChannel sc) {
                     sc.pipeline().addLast(new TrafficMetricsHandler());
-                    sc.pipeline().addLast(new VisitorChannelHandler());
+                    sc.pipeline().addLast(new TcpVisitorChannelHandler());
                 }
             });
         bindAllProxyPort();

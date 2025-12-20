@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
+ * Toml格式文件加载管理工具类
  * @author liuxin
  */
 public class TomlUtils {

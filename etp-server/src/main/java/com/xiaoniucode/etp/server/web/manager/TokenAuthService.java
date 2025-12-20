@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TokenAuthService {
     private final static Logger logger = LoggerFactory.getLogger(TokenAuthService.class);
-    private static final long TOKEN_EXPIRE_SECONDS = 3 * 24 * 60 * 60;
+    private static final long TOKEN_EXPIRE_SECONDS = 24 * 60 * 60;
     // 清理时间点（小时, 分钟）
     private static final LocalTime CLEANUP_TIME = LocalTime.of(1, 0);
 

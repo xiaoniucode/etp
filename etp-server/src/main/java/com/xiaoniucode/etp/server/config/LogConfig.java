@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.config;
 
 /**
+ * 日志配置
  * @author liuxin
  */
 public class LogConfig {

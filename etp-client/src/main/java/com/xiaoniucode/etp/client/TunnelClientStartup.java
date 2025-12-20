@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 /**
+ * 客户端服务启动类
+ *
  * @author liuxin
  */
 public class TunnelClientStartup {
@@ -41,11 +43,11 @@ public class TunnelClientStartup {
         String path = config.getLogPath();
         String pattern = config.getLogPattern();
         new LogbackConfigurator.LogbackConfigBuilder()
-                .setLogFilePath(StringUtils.hasText(path) ? path : ("logs" + File.separator + "etps.log"))
-                .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : ("logs" + File.separator + "etps.%d{yyyy-MM-dd}.log"))
-                .setLogLevel(!StringUtils.hasText(leve) ? Level.INFO : Level.toLevel(leve, Level.INFO))
-                .build()
-                .configureLogback();
+            .setLogFilePath(StringUtils.hasText(path) ? path : ("logs" + File.separator + "etps.log"))
+            .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : ("logs" + File.separator + "etps.%d{yyyy-MM-dd}.log"))
+            .setLogLevel(!StringUtils.hasText(leve) ? Level.INFO : Level.toLevel(leve, Level.INFO))
+            .build()
+            .configureLogback();
     }
 
     private static void registerShutdownHook() {

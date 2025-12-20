@@ -36,7 +36,6 @@
     layui.use(['form', 'jquery', 'layer', 'Rest'], function () {
         const form = layui.form;
         const Rest = layui.Rest;
-        const $ = layui.$;
         const layer = layui.layer;
         const user = JSON.parse(localStorage.getItem("user"));
         form.on('submit(account_form)', function (data) {

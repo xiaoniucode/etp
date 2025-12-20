@@ -20,10 +20,11 @@ import java.util.List;
 import java.util.Locale;
 
 /**
+ * 服务初始化
  * @author liuxin
  */
 public final class EtpInitialize {
-    private static Logger logger = LoggerFactory.getLogger(EtpInitialize.class);
+    private static final Logger logger = LoggerFactory.getLogger(EtpInitialize.class);
     private final static ConfigStore configStore = new ConfigStore();
     private final static RuntimeState runtimeState = RuntimeState.get();
     private final static AppConfig config = AppConfig.get();

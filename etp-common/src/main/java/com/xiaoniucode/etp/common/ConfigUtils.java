@@ -9,10 +9,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ *
  * @author liuxin
  */
 public class ConfigUtils {
-    private static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
     public static String getConfigPath(String[] args,String fileName) {
         if (args.length == 0) {
             Path currentDir = Paths.get("").toAbsolutePath();

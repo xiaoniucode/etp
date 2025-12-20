@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 端口可用性检查
  * @author liuxin
  */
 public class PortChecker {

@@ -1,6 +1,8 @@
 package com.xiaoniucode.etp.server.config;
 
 /**
+ * 密钥库配置
+ *
  * @author liuxin
  */
 public class KeystoreConfig {

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
- * 隧道服务容器
+ * 控制隧道服务容器
  *
  * @author liuxin
  */

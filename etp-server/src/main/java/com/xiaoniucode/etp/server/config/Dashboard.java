@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.config;
 import java.io.Serializable;
 
 /**
+ * 管理界面配置
  * @author liuxin
  */
 public class Dashboard implements Serializable {

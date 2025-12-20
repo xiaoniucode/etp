@@ -21,9 +21,12 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author liuxin
  */
-public class VisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
-    private final Logger logger = LoggerFactory.getLogger(VisitorChannelHandler.class);
+public class TcpVisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
+    private final Logger logger = LoggerFactory.getLogger(TcpVisitorChannelHandler.class);
     private static final AtomicLong SESSION_ID_PRODUCER = new AtomicLong(0);
+    /**
+     * 运行时状态信息管理器
+     */
     private final RuntimeState runtimeState = RuntimeState.get();
 
     @Override

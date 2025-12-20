@@ -1,4 +1,4 @@
-serverAddr = "127.0.0.1" #填ETP服务端地址，默认127.0.0.1
+serverAddr = "127.0.0.1" #填服务器地址，默认127.0.0.1
 serverPort = 9527 #默认9527
 secretKey = "your-secret-key" #认证密钥，必须指定
 

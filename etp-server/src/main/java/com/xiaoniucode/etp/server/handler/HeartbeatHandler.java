@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 连接消息处理器
+ * 心跳消息处理器
  *
  * @author liuxin
  */
