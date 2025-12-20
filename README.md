@@ -112,7 +112,7 @@ remotePort = 3307 # [Optional] Public service port; if not specified, a port wil
 Start the etp server on a Linux server. For external access, make sure to deploy it on a machine with a public IP address.
 
 ```shell
-nohup ./etps -c etps.toml &
+nohup ./etps -c etps.toml > /dev/null 2>&1 &
 ```
 
 ### 💻 Client etpc Configuration
@@ -128,7 +128,7 @@ secretKey = "your client authentication key" # Must match the server configurati
 Start the client on an internal computer (Unix example):
 
 ```shell
-./etpc -c etpc.toml # Or run in the background: nohup ./etpc -c etpc.toml &
+./etpc -c etpc.toml # Or run in the background: nohup ./etpc -c etpc.toml > /dev/null 2>&1 &
 ```
 
 🔔 **Note**: If the configuration file and executable are in the same folder, you **do not need to use -c** to specify the configuration.

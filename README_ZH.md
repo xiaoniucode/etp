@@ -113,7 +113,7 @@ remotePort = 3307 #[可选]公网服务端口，如果不填系统会随机分�
 在Linux服务器上启动etp服务端，若需要外部访问，需要部署在具备公网IP的服务器上。
 
 ```shell
-nohup ./etps -c etps.toml &
+nohup ./etps -c etps.toml > /dev/null 2>&1 &
 ```
 
 ### 💻 客户端etpc配置
@@ -129,7 +129,7 @@ secretKey = "你的客户端认证密钥" #和服务端配置保持一致
 在内网电脑启动客户端，以unix操作系统为例
 
 ```shell
-./etpc -c etpc.toml # 或后台运行：nohup ./etpc -c etpc.toml &  
+./etpc -c etpc.toml # 或后台运行：nohup ./etpc -c etpc.toml > /dev/null 2>&1 & 
 ```
 
 🔔**备注**：如果配置文件和可执行程序在同一个文件夹可**不用用-c**指定配置。

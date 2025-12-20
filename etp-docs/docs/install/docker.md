@@ -4,7 +4,7 @@ sidebar_position: 4
 
 ## 介绍
 
-镜像已经发布到**docker hub**公共仓库，不用自行构建镜像，可以直接去[镜像仓库](https://hub.docker.com/r/xiaoniucode/etps)拉取安装。
+`etps`服务端镜像已发布到**docker hub**公共仓库，不用自行构建镜像，可以直接去[镜像仓库](https://hub.docker.com/r/xiaoniucode/etps)拉取安装。下文介绍`etps`服务端的安装教程。
 
 **端口说明：**
 - `9527`是默认的`etpc`客户端与`etps`服务端通信的端口
