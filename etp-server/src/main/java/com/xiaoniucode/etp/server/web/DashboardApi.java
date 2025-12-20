@@ -92,17 +92,17 @@ public class DashboardApi {
             context.setResponseJson(ResponseEntity.ok().toJson());
         });
         router.route(HttpMethod.GET, "/client/list", context ->
-                context.setResponseJson(ResponseEntity.ok(ConfigService.clients()).toJson()));
+            context.setResponseJson(ResponseEntity.ok(ConfigService.clients()).toJson()));
         router.route(HttpMethod.GET, "/client/get", context ->
-                context.setResponseJson(ResponseEntity.ok(ConfigService.getClient(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
+            context.setResponseJson(ResponseEntity.ok(ConfigService.getClient(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
         router.route(HttpMethod.GET, "/proxy/get", context ->
-                context.setResponseJson(ResponseEntity.ok(ConfigService.getProxy(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
+            context.setResponseJson(ResponseEntity.ok(ConfigService.getProxy(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
         router.route(HttpMethod.GET, "/proxy/list", context ->
-                context.setResponseJson(ResponseEntity.ok(ConfigService.proxies()).toJson()));
+            context.setResponseJson(ResponseEntity.ok(ConfigService.proxies()).toJson()));
         router.route(HttpMethod.GET, "/metrics", context ->
-                context.setResponseJson(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
+            context.setResponseJson(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
         router.route(HttpMethod.GET, "/stats", context ->
-                context.setResponseJson(ResponseEntity.ok(ConfigService.countStats()).toJson()));
+            context.setResponseJson(ResponseEntity.ok(ConfigService.countStats()).toJson()));
         router.route(HttpMethod.POST, "/proxy/add", context -> {
             ConfigService.addProxy(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());

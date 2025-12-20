@@ -17,8 +17,8 @@ public class ConfigStore {
      */
     public void addClient(JSONObject client) {
         SQLiteUtils.insert(
-                "INSERT INTO clients (name, secretKey) VALUES (?, ?)",
-                client.getString("name"), client.getString("secretKey")
+            "INSERT INTO clients (name, secretKey) VALUES (?, ?)",
+            client.getString("name"), client.getString("secretKey")
         );
     }
 
@@ -27,8 +27,8 @@ public class ConfigStore {
      */
     public JSONObject getClientById(long id) {
         return SQLiteUtils.get(
-                "SELECT * FROM clients WHERE id = ?",
-                id
+            "SELECT * FROM clients WHERE id = ?",
+            id
         );
     }
 
@@ -37,8 +37,8 @@ public class ConfigStore {
      */
     public JSONObject getClientByName(String name) {
         return SQLiteUtils.get(
-                "SELECT * FROM clients WHERE name = ?",
-                name
+            "SELECT * FROM clients WHERE name = ?",
+            name
         );
     }
 
@@ -47,8 +47,8 @@ public class ConfigStore {
      */
     public JSONObject getClientBySecretKey(String secretKey) {
         return SQLiteUtils.get(
-                "SELECT * FROM clients WHERE secretKey = ?",
-                secretKey
+            "SELECT * FROM clients WHERE secretKey = ?",
+            secretKey
         );
     }
 
@@ -64,8 +64,8 @@ public class ConfigStore {
      */
     public boolean updateClient(long id, String name) {
         int rows = SQLiteUtils.update(
-                "UPDATE clients SET name = ?, updatedAt = datetime('now') WHERE id = ?",
-                name, id
+            "UPDATE clients SET name = ?, updatedAt = datetime('now') WHERE id = ?",
+            name, id
         );
         return rows > 0;
     }
@@ -82,13 +82,13 @@ public class ConfigStore {
      */
     public long addProxy(JSONObject data) {
         return SQLiteUtils.insert(
-                "INSERT INTO proxies (clientId, name, type, localPort, remotePort, status) VALUES (?, ?, ?, ?, ?, ?)",
-                data.optInt("clientId"),
-                data.optString("name"),
-                data.optString("type"),
-                data.optInt("localPort"),
-                data.optInt("remotePort"),
-                data.optInt("status", 1)
+            "INSERT INTO proxies (clientId, name, type, localPort, remotePort, status) VALUES (?, ?, ?, ?, ?, ?)",
+            data.optInt("clientId"),
+            data.optString("name"),
+            data.optString("type"),
+            data.optInt("localPort"),
+            data.optInt("remotePort"),
+            data.optInt("status", 1)
         );
     }
 
@@ -165,22 +165,22 @@ public class ConfigStore {
 
     public JSONArray listAllProxies() {
         String sql = """
-                SELECT
-                    p.id,
-                    p.clientId,
-                    p.name,
-                    p.type,
-                    p.localPort,
-                    p.remotePort,
-                    p.status,
-                    p.createdAt,
-                    p.updatedAt,
-                    c.name AS clientName,
-                    c.secretKey
-                FROM
-                    proxies p
-                LEFT JOIN clients c ON p.clientId = c.id
-                """;
+            SELECT
+                p.id,
+                p.clientId,
+                p.name,
+                p.type,
+                p.localPort,
+                p.remotePort,
+                p.status,
+                p.createdAt,
+                p.updatedAt,
+                c.name AS clientName,
+                c.secretKey
+            FROM
+                proxies p
+            LEFT JOIN clients c ON p.clientId = c.id
+            """;
         return SQLiteUtils.list(sql);
     }
 
@@ -208,8 +208,8 @@ public class ConfigStore {
 
     public void addUser(JSONObject user) {
         SQLiteUtils.insert(
-                "INSERT INTO users (username, password) VALUES (?, ?)",
-                user.getString("username"), user.getString("password")
+            "INSERT INTO users (username, password) VALUES (?, ?)",
+            user.getString("username"), user.getString("password")
         );
     }
 
@@ -219,8 +219,8 @@ public class ConfigStore {
 
     public void updateUserPassword(int userId, String password) {
         SQLiteUtils.update(
-                "UPDATE users SET password =?  WHERE id = ?",
-                password, userId);
+            "UPDATE users SET password =?  WHERE id = ?",
+            password, userId);
     }
 
     public JSONObject getProxy(int clientId, String name) {

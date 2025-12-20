@@ -65,11 +65,11 @@ public class TunnelServerStartup {
         String path = log.getPath();
         String pattern = log.getPattern();
         new LogbackConfigurator.LogbackConfigBuilder()
-                .setLogFilePath(StringUtils.hasText(path) ? path : ("logs" + File.separator + "etps.log"))
-                .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : ("logs" + File.separator + "etps.%d{yyyy-MM-dd}.log.gz"))
-                .setLogLevel(!StringUtils.hasText(leve) ? Level.INFO : Level.toLevel(leve, Level.INFO))
-                .build()
-                .configureLogback();
+            .setLogFilePath(StringUtils.hasText(path) ? path : ("logs" + File.separator + "etps.log"))
+            .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : ("logs" + File.separator + "etps.%d{yyyy-MM-dd}.log.gz"))
+            .setLogLevel(!StringUtils.hasText(leve) ? Level.INFO : Level.toLevel(leve, Level.INFO))
+            .build()
+            .configureLogback();
     }
 
     private static void registerShutdownHook(TunnelServer tunnelServer) {

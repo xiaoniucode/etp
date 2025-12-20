@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server;
 
-
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.IdleCheckHandler;
@@ -54,26 +53,26 @@ public class TunnelServer implements Lifecycle {
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(tunnelBossGroup, tunnelWorkerGroup)
-                    .childOption(ChannelOption.TCP_NODELAY, true)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)
-                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .channel(NettyEventLoopFactory.serverSocketChannelClass())
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel sc) {
-                            if (tls) {
-                                sc.pipeline().addLast("tls", tlsContext.newHandler(sc.alloc()));
-                                logger.debug("TLS加密处理器添加成功");
-                            }
-                            sc.pipeline()
-                                    .addLast(new ProtobufVarint32FrameDecoder())
-                                    .addLast(new ProtobufDecoder(TunnelMessage.Message.getDefaultInstance()))
-                                    .addLast(new ProtobufVarint32LengthFieldPrepender())
-                                    .addLast(new ProtobufEncoder())
-                                    .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
-                                    .addLast(new ControlChannelHandler());
+                .childOption(ChannelOption.TCP_NODELAY, true)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .channel(NettyEventLoopFactory.serverSocketChannelClass())
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel sc) {
+                        if (tls) {
+                            sc.pipeline().addLast("tls", tlsContext.newHandler(sc.alloc()));
+                            logger.debug("TLS加密处理器添加成功");
                         }
-                    });
+                        sc.pipeline()
+                            .addLast(new ProtobufVarint32FrameDecoder())
+                            .addLast(new ProtobufDecoder(TunnelMessage.Message.getDefaultInstance()))
+                            .addLast(new ProtobufVarint32LengthFieldPrepender())
+                            .addLast(new ProtobufEncoder())
+                            .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
+                            .addLast(new ControlChannelHandler());
+                    }
+                });
             serverBootstrap.bind(host, port).sync();
             onSuccessCallback.accept(null);
             logger.info("ETP服务启动成功:{}:{}", host, port);

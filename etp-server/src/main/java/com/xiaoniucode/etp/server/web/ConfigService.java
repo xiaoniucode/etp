@@ -78,7 +78,6 @@ public final class ConfigService {
         return configStore.listAllProxies();
     }
 
-
     public static void addProxy(JSONObject req) {
         TX.execute(() -> {
             String remotePortString = req.getString("remotePort");
@@ -171,8 +170,8 @@ public final class ConfigService {
 
     private static ProxyMapping createProxyMapping(JSONObject req) {
         ProxyMapping proxyMapping = new ProxyMapping(ProtocolType.getType(req.getString("type")),
-                req.getInt("localPort"),
-                req.getInt("remotePort"));
+            req.getInt("localPort"),
+            req.getInt("remotePort"));
         proxyMapping.setProxyId(req.getInt("clientId"));
         proxyMapping.setName(req.getString("name"));
         proxyMapping.setStatus(req.getInt("status"));

@@ -23,10 +23,10 @@ public class ServerTlsContextFactory extends AbstractTlsContextFactory {
     public SslContext createContext() throws Exception {
         KeyManagerFactory serverKmf = loadKeyStore(SERVER_KEYSTORE, KEYSTORE_KEY_PASS, KEYSTORE_STORE_PASS);
         return SslContextBuilder
-                .forServer(serverKmf)
-                .sslProvider(DEFAULT_SSL_PROVIDER)
-                .protocols(PROTOCOL_TLS_1_3)
-                .clientAuth(ClientAuth.NONE)
-                .build();
+            .forServer(serverKmf)
+            .sslProvider(DEFAULT_SSL_PROVIDER)
+            .protocols(PROTOCOL_TLS_1_3)
+            .clientAuth(ClientAuth.NONE)
+            .build();
     }
 }

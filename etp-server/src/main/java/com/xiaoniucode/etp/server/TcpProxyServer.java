@@ -23,7 +23,6 @@ import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
  * 负责启动和管理TCP代理服务。
  *
@@ -57,14 +56,14 @@ public final class TcpProxyServer implements Lifecycle {
         workerGroup = NettyEventLoopFactory.eventLoopGroup();
         serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
-                .channel(NettyEventLoopFactory.serverSocketChannelClass())
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel sc) {
-                        sc.pipeline().addLast(new TrafficMetricsHandler());
-                        sc.pipeline().addLast(new VisitorChannelHandler());
-                    }
-                });
+            .channel(NettyEventLoopFactory.serverSocketChannelClass())
+            .childHandler(new ChannelInitializer<SocketChannel>() {
+                @Override
+                protected void initChannel(SocketChannel sc) {
+                    sc.pipeline().addLast(new TrafficMetricsHandler());
+                    sc.pipeline().addLast(new VisitorChannelHandler());
+                }
+            });
         bindAllProxyPort();
         LOGGER.info("所有端口映射服务启动完成");
     }
@@ -86,10 +85,10 @@ public final class TcpProxyServer implements Lifecycle {
                             remotePortChannelMapping.put(remotePort, future.channel());
                             StringBuilder portItem = new StringBuilder();
                             portItem.append(client.getName()).append("\t")
-                                    .append(proxy.getName()).append("\t")
-                                    .append(proxy.getType().name()).append("\t")
-                                    .append(proxy.getLocalPort()).append("\t")
-                                    .append(remotePort);
+                                .append(proxy.getName()).append("\t")
+                                .append(proxy.getType().name()).append("\t")
+                                .append(proxy.getLocalPort()).append("\t")
+                                .append(remotePort);
                             bindPorts.add(portItem);
                             LOGGER.info("成功绑定端口: {}", remotePort);
                         } else {

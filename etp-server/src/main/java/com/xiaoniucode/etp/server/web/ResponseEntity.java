@@ -3,7 +3,9 @@ package com.xiaoniucode.etp.server.web;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
+/**
+ * @author liuxin
+ */
 public final class ResponseEntity {
 
     private static final int OK_CODE = 0;
@@ -21,7 +23,7 @@ public final class ResponseEntity {
 
         if (data != null) {
             if (data instanceof JSONObject || data instanceof JSONArray || data instanceof String
-                    || data instanceof Number || data instanceof Boolean || data == JSONObject.NULL) {
+                || data instanceof Number || data instanceof Boolean || data == JSONObject.NULL) {
                 this.json.put("data", data);
             } else {
                 this.json.put("data", new JSONObject(data));
@@ -30,7 +32,6 @@ public final class ResponseEntity {
             this.json.put("data", JSONObject.NULL);
         }
     }
-
 
     public static ResponseEntity ok() {
         return new ResponseEntity(OK_CODE, OK_MSG, null);
@@ -68,10 +69,10 @@ public final class ResponseEntity {
         return new ResponseEntity(code, message, data);
     }
 
-
     public JSONObject getJson() {
         return json;
     }
+
     public String toJson() {
         return json.toString();
     }
