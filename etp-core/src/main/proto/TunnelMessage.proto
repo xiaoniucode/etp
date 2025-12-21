@@ -10,10 +10,29 @@ message Message {
     TRANSFER = 3;
     HEARTBEAT = 4;
     ERROR = 5;
+    PROXY_REGISTER = 6;
+    PROXY_UNREGISTER = 7;
   }
   Type type = 1;
   int64 session_id = 2;
   bytes payload = 3;
-  uint32 port=4;
+  uint32 port = 4;
   string ext = 5;
+}
+message ProxyRequest {
+  string proxy_name = 1;
+  string local_host = 2;
+  uint32 local_port = 3;
+  string protocol = 4;
+  map<string, string> metadata = 5;
+  bool auto_start = 6;
+}
+message ProxyUnregisterRequest {
+  string proxy_id = 1;
+}
+message ProxyResponse {
+  bool success = 1;
+  string message = 2;
+  string proxy_id = 3;
+  string external_url = 4;
 }

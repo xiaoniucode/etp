@@ -39,7 +39,7 @@ public final class TunnelMessage {
      * <code>.com.xiaoniucode.etp.core.protocol.Message.Type type = 1;</code>
      * @return The type.
      */
-    TunnelMessage.Message.Type getType();
+    Message.Type getType();
 
     /**
      * <code>int64 session_id = 2;</code>
@@ -63,7 +63,7 @@ public final class TunnelMessage {
      * <code>string ext = 5;</code>
      * @return The ext.
      */
-    java.lang.String getExt();
+    String getExt();
     /**
      * <code>string ext = 5;</code>
      * @return The bytes for ext.
@@ -103,12 +103,12 @@ public final class TunnelMessage {
       return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_Message_descriptor;
     }
 
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    @Override
+    protected FieldAccessorTable
         internalGetFieldAccessorTable() {
       return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_Message_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              TunnelMessage.Message.class, TunnelMessage.Message.Builder.class);
+              Message.class, Builder.class);
     }
 
     /**
@@ -140,6 +140,14 @@ public final class TunnelMessage {
        * <code>ERROR = 5;</code>
        */
       ERROR(5),
+      /**
+       * <code>PROXY_REGISTER = 6;</code>
+       */
+      PROXY_REGISTER(6),
+      /**
+       * <code>PROXY_UNREGISTER = 7;</code>
+       */
+      PROXY_UNREGISTER(7),
       UNRECOGNIZED(-1),
       ;
 
@@ -176,11 +184,19 @@ public final class TunnelMessage {
        * <code>ERROR = 5;</code>
        */
       public static final int ERROR_VALUE = 5;
+      /**
+       * <code>PROXY_REGISTER = 6;</code>
+       */
+      public static final int PROXY_REGISTER_VALUE = 6;
+      /**
+       * <code>PROXY_UNREGISTER = 7;</code>
+       */
+      public static final int PROXY_UNREGISTER_VALUE = 7;
 
 
       public final int getNumber() {
         if (this == UNRECOGNIZED) {
-          throw new java.lang.IllegalArgumentException(
+          throw new IllegalArgumentException(
               "Can't get the number of an unknown enum value.");
         }
         return value;
@@ -191,7 +207,7 @@ public final class TunnelMessage {
        * @return The enum associated with the given numeric wire value.
        * @deprecated Use {@link #forNumber(int)} instead.
        */
-      @java.lang.Deprecated
+      @Deprecated
       public static Type valueOf(int value) {
         return forNumber(value);
       }
@@ -208,6 +224,8 @@ public final class TunnelMessage {
           case 3: return TRANSFER;
           case 4: return HEARTBEAT;
           case 5: return ERROR;
+          case 6: return PROXY_REGISTER;
+          case 7: return PROXY_UNREGISTER;
           default: return null;
         }
       }
@@ -227,7 +245,7 @@ public final class TunnelMessage {
       public final com.google.protobuf.Descriptors.EnumValueDescriptor
           getValueDescriptor() {
         if (this == UNRECOGNIZED) {
-          throw new java.lang.IllegalStateException(
+          throw new IllegalStateException(
               "Can't get the descriptor of an unrecognized enum value.");
         }
         return getDescriptor().getValues().get(ordinal());
@@ -238,7 +256,7 @@ public final class TunnelMessage {
       }
       public static com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return TunnelMessage.Message.getDescriptor().getEnumTypes().get(0);
+        return Message.getDescriptor().getEnumTypes().get(0);
       }
 
       private static final Type[] VALUES = values();
@@ -246,7 +264,7 @@ public final class TunnelMessage {
       public static Type valueOf(
           com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
         if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
+          throw new IllegalArgumentException(
             "EnumValueDescriptor is not for this type.");
         }
         if (desc.getIndex() == -1) {
@@ -270,16 +288,16 @@ public final class TunnelMessage {
      * <code>.com.xiaoniucode.etp.core.protocol.Message.Type type = 1;</code>
      * @return The enum numeric value on the wire for type.
      */
-    @java.lang.Override public int getTypeValue() {
+    @Override public int getTypeValue() {
       return type_;
     }
     /**
      * <code>.com.xiaoniucode.etp.core.protocol.Message.Type type = 1;</code>
      * @return The type.
      */
-    @java.lang.Override public TunnelMessage.Message.Type getType() {
-      TunnelMessage.Message.Type result = TunnelMessage.Message.Type.forNumber(type_);
-      return result == null ? TunnelMessage.Message.Type.UNRECOGNIZED : result;
+    @Override public Type getType() {
+      Type result = Type.forNumber(type_);
+      return result == null ? Type.UNRECOGNIZED : result;
     }
 
     public static final int SESSION_ID_FIELD_NUMBER = 2;
@@ -288,7 +306,7 @@ public final class TunnelMessage {
      * <code>int64 session_id = 2;</code>
      * @return The sessionId.
      */
-    @java.lang.Override
+    @Override
     public long getSessionId() {
       return sessionId_;
     }
@@ -299,7 +317,7 @@ public final class TunnelMessage {
      * <code>bytes payload = 3;</code>
      * @return The payload.
      */
-    @java.lang.Override
+    @Override
     public com.google.protobuf.ByteString getPayload() {
       return payload_;
     }
@@ -310,27 +328,27 @@ public final class TunnelMessage {
      * <code>uint32 port = 4;</code>
      * @return The port.
      */
-    @java.lang.Override
+    @Override
     public int getPort() {
       return port_;
     }
 
     public static final int EXT_FIELD_NUMBER = 5;
     @SuppressWarnings("serial")
-    private volatile java.lang.Object ext_ = "";
+    private volatile Object ext_ = "";
     /**
      * <code>string ext = 5;</code>
      * @return The ext.
      */
-    @java.lang.Override
-    public java.lang.String getExt() {
-      java.lang.Object ref = ext_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
+    @Override
+    public String getExt() {
+      Object ref = ext_;
+      if (ref instanceof String) {
+        return (String) ref;
       } else {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
+        String s = bs.toStringUtf8();
         ext_ = s;
         return s;
       }
@@ -339,14 +357,14 @@ public final class TunnelMessage {
      * <code>string ext = 5;</code>
      * @return The bytes for ext.
      */
-    @java.lang.Override
+    @Override
     public com.google.protobuf.ByteString
         getExtBytes() {
-      java.lang.Object ref = ext_;
-      if (ref instanceof java.lang.String) {
+      Object ref = ext_;
+      if (ref instanceof String) {
         com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
+                (String) ref);
         ext_ = b;
         return b;
       } else {
@@ -355,7 +373,7 @@ public final class TunnelMessage {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
+    @Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -365,10 +383,10 @@ public final class TunnelMessage {
       return true;
     }
 
-    @java.lang.Override
+    @Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (type_ != TunnelMessage.Message.Type.AUTH.getNumber()) {
+      if (type_ != Type.AUTH.getNumber()) {
         output.writeEnum(1, type_);
       }
       if (sessionId_ != 0L) {
@@ -386,13 +404,13 @@ public final class TunnelMessage {
       getUnknownFields().writeTo(output);
     }
 
-    @java.lang.Override
+    @Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
-      if (type_ != TunnelMessage.Message.Type.AUTH.getNumber()) {
+      if (type_ != Type.AUTH.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, type_);
       }
@@ -416,15 +434,15 @@ public final class TunnelMessage {
       return size;
     }
 
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
+    @Override
+    public boolean equals(final Object obj) {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof TunnelMessage.Message)) {
+      if (!(obj instanceof Message)) {
         return super.equals(obj);
       }
-      TunnelMessage.Message other = (TunnelMessage.Message) obj;
+      Message other = (Message) obj;
 
       if (type_ != other.type_) return false;
       if (getSessionId()
@@ -439,7 +457,7 @@ public final class TunnelMessage {
       return true;
     }
 
-    @java.lang.Override
+    @Override
     public int hashCode() {
       if (memoizedHashCode != 0) {
         return memoizedHashCode;
@@ -462,44 +480,44 @@ public final class TunnelMessage {
       return hash;
     }
 
-    public static TunnelMessage.Message parseFrom(
+    public static Message parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static TunnelMessage.Message parseFrom(
+    public static Message parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static TunnelMessage.Message parseFrom(
+    public static Message parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static TunnelMessage.Message parseFrom(
+    public static Message parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static TunnelMessage.Message parseFrom(byte[] data)
+    public static Message parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static TunnelMessage.Message parseFrom(
+    public static Message parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static TunnelMessage.Message parseFrom(java.io.InputStream input)
+    public static Message parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static TunnelMessage.Message parseFrom(
+    public static Message parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -507,26 +525,26 @@ public final class TunnelMessage {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static TunnelMessage.Message parseDelimitedFrom(java.io.InputStream input)
+    public static Message parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input);
     }
 
-    public static TunnelMessage.Message parseDelimitedFrom(
+    public static Message parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static TunnelMessage.Message parseFrom(
+    public static Message parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static TunnelMessage.Message parseFrom(
+    public static Message parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -534,23 +552,23 @@ public final class TunnelMessage {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
+    @Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(TunnelMessage.Message prototype) {
+    public static Builder newBuilder(Message prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
+    @Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
     }
 
-    @java.lang.Override
+    @Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -560,18 +578,18 @@ public final class TunnelMessage {
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.protocol.Message)
-        TunnelMessage.MessageOrBuilder {
+        MessageOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_Message_descriptor;
       }
 
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      @Override
+      protected FieldAccessorTable
           internalGetFieldAccessorTable() {
         return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_Message_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                TunnelMessage.Message.class, TunnelMessage.Message.Builder.class);
+                Message.class, Builder.class);
       }
 
       // Construct using com.xiaoniucode.etp.core.protocol.TunnelMessage.Message.newBuilder()
@@ -580,11 +598,11 @@ public final class TunnelMessage {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          BuilderParent parent) {
         super(parent);
 
       }
-      @java.lang.Override
+      @Override
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
@@ -596,35 +614,35 @@ public final class TunnelMessage {
         return this;
       }
 
-      @java.lang.Override
+      @Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_Message_descriptor;
       }
 
-      @java.lang.Override
-      public TunnelMessage.Message getDefaultInstanceForType() {
-        return TunnelMessage.Message.getDefaultInstance();
+      @Override
+      public Message getDefaultInstanceForType() {
+        return Message.getDefaultInstance();
       }
 
-      @java.lang.Override
-      public TunnelMessage.Message build() {
-        TunnelMessage.Message result = buildPartial();
+      @Override
+      public Message build() {
+        Message result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      @java.lang.Override
-      public TunnelMessage.Message buildPartial() {
-        TunnelMessage.Message result = new TunnelMessage.Message(this);
+      @Override
+      public Message buildPartial() {
+        Message result = new Message(this);
         if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
       }
 
-      private void buildPartial0(TunnelMessage.Message result) {
+      private void buildPartial0(Message result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.type_ = type_;
@@ -643,18 +661,18 @@ public final class TunnelMessage {
         }
       }
 
-      @java.lang.Override
+      @Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof TunnelMessage.Message) {
-          return mergeFrom((TunnelMessage.Message)other);
+        if (other instanceof Message) {
+          return mergeFrom((Message)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(TunnelMessage.Message other) {
-        if (other == TunnelMessage.Message.getDefaultInstance()) return this;
+      public Builder mergeFrom(Message other) {
+        if (other == Message.getDefaultInstance()) return this;
         if (other.type_ != 0) {
           setTypeValue(other.getTypeValue());
         }
@@ -677,18 +695,18 @@ public final class TunnelMessage {
         return this;
       }
 
-      @java.lang.Override
+      @Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
+      @Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
         if (extensionRegistry == null) {
-          throw new java.lang.NullPointerException();
+          throw new NullPointerException();
         }
         try {
           boolean done = false;
@@ -745,7 +763,7 @@ public final class TunnelMessage {
        * <code>.com.xiaoniucode.etp.core.protocol.Message.Type type = 1;</code>
        * @return The enum numeric value on the wire for type.
        */
-      @java.lang.Override public int getTypeValue() {
+      @Override public int getTypeValue() {
         return type_;
       }
       /**
@@ -763,17 +781,17 @@ public final class TunnelMessage {
        * <code>.com.xiaoniucode.etp.core.protocol.Message.Type type = 1;</code>
        * @return The type.
        */
-      @java.lang.Override
-      public TunnelMessage.Message.Type getType() {
-        TunnelMessage.Message.Type result = TunnelMessage.Message.Type.forNumber(type_);
-        return result == null ? TunnelMessage.Message.Type.UNRECOGNIZED : result;
+      @Override
+      public Type getType() {
+        Type result = Type.forNumber(type_);
+        return result == null ? Type.UNRECOGNIZED : result;
       }
       /**
        * <code>.com.xiaoniucode.etp.core.protocol.Message.Type type = 1;</code>
        * @param value The type to set.
        * @return This builder for chaining.
        */
-      public Builder setType(TunnelMessage.Message.Type value) {
+      public Builder setType(Type value) {
         if (value == null) { throw new NullPointerException(); }
         bitField0_ |= 0x00000001;
         type_ = value.getNumber();
@@ -796,7 +814,7 @@ public final class TunnelMessage {
        * <code>int64 session_id = 2;</code>
        * @return The sessionId.
        */
-      @java.lang.Override
+      @Override
       public long getSessionId() {
         return sessionId_;
       }
@@ -828,7 +846,7 @@ public final class TunnelMessage {
        * <code>bytes payload = 3;</code>
        * @return The payload.
        */
-      @java.lang.Override
+      @Override
       public com.google.protobuf.ByteString getPayload() {
         return payload_;
       }
@@ -860,7 +878,7 @@ public final class TunnelMessage {
        * <code>uint32 port = 4;</code>
        * @return The port.
        */
-      @java.lang.Override
+      @Override
       public int getPort() {
         return port_;
       }
@@ -887,21 +905,21 @@ public final class TunnelMessage {
         return this;
       }
 
-      private java.lang.Object ext_ = "";
+      private Object ext_ = "";
       /**
        * <code>string ext = 5;</code>
        * @return The ext.
        */
-      public java.lang.String getExt() {
-        java.lang.Object ref = ext_;
-        if (!(ref instanceof java.lang.String)) {
+      public String getExt() {
+        Object ref = ext_;
+        if (!(ref instanceof String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
+          String s = bs.toStringUtf8();
           ext_ = s;
           return s;
         } else {
-          return (java.lang.String) ref;
+          return (String) ref;
         }
       }
       /**
@@ -910,11 +928,11 @@ public final class TunnelMessage {
        */
       public com.google.protobuf.ByteString
           getExtBytes() {
-        java.lang.Object ref = ext_;
+        Object ref = ext_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
+                  (String) ref);
           ext_ = b;
           return b;
         } else {
@@ -927,7 +945,7 @@ public final class TunnelMessage {
        * @return This builder for chaining.
        */
       public Builder setExt(
-          java.lang.String value) {
+          String value) {
         if (value == null) { throw new NullPointerException(); }
         ext_ = value;
         bitField0_ |= 0x00000010;
@@ -963,18 +981,18 @@ public final class TunnelMessage {
     }
 
     // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.protocol.Message)
-    private static final TunnelMessage.Message DEFAULT_INSTANCE;
+    private static final Message DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new TunnelMessage.Message();
+      DEFAULT_INSTANCE = new Message();
     }
 
-    public static TunnelMessage.Message getDefaultInstance() {
+    public static Message getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
     private static final com.google.protobuf.Parser<Message>
         PARSER = new com.google.protobuf.AbstractParser<Message>() {
-      @java.lang.Override
+      @Override
       public Message parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -998,13 +1016,2666 @@ public final class TunnelMessage {
       return PARSER;
     }
 
-    @java.lang.Override
+    @Override
     public com.google.protobuf.Parser<Message> getParserForType() {
       return PARSER;
     }
 
-    @java.lang.Override
-    public TunnelMessage.Message getDefaultInstanceForType() {
+    @Override
+    public Message getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface ProxyRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.protocol.ProxyRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string proxy_name = 1;</code>
+     * @return The proxyName.
+     */
+    String getProxyName();
+    /**
+     * <code>string proxy_name = 1;</code>
+     * @return The bytes for proxyName.
+     */
+    com.google.protobuf.ByteString
+        getProxyNameBytes();
+
+    /**
+     * <code>string local_host = 2;</code>
+     * @return The localHost.
+     */
+    String getLocalHost();
+    /**
+     * <code>string local_host = 2;</code>
+     * @return The bytes for localHost.
+     */
+    com.google.protobuf.ByteString
+        getLocalHostBytes();
+
+    /**
+     * <code>uint32 local_port = 3;</code>
+     * @return The localPort.
+     */
+    int getLocalPort();
+
+    /**
+     * <code>string protocol = 4;</code>
+     * @return The protocol.
+     */
+    String getProtocol();
+    /**
+     * <code>string protocol = 4;</code>
+     * @return The bytes for protocol.
+     */
+    com.google.protobuf.ByteString
+        getProtocolBytes();
+
+    /**
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    int getMetadataCount();
+    /**
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    boolean containsMetadata(
+        String key);
+    /**
+     * Use {@link #getMetadataMap()} instead.
+     */
+    @Deprecated
+    java.util.Map<String, String>
+    getMetadata();
+    /**
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    java.util.Map<String, String>
+    getMetadataMap();
+    /**
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    /* nullable */
+String getMetadataOrDefault(
+        String key,
+        /* nullable */
+String defaultValue);
+    /**
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    String getMetadataOrThrow(
+        String key);
+
+    /**
+     * <code>bool auto_start = 6;</code>
+     * @return The autoStart.
+     */
+    boolean getAutoStart();
+  }
+  /**
+   * Protobuf type {@code com.xiaoniucode.etp.core.protocol.ProxyRequest}
+   */
+  public static final class ProxyRequest extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.protocol.ProxyRequest)
+      ProxyRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 31,
+        /* patch= */ 1,
+        /* suffix= */ "",
+        ProxyRequest.class.getName());
+    }
+    // Use ProxyRequest.newBuilder() to construct.
+    private ProxyRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private ProxyRequest() {
+      proxyName_ = "";
+      localHost_ = "";
+      protocol_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_descriptor;
+    }
+
+    @SuppressWarnings({"rawtypes"})
+    @Override
+    protected com.google.protobuf.MapFieldReflectionAccessor internalGetMapFieldReflection(
+        int number) {
+      switch (number) {
+        case 5:
+          return internalGetMetadata();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
+    @Override
+    protected FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              ProxyRequest.class, Builder.class);
+    }
+
+    public static final int PROXY_NAME_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile Object proxyName_ = "";
+    /**
+     * <code>string proxy_name = 1;</code>
+     * @return The proxyName.
+     */
+    @Override
+    public String getProxyName() {
+      Object ref = proxyName_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        proxyName_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string proxy_name = 1;</code>
+     * @return The bytes for proxyName.
+     */
+    @Override
+    public com.google.protobuf.ByteString
+        getProxyNameBytes() {
+      Object ref = proxyName_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        proxyName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LOCAL_HOST_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile Object localHost_ = "";
+    /**
+     * <code>string local_host = 2;</code>
+     * @return The localHost.
+     */
+    @Override
+    public String getLocalHost() {
+      Object ref = localHost_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        localHost_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string local_host = 2;</code>
+     * @return The bytes for localHost.
+     */
+    @Override
+    public com.google.protobuf.ByteString
+        getLocalHostBytes() {
+      Object ref = localHost_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        localHost_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LOCAL_PORT_FIELD_NUMBER = 3;
+    private int localPort_ = 0;
+    /**
+     * <code>uint32 local_port = 3;</code>
+     * @return The localPort.
+     */
+    @Override
+    public int getLocalPort() {
+      return localPort_;
+    }
+
+    public static final int PROTOCOL_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private volatile Object protocol_ = "";
+    /**
+     * <code>string protocol = 4;</code>
+     * @return The protocol.
+     */
+    @Override
+    public String getProtocol() {
+      Object ref = protocol_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        protocol_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string protocol = 4;</code>
+     * @return The bytes for protocol.
+     */
+    @Override
+    public com.google.protobuf.ByteString
+        getProtocolBytes() {
+      Object ref = protocol_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        protocol_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int METADATA_FIELD_NUMBER = 5;
+    private static final class MetadataDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          String, String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<String, String>newDefaultInstance(
+                  TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_MetadataEntry_descriptor,
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    @SuppressWarnings("serial")
+    private com.google.protobuf.MapField<
+        String, String> metadata_;
+    private com.google.protobuf.MapField<String, String>
+    internalGetMetadata() {
+      if (metadata_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            MetadataDefaultEntryHolder.defaultEntry);
+      }
+      return metadata_;
+    }
+    public int getMetadataCount() {
+      return internalGetMetadata().getMap().size();
+    }
+    /**
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    @Override
+    public boolean containsMetadata(
+        String key) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      return internalGetMetadata().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getMetadataMap()} instead.
+     */
+    @Override
+    @Deprecated
+    public java.util.Map<String, String> getMetadata() {
+      return getMetadataMap();
+    }
+    /**
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    @Override
+    public java.util.Map<String, String> getMetadataMap() {
+      return internalGetMetadata().getMap();
+    }
+    /**
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    @Override
+    public /* nullable */
+String getMetadataOrDefault(
+        String key,
+        /* nullable */
+String defaultValue) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      java.util.Map<String, String> map =
+          internalGetMetadata().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    @Override
+    public String getMetadataOrThrow(
+        String key) {
+      if (key == null) { throw new NullPointerException("map key"); }
+      java.util.Map<String, String> map =
+          internalGetMetadata().getMap();
+      if (!map.containsKey(key)) {
+        throw new IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
+    public static final int AUTO_START_FIELD_NUMBER = 6;
+    private boolean autoStart_ = false;
+    /**
+     * <code>bool auto_start = 6;</code>
+     * @return The autoStart.
+     */
+    @Override
+    public boolean getAutoStart() {
+      return autoStart_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyName_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, proxyName_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(localHost_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, localHost_);
+      }
+      if (localPort_ != 0) {
+        output.writeUInt32(3, localPort_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(protocol_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 4, protocol_);
+      }
+      com.google.protobuf.GeneratedMessage
+        .serializeStringMapTo(
+          output,
+          internalGetMetadata(),
+          MetadataDefaultEntryHolder.defaultEntry,
+          5);
+      if (autoStart_ != false) {
+        output.writeBool(6, autoStart_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyName_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, proxyName_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(localHost_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, localHost_);
+      }
+      if (localPort_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(3, localPort_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(protocol_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, protocol_);
+      }
+      for (java.util.Map.Entry<String, String> entry
+           : internalGetMetadata().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<String, String>
+        metadata__ = MetadataDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(5, metadata__);
+      }
+      if (autoStart_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(6, autoStart_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof ProxyRequest)) {
+        return super.equals(obj);
+      }
+      ProxyRequest other = (ProxyRequest) obj;
+
+      if (!getProxyName()
+          .equals(other.getProxyName())) return false;
+      if (!getLocalHost()
+          .equals(other.getLocalHost())) return false;
+      if (getLocalPort()
+          != other.getLocalPort()) return false;
+      if (!getProtocol()
+          .equals(other.getProtocol())) return false;
+      if (!internalGetMetadata().equals(
+          other.internalGetMetadata())) return false;
+      if (getAutoStart()
+          != other.getAutoStart()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + PROXY_NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getProxyName().hashCode();
+      hash = (37 * hash) + LOCAL_HOST_FIELD_NUMBER;
+      hash = (53 * hash) + getLocalHost().hashCode();
+      hash = (37 * hash) + LOCAL_PORT_FIELD_NUMBER;
+      hash = (53 * hash) + getLocalPort();
+      hash = (37 * hash) + PROTOCOL_FIELD_NUMBER;
+      hash = (53 * hash) + getProtocol().hashCode();
+      if (!internalGetMetadata().getMap().isEmpty()) {
+        hash = (37 * hash) + METADATA_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetMetadata().hashCode();
+      }
+      hash = (37 * hash) + AUTO_START_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getAutoStart());
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static ProxyRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ProxyRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ProxyRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ProxyRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ProxyRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ProxyRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ProxyRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static ProxyRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static ProxyRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static ProxyRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static ProxyRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static ProxyRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(ProxyRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @Override
+    protected Builder newBuilderForType(
+        BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code com.xiaoniucode.etp.core.protocol.ProxyRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.protocol.ProxyRequest)
+        ProxyRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_descriptor;
+      }
+
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapFieldReflectionAccessor internalGetMapFieldReflection(
+          int number) {
+        switch (number) {
+          case 5:
+            return internalGetMetadata();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapFieldReflectionAccessor internalGetMutableMapFieldReflection(
+          int number) {
+        switch (number) {
+          case 5:
+            return internalGetMutableMetadata();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @Override
+      protected FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                ProxyRequest.class, Builder.class);
+      }
+
+      // Construct using com.xiaoniucode.etp.core.protocol.TunnelMessage.ProxyRequest.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          BuilderParent parent) {
+        super(parent);
+
+      }
+      @Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        proxyName_ = "";
+        localHost_ = "";
+        localPort_ = 0;
+        protocol_ = "";
+        internalGetMutableMetadata().clear();
+        autoStart_ = false;
+        return this;
+      }
+
+      @Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_descriptor;
+      }
+
+      @Override
+      public ProxyRequest getDefaultInstanceForType() {
+        return ProxyRequest.getDefaultInstance();
+      }
+
+      @Override
+      public ProxyRequest build() {
+        ProxyRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @Override
+      public ProxyRequest buildPartial() {
+        ProxyRequest result = new ProxyRequest(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(ProxyRequest result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.proxyName_ = proxyName_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.localHost_ = localHost_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.localPort_ = localPort_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.protocol_ = protocol_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.metadata_ = internalGetMetadata();
+          result.metadata_.makeImmutable();
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.autoStart_ = autoStart_;
+        }
+      }
+
+      @Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof ProxyRequest) {
+          return mergeFrom((ProxyRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(ProxyRequest other) {
+        if (other == ProxyRequest.getDefaultInstance()) return this;
+        if (!other.getProxyName().isEmpty()) {
+          proxyName_ = other.proxyName_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (!other.getLocalHost().isEmpty()) {
+          localHost_ = other.localHost_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (other.getLocalPort() != 0) {
+          setLocalPort(other.getLocalPort());
+        }
+        if (!other.getProtocol().isEmpty()) {
+          protocol_ = other.protocol_;
+          bitField0_ |= 0x00000008;
+          onChanged();
+        }
+        internalGetMutableMetadata().mergeFrom(
+            other.internalGetMetadata());
+        bitField0_ |= 0x00000010;
+        if (other.getAutoStart() != false) {
+          setAutoStart(other.getAutoStart());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                proxyName_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                localHost_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 24: {
+                localPort_ = input.readUInt32();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              case 34: {
+                protocol_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
+              case 42: {
+                com.google.protobuf.MapEntry<String, String>
+                metadata__ = input.readMessage(
+                    MetadataDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+                internalGetMutableMetadata().getMutableMap().put(
+                    metadata__.getKey(), metadata__.getValue());
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
+              case 48: {
+                autoStart_ = input.readBool();
+                bitField0_ |= 0x00000020;
+                break;
+              } // case 48
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private Object proxyName_ = "";
+      /**
+       * <code>string proxy_name = 1;</code>
+       * @return The proxyName.
+       */
+      public String getProxyName() {
+        Object ref = proxyName_;
+        if (!(ref instanceof String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          String s = bs.toStringUtf8();
+          proxyName_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>string proxy_name = 1;</code>
+       * @return The bytes for proxyName.
+       */
+      public com.google.protobuf.ByteString
+          getProxyNameBytes() {
+        Object ref = proxyName_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          proxyName_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string proxy_name = 1;</code>
+       * @param value The proxyName to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyName(
+          String value) {
+        if (value == null) { throw new NullPointerException(); }
+        proxyName_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_name = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProxyName() {
+        proxyName_ = getDefaultInstance().getProxyName();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_name = 1;</code>
+       * @param value The bytes for proxyName to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        proxyName_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private Object localHost_ = "";
+      /**
+       * <code>string local_host = 2;</code>
+       * @return The localHost.
+       */
+      public String getLocalHost() {
+        Object ref = localHost_;
+        if (!(ref instanceof String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          String s = bs.toStringUtf8();
+          localHost_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>string local_host = 2;</code>
+       * @return The bytes for localHost.
+       */
+      public com.google.protobuf.ByteString
+          getLocalHostBytes() {
+        Object ref = localHost_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          localHost_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string local_host = 2;</code>
+       * @param value The localHost to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLocalHost(
+          String value) {
+        if (value == null) { throw new NullPointerException(); }
+        localHost_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string local_host = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLocalHost() {
+        localHost_ = getDefaultInstance().getLocalHost();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string local_host = 2;</code>
+       * @param value The bytes for localHost to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLocalHostBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        localHost_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private int localPort_ ;
+      /**
+       * <code>uint32 local_port = 3;</code>
+       * @return The localPort.
+       */
+      @Override
+      public int getLocalPort() {
+        return localPort_;
+      }
+      /**
+       * <code>uint32 local_port = 3;</code>
+       * @param value The localPort to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLocalPort(int value) {
+
+        localPort_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>uint32 local_port = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLocalPort() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        localPort_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private Object protocol_ = "";
+      /**
+       * <code>string protocol = 4;</code>
+       * @return The protocol.
+       */
+      public String getProtocol() {
+        Object ref = protocol_;
+        if (!(ref instanceof String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          String s = bs.toStringUtf8();
+          protocol_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>string protocol = 4;</code>
+       * @return The bytes for protocol.
+       */
+      public com.google.protobuf.ByteString
+          getProtocolBytes() {
+        Object ref = protocol_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          protocol_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string protocol = 4;</code>
+       * @param value The protocol to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProtocol(
+          String value) {
+        if (value == null) { throw new NullPointerException(); }
+        protocol_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string protocol = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProtocol() {
+        protocol_ = getDefaultInstance().getProtocol();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string protocol = 4;</code>
+       * @param value The bytes for protocol to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProtocolBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        protocol_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.MapField<
+          String, String> metadata_;
+      private com.google.protobuf.MapField<String, String>
+          internalGetMetadata() {
+        if (metadata_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              MetadataDefaultEntryHolder.defaultEntry);
+        }
+        return metadata_;
+      }
+      private com.google.protobuf.MapField<String, String>
+          internalGetMutableMetadata() {
+        if (metadata_ == null) {
+          metadata_ = com.google.protobuf.MapField.newMapField(
+              MetadataDefaultEntryHolder.defaultEntry);
+        }
+        if (!metadata_.isMutable()) {
+          metadata_ = metadata_.copy();
+        }
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return metadata_;
+      }
+      public int getMetadataCount() {
+        return internalGetMetadata().getMap().size();
+      }
+      /**
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+      @Override
+      public boolean containsMetadata(
+          String key) {
+        if (key == null) { throw new NullPointerException("map key"); }
+        return internalGetMetadata().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getMetadataMap()} instead.
+       */
+      @Override
+      @Deprecated
+      public java.util.Map<String, String> getMetadata() {
+        return getMetadataMap();
+      }
+      /**
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+      @Override
+      public java.util.Map<String, String> getMetadataMap() {
+        return internalGetMetadata().getMap();
+      }
+      /**
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+      @Override
+      public /* nullable */
+String getMetadataOrDefault(
+          String key,
+          /* nullable */
+String defaultValue) {
+        if (key == null) { throw new NullPointerException("map key"); }
+        java.util.Map<String, String> map =
+            internalGetMetadata().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+      @Override
+      public String getMetadataOrThrow(
+          String key) {
+        if (key == null) { throw new NullPointerException("map key"); }
+        java.util.Map<String, String> map =
+            internalGetMetadata().getMap();
+        if (!map.containsKey(key)) {
+          throw new IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+      public Builder clearMetadata() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        internalGetMutableMetadata().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+      public Builder removeMetadata(
+          String key) {
+        if (key == null) { throw new NullPointerException("map key"); }
+        internalGetMutableMetadata().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @Deprecated
+      public java.util.Map<String, String>
+          getMutableMetadata() {
+        bitField0_ |= 0x00000010;
+        return internalGetMutableMetadata().getMutableMap();
+      }
+      /**
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+      public Builder putMetadata(
+          String key,
+          String value) {
+        if (key == null) { throw new NullPointerException("map key"); }
+        if (value == null) { throw new NullPointerException("map value"); }
+        internalGetMutableMetadata().getMutableMap()
+            .put(key, value);
+        bitField0_ |= 0x00000010;
+        return this;
+      }
+      /**
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+      public Builder putAllMetadata(
+          java.util.Map<String, String> values) {
+        internalGetMutableMetadata().getMutableMap()
+            .putAll(values);
+        bitField0_ |= 0x00000010;
+        return this;
+      }
+
+      private boolean autoStart_ ;
+      /**
+       * <code>bool auto_start = 6;</code>
+       * @return The autoStart.
+       */
+      @Override
+      public boolean getAutoStart() {
+        return autoStart_;
+      }
+      /**
+       * <code>bool auto_start = 6;</code>
+       * @param value The autoStart to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAutoStart(boolean value) {
+
+        autoStart_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool auto_start = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAutoStart() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        autoStart_ = false;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.protocol.ProxyRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.protocol.ProxyRequest)
+    private static final ProxyRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new ProxyRequest();
+    }
+
+    public static ProxyRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ProxyRequest>
+        PARSER = new com.google.protobuf.AbstractParser<ProxyRequest>() {
+      @Override
+      public ProxyRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<ProxyRequest> parser() {
+      return PARSER;
+    }
+
+    @Override
+    public com.google.protobuf.Parser<ProxyRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @Override
+    public ProxyRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface ProxyUnregisterRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string proxy_id = 1;</code>
+     * @return The proxyId.
+     */
+    String getProxyId();
+    /**
+     * <code>string proxy_id = 1;</code>
+     * @return The bytes for proxyId.
+     */
+    com.google.protobuf.ByteString
+        getProxyIdBytes();
+  }
+  /**
+   * Protobuf type {@code com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest}
+   */
+  public static final class ProxyUnregisterRequest extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest)
+      ProxyUnregisterRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 31,
+        /* patch= */ 1,
+        /* suffix= */ "",
+        ProxyUnregisterRequest.class.getName());
+    }
+    // Use ProxyUnregisterRequest.newBuilder() to construct.
+    private ProxyUnregisterRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private ProxyUnregisterRequest() {
+      proxyId_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor;
+    }
+
+    @Override
+    protected FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              ProxyUnregisterRequest.class, Builder.class);
+    }
+
+    public static final int PROXY_ID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile Object proxyId_ = "";
+    /**
+     * <code>string proxy_id = 1;</code>
+     * @return The proxyId.
+     */
+    @Override
+    public String getProxyId() {
+      Object ref = proxyId_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        proxyId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string proxy_id = 1;</code>
+     * @return The bytes for proxyId.
+     */
+    @Override
+    public com.google.protobuf.ByteString
+        getProxyIdBytes() {
+      Object ref = proxyId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        proxyId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, proxyId_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, proxyId_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof ProxyUnregisterRequest)) {
+        return super.equals(obj);
+      }
+      ProxyUnregisterRequest other = (ProxyUnregisterRequest) obj;
+
+      if (!getProxyId()
+          .equals(other.getProxyId())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + PROXY_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getProxyId().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static ProxyUnregisterRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ProxyUnregisterRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ProxyUnregisterRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ProxyUnregisterRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ProxyUnregisterRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ProxyUnregisterRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ProxyUnregisterRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static ProxyUnregisterRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static ProxyUnregisterRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static ProxyUnregisterRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static ProxyUnregisterRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static ProxyUnregisterRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(ProxyUnregisterRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @Override
+    protected Builder newBuilderForType(
+        BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest)
+        ProxyUnregisterRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor;
+      }
+
+      @Override
+      protected FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                ProxyUnregisterRequest.class, Builder.class);
+      }
+
+      // Construct using com.xiaoniucode.etp.core.protocol.TunnelMessage.ProxyUnregisterRequest.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          BuilderParent parent) {
+        super(parent);
+
+      }
+      @Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        proxyId_ = "";
+        return this;
+      }
+
+      @Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor;
+      }
+
+      @Override
+      public ProxyUnregisterRequest getDefaultInstanceForType() {
+        return ProxyUnregisterRequest.getDefaultInstance();
+      }
+
+      @Override
+      public ProxyUnregisterRequest build() {
+        ProxyUnregisterRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @Override
+      public ProxyUnregisterRequest buildPartial() {
+        ProxyUnregisterRequest result = new ProxyUnregisterRequest(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(ProxyUnregisterRequest result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.proxyId_ = proxyId_;
+        }
+      }
+
+      @Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof ProxyUnregisterRequest) {
+          return mergeFrom((ProxyUnregisterRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(ProxyUnregisterRequest other) {
+        if (other == ProxyUnregisterRequest.getDefaultInstance()) return this;
+        if (!other.getProxyId().isEmpty()) {
+          proxyId_ = other.proxyId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                proxyId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private Object proxyId_ = "";
+      /**
+       * <code>string proxy_id = 1;</code>
+       * @return The proxyId.
+       */
+      public String getProxyId() {
+        Object ref = proxyId_;
+        if (!(ref instanceof String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          String s = bs.toStringUtf8();
+          proxyId_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>string proxy_id = 1;</code>
+       * @return The bytes for proxyId.
+       */
+      public com.google.protobuf.ByteString
+          getProxyIdBytes() {
+        Object ref = proxyId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          proxyId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string proxy_id = 1;</code>
+       * @param value The proxyId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyId(
+          String value) {
+        if (value == null) { throw new NullPointerException(); }
+        proxyId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProxyId() {
+        proxyId_ = getDefaultInstance().getProxyId();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_id = 1;</code>
+       * @param value The bytes for proxyId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        proxyId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest)
+    private static final ProxyUnregisterRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new ProxyUnregisterRequest();
+    }
+
+    public static ProxyUnregisterRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ProxyUnregisterRequest>
+        PARSER = new com.google.protobuf.AbstractParser<ProxyUnregisterRequest>() {
+      @Override
+      public ProxyUnregisterRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<ProxyUnregisterRequest> parser() {
+      return PARSER;
+    }
+
+    @Override
+    public com.google.protobuf.Parser<ProxyUnregisterRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @Override
+    public ProxyUnregisterRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface ProxyResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.protocol.ProxyResponse)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>bool success = 1;</code>
+     * @return The success.
+     */
+    boolean getSuccess();
+
+    /**
+     * <code>string message = 2;</code>
+     * @return The message.
+     */
+    String getMessage();
+    /**
+     * <code>string message = 2;</code>
+     * @return The bytes for message.
+     */
+    com.google.protobuf.ByteString
+        getMessageBytes();
+
+    /**
+     * <code>string proxy_id = 3;</code>
+     * @return The proxyId.
+     */
+    String getProxyId();
+    /**
+     * <code>string proxy_id = 3;</code>
+     * @return The bytes for proxyId.
+     */
+    com.google.protobuf.ByteString
+        getProxyIdBytes();
+
+    /**
+     * <code>string external_url = 4;</code>
+     * @return The externalUrl.
+     */
+    String getExternalUrl();
+    /**
+     * <code>string external_url = 4;</code>
+     * @return The bytes for externalUrl.
+     */
+    com.google.protobuf.ByteString
+        getExternalUrlBytes();
+  }
+  /**
+   * Protobuf type {@code com.xiaoniucode.etp.core.protocol.ProxyResponse}
+   */
+  public static final class ProxyResponse extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.protocol.ProxyResponse)
+      ProxyResponseOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 31,
+        /* patch= */ 1,
+        /* suffix= */ "",
+        ProxyResponse.class.getName());
+    }
+    // Use ProxyResponse.newBuilder() to construct.
+    private ProxyResponse(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private ProxyResponse() {
+      message_ = "";
+      proxyId_ = "";
+      externalUrl_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_descriptor;
+    }
+
+    @Override
+    protected FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              ProxyResponse.class, Builder.class);
+    }
+
+    public static final int SUCCESS_FIELD_NUMBER = 1;
+    private boolean success_ = false;
+    /**
+     * <code>bool success = 1;</code>
+     * @return The success.
+     */
+    @Override
+    public boolean getSuccess() {
+      return success_;
+    }
+
+    public static final int MESSAGE_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile Object message_ = "";
+    /**
+     * <code>string message = 2;</code>
+     * @return The message.
+     */
+    @Override
+    public String getMessage() {
+      Object ref = message_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        message_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string message = 2;</code>
+     * @return The bytes for message.
+     */
+    @Override
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      Object ref = message_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        message_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PROXY_ID_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile Object proxyId_ = "";
+    /**
+     * <code>string proxy_id = 3;</code>
+     * @return The proxyId.
+     */
+    @Override
+    public String getProxyId() {
+      Object ref = proxyId_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        proxyId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string proxy_id = 3;</code>
+     * @return The bytes for proxyId.
+     */
+    @Override
+    public com.google.protobuf.ByteString
+        getProxyIdBytes() {
+      Object ref = proxyId_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        proxyId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int EXTERNAL_URL_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private volatile Object externalUrl_ = "";
+    /**
+     * <code>string external_url = 4;</code>
+     * @return The externalUrl.
+     */
+    @Override
+    public String getExternalUrl() {
+      Object ref = externalUrl_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        externalUrl_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string external_url = 4;</code>
+     * @return The bytes for externalUrl.
+     */
+    @Override
+    public com.google.protobuf.ByteString
+        getExternalUrlBytes() {
+      Object ref = externalUrl_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b =
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        externalUrl_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (success_ != false) {
+        output.writeBool(1, success_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(message_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, message_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 3, proxyId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(externalUrl_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 4, externalUrl_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (success_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(1, success_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(message_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, message_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, proxyId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(externalUrl_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, externalUrl_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof ProxyResponse)) {
+        return super.equals(obj);
+      }
+      ProxyResponse other = (ProxyResponse) obj;
+
+      if (getSuccess()
+          != other.getSuccess()) return false;
+      if (!getMessage()
+          .equals(other.getMessage())) return false;
+      if (!getProxyId()
+          .equals(other.getProxyId())) return false;
+      if (!getExternalUrl()
+          .equals(other.getExternalUrl())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + SUCCESS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getSuccess());
+      hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getMessage().hashCode();
+      hash = (37 * hash) + PROXY_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getProxyId().hashCode();
+      hash = (37 * hash) + EXTERNAL_URL_FIELD_NUMBER;
+      hash = (53 * hash) + getExternalUrl().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static ProxyResponse parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ProxyResponse parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ProxyResponse parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ProxyResponse parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ProxyResponse parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ProxyResponse parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ProxyResponse parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static ProxyResponse parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static ProxyResponse parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static ProxyResponse parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static ProxyResponse parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static ProxyResponse parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(ProxyResponse prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @Override
+    protected Builder newBuilderForType(
+        BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code com.xiaoniucode.etp.core.protocol.ProxyResponse}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.protocol.ProxyResponse)
+        ProxyResponseOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_descriptor;
+      }
+
+      @Override
+      protected FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                ProxyResponse.class, Builder.class);
+      }
+
+      // Construct using com.xiaoniucode.etp.core.protocol.TunnelMessage.ProxyResponse.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          BuilderParent parent) {
+        super(parent);
+
+      }
+      @Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        success_ = false;
+        message_ = "";
+        proxyId_ = "";
+        externalUrl_ = "";
+        return this;
+      }
+
+      @Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_descriptor;
+      }
+
+      @Override
+      public ProxyResponse getDefaultInstanceForType() {
+        return ProxyResponse.getDefaultInstance();
+      }
+
+      @Override
+      public ProxyResponse build() {
+        ProxyResponse result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @Override
+      public ProxyResponse buildPartial() {
+        ProxyResponse result = new ProxyResponse(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(ProxyResponse result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.success_ = success_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.message_ = message_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.proxyId_ = proxyId_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.externalUrl_ = externalUrl_;
+        }
+      }
+
+      @Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof ProxyResponse) {
+          return mergeFrom((ProxyResponse)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(ProxyResponse other) {
+        if (other == ProxyResponse.getDefaultInstance()) return this;
+        if (other.getSuccess() != false) {
+          setSuccess(other.getSuccess());
+        }
+        if (!other.getMessage().isEmpty()) {
+          message_ = other.message_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (!other.getProxyId().isEmpty()) {
+          proxyId_ = other.proxyId_;
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        if (!other.getExternalUrl().isEmpty()) {
+          externalUrl_ = other.externalUrl_;
+          bitField0_ |= 0x00000008;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                success_ = input.readBool();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 18: {
+                message_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                proxyId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              case 34: {
+                externalUrl_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private boolean success_ ;
+      /**
+       * <code>bool success = 1;</code>
+       * @return The success.
+       */
+      @Override
+      public boolean getSuccess() {
+        return success_;
+      }
+      /**
+       * <code>bool success = 1;</code>
+       * @param value The success to set.
+       * @return This builder for chaining.
+       */
+      public Builder setSuccess(boolean value) {
+
+        success_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool success = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearSuccess() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        success_ = false;
+        onChanged();
+        return this;
+      }
+
+      private Object message_ = "";
+      /**
+       * <code>string message = 2;</code>
+       * @return The message.
+       */
+      public String getMessage() {
+        Object ref = message_;
+        if (!(ref instanceof String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          String s = bs.toStringUtf8();
+          message_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>string message = 2;</code>
+       * @return The bytes for message.
+       */
+      public com.google.protobuf.ByteString
+          getMessageBytes() {
+        Object ref = message_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          message_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string message = 2;</code>
+       * @param value The message to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMessage(
+          String value) {
+        if (value == null) { throw new NullPointerException(); }
+        message_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string message = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMessage() {
+        message_ = getDefaultInstance().getMessage();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string message = 2;</code>
+       * @param value The bytes for message to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        message_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private Object proxyId_ = "";
+      /**
+       * <code>string proxy_id = 3;</code>
+       * @return The proxyId.
+       */
+      public String getProxyId() {
+        Object ref = proxyId_;
+        if (!(ref instanceof String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          String s = bs.toStringUtf8();
+          proxyId_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>string proxy_id = 3;</code>
+       * @return The bytes for proxyId.
+       */
+      public com.google.protobuf.ByteString
+          getProxyIdBytes() {
+        Object ref = proxyId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          proxyId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string proxy_id = 3;</code>
+       * @param value The proxyId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyId(
+          String value) {
+        if (value == null) { throw new NullPointerException(); }
+        proxyId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_id = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProxyId() {
+        proxyId_ = getDefaultInstance().getProxyId();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_id = 3;</code>
+       * @param value The bytes for proxyId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        proxyId_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      private Object externalUrl_ = "";
+      /**
+       * <code>string external_url = 4;</code>
+       * @return The externalUrl.
+       */
+      public String getExternalUrl() {
+        Object ref = externalUrl_;
+        if (!(ref instanceof String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          String s = bs.toStringUtf8();
+          externalUrl_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>string external_url = 4;</code>
+       * @return The bytes for externalUrl.
+       */
+      public com.google.protobuf.ByteString
+          getExternalUrlBytes() {
+        Object ref = externalUrl_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b =
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          externalUrl_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string external_url = 4;</code>
+       * @param value The externalUrl to set.
+       * @return This builder for chaining.
+       */
+      public Builder setExternalUrl(
+          String value) {
+        if (value == null) { throw new NullPointerException(); }
+        externalUrl_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string external_url = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearExternalUrl() {
+        externalUrl_ = getDefaultInstance().getExternalUrl();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string external_url = 4;</code>
+       * @param value The bytes for externalUrl to set.
+       * @return This builder for chaining.
+       */
+      public Builder setExternalUrlBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        externalUrl_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.protocol.ProxyResponse)
+    }
+
+    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.protocol.ProxyResponse)
+    private static final ProxyResponse DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new ProxyResponse();
+    }
+
+    public static ProxyResponse getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ProxyResponse>
+        PARSER = new com.google.protobuf.AbstractParser<ProxyResponse>() {
+      @Override
+      public ProxyResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<ProxyResponse> parser() {
+      return PARSER;
+    }
+
+    @Override
+    public com.google.protobuf.Parser<ProxyResponse> getParserForType() {
+      return PARSER;
+    }
+
+    @Override
+    public ProxyResponse getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -1015,6 +3686,26 @@ public final class TunnelMessage {
   private static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_xiaoniucode_etp_core_protocol_Message_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_descriptor;
+  private static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_MetadataEntry_descriptor;
+  private static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_MetadataEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor;
+  private static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_descriptor;
+  private static final
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1023,15 +3714,26 @@ public final class TunnelMessage {
   private static  com.google.protobuf.Descriptors.FileDescriptor
       descriptor;
   static {
-    java.lang.String[] descriptorData = {
+    String[] descriptorData = {
       "\n\023TunnelMessage.proto\022!com.xiaoniucode.e" +
-      "tp.core.protocol\"\337\001\n\007Message\022=\n\004type\030\001 \001" +
+      "tp.core.protocol\"\211\002\n\007Message\022=\n\004type\030\001 \001" +
       "(\0162/.com.xiaoniucode.etp.core.protocol.M" +
       "essage.Type\022\022\n\nsession_id\030\002 \001(\003\022\017\n\007paylo" +
-      "ad\030\003 \001(\014\022\014\n\004port\030\004 \001(\r\022\013\n\003ext\030\005 \001(\t\"U\n\004T" +
+      "ad\030\003 \001(\014\022\014\n\004port\030\004 \001(\r\022\013\n\003ext\030\005 \001(\t\"\177\n\004T" +
       "ype\022\010\n\004AUTH\020\000\022\013\n\007CONNECT\020\001\022\016\n\nDISCONNECT" +
       "\020\002\022\014\n\010TRANSFER\020\003\022\r\n\tHEARTBEAT\020\004\022\t\n\005ERROR" +
-      "\020\005B\017B\rTunnelMessageb\006proto3"
+      "\020\005\022\022\n\016PROXY_REGISTER\020\006\022\024\n\020PROXY_UNREGIST" +
+      "ER\020\007\"\362\001\n\014ProxyRequest\022\022\n\nproxy_name\030\001 \001(" +
+      "\t\022\022\n\nlocal_host\030\002 \001(\t\022\022\n\nlocal_port\030\003 \001(" +
+      "\r\022\020\n\010protocol\030\004 \001(\t\022O\n\010metadata\030\005 \003(\0132=." +
+      "com.xiaoniucode.etp.core.protocol.ProxyR" +
+      "equest.MetadataEntry\022\022\n\nauto_start\030\006 \001(\010" +
+      "\032/\n\rMetadataEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030" +
+      "\002 \001(\t:\0028\001\"*\n\026ProxyUnregisterRequest\022\020\n\010p" +
+      "roxy_id\030\001 \001(\t\"Y\n\rProxyResponse\022\017\n\007succes" +
+      "s\030\001 \001(\010\022\017\n\007message\030\002 \001(\t\022\020\n\010proxy_id\030\003 \001" +
+      "(\t\022\024\n\014external_url\030\004 \001(\tB\017B\rTunnelMessag" +
+      "eb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -1042,7 +3744,31 @@ public final class TunnelMessage {
     internal_static_com_xiaoniucode_etp_core_protocol_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_protocol_Message_descriptor,
-        new java.lang.String[] { "Type", "SessionId", "Payload", "Port", "Ext", });
+        new String[] { "Type", "SessionId", "Payload", "Port", "Ext", });
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_descriptor,
+        new String[] { "ProxyName", "LocalHost", "LocalPort", "Protocol", "Metadata", "AutoStart", });
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_MetadataEntry_descriptor =
+      internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_descriptor.getNestedTypes().get(0);
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_MetadataEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_MetadataEntry_descriptor,
+        new String[] { "Key", "Value", });
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor,
+        new String[] { "ProxyId", });
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_descriptor,
+        new String[] { "Success", "Message", "ProxyId", "ExternalUrl", });
     descriptor.resolveAllFeaturesImmutable();
   }
 

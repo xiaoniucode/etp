@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <name>etp-spring-boot-starter</name>
-    <description>一个内网穿透工具客户端</description>
+    <description>内网穿透工具客户端，支持SpringBoot 2.x版本</description>
     <url>https://github.com/xiaoniucode/etp</url>
 
     <properties>
