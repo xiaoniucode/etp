@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.transaction;
 
-import com.xiaoniucode.etp.server.Constants;
+import com.xiaoniucode.etp.common.Constants;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

@@ -2,12 +2,11 @@ package com.xiaoniucode.etp.client;
 
 import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.common.ConfigUtils;
+import com.xiaoniucode.etp.common.Constants;
 import com.xiaoniucode.etp.common.LogbackConfigurator;
 import com.xiaoniucode.etp.common.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 /**
  * 客户端服务启动类
@@ -16,7 +15,6 @@ import java.io.File;
  */
 public class TunnelClientStartup {
     private static final Logger logger = LoggerFactory.getLogger(TunnelClientStartup.class);
-    private static final String DEFAULT_CONFIG_NAME = "etpc.toml";
     private static TunnelClient tunnelClient;
 
     static {
@@ -24,7 +22,7 @@ public class TunnelClientStartup {
     }
 
     public static void main(String[] args) {
-        String configPath = ConfigUtils.getConfigPath(args, DEFAULT_CONFIG_NAME);
+        String configPath = ConfigUtils.getConfigPath(args, Constants.DEFAULT_CLIENT_CONFIG_NAME);
         if (!StringUtils.hasText(configPath)) {
             System.err.println("请指定配置文件路径！");
             return;
@@ -43,8 +41,8 @@ public class TunnelClientStartup {
         String path = config.getLogPath();
         String pattern = config.getLogPattern();
         new LogbackConfigurator.LogbackConfigBuilder()
-            .setLogFilePath(StringUtils.hasText(path) ? path : ("logs" + File.separator + "etps.log"))
-            .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : ("logs" + File.separator + "etps.%d{yyyy-MM-dd}.log"))
+            .setLogFilePath(StringUtils.hasText(path) ? path : (Constants.LOG_BASE_PATH + Constants.DEFAULT_CLIENT_LOG_NAME))
+            .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : (Constants.LOG_BASE_PATH + Constants.DEFAULT_CLIENT_LOG_PATTERN))
             .setLogLevel(!StringUtils.hasText(leve) ? Level.INFO : Level.toLevel(leve, Level.INFO))
             .build()
             .configureLogback();

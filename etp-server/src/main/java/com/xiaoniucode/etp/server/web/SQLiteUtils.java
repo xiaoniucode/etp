@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web;
 
-import com.xiaoniucode.etp.server.Constants;
+import com.xiaoniucode.etp.common.Constants;
 import com.xiaoniucode.etp.server.web.transaction.SQLiteConnectionHolder;
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -35,7 +35,7 @@
             <id>native</id>
             <activation>
                 <property>
-                    <name>env.GRAALVM_HOME</name> <!-- 只有GraalVM环境存在时才激活 -->
+                    <name>env.GRAALVM_HOME</name>
                 </property>
             </activation>
             <build>

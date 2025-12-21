@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server;
 
 import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.common.ConfigUtils;
+import com.xiaoniucode.etp.common.Constants;
 import com.xiaoniucode.etp.common.LogbackConfigurator;
 import com.xiaoniucode.etp.common.PortChecker;
 import com.xiaoniucode.etp.common.StringUtils;
@@ -13,8 +14,6 @@ import com.xiaoniucode.etp.server.web.server.NettyWebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-
 /**
  * 代理服务启动类
  *
@@ -23,7 +22,6 @@ import java.io.File;
 public class TunnelServerStartup {
     private static TunnelServer tunnelServer;
     private static NettyWebServer webServer;
-    private static final String DEFAULT_CONFIG_NAME = "etps.toml";
     private static final Logger logger = LoggerFactory.getLogger(TunnelServerStartup.class);
 
     static {
@@ -31,7 +29,7 @@ public class TunnelServerStartup {
     }
 
     public static void main(String[] args) {
-        String configPath = ConfigUtils.getConfigPath(args, DEFAULT_CONFIG_NAME);
+        String configPath = ConfigUtils.getConfigPath(args, Constants.DEFAULT_SERVER_CONFIG_NAME);
         if (configPath == null) {
             System.err.println("请指定配置文件路径！");
             return;
@@ -68,8 +66,8 @@ public class TunnelServerStartup {
         String path = log.getPath();
         String pattern = log.getPattern();
         new LogbackConfigurator.LogbackConfigBuilder()
-            .setLogFilePath(StringUtils.hasText(path) ? path : ("logs" + File.separator + "etps.log"))
-            .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : ("logs" + File.separator + "etps.%d{yyyy-MM-dd}.log.gz"))
+            .setLogFilePath(StringUtils.hasText(path) ? path : (Constants.LOG_BASE_PATH + Constants.DEFAULT_SERVER_LOG_NAME))
+            .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : (Constants.LOG_BASE_PATH + Constants.DEFAULT_SERVER_LOG_PATTERN))
             .setLogLevel(!StringUtils.hasText(leve) ? Level.INFO : Level.toLevel(leve, Level.INFO))
             .build()
             .configureLogback();

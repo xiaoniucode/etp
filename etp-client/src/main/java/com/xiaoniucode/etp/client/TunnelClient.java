@@ -48,13 +48,13 @@ public class TunnelClient implements Lifecycle {
     /**
      * 用于记录当前重试次数
      */
-    private AtomicInteger retryCount = new AtomicInteger(0);
+    private final AtomicInteger retryCount = new AtomicInteger(0);
     /**
-     * 隧道BootStrap
+     * 控制隧道BootStrap
      */
     private Bootstrap controlBootstrap;
     /**
-     * 隧道工作线程组
+     * 控制隧道工作线程组
      */
     private EventLoopGroup tunnelWorkerGroup;
     /**
