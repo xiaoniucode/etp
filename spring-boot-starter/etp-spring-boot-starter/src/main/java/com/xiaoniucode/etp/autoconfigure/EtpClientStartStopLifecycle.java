@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
 
 /**
+ * etp启动停止生命周期
+ *
  * @author liuxin
  */
 public class EtpClientStartStopLifecycle implements SmartLifecycle {
@@ -35,7 +37,7 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
 
     @Override
     public void stop() {
-        if (running && tunnelClient != null) {
+        if (isRunning() && tunnelClient != null) {
             tunnelClient.stop();
             logger.info("etp client stopped");
         }

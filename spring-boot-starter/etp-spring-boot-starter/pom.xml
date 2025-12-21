@@ -2,11 +2,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.xiaoniucode</groupId>
-    <artifactId>etp-spring-boot2-starter</artifactId>
-    <version>0.1.0</version>
+    <parent>
+        <groupId>com.xiaoniucode</groupId>
+        <artifactId>etp-spring-boot-parent</artifactId>
+        <version>0.1.0</version>
+    </parent>
+    <artifactId>etp-spring-boot-starter</artifactId>
     <packaging>jar</packaging>
-    <name>etp-spring-boot2-starter</name>
+
+    <name>etp-spring-boot-starter</name>
     <description>一个内网穿透工具客户端</description>
     <url>https://github.com/xiaoniucode/etp</url>
 
@@ -58,11 +62,6 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

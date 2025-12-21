@@ -8,10 +8,10 @@
         <version>2.7.18</version>
         <relativePath/>
     </parent>
-    <groupId>com.xiaoniucode.etp.exampls</groupId>
-    <artifactId>springboot2-example</artifactId>
+    <groupId>com.xiaoniucode</groupId>
+    <artifactId>spring-boot2-example</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>springboot2-example</name>
+    <name>spring-boot2-example</name>
 
     <properties>
         <java.version>1.8</java.version>
@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>com.xiaoniucode</groupId>
-            <artifactId>etp-spring-boot2-starter</artifactId>
+            <artifactId>etp-spring-boot-starter</artifactId>
             <version>0.1.0</version>
         </dependency>
         <dependency>

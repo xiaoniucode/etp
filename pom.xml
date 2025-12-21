@@ -33,6 +33,7 @@
         <module>etp-server</module>
         <module>etp-client</module>
         <module>etp-test</module>
+        <module>spring-boot-starter</module>
     </modules>
 
     <dependencyManagement>
