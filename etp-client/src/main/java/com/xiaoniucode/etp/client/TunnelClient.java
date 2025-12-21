@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 客户端服务容器
+ *
  * @author liuxin
  */
 public class TunnelClient implements Lifecycle {
@@ -36,7 +37,7 @@ public class TunnelClient implements Lifecycle {
     /**
      * 初始化重连延迟时间 单位：秒
      */
-    private long initialDelaySec = 2;
+    private int initialDelaySec = 2;
     /**
      * 最大重试次数 超过以后关闭workerGroup
      */
@@ -44,7 +45,7 @@ public class TunnelClient implements Lifecycle {
     /**
      * 最大延迟时间 如果超过了则取maxDelaySec为最大延迟时间 单位：秒
      */
-    private long maxDelaySec = 8;
+    private int maxDelaySec = 8;
     /**
      * 用于记录当前重试次数
      */
@@ -80,46 +81,46 @@ public class TunnelClient implements Lifecycle {
             Bootstrap realBootstrap = new Bootstrap();
 
             realBootstrap.group(NettyEventLoopFactory.eventLoopGroup())
-                    .channel(NettyEventLoopFactory.socketChannelClass())
-                    .option(ChannelOption.TCP_NODELAY, true)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new RealChannelHandler());
-                        }
-                    });
+                .channel(NettyEventLoopFactory.socketChannelClass())
+                .option(ChannelOption.TCP_NODELAY, true)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) {
+                        ch.pipeline().addLast(new RealChannelHandler());
+                    }
+                });
 
             if (tls) {
                 tlsContext = new ClientTlsContextFactory().createContext();
             }
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             controlBootstrap.group(tunnelWorkerGroup)
-                    .channel(NettyEventLoopFactory.socketChannelClass())
-                    .option(ChannelOption.TCP_NODELAY, true) // 禁用Nagle算法
-                    .option(ChannelOption.SO_KEEPALIVE, true) // TCP保活
-                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) // 内存池
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel sc) {
-                            if (tls) {
-                                SSLEngine engine = tlsContext.newEngine(sc.alloc(), serverAddr, serverPort);
-                                engine.setUseClientMode(true);
-                                sc.pipeline().addLast("tls", new SslHandler(engine));
-                            }
-                            sc.pipeline()
-                                    .addLast(new ProtobufVarint32FrameDecoder())
-                                    .addLast(new ProtobufDecoder(TunnelMessage.Message.getDefaultInstance()))
-                                    .addLast(new ProtobufVarint32LengthFieldPrepender())
-                                    .addLast(new ProtobufEncoder())
-                                    .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
-                                    .addLast(new ControlChannelHandler(ctx -> {
-                                        // 重置重试计数器
-                                        retryCount.set(0);
-                                        //服务器断开 执行重试 重新连接
-                                        scheduleReconnect();
-                                    }));
+                .channel(NettyEventLoopFactory.socketChannelClass())
+                .option(ChannelOption.TCP_NODELAY, true) // 禁用Nagle算法
+                .option(ChannelOption.SO_KEEPALIVE, true) // TCP保活
+                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) // 内存池
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel sc) {
+                        if (tls) {
+                            SSLEngine engine = tlsContext.newEngine(sc.alloc(), serverAddr, serverPort);
+                            engine.setUseClientMode(true);
+                            sc.pipeline().addLast("tls", new SslHandler(engine));
                         }
-                    });
+                        sc.pipeline()
+                            .addLast(new ProtobufVarint32FrameDecoder())
+                            .addLast(new ProtobufDecoder(TunnelMessage.Message.getDefaultInstance()))
+                            .addLast(new ProtobufVarint32LengthFieldPrepender())
+                            .addLast(new ProtobufEncoder())
+                            .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
+                            .addLast(new ControlChannelHandler(ctx -> {
+                                // 重置重试计数器
+                                retryCount.set(0);
+                                //服务器断开 执行重试 重新连接
+                                scheduleReconnect();
+                            }));
+                    }
+                });
             ChannelManager.initBootstraps(controlBootstrap, realBootstrap);
             //连接到服务器
             connectTunnelServer();
@@ -135,9 +136,9 @@ public class TunnelClient implements Lifecycle {
                 //缓存控制隧道
                 ChannelManager.setControlChannel(channelFuture.channel());
                 TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
-                        .setType(TunnelMessage.Message.Type.AUTH)
-                        .setExt(secretKey)
-                        .build();
+                    .setType(TunnelMessage.Message.Type.AUTH)
+                    .setExt(secretKey)
+                    .build();
                 future.channel().writeAndFlush(message);
                 retryCount.set(0);
                 logger.info("已连接到ETP服务端: {}:{}", serverAddr, serverPort);
@@ -149,7 +150,7 @@ public class TunnelClient implements Lifecycle {
     }
 
     private void scheduleReconnect() {
-        if (retryCount.get() >= maxRetries) {
+        if (retryCount.get() >= getMaxRetries()) {
             logger.error("达到最大重试次数，停止重连");
             this.stop();
             return;
@@ -168,12 +169,12 @@ public class TunnelClient implements Lifecycle {
     private long calculateDelay() {
         int retries = retryCount.get();
         if (retries == 0) {
-            return initialDelaySec;
+            return getInitialDelaySec();
         }
         // 指数退避 + 随机抖动(±30%)
-        long delay = Math.min((1L << retries), maxDelaySec);
+        long delay = Math.min((1L << retries), getMaxDelaySec());
         long jitter = (long) (delay * 0.3 * (Math.random() * 2 - 1));
-        return Math.min(delay + jitter, maxDelaySec);
+        return Math.min(delay + jitter, getMaxDelaySec());
     }
 
     @Override
@@ -209,5 +210,35 @@ public class TunnelClient implements Lifecycle {
 
     public void setTls(boolean tls) {
         this.tls = tls;
+    }
+
+    public int getInitialDelaySec() {
+        return initialDelaySec;
+    }
+
+    public void setInitialDelaySec(int initialDelaySec) {
+        if (initialDelaySec > 0) {
+            this.initialDelaySec = initialDelaySec;
+        }
+    }
+
+    public int getMaxRetries() {
+        return maxRetries;
+    }
+
+    public void setMaxRetries(int maxRetries) {
+        if (maxRetries > 0) {
+            this.maxRetries = maxRetries;
+        }
+    }
+
+    public int getMaxDelaySec() {
+        return maxDelaySec;
+    }
+
+    public void setMaxDelaySec(int maxDelaySec) {
+        if (maxDelaySec > 0) {
+            this.maxDelaySec = maxDelaySec;
+        }
     }
 }

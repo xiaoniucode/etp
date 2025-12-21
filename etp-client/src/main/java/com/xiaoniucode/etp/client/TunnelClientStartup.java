@@ -32,6 +32,9 @@ public class TunnelClientStartup {
         Config config = Config.get();
         registerShutdownHook();
         tunnelClient = new TunnelClient(config.getServerAddr(), config.getServerPort(), config.getSecretKey(), config.isTls());
+        tunnelClient.setMaxDelaySec(config.getMaxDelaySec());
+        tunnelClient.setInitialDelaySec(config.getInitialDelaySec());
+        tunnelClient.setMaxRetries(config.getMaxRetries());
         tunnelClient.start();
     }
 

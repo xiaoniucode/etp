@@ -25,7 +25,6 @@ public final class Config {
      */
     private static int serverPort = DEFAULT_SERVER_PORT;
 
-
     /**
      * 用于与代理服务器通信认证的密钥
      */
@@ -44,6 +43,19 @@ public final class Config {
     private static String logPath;
     private static String logLevel;
     private static String logPattern;
+
+    /**
+     * 初始化重连延迟时间 单位：秒
+     */
+    private static int initialDelaySec;
+    /**
+     * 最大重试次数 超过以后关闭workerGroup
+     */
+    private static int maxRetries;
+    /**
+     * 最大延迟时间 如果超过了则取maxDelaySec为最大延迟时间 单位：秒
+     */
+    private static int maxDelaySec;
 
     /**
      * SSL信任库配置内部类
@@ -65,7 +77,6 @@ public final class Config {
             return storePass;
         }
     }
-
 
     /**
      * 初始化配置
@@ -97,7 +108,19 @@ public final class Config {
             Long serverPortValue = root.getLong("serverPort");
             String secretKeyValue = root.getString("secretKey");
             Boolean tlsValue = root.getBoolean("tls");
-
+            //连接超时
+            Long initialDelaySecValue = root.getLong("initialDelaySec");
+            Long maxRetriesValue = root.getLong("maxRetries");
+            Long maxDelaySecValue = root.getLong("maxDelaySec");
+            if (initialDelaySecValue != null) {
+                initialDelaySec = initialDelaySecValue.intValue();
+            }
+            if (maxRetriesValue != null) {
+                maxRetries = maxRetriesValue.intValue();
+            }
+            if (maxDelaySecValue != null) {
+                maxDelaySec = maxDelaySecValue.intValue();
+            }
             if (StringUtils.hasText(serverAddrValue)) {
                 serverAddr = serverAddrValue.trim();
             }
@@ -114,7 +137,6 @@ public final class Config {
                 tls = tlsValue;
             }
 
-            //----------------------------------------------//
             Toml log = root.getTable("log");
             if (log != null) {
                 String level = log.getString("level");
@@ -130,7 +152,6 @@ public final class Config {
                     logPath = path;
                 }
             }
-            //----------------------------------------------//
             TruststoreConfig truststoreConfig = null;
             if (tls) {
                 Toml truststoreTable = root.getTable("truststore");
@@ -141,21 +162,15 @@ public final class Config {
                         truststoreConfig = new TruststoreConfig(path, password);
                     }
                     if (truststoreConfig != null) {
-                        // 清理可能存在的旧配置
-                        System.clearProperty("client.truststore.path");
-                        System.clearProperty("client.truststore.storePass");
-                        //添加到系统属性中
                         System.setProperty("client.truststore.path", truststoreConfig.getPath());
                         System.setProperty("client.truststore.storePass", truststoreConfig.getStorePass());
                     }
-
                 }
             }
         } catch (Exception e) {
             throw new IllegalStateException("配置文件加载失败: " + configPath, e);
         }
     }
-
 
     /**
      * 验证端口号有效性
@@ -204,5 +219,17 @@ public final class Config {
 
     public String getLogPattern() {
         return logPattern;
+    }
+
+    public int getInitialDelaySec() {
+        return initialDelaySec;
+    }
+
+    public int getMaxRetries() {
+        return maxRetries;
+    }
+
+    public int getMaxDelaySec() {
+        return maxDelaySec;
     }
 }
