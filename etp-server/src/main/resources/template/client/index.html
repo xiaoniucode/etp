@@ -75,16 +75,31 @@
                     templet: function (d) {
                         if (d.status === 1) {
                             return `
-                            <i class="layui-icon layui-icon-circle-dot status-breath"
-                            style="font-size:16px; color:#00baff; margin-right:6px;"></i>
-                            <span style="color:#00baff; font-weight:500;">在线</span>
-                        `;
+                <div style="display: flex; justify-content: space-between; align-items: center">
+                    <div style="display: flex; align-items: center;">
+                        <i class="layui-icon layui-icon-circle-dot status-breath"
+                        style="font-size:16px; color:#00baff; margin-right:6px;"></i>
+                        <span style="color:#00baff; font-weight:500;">在线</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+
+                        <i class="layui-icon layui-icon-windows" style="color:#666; margin-right:4px;"></i>
+                        <span>${d.os||''}</span>
+                        <span style="color:#666; font-size:12px; margin-left:15px;">${d.arch || ''}</span>
+                    </div>
+                </div>
+            `;
                         } else {
                             return `
-                           <i class="layui-icon layui-icon-circle-dot"
-                            style="font-size:16px; color:#ff4d4f; margin-right:6px;"></i>
-                             <span style="color:#999;">离线</span>
-                        `;
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center;">
+                        <i class="layui-icon layui-icon-circle-dot"
+                        style="font-size:16px; color:#ff4d4f; margin-right:6px;"></i>
+                        <span style="color:#999;">离线</span>
+                    </div>
+                    <div></div>
+                </div>
+            `;
                         }
                     }
                 },

@@ -1,8 +1,11 @@
 etp:
   client:
     enabled: true #是否开启etp代理，默认为关闭状态
-    server-addr: 129.204.59.184 #服务器地址
-    secret-key: 273483b4bf904d3aaafd0bf6c1ab3ab1 #认证Token
+    server-addr: localhost #服务器地址
+    secret-key: 4b0063baa5ae47c2910fc25265aae4132 #认证Token
+#    protocol: tcp
+#    local-host: 127.0.0.1
+#    remote-port: 8025
 
 #    tls: false
 #    truststore:

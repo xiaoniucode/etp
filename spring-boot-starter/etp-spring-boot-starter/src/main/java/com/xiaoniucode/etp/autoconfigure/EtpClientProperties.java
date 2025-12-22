@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.autoconfigure;
 
+import com.xiaoniucode.etp.core.protocol.ProtocolType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -23,15 +24,26 @@ public class EtpClientProperties {
      * 服务端端口，默认 9527
      */
     private int serverPort = 9527;
-//    /**
-//     * 公网端口
-//     */
-//    private int remotePort;
-
+    /**
+     * 公网端口
+     */
+    private int remotePort = -1;
+    /**
+     * 内网IP
+     */
+    private String localHost = "127.0.0.1";
+    /**
+     * 协议
+     */
+    private ProtocolType protocol = ProtocolType.TCP;
     /**
      * 密钥，必填
      */
     private String secretKey;
+    /**
+     * 是否自动启动代理服务
+     */
+    private boolean autoStart = true;
 
     /**
      * 是否启用 TLS 加密，默认 false
@@ -41,15 +53,15 @@ public class EtpClientProperties {
     /**
      * 初始化重连延迟时间 单位：秒
      */
-    private int initialDelaySec;
+    private int initialDelaySec = 2;
     /**
      * 最大重试次数 超过以后关闭workerGroup
      */
-    private int maxRetries;
+    private int maxRetries = 5;
     /**
-     * 最大延迟时间 如果超过了则取maxDelaySec为最大延迟时间 单位：秒
+     * 最大延迟时间,如果超过了则取maxDelaySec为最大延迟时间 单位：秒
      */
-    private int maxDelaySec;
+    private int maxDelaySec = 8;
 
     /**
      * ==================== TLS 加密配置 ====================
@@ -154,5 +166,37 @@ public class EtpClientProperties {
 
     public void setMaxDelaySec(int maxDelaySec) {
         this.maxDelaySec = maxDelaySec;
+    }
+
+    public int getRemotePort() {
+        return remotePort;
+    }
+
+    public void setRemotePort(int remotePort) {
+        this.remotePort = remotePort;
+    }
+
+    public String getLocalHost() {
+        return localHost;
+    }
+
+    public void setLocalHost(String localHost) {
+        this.localHost = localHost;
+    }
+
+    public ProtocolType getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(ProtocolType protocol) {
+        this.protocol = protocol;
+    }
+
+    public boolean isAutoStart() {
+        return autoStart;
+    }
+
+    public void setAutoStart(boolean autoStart) {
+        this.autoStart = autoStart;
     }
 }

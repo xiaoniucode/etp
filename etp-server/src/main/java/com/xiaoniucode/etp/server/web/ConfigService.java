@@ -70,6 +70,9 @@ public final class ConfigService {
         for (int i = 0; i < clients.length(); i++) {
             JSONObject client = clients.getJSONObject(i);
             client.put("status", ChannelManager.clientIsOnline(client.getString("secretKey")) ? 1 : 0);
+            //todo 获取已认证客户端信息
+            client.put("os", "MacOS");
+            client.put("arch", "x86-64");
         }
         return clients;
     }
@@ -78,24 +81,26 @@ public final class ConfigService {
         return configStore.listAllProxies();
     }
 
-    public static void addProxy(JSONObject req) {
-        TX.execute(() -> {
-            String remotePortString = req.getString("remotePort");
+    public static JSONObject addProxy(JSONObject req) {
+        return TX.execute(() -> {
+            int remotePort = req.getInt("remotePort");
+            if (remotePort != -1 && !PortAllocator.get().isPortAvailable(remotePort)) {
+                throw new BizException("公网端口: " + remotePort + "无效");
+            }
             String secretKey = req.getString("secretKey");
-            if (StringUtils.hasText(remotePortString) && state.isPortOccupied(req.getInt("remotePort"))) {
-                throw new BizException("公网端口已被占用");
+            if (state.isPortOccupied(remotePort)) {
+                throw new BizException("公网端口:" + remotePort + "已被占用");
             }
-            if (StringUtils.hasText(remotePortString) && !PortAllocator.get().isPortAvailable(req.getInt("remotePort"))) {
-                throw new BizException("公网端口无效");
-            }
-            if (configStore.getProxy(req.getInt("clientId"), req.getString("name")) != null) {
-                throw new BizException("该客户端已存在同名映射");
-            }
-            if (!StringUtils.hasText(remotePortString)) {
+            //-1表示用户没有自定义端口
+            if (remotePort == -1) {
                 int allocatePort = PortAllocator.get().allocateAvailablePort();
                 req.put("remotePort", allocatePort);
             }
-            configStore.addProxy(req);
+            if (!StringUtils.hasText(req.getString("name"))) {
+                req.put("name", req.getInt("remotePort"));
+            }
+            JSONObject res = new JSONObject();
+            int proxyId = configStore.addProxy(req);
             int remotePortInt = req.getInt("remotePort");
             //注册端口映射
             state.registerProxy(secretKey, createProxyMapping(req));
@@ -108,7 +113,9 @@ public final class ConfigService {
                 //将公网端口添加到已分配缓存
                 PortAllocator.get().addRemotePort(remotePortInt);
             }
-            return null;
+            res.put("proxyId", proxyId);
+            res.put("remotePort", remotePortInt);
+            return res;
         });
     }
 

@@ -32,7 +32,9 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> 
             return;
         }
         MessageHandler handler = MessageHandlerFactory.getHandler(msg.getType());
-        handler.handle(ctx, msg);
+        if (handler!= null) {
+            handler.handle(ctx, msg);
+        }
     }
 
     @Override

@@ -51,13 +51,15 @@
                 {field: 'name', title: '代理名称'},
                 {
                     field: 'type', title: '协议', sort: true, templet: function (d) {
-                        if (d.type === "tcp") {
+                        if (d.type === "TCP") {
                             return ' <span class="layui-badge layui-bg-green">TCP</span>';
-                        } else if (d.type === "http") {
+                        } else if (d.type === "HTTP") {
                             return '<span class="layui-badge">HTTP</span>';
                         }
                     }
                 },
+
+
                 {
                     field: 'remotePort', sort: true, title: '公网端口',
                     templet: function (d) {
@@ -77,6 +79,15 @@
                     field: 'status', width: 120, title: '状态', sort: true, templet: function (d) {
                         const isChecked = d.status === 1 ? 'checked' : '';
                         return '<input type="checkbox" lay-skin="switch" lay-text="开启|关闭" lay-event="statusSwitch" ' + isChecked + '>';
+                    }
+                },
+                {
+                    field: 'autoRegistered', title: '映射来源', sort: true, templet: function (d) {
+                        if (d.autoRegistered === 1) {
+                            return ' <span class="layui-badge layui-bg-orange">自动注册</span>';
+                        } else if (d.autoRegistered === 0) {
+                            return '<span class="layui-badge layui-bg-green">手动添加</span>';
+                        }
                     }
                 },
                 {fixed: 'right', title: '操作', width: 180, templet: '#post_table_tool'}

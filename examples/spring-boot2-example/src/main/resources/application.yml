@@ -3,3 +3,5 @@ server:
 spring:
   profiles:
     active: dev
+  application:
+    name: cat-app

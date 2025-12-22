@@ -29,21 +29,23 @@
         <div class="layui-form-item" pane>
             <label class="layui-form-label">协议</label>
             <div class="layui-input-inline">
-                <input type="radio" name="type" value="tcp" lay-verify="required" title="TCP" checked>
+                <input type="radio" name="type" value="TCP" lay-verify="required" title="TCP" checked>
             </div>
         </div>
         <div class="layui-form-item">
             <div class="layui-inline">
                 <label class="layui-form-label">公网端口</label>
                 <div class="layui-input-block">
-                    <input type="number" lay-verify="number" placeholder="不填自动分配" name="remotePort" id="remotePort" autocomplete="off"
+                    <input type="number" lay-verify="number" placeholder="不填自动分配" name="remotePort"
+                           id="remotePort" autocomplete="off"
                            class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">内网端口</label>
                 <div class="layui-input-inline">
-                    <input type="number" lay-verify="required" placeholder="请输入" name="localPort" autocomplete="off" class="layui-input">
+                    <input type="number" lay-verify="required" placeholder="请输入" name="localPort" autocomplete="off"
+                           class="layui-input">
                 </div>
             </div>
         </div>
@@ -65,12 +67,12 @@
 <script src="/static/layui/layui.js"></script>
 <script src="/static/js/ajax.js"></script>
 <script>
-    layui.use(['form', 'jquery','Rest'], function () {
+    layui.use(['form', 'jquery', 'Rest'], function () {
         const form = layui.form;
         const Rest = layui.Rest;
         const $ = layui.$;
         //渲染客户端下拉框
-        Rest.get('/api/client/list').then(data=>{
+        Rest.get('/api/client/list').then(data => {
             const $select = $('select[name="client"]');
             const $submitBtn = $('button[lay-filter="proxyForm"]');
             // 清空旧选项
@@ -94,6 +96,10 @@
         })
         form.on('submit(proxyForm)', function (data) {
             const field = data.field;
+            const remotePort = field.remotePort
+            if (remotePort === undefined || remotePort === '' || remotePort === 0) {
+                field.remotePort = -1
+            }
             if (field.client) {
                 const [clientId, secretKey] = field.client.split('|', 2);
                 field.clientId = Number(clientId) || 0;
@@ -101,7 +107,7 @@
                 delete field.client;
             }
             field.status = field.status ? 1 : 0;
-            Rest.post('/api/proxy/add',field).then(data=>{
+            Rest.post('/api/proxy/add', field).then(data => {
                 layer.msg('创建成功', {icon: 1, time: 400,}, () => {
                     const parentTable = parent.layui.table;
                     parentTable.reload('proxy');

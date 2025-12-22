@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.client;
 
 import com.xiaoniucode.etp.client.handler.RealChannelHandler;
 import com.xiaoniucode.etp.client.handler.ControlChannelHandler;
+import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage;
@@ -16,6 +17,7 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
+import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +64,10 @@ public class TunnelClient implements Lifecycle {
      * SSL加密上下文
      */
     private SslContext tlsContext;
+    /**
+     * 连接到服务端后通知调用者
+     */
+    private Consumer<Void> connectSuccessListener;
 
     public TunnelClient() {
     }
@@ -134,7 +140,10 @@ public class TunnelClient implements Lifecycle {
         future.addListener((ChannelFutureListener) channelFuture -> {
             if (channelFuture.isSuccess()) {
                 //缓存控制隧道
-                ChannelManager.setControlChannel(channelFuture.channel());
+                Channel channel = channelFuture.channel();
+                channel.attr(EtpConstants.SERVER_DDR).set(serverAddr);
+                channel.attr(EtpConstants.SECRET_KEY).set(secretKey);
+                ChannelManager.setControlChannel(channel);
                 TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                     .setType(TunnelMessage.Message.Type.AUTH)
                     .setExt(secretKey)
@@ -142,6 +151,7 @@ public class TunnelClient implements Lifecycle {
                 future.channel().writeAndFlush(message);
                 retryCount.set(0);
                 logger.info("已连接到ETP服务端: {}:{}", serverAddr, serverPort);
+                connectSuccessListener.accept(null);
             } else {
                 //重新连接
                 scheduleReconnect();
@@ -240,5 +250,9 @@ public class TunnelClient implements Lifecycle {
         if (maxDelaySec > 0) {
             this.maxDelaySec = maxDelaySec;
         }
+    }
+
+    public void onConnectSuccessListener(Consumer<Void> connectCallback) {
+        this.connectSuccessListener = connectCallback;
     }
 }

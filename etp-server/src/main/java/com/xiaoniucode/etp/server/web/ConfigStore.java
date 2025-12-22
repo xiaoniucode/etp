@@ -15,8 +15,8 @@ public class ConfigStore {
     /**
      * 新增客户端
      */
-    public void addClient(JSONObject client) {
-        SQLiteUtils.insert(
+    public int  addClient(JSONObject client) {
+       return SQLiteUtils.insert(
             "INSERT INTO clients (name, secretKey) VALUES (?, ?)",
             client.getString("name"), client.getString("secretKey")
         );
@@ -80,15 +80,16 @@ public class ConfigStore {
     /**
      * 添加代理
      */
-    public long addProxy(JSONObject data) {
+    public int addProxy(JSONObject data) {
         return SQLiteUtils.insert(
-            "INSERT INTO proxies (clientId, name, type, localPort, remotePort, status) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO proxies (clientId, name, type, localPort, remotePort, status,autoRegistered) VALUES (?, ?, ?, ?, ?, ?,?)",
             data.optInt("clientId"),
             data.optString("name"),
             data.optString("type"),
             data.optInt("localPort"),
             data.optInt("remotePort"),
-            data.optInt("status", 1)
+            data.optInt("status", 1),
+            data.optInt("autoRegistered")
         );
     }
 
@@ -144,6 +145,10 @@ public class ConfigStore {
             set.append("status = ?, ");
             params.add(data.getInt("status"));
         }
+        if (data.has("autoRegistered")) {
+            set.append("autoRegistered = ?, ");
+            params.add(data.getInt("autoRegistered"));
+        }
 
         if (params.isEmpty()) {
             return false;
@@ -175,6 +180,7 @@ public class ConfigStore {
                 p.status,
                 p.createdAt,
                 p.updatedAt,
+                p.autoRegistered,
                 c.name AS clientName,
                 c.secretKey
             FROM

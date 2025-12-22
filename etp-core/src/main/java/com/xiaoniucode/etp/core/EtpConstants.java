@@ -20,7 +20,11 @@ public class EtpConstants {
     public static final AttributeKey<Channel> REAL_SERVER_CHANNEL = AttributeKey.valueOf("etp.realServerChannel");
     public static final AttributeKey<Channel> VISITOR_CHANNEL = AttributeKey.valueOf("etp.visitorChannel");
 
-    // ====================== 其他 ======================
+
     public static final AttributeKey<Map<Long, Channel>> VISITOR_CHANNELS = AttributeKey.newInstance("etp.visitorChannels");
     public static final AttributeKey<List<Integer>> CHANNEL_REMOTE_PORT = AttributeKey.valueOf("etp.channelRemotePort");
+
+    public static final AttributeKey<String> SERVER_DDR = AttributeKey.valueOf("etp.serverAddr");
+    public static final AttributeKey<Integer> PROXY_ID = AttributeKey.valueOf("etp.proxyId");
+
 }

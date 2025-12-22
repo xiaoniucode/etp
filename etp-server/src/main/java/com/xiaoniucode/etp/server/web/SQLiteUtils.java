@@ -93,7 +93,7 @@ public final class SQLiteUtils {
         return array;
     }
 
-    public static long insert(String sql, Object... params) {
+    public static int insert(String sql, Object... params) {
         Connection conn = null;
         try {
             conn = getConnection();
@@ -110,7 +110,7 @@ public final class SQLiteUtils {
 
                 try (ResultSet rs = pstmt.getGeneratedKeys()) {
                     if (rs.next()) {
-                        long id = rs.getLong(1);
+                        int id = rs.getInt(1);
                         logger.debug("插入成功，ID = {}", id);
                         return id;
                     } else {

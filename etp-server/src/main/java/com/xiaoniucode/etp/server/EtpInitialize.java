@@ -21,6 +21,7 @@ import java.util.Locale;
 
 /**
  * 服务初始化
+ *
  * @author liuxin
  */
 public final class EtpInitialize {
@@ -85,16 +86,18 @@ public final class EtpInitialize {
                 String secretKey = clientInfo.getSecretKey();
                 String name = clientInfo.getName();
                 if (!runtimeState.hasClient(secretKey)) {
-                    //注册客户端
-                    runtimeState.registerClient(clientInfo);
+                    Integer clientId = null;
                     //如果开启了管理面板，需要将客户端配置同步到数据库
                     if (enableDashboard) {
                         JSONObject save = new JSONObject();
                         save.put("secretKey", secretKey);
                         save.put("name", name);
-                        configStore.addClient(save);
+                        clientId = configStore.addClient(save);
                         logger.info("同步静态配置客户端「{}」到数据库", name);
                     }
+                    //注册客户端
+                    clientInfo.setClientId(clientId);
+                    runtimeState.registerClient(clientInfo);
                 } else {
                     logger.warn("客户端「{}」 注册失败，已经在数据库被注册", name);
                 }
@@ -102,8 +105,7 @@ public final class EtpInitialize {
                 proxies.forEach(proxy -> {
                     Integer remotePort = proxy.getRemotePort();
                     if (!runtimeState.hasProxy(secretKey, remotePort)) {
-                        //注册端口映射
-                        runtimeState.registerProxy(secretKey, proxy);
+                        Integer proxyId = null;
                         //如果开启了管理面板，需要将映射配置同步到数据库
                         if (enableDashboard) {
                             JSONObject existClient = configStore.getClientBySecretKey(secretKey);
@@ -114,9 +116,13 @@ public final class EtpInitialize {
                             save.put("remotePort", proxy.getRemotePort());
                             save.put("status", proxy.getStatus());
                             save.put("type", proxy.getType().name().toLowerCase(Locale.ROOT));
-                            configStore.addProxy(save);
+                            save.put("autoRegistered", 0);
+                            proxyId = configStore.addProxy(save);
                             logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", existClient.get("id"), proxy.getName(), proxy.getRemotePort());
                         }
+                        //注册端口映射
+                        proxy.setProxyId(proxyId);
+                        runtimeState.registerProxy(secretKey, proxy);
                     } else {
                         logger.warn("同步取消，该客户端公网端口「{}-{}」已经被注册", name, remotePort);
                     }
@@ -148,9 +154,9 @@ public final class EtpInitialize {
                 JSONObject proxy = proxies.getJSONObject(i);
                 String secretKey = proxy.getString("secretKey");
                 ProxyMapping proxyMapping = new ProxyMapping(
-                        ProtocolType.getType(proxy.getString("type")),
-                        proxy.getInt("localPort"),
-                        proxy.getInt("remotePort"));
+                    ProtocolType.getType(proxy.getString("type")),
+                    proxy.getInt("localPort"),
+                    proxy.getInt("remotePort"));
                 proxyMapping.setProxyId(proxy.getInt("id"));
                 proxyMapping.setName(proxy.getString("name"));
                 proxyMapping.setStatus(proxy.getInt("status"));
@@ -173,58 +179,59 @@ public final class EtpInitialize {
 
     private static void createAuthTokenTable() {
         String sql = """
-                CREATE TABLE IF NOT EXISTS auth_tokens (
-                    token TEXT PRIMARY KEY,
-                    uid INTEGER NOT NULL,
-                    username TEXT NOT NULL,
-                    expiredAt INTEGER NOT NULL,         -- unix 时间戳（秒）
-                    createdAt INTEGER DEFAULT (strftime('%s','now')),
-                    FOREIGN KEY (uid) REFERENCES users(id)
-                );
-                CREATE INDEX IF NOT EXISTS idx_auth_tokens_expiredAt ON auth_tokens(expiredAt);
-                """;
+            CREATE TABLE IF NOT EXISTS auth_tokens (
+                token TEXT PRIMARY KEY,
+                uid INTEGER NOT NULL,
+                username TEXT NOT NULL,
+                expiredAt INTEGER NOT NULL,         -- unix 时间戳（秒）
+                createdAt INTEGER DEFAULT (strftime('%s','now')),
+                FOREIGN KEY (uid) REFERENCES users(id)
+            );
+            CREATE INDEX IF NOT EXISTS idx_auth_tokens_expiredAt ON auth_tokens(expiredAt);
+            """;
         SQLiteUtils.createTable(sql);
     }
 
     private static void createUserTable() {
         String sql = """
-                CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT UNIQUE NOT NULL,
-                    password TEXT NOT NULL
-                );
-                """;
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL
+            );
+            """;
         SQLiteUtils.createTable(sql);
     }
 
     private static void createProxiesTable() {
         String sql = """
-                CREATE TABLE IF NOT EXISTS proxies (
-                    id          INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增主键
-                    clientId   INTEGER NOT NULL,                    -- 所属客户端ID
-                    name        TEXT NOT NULL,                      -- 代理名称
-                    type        TEXT NOT NULL,                      -- 协议类型（如 "TCP"、"HTTP"）
-                    localPort  INTEGER NOT NULL,                    -- 内网端口（如 3306）
-                    remotePort INTEGER NOT NULL UNIQUE,             -- 远程服务端口（对外暴露的端口）
-                    status      INTEGER NOT NULL DEFAULT 1,         -- 状态：1=开启，0=关闭
-                    createdAt  TEXT DEFAULT (datetime('now')),      -- 创建时间
-                    updatedAt  TEXT DEFAULT (datetime('now'))       -- 更新时间
-                );
-                """;
+            CREATE TABLE IF NOT EXISTS proxies (
+                id               INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增主键
+                clientId         INTEGER NOT NULL,                   -- 所属客户端ID
+                name             TEXT NOT NULL,                      -- 代理名称
+                type             TEXT NOT NULL,                      -- 协议类型（如 "TCP"、"HTTP"）
+                autoRegistered   INTEGER NOT NULL DEFAULT 0,         -- 注册类型（1：自动注册、0手动注册）
+                localPort        INTEGER NOT NULL,                   -- 内网端口（如 3306）
+                remotePort       INTEGER NOT NULL UNIQUE,            -- 远程服务端口（对外暴露的端口）
+                status           INTEGER NOT NULL DEFAULT 1,         -- 状态：1=开启，0=关闭
+                createdAt        TEXT DEFAULT (datetime('now')),     -- 创建时间
+                updatedAt        TEXT DEFAULT (datetime('now'))      -- 更新时间
+            );
+            """;
         SQLiteUtils.createTable(sql);
     }
 
     private static void createClientTable() {
         String sql = """
-                CREATE TABLE IF NOT EXISTS clients (
-                    id         INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增ID
-                    name       TEXT    NOT NULL UNIQUE,            -- 客户端名称
-                    secretKey  TEXT    NOT NULL UNIQUE,            -- 密钥
-                    createdAt TEXT    DEFAULT (datetime('now')),   -- 创建时间
-                    updatedAt TEXT    DEFAULT (datetime('now'))    -- 更新时间
-                );
-                 CREATE INDEX IF NOT EXISTS idx_clients_name_secretkey ON clients (name, secretKey);
-                """;
+            CREATE TABLE IF NOT EXISTS clients (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增ID
+                name       TEXT    NOT NULL UNIQUE,            -- 客户端名称
+                secretKey  TEXT    NOT NULL UNIQUE,            -- 密钥
+                createdAt TEXT    DEFAULT (datetime('now')),   -- 创建时间
+                updatedAt TEXT    DEFAULT (datetime('now'))    -- 更新时间
+            );
+             CREATE INDEX IF NOT EXISTS idx_clients_name_secretkey ON clients (name, secretKey);
+            """;
         SQLiteUtils.createTable(sql);
     }
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 
 /**
  * 隧道消息处理器工厂
+ *
  * @author liuxin
  */
 public class MessageHandlerFactory {
@@ -19,12 +20,14 @@ public class MessageHandlerFactory {
         handlers.put(TunnelMessage.Message.Type.CONNECT, new ConnectHandler());
         handlers.put(TunnelMessage.Message.Type.TRANSFER, new TransferHandler());
         handlers.put(TunnelMessage.Message.Type.DISCONNECT, new DisconnectHandler());
+        handlers.put(TunnelMessage.Message.Type.PROXY_REGISTER, new ProxyRegisterMessageHandler());
+        handlers.put(TunnelMessage.Message.Type.PROXY_UNREGISTER, new ProxyUnregisterMessageHandler());
     }
 
     public static MessageHandler getHandler(TunnelMessage.Message.Type type) {
         MessageHandler handler = handlers.get(type);
-        if (handler==null){
-            throw new RuntimeException("not found handler for type:"+type);
+        if (handler == null) {
+            throw new RuntimeException("not found handler for type:" + type);
         }
         return handler;
     }

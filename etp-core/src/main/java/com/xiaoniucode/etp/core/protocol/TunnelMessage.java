@@ -1033,24 +1033,34 @@ public final class TunnelMessage {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string proxy_name = 1;</code>
+     * <code>optional string proxy_name = 1;</code>
+     * @return Whether the proxyName field is set.
+     */
+    boolean hasProxyName();
+    /**
+     * <code>optional string proxy_name = 1;</code>
      * @return The proxyName.
      */
     String getProxyName();
     /**
-     * <code>string proxy_name = 1;</code>
+     * <code>optional string proxy_name = 1;</code>
      * @return The bytes for proxyName.
      */
     com.google.protobuf.ByteString
         getProxyNameBytes();
 
     /**
-     * <code>string local_host = 2;</code>
+     * <code>optional string local_host = 2;</code>
+     * @return Whether the localHost field is set.
+     */
+    boolean hasLocalHost();
+    /**
+     * <code>optional string local_host = 2;</code>
      * @return The localHost.
      */
     String getLocalHost();
     /**
-     * <code>string local_host = 2;</code>
+     * <code>optional string local_host = 2;</code>
      * @return The bytes for localHost.
      */
     com.google.protobuf.ByteString
@@ -1063,23 +1073,34 @@ public final class TunnelMessage {
     int getLocalPort();
 
     /**
-     * <code>string protocol = 4;</code>
+     * <code>optional uint32 remote_port = 4;</code>
+     * @return Whether the remotePort field is set.
+     */
+    boolean hasRemotePort();
+    /**
+     * <code>optional uint32 remote_port = 4;</code>
+     * @return The remotePort.
+     */
+    int getRemotePort();
+
+    /**
+     * <code>string protocol = 5;</code>
      * @return The protocol.
      */
     String getProtocol();
     /**
-     * <code>string protocol = 4;</code>
+     * <code>string protocol = 5;</code>
      * @return The bytes for protocol.
      */
     com.google.protobuf.ByteString
         getProtocolBytes();
 
     /**
-     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     * <code>map&lt;string, string&gt; metadata = 6;</code>
      */
     int getMetadataCount();
     /**
-     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     * <code>map&lt;string, string&gt; metadata = 6;</code>
      */
     boolean containsMetadata(
         String key);
@@ -1090,12 +1111,12 @@ public final class TunnelMessage {
     java.util.Map<String, String>
     getMetadata();
     /**
-     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     * <code>map&lt;string, string&gt; metadata = 6;</code>
      */
     java.util.Map<String, String>
     getMetadataMap();
     /**
-     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     * <code>map&lt;string, string&gt; metadata = 6;</code>
      */
     /* nullable */
 String getMetadataOrDefault(
@@ -1103,13 +1124,18 @@ String getMetadataOrDefault(
         /* nullable */
 String defaultValue);
     /**
-     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     * <code>map&lt;string, string&gt; metadata = 6;</code>
      */
     String getMetadataOrThrow(
         String key);
 
     /**
-     * <code>bool auto_start = 6;</code>
+     * <code>optional bool auto_start = 7;</code>
+     * @return Whether the autoStart field is set.
+     */
+    boolean hasAutoStart();
+    /**
+     * <code>optional bool auto_start = 7;</code>
      * @return The autoStart.
      */
     boolean getAutoStart();
@@ -1151,7 +1177,7 @@ String defaultValue);
     protected com.google.protobuf.MapFieldReflectionAccessor internalGetMapFieldReflection(
         int number) {
       switch (number) {
-        case 5:
+        case 6:
           return internalGetMetadata();
         default:
           throw new RuntimeException(
@@ -1166,11 +1192,20 @@ String defaultValue);
               ProxyRequest.class, Builder.class);
     }
 
+    private int bitField0_;
     public static final int PROXY_NAME_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
     private volatile Object proxyName_ = "";
     /**
-     * <code>string proxy_name = 1;</code>
+     * <code>optional string proxy_name = 1;</code>
+     * @return Whether the proxyName field is set.
+     */
+    @Override
+    public boolean hasProxyName() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>optional string proxy_name = 1;</code>
      * @return The proxyName.
      */
     @Override
@@ -1187,7 +1222,7 @@ String defaultValue);
       }
     }
     /**
-     * <code>string proxy_name = 1;</code>
+     * <code>optional string proxy_name = 1;</code>
      * @return The bytes for proxyName.
      */
     @Override
@@ -1209,7 +1244,15 @@ String defaultValue);
     @SuppressWarnings("serial")
     private volatile Object localHost_ = "";
     /**
-     * <code>string local_host = 2;</code>
+     * <code>optional string local_host = 2;</code>
+     * @return Whether the localHost field is set.
+     */
+    @Override
+    public boolean hasLocalHost() {
+      return ((bitField0_ & 0x00000002) != 0);
+    }
+    /**
+     * <code>optional string local_host = 2;</code>
      * @return The localHost.
      */
     @Override
@@ -1226,7 +1269,7 @@ String defaultValue);
       }
     }
     /**
-     * <code>string local_host = 2;</code>
+     * <code>optional string local_host = 2;</code>
      * @return The bytes for localHost.
      */
     @Override
@@ -1255,11 +1298,30 @@ String defaultValue);
       return localPort_;
     }
 
-    public static final int PROTOCOL_FIELD_NUMBER = 4;
+    public static final int REMOTE_PORT_FIELD_NUMBER = 4;
+    private int remotePort_ = 0;
+    /**
+     * <code>optional uint32 remote_port = 4;</code>
+     * @return Whether the remotePort field is set.
+     */
+    @Override
+    public boolean hasRemotePort() {
+      return ((bitField0_ & 0x00000004) != 0);
+    }
+    /**
+     * <code>optional uint32 remote_port = 4;</code>
+     * @return The remotePort.
+     */
+    @Override
+    public int getRemotePort() {
+      return remotePort_;
+    }
+
+    public static final int PROTOCOL_FIELD_NUMBER = 5;
     @SuppressWarnings("serial")
     private volatile Object protocol_ = "";
     /**
-     * <code>string protocol = 4;</code>
+     * <code>string protocol = 5;</code>
      * @return The protocol.
      */
     @Override
@@ -1276,7 +1338,7 @@ String defaultValue);
       }
     }
     /**
-     * <code>string protocol = 4;</code>
+     * <code>string protocol = 5;</code>
      * @return The bytes for protocol.
      */
     @Override
@@ -1294,7 +1356,7 @@ String defaultValue);
       }
     }
 
-    public static final int METADATA_FIELD_NUMBER = 5;
+    public static final int METADATA_FIELD_NUMBER = 6;
     private static final class MetadataDefaultEntryHolder {
       static final com.google.protobuf.MapEntry<
           String, String> defaultEntry =
@@ -1321,7 +1383,7 @@ String defaultValue);
       return internalGetMetadata().getMap().size();
     }
     /**
-     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     * <code>map&lt;string, string&gt; metadata = 6;</code>
      */
     @Override
     public boolean containsMetadata(
@@ -1338,14 +1400,14 @@ String defaultValue);
       return getMetadataMap();
     }
     /**
-     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     * <code>map&lt;string, string&gt; metadata = 6;</code>
      */
     @Override
     public java.util.Map<String, String> getMetadataMap() {
       return internalGetMetadata().getMap();
     }
     /**
-     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     * <code>map&lt;string, string&gt; metadata = 6;</code>
      */
     @Override
     public /* nullable */
@@ -1359,7 +1421,7 @@ String defaultValue) {
       return map.containsKey(key) ? map.get(key) : defaultValue;
     }
     /**
-     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     * <code>map&lt;string, string&gt; metadata = 6;</code>
      */
     @Override
     public String getMetadataOrThrow(
@@ -1373,10 +1435,18 @@ String defaultValue) {
       return map.get(key);
     }
 
-    public static final int AUTO_START_FIELD_NUMBER = 6;
+    public static final int AUTO_START_FIELD_NUMBER = 7;
     private boolean autoStart_ = false;
     /**
-     * <code>bool auto_start = 6;</code>
+     * <code>optional bool auto_start = 7;</code>
+     * @return Whether the autoStart field is set.
+     */
+    @Override
+    public boolean hasAutoStart() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <code>optional bool auto_start = 7;</code>
      * @return The autoStart.
      */
     @Override
@@ -1398,26 +1468,29 @@ String defaultValue) {
     @Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyName_)) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 1, proxyName_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(localHost_)) {
+      if (((bitField0_ & 0x00000002) != 0)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 2, localHost_);
       }
       if (localPort_ != 0) {
         output.writeUInt32(3, localPort_);
       }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        output.writeUInt32(4, remotePort_);
+      }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(protocol_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 4, protocol_);
+        com.google.protobuf.GeneratedMessage.writeString(output, 5, protocol_);
       }
       com.google.protobuf.GeneratedMessage
         .serializeStringMapTo(
           output,
           internalGetMetadata(),
           MetadataDefaultEntryHolder.defaultEntry,
-          5);
-      if (autoStart_ != false) {
-        output.writeBool(6, autoStart_);
+          6);
+      if (((bitField0_ & 0x00000008) != 0)) {
+        output.writeBool(7, autoStart_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1428,18 +1501,22 @@ String defaultValue) {
       if (size != -1) return size;
 
       size = 0;
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyName_)) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(1, proxyName_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(localHost_)) {
+      if (((bitField0_ & 0x00000002) != 0)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(2, localHost_);
       }
       if (localPort_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(3, localPort_);
       }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(4, remotePort_);
+      }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(protocol_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, protocol_);
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(5, protocol_);
       }
       for (java.util.Map.Entry<String, String> entry
            : internalGetMetadata().getMap().entrySet()) {
@@ -1449,11 +1526,11 @@ String defaultValue) {
             .setValue(entry.getValue())
             .build();
         size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(5, metadata__);
+            .computeMessageSize(6, metadata__);
       }
-      if (autoStart_ != false) {
+      if (((bitField0_ & 0x00000008) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(6, autoStart_);
+          .computeBoolSize(7, autoStart_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -1470,18 +1547,32 @@ String defaultValue) {
       }
       ProxyRequest other = (ProxyRequest) obj;
 
-      if (!getProxyName()
-          .equals(other.getProxyName())) return false;
-      if (!getLocalHost()
-          .equals(other.getLocalHost())) return false;
+      if (hasProxyName() != other.hasProxyName()) return false;
+      if (hasProxyName()) {
+        if (!getProxyName()
+            .equals(other.getProxyName())) return false;
+      }
+      if (hasLocalHost() != other.hasLocalHost()) return false;
+      if (hasLocalHost()) {
+        if (!getLocalHost()
+            .equals(other.getLocalHost())) return false;
+      }
       if (getLocalPort()
           != other.getLocalPort()) return false;
+      if (hasRemotePort() != other.hasRemotePort()) return false;
+      if (hasRemotePort()) {
+        if (getRemotePort()
+            != other.getRemotePort()) return false;
+      }
       if (!getProtocol()
           .equals(other.getProtocol())) return false;
       if (!internalGetMetadata().equals(
           other.internalGetMetadata())) return false;
-      if (getAutoStart()
-          != other.getAutoStart()) return false;
+      if (hasAutoStart() != other.hasAutoStart()) return false;
+      if (hasAutoStart()) {
+        if (getAutoStart()
+            != other.getAutoStart()) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -1493,21 +1584,31 @@ String defaultValue) {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + PROXY_NAME_FIELD_NUMBER;
-      hash = (53 * hash) + getProxyName().hashCode();
-      hash = (37 * hash) + LOCAL_HOST_FIELD_NUMBER;
-      hash = (53 * hash) + getLocalHost().hashCode();
+      if (hasProxyName()) {
+        hash = (37 * hash) + PROXY_NAME_FIELD_NUMBER;
+        hash = (53 * hash) + getProxyName().hashCode();
+      }
+      if (hasLocalHost()) {
+        hash = (37 * hash) + LOCAL_HOST_FIELD_NUMBER;
+        hash = (53 * hash) + getLocalHost().hashCode();
+      }
       hash = (37 * hash) + LOCAL_PORT_FIELD_NUMBER;
       hash = (53 * hash) + getLocalPort();
+      if (hasRemotePort()) {
+        hash = (37 * hash) + REMOTE_PORT_FIELD_NUMBER;
+        hash = (53 * hash) + getRemotePort();
+      }
       hash = (37 * hash) + PROTOCOL_FIELD_NUMBER;
       hash = (53 * hash) + getProtocol().hashCode();
       if (!internalGetMetadata().getMap().isEmpty()) {
         hash = (37 * hash) + METADATA_FIELD_NUMBER;
         hash = (53 * hash) + internalGetMetadata().hashCode();
       }
-      hash = (37 * hash) + AUTO_START_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getAutoStart());
+      if (hasAutoStart()) {
+        hash = (37 * hash) + AUTO_START_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getAutoStart());
+      }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1621,7 +1722,7 @@ String defaultValue) {
       protected com.google.protobuf.MapFieldReflectionAccessor internalGetMapFieldReflection(
           int number) {
         switch (number) {
-          case 5:
+          case 6:
             return internalGetMetadata();
           default:
             throw new RuntimeException(
@@ -1632,7 +1733,7 @@ String defaultValue) {
       protected com.google.protobuf.MapFieldReflectionAccessor internalGetMutableMapFieldReflection(
           int number) {
         switch (number) {
-          case 5:
+          case 6:
             return internalGetMutableMetadata();
           default:
             throw new RuntimeException(
@@ -1664,6 +1765,7 @@ String defaultValue) {
         proxyName_ = "";
         localHost_ = "";
         localPort_ = 0;
+        remotePort_ = 0;
         protocol_ = "";
         internalGetMutableMetadata().clear();
         autoStart_ = false;
@@ -1700,25 +1802,34 @@ String defaultValue) {
 
       private void buildPartial0(ProxyRequest result) {
         int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.proxyName_ = proxyName_;
+          to_bitField0_ |= 0x00000001;
         }
         if (((from_bitField0_ & 0x00000002) != 0)) {
           result.localHost_ = localHost_;
+          to_bitField0_ |= 0x00000002;
         }
         if (((from_bitField0_ & 0x00000004) != 0)) {
           result.localPort_ = localPort_;
         }
         if (((from_bitField0_ & 0x00000008) != 0)) {
-          result.protocol_ = protocol_;
+          result.remotePort_ = remotePort_;
+          to_bitField0_ |= 0x00000004;
         }
         if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.protocol_ = protocol_;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
           result.metadata_ = internalGetMetadata();
           result.metadata_.makeImmutable();
         }
-        if (((from_bitField0_ & 0x00000020) != 0)) {
+        if (((from_bitField0_ & 0x00000040) != 0)) {
           result.autoStart_ = autoStart_;
+          to_bitField0_ |= 0x00000008;
         }
+        result.bitField0_ |= to_bitField0_;
       }
 
       @Override
@@ -1733,12 +1844,12 @@ String defaultValue) {
 
       public Builder mergeFrom(ProxyRequest other) {
         if (other == ProxyRequest.getDefaultInstance()) return this;
-        if (!other.getProxyName().isEmpty()) {
+        if (other.hasProxyName()) {
           proxyName_ = other.proxyName_;
           bitField0_ |= 0x00000001;
           onChanged();
         }
-        if (!other.getLocalHost().isEmpty()) {
+        if (other.hasLocalHost()) {
           localHost_ = other.localHost_;
           bitField0_ |= 0x00000002;
           onChanged();
@@ -1746,15 +1857,18 @@ String defaultValue) {
         if (other.getLocalPort() != 0) {
           setLocalPort(other.getLocalPort());
         }
+        if (other.hasRemotePort()) {
+          setRemotePort(other.getRemotePort());
+        }
         if (!other.getProtocol().isEmpty()) {
           protocol_ = other.protocol_;
-          bitField0_ |= 0x00000008;
+          bitField0_ |= 0x00000010;
           onChanged();
         }
         internalGetMutableMetadata().mergeFrom(
             other.internalGetMetadata());
-        bitField0_ |= 0x00000010;
-        if (other.getAutoStart() != false) {
+        bitField0_ |= 0x00000020;
+        if (other.hasAutoStart()) {
           setAutoStart(other.getAutoStart());
         }
         this.mergeUnknownFields(other.getUnknownFields());
@@ -1798,25 +1912,30 @@ String defaultValue) {
                 bitField0_ |= 0x00000004;
                 break;
               } // case 24
-              case 34: {
-                protocol_ = input.readStringRequireUtf8();
+              case 32: {
+                remotePort_ = input.readUInt32();
                 bitField0_ |= 0x00000008;
                 break;
-              } // case 34
+              } // case 32
               case 42: {
+                protocol_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
+              case 50: {
                 com.google.protobuf.MapEntry<String, String>
                 metadata__ = input.readMessage(
                     MetadataDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
                 internalGetMutableMetadata().getMutableMap().put(
                     metadata__.getKey(), metadata__.getValue());
-                bitField0_ |= 0x00000010;
-                break;
-              } // case 42
-              case 48: {
-                autoStart_ = input.readBool();
                 bitField0_ |= 0x00000020;
                 break;
-              } // case 48
+              } // case 50
+              case 56: {
+                autoStart_ = input.readBool();
+                bitField0_ |= 0x00000040;
+                break;
+              } // case 56
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -1836,7 +1955,14 @@ String defaultValue) {
 
       private Object proxyName_ = "";
       /**
-       * <code>string proxy_name = 1;</code>
+       * <code>optional string proxy_name = 1;</code>
+       * @return Whether the proxyName field is set.
+       */
+      public boolean hasProxyName() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <code>optional string proxy_name = 1;</code>
        * @return The proxyName.
        */
       public String getProxyName() {
@@ -1852,7 +1978,7 @@ String defaultValue) {
         }
       }
       /**
-       * <code>string proxy_name = 1;</code>
+       * <code>optional string proxy_name = 1;</code>
        * @return The bytes for proxyName.
        */
       public com.google.protobuf.ByteString
@@ -1869,7 +1995,7 @@ String defaultValue) {
         }
       }
       /**
-       * <code>string proxy_name = 1;</code>
+       * <code>optional string proxy_name = 1;</code>
        * @param value The proxyName to set.
        * @return This builder for chaining.
        */
@@ -1882,7 +2008,7 @@ String defaultValue) {
         return this;
       }
       /**
-       * <code>string proxy_name = 1;</code>
+       * <code>optional string proxy_name = 1;</code>
        * @return This builder for chaining.
        */
       public Builder clearProxyName() {
@@ -1892,7 +2018,7 @@ String defaultValue) {
         return this;
       }
       /**
-       * <code>string proxy_name = 1;</code>
+       * <code>optional string proxy_name = 1;</code>
        * @param value The bytes for proxyName to set.
        * @return This builder for chaining.
        */
@@ -1908,7 +2034,14 @@ String defaultValue) {
 
       private Object localHost_ = "";
       /**
-       * <code>string local_host = 2;</code>
+       * <code>optional string local_host = 2;</code>
+       * @return Whether the localHost field is set.
+       */
+      public boolean hasLocalHost() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>optional string local_host = 2;</code>
        * @return The localHost.
        */
       public String getLocalHost() {
@@ -1924,7 +2057,7 @@ String defaultValue) {
         }
       }
       /**
-       * <code>string local_host = 2;</code>
+       * <code>optional string local_host = 2;</code>
        * @return The bytes for localHost.
        */
       public com.google.protobuf.ByteString
@@ -1941,7 +2074,7 @@ String defaultValue) {
         }
       }
       /**
-       * <code>string local_host = 2;</code>
+       * <code>optional string local_host = 2;</code>
        * @param value The localHost to set.
        * @return This builder for chaining.
        */
@@ -1954,7 +2087,7 @@ String defaultValue) {
         return this;
       }
       /**
-       * <code>string local_host = 2;</code>
+       * <code>optional string local_host = 2;</code>
        * @return This builder for chaining.
        */
       public Builder clearLocalHost() {
@@ -1964,7 +2097,7 @@ String defaultValue) {
         return this;
       }
       /**
-       * <code>string local_host = 2;</code>
+       * <code>optional string local_host = 2;</code>
        * @param value The bytes for localHost to set.
        * @return This builder for chaining.
        */
@@ -2010,9 +2143,49 @@ String defaultValue) {
         return this;
       }
 
+      private int remotePort_ ;
+      /**
+       * <code>optional uint32 remote_port = 4;</code>
+       * @return Whether the remotePort field is set.
+       */
+      @Override
+      public boolean hasRemotePort() {
+        return ((bitField0_ & 0x00000008) != 0);
+      }
+      /**
+       * <code>optional uint32 remote_port = 4;</code>
+       * @return The remotePort.
+       */
+      @Override
+      public int getRemotePort() {
+        return remotePort_;
+      }
+      /**
+       * <code>optional uint32 remote_port = 4;</code>
+       * @param value The remotePort to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRemotePort(int value) {
+
+        remotePort_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional uint32 remote_port = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRemotePort() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        remotePort_ = 0;
+        onChanged();
+        return this;
+      }
+
       private Object protocol_ = "";
       /**
-       * <code>string protocol = 4;</code>
+       * <code>string protocol = 5;</code>
        * @return The protocol.
        */
       public String getProtocol() {
@@ -2028,7 +2201,7 @@ String defaultValue) {
         }
       }
       /**
-       * <code>string protocol = 4;</code>
+       * <code>string protocol = 5;</code>
        * @return The bytes for protocol.
        */
       public com.google.protobuf.ByteString
@@ -2045,7 +2218,7 @@ String defaultValue) {
         }
       }
       /**
-       * <code>string protocol = 4;</code>
+       * <code>string protocol = 5;</code>
        * @param value The protocol to set.
        * @return This builder for chaining.
        */
@@ -2053,22 +2226,22 @@ String defaultValue) {
           String value) {
         if (value == null) { throw new NullPointerException(); }
         protocol_ = value;
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         onChanged();
         return this;
       }
       /**
-       * <code>string protocol = 4;</code>
+       * <code>string protocol = 5;</code>
        * @return This builder for chaining.
        */
       public Builder clearProtocol() {
         protocol_ = getDefaultInstance().getProtocol();
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         onChanged();
         return this;
       }
       /**
-       * <code>string protocol = 4;</code>
+       * <code>string protocol = 5;</code>
        * @param value The bytes for protocol to set.
        * @return This builder for chaining.
        */
@@ -2077,7 +2250,7 @@ String defaultValue) {
         if (value == null) { throw new NullPointerException(); }
         checkByteStringIsUtf8(value);
         protocol_ = value;
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         onChanged();
         return this;
       }
@@ -2101,7 +2274,7 @@ String defaultValue) {
         if (!metadata_.isMutable()) {
           metadata_ = metadata_.copy();
         }
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         onChanged();
         return metadata_;
       }
@@ -2109,7 +2282,7 @@ String defaultValue) {
         return internalGetMetadata().getMap().size();
       }
       /**
-       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       * <code>map&lt;string, string&gt; metadata = 6;</code>
        */
       @Override
       public boolean containsMetadata(
@@ -2126,14 +2299,14 @@ String defaultValue) {
         return getMetadataMap();
       }
       /**
-       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       * <code>map&lt;string, string&gt; metadata = 6;</code>
        */
       @Override
       public java.util.Map<String, String> getMetadataMap() {
         return internalGetMetadata().getMap();
       }
       /**
-       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       * <code>map&lt;string, string&gt; metadata = 6;</code>
        */
       @Override
       public /* nullable */
@@ -2147,7 +2320,7 @@ String defaultValue) {
         return map.containsKey(key) ? map.get(key) : defaultValue;
       }
       /**
-       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       * <code>map&lt;string, string&gt; metadata = 6;</code>
        */
       @Override
       public String getMetadataOrThrow(
@@ -2161,13 +2334,13 @@ String defaultValue) {
         return map.get(key);
       }
       public Builder clearMetadata() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         internalGetMutableMetadata().getMutableMap()
             .clear();
         return this;
       }
       /**
-       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       * <code>map&lt;string, string&gt; metadata = 6;</code>
        */
       public Builder removeMetadata(
           String key) {
@@ -2182,11 +2355,11 @@ String defaultValue) {
       @Deprecated
       public java.util.Map<String, String>
           getMutableMetadata() {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return internalGetMutableMetadata().getMutableMap();
       }
       /**
-       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       * <code>map&lt;string, string&gt; metadata = 6;</code>
        */
       public Builder putMetadata(
           String key,
@@ -2195,23 +2368,31 @@ String defaultValue) {
         if (value == null) { throw new NullPointerException("map value"); }
         internalGetMutableMetadata().getMutableMap()
             .put(key, value);
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
       /**
-       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       * <code>map&lt;string, string&gt; metadata = 6;</code>
        */
       public Builder putAllMetadata(
           java.util.Map<String, String> values) {
         internalGetMutableMetadata().getMutableMap()
             .putAll(values);
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         return this;
       }
 
       private boolean autoStart_ ;
       /**
-       * <code>bool auto_start = 6;</code>
+       * <code>optional bool auto_start = 7;</code>
+       * @return Whether the autoStart field is set.
+       */
+      @Override
+      public boolean hasAutoStart() {
+        return ((bitField0_ & 0x00000040) != 0);
+      }
+      /**
+       * <code>optional bool auto_start = 7;</code>
        * @return The autoStart.
        */
       @Override
@@ -2219,23 +2400,23 @@ String defaultValue) {
         return autoStart_;
       }
       /**
-       * <code>bool auto_start = 6;</code>
+       * <code>optional bool auto_start = 7;</code>
        * @param value The autoStart to set.
        * @return This builder for chaining.
        */
       public Builder setAutoStart(boolean value) {
 
         autoStart_ = value;
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         onChanged();
         return this;
       }
       /**
-       * <code>bool auto_start = 6;</code>
+       * <code>optional bool auto_start = 7;</code>
        * @return This builder for chaining.
        */
       public Builder clearAutoStart() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         autoStart_ = false;
         onChanged();
         return this;
@@ -2292,516 +2473,6 @@ String defaultValue) {
 
   }
 
-  public interface ProxyUnregisterRequestOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>string proxy_id = 1;</code>
-     * @return The proxyId.
-     */
-    String getProxyId();
-    /**
-     * <code>string proxy_id = 1;</code>
-     * @return The bytes for proxyId.
-     */
-    com.google.protobuf.ByteString
-        getProxyIdBytes();
-  }
-  /**
-   * Protobuf type {@code com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest}
-   */
-  public static final class ProxyUnregisterRequest extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest)
-      ProxyUnregisterRequestOrBuilder {
-  private static final long serialVersionUID = 0L;
-    static {
-      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
-        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
-        /* major= */ 4,
-        /* minor= */ 31,
-        /* patch= */ 1,
-        /* suffix= */ "",
-        ProxyUnregisterRequest.class.getName());
-    }
-    // Use ProxyUnregisterRequest.newBuilder() to construct.
-    private ProxyUnregisterRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-    }
-    private ProxyUnregisterRequest() {
-      proxyId_ = "";
-    }
-
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor;
-    }
-
-    @Override
-    protected FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              ProxyUnregisterRequest.class, Builder.class);
-    }
-
-    public static final int PROXY_ID_FIELD_NUMBER = 1;
-    @SuppressWarnings("serial")
-    private volatile Object proxyId_ = "";
-    /**
-     * <code>string proxy_id = 1;</code>
-     * @return The proxyId.
-     */
-    @Override
-    public String getProxyId() {
-      Object ref = proxyId_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        proxyId_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string proxy_id = 1;</code>
-     * @return The bytes for proxyId.
-     */
-    @Override
-    public com.google.protobuf.ByteString
-        getProxyIdBytes() {
-      Object ref = proxyId_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (String) ref);
-        proxyId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 1, proxyId_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    @Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, proxyId_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof ProxyUnregisterRequest)) {
-        return super.equals(obj);
-      }
-      ProxyUnregisterRequest other = (ProxyUnregisterRequest) obj;
-
-      if (!getProxyId()
-          .equals(other.getProxyId())) return false;
-      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
-      return true;
-    }
-
-    @Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + PROXY_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getProxyId().hashCode();
-      hash = (29 * hash) + getUnknownFields().hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static ProxyUnregisterRequest parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static ProxyUnregisterRequest parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static ProxyUnregisterRequest parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static ProxyUnregisterRequest parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static ProxyUnregisterRequest parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static ProxyUnregisterRequest parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static ProxyUnregisterRequest parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static ProxyUnregisterRequest parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    public static ProxyUnregisterRequest parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-
-    public static ProxyUnregisterRequest parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static ProxyUnregisterRequest parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static ProxyUnregisterRequest parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(ProxyUnregisterRequest prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @Override
-    protected Builder newBuilderForType(
-        BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest)
-        ProxyUnregisterRequestOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor;
-      }
-
-      @Override
-      protected FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                ProxyUnregisterRequest.class, Builder.class);
-      }
-
-      // Construct using com.xiaoniucode.etp.core.protocol.TunnelMessage.ProxyUnregisterRequest.newBuilder()
-      private Builder() {
-
-      }
-
-      private Builder(
-          BuilderParent parent) {
-        super(parent);
-
-      }
-      @Override
-      public Builder clear() {
-        super.clear();
-        bitField0_ = 0;
-        proxyId_ = "";
-        return this;
-      }
-
-      @Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return TunnelMessage.internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor;
-      }
-
-      @Override
-      public ProxyUnregisterRequest getDefaultInstanceForType() {
-        return ProxyUnregisterRequest.getDefaultInstance();
-      }
-
-      @Override
-      public ProxyUnregisterRequest build() {
-        ProxyUnregisterRequest result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @Override
-      public ProxyUnregisterRequest buildPartial() {
-        ProxyUnregisterRequest result = new ProxyUnregisterRequest(this);
-        if (bitField0_ != 0) { buildPartial0(result); }
-        onBuilt();
-        return result;
-      }
-
-      private void buildPartial0(ProxyUnregisterRequest result) {
-        int from_bitField0_ = bitField0_;
-        if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.proxyId_ = proxyId_;
-        }
-      }
-
-      @Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof ProxyUnregisterRequest) {
-          return mergeFrom((ProxyUnregisterRequest)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(ProxyUnregisterRequest other) {
-        if (other == ProxyUnregisterRequest.getDefaultInstance()) return this;
-        if (!other.getProxyId().isEmpty()) {
-          proxyId_ = other.proxyId_;
-          bitField0_ |= 0x00000001;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        onChanged();
-        return this;
-      }
-
-      @Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        if (extensionRegistry == null) {
-          throw new NullPointerException();
-        }
-        try {
-          boolean done = false;
-          while (!done) {
-            int tag = input.readTag();
-            switch (tag) {
-              case 0:
-                done = true;
-                break;
-              case 10: {
-                proxyId_ = input.readStringRequireUtf8();
-                bitField0_ |= 0x00000001;
-                break;
-              } // case 10
-              default: {
-                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
-                  done = true; // was an endgroup tag
-                }
-                break;
-              } // default:
-            } // switch (tag)
-          } // while (!done)
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.unwrapIOException();
-        } finally {
-          onChanged();
-        } // finally
-        return this;
-      }
-      private int bitField0_;
-
-      private Object proxyId_ = "";
-      /**
-       * <code>string proxy_id = 1;</code>
-       * @return The proxyId.
-       */
-      public String getProxyId() {
-        Object ref = proxyId_;
-        if (!(ref instanceof String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          String s = bs.toStringUtf8();
-          proxyId_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
-      }
-      /**
-       * <code>string proxy_id = 1;</code>
-       * @return The bytes for proxyId.
-       */
-      public com.google.protobuf.ByteString
-          getProxyIdBytes() {
-        Object ref = proxyId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (String) ref);
-          proxyId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string proxy_id = 1;</code>
-       * @param value The proxyId to set.
-       * @return This builder for chaining.
-       */
-      public Builder setProxyId(
-          String value) {
-        if (value == null) { throw new NullPointerException(); }
-        proxyId_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string proxy_id = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearProxyId() {
-        proxyId_ = getDefaultInstance().getProxyId();
-        bitField0_ = (bitField0_ & ~0x00000001);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string proxy_id = 1;</code>
-       * @param value The bytes for proxyId to set.
-       * @return This builder for chaining.
-       */
-      public Builder setProxyIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        proxyId_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest)
-    }
-
-    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.protocol.ProxyUnregisterRequest)
-    private static final ProxyUnregisterRequest DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new ProxyUnregisterRequest();
-    }
-
-    public static ProxyUnregisterRequest getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<ProxyUnregisterRequest>
-        PARSER = new com.google.protobuf.AbstractParser<ProxyUnregisterRequest>() {
-      @Override
-      public ProxyUnregisterRequest parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        Builder builder = newBuilder();
-        try {
-          builder.mergeFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(builder.buildPartial());
-        } catch (com.google.protobuf.UninitializedMessageException e) {
-          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
-        } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(e)
-              .setUnfinishedMessage(builder.buildPartial());
-        }
-        return builder.buildPartial();
-      }
-    };
-
-    public static com.google.protobuf.Parser<ProxyUnregisterRequest> parser() {
-      return PARSER;
-    }
-
-    @Override
-    public com.google.protobuf.Parser<ProxyUnregisterRequest> getParserForType() {
-      return PARSER;
-    }
-
-    @Override
-    public ProxyUnregisterRequest getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
   public interface ProxyResponseOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.protocol.ProxyResponse)
       com.google.protobuf.MessageOrBuilder {
@@ -2825,16 +2496,10 @@ String defaultValue) {
         getMessageBytes();
 
     /**
-     * <code>string proxy_id = 3;</code>
+     * <code>int32 proxy_id = 3;</code>
      * @return The proxyId.
      */
-    String getProxyId();
-    /**
-     * <code>string proxy_id = 3;</code>
-     * @return The bytes for proxyId.
-     */
-    com.google.protobuf.ByteString
-        getProxyIdBytes();
+    int getProxyId();
 
     /**
      * <code>string external_url = 4;</code>
@@ -2871,7 +2536,6 @@ String defaultValue) {
     }
     private ProxyResponse() {
       message_ = "";
-      proxyId_ = "";
       externalUrl_ = "";
     }
 
@@ -2939,42 +2603,14 @@ String defaultValue) {
     }
 
     public static final int PROXY_ID_FIELD_NUMBER = 3;
-    @SuppressWarnings("serial")
-    private volatile Object proxyId_ = "";
+    private int proxyId_ = 0;
     /**
-     * <code>string proxy_id = 3;</code>
+     * <code>int32 proxy_id = 3;</code>
      * @return The proxyId.
      */
     @Override
-    public String getProxyId() {
-      Object ref = proxyId_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        proxyId_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string proxy_id = 3;</code>
-     * @return The bytes for proxyId.
-     */
-    @Override
-    public com.google.protobuf.ByteString
-        getProxyIdBytes() {
-      Object ref = proxyId_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b =
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (String) ref);
-        proxyId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getProxyId() {
+      return proxyId_;
     }
 
     public static final int EXTERNAL_URL_FIELD_NUMBER = 4;
@@ -3036,8 +2672,8 @@ String defaultValue) {
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(message_)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 2, message_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 3, proxyId_);
+      if (proxyId_ != 0) {
+        output.writeInt32(3, proxyId_);
       }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(externalUrl_)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 4, externalUrl_);
@@ -3058,8 +2694,9 @@ String defaultValue) {
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(message_)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(2, message_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, proxyId_);
+      if (proxyId_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, proxyId_);
       }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(externalUrl_)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(4, externalUrl_);
@@ -3083,8 +2720,8 @@ String defaultValue) {
           != other.getSuccess()) return false;
       if (!getMessage()
           .equals(other.getMessage())) return false;
-      if (!getProxyId()
-          .equals(other.getProxyId())) return false;
+      if (getProxyId()
+          != other.getProxyId()) return false;
       if (!getExternalUrl()
           .equals(other.getExternalUrl())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
@@ -3104,7 +2741,7 @@ String defaultValue) {
       hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
       hash = (53 * hash) + getMessage().hashCode();
       hash = (37 * hash) + PROXY_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getProxyId().hashCode();
+      hash = (53 * hash) + getProxyId();
       hash = (37 * hash) + EXTERNAL_URL_FIELD_NUMBER;
       hash = (53 * hash) + getExternalUrl().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
@@ -3240,7 +2877,7 @@ String defaultValue) {
         bitField0_ = 0;
         success_ = false;
         message_ = "";
-        proxyId_ = "";
+        proxyId_ = 0;
         externalUrl_ = "";
         return this;
       }
@@ -3309,10 +2946,8 @@ String defaultValue) {
           bitField0_ |= 0x00000002;
           onChanged();
         }
-        if (!other.getProxyId().isEmpty()) {
-          proxyId_ = other.proxyId_;
-          bitField0_ |= 0x00000004;
-          onChanged();
+        if (other.getProxyId() != 0) {
+          setProxyId(other.getProxyId());
         }
         if (!other.getExternalUrl().isEmpty()) {
           externalUrl_ = other.externalUrl_;
@@ -3355,11 +2990,11 @@ String defaultValue) {
                 bitField0_ |= 0x00000002;
                 break;
               } // case 18
-              case 26: {
-                proxyId_ = input.readStringRequireUtf8();
+              case 24: {
+                proxyId_ = input.readInt32();
                 bitField0_ |= 0x00000004;
                 break;
-              } // case 26
+              } // case 24
               case 34: {
                 externalUrl_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000008;
@@ -3486,74 +3121,34 @@ String defaultValue) {
         return this;
       }
 
-      private Object proxyId_ = "";
+      private int proxyId_ ;
       /**
-       * <code>string proxy_id = 3;</code>
+       * <code>int32 proxy_id = 3;</code>
        * @return The proxyId.
        */
-      public String getProxyId() {
-        Object ref = proxyId_;
-        if (!(ref instanceof String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          String s = bs.toStringUtf8();
-          proxyId_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      @Override
+      public int getProxyId() {
+        return proxyId_;
       }
       /**
-       * <code>string proxy_id = 3;</code>
-       * @return The bytes for proxyId.
-       */
-      public com.google.protobuf.ByteString
-          getProxyIdBytes() {
-        Object ref = proxyId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b =
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (String) ref);
-          proxyId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string proxy_id = 3;</code>
+       * <code>int32 proxy_id = 3;</code>
        * @param value The proxyId to set.
        * @return This builder for chaining.
        */
-      public Builder setProxyId(
-          String value) {
-        if (value == null) { throw new NullPointerException(); }
+      public Builder setProxyId(int value) {
+
         proxyId_ = value;
         bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
       /**
-       * <code>string proxy_id = 3;</code>
+       * <code>int32 proxy_id = 3;</code>
        * @return This builder for chaining.
        */
       public Builder clearProxyId() {
-        proxyId_ = getDefaultInstance().getProxyId();
         bitField0_ = (bitField0_ & ~0x00000004);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string proxy_id = 3;</code>
-       * @param value The bytes for proxyId to set.
-       * @return This builder for chaining.
-       */
-      public Builder setProxyIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        proxyId_ = value;
-        bitField0_ |= 0x00000004;
+        proxyId_ = 0;
         onChanged();
         return this;
       }
@@ -3697,11 +3292,6 @@ String defaultValue) {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_MetadataEntry_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor;
-  private static final
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_descriptor;
   private static final
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -3723,17 +3313,18 @@ String defaultValue) {
       "ype\022\010\n\004AUTH\020\000\022\013\n\007CONNECT\020\001\022\016\n\nDISCONNECT" +
       "\020\002\022\014\n\010TRANSFER\020\003\022\r\n\tHEARTBEAT\020\004\022\t\n\005ERROR" +
       "\020\005\022\022\n\016PROXY_REGISTER\020\006\022\024\n\020PROXY_UNREGIST" +
-      "ER\020\007\"\362\001\n\014ProxyRequest\022\022\n\nproxy_name\030\001 \001(" +
-      "\t\022\022\n\nlocal_host\030\002 \001(\t\022\022\n\nlocal_port\030\003 \001(" +
-      "\r\022\020\n\010protocol\030\004 \001(\t\022O\n\010metadata\030\005 \003(\0132=." +
-      "com.xiaoniucode.etp.core.protocol.ProxyR" +
-      "equest.MetadataEntry\022\022\n\nauto_start\030\006 \001(\010" +
-      "\032/\n\rMetadataEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030" +
-      "\002 \001(\t:\0028\001\"*\n\026ProxyUnregisterRequest\022\020\n\010p" +
-      "roxy_id\030\001 \001(\t\"Y\n\rProxyResponse\022\017\n\007succes" +
-      "s\030\001 \001(\010\022\017\n\007message\030\002 \001(\t\022\020\n\010proxy_id\030\003 \001" +
-      "(\t\022\024\n\014external_url\030\004 \001(\tB\017B\rTunnelMessag" +
-      "eb\006proto3"
+      "ER\020\007\"\330\002\n\014ProxyRequest\022\027\n\nproxy_name\030\001 \001(" +
+      "\tH\000\210\001\001\022\027\n\nlocal_host\030\002 \001(\tH\001\210\001\001\022\022\n\nlocal" +
+      "_port\030\003 \001(\r\022\030\n\013remote_port\030\004 \001(\rH\002\210\001\001\022\020\n" +
+      "\010protocol\030\005 \001(\t\022O\n\010metadata\030\006 \003(\0132=.com." +
+      "xiaoniucode.etp.core.protocol.ProxyReque" +
+      "st.MetadataEntry\022\027\n\nauto_start\030\007 \001(\010H\003\210\001" +
+      "\001\032/\n\rMetadataEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value" +
+      "\030\002 \001(\t:\0028\001B\r\n\013_proxy_nameB\r\n\013_local_host" +
+      "B\016\n\014_remote_portB\r\n\013_auto_start\"Y\n\rProxy" +
+      "Response\022\017\n\007success\030\001 \001(\010\022\017\n\007message\030\002 \001" +
+      "(\t\022\020\n\010proxy_id\030\003 \001(\005\022\024\n\014external_url\030\004 \001" +
+      "(\tB\017B\rTunnelMessageb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3750,21 +3341,15 @@ String defaultValue) {
     internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_descriptor,
-        new String[] { "ProxyName", "LocalHost", "LocalPort", "Protocol", "Metadata", "AutoStart", });
+        new String[] { "ProxyName", "LocalHost", "LocalPort", "RemotePort", "Protocol", "Metadata", "AutoStart", });
     internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_MetadataEntry_descriptor =
       internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_descriptor.getNestedTypes().get(0);
     internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_MetadataEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_protocol_ProxyRequest_MetadataEntry_descriptor,
         new String[] { "Key", "Value", });
-    internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_com_xiaoniucode_etp_core_protocol_ProxyUnregisterRequest_descriptor,
-        new String[] { "ProxyId", });
     internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(2);
     internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_protocol_ProxyResponse_descriptor,

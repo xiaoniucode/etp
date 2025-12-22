@@ -1,7 +1,6 @@
 package com.xiaoniucode.etp.client.handler;
 
 import com.xiaoniucode.etp.client.ChannelManager;
-import com.xiaoniucode.etp.client.Config;
 import com.xiaoniucode.etp.core.AbstractMessageHandler;
 import com.xiaoniucode.etp.core.DataTunnelChannelBorrowCallback;
 import com.xiaoniucode.etp.core.EtpConstants;
@@ -24,6 +23,7 @@ public class ConnectHandler extends AbstractMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, Message msg) {
         Channel controlTunnelChannel = ctx.channel();
+        String secretKey = controlTunnelChannel.attr(EtpConstants.SECRET_KEY).get();
         long sessionId = msg.getSessionId();
         int port = msg.getPort();
         Bootstrap realBootstrap = ChannelManager.getRealBootstrap();
@@ -43,7 +43,7 @@ public class ConnectHandler extends AbstractMessageHandler {
                         Message tunnelMessage = Message.newBuilder()
                                 .setType(Message.Type.CONNECT)
                                 .setSessionId(sessionId)
-                                .setExt(Config.get().getSecretKey())
+                                .setExt(secretKey)
                                 .build();
 
                         dataChannel.writeAndFlush(tunnelMessage).addListener(future -> {
