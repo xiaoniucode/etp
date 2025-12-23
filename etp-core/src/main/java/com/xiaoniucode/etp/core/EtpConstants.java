@@ -26,5 +26,7 @@ public class EtpConstants {
 
     public static final AttributeKey<String> SERVER_DDR = AttributeKey.valueOf("etp.serverAddr");
     public static final AttributeKey<Integer> PROXY_ID = AttributeKey.valueOf("etp.proxyId");
+    public static final AttributeKey<String> OS = AttributeKey.valueOf("etp.os");
+    public static final AttributeKey<String> ARCH = AttributeKey.valueOf("etp.arch");
 
 }

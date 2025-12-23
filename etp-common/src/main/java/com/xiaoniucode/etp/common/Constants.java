@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.common;
 import java.io.File;
 
 /**
- * 常量
+ * 系统常量
  *
  * @author liuxin
  */

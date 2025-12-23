@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.core.protocol.ProtocolType;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ClientInfo;
 import com.xiaoniucode.etp.server.config.Dashboard;
+import com.xiaoniucode.etp.server.config.PortRange;
 import com.xiaoniucode.etp.server.config.ProxyMapping;
 import com.xiaoniucode.etp.server.manager.RuntimeState;
 import com.xiaoniucode.etp.server.web.ConfigService;
@@ -45,10 +46,38 @@ public final class EtpInitialize {
             registerDBProxyConfig();
             //将Toml中的用户信息同步到数据库
             syncDashboardUser();
+            //同步系统设置
+            syncSystemSettings();
         }
         //注册和同步Toml静态配
         registerTomlConfig();
         logger.debug("数据初始化完毕");
+    }
+
+    private static void syncSystemSettings() {
+        TX.execute(() -> {
+            Boolean enableDashboard = config.getDashboard().getEnable();
+            if (enableDashboard) {
+                // 同步端口范围设置
+                JSONObject portRange = ConfigService.getSystemSetting("port_range");
+                if (portRange == null) {
+                    JSONObject save = new JSONObject();
+                    save.put("key", "port_range");
+                    save.put("value", config.getPortRange().getStart() + ":" + config.getPortRange().getEnd());
+                    ConfigService.addSystemSetting(save);
+                    logger.info("同步端口范围配置到数据库");
+                } else {
+                    //如果数据库存在配置，采用数据库配置作为系统全局配置
+                    String range = portRange.getString("value");
+                    String[] split = range.split(":");
+                    PortRange configRange = config.getPortRange();
+                    configRange.setStart(Integer.parseInt(split[0]));
+                    configRange.setEnd(Integer.parseInt(split[1]));
+                }
+            }
+
+            return null;
+        });
     }
 
     private static void syncDashboardUser() {
@@ -174,7 +203,20 @@ public final class EtpInitialize {
         createUserTable();
         createClientTable();
         createProxiesTable();
+        createSystemSettingsTable();
         logger.debug("数据库表初始化完毕");
+    }
+
+    private static void createSystemSettingsTable() {
+        String sql = """
+            CREATE TABLE IF NOT EXISTS settings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                key TEXT NOT NULL UNIQUE,       -- 设置键
+                value TEXT NOT NULL             -- 设置值
+            );
+            CREATE INDEX IF NOT EXISTS idx_settings_k ON settings(key);
+            """;
+        SQLiteUtils.createTable(sql);
     }
 
     private static void createAuthTokenTable() {

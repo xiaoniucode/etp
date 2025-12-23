@@ -36,12 +36,13 @@ public class ProxyRegisterMessageHandler implements MessageHandler {
                 sendSuccessResponse(ctx, msg, response);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            Throwable cause = e.getCause();
+            logger.error(cause.getMessage(), cause);
             String errorMsg;
-            if (e instanceof BizException biz) {
+            if (cause instanceof BizException biz) {
                 errorMsg = biz.getMessage();
             } else {
-                errorMsg = e.getMessage();
+                errorMsg = cause.getMessage();
             }
             sendErrorResponse(ctx, msg, errorMsg);
         }
@@ -76,17 +77,11 @@ public class ProxyRegisterMessageHandler implements MessageHandler {
     }
 
     private void sendErrorResponse(ChannelHandlerContext ctx, TunnelMessage.Message originalMsg, String errorMessage) {
-        TunnelMessage.ProxyResponse errorResponse = TunnelMessage.ProxyResponse.newBuilder()
-            .setSuccess(false)
-            .setMessage(errorMessage)
-            .build();
-
         TunnelMessage.Message responseMsg = TunnelMessage.Message.newBuilder()
             .setType(TunnelMessage.Message.Type.ERROR)
             .setSessionId(originalMsg.getSessionId())
-            .setPayload(errorResponse.toByteString())
+            .setExt(errorMessage)
             .build();
-
         ctx.writeAndFlush(responseMsg);
     }
 }

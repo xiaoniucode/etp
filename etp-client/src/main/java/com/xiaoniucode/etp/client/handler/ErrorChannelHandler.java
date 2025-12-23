@@ -15,6 +15,7 @@ public class ErrorChannelHandler implements MessageHandler {
     private final Logger logger = LoggerFactory.getLogger(ErrorChannelHandler.class);
 
     @Override public void handle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
-        logger.error("发生错误");
+        String error = msg.getExt();
+        logger.error(error);
     }
 }

@@ -21,7 +21,7 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
     private final EtpClientProperties properties;
     private volatile boolean running = false;
     private TunnelClient tunnelClient;
-    private Environment environment;
+    private final Environment environment;
     private final WebServerPortListener webServerPortListener;
     private final ProxyRegisterClient proxyRegisterClient;
 

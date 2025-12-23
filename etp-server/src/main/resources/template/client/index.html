@@ -54,7 +54,7 @@
                 'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
             },
             cols: [[
-                {field: 'name', fixed: 'left', width: 150, title: '客户端'},
+                {field: 'name', fixed: 'left', width: 150, title: '客户端名'},
                 {
                     field: 'secretKey',
                     title: 'Token',
@@ -82,7 +82,6 @@
                         <span style="color:#00baff; font-weight:500;">在线</span>
                     </div>
                     <div style="display: flex; align-items: center;">
-
                         <i class="layui-icon layui-icon-windows" style="color:#666; margin-right:4px;"></i>
                         <span>${d.os||''}</span>
                         <span style="color:#666; font-size:12px; margin-left:15px;">${d.arch || ''}</span>

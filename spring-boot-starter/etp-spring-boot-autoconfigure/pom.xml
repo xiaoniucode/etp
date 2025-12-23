@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.xiaoniucode</groupId>
+        <artifactId>etp-spring-boot-parent</artifactId>
+        <version>0.1.0</version>
+    </parent>
+    <artifactId>etp-spring-boot-autoconfigure</artifactId>
+    <packaging>jar</packaging>
+
+    <name>etp-spring-boot-autoconfigure</name>
+    <description>自动装配</description>
+    <url>https://github.com/xiaoniucode/etp</url>
+
+    <properties>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <etp-client.version>0.3.2</etp-client.version>
+    </properties>
+</project>

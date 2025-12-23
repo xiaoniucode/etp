@@ -53,6 +53,10 @@ public final class AppConfig {
      */
     private Dashboard dashboard;
     /**
+     * 公网端口分配范围
+     */
+    private PortRange portRange;
+    /**
      * 存储所有客户端
      */
     private final List<ClientInfo> clients = new CopyOnWriteArrayList<>();
@@ -70,12 +74,13 @@ public final class AppConfig {
         parseClient(root);
         //解析日志配置
         parseLogConfig(root);
+        parsePortRange(root);
         return this;
     }
 
     private void parseRoot(Toml root) {
         if (root.contains("bindPort")) {
-            Long bindPortValue = root.getLong("bindPort", (long)DEFAULT_BIND_PORT);
+            Long bindPortValue = root.getLong("bindPort", (long) DEFAULT_BIND_PORT);
             bindPort = bindPortValue.intValue();
         }
         if (root.contains("host")) {
@@ -169,7 +174,7 @@ public final class AppConfig {
                 dashboard.setEnable(true);
                 String addr = dash.getString("addr", DEFAULT_DASHBOARD_HOST);
                 dashboard.setAddr(addr);
-                Long port = dash.getLong("port", (long)DEFAULT_DASHBOARD_PORT);
+                Long port = dash.getLong("port", (long) DEFAULT_DASHBOARD_PORT);
                 dashboard.setPort(port.intValue());
                 String username = dash.getString("username");
                 String password = dash.getString("password");
@@ -211,6 +216,17 @@ public final class AppConfig {
         }
     }
 
+    private void parsePortRange(Toml root) {
+        Toml range = root.getTable("port_range");
+        portRange = new PortRange();
+        if (range != null) {
+            Long start = range.getLong("start", -1L);
+            portRange.setStart(start.intValue());
+            Long end = range.getLong("end", -1L);
+            portRange.setEnd(end.intValue());
+        }
+    }
+
     public String getHost() {
         return host;
     }
@@ -237,5 +253,9 @@ public final class AppConfig {
 
     public List<ClientInfo> getClients() {
         return clients;
+    }
+
+    public PortRange getPortRange() {
+        return portRange;
     }
 }

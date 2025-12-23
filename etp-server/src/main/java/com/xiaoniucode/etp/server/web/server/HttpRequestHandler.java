@@ -122,7 +122,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             setCommonResponseHeaders(response, context);
             ctx.writeAndFlush(response);
         } else {
-            String msg = e.getMessage() != null ? e.getMessage() : "Internal Server Error";
+            String msg = cause.getMessage() != null ? cause.getMessage() : "Internal Server Error";
             ByteBuf buffer = Unpooled.copiedBuffer(ResponseEntity.error(500, msg).toJson(), CharsetUtil.UTF_8);
             FullHttpResponse response = new DefaultFullHttpResponse(
                     HttpVersion.HTTP_1_1,

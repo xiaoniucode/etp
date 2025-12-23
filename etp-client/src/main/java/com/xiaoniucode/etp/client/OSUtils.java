@@ -25,4 +25,10 @@ public class OSUtils {
             return "Other";
         }
     }
+    /**
+     * 获取系统架构
+     */
+    public static String getOSArch() {
+        return System.getProperty("os.arch");
+    }
 }

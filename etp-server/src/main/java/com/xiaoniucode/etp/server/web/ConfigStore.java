@@ -15,8 +15,8 @@ public class ConfigStore {
     /**
      * 新增客户端
      */
-    public int  addClient(JSONObject client) {
-       return SQLiteUtils.insert(
+    public int addClient(JSONObject client) {
+        return SQLiteUtils.insert(
             "INSERT INTO clients (name, secretKey) VALUES (?, ?)",
             client.getString("name"), client.getString("secretKey")
         );
@@ -231,6 +231,23 @@ public class ConfigStore {
 
     public JSONObject getProxy(int clientId, String name) {
         return SQLiteUtils.get("SELECT * FROM proxies WHERE clientId = ? and name=?", clientId, name);
+    }
+
+    public int updateSetting(JSONObject save) {
+        return SQLiteUtils.update(
+            "UPDATE settings SET key =?,value=?  WHERE id = ?",
+            save.getString("id"), save.getString("value"), save.getString("value"));
+    }
+
+    public int addSetting(JSONObject save) {
+        return SQLiteUtils.insert(
+            "INSERT INTO settings (key, value) VALUES (?, ?)",
+            save.getString("key"), save.getString("value")
+        );
+    }
+
+    public JSONObject findSettingByKey(String key) {
+        return SQLiteUtils.get("SELECT id,key,value FROM settings WHERE key = ? ", key);
     }
 }
 

@@ -144,9 +144,13 @@ public class TunnelClient implements Lifecycle {
                 channel.attr(EtpConstants.SERVER_DDR).set(serverAddr);
                 channel.attr(EtpConstants.SECRET_KEY).set(secretKey);
                 ChannelManager.setControlChannel(channel);
+
+                String os = OSUtils.getOS();
+                String arch = OSUtils.getOSArch();
+                String body = secretKey + ":" + os + ":" + arch;
                 TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
                     .setType(TunnelMessage.Message.Type.AUTH)
-                    .setExt(secretKey)
+                    .setExt(body)
                     .build();
                 future.channel().writeAndFlush(message);
                 retryCount.set(0);

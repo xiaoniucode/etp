@@ -9,17 +9,22 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * 负责认证、消息分发
+ * 控制隧道Channel处理器，负责消息分发、连接断开处理
  *
  * @author liuxin
  */
 public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
+    private Logger logger = LoggerFactory.getLogger(ControlChannelHandler.class);
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
         MessageHandler handler = MessageHandlerFactory.getHandler(msg.getType());
-        handler.handle(ctx, msg);
+        if (handler != null) {
+            handler.handle(ctx, msg);
+        }
     }
 
     /**

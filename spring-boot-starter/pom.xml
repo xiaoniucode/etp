@@ -12,6 +12,8 @@
     <url>https://github.com/xiaoniucode/etp</url>
    <modules>
        <module>etp-spring-boot-starter</module>
+       <module>etp-spring-boot3-starter</module>
+       <module>etp-spring-boot4-starter</module>
    </modules>
     <build>
 

@@ -25,10 +25,6 @@ public class MessageHandlerFactory {
     }
 
     public static MessageHandler getHandler(TunnelMessage.Message.Type type) {
-        MessageHandler handler = handlers.get(type);
-        if (handler == null) {
-            throw new RuntimeException("not found handler for type:" + type);
-        }
-        return handler;
+        return handlers.get(type);
     }
 }

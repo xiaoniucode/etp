@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.web;
 
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.core.protocol.ProtocolType;
+import com.xiaoniucode.etp.server.config.AuthInfo;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.PortAllocator;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
@@ -69,10 +70,14 @@ public final class ConfigService {
         JSONArray clients = configStore.listClients();
         for (int i = 0; i < clients.length(); i++) {
             JSONObject client = clients.getJSONObject(i);
+            String secretKey = client.getString("secretKey");
             client.put("status", ChannelManager.clientIsOnline(client.getString("secretKey")) ? 1 : 0);
-            //todo 获取已认证客户端信息
-            client.put("os", "MacOS");
-            client.put("arch", "x86-64");
+            //获取在线客户端信息
+            AuthInfo authInfo = ChannelManager.getAuthInfo(secretKey);
+            if (authInfo != null) {
+                client.put("os", authInfo.getOs());
+                client.put("arch", authInfo.getArch());
+            }
         }
         return clients;
     }
@@ -85,7 +90,7 @@ public final class ConfigService {
         return TX.execute(() -> {
             int remotePort = req.getInt("remotePort");
             if (remotePort != -1 && !PortAllocator.get().isPortAvailable(remotePort)) {
-                throw new BizException("公网端口: " + remotePort + "无效");
+                throw new BizException("映射注册失败，公网端口: " + remotePort + "无效！");
             }
             String secretKey = req.getString("secretKey");
             if (state.isPortOccupied(remotePort)) {
@@ -329,5 +334,13 @@ public final class ConfigService {
             return null;
         });
 
+    }
+
+    public static JSONObject getSystemSetting(String key) {
+        return configStore.findSettingByKey(key);
+    }
+
+    public static void addSystemSetting(JSONObject save) {
+       configStore.addSetting(save);
     }
 }

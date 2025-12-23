@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.client;
 
-import com.xiaoniucode.etp.core.protocol.TunnelMessage;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage.ProxyRequest;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage.Message;
 import io.netty.channel.Channel;

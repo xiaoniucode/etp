@@ -95,6 +95,7 @@ public final class TcpProxyServer implements Lifecycle {
                             LOGGER.warn("未成功启动服务，remotePort:{}端口不可用！", remotePort);
                         }
                     }
+                    PortAllocator.get().addRemotePort(proxy.getRemotePort());
                 }
                 if (!bindPorts.isEmpty()) {
                     PortFileUtil.writePortsToFile(bindPorts);

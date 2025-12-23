@@ -26,8 +26,11 @@ level = "debug"
 enable = true
 #addr = "localhost"
 port = 8030
-reset=true
+reset = true
 username = "admin"
 password = "123456"
 #
-#
+#端口范围
+[port_range]
+start = 8600
+end = 8603

@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.manager;
 
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.server.config.AuthInfo;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,14 +41,33 @@ public final class ChannelManager {
      * @param secretKey      客户端密钥
      * @param controlChannel 控制隧道
      */
-    public static void addControlChannel(List<Integer> remotePorts, String secretKey, Channel controlChannel) {
+    public static void addControlChannel(List<Integer> remotePorts, String secretKey, String os, String arch,
+        Channel controlChannel) {
         for (Integer remotePort : remotePorts) {
             portControlChannelMapping.put(remotePort, controlChannel);
         }
         controlChannel.attr(EtpConstants.CHANNEL_REMOTE_PORT).set(remotePorts);
         controlChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
+        controlChannel.attr(EtpConstants.OS).set(os);
+        controlChannel.attr(EtpConstants.ARCH).set(arch);
         controlChannel.attr(EtpConstants.VISITOR_CHANNELS).set(new ConcurrentHashMap<>());
         clientControlChannelMapping.put(secretKey, controlChannel);
+    }
+
+    /**
+     * 获取认证成功在线的客户端信息
+     *
+     * @param secretKey 认证密钥
+     * @return 认证客户端信息
+     */
+    public static AuthInfo getAuthInfo(String secretKey) {
+        Channel channel = clientControlChannelMapping.get(secretKey);
+        if (channel != null) {
+            String os = channel.attr(EtpConstants.OS).get();
+            String arch = channel.attr(EtpConstants.ARCH).get();
+            return new AuthInfo(os, arch);
+        }
+        return null;
     }
 
     /**
@@ -137,7 +157,8 @@ public final class ChannelManager {
         return controlChannel.attr(EtpConstants.VISITOR_CHANNELS).get().get(sessionId);
     }
 
-    public static void addClientChannelToControlChannel(Channel visitorChannel, Long sessionId, Channel controlChannel) {
+    public static void addClientChannelToControlChannel(Channel visitorChannel, Long sessionId,
+        Channel controlChannel) {
         controlChannel.attr(EtpConstants.VISITOR_CHANNELS).get().put(sessionId, visitorChannel);
         visitorChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
     }

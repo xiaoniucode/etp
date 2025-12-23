@@ -7,6 +7,8 @@ etp:
 #    local-host: 127.0.0.1
 #    remote-port: 8025
 
+    auto-start: true
+
 #    tls: false
 #    truststore:
 #      path: cert/client.p12 #证书路径

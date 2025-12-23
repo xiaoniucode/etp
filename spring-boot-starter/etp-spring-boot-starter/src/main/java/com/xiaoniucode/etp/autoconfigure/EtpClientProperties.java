@@ -11,9 +11,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "etp.client")
 public class EtpClientProperties {
     /**
-     * 是否启用 ETP 客户端自动启动
+     * 是否启用 ETP客户端自动启动
      */
-    private boolean enabled = true;
+    private boolean enabled = false;
 
     /**
      * 服务端地址，默认 127.0.0.1
@@ -37,7 +37,7 @@ public class EtpClientProperties {
      */
     private ProtocolType protocol = ProtocolType.TCP;
     /**
-     * 密钥，必填
+     * 密钥
      */
     private String secretKey;
     /**
@@ -46,7 +46,7 @@ public class EtpClientProperties {
     private boolean autoStart = true;
 
     /**
-     * 是否启用 TLS 加密，默认 false
+     * 是否启用 TLS 加密
      */
     private boolean tls = false;
 
@@ -59,7 +59,7 @@ public class EtpClientProperties {
      */
     private int maxRetries = 5;
     /**
-     * 最大延迟时间,如果超过了则取maxDelaySec为最大延迟时间 单位：秒
+     * 最大延迟时间,如果超过了最大值则取maxDelaySec为最大延迟时间 单位：秒
      */
     private int maxDelaySec = 8;
 

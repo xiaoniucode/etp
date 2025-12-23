@@ -22,7 +22,11 @@ public class AuthHandler extends AbstractMessageHandler {
 
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
-        String secretKey = msg.getExt();
+        String body = msg.getExt();
+        String[] values = body.split(":");
+        String secretKey = values[0];
+        String os = values[1];
+        String arch = values[2];
         //检查密钥是否存在
         if (!state.hasClient(secretKey)) {
             logger.error("secretKey认证密钥未授权");
@@ -34,7 +38,7 @@ public class AuthHandler extends AbstractMessageHandler {
             ctx.channel().close();
         }
         List<Integer> remotePorts = state.getClientRemotePorts(secretKey);
-        ChannelManager.addControlChannel(remotePorts, secretKey, ctx.channel());
+        ChannelManager.addControlChannel(remotePorts, secretKey,os,arch, ctx.channel());
         logger.debug("客户端认证成功");
     }
 }
