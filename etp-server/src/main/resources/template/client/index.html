@@ -41,6 +41,20 @@
 <script src="/static/js/ajax.js"></script>
 <script src="/static/js/copy.js"></script>
 <script>
+    function getOsIcon(osName) {
+        const os = osName.toLowerCase();
+        const base = '/static/icons/'
+        if (os === 'windows') {
+            return base + 'windows.svg'
+        } else if (os === 'macos') {
+            return base + 'mac-os.svg'
+        } else if (os === 'linux') {
+            return base + 'linux.svg'
+        } else {
+            return base + 'unknown.svg'
+        }
+    }
+
     layui.use(['table', 'dropdown', 'jquery', 'Rest'], function () {
         var table = layui.table;
         var Rest = layui.Rest;
@@ -82,9 +96,9 @@
                         <span style="color:#00baff; font-weight:500;">在线</span>
                     </div>
                     <div style="display: flex; align-items: center;">
-                        <i class="layui-icon layui-icon-windows" style="color:#666; margin-right:4px;"></i>
-                        <span>${d.os||''}</span>
-                        <span style="color:#666; font-size:12px; margin-left:15px;">${d.arch || ''}</span>
+                        <img  style="height: 24px;width: 24px;margin-right: 2px"  src="${getOsIcon(d.os)}">
+                        <span style="font-weight:500;color: #333;font-size: 15px">${d.os || ''}</span>
+                        <span class="layui-badge layui-bg-cyan" style=" font-size:15px; margin-left:15px;">${d.arch || ''}</span>
                     </div>
                 </div>
             `;
