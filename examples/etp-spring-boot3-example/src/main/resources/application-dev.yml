@@ -1,0 +1,19 @@
+etp:
+  client:
+    enabled: true #是否开启etp代理，默认为关闭状态
+    server-addr: localhost #服务器地址
+    secret-key: c05c8d54293b4862ae0892e9546354af #认证Token
+#    protocol: tcp
+#    local-host: 127.0.0.1
+#    remote-port: 8025
+
+    auto-start: true
+
+#    tls: false
+#    truststore:
+#      path: cert/client.p12 #证书路径
+#      store-pass: jesjH9JNLKY3 # 密钥
+#
+#    initial-delay-sec: 2 #首次连接失败延迟
+#    max-delay-sec: 10 # 最大延迟秒数
+#    max-retries: 8 # 最大重试次数

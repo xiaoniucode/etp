@@ -1,15 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>com.xiaoniucode</groupId>
-        <artifactId>etp-spring-boot-starter-parent</artifactId>
-        <version>0.1.0</version>
-    </parent>
+   <parent>
+       <groupId>com.xiaoniucode</groupId>
+       <artifactId>etp-spring-boot-starter-parent</artifactId>
+       <version>0.1.0</version>
+   </parent>
     <artifactId>etp-spring-boot4-starter</artifactId>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
-
     <name>etp-spring-boot4-starter</name>
     <description>将etp嵌入SpringBoot应用，无需单独安装运行二进制客户端，开发测试更便捷！</description>
     <url>https://github.com/xiaoniucode/etp</url>
@@ -31,34 +30,50 @@
         <system>Github</system>
         <url>https://github.com/xiaoniucode/etp/actions</url>
     </ciManagement>
+
     <properties>
         <java.version>17</java.version>
+        <spring-boot4.version>4.0.0</spring-boot4.version>
+        <etp-client.version>0.3.2-SNAPSHOT</etp-client.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <etp-client.version>0.3.2-SNAPSHOT</etp-client.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot4.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>com.xiaoniucode</groupId>
             <artifactId>etp-spring-boot-autoconfigure</artifactId>
             <version>0.1.0</version>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-web-server</artifactId>
+            <version>${spring-boot4.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>${spring-boot4.version}</version>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure-processor</artifactId>
+            <version>${spring-boot4.version}</version>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <version>${spring-boot4.version}</version>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
     <build>
         <plugins>
             <plugin>

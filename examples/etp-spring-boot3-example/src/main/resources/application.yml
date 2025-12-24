@@ -1,0 +1,7 @@
+server:
+  port: 8084
+spring:
+  profiles:
+    active: dev
+  application:
+    name: Application3
