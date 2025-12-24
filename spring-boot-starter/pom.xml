@@ -3,17 +3,27 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.xiaoniucode</groupId>
-    <artifactId>etp-spring-boot-parent</artifactId>
+    <artifactId>etp-spring-boot-starter-parent</artifactId>
     <version>0.1.0</version>
 
     <name>etp-spring-boot-parent</name>
     <packaging>pom</packaging>
     <description>一个内网穿透工具客户端</description>
     <url>https://github.com/xiaoniucode/etp</url>
+    <properties>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-boot.version>2.7.18</spring-boot.version>
+        <spring-boot3.version>3.4.1</spring-boot3.version>
+        <spring-boot4.version>4.0.0</spring-boot4.version>
+        <etp-client.version>0.3.2-SNAPSHOT</etp-client.version>
+    </properties>
    <modules>
        <module>etp-spring-boot-starter</module>
        <module>etp-spring-boot3-starter</module>
        <module>etp-spring-boot4-starter</module>
+       <module>etp-spring-boot-autoconfigure</module>
    </modules>
     <build>
 

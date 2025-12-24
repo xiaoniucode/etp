@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.xiaoniucode</groupId>
     <artifactId>etp</artifactId>
-    <version>${revision}</version>
+    <version>0.3.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <properties>
         <java.version>21</java.version>
-        <revision>0.3.2</revision>
+        <revision>0.3.2-SNAPSHOT</revision>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -33,7 +33,6 @@
         <module>etp-server</module>
         <module>etp-client</module>
         <module>etp-test</module>
-        <module>spring-boot-starter</module>
     </modules>
 
     <dependencyManagement>

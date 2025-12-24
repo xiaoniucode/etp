@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.xiaoniucode</groupId>
         <artifactId>etp</artifactId>
-        <version>0.3.2</version>
+        <version>0.3.2-SNAPSHOT</version>
     </parent>
     <artifactId>etp-client</artifactId>
     <packaging>jar</packaging>

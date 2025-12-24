@@ -4,23 +4,39 @@
 
     <parent>
         <groupId>com.xiaoniucode</groupId>
-        <artifactId>etp-spring-boot-parent</artifactId>
+        <artifactId>etp-spring-boot-starter-parent</artifactId>
         <version>0.1.0</version>
     </parent>
     <artifactId>etp-spring-boot4-starter</artifactId>
     <packaging>jar</packaging>
 
     <name>etp-spring-boot4-starter</name>
-    <description>内网穿透工具客户端，支持SpringBoot 4.x版本</description>
+    <description>将etp嵌入SpringBoot应用，无需单独安装运行二进制客户端，开发测试更便捷！</description>
     <url>https://github.com/xiaoniucode/etp</url>
-
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://github.com/xiaoniucode/etp/blob/main/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>xiaoniucode</name>
+            <email>yuanyicode@gmail.com</email>
+            <timezone>🇨🇳</timezone>
+        </developer>
+    </developers>
+    <ciManagement>
+        <system>Github</system>
+        <url>https://github.com/xiaoniucode/etp/actions</url>
+    </ciManagement>
     <properties>
-        <spring-boot.version>4.0.0</spring-boot.version>
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <etp-client.version>0.3.2</etp-client.version>
+        <etp-client.version>0.3.2-SNAPSHOT</etp-client.version>
     </properties>
 
     <dependencyManagement>
@@ -28,7 +44,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
+                <version>${spring-boot4.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -38,30 +54,9 @@
     <dependencies>
         <dependency>
             <groupId>com.xiaoniucode</groupId>
-            <artifactId>etp-client</artifactId>
-            <version>${etp-client.version}</version>
+            <artifactId>etp-spring-boot-autoconfigure</artifactId>
+            <version>0.1.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.xiaoniucode</groupId>
-            <artifactId>etp-common</artifactId>
-            <version>${etp-client.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.xiaoniucode</groupId>
-            <artifactId>etp-core</artifactId>
-            <version>${etp-client.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-
     </dependencies>
 
     <build>
