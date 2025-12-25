@@ -2,48 +2,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
    <parent>
-       <groupId>com.xiaoniucode</groupId>
+       <groupId>io.github.xiaoniucode</groupId>
        <artifactId>etp-spring-boot-starter-parent</artifactId>
-       <version>0.1.0</version>
+       <version>0.4.0</version>
    </parent>
     <artifactId>etp-spring-boot4-starter</artifactId>
-    <version>0.1.0</version>
-    <packaging>jar</packaging>
     <name>etp-spring-boot4-starter</name>
-    <description>将etp嵌入SpringBoot应用，无需单独安装运行二进制客户端，开发测试更便捷！</description>
-    <url>https://github.com/xiaoniucode/etp</url>
-    <licenses>
-        <license>
-            <name>Apache License 2.0</name>
-            <url>https://github.com/xiaoniucode/etp/blob/main/LICENSE</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <developers>
-        <developer>
-            <name>xiaoniucode</name>
-            <email>yuanyicode@gmail.com</email>
-            <timezone>🇨🇳</timezone>
-        </developer>
-    </developers>
-    <ciManagement>
-        <system>Github</system>
-        <url>https://github.com/xiaoniucode/etp/actions</url>
-    </ciManagement>
-
+    <packaging>jar</packaging>
     <properties>
         <java.version>17</java.version>
-        <spring-boot4.version>4.0.0</spring-boot4.version>
-        <etp-client.version>0.3.2-SNAPSHOT</etp-client.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>com.xiaoniucode</groupId>
+            <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-spring-boot-autoconfigure</artifactId>
-            <version>0.1.0</version>
+            <version>${etp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -72,48 +45,5 @@
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.sonatype.central</groupId>
-                <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.9.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <publishingServerId>central</publishingServerId>
-                    <autoPublish>false</autoPublish>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.8.0</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

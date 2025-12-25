@@ -8,19 +8,20 @@
         <version>3.4.1</version>
         <relativePath/>
     </parent>
-    <groupId>com.xiaoniucode</groupId>
+    <groupId>io.github.xiaoniucode</groupId>
     <artifactId>etp-spring-boot3-example</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.4.0-SNAPSHOT</version>
     <name>etp-spring-boot3-example</name>
     <description>etp-spring-boot3-example</description>
     <properties>
         <java.version>17</java.version>
+        <etp.version>0.4.0</etp.version>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>com.xiaoniucode</groupId>
+            <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-spring-boot3-starter</artifactId>
-            <version>0.1.0</version>
+            <version>${etp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

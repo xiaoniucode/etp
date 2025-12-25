@@ -2,9 +2,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.xiaoniucode</groupId>
+        <groupId>io.github.xiaoniucode</groupId>
         <artifactId>etp</artifactId>
-        <version>0.3.2-SNAPSHOT</version>
+        <version>0.4.0</version>
     </parent>
     <artifactId>etp-core</artifactId>
     <packaging>jar</packaging>
@@ -23,7 +23,7 @@
             <artifactId>protobuf-java-util</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.xiaoniucode</groupId>
+            <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-common</artifactId>
         </dependency>
     </dependencies>
