@@ -3,7 +3,10 @@ package com.xiaoniucode.etp.examples.springboot4;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = "com.xiaoniucode.etp")
+/**
+ * @author liuxin
+ */
+@SpringBootApplication
 public class Application4 {
 
     public static void main(String[] args) {

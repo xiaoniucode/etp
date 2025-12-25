@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * @author liuxin
  */
-@SpringBootApplication(scanBasePackages = "com.xiaoniucode.etp")
+@SpringBootApplication
 public class Application3 {
 
     public static void main(String[] args) {

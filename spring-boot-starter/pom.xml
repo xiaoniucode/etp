@@ -20,7 +20,7 @@
         <developer>
             <name>xiaoniucode</name>
             <email>yuanyicode@gmail.com</email>
-            <timezone>🇨🇳</timezone>
+            <timezone>Asia/Shanghai</timezone>
         </developer>
     </developers>
     <ciManagement>
@@ -64,7 +64,6 @@
         <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
     </properties>
     <modules>
-        <module>etp-spring-boot-autoconfigure</module>
         <module>etp-spring-boot-starter</module>
         <module>etp-spring-boot3-starter</module>
         <module>etp-spring-boot4-starter</module>
@@ -150,32 +149,6 @@
                         <phase>verify</phase>
                         <goals>
                             <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <version>${flatten-maven-plugin.version}</version>
-                <configuration>
-                    <updatePomFile>true</updatePomFile>
-                    <flattenMode>ossrh</flattenMode>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>flatten.clean</id>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>clean</goal>
                         </goals>
                     </execution>
                 </executions>

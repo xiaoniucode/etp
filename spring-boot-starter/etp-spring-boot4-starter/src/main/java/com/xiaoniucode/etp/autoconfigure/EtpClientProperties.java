@@ -7,7 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * etp客户端配置属性
  *
  * @author liuxin
- * @since 0.4.0
  */
 @ConfigurationProperties(prefix = "etp.client")
 public class EtpClientProperties {

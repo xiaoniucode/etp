@@ -16,9 +16,18 @@
     <dependencies>
         <dependency>
             <groupId>io.github.xiaoniucode</groupId>
-            <artifactId>etp-spring-boot-autoconfigure</artifactId>
+            <artifactId>etp-client</artifactId>
             <version>${etp.version}</version>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.xiaoniucode</groupId>
+            <artifactId>etp-common</artifactId>
+            <version>${etp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.xiaoniucode</groupId>
+            <artifactId>etp-core</artifactId>
+            <version>${etp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
