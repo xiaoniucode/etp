@@ -43,7 +43,7 @@
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
-                        <version>${native.version}</version>
+                        <version>${native-maven-plugin.version}</version>
                         <configuration>
                             <mainClass>com.xiaoniucode.etp.client.TunnelClientStartup</mainClass>
                             <imageName>etp-client</imageName>

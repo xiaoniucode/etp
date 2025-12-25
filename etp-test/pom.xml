@@ -3,19 +3,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.xiaoniucode</groupId>
-        <artifactId>etp</artifactId>
-        <version>0.4.0</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.1</version>
+        <relativePath/>
     </parent>
     <artifactId>etp-test</artifactId>
     <name>etp-test</name>
     <description>etp-test</description>
     <properties>
-        <java.version>21</java.version>
-        <spring-boot.version>3.5.7</spring-boot.version>
+        <etp.version>0.4.0</etp.version>
+
+        <java.version>17</java.version>
         <maven.test.skip>true</maven.test.skip>
         <skipTests>true</skipTests>
-
         <mysql-connector-j.version>8.0.33</mysql-connector-j.version>
         <lombok.version>1.18.42</lombok.version>
         <junit.version>4.13.2</junit.version>
@@ -26,15 +27,16 @@
         <dependency>
             <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-server</artifactId>
+            <version>${etp.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-client</artifactId>
+            <version>${etp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
 
         <dependency>
@@ -52,7 +54,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring-boot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -66,39 +67,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
             </plugin>
         </plugins>
     </build>

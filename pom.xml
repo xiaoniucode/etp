@@ -4,7 +4,44 @@
     <groupId>io.github.xiaoniucode</groupId>
     <artifactId>etp</artifactId>
     <version>0.4.0</version>
+    <name>etp</name>
     <packaging>pom</packaging>
+    <url>https://github.com/xiaoniucode/etp</url>
+    <description>etp(Easy Tunnel Proxy)是一个支持跨平台的高性能内网穿透应用，用于快速将内网服务暴露为公网服务。</description>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://github.com/xiaoniucode/etp/blob/main/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>xiaoniucode</name>
+            <email>yuanyicode@gmail.com</email>
+            <timezone>🇨🇳</timezone>
+        </developer>
+    </developers>
+    <ciManagement>
+        <system>GitHub Actions</system>
+        <url>https://github.com/xiaoniucode/etp/actions</url>
+    </ciManagement>
+    <scm>
+        <connection>scm:git:https://github.com/xiaoniucode/etp.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:xiaoniucode/etp.git</developerConnection>
+        <url>https://github.com/xiaoniucode/etp</url>
+        <tag>HEAD</tag>
+    </scm>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>central</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>central</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
     <properties>
         <java.version>21</java.version>
         <revision>0.4.0</revision>
@@ -17,7 +54,7 @@
         <!--核心依赖-->
         <netty.version>4.1.80.Final</netty.version>
         <protobuf.version>4.32.1</protobuf.version>
-        <native.version>0.10.6</native.version>
+        <native-maven-plugin.version>0.10.6</native-maven-plugin.version>
         <maven.compiler>3.8.1</maven.compiler>
         <toml4j.version>0.7.2</toml4j.version>
         <maven-assembly-plugin>3.3.0</maven-assembly-plugin>
@@ -26,13 +63,19 @@
         <disruptor.version>4.0.0</disruptor.version>
         <sqlite.version>3.42.0.0</sqlite.version>
         <org-json.version>20250517</org-json.version>
+
+        <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
+        <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
+        <maven-javadoc-plugin.version>3.8.0</maven-javadoc-plugin.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+        <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
     </properties>
     <modules>
         <module>etp-core</module>
         <module>etp-common</module>
         <module>etp-server</module>
         <module>etp-client</module>
-        <module>etp-test</module>
     </modules>
 
     <dependencyManagement>
@@ -76,7 +119,7 @@
             <dependency>
                 <groupId>org.graalvm.buildtools</groupId>
                 <artifactId>native-maven-plugin</artifactId>
-                <version>${native.version}</version>
+                <version>${native-maven-plugin.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.protobuf</groupId>
@@ -117,8 +160,8 @@
         </dependencies>
     </dependencyManagement>
     <build>
-        <!--<plugins>
-            <plugin>
+        <plugins>
+           <!-- <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.5.0</version>
@@ -138,8 +181,109 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>-->
+
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>${central-publishing-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>false</autoPublish>
+                </configuration>
             </plugin>
-        </plugins>-->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <source>${java.version}</source>
+                            <doclint>none</doclint>
+                            <show>private</show>
+                            <nohelp>true</nohelp>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                    <proc>none</proc>
+                    <compilerArgs>
+                        <arg>-Xlint:none</arg>
+                        <arg>-Xlint:-options</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven-gpg-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flatten-maven-plugin.version}</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>ossrh</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
