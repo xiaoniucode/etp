@@ -14,8 +14,8 @@
   <a href="https://github.com/xiaoniucode/etp/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge" alt="License"/>
   </a>
- <a href="https://github.com/xiaoniucode/etp/releases/v0.3.2">
-    <img src="https://img.shields.io/badge/etp-0.3.2-blue?style=for-the-badge" alt="etp:0.3.2"/>
+ <a href="https://github.com/xiaoniucode/etp/releases/v0.4.0">
+    <img src="https://img.shields.io/badge/etp-0.4.0-blue?style=for-the-badge" alt="etp:0.3.2"/>
   </a>
 <a href="https://somsubhra.github.io/github-release-stats/?username=xiaoniucode&repository=etp">
   <img src="https://img.shields.io/github/downloads/xiaoniucode/etp/total?style=for-the-badge" alt="Downloads"/>
@@ -140,16 +140,6 @@ secretKey = "你的客户端认证密钥" #和服务端配置保持一致
 ## 问题反馈
 
 反馈问题:[issues](https://github.com/xiaoniucode/etp/issues)
-
-交流&反馈QQ群：1061026558
-
-<img src="doc/image/qq.JPG" alt="QQ交流群" width="200" height="200" />
-
-## 未来规划
-
-- 原生支持HTTP/HTTPS协议，端口复用
-- IP黑白名单
-- 限流
 
 ## 📈 项目趋势
 

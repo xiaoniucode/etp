@@ -4,4 +4,4 @@ spring:
   profiles:
     active: dev
   application:
-    name: Application2
+    name: 物流服务

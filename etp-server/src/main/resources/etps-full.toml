@@ -57,3 +57,8 @@ remotePort = 6380
 #username = "admin"
 #password = "123456"
 #reset=false #是否重置管理界面，默认false
+
+###################端口范围###################
+#[port_range]
+#start = 8600 #开始
+#end = 8609 #结束
