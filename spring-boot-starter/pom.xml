@@ -44,7 +44,7 @@
         </repository>
     </distributionManagement>
     <properties>
-        <etp.version>0.4.0</etp.version>
+        <etp.version>0.4.1</etp.version>
 
         <spring-boot.version>2.7.18</spring-boot.version>
         <spring-boot3.version>3.4.1</spring-boot3.version>

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.xiaoniucode</groupId>
     <artifactId>etp</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
     <name>etp</name>
     <packaging>pom</packaging>
     <url>https://github.com/xiaoniucode/etp</url>
@@ -44,7 +44,7 @@
     </distributionManagement>
     <properties>
         <java.version>21</java.version>
-        <revision>0.4.0</revision>
+        <revision>0.4.1</revision>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -183,7 +183,7 @@
                 </executions>
             </plugin>-->
 
-           <plugin>
+          <!-- <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
                 <version>${central-publishing-maven-plugin.version}</version>
@@ -282,7 +282,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
         </plugins>
         <resources>
             <resource>
