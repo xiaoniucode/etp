@@ -6,7 +6,7 @@ sidebar_position: 7
 `etp v0.4.0`版本开始支持`etp客户端`嵌入到`SpringBoot` / `Spring Cloud`应用中使用，只需要引入`Maven`依赖，添加几行配置即可无缝集成，生命周期同`SpringBoot`应用，无需独立安装运行`etpc`，使用起来更便捷。
 
 ## 引入依赖
-根据自己项目使用的`SpringBoot`版本引入对应版本依赖，最新版本去[Maven repository中央仓库](https://mvnrepository.com/)查找，同时仓库也提供了对应版本的使用案例，[下载地址](https://github.com/xiaoniucode/etp/exampls)。
+根据自己项目使用的`SpringBoot`版本引入对应版本依赖，最新版本去[Maven中央仓库](https://central.sonatype.com/)获取，同时仓库也提供了对应版本的使用案例，[下载地址](https://github.com/xiaoniucode/etp/exampls)。
 ### SpringBoot 2.x
 
 ```xml
