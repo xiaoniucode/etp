@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.github.xiaoniucode</groupId>
         <artifactId>etp-spring-boot-starter-parent</artifactId>
-        <version>0.1.2</version>
+        <version>0.1.3</version>
     </parent>
     <artifactId>etp-spring-boot3-starter</artifactId>
     <name>etp-spring-boot3-starter</name>
