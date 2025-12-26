@@ -155,7 +155,9 @@ public class TunnelClient implements Lifecycle {
                 future.channel().writeAndFlush(message);
                 retryCount.set(0);
                 logger.info("已连接到ETP服务端: {}:{}", serverAddr, serverPort);
-                connectSuccessListener.accept(null);
+                if (connectSuccessListener != null) {
+                    connectSuccessListener.accept(null);
+                }
             } else {
                 //重新连接
                 scheduleReconnect();

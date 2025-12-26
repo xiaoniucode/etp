@@ -218,7 +218,7 @@ public final class AppConfig {
 
     private void parsePortRange(Toml root) {
         Toml range = root.getTable("port_range");
-        portRange = new PortRange();
+        portRange = new PortRange(1024, 49151);
         if (range != null) {
             Long start = range.getLong("start", -1L);
             portRange.setStart(start.intValue());
