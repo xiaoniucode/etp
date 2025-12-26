@@ -7,7 +7,7 @@
     <name>etp</name>
     <packaging>pom</packaging>
     <url>https://github.com/xiaoniucode/etp</url>
-    <description>etp(Easy Tunnel Proxy)是一个支持跨平台的高性能内网穿透应用，用于快速将内网服务暴露为公网服务。</description>
+    <description>etp(Easy Tunnel Proxy)</description>
     <licenses>
         <license>
             <name>Apache License 2.0</name>

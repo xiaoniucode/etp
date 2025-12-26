@@ -4,10 +4,10 @@
 
     <groupId>io.github.xiaoniucode</groupId>
     <artifactId>etp-spring-boot-starter-parent</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <name>etp-spring-boot-parent</name>
     <packaging>pom</packaging>
-    <description>将etp嵌入SpringBoot应用，无需单独安装运行二进制客户端，开发测试更便捷！</description>
+    <description>etp-spring-boot-parent</description>
     <url>https://github.com/xiaoniucode/etp</url>
     <licenses>
         <license>
