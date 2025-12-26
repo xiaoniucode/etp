@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * @author liuxin
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.xiaoniucode")
 public class Applicaion2 {
 
     public static void main(String[] args) {

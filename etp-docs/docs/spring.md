@@ -67,7 +67,3 @@ etp:
     max-retries: 8 # 最大重试次数
 ```
 详细配置细节请查看源码: `EtpClientProperties.java`
-
-:::danger 注意
-`etp-spring-boot-starter`的版本号规范同`etp`的版本，建议引入和`etp服务端`版本相同的`stater`的`maven`坐标，避免出现版本兼容性问题！
-:::

@@ -14,7 +14,7 @@
     <name>etp-spring-boot4-example</name>
     <description>etp-spring-boot4-example</description>
     <properties>
-        <etp.version>0.4.0</etp.version>
+        <etp.version>0.1.0</etp.version>
         <java.version>17</java.version>
     </properties>
     <dependencies>

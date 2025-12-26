@@ -18,6 +18,8 @@
 - 代理映射的名称可以重复
 - 新增端口池配置
 
+  [查看本次发行完整信息 ➡️](https://github.com/xiaoniucode/etp/releases/tag/v0.4.0)
+
 ## etp v0.3.2
 
 - 优化服务端项目工程代码结构
