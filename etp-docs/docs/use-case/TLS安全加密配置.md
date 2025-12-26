@@ -2,7 +2,7 @@
 sidebar_position: 3
 ---
 
-:::success
+:::tip 提示
 etp强制采用`TLSv1.3`协议
 :::
 

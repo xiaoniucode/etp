@@ -36,6 +36,7 @@ A lightweight NAT traversal reverse proxy application implemented with Netty.
 
 - 📡 Supports TCP and HTTP protocols
 - 🔐 Utilizes efficient and secure TLS 1.3 encryption
+- 🍃 Seamlessly integrates with the **Spring Boot & Cloud** ecosystem
 - 🖥️ Intuitive management UI for configuration
 - 🛜 High-performance, low-latency data transfer
 - 🚀 Millisecond-level startup
@@ -92,7 +93,7 @@ Download the appropriate [release package](https://github.com/xiaoniucode/etp/re
 
 ### 🖥️ Server Setup
 
-This section demonstrates how to expose an internal MySQL service to the public on port 3307.
+This demonstrates how to expose an internal MySQL service to the public network on port 3307 through simple configuration.
 
 > Edit the configuration file `etps.toml` and add the following content:
 

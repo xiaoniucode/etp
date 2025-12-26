@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.client.handler;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.MessageHandler;

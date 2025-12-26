@@ -9,10 +9,10 @@ etp:
 
     auto-start: true
 
-#    tls: false
-#    truststore:
-#      path: cert/client.p12 #证书路径
-#      store-pass: jesjH9JNLKY3 # 密钥
+    tls: true
+    truststore:
+      path: cert/client.p12 #证书路径
+      store-pass: jesjH9JNLKY3 # 密钥
 #
 #    initial-delay-sec: 2 #首次连接失败延迟
 #    max-delay-sec: 10 # 最大延迟秒数

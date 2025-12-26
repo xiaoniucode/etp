@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.autoconfigure;
 import com.xiaoniucode.etp.client.ChannelManager;
 import com.xiaoniucode.etp.client.ProxyRegisterClient;
 import com.xiaoniucode.etp.client.TunnelClient;
+import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage;
 import io.netty.channel.Channel;
@@ -39,7 +40,12 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
             System.setProperty("client.truststore.path", properties.getTruststore().getPath());
             System.setProperty("client.truststore.storePass", properties.getTruststore().getStorePass());
         }
-        tunnelClient = new TunnelClient(properties.getServerAddr(), properties.getServerPort(), properties.getSecretKey(), properties.isTls());
+        String secretKey = properties.getSecretKey();
+        if (!StringUtils.hasText(secretKey)) {
+            logger.error("必须指定secretKey");
+            return;
+        }
+        tunnelClient = new TunnelClient(properties.getServerAddr(), properties.getServerPort(), secretKey, properties.isTls());
         tunnelClient.setMaxDelaySec(properties.getMaxDelaySec());
         tunnelClient.setInitialDelaySec(properties.getInitialDelaySec());
         tunnelClient.setMaxRetries(properties.getMaxRetries());
@@ -59,7 +65,6 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
                 .setProtocol(properties.getProtocol().name())
                 .build();
             proxyRegisterClient.registerProxy(request);
-            logger.info("Etp client start success: {}：{}", properties.getServerAddr(), properties.getServerPort());
         });
         running = true;
     }
