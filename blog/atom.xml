@@ -14,6 +14,13 @@
         <updated>2025-12-03T10:55:20.000Z</updated>
         <summary type="html"><![CDATA[详细发布细节请往Github Release 页面查看]]></summary>
         <content type="html"><![CDATA[<p>详细发布细节请往Github <a href="https://github.com/xiaoniucode/etp/releases" target="_blank" rel="noopener noreferrer">Release</a> 页面查看</p>
+<h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v041">etp v0.4.1<a href="https://etp.github.io/etp/blog/index#etp-v041" class="hash-link" aria-label="etp v0.4.1的直接链接" title="etp v0.4.1的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
+<ul>
+<li>修复端口池没有设置范围时空指针异常</li>
+<li>修复etp客户端启动成功回调接口空指针异常</li>
+</ul>
+<p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.4.1" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>
 <h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v040">etp v0.4.0<a href="https://etp.github.io/etp/blog/index#etp-v040" class="hash-link" aria-label="etp v0.4.0的直接链接" title="etp v0.4.0的直接链接" translate="no">​</a></h2>
 <h3 class="anchor anchorWithStickyNavbar_iX64" id="新特性">✨新特性<a href="https://etp.github.io/etp/blog/index#%E6%96%B0%E7%89%B9%E6%80%A7" class="hash-link" aria-label="✨新特性的直接链接" title="✨新特性的直接链接" translate="no">​</a></h3>
 <ul>
@@ -24,7 +31,7 @@
 <li>已认证客户端支持自主上报端口映射信息</li>
 <li>管理界面体验优化，调整样式布局</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复-1">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D-1" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
 <ul>
 <li>客户端日志文件命名错误修复</li>
 <li>默认日志收集格式修复</li>
@@ -54,7 +61,7 @@
 </li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v031">etp v0.3.1<a href="https://etp.github.io/etp/blog/index#etp-v031" class="hash-link" aria-label="etp v0.3.1的直接链接" title="etp v0.3.1的直接链接" translate="no">​</a></h2>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复-1">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D-1" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复-2">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D-2" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
 <ul>
 <li>修复TCP协议无法加载HTTP服务WEB页面问题‼️</li>
 </ul>
@@ -64,7 +71,7 @@
 <ul>
 <li>增加SQLite事务管理机制</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复-2">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D-2" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复-3">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D-3" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
 <ul>
 <li>修复统一异常处理无法处理所有类型异常问题</li>
 <li>完善管理面板接口业务逻辑，添加事务支持</li>
