@@ -4,13 +4,15 @@
    <parent>
        <groupId>io.github.xiaoniucode</groupId>
        <artifactId>etp-spring-boot-starter-parent</artifactId>
-       <version>0.1.0</version>
+       <version>0.1.1</version>
    </parent>
     <artifactId>etp-spring-boot4-starter</artifactId>
     <name>etp-spring-boot4-starter</name>
     <packaging>jar</packaging>
     <properties>
         <java.version>17</java.version>
+        <etp.version>0.4.0</etp.version>
+        <spring-boot4.version>4.0.0</spring-boot4.version>
     </properties>
     <dependencies>
         <dependency>
