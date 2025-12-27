@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.xiaoniucode</groupId>
     <artifactId>etp</artifactId>
-    <version>0.4.1</version>
+    <version>0.5.0</version>
     <name>etp</name>
     <packaging>pom</packaging>
     <url>https://github.com/xiaoniucode/etp</url>
@@ -44,7 +44,7 @@
     </distributionManagement>
     <properties>
         <java.version>21</java.version>
-        <revision>0.4.1</revision>
+        <revision>0.5.0</revision>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

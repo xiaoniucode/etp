@@ -6,15 +6,27 @@
         <artifactId>etp-spring-boot-starter-parent</artifactId>
         <version>0.2.0</version>
     </parent>
-    <artifactId>etp-spring-boot-starter</artifactId>
+    <artifactId>etp-spring-boot-autoconfigure</artifactId>
     <packaging>jar</packaging>
-    <name>etp-spring-boot-starter</name>
-    <description>etp-spring-boot-starter</description>
+    <name>etp-spring-boot-autoconfigure</name>
+    <description>etp-spring-boot-autoconfigure</description>
     <dependencies>
         <dependency>
             <groupId>io.github.xiaoniucode</groupId>
-            <artifactId>etp-spring-boot-autoconfigure</artifactId>
-            <version>${etp-spring-boot.version}</version>
+            <artifactId>etp-client</artifactId>
+            <version>${etp.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.xiaoniucode</groupId>
+            <artifactId>etp-common</artifactId>
+            <version>${etp.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.xiaoniucode</groupId>
+            <artifactId>etp-core</artifactId>
+            <version>${etp.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

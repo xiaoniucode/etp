@@ -4,57 +4,43 @@
    <parent>
        <groupId>io.github.xiaoniucode</groupId>
        <artifactId>etp-spring-boot-starter-parent</artifactId>
-       <version>0.1.3</version>
+       <version>0.2.0</version>
    </parent>
     <artifactId>etp-spring-boot4-starter</artifactId>
     <name>etp-spring-boot4-starter</name>
     <description>etp-spring-boot4-starter</description>
     <packaging>jar</packaging>
-    <properties>
-        <java.version>17</java.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>io.github.xiaoniucode</groupId>
-            <artifactId>etp-client</artifactId>
-            <version>${etp.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.xiaoniucode</groupId>
-            <artifactId>etp-common</artifactId>
-            <version>${etp.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.xiaoniucode</groupId>
-            <artifactId>etp-core</artifactId>
-            <version>${etp.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-web-server</artifactId>
-            <version>${spring-boot4.version}</version>
+            <artifactId>etp-spring-boot-autoconfigure</artifactId>
+            <version>${etp-spring-boot.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
             <version>${spring-boot4.version}</version>
-            <optional>true</optional>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure-processor</artifactId>
             <version>${spring-boot4.version}</version>
-            <optional>true</optional>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <version>${spring-boot4.version}</version>
-            <optional>true</optional>
-            <scope>provided</scope>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-web-server</artifactId>
+            <version>${spring-boot4.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

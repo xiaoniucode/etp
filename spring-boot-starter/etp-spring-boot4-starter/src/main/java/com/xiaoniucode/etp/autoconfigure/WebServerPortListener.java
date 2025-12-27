@@ -3,7 +3,6 @@ package com.xiaoniucode.etp.autoconfigure;
 
 import org.springframework.boot.web.server.context.WebServerInitializedEvent;
 import org.springframework.context.event.EventListener;
-
 /**
  * 监听 WebServer 启动事件WebServerInitializedEvent，捕获springboot web容器实际绑定运行的端口
  *

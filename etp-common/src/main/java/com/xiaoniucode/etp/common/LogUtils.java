@@ -14,8 +14,8 @@ public class LogUtils {
             Constants.SERVER_LOG_NAME,
             Constants.SERVER_LOG_ARCHIVE_PATTERN,
             Constants.LOG_PATTERN,
-            Constants.DEFAULT_MAX_HISTORY,
-            Constants.DEFAULT_TOTAL_SIZE_CAP,
+            Constants.LOG_MAX_HISTORY,
+            Constants.LOG_TOTAL_SIZE_CAP,
             Constants.LOG_LEVEL
         );
     }
@@ -26,8 +26,8 @@ public class LogUtils {
             Constants.CLIENT_LOG_NAME,
             Constants.CLIENT_LOG_ARCHIVE_PATTERN,
             Constants.LOG_PATTERN,
-            Constants.DEFAULT_MAX_HISTORY,
-            Constants.DEFAULT_TOTAL_SIZE_CAP,
+            Constants.LOG_MAX_HISTORY,
+            Constants.LOG_TOTAL_SIZE_CAP,
             Constants.LOG_LEVEL
         );
     }
