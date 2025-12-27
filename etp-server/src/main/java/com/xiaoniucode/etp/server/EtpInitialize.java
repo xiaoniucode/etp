@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
  * 服务初始化
@@ -27,10 +26,10 @@ import java.util.Locale;
  */
 public final class EtpInitialize {
     private static final Logger logger = LoggerFactory.getLogger(EtpInitialize.class);
-    private final static ConfigStore configStore = new ConfigStore();
+    private final static ConfigStore configStore =ConfigStore.get();
     private final static RuntimeState runtimeState = RuntimeState.get();
     private final static AppConfig config = AppConfig.get();
-    private static final SQLiteTransactionTemplate TX = new SQLiteTransactionTemplate();
+    private static SQLiteTransactionTemplate TX;
 
     /**
      * 需要先初始化SQLite配置，如果存在和toml中相同的配置，则不同步到SQLite，否则进行同步
@@ -38,6 +37,7 @@ public final class EtpInitialize {
     public static void initDataConfig() {
         //只有管理面板启动才初始化动态数据
         if (config.getDashboard().getEnable()) {
+            TX = new SQLiteTransactionTemplate();
             //如果数据库和表不存在则创建
             initDBTable();
             //注册所有客户端配置
@@ -48,11 +48,11 @@ public final class EtpInitialize {
             syncDashboardUser();
             //同步系统设置
             syncSystemSettings();
+            //每次启动或者重启都删除所有自动注册的映射，避免客户端断线重练导致僵尸映射
+            ConfigService.deleteAllAutoRegisterProxy();
         }
         //注册和同步Toml静态配
         registerTomlConfig();
-        //每次启动或者重启都删除所有自动注册的映射，避免客户端断线重练导致僵尸映射
-        ConfigService.deleteAllAutoRegisterProxy();
         logger.debug("数据初始化完毕");
     }
 
@@ -77,7 +77,6 @@ public final class EtpInitialize {
                     configRange.setEnd(Integer.parseInt(split[1]));
                 }
             }
-
             return null;
         });
     }
@@ -110,56 +109,59 @@ public final class EtpInitialize {
     }
 
     private static void registerTomlConfig() {
-        TX.execute(() -> {
-            Boolean enableDashboard = config.getDashboard().getEnable();
-            List<ClientInfo> clients = AppConfig.get().getClients();
-            clients.forEach(clientInfo -> {
-                String secretKey = clientInfo.getSecretKey();
-                String name = clientInfo.getName();
-                if (!runtimeState.hasClient(secretKey)) {
-                    Integer clientId = null;
-                    //如果开启了管理面板，需要将客户端配置同步到数据库
-                    if (enableDashboard) {
-                        JSONObject save = new JSONObject();
-                        save.put("secretKey", secretKey);
-                        save.put("name", name);
-                        clientId = configStore.addClient(save);
-                        logger.info("同步静态配置客户端「{}」到数据库", name);
-                    }
-                    //注册客户端
-                    clientInfo.setClientId(clientId);
-                    runtimeState.registerClient(clientInfo);
-                } else {
-                    logger.warn("客户端「{}」 注册失败，已经在数据库被注册", name);
+        Boolean enableDashboard = config.getDashboard().getEnable();
+        List<ClientInfo> clients = AppConfig.get().getClients();
+        clients.forEach(clientInfo -> {
+            String secretKey = clientInfo.getSecretKey();
+            String name = clientInfo.getName();
+            if (!runtimeState.hasClient(secretKey)) {
+                Integer clientId = null;
+                //如果开启了管理面板，需要将客户端配置同步到数据库
+                if (enableDashboard) {
+                    JSONObject save = new JSONObject();
+                    save.put("secretKey", secretKey);
+                    save.put("name", name);
+                    clientId = configStore.addClient(save);
+                    logger.info("同步静态配置客户端「{}」到数据库", name);
                 }
-                List<ProxyMapping> proxies = clientInfo.getProxies();
-                proxies.forEach(proxy -> {
-                    Integer remotePort = proxy.getRemotePort();
-                    if (!runtimeState.hasProxy(secretKey, remotePort)) {
-                        Integer proxyId = null;
-                        //如果开启了管理面板，需要将映射配置同步到数据库
-                        if (enableDashboard) {
-                            JSONObject existClient = configStore.getClientBySecretKey(secretKey);
-                            JSONObject save = new JSONObject();
-                            save.put("clientId", existClient.getInt("id"));
-                            save.put("name", proxy.getName());
-                            save.put("localPort", proxy.getLocalPort());
-                            save.put("remotePort", proxy.getRemotePort());
-                            save.put("status", proxy.getStatus());
-                            save.put("type", proxy.getType().name().toLowerCase(Locale.ROOT));
-                            save.put("autoRegistered", 0);
-                            proxyId = configStore.addProxy(save);
-                            logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", existClient.get("id"), proxy.getName(), proxy.getRemotePort());
-                        }
-                        //注册端口映射
-                        proxy.setProxyId(proxyId);
-                        runtimeState.registerProxy(secretKey, proxy);
-                    } else {
-                        logger.warn("同步取消，该客户端公网端口「{}-{}」已经被注册", name, remotePort);
+                if (clientId == null) {
+                    clientId = GlobalIdGenerator.nextId();
+                }
+                //注册客户端
+                clientInfo.setClientId(clientId);
+                runtimeState.registerClient(clientInfo);
+            } else {
+                logger.warn("客户端「{}」 注册失败，已经在数据库被注册", name);
+            }
+            List<ProxyMapping> proxies = clientInfo.getProxies();
+            proxies.forEach(proxy -> {
+                Integer remotePort = proxy.getRemotePort();
+                if (!runtimeState.hasProxy(secretKey, remotePort)) {
+                    Integer proxyId = null;
+                    //如果开启了管理面板，需要将映射配置同步到数据库
+                    if (enableDashboard) {
+                        JSONObject existClient = configStore.getClientBySecretKey(secretKey);
+                        JSONObject save = new JSONObject();
+                        save.put("clientId", existClient.getInt("id"));
+                        save.put("name", proxy.getName());
+                        save.put("localPort", proxy.getLocalPort());
+                        save.put("remotePort", proxy.getRemotePort());
+                        save.put("status", proxy.getStatus());
+                        save.put("type", proxy.getType().name());
+                        save.put("autoRegistered", 0);
+                        proxyId = configStore.addProxy(save);
+                        logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", existClient.get("id"), proxy.getName(), proxy.getRemotePort());
                     }
-                });
+                    //注册端口映射
+                    if (proxyId == null) {
+                        proxyId = GlobalIdGenerator.nextId();
+                    }
+                    proxy.setProxyId(proxyId);
+                    runtimeState.registerProxy(secretKey, proxy);
+                } else {
+                    logger.warn("同步取消，该客户端公网端口「{}-{}」已经被注册", name, remotePort);
+                }
             });
-            return null;
         });
     }
 
@@ -171,7 +173,7 @@ public final class EtpInitialize {
                 int clientId = client.getInt("id");
                 String name = client.getString("name");
                 String secretKey = client.getString("secretKey");
-                ClientInfo clientInfo = new ClientInfo(clientId,name,secretKey);
+                ClientInfo clientInfo = new ClientInfo(clientId, name, secretKey);
                 runtimeState.registerClient(clientInfo);
                 logger.info("Client {} 已注册", name);
             }

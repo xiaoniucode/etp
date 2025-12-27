@@ -15,19 +15,16 @@
             <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-client</artifactId>
             <version>${etp.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-common</artifactId>
             <version>${etp.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-core</artifactId>
             <version>${etp.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

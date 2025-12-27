@@ -55,7 +55,6 @@ etp:
     enabled: true #是否开启etp代理，默认为关闭状态
     server-addr: localhost #服务器地址
     secret-key: your-secret-key #Token
-    local-host: 127.0.0.1 #内网IP
     remote-port: 8025 #自定义remotePort公网端口，不指定会自动分配
     auto-start: true # 是否自动开启代理，默认是true，如果为false需要去管理界面手动开启
     tls: false # 是否开启隧道tls加密

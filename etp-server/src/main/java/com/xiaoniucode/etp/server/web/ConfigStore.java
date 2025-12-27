@@ -12,6 +12,11 @@ import java.util.List;
  * @author liuxin
  */
 public class ConfigStore {
+    public final static ConfigStore instance = new ConfigStore();
+    private ConfigStore() {}
+    public static ConfigStore get() {
+        return instance;
+    }
     /**
      * 新增客户端
      */

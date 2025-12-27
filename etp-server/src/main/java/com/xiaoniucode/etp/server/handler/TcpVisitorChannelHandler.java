@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage;
+import com.xiaoniucode.etp.server.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.RuntimeState;
 import com.google.protobuf.ByteString;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 处理来自公网客户端的连接读写请求
@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class TcpVisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final Logger logger = LoggerFactory.getLogger(TcpVisitorChannelHandler.class);
-    private static final AtomicLong SESSION_ID_PRODUCER = new AtomicLong(0);
     /**
      * 运行时状态信息管理器
      */
@@ -51,7 +50,7 @@ public class TcpVisitorChannelHandler extends SimpleChannelInboundHandler<ByteBu
             visitorChannel.close();
             return;
         } else {
-            long nextSessionId = nextSessionId();
+            long nextSessionId = GlobalIdGenerator.nextId();
             visitorChannel.config().setOption(ChannelOption.AUTO_READ, false);
             int localPort = runtimeState.getLocalPort(sa.getPort());
             ChannelManager.addClientChannelToControlChannel(visitorChannel, nextSessionId, controllChannel);
@@ -113,9 +112,5 @@ public class TcpVisitorChannelHandler extends SimpleChannelInboundHandler<ByteBu
             }
         }
         super.channelWritabilityChanged(ctx);
-    }
-
-    public long nextSessionId() {
-        return SESSION_ID_PRODUCER.incrementAndGet();
     }
 }

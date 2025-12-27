@@ -29,10 +29,6 @@ public class EtpClientProperties {
      */
     private int remotePort = -1;
     /**
-     * 内网IP
-     */
-    private String localHost = "127.0.0.1";
-    /**
      * 协议
      */
     private ProtocolType protocol = ProtocolType.TCP;
@@ -174,14 +170,6 @@ public class EtpClientProperties {
 
     public void setRemotePort(int remotePort) {
         this.remotePort = remotePort;
-    }
-
-    public String getLocalHost() {
-        return localHost;
-    }
-
-    public void setLocalHost(String localHost) {
-        this.localHost = localHost;
     }
 
     public ProtocolType getProtocol() {

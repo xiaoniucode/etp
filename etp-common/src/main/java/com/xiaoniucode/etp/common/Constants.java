@@ -15,7 +15,7 @@ public class Constants {
         if (StringUtils.hasText(dockerPath)) {
             SQLITE_DB_URL = "jdbc:sqlite:" + dockerPath;
         } else {
-            SQLITE_DB_URL = "jdbc:sqlite:./data/etp.db";
+            SQLITE_DB_URL = "jdbc:sqlite:etp.db";
         }
     }
 

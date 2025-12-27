@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.manager;
 
 import com.xiaoniucode.etp.server.config.ClientInfo;
 import com.xiaoniucode.etp.server.config.ProxyMapping;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ public final class RuntimeState {
             return;
         }
         clients.putIfAbsent(client.getSecretKey(), client);
-        clientRemotePorts.put(client.getSecretKey(), new ArrayList<>());
+        clientRemotePorts.put(client.getSecretKey(), new CopyOnWriteArrayList<>());
         logger.debug("客户端: {}-{} 注册成功", client.getClientId(), client.getName());
     }
 
@@ -123,7 +124,7 @@ public final class RuntimeState {
         ClientInfo client = clients.get(secretKey);
         if (!Objects.isNull(client) && !isPortOccupied(proxy.getRemotePort())) {
             client.getProxies().add(proxy);
-            clientRemotePorts.getOrDefault(secretKey, new ArrayList<>()).add(proxy.getRemotePort());
+            clientRemotePorts.getOrDefault(secretKey, new CopyOnWriteArrayList<>()).add(proxy.getRemotePort());
             portMapping.put(proxy.getRemotePort(), proxy.getLocalPort());
             logger.info("映射{} - {} 注册成功", proxy.getName(), proxy.getRemotePort());
             return true;
@@ -155,7 +156,10 @@ public final class RuntimeState {
         if (!Objects.isNull(client)) {
             List<ProxyMapping> proxies = client.getProxies();
             proxies.removeIf(proxy -> proxy.getRemotePort().equals(remotePort));
-            clientRemotePorts.getOrDefault(secretKey, new ArrayList<>()).remove(remotePort);
+            List<Integer> ports = clientRemotePorts.get(secretKey);
+            if (ports != null) {
+                ports.remove(remotePort);
+            }
             portMapping.remove(remotePort);
         }
         return false;

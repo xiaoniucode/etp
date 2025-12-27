@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.web;
 
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.core.protocol.ProtocolType;
+import com.xiaoniucode.etp.server.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.config.AuthInfo;
 import com.xiaoniucode.etp.server.config.PortRange;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
@@ -30,7 +31,7 @@ import java.util.*;
  */
 public final class ConfigService {
     private static Logger logger = LoggerFactory.getLogger(ConfigService.class);
-    private final static ConfigStore configStore = new ConfigStore();
+    private final static ConfigStore configStore =ConfigStore.get();
     private final static AppConfig config = AppConfig.get();
     private final static RuntimeState state = RuntimeState.get();
     private static final SQLiteTransactionTemplate TX = new SQLiteTransactionTemplate();
@@ -93,41 +94,47 @@ public final class ConfigService {
     }
 
     public static JSONObject addProxy(JSONObject req) {
-        return TX.execute(() -> {
-            int remotePort = req.getInt("remotePort");
-            if (remotePort != -1 && !PortAllocator.get().isPortAvailable(remotePort)) {
-                throw new BizException("映射注册失败，公网端口: " + remotePort + "无效！");
-            }
-            String secretKey = req.getString("secretKey");
-            if (state.isPortOccupied(remotePort)) {
-                throw new BizException("公网端口:" + remotePort + "已被占用");
-            }
-            //-1表示用户没有自定义端口
-            if (remotePort == -1) {
-                int allocatePort = PortAllocator.get().allocateAvailablePort();
-                req.put("remotePort", allocatePort);
-            }
-            if (!StringUtils.hasText(req.getString("name"))) {
-                req.put("name", req.getInt("remotePort"));
-            }
-            JSONObject res = new JSONObject();
-            int proxyId = configStore.addProxy(req);
-            int remotePortInt = req.getInt("remotePort");
-            //注册端口映射
-            state.registerProxy(secretKey, createProxyMapping(req));
-            //如果客户度已经启动认证
-            ChannelManager.addPortToControlChannelIfOnline(secretKey, remotePortInt);
-            //如果状态是1，需要启动代理服务
-            if (req.getInt("status") == 1) {
-                TcpProxyServer.get().startRemotePort(remotePortInt);
-            } else {
-                //将公网端口添加到已分配缓存
-                PortAllocator.get().addRemotePort(remotePortInt);
-            }
-            res.put("proxyId", proxyId);
-            res.put("remotePort", remotePortInt);
-            return res;
-        });
+        int remotePort = req.getInt("remotePort");
+        if (remotePort != -1 && !PortAllocator.get().isPortAvailable(remotePort)) {
+            throw new BizException("映射注册失败，公网端口: " + remotePort + "无效！");
+        }
+        String secretKey = req.getString("secretKey");
+        if (state.isPortOccupied(remotePort)) {
+            throw new BizException("公网端口:" + remotePort + "已被占用");
+        }
+        //-1表示用户没有自定义端口
+        if (remotePort == -1) {
+            int allocatePort = PortAllocator.get().allocateAvailablePort();
+            req.put("remotePort", allocatePort);
+        }
+        if (!StringUtils.hasText(req.getString("name"))) {
+            req.put("name", req.getInt("remotePort"));
+        }
+        JSONObject res = new JSONObject();
+
+        int remotePortInt = req.getInt("remotePort");
+        //注册端口映射
+        state.registerProxy(secretKey, createProxyMapping(req));
+        //如果客户度已经启动认证
+        ChannelManager.addPortToControlChannelIfOnline(secretKey, remotePortInt);
+        //如果状态是1，需要启动代理服务
+        if (req.getInt("status") == 1) {
+            TcpProxyServer.get().startRemotePort(remotePortInt);
+        } else {
+            //将公网端口添加到已分配缓存
+            PortAllocator.get().addRemotePort(remotePortInt);
+        }
+        //最后执行持久化
+        int proxyId;
+        if (config.getDashboard().getEnable()) {
+            proxyId = configStore.addProxy(req);
+        } else {
+            //纯TOML模式
+            proxyId = GlobalIdGenerator.nextId();
+        }
+        res.put("proxyId", proxyId);
+        res.put("remotePort", remotePortInt);
+        return res;
     }
 
     public static void updateProxy(JSONObject req) {
@@ -222,8 +229,8 @@ public final class ConfigService {
     public static void deleteProxy(JSONObject req) {
         TX.execute(() -> {
             int id = req.getInt("id");
-            JSONObject proxy = configStore.getProxyById(id);
             String secretKey = req.getString("secretKey");
+            JSONObject proxy = configStore.getProxyById(id);
             int remotePort = proxy.getInt("remotePort");
             //删除注册的端口映射
             state.removeProxy(secretKey, remotePort);
