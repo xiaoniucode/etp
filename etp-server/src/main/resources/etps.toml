@@ -1,7 +1,5 @@
-bindPort = 9527
-
 [[clients]]
-name = "windows"
+name = "client"
 secretKey = "your-secret-key"
 
 [[clients.proxies]]

@@ -13,7 +13,7 @@ secretKey = "your-secret-key"
 
 #################日志配置####################
 #[log]
-#level = "debug"
+#level = "info"
 #path = "log"
 #name = "etpc.log"
 #archivePattern = "etpc.%d{yyyy-MM-dd}.log.gz"

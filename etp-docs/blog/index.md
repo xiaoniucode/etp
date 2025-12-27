@@ -1,6 +1,38 @@
 # 版本历史
 详细发布细节请往Github [Release](https://github.com/xiaoniucode/etp/releases) 页面查看
 
+
+## etp v0.5.0
+
+### ✨新特性
+- 支持更多日志自定义参数配置
+- 管理界面增加服务端系统配置信息展示
+
+### 🐛问题修复
+- 修复通过SpringBoot starter启动客户端断线重连时，由于配置缺失导致无法连接的问题
+- 修复端口池未在配置文件中指定范围时抛出异常的问题
+
+### ⚙️ 配置变更
+- 原`path`字段表示主日志文件的完整文件路径，现调整为仅表示基础日志目录路径
+- 新增`name`字段，用于指定主日志文件名
+- 原`pattern`字段表示完整的日志归档路径格式，现改为`archivePattern`，仅需填写归档文件名模式（无需包含完整路径）
+- 部分字段是本次版本新增的配置参数
+
+下面是完整的配置案例：
+
+```toml
+[log]
+level = "info" # 日志级别
+path = "log" # 基础路径
+name = "etps.log" # 主日志文件名
+archivePattern = "etpc.%d{yyyy-MM-dd}.log.gz" # 日志归档格式
+logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" # 控制台打印格式
+maxHistory = 30 # 最大保存天数
+totalSizeCap = "3GB" # 总空间大小
+```
+
+[查看本次发行完整信息 ➡️](https://github.com/xiaoniucode/etp/releases/tag/v0.5.0)
+
 ## etp v0.4.1
 ### 🐛 问题修复
 - 修复端口池没有设置范围时空指针异常
