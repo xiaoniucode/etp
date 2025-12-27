@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 代理信息注册，由客户端发起
+ * 客户端主动注册端口映射信息
  *
  * @author liuxin
  */
@@ -54,8 +54,9 @@ public class ProxyRegisterMessageHandler implements MessageHandler {
         String name = request.getProxyName();
         int remotePort = request.getRemotePort();
         boolean start = request.getAutoStart();
+        Integer clientId = RuntimeState.get().getClient(secretKey).getClientId();
         JSONObject body = new JSONObject();
-        body.put("clientId", RuntimeState.get().getClient(secretKey).getClientId());
+        body.put("clientId", clientId);
         body.put("secretKey", secretKey);
         body.put("localPort", localPort);
         body.put("remotePort", remotePort);

@@ -6,7 +6,7 @@ sidebar_position: 7
 `etp v0.4.0`版本开始支持`etp客户端`嵌入到`SpringBoot` / `Spring Cloud`应用中运行，只需引入`Maven`坐标，添加几行配置即可无缝集成，生命周期同`SpringBoot`应用，无需独立安装运行`etpc`客户端。
 
 ## 引入依赖
-根据自己项目使用的`SpringBoot`版本引入对应版本依赖，最新版本去[Maven中央仓库](https://central.sonatype.com/)获取，同时仓库也提供了对应版本的使用案例，[下载地址](https://github.com/xiaoniucode/etp)。
+根据自己项目使用的`SpringBoot`版本引入对应版本依赖，最新版本依赖去[Maven中央仓库](https://central.sonatype.com/)获取。仓库也提供了对应版本的使用案例，[下载地址](https://github.com/xiaoniucode/etp)。
 ### SpringBoot 2.x
 
 ```xml
@@ -54,11 +54,11 @@ etp:
   client:
     enabled: true #是否开启etp代理，默认为关闭状态
     server-addr: localhost #服务器地址
-    secret-key: 430299890d2b4376a788ecbf88090810 #认证Token
+    secret-key: your-secret-key #Token
     local-host: 127.0.0.1 #内网IP
     remote-port: 8025 #自定义remotePort公网端口，不指定会自动分配
     auto-start: true # 是否自动开启代理，默认是true，如果为false需要去管理界面手动开启
-    tls: false # 是否开启隧道tls安全加密
+    tls: false # 是否开启隧道tls加密
     truststore:
       path: cert/client.p12 #证书路径
       store-pass: your-store-pass # 密钥

@@ -4,7 +4,7 @@ sidebar_position: 4
 
 ## 介绍
 
-`etps`服务端镜像已发布到**docker hub**公共仓库，不用自行构建镜像，可以直接去[镜像仓库](https://hub.docker.com/r/xiaoniucode/etps)拉取安装。下文介绍`etps`服务端的安装教程。
+`etps`服务端最新镜像仓库获取地址：[docker hub](https://hub.docker.com/r/xiaoniucode/etps)。
 
 **端口说明：**
 - `9527`是默认的`etpc`客户端与`etps`服务端通信的端口
@@ -12,18 +12,26 @@ sidebar_position: 4
 
 web管理界面默认登录用户名和密码是：`admin`: `etp.123456`
 
-## 安装
+## 安装案例
 :::tip 提示
-启动容器时需要建立容器与服务器的端口映射，建议制定一个范围的代理端口(remotePort)，避免重复启动容器。
+启动容器时需要建立容器与服务器的端口映射，建议指定一个范围的端口(remotePort)。
 :::
 
-### 1、快速运行验证
+如果需要限制公网端口的分配范围，需要提前在指定映射目录的`etps.toml`文件中指定范围，案例如下：
+```toml
+[port_range]
+start = 8600 #开始端口
+end = 8609 #结束端口
+```
+
+### 1、快速体验
 ```shell
 docker run -d \
   --name etps \
   -p 8020:8020 \
   -p 9527:9527 \
   -p 3306:3306 \
+  -e ETP_DB_PATH=/app/data/etp.db \ 
   xiaoniucode/etps:latest
 ```
 
@@ -34,20 +42,22 @@ docker run -d \
   -p 8020:8020 \
   -p 9527:9527 \
   -e JVM_OPTS="-Xmx1g -Xms512m" \
+  -e ETP_DB_PATH=/app/data/etp.db \ 
   xiaoniucode/etps:latest
 ```
 - JVM_OPTS: 用于自定义JVM调优参数
 
-### 3、配置数据卷，持久化数据
+### 3、配置volume，持久化数据
 
 ```shell
 docker run -d \
   --name etps \
   -p 8020:8020 \
   -p 9527:9527 \
-  -v /opt/etps/db:/app/etp.db \
+  -v /opt/etps/data:/app/data \
   -v /opt/etps/logs:/app/logs \
-  -v /opt/etps:/app/etps.toml \
+  -v /opt/etps/etps.toml:/app/etps.toml \
+  -e ETP_DB_PATH=/app/data/etp.db \ 
   xiaoniucode/etps:latest
 ```
 
@@ -60,6 +70,7 @@ docker run -d \
   -p 9527:9527 \
   -p 8600-8609:8600-8609 \
   -e JVM_OPTS="-Xmx1g -Xms512m" \
+  -e ETP_DB_PATH=/app/data/etp.db \ 
   xiaoniucode/etps:latest
 ```
 
@@ -72,17 +83,18 @@ services:
   etps:
     image: xiaoniucode/etps:latest
     container_name: etps
-    restart: unless-stopped
+    restart: always
     ports:
       - "8020:8020"     # Web管理界面
       - "9527:9527"     # 客户端通信端口
       - "8600-8609:8600-8609"  # 端口范围映射
     environment:
-      - JVM_OPTS=-Xmx1g -Xms512m #JVM调优参数
+      - ETP_DB_PATH=/app/data/etp.db
+      - JVM_OPTS=-Xmx1g -Xms1g #JVM调优参数
     volumes: # 数据持久化
-      - ./etps/db:/app/etp.db \ # 数据
-      - ./etps/logs:/app/logs \ # 日志
-      - ./etps:/app/etps.toml \ # 配置文件
+      - opt/etps/data:/app/data \ # 数据
+      - opt/etps/logs:/app/logs \ # 日志
+      - opt/etps/etps.toml:/app/etps.toml \ # 配置文件
     networks:
       - etps-network
 

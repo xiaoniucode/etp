@@ -37,16 +37,16 @@ public final class ConfigService {
 
     public static void addClient(JSONObject client) {
         TX.execute(() -> {
-            JSONObject existClient = configStore.getClientByName(client.getString("name"));
+            String name = client.getString("name");
+            JSONObject existClient = configStore.getClientByName(name);
             if (existClient != null) {
                 throw new BizException("名称不能重复");
             }
             String secretKey = UUID.randomUUID().toString().replaceAll("-", "");
             client.put("secretKey", secretKey);
             //添加到数据库
-            configStore.addClient(client);
-            ClientInfo clientInfo = new ClientInfo(client.getString("secretKey"));
-            clientInfo.setName(client.getString("name"));
+            int clientId = configStore.addClient(client);
+            ClientInfo clientInfo = new ClientInfo(clientId, name, secretKey);
             //注册客户端
             state.registerClient(clientInfo);
             return null;

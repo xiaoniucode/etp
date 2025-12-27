@@ -8,7 +8,17 @@ import ch.qos.logback.classic.Level;
  * @author liuxin
  */
 public class Constants {
-    public static final String SQLITE_DB_URL = "jdbc:sqlite:etp.db";
+    public static final String SQLITE_DB_URL;
+
+    static {
+        String dockerPath = System.getenv("ETP_DB_PATH");
+        if (StringUtils.hasText(dockerPath)) {
+            SQLITE_DB_URL = "jdbc:sqlite:" + dockerPath;
+        } else {
+            SQLITE_DB_URL = "jdbc:sqlite:./data/etp.db";
+        }
+    }
+
     public static final Level LOG_LEVEL = Level.INFO;
     public static final String LOG_BASE_PATH = "logs";
 

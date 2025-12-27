@@ -18,14 +18,14 @@ name = "静态客户端"
 #type = "tcp"
 ##
 ##---------------------------日志--------------------------------#
-#[log]
-#level = "debug"
-#path = "log"
-#name = "etps.log"
-#archivePattern = "etps.%d{yyyy-MM-dd}.log"
-#logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-#maxHistory = 30
-#totalSizeCap = "3GB"
+[log]
+level = "debug"
+path = "log"
+name = "etps.log"
+archivePattern = "etps.%d{yyyy-MM-dd}.log"
+logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+maxHistory = 30
+totalSizeCap = "3GB"
 
 [dashboard]
 enable = true

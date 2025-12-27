@@ -26,13 +26,15 @@ public class ClientInfo {
      */
     private List<ProxyMapping> proxies = new CopyOnWriteArrayList<>();
 
-    public ClientInfo(String secretKey) {
+    public ClientInfo(Integer clientId, String name, String secretKey) {
+        this.clientId = clientId;
+        this.name = name;
         this.secretKey = secretKey;
     }
 
-    public ClientInfo(String name, String secretKey) {
-        this.name = name;
+    public ClientInfo(String secretKey, String name) {
         this.secretKey = secretKey;
+        this.name = name;
     }
 
     public String getSecretKey() {

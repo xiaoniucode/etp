@@ -168,10 +168,10 @@ public final class EtpInitialize {
         if (clients != null) {
             for (int i = 0; i < clients.length(); i++) {
                 JSONObject client = clients.getJSONObject(i);
+                int clientId = client.getInt("id");
                 String name = client.getString("name");
-                ClientInfo clientInfo = new ClientInfo(client.getString("secretKey"));
-                clientInfo.setClientId(client.getInt("id"));
-                clientInfo.setName(client.getString("name"));
+                String secretKey = client.getString("secretKey");
+                ClientInfo clientInfo = new ClientInfo(clientId,name,secretKey);
                 runtimeState.registerClient(clientInfo);
                 logger.info("Client {} 已注册", name);
             }
@@ -216,7 +216,7 @@ public final class EtpInitialize {
                 key TEXT NOT NULL UNIQUE,       -- 设置键
                 value TEXT NOT NULL             -- 设置值
             );
-            CREATE INDEX IF NOT EXISTS idx_settings_k ON settings(key);
+            CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);
             """;
         SQLiteUtils.createTable(sql);
     }
@@ -227,8 +227,8 @@ public final class EtpInitialize {
                 token TEXT PRIMARY KEY,
                 uid INTEGER NOT NULL,
                 username TEXT NOT NULL,
-                expiredAt INTEGER NOT NULL,         -- unix 时间戳（秒）
-                createdAt INTEGER DEFAULT (strftime('%s','now')),
+                expiredAt INTEGER NOT NULL,
+                createdAt INTEGER DEFAULT (datetime('now')),
                 FOREIGN KEY (uid) REFERENCES users(id)
             );
             CREATE INDEX IF NOT EXISTS idx_auth_tokens_expiredAt ON auth_tokens(expiredAt);

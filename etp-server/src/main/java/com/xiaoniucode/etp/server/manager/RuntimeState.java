@@ -48,6 +48,7 @@ public final class RuntimeState {
         }
         clients.putIfAbsent(client.getSecretKey(), client);
         clientRemotePorts.put(client.getSecretKey(), new ArrayList<>());
+        logger.debug("客户端: {}-{} 注册成功", client.getClientId(), client.getName());
     }
 
     public void updateClientName(String secretKey, String name) {
@@ -121,7 +122,7 @@ public final class RuntimeState {
     public boolean registerProxy(String secretKey, ProxyMapping proxy) {
         ClientInfo client = clients.get(secretKey);
         if (!Objects.isNull(client) && !isPortOccupied(proxy.getRemotePort())) {
-             client.getProxies().add(proxy);
+            client.getProxies().add(proxy);
             clientRemotePorts.getOrDefault(secretKey, new ArrayList<>()).add(proxy.getRemotePort());
             portMapping.put(proxy.getRemotePort(), proxy.getLocalPort());
             logger.info("映射{} - {} 注册成功", proxy.getName(), proxy.getRemotePort());

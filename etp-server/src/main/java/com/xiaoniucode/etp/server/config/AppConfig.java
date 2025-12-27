@@ -122,12 +122,10 @@ public final class AppConfig {
             if (nameTemp.contains(name)) {
                 throw new IllegalArgumentException("客户端[名称]冲突，不能存在重复的名称！ " + name);
             }
-
             //创建一个客户端
-            ClientInfo clientInfo = new ClientInfo(secretKey);
+            ClientInfo clientInfo = new ClientInfo(secretKey,name);
             //解析客户端的所有端口映射信息
             parseProxes(clientInfo.getProxies(), client);
-            clientInfo.setName(name);
             clients.add(clientInfo);
             tokenTemp.add(secretKey);
             nameTemp.add(name);
