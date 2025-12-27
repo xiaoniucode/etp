@@ -60,18 +60,83 @@
         </div>
     </div>
 </div>
+<!--系统配置信息 -->
+<div class="layui-row layui-col-space20" style="margin-top: 30px;">
+    <div class="layui-col-md12">
+        <div class="layui-card">
+            <div class="layui-card-header">配置信息</div>
+            <div class="layui-card-body">
+                <form class="layui-form" lay-filter="sysConfigForm">
+
+                    <!-- 第一行-->
+                    <div class="layui-row layui-col-space20">
+                        <div class="layui-col-md6">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">隧道地址</label>
+                                <div class="layui-input-block">
+                                    <input type="text" class="layui-input config-display" readonly name="host">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md6">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">控制端口</label>
+                                <div class="layui-input-block">
+                                    <input type="text" class="layui-input config-display" readonly name="bind_port">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 第二行 -->
+                    <div class="layui-row layui-col-space20">
+                        <div class="layui-col-md6">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">端口范围</label>
+                                <div class="layui-input-block">
+                                    <input type="text" class="layui-input config-display" readonly name="port_range">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md6">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">TLS</label>
+                                <div class="layui-input-block">
+                                    <input type="text" class="layui-input config-display" readonly name="tls_enabled">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="/static/layui/layui.js"></script>
 <script src="/static/js/ajax.js"></script>
 <script>
     layui.use(['jquery', 'Rest'], function () {
         var Rest = layui.Rest;
         const $ = layui.$;
+        var form = layui.form;
         $(function () {
-            Rest.get('/api/stats').then(data => {
-                $('#clientTotal').text(data.clientTotal);
-                $('#onlineClient').text(data.onlineClient);
-                $('#mappingTotal').text(data.mappingTotal);
-                $('#startMapping').text(data.startMapping);
+            Rest.get('/api/monitor').then(data => {
+                const {stats, sysConfig} = data
+                $('#clientTotal').text(stats.clientTotal);
+                $('#onlineClient').text(stats.onlineClient);
+                $('#mappingTotal').text(stats.mappingTotal);
+                $('#startMapping').text(stats.startMapping);
+
+                // 系统配置
+                const start = sysConfig.port_range_start || '';
+                const end = sysConfig.port_range_end || '';
+                const portRange = start && end ? `${start} - ${end}` : (start || end || '未设置');
+                form.val('sysConfigForm', {
+                    tls_enabled: sysConfig.tls_enabled,
+                    host: sysConfig.host,
+                    bind_port: sysConfig.bind_port,
+                    port_range: portRange
+                });
             })
         });
     });

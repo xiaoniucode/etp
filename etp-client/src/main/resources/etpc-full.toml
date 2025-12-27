@@ -13,6 +13,10 @@ secretKey = "your-secret-key"
 
 #################日志配置####################
 #[log]
-#level = "info" #默认为info
-#pattern = ""
-#path=""
+#level = "debug"
+#path = "log"
+#name = "etpc.log"
+#archivePattern = "etpc.%d{yyyy-MM-dd}.log.gz"
+#logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+#maxHistory = 30
+#totalSizeCap = "3GB"

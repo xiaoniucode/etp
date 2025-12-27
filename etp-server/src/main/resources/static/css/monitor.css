@@ -68,3 +68,13 @@ body {
         padding: 16px;
     }
 }
+.config-display {
+    border: none !important;
+    background-color: #f6f8fa !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+.config-display:focus {
+    outline: none !important;
+    background-color: #eef1f5 !important;
+}

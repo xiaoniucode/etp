@@ -1,5 +1,7 @@
 package com.xiaoniucode.etp.client;
 
+import com.xiaoniucode.etp.common.LogConfig;
+import com.xiaoniucode.etp.common.LogUtils;
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.common.TomlUtils;
 import com.moandjiezana.toml.Toml;
@@ -40,9 +42,7 @@ public final class Config {
      */
     private static TruststoreConfig truststore;
 
-    private static String logPath;
-    private static String logLevel;
-    private static String logPattern;
+    private static LogConfig logConfig;
 
     /**
      * 初始化重连延迟时间 单位：秒
@@ -59,6 +59,8 @@ public final class Config {
 
     /**
      * SSL信任库配置内部类
+     *
+     * @author liuxin
      */
     public static final class TruststoreConfig {
         private final String path;
@@ -136,22 +138,9 @@ public final class Config {
             if (tlsValue != null) {
                 tls = tlsValue;
             }
-
+            //解析日志
             Toml log = root.getTable("log");
-            if (log != null) {
-                String level = log.getString("level");
-                String pattern = log.getString("pattern");
-                String path = log.getString("path");
-                if (StringUtils.hasText(level)) {
-                    logLevel = level;
-                }
-                if (StringUtils.hasText(pattern)) {
-                    logPattern = pattern;
-                }
-                if (StringUtils.hasText(path)) {
-                    logPath = path;
-                }
-            }
+            logConfig = LogUtils.parseLogConfig(log,false);
             TruststoreConfig truststoreConfig = null;
             if (tls) {
                 Toml truststoreTable = root.getTable("truststore");
@@ -209,16 +198,8 @@ public final class Config {
         return tls && truststore != null;
     }
 
-    public String getLogPath() {
-        return logPath;
-    }
-
-    public String getLogLevel() {
-        return logLevel;
-    }
-
-    public String getLogPattern() {
-        return logPattern;
+    public LogConfig getLogConfig() {
+        return logConfig;
     }
 
     public int getInitialDelaySec() {

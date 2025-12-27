@@ -1,13 +1,11 @@
 package com.xiaoniucode.etp.server;
 
-import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.common.ConfigUtils;
 import com.xiaoniucode.etp.common.Constants;
+import com.xiaoniucode.etp.common.LogConfig;
 import com.xiaoniucode.etp.common.LogbackConfigurator;
 import com.xiaoniucode.etp.common.PortChecker;
-import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.LogConfig;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.DashboardApi;
 import com.xiaoniucode.etp.server.web.server.NettyWebServer;
@@ -29,7 +27,7 @@ public class TunnelServerStartup {
     }
 
     public static void main(String[] args) {
-        String configPath = ConfigUtils.getConfigPath(args, Constants.DEFAULT_SERVER_CONFIG_NAME);
+        String configPath = ConfigUtils.getConfigPath(args, Constants.SERVER_CONFIG_NAME);
         if (configPath == null) {
             System.err.println("请指定配置文件路径！");
             return;
@@ -62,15 +60,16 @@ public class TunnelServerStartup {
 
     private static void initLogback() {
         LogConfig log = AppConfig.get().getLogConfig();
-        String leve = log.getLevel();
-        String path = log.getPath();
-        String pattern = log.getPattern();
-        new LogbackConfigurator.LogbackConfigBuilder()
-            .setLogFilePath(StringUtils.hasText(path) ? path : (Constants.LOG_BASE_PATH + Constants.DEFAULT_SERVER_LOG_NAME))
-            .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : (Constants.LOG_BASE_PATH + Constants.DEFAULT_SERVER_LOG_PATTERN))
-            .setLogLevel(!StringUtils.hasText(leve) ? Level.INFO : Level.toLevel(leve, Level.INFO))
+        new LogbackConfigurator.Builder()
+            .setPath(log.getPath())
+            .setLogPattern(log.getLogPattern())
+            .setArchivePattern(log.getArchivePattern())
+            .setLogLevel(log.getLevel())
+            .setLogName(log.getName())
+            .setMaxHistory(log.getMaxHistory())
+            .setTotalSizeCap(log.getTotalSizeCap())
             .build()
-            .configureLogback();
+            .configure();
     }
 
     private static void registerShutdownHook(TunnelServer tunnelServer) {

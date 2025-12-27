@@ -51,6 +51,8 @@ public final class EtpInitialize {
         }
         //注册和同步Toml静态配
         registerTomlConfig();
+        //每次启动或者重启都删除所有自动注册的映射，避免客户端断线重练导致僵尸映射
+        ConfigService.deleteAllAutoRegisterProxy();
         logger.debug("数据初始化完毕");
     }
 

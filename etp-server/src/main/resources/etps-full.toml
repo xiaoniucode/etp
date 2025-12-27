@@ -46,9 +46,13 @@ remotePort = 6380
 
 #################日志配置#################
 #[log]
-#level = "info" #默认为info
-#pattern = ""
-#path=""
+#level = "debug"
+#path = "log"
+#name = "etps.log"
+#archivePattern = "etps.%d{yyyy-MM-dd}.log.gz"
+#logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+#maxHistory = 30
+#totalSizeCap = "3GB"
 #################管理面板配置#################
 #[dashboard]
 #enable = true

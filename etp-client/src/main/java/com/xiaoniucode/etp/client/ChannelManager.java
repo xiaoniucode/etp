@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * 连接池管理、channel管理、Bootstrap管理
+ *
  * @author liuxin
  */
 public final class ChannelManager {
@@ -118,7 +119,10 @@ public final class ChannelManager {
             callback.success(dataTunnelChannel);
             return;
         }
-        tunnelBootstrap.connect(Config.get().getServerAddr(), Config.get().getServerPort()).addListener((ChannelFutureListener) future -> {
+        Channel controlChannel = getControlChannel();
+        String serverAddr = controlChannel.attr(EtpConstants.SERVER_DDR).get();
+        Integer serverPort = controlChannel.attr(EtpConstants.SERVER_PORT).get();
+        tunnelBootstrap.connect(serverAddr, serverPort).addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 callback.success(future.channel());
             } else {

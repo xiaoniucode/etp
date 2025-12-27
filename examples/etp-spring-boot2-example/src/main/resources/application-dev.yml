@@ -2,7 +2,7 @@ etp:
   client:
     enabled: true #是否开启etp代理，默认为关闭状态
     server-addr: localhost #服务器地址
-    secret-key: 430299890d2b4376a788ecbf88090810 #认证Token
+    secret-key: your-secret-key #认证Token
 #    protocol: tcp
 #    local-host: 127.0.0.1
 #    remote-port: 8025

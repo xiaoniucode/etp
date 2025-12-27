@@ -249,5 +249,9 @@ public class ConfigStore {
     public JSONObject findSettingByKey(String key) {
         return SQLiteUtils.get("SELECT id,key,value FROM settings WHERE key = ? ", key);
     }
+
+    public int deleteAllAutoRegisterProxy() {
+        return SQLiteUtils.delete("DELETE FROM proxies WHERE autoRegistered = 1");
+    }
 }
 

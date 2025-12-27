@@ -1,6 +1,7 @@
-tls = true
-#bindPort = 9527
-#
+host="0.0.0.0"
+bindPort = 9527
+# TLS
+tls = false
 [keystore]
 path = "cert/server.p12"
 keyPass = "3FbV8R8VW49O"
@@ -17,11 +18,15 @@ name = "静态客户端"
 #type = "tcp"
 ##
 ##---------------------------日志--------------------------------#
-[log]
-level = "debug"
-###pattern = ""
-#path="logg/etps.log"
-##
+#[log]
+#level = "debug"
+#path = "log"
+#name = "etps.log"
+#archivePattern = "etps.%d{yyyy-MM-dd}.log"
+#logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+#maxHistory = 30
+#totalSizeCap = "3GB"
+
 [dashboard]
 enable = true
 #addr = "localhost"

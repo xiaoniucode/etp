@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.web;
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.core.protocol.ProtocolType;
 import com.xiaoniucode.etp.server.config.AuthInfo;
+import com.xiaoniucode.etp.server.config.PortRange;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.PortAllocator;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
@@ -52,18 +53,19 @@ public final class ConfigService {
         });
     }
 
-    /**
-     * 数据统计
-     */
-    public static JSONObject countStats() {
-        JSONObject jsonObject = new JSONObject();
+    public static JSONObject monitorInfo() {
+        JSONObject res = new JSONObject();
+        JSONObject stats = new JSONObject();
         JSONArray clients = clients();
         JSONArray proxies = proxies();
-        jsonObject.put("clientTotal", clients.length());
-        jsonObject.put("onlineClient", ChannelManager.onlineClientCount());
-        jsonObject.put("mappingTotal", proxies.length());
-        jsonObject.put("startMapping", TcpProxyServer.get().runningPortCount());
-        return jsonObject;
+        stats.put("clientTotal", clients.length());
+        stats.put("onlineClient", ChannelManager.onlineClientCount());
+        stats.put("mappingTotal", proxies.length());
+        stats.put("startMapping", TcpProxyServer.get().runningPortCount());
+        JSONObject sysConfig = getSystemConfig();
+        res.put("stats", stats);
+        res.put("sysConfig", sysConfig);
+        return res;
     }
 
     public static JSONArray clients() {
@@ -80,6 +82,10 @@ public final class ConfigService {
             }
         }
         return clients;
+    }
+
+    public static void deleteAllAutoRegisterProxy() {
+        configStore.deleteAllAutoRegisterProxy();
     }
 
     public static JSONArray proxies() {
@@ -341,6 +347,19 @@ public final class ConfigService {
     }
 
     public static void addSystemSetting(JSONObject save) {
-       configStore.addSetting(save);
+        configStore.addSetting(save);
+    }
+
+    private static JSONObject getSystemConfig() {
+        JSONObject res = new JSONObject();
+        PortRange range = config.getPortRange();
+        res.put("tls_enabled", config.isTls() ? "已开启" : "未开启");
+        res.put("host", config.getHost());
+        res.put("bind_port", config.getBindPort());
+
+        res.put("port_range_start", range.getStart());
+        res.put("port_range_end", range.getEnd());
+
+        return res;
     }
 }

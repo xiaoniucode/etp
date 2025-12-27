@@ -3,7 +3,15 @@
 #认证密钥[必填]
 secretKey = "your-secret-key"
 #TCP SSL安全加密密码配置
-tls =true
+tls =false
 [truststore]
 path = "cert/client.p12"
 storePass = "jesjH9JNLKY3"
+[log]
+level = "debug"
+path = "log"
+name = "etpc.log"
+archivePattern = "etpc.%d{yyyy-MM-dd}.log"
+logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+maxHistory = 30
+totalSizeCap = "3GB"

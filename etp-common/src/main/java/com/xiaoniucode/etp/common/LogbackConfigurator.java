@@ -14,108 +14,145 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 /**
- * Logback 配置类
+ * Logback 日志配置管理
+ *
  * @author liuxin
  */
 public class LogbackConfigurator {
 
     private final LogbackConfig config;
 
-    /**
-     * 私有构造函数，通过建造者创建实例
-     */
     private LogbackConfigurator(LogbackConfig config) {
         this.config = config;
     }
-    /**
-     * 日志配置的不可变对象
-     */
+
     public static class LogbackConfig {
-        private final String logDir;
+        /**
+         * 日志文件存储目录
+         */
+        private final String path;
+        /**
+         * 当前活动日志文件路径
+         */
         private final String logFilePath;
-        private final String archiveFilePattern;
+        /**
+         * 归档日志文件模式
+         */
+        private final String archiveFilePatternPath;
+        /**
+         * 日志输出格式
+         */
         private final String logPattern;
+        /**
+         * 保留历史文件天数
+         */
         private final int maxHistory;
+        /**
+         * 日志总大小限制
+         */
         private final String totalSizeCap;
+        /**
+         * 日志级别
+         */
         private final Level logLevel;
 
-        private LogbackConfig(String logDir, String logFilePath, String archiveFilePattern, String logPattern,
-                             int maxHistory, String totalSizeCap, Level logLevel) {
-            this.logDir = logDir;
+        private LogbackConfig(String path, String logFilePath, String archiveFilePatternPath, String logPattern,
+            int maxHistory, String totalSizeCap, Level logLevel) {
+            this.path = path;
             this.logFilePath = logFilePath;
-            this.archiveFilePattern = archiveFilePattern;
+            this.archiveFilePatternPath = archiveFilePatternPath;
             this.logPattern = logPattern;
             this.maxHistory = maxHistory;
             this.totalSizeCap = totalSizeCap;
             this.logLevel = logLevel;
         }
-        public String getLogDir() { return logDir; }
-        public String getLogFilePath() { return logFilePath; }
-        public String getArchiveFilePattern() { return archiveFilePattern; }
-        public String getLogPattern() { return logPattern; }
-        public int getMaxHistory() { return maxHistory; }
-        public String getTotalSizeCap() { return totalSizeCap; }
-        public Level getLogLevel() { return logLevel; }
+
+        public String getPath() {
+            return path;
+        }
+
+        public String getLogFilePath() {
+            return logFilePath;
+        }
+
+        public String getArchiveFilePatternPath() {
+            return archiveFilePatternPath;
+        }
+
+        public String getLogPattern() {
+            return logPattern;
+        }
+
+        public int getMaxHistory() {
+            return maxHistory;
+        }
+
+        public String getTotalSizeCap() {
+            return totalSizeCap;
+        }
+
+        public Level getLogLevel() {
+            return logLevel;
+        }
     }
 
-    /**
-     * 建造者类，用于构建 Logback 配置
-     */
-    public static class LogbackConfigBuilder {
-        private String logDir = "logs";
-        private String logFilePath = logDir + File.separator + "app.log";
-        private String archiveFilePattern = logDir + File.separator + "app.%d{yyyy-MM-dd}.log";
+    public static class Builder {
+        private String path = "logs";
+        private String logName = "app.log";
+        private String archivePattern = "app.%d{yyyy-MM-dd}.log";
         private String logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n";
         private int maxHistory = 30;
         private String totalSizeCap = "3GB";
         private Level logLevel = Level.INFO;
 
-        public LogbackConfigBuilder setLogDir(String logDir) {
-            this.logDir = logDir;
+        public Builder setPath(String path) {
+            this.path = path;
             return this;
         }
 
-        public LogbackConfigBuilder setLogFilePath(String logFilePath) {
-            this.logFilePath = logFilePath;
+        public Builder setLogName(String logName) {
+            this.logName = logName;
             return this;
         }
 
-        public LogbackConfigBuilder setArchiveFilePattern(String archiveFilePattern) {
-            this.archiveFilePattern = archiveFilePattern;
+        public Builder setArchivePattern(String archivePattern) {
+            this.archivePattern = archivePattern;
             return this;
         }
 
-        public LogbackConfigBuilder setLogPattern(String logPattern) {
+        public Builder setLogPattern(String logPattern) {
             this.logPattern = logPattern;
             return this;
         }
 
-        public LogbackConfigBuilder setMaxHistory(int maxHistory) {
+        public Builder setMaxHistory(int maxHistory) {
             this.maxHistory = maxHistory;
             return this;
         }
 
-        public LogbackConfigBuilder setTotalSizeCap(String totalSizeCap) {
+        public Builder setTotalSizeCap(String totalSizeCap) {
             this.totalSizeCap = totalSizeCap;
             return this;
         }
 
-        public LogbackConfigBuilder setLogLevel(Level logLevel) {
+        public Builder setLogLevel(Level logLevel) {
             this.logLevel = logLevel;
             return this;
         }
 
         public LogbackConfigurator build() {
-            LogbackConfig config = new LogbackConfig(logDir, logFilePath, archiveFilePattern, logPattern,
-                    maxHistory, totalSizeCap, logLevel);
+            LogbackConfig config = new LogbackConfig(
+                path,
+                path + File.separator + logName,
+                path + File.separator + archivePattern,
+                logPattern,
+                maxHistory,
+                totalSizeCap, logLevel);
             return new LogbackConfigurator(config);
         }
     }
 
-    /**
-     * 配置 Logback 日志系统
-     */
-    public void configureLogback() {
+    public void configure() {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         context.reset();
 
@@ -132,15 +169,6 @@ public class LogbackConfigurator {
         consoleAppender.setEncoder(encoder);
         consoleAppender.start();
 
-        // 创建日志目录
-        File logDirectory = new File(config.getLogDir());
-        if (!logDirectory.exists()) {
-            boolean created = logDirectory.mkdirs();
-            if (!created) {
-                System.err.println("无法创建日志目录: " + config.getLogDir());
-            }
-        }
-
         // 配置文件输出
         RollingFileAppender<ILoggingEvent> fileAppender = new RollingFileAppender<>();
         fileAppender.setContext(context);
@@ -151,7 +179,7 @@ public class LogbackConfigurator {
         TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new TimeBasedRollingPolicy<>();
         rollingPolicy.setContext(context);
         rollingPolicy.setParent(fileAppender);
-        rollingPolicy.setFileNamePattern(config.getArchiveFilePattern());
+        rollingPolicy.setFileNamePattern(config.getArchiveFilePatternPath());
         rollingPolicy.setMaxHistory(config.getMaxHistory());
         rollingPolicy.setTotalSizeCap(FileSize.valueOf(config.getTotalSizeCap()));
         rollingPolicy.start();

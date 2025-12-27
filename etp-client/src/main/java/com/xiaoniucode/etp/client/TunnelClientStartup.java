@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.client;
 import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.common.ConfigUtils;
 import com.xiaoniucode.etp.common.Constants;
+import com.xiaoniucode.etp.common.LogConfig;
 import com.xiaoniucode.etp.common.LogbackConfigurator;
 import com.xiaoniucode.etp.common.StringUtils;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ public class TunnelClientStartup {
     }
 
     public static void main(String[] args) {
-        String configPath = ConfigUtils.getConfigPath(args, Constants.DEFAULT_CLIENT_CONFIG_NAME);
+        String configPath = ConfigUtils.getConfigPath(args, Constants.CLIENT_CONFIG_NAME);
         if (!StringUtils.hasText(configPath)) {
             System.err.println("请指定配置文件路径！");
             return;
@@ -39,16 +40,17 @@ public class TunnelClientStartup {
     }
 
     private static void initLogback() {
-        Config config = Config.get();
-        String leve = config.getLogLevel();
-        String path = config.getLogPath();
-        String pattern = config.getLogPattern();
-        new LogbackConfigurator.LogbackConfigBuilder()
-            .setLogFilePath(StringUtils.hasText(path) ? path : (Constants.LOG_BASE_PATH + Constants.DEFAULT_CLIENT_LOG_NAME))
-            .setArchiveFilePattern(StringUtils.hasText(pattern) ? pattern : (Constants.LOG_BASE_PATH + Constants.DEFAULT_CLIENT_LOG_PATTERN))
-            .setLogLevel(!StringUtils.hasText(leve) ? Level.INFO : Level.toLevel(leve, Level.INFO))
+        LogConfig log = Config.get().getLogConfig();
+        new LogbackConfigurator.Builder()
+            .setPath(log.getPath())
+            .setLogPattern(log.getLogPattern())
+            .setArchivePattern(log.getArchivePattern())
+            .setLogLevel(log.getLevel())
+            .setLogName(log.getName())
+            .setMaxHistory(log.getMaxHistory())
+            .setTotalSizeCap(log.getTotalSizeCap())
             .build()
-            .configureLogback();
+            .configure();
     }
 
     private static void registerShutdownHook() {

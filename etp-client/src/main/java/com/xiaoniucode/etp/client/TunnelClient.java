@@ -142,6 +142,7 @@ public class TunnelClient implements Lifecycle {
                 //缓存控制隧道
                 Channel channel = channelFuture.channel();
                 channel.attr(EtpConstants.SERVER_DDR).set(serverAddr);
+                channel.attr(EtpConstants.SERVER_PORT).set(serverPort);
                 channel.attr(EtpConstants.SECRET_KEY).set(secretKey);
                 ChannelManager.setControlChannel(channel);
 
