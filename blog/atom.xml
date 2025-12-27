@@ -14,6 +14,29 @@
         <updated>2025-12-03T10:55:20.000Z</updated>
         <summary type="html"><![CDATA[详细发布细节请往Github Release 页面查看]]></summary>
         <content type="html"><![CDATA[<p>详细发布细节请往Github <a href="https://github.com/xiaoniucode/etp/releases" target="_blank" rel="noopener noreferrer">Release</a> 页面查看</p>
+<h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v050">etp v0.5.0<a href="https://etp.github.io/etp/blog/index#etp-v050" class="hash-link" aria-label="etp v0.5.0的直接链接" title="etp v0.5.0的直接链接" translate="no">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_iX64" id="新特性">✨新特性<a href="https://etp.github.io/etp/blog/index#%E6%96%B0%E7%89%B9%E6%80%A7" class="hash-link" aria-label="✨新特性的直接链接" title="✨新特性的直接链接" translate="no">​</a></h3>
+<ul>
+<li>支持更多日志自定义参数配置</li>
+<li>管理界面增加服务端系统配置信息展示</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_iX64" id="问题修复">🐛问题修复<a href="https://etp.github.io/etp/blog/index#%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="🐛问题修复的直接链接" title="🐛问题修复的直接链接" translate="no">​</a></h3>
+<ul>
+<li>修复通过SpringBoot starter启动客户端断线重连时，由于配置缺失导致无法连接的问题</li>
+<li>修复端口池未在配置文件中指定范围时抛出异常的问题</li>
+<li>修复界面添加客户端时，没有将客户端ID注册到运行时状态管理器导致通过SpringBoot嵌入运行etp客户端时出现异常</li>
+<li>完善etp.db数据库文件的路径逻辑，添加docker环境下配置路径的环境变量，避免因权限问题导致运行失败</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_iX64" id="️-配置变更">⚙️ 配置变更<a href="https://etp.github.io/etp/blog/index#%EF%B8%8F-%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4" class="hash-link" aria-label="⚙️ 配置变更的直接链接" title="⚙️ 配置变更的直接链接" translate="no">​</a></h3>
+<ul>
+<li>原<code>path</code>字段表示主日志文件的完整文件路径，现调整为仅表示基础日志目录路径</li>
+<li>新增<code>name</code>字段，用于指定主日志文件名</li>
+<li>原<code>pattern</code>字段表示完整的日志归档路径格式，现改为<code>archivePattern</code>，仅需填写归档文件名模式（无需包含完整路径）</li>
+<li>部分字段是本次版本新增的配置参数</li>
+</ul>
+<p>下面是完整的配置案例：</p>
+<div class="language-toml codeBlockContainer_K4rn theme-code-block" style="--prism-background-color:hsl(220, 13%, 18%);--prism-color:hsl(220, 14%, 71%)"><div class="codeBlockContent_dtSl"><pre tabindex="0" class="prism-code language-toml codeBlock_eTQc thin-scrollbar" style="background-color:hsl(220, 13%, 18%);color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><code class="codeBlockLines_gQtJ"><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain">[log]</span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain">level = "info" # 日志级别</span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain">path = "log" # 基础路径</span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain">name = "etps.log" # 主日志文件名</span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain">archivePattern = "etpc.%d{yyyy-MM-dd}.log.gz" # 日志归档格式</span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain">logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" # 控制台打印格式</span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain">maxHistory = 30 # 最大保存天数</span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain">totalSizeCap = "3GB" # 总空间大小</span><br></span></code></pre></div></div>
+<p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.5.0" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>
 <h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v041">etp v0.4.1<a href="https://etp.github.io/etp/blog/index#etp-v041" class="hash-link" aria-label="etp v0.4.1的直接链接" title="etp v0.4.1的直接链接" translate="no">​</a></h2>
 <h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
 <ul>
@@ -22,7 +45,7 @@
 </ul>
 <p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.4.1" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>
 <h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v040">etp v0.4.0<a href="https://etp.github.io/etp/blog/index#etp-v040" class="hash-link" aria-label="etp v0.4.0的直接链接" title="etp v0.4.0的直接链接" translate="no">​</a></h2>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="新特性">✨新特性<a href="https://etp.github.io/etp/blog/index#%E6%96%B0%E7%89%B9%E6%80%A7" class="hash-link" aria-label="✨新特性的直接链接" title="✨新特性的直接链接" translate="no">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_iX64" id="新特性-1">✨新特性<a href="https://etp.github.io/etp/blog/index#%E6%96%B0%E7%89%B9%E6%80%A7-1" class="hash-link" aria-label="✨新特性的直接链接" title="✨新特性的直接链接" translate="no">​</a></h3>
 <ul>
 <li>新增springboot 2/3/4版本集成etp的stater，支持嵌入使用，无需安装etp客户端</li>
 <li>客户端支持自定义连接超时配置</li>
@@ -37,7 +60,7 @@
 <li>默认日志收集格式修复</li>
 <li>代码优化，解决潜在的空指针问题</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="️-配置变更">⚙️ 配置变更<a href="https://etp.github.io/etp/blog/index#%EF%B8%8F-%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4" class="hash-link" aria-label="⚙️ 配置变更的直接链接" title="⚙️ 配置变更的直接链接" translate="no">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_iX64" id="️-配置变更-1">⚙️ 配置变更<a href="https://etp.github.io/etp/blog/index#%EF%B8%8F-%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4-1" class="hash-link" aria-label="⚙️ 配置变更的直接链接" title="⚙️ 配置变更的直接链接" translate="no">​</a></h3>
 <ul>
 <li>
 <p>代理映射的名称可以重复</p>
@@ -83,7 +106,7 @@
 <li>新增易于操作的图形化管理界面。</li>
 <li>新增支持日志自定义规则配置。</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="️-配置变更-1">⚙️ 配置变更<a href="https://etp.github.io/etp/blog/index#%EF%B8%8F-%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4-1" class="hash-link" aria-label="⚙️ 配置变更的直接链接" title="⚙️ 配置变更的直接链接" translate="no">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_iX64" id="️-配置变更-2">⚙️ 配置变更<a href="https://etp.github.io/etp/blog/index#%EF%B8%8F-%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4-2" class="hash-link" aria-label="⚙️ 配置变更的直接链接" title="⚙️ 配置变更的直接链接" translate="no">​</a></h3>
 <ul>
 <li>配置文件中的证书配置属性由 <code>ssl</code> 更名为 <code>tls</code>。</li>
 <li>端口映射增加status状态字段，用于控制映射的开启状态。</li>
