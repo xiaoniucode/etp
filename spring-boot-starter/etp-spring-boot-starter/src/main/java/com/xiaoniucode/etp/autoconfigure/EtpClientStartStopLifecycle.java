@@ -60,7 +60,6 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
                 .setLocalPort(localPort)
                 .setAutoStart(properties.isAutoStart())
                 .setProxyName(appName)
-                .setLocalHost(properties.getLocalHost())
                 .setRemotePort(properties.getRemotePort())
                 .setProtocol(properties.getProtocol().name())
                 .build();

@@ -58,9 +58,4 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMes
 
         super.channelWritabilityChanged(ctx);
     }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-    }
 }

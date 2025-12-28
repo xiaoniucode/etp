@@ -9,12 +9,15 @@ import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import ch.qos.logback.core.util.FileSize;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
 /**
- * Logback 日志配置管理
+ * Logback 日志配置管理器
  *
  * @author liuxin
  */
@@ -52,12 +55,16 @@ public class LogbackConfigurator {
          */
         private final String totalSizeCap;
         /**
-         * 日志级别
+         * 根logger日志级别
          */
         private final Level logLevel;
+        /**
+         * 自定义logger日志级别，用于精细化控制
+         */
+        private final Map<String, Level> specificLoggers;
 
         private LogbackConfig(String path, String logFilePath, String archiveFilePatternPath, String logPattern,
-            int maxHistory, String totalSizeCap, Level logLevel) {
+            int maxHistory, String totalSizeCap, Level logLevel, Map<String, Level> specificLoggers) {
             this.path = path;
             this.logFilePath = logFilePath;
             this.archiveFilePatternPath = archiveFilePatternPath;
@@ -65,6 +72,7 @@ public class LogbackConfigurator {
             this.maxHistory = maxHistory;
             this.totalSizeCap = totalSizeCap;
             this.logLevel = logLevel;
+            this.specificLoggers = specificLoggers != null ? Collections.unmodifiableMap(specificLoggers) : Collections.emptyMap();
         }
 
         public String getPath() {
@@ -94,6 +102,10 @@ public class LogbackConfigurator {
         public Level getLogLevel() {
             return logLevel;
         }
+
+        public Map<String, Level> getSpecificLoggers() {
+            return specificLoggers;
+        }
     }
 
     public static class Builder {
@@ -104,6 +116,7 @@ public class LogbackConfigurator {
         private int maxHistory = 30;
         private String totalSizeCap = "3GB";
         private Level logLevel = Level.INFO;
+        private final Map<String, Level> specificLoggers = new LinkedHashMap<>();
 
         public Builder setPath(String path) {
             this.path = path;
@@ -140,6 +153,16 @@ public class LogbackConfigurator {
             return this;
         }
 
+        public Builder addLogger(String loggerName, Level level) {
+            this.specificLoggers.put(loggerName, level);
+            return this;
+        }
+
+        public Builder addLoggers(Map<String, Level> loggers) {
+            this.specificLoggers.putAll(loggers);
+            return this;
+        }
+
         public LogbackConfigurator build() {
             LogbackConfig config = new LogbackConfig(
                 path,
@@ -147,7 +170,9 @@ public class LogbackConfigurator {
                 path + File.separator + archivePattern,
                 logPattern,
                 maxHistory,
-                totalSizeCap, logLevel);
+                totalSizeCap,
+                logLevel,
+                new LinkedHashMap<>(specificLoggers));
             return new LogbackConfigurator(config);
         }
     }
@@ -193,5 +218,12 @@ public class LogbackConfigurator {
         rootLogger.setLevel(config.getLogLevel());
         rootLogger.addAppender(consoleAppender);
         rootLogger.addAppender(fileAppender);
+        //自定义Logger
+        for (Map.Entry<String, Level> entry : config.getSpecificLoggers().entrySet()) {
+            String loggerName = entry.getKey();
+            Level level = entry.getValue();
+            Logger logger = context.getLogger(loggerName);
+            logger.setLevel(level);
+        }
     }
 }

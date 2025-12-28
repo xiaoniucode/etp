@@ -25,7 +25,7 @@ end = 8609 #结束端口
 ```
 
 ### 1、快速体验
-```shell
+```powershell
 docker run -d \
   --name etps \
   -p 8020:8020 \
@@ -36,7 +36,7 @@ docker run -d \
 ```
 
 ### 2、自定义JVM调优参数
-```shell
+```powershell
 docker run -d \
   --name etps \
   -p 8020:8020 \
@@ -49,7 +49,7 @@ docker run -d \
 
 ### 3、配置volume，持久化数据
 
-```shell
+```powershell
 docker run -d \
   --name etps \
   -p 8020:8020 \
@@ -63,7 +63,7 @@ docker run -d \
 
 ### 4、映射指定端口范围
 
-```shell
+```powershell
 docker run -d \
   --name etps \
   -p 8020:8020 \

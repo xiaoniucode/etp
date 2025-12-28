@@ -9,27 +9,24 @@ sidebar_position: 1
 :::
 
 ## 方法一：采用nohup
-服务端配置：
-```js
-etps.toml
+服务端配置(`etps.toml`)：
+```toml
 host="0.0.0.0"
 bindPort = 9527
 ```
-客户端配置：
-```js
-etpc.toml
-
+客户端配置(`etpc.toml`)：
+```toml
 serverAddr = "x.x.x.x"
 serverPort = 9527
 secretKey = "your-secret-key"
 ```
 将可执行程序和toml配置文件放在同一个文件夹，然后执行命令：
-```js
+```powershell
 sudo nohup ./etps > /dev/null 2>&1 && #启动服务端
 sudo nohup ./etpc > /dev/null 2>&1 & #启动客户端
 ```
 或者
-```js
+```powershell
 sudo nohup ./etps -c etps.toml > /dev/null 2>&1 &  #启动服务端
 sudo nohup ./etpc -c etpc.toml > /dev/null 2>&1 &  #启动客户端
 ```
@@ -38,20 +35,21 @@ sudo nohup ./etpc -c etpc.toml > /dev/null 2>&1 &  #启动客户端
 
 1. 安装`systemd`
 如果没有安装`systemd`，执行如下命令安装：
-```js
+```powershell
 # CentOS/RHEL
 yum install systemd
 
 # Debian/Ubuntu
 apt install systemd
 ```
+
 2. 创建`etps.service`服务文件
 在`/etc/systemd/system` 目录下创建一个`etps.service`服务文件
-```js
+```powershell
 sudo vim /etc/systemd/system/etps.service
 ```
 添加如下内容：
-```js
+```toml
 [Unit]
 # 服务名称，可自定义
 Description = etp server
@@ -67,7 +65,7 @@ ExecStart = /path/to/etps -c /path/to/etps.toml
 WantedBy = multi-user.target
 ```
 3. 使用`systemd`命令管理`etps`服务
-```shell
+```powershell
 # 启动
 sudo systemctl start etps
 # 停止

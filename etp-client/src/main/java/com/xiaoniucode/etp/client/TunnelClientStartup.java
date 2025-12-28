@@ -19,7 +19,7 @@ public class TunnelClientStartup {
     private static TunnelClient tunnelClient;
 
     static {
-        System.setProperty("io.netty.leakDetection.level", "SIMPLE");
+        System.setProperty("io.netty.leakDetection.level", "DISABLED");
     }
 
     public static void main(String[] args) {
@@ -49,6 +49,7 @@ public class TunnelClientStartup {
             .setLogName(log.getName())
             .setMaxHistory(log.getMaxHistory())
             .setTotalSizeCap(log.getTotalSizeCap())
+            .addLogger("io.netty.channel.ChannelHandlerMask", Level.INFO)
             .build()
             .configure();
     }

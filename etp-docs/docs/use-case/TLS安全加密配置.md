@@ -30,7 +30,7 @@ sh tls.sh
 ![tls_res.png](img/tls_res.png)
 
 ### 🖥️服务端
-```js
+```toml
 ssl = true
 [keystore]
 path = "/path/cert/server.p12"
@@ -38,7 +38,7 @@ keyPass = "your-keypass"
 storePass = "your-storepass"
 ```
 ### 💻客户端
-```js
+```toml
 ssl = true
 [truststore]
 path = "/path/cert/client.p12"

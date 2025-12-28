@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server;
 
+import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.common.ConfigUtils;
 import com.xiaoniucode.etp.common.Constants;
 import com.xiaoniucode.etp.common.LogConfig;
@@ -23,7 +24,7 @@ public class TunnelServerStartup {
     private static final Logger logger = LoggerFactory.getLogger(TunnelServerStartup.class);
 
     static {
-        System.setProperty("io.netty.leakDetection.level", "SIMPLE");
+        System.setProperty("io.netty.leakDetection.level", "DISABLED");
     }
 
     public static void main(String[] args) {
@@ -68,6 +69,7 @@ public class TunnelServerStartup {
             .setLogName(log.getName())
             .setMaxHistory(log.getMaxHistory())
             .setTotalSizeCap(log.getTotalSizeCap())
+            .addLogger("io.netty.channel.ChannelHandlerMask", Level.INFO)
             .build()
             .configure();
     }
