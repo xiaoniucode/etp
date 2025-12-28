@@ -128,7 +128,6 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>UTF-8</encoding>
-                    <proc>none</proc>
                     <compilerArgs>
                         <arg>-Xlint:none</arg>
                         <arg>-Xlint:-options</arg>

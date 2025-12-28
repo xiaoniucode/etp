@@ -36,14 +36,23 @@ public class ProxyRegisterMessageHandler implements MessageHandler {
                 sendSuccessResponse(ctx, msg, response);
             }
         } catch (Exception e) {
-            Throwable cause = e.getCause();
-            logger.error(cause.getMessage(), cause);
-            String errorMsg;
-            if (cause instanceof BizException biz) {
-                errorMsg = biz.getMessage();
-            } else {
-                errorMsg = cause.getMessage();
+            String errorMsg = "";
+            Throwable current = e;
+            while (current != null) {
+                if (current instanceof BizException biz) {
+                    errorMsg = biz.getMessage();
+                    break;
+                }
+                current = current.getCause();
             }
+            if (errorMsg.isEmpty() && e.getMessage() != null) {
+                errorMsg = e.getMessage();
+            }
+            Throwable root = e;
+            while (root.getCause() != null) {
+                root = root.getCause();
+            }
+            logger.error(root.toString(), root);
             sendErrorResponse(ctx, msg, errorMsg);
         }
     }

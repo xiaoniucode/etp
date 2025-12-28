@@ -96,7 +96,7 @@ public final class ConfigService {
     public static JSONObject addProxy(JSONObject req) {
         int remotePort = req.getInt("remotePort");
         if (remotePort != -1 && !PortAllocator.get().isPortAvailable(remotePort)) {
-            throw new BizException("映射注册失败，公网端口: " + remotePort + "无效！");
+            throw new BizException("映射注册失败，公网端口: " + remotePort + "不可用！");
         }
         String secretKey = req.getString("secretKey");
         if (state.isPortOccupied(remotePort)) {

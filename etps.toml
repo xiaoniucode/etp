@@ -1,7 +1,7 @@
 host="0.0.0.0"
 bindPort = 9527
 # TLS
-tls = false
+tls = true
 [keystore]
 path = "cert/server.p12"
 keyPass = "3FbV8R8VW49O"
@@ -27,15 +27,15 @@ logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%
 maxHistory = 30
 totalSizeCap = "3GB"
 
-#[dashboard]
-#enable = true
-##addr = "localhost"
-#port = 8030
-#reset = true
-#username = "admin"
-#password = "123456"
+[dashboard]
+enable = true
+#addr = "localhost"
+port = 8020
+reset = true
+username = "a"
+password = "1"
 #
 #端口范围
 [port_range]
-start = 8600
-end = 8609
+start = 8000
+end = 8009
