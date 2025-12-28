@@ -50,6 +50,12 @@ docker run -d \
 ### 3、配置volume，持久化数据
 
 ```powershell
+sudo mkdir /opt/etps
+cd /opt/etps
+touch etps.toml
+vim etps.toml
+```
+```powershell
 docker run -d \
   --name etps \
   -p 8020:8020 \
@@ -75,6 +81,13 @@ docker run -d \
 ```
 
 ### 5、docker-compose案例
+
+```powershell
+sudo mkdir /opt/etps
+cd /opt/etps
+touch etps.toml
+vim etps.toml
+```
 
 ```yaml
 version: '3.8'
