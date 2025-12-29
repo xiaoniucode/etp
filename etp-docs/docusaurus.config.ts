@@ -6,7 +6,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
     title: 'etp',
-    tagline: '☕由Netty驱动的内网穿',
+    tagline: '☕由Netty驱动的内网穿透隧道',
     favicon: 'img/favicon.ico',
 
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
