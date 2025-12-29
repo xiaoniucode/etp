@@ -19,7 +19,7 @@ function HomepageHeader() {
                 </div>
                 <p className={styles.heroTagline}>{siteConfig.tagline}</p>
                 <p className={styles.heroSubtitle}>
-                    简单、高效、支持TCP协议以及支持与SpringBoot&Cloud生态无缝集成的隧道代理解决方案
+                    简单、高效、支持TCP及上层协议代理以及支持与SpringBoot&Cloud生态无缝集成的隧道代理解决方案
                 </p>
                 <div className={styles.buttons}>
                     <Link
@@ -47,7 +47,7 @@ const features = [
     {title: '管理面板', description: '提供直观易与操作的高颜值Web管理界面，简化配置操作，功能丰富，提供实时流量观测统计'},
     {title: '高性能传输', description: '基于Netty零拷贝机制、ProtoBuf等技术实现高性能数据传输,GraalVM原生编译实现毫秒级启动'},
     {title: '协议支持', description: '支持TCP协议以及TCP上层协议代理,TLS1.3高效加密协议,使用PKCS#12格式存储密钥与证书'},
-    {title: '轻量小巧', description: '聚焦核心，资源占用少，零外部依赖，即装即用, 支持纯Toml静态配置或管理界面动态配置使用'},
+    {title: '简单易用', description: '聚焦核心，资源占用少，零外部依赖，即装即用, 支持纯Toml静态配置或管理界面动态配置使用'},
     {title: '跨平台支持', description: '支持Linux、Windows、macOS、Docker，兼容ARM64、AMD64架构，支持SpringBoot生态集成'},
     {title: '功能丰富', description: '支持断线重连、流量观测统计、启停代理服务、端口池、多客户端、无客户端模式、客户端踢除等'},
 ];
