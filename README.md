@@ -1,9 +1,9 @@
 <div align="center">
   <img src="doc/logo.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
 </div>
-<div align="center" style="font-size:18px;color:#555;margin-top:-10px;margin-bottom:24px;">
-A lightweight NAT traversal reverse proxy application implemented with Netty.
-</div>
+<p align="center" style="font-size:18px;color:#555;margin-top:-10px;margin-bottom:24px;">
+  An intranet penetration solution implemented based on Netty
+</p>
 <div align="center">
   <a href="https://github.com/xiaoniucode/etp/stargazers">
     <img src="https://img.shields.io/github/stars/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Stars"/>
@@ -14,12 +14,13 @@ A lightweight NAT traversal reverse proxy application implemented with Netty.
   <a href="https://github.com/xiaoniucode/etp/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge" alt="License"/>
   </a>
-  <a href="https://github.com/xiaoniucode/etp/releases/v0.5.0">
+ <a href="https://github.com/xiaoniucode/etp/releases/v0.5.0">
     <img src="https://img.shields.io/badge/etp-0.5.0-blue?style=for-the-badge" alt="etp:0.5.0"/>
   </a>
 <a href="https://somsubhra.github.io/github-release-stats/?username=xiaoniucode&repository=etp">
   <img src="https://img.shields.io/github/downloads/xiaoniucode/etp/total?style=for-the-badge" alt="Downloads"/>
 </a>
+
 </div>
 
 <div align="center">
@@ -28,29 +29,28 @@ A lightweight NAT traversal reverse proxy application implemented with Netty.
   <a href="https://xiaoniucode.github.io/etp"><strong>Documentation</strong></a>
 </div>
 
-## ✨ Introduction
+## Introduction
 
-**etp** (Easy Tunnel Proxy) is a lightweight, high-performance reverse proxy application for NAT traversal. It supports TCP, HTTP and upper-layer TCP protocols, as well as efficient and secure TLS 1.3 encryption. Both pure Toml static configuration and dynamic configuration via management interface are supported. etp enables rapid exposure of internal network services to the public internet, making them accessible for public users and development/testing purposes, while reducing the cost of purchasing public cloud servers.
+etp(Easy Tunnel Proxy) is a cross-platform intranet penetration tool that supports the TCP protocol and TCP-based upper-layer protocols. It supports the TLS 1.3 high-efficiency and secure encryption protocol, supports pure Toml static configuration or dynamic configuration via a management interface, and can be easily integrated with the Spring Boot ecosystem.
 
-## 🌟 Features
+## Features
 
-- 📡 Supports TCP and HTTP protocols
-- 🔐 Utilizes efficient and secure TLS 1.3 encryption
-- 🍃 Seamlessly integrates with the **Spring Boot & Cloud** ecosystem
-- 🖥️ Intuitive management UI for configuration
-- 🛜 High-performance, low-latency data transfer
-- 🚀 Millisecond-level startup
-- 🔗 Automatic reconnection
-- 🔐 Authentication
-- 🐒 Supports multiple clients
-- 🧿 Automatic port allocation for mapping
-- 📄 Supports pure Toml configuration and web UI configuration
-- 📺 Cross-platform, compatible with arm64 and amd64 architectures
-- 💨 Lightweight with low resource consumption
+- Supports TCP protocol and TCP-based upper-layer protocols  
+- Supports the TLS 1.3 high-efficiency and secure encryption protocol  
+- Supports seamless integration with the Spring Boot & Cloud ecosystem  
+- Built-in easy-to-use management interface  
+- High-efficiency data transmission  
+- Millisecond-level startup  
+- Automatic reconnection  
+- Authentication  
+- Supports multiple clients  
+- Automatic allocation of mapping ports  
+- Supports pure Toml configuration or usage via the management interface  
+- Cross-platform, compatible with arm64 and amd64 architectures  
 
-## 🎨 Dashboard Screenshots
+## Screenshots
 
-In addition to supporting pure Toml static configuration, etp also provides a graphical management interface for easy operation. This greatly reduces management and usage costs while offering more comprehensive features.
+In addition to supporting pure `Toml` static configuration, etp also supports graphical interface management, which has low usage cost and richer functionality.
 
 <div align="center">
   <table width="100%">
@@ -60,7 +60,7 @@ In addition to supporting pure Toml static configuration, etp also provides a gr
         <sub>Login Page</sub>
       </td>
       <td align="center" width="50%" style="vertical-align:top;">
-        <img src="doc/image/screeshot/监控面板.png" alt="Dashboard" style="max-width:95%;height:auto;"/><br/>
+        <img src="doc/image/screeshot/监控面板.png" alt="Monitoring Dashboard" style="max-width:95%;height:auto;"/><br/>
         <sub>Monitoring Dashboard</sub>
       </td>
     </tr>
@@ -87,60 +87,51 @@ In addition to supporting pure Toml static configuration, etp also provides a gr
   </table>
 </div>
 
-## 🚀 Quick Start
+## Quick Start
 
-Download the appropriate [release package](https://github.com/xiaoniucode/etp/releases) for your operating system. The server is typically deployed on a machine with a public IP address.
+Download the corresponding [release package](https://github.com/xiaoniucode/etp/releases) according to your operating system. If external access is required, it needs to be deployed on a server with a public IP. The following example demonstrates usage in a local environment.
 
-### 🖥️ Server Setup
+### Run the Server
 
-This demonstrates how to expose an internal MySQL service to the public network on port 3307 through simple configuration.
+Edit the configuration file `etps.toml`:
 
-> Edit the configuration file `etps.toml` and add the following content:
-
-```toml
+```toml 
+host="127.0.0.1"
 bindPort = 9527
 [[clients]]
-name = "Mac" # [Required] Custom client name
-secretKey = "your client authentication key" # [Required] Custom key
+name = "client"
+secretKey = "authentication key"
 
 [[clients.proxies]]
-name = "mysql" # Service name
-type = "tcp" # [Required] Network transport protocol
-localPort = 3306 # [Required] Internal service port
-remotePort = 3307 # [Optional] Public service port; if not specified, a port will be randomly assigned by the system
-```
-
-Start the etp server on a Linux server. For external access, make sure to deploy it on a machine with a public IP address.
+name = "mysql"
+type = "tcp"
+localPort = 3306
+remotePort = 3307
+````
 
 ```shell
-nohup ./etps -c etps.toml > /dev/null 2>&1 &
+./etps -c etps.toml
 ```
 
-### 💻 Client etpc Configuration
+### Run the Client
 
-> Edit the configuration file `etpc.toml`:
+Edit the configuration file `etpc.toml`:
 
 ```toml
-serverAddr = "x.x.x.x" # IP address of the server where etps is deployed
-serverPort = 9527 # bindPort port of the server
-secretKey = "your client authentication key" # Must match the server configuration
+serverAddr = "127.0.0.1"
+serverPort = 9527
+secretKey = "authentication key"
 ```
-
-Start the client on an internal computer (Unix example):
 
 ```shell
-./etpc -c etpc.toml # Or run in the background: nohup ./etpc -c etpc.toml > /dev/null 2>&1 &
+./etpc -c etpc.toml
 ```
 
-🔔 **Note**: If the configuration file and executable are in the same folder, you **do not need to use -c** to specify the configuration.
+## Issue Feedback
 
-After a successful startup, connect to MySQL using port **3307**.
+Report issues: [issues](https://github.com/xiaoniucode/etp/issues)
 
-## Feedback
-
-To report issues: [issues](https://github.com/xiaoniucode/etp/issues)
-
-## 📈 Project Trends
+## Project Trend
 
 <p align="center">
   <a href="https://github.com/xiaoniucode/etp/stargazers">

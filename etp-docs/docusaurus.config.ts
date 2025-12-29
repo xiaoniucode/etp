@@ -6,7 +6,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
     title: 'etp',
-    tagline: '☕由Netty驱动的内网穿透利器',
+    tagline: '☕由Netty驱动的内网穿',
     favicon: 'img/favicon.ico',
 
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -75,7 +75,7 @@ const config: Config = {
             respectPrefersColorScheme: true,
         },
         navbar: {
-            title: '🏠首页',
+            title: '首页',
             logo: {
                 alt: 'etp',
                 src: 'img/logo.png',
@@ -85,22 +85,22 @@ const config: Config = {
                     type: 'docSidebar',
                     sidebarId: 'tutorialSidebar',
                     position: 'left',
-                    label: '📚文档',
+                    label: '文档',
                 },
-                {to: '/blog', label: '📝博客', position: 'right'},
+                {to: '/blog', label: '博客', position: 'right'},
                 {
                     href: 'https://github.com/xiaoniucode/etp/issues',
-                    label: '🐛问题反馈',
+                    label: '问题反馈',
                     position: 'right',
                 },
                 {
                     href: 'https://github.com/xiaoniucode/etp/discussions',
-                    label: '👥GitHub社区',
+                    label: 'GitHub社区',
                     position: 'right',
                 },
                 {
                     href: 'https://github.com/xiaoniucode/etp',
-                    label: '👩‍💻GitHub',
+                    label: 'GitHub',
                     position: 'right',
                 },
                 {

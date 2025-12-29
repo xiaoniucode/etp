@@ -23,13 +23,13 @@ sh tls.sh
 ![tls_2.png](img/tls_2.png)
 
 
-## ✍️配置
+## 配置
 
 将上面生成的证书和密钥分别客户端和服务端进行配置。
 
 ![tls_res.png](img/tls_res.png)
 
-### 🖥️服务端
+### 服务端配置
 ```toml
 ssl = true
 [keystore]
@@ -37,14 +37,17 @@ path = "/path/cert/server.p12"
 keyPass = "your-keypass"
 storePass = "your-storepass"
 ```
-### 💻客户端
+### 客户端配置
 ```toml
 ssl = true
 [truststore]
 path = "/path/cert/client.p12"
 storePass = "your-storepass"
 ```
-⚠️ `tls=true / tls=false`必须在服务端和客户端同时设置并保持一致！
+
+:::warning
+`tls=true / tls=false`必须保证服务端和客户端的配置一致！
+:::
 
 ---
 

@@ -4,7 +4,7 @@ sidebar_position: 4
 
 ## 介绍
 
-`etps`服务端最新镜像仓库获取地址：[docker hub](https://hub.docker.com/r/xiaoniucode/etps)。
+`etps`服务端最新镜像获取地址：[docker hub](https://hub.docker.com/r/xiaoniucode/etps)。
 
 **端口说明：**
 - `9527`是默认的`etpc`客户端与`etps`服务端通信的端口
@@ -45,7 +45,7 @@ docker run -d \
   -e ETP_DB_PATH=/app/data/etp.db \ 
   xiaoniucode/etps:latest
 ```
-- JVM_OPTS: 用于自定义JVM调优参数
+- JVM_OPTS: 用于自定义JVM参数
 
 ### 3、配置volume，持久化数据
 
@@ -75,7 +75,7 @@ docker run -d \
   -p 8020:8020 \
   -p 9527:9527 \
   -p 8600-8609:8600-8609 \
-  -e JVM_OPTS="-Xmx1g -Xms512m" \
+  -e JVM_OPTS="-Xmx1g -Xms1g" \
   -e ETP_DB_PATH=/app/data/etp.db \ 
   xiaoniucode/etps:latest
 ```
@@ -103,7 +103,7 @@ services:
       - "8600-8609:8600-8609"  # 端口范围映射
     environment:
       - ETP_DB_PATH=/app/data/etp.db
-      - JVM_OPTS=-Xmx1g -Xms1g #JVM调优参数
+      - JVM_OPTS=-Xmx1g -Xms1g #JVM参数
     volumes: # 数据持久化
       - opt/etps/data:/app/data \ # 数据
       - opt/etps/logs:/app/logs \ # 日志

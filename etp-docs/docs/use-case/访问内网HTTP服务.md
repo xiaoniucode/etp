@@ -7,7 +7,7 @@ sidebar_position: 2
 ```toml
 [[clients.proxies]]
 name = "web" 
-type = "tcp" #指定为tcp
+type = "tcp"
 localPort = 8080
 remotePort = 8081
 ```

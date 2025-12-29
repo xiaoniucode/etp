@@ -5,7 +5,7 @@ sidebar_position: 1
 # Linux
 `etp`服务端一般安装在具有`公网IP`的Linux服务器上，本文介绍基于Linux环境的安装教程。
 :::tip 提示
-安装过程中若出现问题，可先查阅 [常见问题](../faq/faq.md) 文档寻找解决方案。
+安装过程中遇到问题，可先查阅 [常见问题](../faq/faq.md) 文档寻找解决方案。
 :::
 
 ## 方法一：采用nohup
@@ -22,13 +22,13 @@ secretKey = "your-secret-key"
 ```
 将可执行程序和toml配置文件放在同一个文件夹，然后执行命令：
 ```powershell
-sudo nohup ./etps > /dev/null 2>&1 && #启动服务端
-sudo nohup ./etpc > /dev/null 2>&1 & #启动客户端
+sudo nohup ./etps > /dev/null 2>&1 &
+sudo nohup ./etpc > /dev/null 2>&1 &
 ```
 或者
 ```powershell
-sudo nohup ./etps -c etps.toml > /dev/null 2>&1 &  #启动服务端
-sudo nohup ./etpc -c etpc.toml > /dev/null 2>&1 &  #启动客户端
+sudo nohup ./etps -c etps.toml > /dev/null 2>&1 &
+sudo nohup ./etpc -c etpc.toml > /dev/null 2>&1 &
 ```
 ## 方法二：采用systemd
 下文介绍如何使用systemd安装etp服务端。
