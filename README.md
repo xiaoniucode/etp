@@ -100,7 +100,7 @@ host="127.0.0.1"
 bindPort = 9527
 [[clients]]
 name = "client"
-secretKey = "authentication key"
+secretKey = "your-secret-key"
 
 [[clients.proxies]]
 name = "mysql"
@@ -120,7 +120,7 @@ Edit the configuration file `etpc.toml`:
 ```toml
 serverAddr = "127.0.0.1"
 serverPort = 9527
-secretKey = "authentication key"
+secretKey = "your-secret-key"
 ```
 
 ```shell
