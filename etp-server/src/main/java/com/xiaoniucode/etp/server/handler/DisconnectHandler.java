@@ -34,6 +34,7 @@ public class DisconnectHandler extends AbstractMessageHandler {
 
         Channel controlChannel = ChannelManager.getControlChannelBySecretKey(secretKey);
         if (controlChannel == null) {
+            logger.warn("control channel is null");
             return;
         }
 

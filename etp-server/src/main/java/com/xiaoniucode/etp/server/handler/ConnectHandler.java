@@ -24,6 +24,9 @@ public class ConnectHandler extends AbstractMessageHandler {
         }
         Channel visitorChannel = ChannelManager.getClientChannel(controlChannel, sessionId);
         Channel dataChannel = ctx.channel();
+        if (dataChannel == null) {
+            return;
+        }
         dataChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
         dataChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
         //访问者channel与数据隧道channel双向绑定

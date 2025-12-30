@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
     private Logger logger = LoggerFactory.getLogger(ControlChannelHandler.class);
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
         MessageHandler handler = MessageHandlerFactory.getHandler(msg.getType());
@@ -54,6 +55,8 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMes
         Channel visitorChannel = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
         if (visitorChannel != null) {
             visitorChannel.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
+        } else {
+            logger.warn("channel wriability changed and visitorChannel is null");
         }
 
         super.channelWritabilityChanged(ctx);

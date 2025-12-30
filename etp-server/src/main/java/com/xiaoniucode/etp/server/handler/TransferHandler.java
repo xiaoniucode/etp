@@ -18,7 +18,7 @@ public class TransferHandler extends AbstractMessageHandler {
     protected void doHandle(ChannelHandlerContext ctx, Message msg) {
         Channel dataChannel = ctx.channel();
         Channel visitorChannel = dataChannel.attr(EtpConstants.VISITOR_CHANNEL).get();
-        if (visitorChannel != null) {
+        if (visitorChannel != null/*&&visitorChannel.isActive()*/) {
             dataChannel.config().setAutoRead(visitorChannel.isWritable());
             ByteBuf buf = Unpooled.wrappedBuffer(msg.getPayload().asReadOnlyByteBuffer());
             visitorChannel.writeAndFlush(buf);

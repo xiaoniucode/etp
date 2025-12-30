@@ -31,11 +31,15 @@ public class TcpVisitorChannelHandler extends SimpleChannelInboundHandler<ByteBu
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
         Channel dataChannel = ctx.channel().attr(EtpConstants.DATA_CHANNEL).get();
+        if (dataChannel == null || !dataChannel.isActive()) {
+            logger.warn("data channel is null");
+            return;
+        }
         ByteString payload = ByteString.copyFrom(buf.nioBuffer());
         TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
-                .setType(TunnelMessage.Message.Type.TRANSFER)
-                .setPayload(payload)
-                .build();
+            .setType(TunnelMessage.Message.Type.TRANSFER)
+            .setPayload(payload)
+            .build();
         if (dataChannel.isWritable()) {
             dataChannel.writeAndFlush(message);
         }
@@ -56,10 +60,10 @@ public class TcpVisitorChannelHandler extends SimpleChannelInboundHandler<ByteBu
             ChannelManager.addClientChannelToControlChannel(visitorChannel, nextSessionId, controllChannel);
             ChannelManager.registerActiveConnection(sa.getPort(), visitorChannel);
             TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
-                    .setType(TunnelMessage.Message.Type.CONNECT)
-                    .setSessionId(nextSessionId)
-                    .setPort(localPort)
-                    .build();
+                .setType(TunnelMessage.Message.Type.CONNECT)
+                .setSessionId(nextSessionId)
+                .setPort(localPort)
+                .build();
             controllChannel.writeAndFlush(message);
         }
         super.channelActive(ctx);
@@ -83,9 +87,9 @@ public class TcpVisitorChannelHandler extends SimpleChannelInboundHandler<ByteBu
                 dataChannel.attr(EtpConstants.SESSION_ID).getAndSet(null);
                 dataChannel.config().setOption(ChannelOption.AUTO_READ, true);
                 TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
-                        .setType(TunnelMessage.Message.Type.DISCONNECT)
-                        .setSessionId(sessionId)
-                        .build();
+                    .setType(TunnelMessage.Message.Type.DISCONNECT)
+                    .setSessionId(sessionId)
+                    .build();
                 dataChannel.writeAndFlush(tunnelMessage);
             }
         }

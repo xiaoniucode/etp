@@ -7,6 +7,7 @@ import com.xiaoniucode.etp.core.protocol.TunnelMessage;
 import com.xiaoniucode.etp.server.manager.RuntimeState;
 import com.xiaoniucode.etp.server.web.ConfigService;
 import com.xiaoniucode.etp.server.web.server.BizException;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -23,7 +24,12 @@ public class ProxyRegisterMessageHandler implements MessageHandler {
     @Override public void handle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
         try {
             TunnelMessage.ProxyRequest request = TunnelMessage.ProxyRequest.parseFrom(msg.getPayload());
-            String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
+            Channel controlChannel = ctx.channel();
+            if (controlChannel == null || !controlChannel.isActive()) {
+                logger.warn("control channel is null or not active");
+                return;
+            }
+            String secretKey = controlChannel.attr(EtpConstants.SECRET_KEY).get();
             if (StringUtils.hasText(secretKey)) {
                 JSONObject body = buildAddReq(request, secretKey);
                 JSONObject proxy = ConfigService.addProxy(body);
