@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * @author liuxin
  */
 public class ControlChannelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
-    private Logger logger = LoggerFactory.getLogger(ControlChannelHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(ControlChannelHandler.class);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {

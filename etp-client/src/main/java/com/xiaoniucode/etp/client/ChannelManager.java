@@ -1,7 +1,6 @@
 package com.xiaoniucode.etp.client;
 
 import com.xiaoniucode.etp.core.ChannelUtils;
-import com.xiaoniucode.etp.core.DataTunnelChannelBorrowCallback;
 import com.xiaoniucode.etp.core.EtpConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -11,6 +10,7 @@ import io.netty.channel.ChannelOption;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -108,26 +108,30 @@ public final class ChannelManager {
     }
 
     /**
-     * 用于从数据隧道通道池中获取一个通道连接，如果没有则创建一个新的通道
+     * 获取数据隧道，没有则新建一个
      *
      * @param tunnelBootstrap 隧道
-     * @param callback        回调接口
      */
-    public static void borrowDataTunnelChanel(Bootstrap tunnelBootstrap, DataTunnelChannelBorrowCallback callback) {
+    public static CompletableFuture<Channel> borrowDataTunnelChannel(Bootstrap tunnelBootstrap) {
+        CompletableFuture<Channel> future = new CompletableFuture<>();
         Channel dataTunnelChannel = dataTunnelChannelPool.poll();
         if (dataTunnelChannel != null) {
-            callback.success(dataTunnelChannel);
-            return;
+            future.complete(dataTunnelChannel);
+            return future;
         }
+
         Channel controlChannel = getControlChannel();
         String serverAddr = controlChannel.attr(EtpConstants.SERVER_DDR).get();
         Integer serverPort = controlChannel.attr(EtpConstants.SERVER_PORT).get();
-        tunnelBootstrap.connect(serverAddr, serverPort).addListener((ChannelFutureListener) future -> {
-            if (future.isSuccess()) {
-                callback.success(future.channel());
+        tunnelBootstrap.connect(serverAddr, serverPort).addListener((ChannelFutureListener) f -> {
+            if (f.isSuccess()) {
+                future.complete(f.channel());
             } else {
-                callback.fail(future.cause());
+                future.completeExceptionally(f.cause());
             }
         });
+
+        return future;
     }
+
 }

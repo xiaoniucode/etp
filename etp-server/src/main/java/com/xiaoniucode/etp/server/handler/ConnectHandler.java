@@ -4,9 +4,16 @@ import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.core.AbstractMessageHandler;
+import com.xiaoniucode.etp.server.proxy.HttpVisitorChannelHandler;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * 数据隧道，连接消息处理器
@@ -15,7 +22,7 @@ import io.netty.channel.ChannelOption;
  */
 public class ConnectHandler extends AbstractMessageHandler {
     @Override
-    protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
+    protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
         long sessionId = msg.getSessionId();
         String secretKey = msg.getExt();
         Channel controlChannel = ChannelManager.getControlChannelBySecretKey(secretKey);

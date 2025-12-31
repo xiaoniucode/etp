@@ -1,7 +1,7 @@
-host="0.0.0.0"
+host = "0.0.0.0"
 bindPort = 9527
 # TLS
-tls = true
+tls = false
 [keystore]
 path = "cert/server.p12"
 keyPass = "3FbV8R8VW49O"
@@ -12,11 +12,12 @@ secretKey = "your-secret-key"
 name = "静态客户端"
 #
 #[[clients.proxies]]
-#localPort = 3306
-#name = "MySQL"
-#remotePort = 3309
-#type = "tcp"
-##
+#localPort = 8081
+#name = "web"
+#domains = ["web.domain.com"]
+#type = "http"
+
+#
 ##---------------------------日志--------------------------------#
 [log]
 level = "debug"

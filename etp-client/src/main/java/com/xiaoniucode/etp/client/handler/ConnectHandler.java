@@ -2,7 +2,6 @@ package com.xiaoniucode.etp.client.handler;
 
 import com.xiaoniucode.etp.client.ChannelManager;
 import com.xiaoniucode.etp.core.AbstractMessageHandler;
-import com.xiaoniucode.etp.core.DataTunnelChannelBorrowCallback;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage.Message;
 import io.netty.bootstrap.Bootstrap;
@@ -34,39 +33,36 @@ public class ConnectHandler extends AbstractMessageHandler {
                 logger.debug("成功连接到内网服务{}:{}", LOCALHOST, port);
                 Channel realChannel = future.channel();
                 realChannel.config().setOption(ChannelOption.AUTO_READ, false);
-                ChannelManager.borrowDataTunnelChanel(controlBootstrap, new DataTunnelChannelBorrowCallback() {
-                    @Override
-                    public void success(Channel dataChannel) {
 
+                ChannelManager.borrowDataTunnelChannel(controlBootstrap)
+                    .thenAccept(dataChannel -> {
                         dataChannel.attr(EtpConstants.REAL_SERVER_CHANNEL).set(realChannel);
                         realChannel.attr(EtpConstants.DATA_CHANNEL).set(dataChannel);
                         Message tunnelMessage = Message.newBuilder()
-                                .setType(Message.Type.CONNECT)
-                                .setSessionId(sessionId)
-                                .setExt(secretKey)
-                                .build();
+                            .setType(Message.Type.CONNECT)
+                            .setSessionId(sessionId)
+                            .setExt(secretKey)
+                            .build();
 
-                        dataChannel.writeAndFlush(tunnelMessage).addListener(future -> {
-                            if (future.isSuccess()) {
+                        dataChannel.writeAndFlush(tunnelMessage).addListener(f -> {
+                            if (f.isSuccess()) {
                                 ChannelManager.addRealServerChannel(sessionId, realChannel);
                                 realChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
                                 realChannel.config().setOption(ChannelOption.AUTO_READ, true);
-                                logger.debug("代理客户端向代理服务端成功建立数据传输通道:[sessionId:{},port:{}]", sessionId, port);
+                                logger.debug("成功建立数据传输通道:[sessionId:{},port:{}]", sessionId, port);
                             }
                         });
-                    }
-
-                    @Override
-                    public void fail(Throwable cause) {
+                    })
+                    .exceptionally(cause -> {
                         logger.error(cause.getMessage(), cause);
                         //如果发生错误，通知服务端断开连接
                         Message message = Message.newBuilder()
-                                .setSessionId(sessionId)
-                                .setType(Message.Type.DISCONNECT)
-                                .build();
+                            .setSessionId(sessionId)
+                            .setType(Message.Type.DISCONNECT)
+                            .build();
                         controlTunnelChannel.writeAndFlush(message);
-                    }
-                });
+                        return null;
+                    });
             } else {
                 logger.error("内网服务[{}:{}]不可用!", LOCALHOST, port);
             }
