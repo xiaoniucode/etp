@@ -16,25 +16,23 @@ const config: Config = {
 
     // Set the production url of your site here
     url: 'https://etp.github.io',
-    // Set the /<baseUrl>/ pathname under which your site is served
-    // For GitHub pages deployment, it is often '/<projectName>/'
     baseUrl: '/etp/',
-
-    // GitHub pages deployment config.
-    // If you aren't using GitHub pages, you don't need these.
     organizationName: 'xiaoniucode', // Usually your GitHub org/user name.
     projectName: 'etp', // Usually your repo name.
 
     onBrokenLinks: 'throw',
 
-    // Even if you don't use internationalization, you can use this field to set
-    // useful metadata like html lang. For example, if your site is Chinese, you
-    // may want to replace "en" with "zh-Hans".
     i18n: {
         defaultLocale: 'zh-Hans',
         locales: ['zh-Hans'],
     },
-
+    scripts: [
+        {
+            src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9884377286673200",
+            async: true,
+            crossorigin: 'anonymous',
+        }
+    ],
     presets: [
         [
             'classic',
@@ -115,7 +113,7 @@ const config: Config = {
         },
         prism: {
             //设置高亮语言
-            additionalLanguages: ['powershell', "java", "protobuf", "python","groovy","toml"],
+            additionalLanguages: ['powershell', "java", "protobuf", "python", "groovy", "toml"],
             theme: prismThemes.oneDark,//白天主题
             darkTheme: prismThemes.oneDark,//黑夜主题
         },
