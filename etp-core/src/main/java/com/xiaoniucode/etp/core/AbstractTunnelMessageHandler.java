@@ -8,7 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
  * 抽象隧道消息处理器
  * @author liuxin
  */
-public abstract class AbstractMessageHandler implements MessageHandler {
+public abstract class AbstractTunnelMessageHandler implements MessageHandler {
 
     @Override
     public void handle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {

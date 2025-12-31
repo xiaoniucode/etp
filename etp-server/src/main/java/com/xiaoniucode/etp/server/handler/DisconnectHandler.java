@@ -1,12 +1,11 @@
 package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.common.StringUtils;
-import com.xiaoniucode.etp.core.AbstractMessageHandler;
+import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.ChannelUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
-import com.xiaoniucode.etp.server.web.ConfigService;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -17,7 +16,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author liuxin
  */
-public class DisconnectHandler extends AbstractMessageHandler {
+public class DisconnectHandler extends AbstractTunnelMessageHandler {
     private final Logger logger = LoggerFactory.getLogger(DisconnectHandler.class);
 
     @Override

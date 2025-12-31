@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.core.protocol.TunnelMessage;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
-import com.xiaoniucode.etp.core.AbstractMessageHandler;
+import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.server.manager.RuntimeState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author liuxin
  */
-public class AuthHandler extends AbstractMessageHandler {
+public class AuthHandler extends AbstractTunnelMessageHandler {
     private final Logger logger = LoggerFactory.getLogger(AuthHandler.class);
     private final RuntimeState state = RuntimeState.get();
 

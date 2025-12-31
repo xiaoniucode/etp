@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * @author liuxin
  */
-public class MessageHandlerFactory {
+public class TunnelMessageHandlerFactory {
     private static final Map<TunnelMessage.Message.Type, MessageHandler> handlers = new HashMap<>();
 
     static {

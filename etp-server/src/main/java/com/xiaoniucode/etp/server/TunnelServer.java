@@ -5,7 +5,7 @@ import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.IdleCheckHandler;
 
 import com.xiaoniucode.etp.core.protocol.TunnelMessage;
-import com.xiaoniucode.etp.server.handler.ControlChannelHandler;
+import com.xiaoniucode.etp.server.handler.ControlTunnelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -70,7 +70,7 @@ public class TunnelServer implements Lifecycle {
                             .addLast(new ProtobufVarint32LengthFieldPrepender())
                             .addLast(new ProtobufEncoder())
                             .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
-                            .addLast(new ControlChannelHandler());
+                            .addLast(new ControlTunnelHandler());
                     }
                 });
             serverBootstrap.bind(host, port).sync();

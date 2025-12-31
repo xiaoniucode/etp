@@ -3,24 +3,17 @@ package com.xiaoniucode.etp.server.handler;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
-import com.xiaoniucode.etp.core.AbstractMessageHandler;
-import com.xiaoniucode.etp.server.proxy.HttpVisitorChannelHandler;
-import io.netty.buffer.Unpooled;
+import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * 数据隧道，连接消息处理器
  *
  * @author liuxin
  */
-public class ConnectHandler extends AbstractMessageHandler {
+public class ConnectHandler extends AbstractTunnelMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
         long sessionId = msg.getSessionId();

@@ -32,8 +32,6 @@ public final class ChannelManager {
      */
     private static Map<Integer, Set<Channel>> activeChannels = new ConcurrentHashMap<>();
 
-    private final static Lock LOCK = new ReentrantLock();
-
     /**
      * 只会在客户端认证的时候执行一次
      *
@@ -77,17 +75,12 @@ public final class ChannelManager {
      * @param remotePort 需要新添加的端口
      */
     public static void addPortToControlChannelIfOnline(String secretKey, Integer remotePort) {
-        LOCK.lock();
-        try {
-            Channel controlChannel = clientControlChannelMapping.get(secretKey);
-            if (null == controlChannel) {
-                return;
-            }
-            portControlChannelMapping.put(remotePort, controlChannel);
-            controlChannel.attr(EtpConstants.CHANNEL_REMOTE_PORT).get().add(remotePort);
-        } finally {
-            LOCK.unlock();
+        Channel controlChannel = clientControlChannelMapping.get(secretKey);
+        if (null == controlChannel) {
+            return;
         }
+        portControlChannelMapping.put(remotePort, controlChannel);
+        controlChannel.attr(EtpConstants.CHANNEL_REMOTE_PORT).get().add(remotePort);
     }
 
     public static boolean clientIsOnline(String secretKey) {
@@ -111,21 +104,16 @@ public final class ChannelManager {
         if (controlChannel.attr(EtpConstants.CHANNEL_REMOTE_PORT).get() == null) {
             return;
         }
-        LOCK.lock();
-        try {
-            String secretKey = controlChannel.attr(EtpConstants.SECRET_KEY).get();
-            Channel existingChannel = clientControlChannelMapping.get(secretKey);
-            if (controlChannel == existingChannel) {
-                clientControlChannelMapping.remove(secretKey);
+        String secretKey = controlChannel.attr(EtpConstants.SECRET_KEY).get();
+        Channel existingChannel = clientControlChannelMapping.get(secretKey);
+        if (controlChannel == existingChannel) {
+            clientControlChannelMapping.remove(secretKey);
+        }
+        List<Integer> remotePorts = controlChannel.attr(EtpConstants.CHANNEL_REMOTE_PORT).get();
+        if (remotePorts != null) {
+            for (int port : remotePorts) {
+                portControlChannelMapping.remove(port);
             }
-            List<Integer> remotePorts = controlChannel.attr(EtpConstants.CHANNEL_REMOTE_PORT).get();
-            if (remotePorts != null) {
-                for (int port : remotePorts) {
-                    portControlChannelMapping.remove(port);
-                }
-            }
-        } finally {
-            LOCK.unlock();
         }
         if (controlChannel.isActive()) {
             controlChannel.close();

@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.client.handler;
 
 import com.xiaoniucode.etp.client.ChannelManager;
-import com.xiaoniucode.etp.core.AbstractMessageHandler;
+import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage.Message;
 import io.netty.bootstrap.Bootstrap;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author liuxin
  */
-public class ConnectHandler extends AbstractMessageHandler {
+public class ConnectHandler extends AbstractTunnelMessageHandler {
     private final Logger logger = LoggerFactory.getLogger(ConnectHandler.class);
     private final String LOCALHOST = "127.0.0.1";
 

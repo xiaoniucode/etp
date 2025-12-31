@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage.Message;
-import com.xiaoniucode.etp.core.AbstractMessageHandler;
+import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -13,7 +13,7 @@ import io.netty.channel.ChannelHandlerContext;
  *
  * @author liuxin
  */
-public class TransferHandler extends AbstractMessageHandler {
+public class TransferHandler extends AbstractTunnelMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, Message msg) {
         Channel dataChannel = ctx.channel();

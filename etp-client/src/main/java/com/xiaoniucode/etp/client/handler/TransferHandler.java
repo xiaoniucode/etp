@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.handler;
 
-import com.xiaoniucode.etp.core.AbstractMessageHandler;
+import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage;
 import io.netty.buffer.ByteBuf;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author liuxin
  */
-public class TransferHandler extends AbstractMessageHandler {
+public class TransferHandler extends AbstractTunnelMessageHandler {
     private static final Logger logger = LoggerFactory.getLogger(TransferHandler.class);
 
     @Override
