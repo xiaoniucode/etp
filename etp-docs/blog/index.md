@@ -1,6 +1,8 @@
 # 版本历史
 详细发布细节请往Github [Release](https://github.com/xiaoniucode/etp/releases) 页面查看
 
+## etp v0.5.1
+- 代码优化，提升代码健壮性，避免意外情况出现异常。
 
 ## etp v0.5.0
 
