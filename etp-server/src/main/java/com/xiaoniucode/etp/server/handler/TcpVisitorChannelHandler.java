@@ -35,6 +35,7 @@ public class TcpVisitorChannelHandler extends SimpleChannelInboundHandler<ByteBu
             logger.warn("data channel is null");
             return;
         }
+        
         ByteString payload = ByteString.copyFrom(buf.nioBuffer());
         TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
             .setType(TunnelMessage.Message.Type.TRANSFER)

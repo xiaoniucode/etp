@@ -16,15 +16,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author liuxin
  */
 public final class AppConfig {
-    private final static AppConfig INSTANCE = new AppConfig();
-
-    private AppConfig() {
-    }
-
-    public static AppConfig get() {
-        return INSTANCE;
-    }
-
     private final static String DEFAULT_HOST = "0.0.0.0";
     private final static int DEFAULT_BIND_PORT = 9527;
     private final static String DEFAULT_DASHBOARD_HOST = "0.0.0.0";
@@ -62,6 +53,17 @@ public final class AppConfig {
      * 存储所有客户端
      */
     private final List<ClientInfo> clients = new CopyOnWriteArrayList<>();
+
+    private AppConfig() {
+    }
+
+    public static AppConfig get() {
+        return Holder.INSTANCE;
+    }
+
+    private static class Holder {
+        private static final AppConfig INSTANCE = new AppConfig();
+    }
 
     public AppConfig load(String path) {
         //顺序解析下面各种配置
@@ -120,7 +122,7 @@ public final class AppConfig {
                 throw new IllegalArgumentException("客户端[名称]冲突，不能存在重复的名称！ " + name);
             }
             //创建一个客户端
-            ClientInfo clientInfo = new ClientInfo(secretKey,name);
+            ClientInfo clientInfo = new ClientInfo(secretKey, name);
             //解析客户端的所有端口映射信息
             parseProxes(clientInfo.getProxies(), client);
             clients.add(clientInfo);

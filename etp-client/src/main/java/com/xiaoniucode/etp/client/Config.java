@@ -13,10 +13,14 @@ import com.moandjiezana.toml.Toml;
  * @since 2025
  */
 public final class Config {
-    private static final Config instance = new Config();
+    private static volatile Config instance;
     private static final String DEFAULT_SERVER_ADDR = "127.0.0.1";
     private static final int DEFAULT_SERVER_PORT = 9527;
     private static final boolean DEFAULT_TLS = false;
+
+    private Config() {
+    }
+
     /**
      * 代理服务器地址
      */
@@ -97,6 +101,13 @@ public final class Config {
      * @return 配置实例
      */
     public static Config get() {
+        if (instance == null) {
+            synchronized (Config.class) {
+                if (instance == null) {
+                    instance = new Config();
+                }
+            }
+        }
         return instance;
     }
 
@@ -140,7 +151,7 @@ public final class Config {
             }
             //解析日志
             Toml log = root.getTable("log");
-            logConfig = LogUtils.parseLogConfig(log,false);
+            logConfig = LogUtils.parseLogConfig(log, false);
             TruststoreConfig truststoreConfig = null;
             if (tls) {
                 Toml truststoreTable = root.getTable("truststore");
