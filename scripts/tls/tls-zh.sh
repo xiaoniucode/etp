@@ -187,7 +187,7 @@ keytool -exportcert \
     -storepass "$SERVER_STOREPASS" \
     -file "$CERT_DIR/server.cer"
 
-# 步骤3: 创建客户端信任库（使用不同的密码）
+# 步骤3: 创建客户端信任库
 echo -e "${YELLOW}[3/3] 创建客户端信任库...${NC}"
 keytool -importcert \
     -alias "${ALIAS}cert" \

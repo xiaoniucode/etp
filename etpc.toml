@@ -2,11 +2,12 @@
 #serverPort = 9527
 #认证密钥[必填]
 secretKey = "your-secret-key"
-#TCP SSL安全加密密码配置
+#SSL安全加密密码配置
 tls =false
 [truststore]
 path = "cert/client.p12"
 storePass = "jesjH9JNLKY3"
+#日志
 [log]
 level = "debug"
 path = "log"

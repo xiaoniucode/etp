@@ -6,11 +6,11 @@ tls = false
 path = "cert/server.p12"
 keyPass = "3FbV8R8VW49O"
 storePass = "3FbV8R8VW49O"
-#
+#客户端
 [[clients]]
 secretKey = "your-secret-key"
-name = "静态客户端"
-##---------------------------日志--------------------------------#
+name = "客户端"
+#日志
 [log]
 level = "debug"
 path = "log"
@@ -19,7 +19,7 @@ archivePattern = "etps.%d{yyyy-MM-dd}.log"
 logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 maxHistory = 30
 totalSizeCap = "3GB"
-
+#管理界面
 [dashboard]
 enable = true
 #addr = "localhost"
@@ -27,8 +27,7 @@ port = 8020
 reset = true
 username = "a"
 password = "1"
-#
-#端口范围
+#公网端口分配范围
 [port_range]
 start = 8000
 end = 8009

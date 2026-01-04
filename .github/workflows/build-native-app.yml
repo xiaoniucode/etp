@@ -1,22 +1,22 @@
-name: 🚀 构建跨平台程序与发布
+name: Build release version
 
 on:
-  workflow_dispatch:    # 🎮 手动触发
+  workflow_dispatch:    #手动触发
   push:
     tags:
-      - 'v*'           # 🏷️ 版本标签触发
+      - 'v*'           # push版本标签时候触发
 env:
   JAVA_VERSION: '21'
 
 jobs:
-  # 🔨 构建原生镜像（多平台）
+  # 构建跨平台Native镜像
   build-native:
-    name: 🔨 构建原生镜像 - ${{ matrix.display_name }}
+    name: 构建原生镜像 - ${{ matrix.display_name }}
     strategy:
-      fail-fast: false  # ⚡ 一个平台失败不影响其他平台
+      fail-fast: false
       matrix:
         include:
-          #   🐧 Linux 平台
+          #Linux 平台
           - os: ubuntu-latest
             platform: linux
             arch: amd64
@@ -28,14 +28,14 @@ jobs:
             artifact_suffix: linux_arm64
             display_name: "Linux ARM64"
 
-          # 🪟 Windows 平台
+          # Windows 平台
           - os: windows-latest
             platform: windows
             arch: amd64
             artifact_suffix: windows_amd64
             display_name: "Windows AMD64"
 
-          # 🍎 macOS 平台
+          # macOS 平台
           - os: macos-latest
             platform: darwin
             arch: amd64
@@ -52,27 +52,27 @@ jobs:
       contents: write
 
     steps:
-      - name: 📥 检出代码
+      - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: ☕ 设置 GraalVM 环境
+      - name: 设置 GraalVM 环境
         uses: graalvm/setup-graalvm@v1
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 💾 缓存 Maven 依赖
+      - name: 缓存 Maven 依赖
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ matrix.platform }}-${{ matrix.arch }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ matrix.platform }}-${{ matrix.arch }}-maven-
-      - name: 🏗️ 构建 模块原生镜像
+      - name: 构建 模块原生镜像
         run: mvn clean install native:compile -Pnative -am -DskipTests --no-transfer-progress
       # Linux/macOS 打包
-      - name: 📦 打包Unix发布文件
+      - name: 打包Unix发布文件
         if: matrix.os != 'windows-latest'
         shell: bash
         run: |
@@ -89,7 +89,7 @@ jobs:
           tar -czf "$RELEASE_NAME.tar.gz" "$RELEASE_NAME"
           echo "✅ Unix打包完成: $RELEASE_NAME.tar.gz"
       # Windows 打包
-      - name: 📦 打包Windows发布文件
+      - name: 打包Windows发布文件
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
@@ -105,36 +105,36 @@ jobs:
 
           Compress-Archive -Path "$RELEASE_NAME\*" -DestinationPath "$RELEASE_NAME.zip"
           Write-Host "✅ Windows打包完成: $RELEASE_NAME.zip"
-      - name: ⬆️ 上传构件
+      - name: 上传构件
         uses: actions/upload-artifact@v4
         with:
           name: etp-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
           path: etp_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
 
-  #  # 📦 构建 JAR 包
+  #  # 构建 JAR 包
   #  build-jar:
-  #    name: 📦 构建 JAR 包
+  #    name: 构建 JAR 包
   #    runs-on: ubuntu-latest
   #    permissions:
   #      contents: write
   #    steps:
   #      - uses: actions/checkout@v4
   #
-  #      - name: ☕ 设置 Java 环境
+  #      - name: 设置 Java 环境
   #        uses: actions/setup-java@v4
   #        with:
   #          java-version: ${{ env.JAVA_VERSION }}
   #          distribution: 'temurin'
   #          cache: maven
   #
-  #      - name: 🏗️ 构建模块 JAR
+  #      - name: 构建模块 JAR
   #        run: |
   #          mv pom.xml pom.xml.bak
   #          mv build.xml pom.xml
   #          mvn clean install package -DskipTests -Dnative.skip=true --no-transfer-progress
   #          mv pom.xml build.xml
   #          mv pom.xml.bak pom.xml
-  #      - name: 📦 打包 JAR 发布文件
+  #      - name: 打包 JAR 发布文件
   #        shell: bash
   #        run: |
   #          VERSION="${{ github.ref_name }}"
@@ -152,15 +152,15 @@ jobs:
   #
   #          zip -r "$RELEASE_NAME.zip" "$RELEASE_NAME"
   #          echo "✅ JAR包打包完成: $RELEASE_NAME.zip"
-  #      - name: ⬆️ 上传 JAR 构件
+  #      - name: 上传 JAR 构件
   #        uses: actions/upload-artifact@v4
   #        with:
   #          name: etp-jar-${{ github.ref_name }}-jdk${{ env.JAVA_VERSION }}
   #          path: etp_${{ github.ref_name }}_jdk${{ env.JAVA_VERSION }}_jar.zip
 
-  # 🚀 统一发布阶段
+  # 统一发布阶段
   create-release:
-    name: 🚀 创建统一 Release
+    name: 创建统一 Release
     needs: [ build-native ]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
@@ -168,14 +168,14 @@ jobs:
       contents: write
 
     steps:
-      - name: 📥 下载所有构件
+      - name: 下载所有构件
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
           pattern: '*'
           merge-multiple: true
 
-      - name: 🏷️ 创建 GitHub Release
+      - name: 创建 GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: artifacts/**/*

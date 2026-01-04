@@ -4,17 +4,18 @@ services:
   etps:
     image: xiaoniucode/etps:latest
     container_name: etps
-    restart: unless-stopped
+    restart: always
     ports:
       - "8020:8020"     # Web管理界面
       - "9527:9527"     # 客户端通信端口
-      - "8600-8609:8600-8609"  # 自定义端口范围映射
+      - "8600-8609:8600-8609"  # 端口范围映射
     environment:
-      - JVM_OPTS=-Xmx1g -Xms512m #JVM调优参数
+      - ETP_DB_PATH=/app/data/etp.db
+      - JVM_OPTS=-Xmx1g -Xms1g #JVM参数
     volumes: # 数据持久化
-      - ./etps/db:/app/etp.db \ # SQLite数据库
-      - ./etps/logs:/app/logs \ # 日志
-      - ./etps:/app/etps.toml \ # 配置文件
+      - opt/etps/data:/app/data \ # 数据
+      - opt/etps/logs:/app/logs \ # 日志
+      - opt/etps/etps.toml:/app/etps.toml \ # 配置文件
     networks:
       - etps-network
 
