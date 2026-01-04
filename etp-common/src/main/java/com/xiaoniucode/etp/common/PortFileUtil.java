@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * 文件工具类
+ * 用于将端口映射信息写到本地文件存储
  *
  * @author liuxin
  */

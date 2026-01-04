@@ -9,7 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 
 /**
- * 数据隧道，连接消息处理器
+ * 处理来自代理客户端连接成功消息
  *
  * @author liuxin
  */

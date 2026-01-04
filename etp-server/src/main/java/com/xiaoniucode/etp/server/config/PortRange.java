@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.config;
 
 /**
- * 端口范围
+ * 端口范围配置
  *
  * @author liuxin
  */

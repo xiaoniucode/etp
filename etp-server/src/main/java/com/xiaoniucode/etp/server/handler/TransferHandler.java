@@ -9,7 +9,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
- * 将从客户端接收到的数据转发给公网访问者
+ * 将从内网代理客户端接收到的数据转发给公网访问者
  *
  * @author liuxin
  */

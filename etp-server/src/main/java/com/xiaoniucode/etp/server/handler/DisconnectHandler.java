@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 连接断开，释放资源
+ * 代理客户端连接断开，释放资源
  *
  * @author liuxin
  */
@@ -33,7 +33,7 @@ public class DisconnectHandler extends AbstractTunnelMessageHandler {
 
         Channel controlChannel = ChannelManager.getControlChannelBySecretKey(secretKey);
         if (controlChannel == null) {
-            logger.warn("control channel is null");
+            logger.warn("控制隧道连接为空");
             return;
         }
 
@@ -44,6 +44,6 @@ public class DisconnectHandler extends AbstractTunnelMessageHandler {
             ctx.channel().attr(EtpConstants.SECRET_KEY).getAndSet(null);
             ctx.channel().attr(EtpConstants.SESSION_ID).getAndSet(null);
         }
-        logger.debug("客户端断开连接");
+        logger.debug("客户端:{} 断开连接", secretKey);
     }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 通道相关常量
  * @author liuxin
  */
 public class EtpConstants {

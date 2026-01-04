@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.core.protocol.TunnelMessage;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
- * 隧道消息处理器
+ * 隧道消息处理器接口
  * @author liuxin
  */
 public interface MessageHandler {

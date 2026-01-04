@@ -9,7 +9,7 @@ import javax.net.ssl.KeyManagerFactory;
 import java.io.File;
 
 /**
- * 服务端SSL上下文工厂
+ * SSL上下文创建工厂
  *
  * @author liuxin
  */

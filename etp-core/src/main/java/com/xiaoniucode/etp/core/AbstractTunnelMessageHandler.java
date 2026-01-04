@@ -13,11 +13,11 @@ public abstract class AbstractTunnelMessageHandler implements MessageHandler {
     @Override
     public void handle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
         try {
-            // 通用前置检查
+            // 检查当前通道是否激活
             if (!ctx.channel().isActive()) {
                 return;
             }
-            // 执行具体处理逻辑
+            // 执行具体业务处理
             doHandle(ctx, msg);
         } catch (Exception e) {
             ctx.fireExceptionCaught(e);

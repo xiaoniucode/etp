@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 代理服务启动类
+ * 服务启动入口
  *
  * @author liuxin
  */

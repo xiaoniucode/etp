@@ -8,6 +8,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 心跳检查
  * @author liuxin
  */
 public class IdleCheckHandler extends IdleStateHandler {

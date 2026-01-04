@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * 客户端认证消息处理器
+ * 处理客户端连接认证
  *
  * @author liuxin
  */
@@ -29,7 +29,7 @@ public class AuthHandler extends AbstractTunnelMessageHandler {
         String arch = values[2];
         //检查密钥是否存在
         if (!state.hasClient(secretKey)) {
-            logger.error("secretKey认证密钥未授权");
+            logger.error("客户端: {} 认证失败", secretKey);
             ctx.channel().close();
             return;
         }
@@ -38,7 +38,7 @@ public class AuthHandler extends AbstractTunnelMessageHandler {
             ctx.channel().close();
         }
         List<Integer> remotePorts = state.getClientRemotePorts(secretKey);
-        ChannelManager.addControlChannel(remotePorts, secretKey,os,arch, ctx.channel());
-        logger.debug("客户端认证成功");
+        ChannelManager.addControlChannel(remotePorts, secretKey, os, arch, ctx.channel());
+        logger.debug("客户端: {} 认证成功", secretKey);
     }
 }

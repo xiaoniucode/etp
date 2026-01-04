@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 客户端主动注册端口映射信息
+ * 处理来自代理客户端端口映射注册
  *
  * @author liuxin
  */
@@ -26,7 +26,7 @@ public class ProxyRegisterMessageHandler implements MessageHandler {
             TunnelMessage.ProxyRequest request = TunnelMessage.ProxyRequest.parseFrom(msg.getPayload());
             Channel controlChannel = ctx.channel();
             if (controlChannel == null || !controlChannel.isActive()) {
-                logger.warn("control channel is null or not active");
+                logger.warn("控制隧道不存在或隧道未激活！");
                 return;
             }
             String secretKey = controlChannel.attr(EtpConstants.SECRET_KEY).get();

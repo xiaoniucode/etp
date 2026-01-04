@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 负责启动和管理TCP代理服务。
+ * TCP服务启动、停止、管理
  *
  * @author liuxin
  */

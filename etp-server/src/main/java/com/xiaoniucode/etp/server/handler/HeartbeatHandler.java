@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 心跳消息处理器
+ * 心跳消息处理
  *
  * @author liuxin
  */
@@ -19,6 +19,6 @@ public class HeartbeatHandler extends AbstractTunnelMessageHandler {
                 .setType(Message.Type.HEARTBEAT)
                 .build();
         ctx.channel().writeAndFlush(response);
-        logger.debug("心跳检测");
+        logger.debug("连接心跳检查");
     }
 }

@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.core;
 
 /**
- * Netty 容器服务生命周期
+ * Netty 容器服务生命周期，启动、停止
  * @author liuxin
  */
 public interface Lifecycle {

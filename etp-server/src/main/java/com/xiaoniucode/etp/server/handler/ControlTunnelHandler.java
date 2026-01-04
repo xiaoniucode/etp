@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 控制隧道Channel处理器，负责消息分发、连接断开处理
+ * 负责消息分发、连接断开处理
  *
  * @author liuxin
  */

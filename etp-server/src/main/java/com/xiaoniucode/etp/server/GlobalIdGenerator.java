@@ -2,11 +2,17 @@ package com.xiaoniucode.etp.server;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 生成系统唯一ID
+ *
+ * @author liuxin
+ */
 public final class GlobalIdGenerator {
 
     private static final AtomicInteger ID = new AtomicInteger(0);
 
-    private GlobalIdGenerator() {}
+    private GlobalIdGenerator() {
+    }
 
     /**
      * 返回全局自增ID

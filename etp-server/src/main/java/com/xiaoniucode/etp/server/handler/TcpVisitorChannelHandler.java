@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 
 /**
- * 处理来自公网客户端的连接读写请求
+ * 处理来自公网访问者连接读写请求
  *
  * @author liuxin
  */
@@ -35,7 +35,7 @@ public class TcpVisitorChannelHandler extends SimpleChannelInboundHandler<ByteBu
             logger.warn("data channel is null");
             return;
         }
-        
+
         ByteString payload = ByteString.copyFrom(buf.nioBuffer());
         TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
             .setType(TunnelMessage.Message.Type.TRANSFER)

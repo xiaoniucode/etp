@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 下线代理信息
+ * 代理客户端下线，清理端口映射配置信息
  *
  * @author liuxin
  */

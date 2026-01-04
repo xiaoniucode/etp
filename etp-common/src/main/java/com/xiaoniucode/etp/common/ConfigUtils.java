@@ -9,12 +9,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ * 配置工具类
  *
  * @author liuxin
  */
 public class ConfigUtils {
     private static final Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
-    public static String getConfigPath(String[] args,String fileName) {
+
+    public static String getConfigPath(String[] args, String fileName) {
         if (args.length == 0) {
             Path currentDir = Paths.get("").toAbsolutePath();
             Path defaultConfig = currentDir.resolve(fileName);
