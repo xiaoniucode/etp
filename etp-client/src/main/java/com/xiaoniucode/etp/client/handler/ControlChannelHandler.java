@@ -11,15 +11,12 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Consumer;
 
 /**
- * 控制通道netty处理器
+ * 处理各种控制指令，分配给对应的处理器处理
  *
  * @author liuxin
  */
 public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> {
     private final Logger logger = LoggerFactory.getLogger(ControlChannelHandler.class);
-    /**
-     * 连接断开的时候回调
-     */
     private final Consumer<ChannelHandlerContext> channelStatusCallback;
 
     public ControlChannelHandler(Consumer<ChannelHandlerContext> channelStatusCallback) {
@@ -32,7 +29,7 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> 
             return;
         }
         MessageHandler handler = MessageHandlerFactory.getHandler(msg.getType());
-        if (handler!= null) {
+        if (handler != null) {
             handler.handle(ctx, msg);
         }
     }
@@ -41,11 +38,10 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> 
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         //控制通道断开
         if (ctx.channel() == ChannelManager.getControlChannel()) {
-            logger.debug("代理客户端与代理服务器断开连接");
+            logger.debug("与服务端断开连接");
             //清除当前控制通道
             ChannelManager.setControlChannel(null);
             ChannelManager.clearAllRealServerChannel();
-            //控制通道断开回调
             channelStatusCallback.accept(ctx);
         } else {
             //当前传输数据的通道断开

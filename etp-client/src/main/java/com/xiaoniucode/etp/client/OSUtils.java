@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.client;
 
 /**
- * 用于获取当前操作系统信息
+ * 获取当前操作系统相关的系统信息
  *
  * @author liuxin
  */

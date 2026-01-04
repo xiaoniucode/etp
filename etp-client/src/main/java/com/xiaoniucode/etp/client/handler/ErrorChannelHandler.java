@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 错误处理器，处理来自服务端返回的错误消息
+ * 处理来自服务端返回的错误消息
  *
  * @author liuxin
  */

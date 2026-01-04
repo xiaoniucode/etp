@@ -69,7 +69,7 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     /**
      * 背压，流量控制
-     * 当 内网真实服务（realChannel）写缓冲区满,暂停数据隧道（dataTunnelChannel）的自动读取数据。
+     * 当内网真实服务（realChannel）写缓冲区满,暂停数据隧道（dataTunnelChannel）的自动读取数据。
      */
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {

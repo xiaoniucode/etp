@@ -10,8 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 代理客户端收到来自服务端的连接请求后，代理客户端通过代理服务端提供的内网端口号与内网真实服务建立连接
- * 连接建立成功后，代理客户端需要和代理服务端建立一条数据传输隧道。
+ * 与内网真实目标服务建立连接，同时建立数据传输隧道
  *
  * @author liuxin
  */
@@ -27,7 +26,7 @@ public class ConnectHandler extends AbstractTunnelMessageHandler {
         int port = msg.getPort();
         Bootstrap realBootstrap = ChannelManager.getRealBootstrap();
         Bootstrap controlBootstrap = ChannelManager.getControlBootstrap();
-        //代理客户端与内网真实服务建立连接
+        //与内网真实服务建立连接
         realBootstrap.connect(LOCALHOST, port).addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 logger.debug("成功连接到内网服务{}:{}", LOCALHOST, port);
@@ -64,7 +63,7 @@ public class ConnectHandler extends AbstractTunnelMessageHandler {
                         return null;
                     });
             } else {
-                logger.error("内网服务[{}:{}]不可用!", LOCALHOST, port);
+                logger.error("内网目标服务[{}:{}]不可用!", LOCALHOST, port);
             }
         });
     }

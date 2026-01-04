@@ -5,7 +5,7 @@ import com.xiaoniucode.etp.core.protocol.TunnelMessage.Message;
 import io.netty.channel.Channel;
 
 /**
- * 代理注册客户端
+ * 映射注册客户端
  *
  * @author liuxin
  */

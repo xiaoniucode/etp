@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 处理代理端口注册返回信息
+ * 处理端口映射注册结果信息
  *
  * @author liuxin
  */
@@ -21,9 +21,9 @@ public class ProxyRegisterMessageHandler implements MessageHandler {
     public void handle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws InvalidProtocolBufferException {
         Channel controlChannel = ctx.channel();
         TunnelMessage.ProxyResponse response = TunnelMessage.ProxyResponse.parseFrom(msg.getPayload());
-        //用于下线时通知服务端清理资源
+        //用于下线时通知服务端清理对应的资源
         controlChannel.attr(EtpConstants.PROXY_ID).set(response.getProxyId());
         String serverAddr = controlChannel.attr(EtpConstants.SERVER_DDR).get();
-        logger.info("已开启隧道代理，公网访问地址：{}:{}", serverAddr, response.getExternalUrl());
+        logger.info("公网访问地址：{}:{}", serverAddr, response.getExternalUrl());
     }
 }

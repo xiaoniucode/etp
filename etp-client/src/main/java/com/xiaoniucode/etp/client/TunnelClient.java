@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 客户端服务容器
+ * 代理客户端服务容器
  *
  * @author liuxin
  */
@@ -139,12 +139,11 @@ public class TunnelClient implements Lifecycle {
         ChannelFuture future = controlBootstrap.connect(serverAddr, serverPort);
         future.addListener((ChannelFutureListener) channelFuture -> {
             if (channelFuture.isSuccess()) {
-                //缓存控制隧道
-                Channel channel = channelFuture.channel();
-                channel.attr(EtpConstants.SERVER_DDR).set(serverAddr);
-                channel.attr(EtpConstants.SERVER_PORT).set(serverPort);
-                channel.attr(EtpConstants.SECRET_KEY).set(secretKey);
-                ChannelManager.setControlChannel(channel);
+                Channel controlChannel = channelFuture.channel();
+                controlChannel.attr(EtpConstants.SERVER_DDR).set(serverAddr);
+                controlChannel.attr(EtpConstants.SERVER_PORT).set(serverPort);
+                controlChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
+                ChannelManager.setControlChannel(controlChannel);
 
                 String os = OSUtils.getOS();
                 String arch = OSUtils.getOSArch();
@@ -160,7 +159,7 @@ public class TunnelClient implements Lifecycle {
                     connectSuccessListener.accept(null);
                 }
             } else {
-                //重新连接
+                //连接失败，执行重连
                 scheduleReconnect();
             }
         });

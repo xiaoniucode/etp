@@ -7,7 +7,7 @@ import com.xiaoniucode.etp.common.TomlUtils;
 import com.moandjiezana.toml.Toml;
 
 /**
- * 客户端配置管理类
+ * 客户端应用配置信息
  *
  * @author liuxin
  * @since 2025

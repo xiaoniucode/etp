@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 将从公网代理服务器接受到的访问者发送的数据传输给内网真实服务
+ * 将从公网代理服务器接受到的访问者发送的数据传输给内网真实目标服务
  *
  * @author liuxin
  */
@@ -20,7 +20,6 @@ public class TransferHandler extends AbstractTunnelMessageHandler {
 
     @Override
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
-        //客户端与内网真实服务的连接
         Channel realChannel = ctx.channel().attr(EtpConstants.REAL_SERVER_CHANNEL).get();
         if (realChannel != null) {
             ByteBuf buffer = Unpooled.wrappedBuffer(msg.getPayload().asReadOnlyByteBuffer());

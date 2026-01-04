@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 断开连接处理器
+ * 数据传输隧道断开，归还连接到连接池，资源清理
  *
  * @author liuxin
  */
@@ -22,7 +22,6 @@ public class DisconnectHandler extends AbstractTunnelMessageHandler {
     protected void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) {
         Channel realChannel = ctx.channel().attr(EtpConstants.REAL_SERVER_CHANNEL).get();
         if (realChannel != null) {
-            //归还数据通道到池中
             ChannelManager.returnDataTunnelChanel(ctx.channel());
             ChannelUtils.closeOnFlush(realChannel);
         } else {

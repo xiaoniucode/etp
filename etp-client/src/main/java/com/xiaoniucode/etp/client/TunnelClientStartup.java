@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 客户端服务启动类
+ * 代理客户端启动入口
  *
  * @author liuxin
  */
