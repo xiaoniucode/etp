@@ -15,6 +15,10 @@
             <pubDate>Wed, 03 Dec 2025 10:55:20 GMT</pubDate>
             <description><![CDATA[详细发布细节请往Github Release 页面查看]]></description>
             <content:encoded><![CDATA[<p>详细发布细节请往Github <a href="https://github.com/xiaoniucode/etp/releases" target="_blank" rel="noopener noreferrer">Release</a> 页面查看</p>
+<h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v051">etp v0.5.1<a href="https://etp.github.io/etp/blog/index#etp-v051" class="hash-link" aria-label="etp v0.5.1的直接链接" title="etp v0.5.1的直接链接" translate="no">​</a></h2>
+<ul>
+<li>代码优化，提升代码健壮性，避免意外情况出现异常。</li>
+</ul>
 <h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v050">etp v0.5.0<a href="https://etp.github.io/etp/blog/index#etp-v050" class="hash-link" aria-label="etp v0.5.0的直接链接" title="etp v0.5.0的直接链接" translate="no">​</a></h2>
 <h3 class="anchor anchorWithStickyNavbar_iX64" id="新特性">✨新特性<a href="https://etp.github.io/etp/blog/index#%E6%96%B0%E7%89%B9%E6%80%A7" class="hash-link" aria-label="✨新特性的直接链接" title="✨新特性的直接链接" translate="no">​</a></h3>
 <ul>
