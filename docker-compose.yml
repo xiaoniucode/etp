@@ -13,9 +13,9 @@ services:
       - ETP_DB_PATH=/app/data/etp.db
       - JVM_OPTS=-Xmx1g -Xms1g #JVM参数
     volumes: # 数据持久化
-      - opt/etps/data:/app/data \ # 数据
-      - opt/etps/logs:/app/logs \ # 日志
-      - opt/etps/etps.toml:/app/etps.toml \ # 配置文件
+      - /opt/etps/data:/app/data \ # 数据
+      - /opt/etps/logs:/app/logs \ # 日志
+      - /opt/etps/etps.toml:/app/etps.toml \ # 配置文件
     networks:
       - etps-network
 

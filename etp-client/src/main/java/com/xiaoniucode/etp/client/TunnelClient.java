@@ -17,7 +17,9 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
+
 import java.util.function.Consumer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,46 +89,47 @@ public class TunnelClient implements Lifecycle {
             Bootstrap realBootstrap = new Bootstrap();
 
             realBootstrap.group(NettyEventLoopFactory.eventLoopGroup())
-                .channel(NettyEventLoopFactory.socketChannelClass())
-                .option(ChannelOption.TCP_NODELAY, true)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel ch) {
-                        ch.pipeline().addLast(new RealChannelHandler());
-                    }
-                });
+                    .channel(NettyEventLoopFactory.socketChannelClass())
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) {
+                            ch.pipeline().addLast(new RealChannelHandler());
+                        }
+                    });
 
             if (tls) {
                 tlsContext = new ClientTlsContextFactory().createContext();
             }
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             controlBootstrap.group(tunnelWorkerGroup)
-                .channel(NettyEventLoopFactory.socketChannelClass())
-                .option(ChannelOption.TCP_NODELAY, true) // 禁用Nagle算法
-                .option(ChannelOption.SO_KEEPALIVE, true) // TCP保活
-                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) // 内存池
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel sc) {
-                        if (tls) {
-                            SSLEngine engine = tlsContext.newEngine(sc.alloc(), serverAddr, serverPort);
-                            engine.setUseClientMode(true);
-                            sc.pipeline().addLast("tls", new SslHandler(engine));
+                    .channel(NettyEventLoopFactory.socketChannelClass())
+                    .option(ChannelOption.TCP_NODELAY, true) // 禁用Nagle算法
+                    .option(ChannelOption.SO_KEEPALIVE, true) // TCP保活
+                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) // 内存池
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel sc) {
+                            if (tls) {
+                                SSLEngine engine = tlsContext.newEngine(sc.alloc(), serverAddr, serverPort);
+                                engine.setUseClientMode(true);
+                                sc.pipeline().addLast("tls", new SslHandler(engine));
+                            }
+                            sc.pipeline()
+                                    .addLast(new ProtobufVarint32FrameDecoder())
+                                    .addLast(new ProtobufDecoder(TunnelMessage.Message.getDefaultInstance()))
+                                    .addLast(new ProtobufVarint32LengthFieldPrepender())
+                                    .addLast(new ProtobufEncoder())
+                                    .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
+                                    .addLast(new ControlChannelHandler(ctx -> {
+                                        // 重置重试计数器
+                                        retryCount.set(0);
+                                        //服务器断开 执行重试 重新连接
+                                        scheduleReconnect();
+                                    }));
                         }
-                        sc.pipeline()
-                            .addLast(new ProtobufVarint32FrameDecoder())
-                            .addLast(new ProtobufDecoder(TunnelMessage.Message.getDefaultInstance()))
-                            .addLast(new ProtobufVarint32LengthFieldPrepender())
-                            .addLast(new ProtobufEncoder())
-                            .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
-                            .addLast(new ControlChannelHandler(ctx -> {
-                                // 重置重试计数器
-                                retryCount.set(0);
-                                //服务器断开 执行重试 重新连接
-                                scheduleReconnect();
-                            }));
-                    }
-                });
+                    });
             ChannelManager.initBootstraps(controlBootstrap, realBootstrap);
             //连接到服务器
             connectTunnelServer();
@@ -149,9 +152,9 @@ public class TunnelClient implements Lifecycle {
                 String arch = OSUtils.getOSArch();
                 String body = secretKey + ":" + os + ":" + arch;
                 TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
-                    .setType(TunnelMessage.Message.Type.AUTH)
-                    .setExt(body)
-                    .build();
+                        .setType(TunnelMessage.Message.Type.AUTH)
+                        .setExt(body)
+                        .build();
                 future.channel().writeAndFlush(message);
                 retryCount.set(0);
                 logger.info("已连接到ETP服务端: {}:{}", serverAddr, serverPort);

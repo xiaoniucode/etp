@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.handler;
+package com.xiaoniucode.etp.server.handler.visitor;
 
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.protocol.TunnelMessage;
@@ -21,8 +21,8 @@ import java.net.InetSocketAddress;
  *
  * @author liuxin
  */
-public class TcpVisitorChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
-    private final Logger logger = LoggerFactory.getLogger(TcpVisitorChannelHandler.class);
+public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
+    private final Logger logger = LoggerFactory.getLogger(TcpVisitorHandler.class);
     /**
      * 运行时状态信息管理器
      */

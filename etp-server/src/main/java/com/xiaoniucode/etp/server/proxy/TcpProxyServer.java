@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.proxy;
 import com.xiaoniucode.etp.common.PortFileUtil;
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
-import com.xiaoniucode.etp.server.handler.TcpVisitorChannelHandler;
+import com.xiaoniucode.etp.server.handler.visitor.TcpVisitorHandler;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.PortAllocator;
 import com.xiaoniucode.etp.server.manager.RuntimeState;
@@ -11,11 +11,8 @@ import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import com.xiaoniucode.etp.server.config.*;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.ChannelInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +33,7 @@ public final class TcpProxyServer implements Lifecycle {
         return instance;
     }
 
+    private ServerBootstrap serverBootstrap;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     /**
@@ -43,7 +41,6 @@ public final class TcpProxyServer implements Lifecycle {
      */
     private final Map<Integer, Channel> remotePortChannelMapping = new ConcurrentHashMap<>();
     private final PortAllocator portAllocator;
-    private ServerBootstrap serverBootstrap;
     private final RuntimeState state = RuntimeState.get();
 
     private TcpProxyServer() {
@@ -56,14 +53,18 @@ public final class TcpProxyServer implements Lifecycle {
         workerGroup = NettyEventLoopFactory.eventLoopGroup();
         serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
-            .channel(NettyEventLoopFactory.serverSocketChannelClass())
-            .childHandler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                protected void initChannel(SocketChannel sc) {
-                    sc.pipeline().addLast(new TrafficMetricsHandler());
-                    sc.pipeline().addLast(new TcpVisitorChannelHandler());
-                }
-            });
+                .option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.TCP_NODELAY, true)
+                .channel(NettyEventLoopFactory.serverSocketChannelClass())
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel sc) {
+                        sc.pipeline().addLast(new TrafficMetricsHandler());
+                        sc.pipeline().addLast(new TcpVisitorHandler());
+                    }
+                });
         bindAllProxyPort();
         LOGGER.info("所有端口映射服务启动完成");
     }
@@ -85,10 +86,10 @@ public final class TcpProxyServer implements Lifecycle {
                             remotePortChannelMapping.put(remotePort, future.channel());
                             StringBuilder portItem = new StringBuilder();
                             portItem.append(client.getName()).append("\t")
-                                .append(proxy.getName()).append("\t")
-                                .append(proxy.getType().name()).append("\t")
-                                .append(proxy.getLocalPort()).append("\t")
-                                .append(remotePort);
+                                    .append(proxy.getName()).append("\t")
+                                    .append(proxy.getType().name()).append("\t")
+                                    .append(proxy.getLocalPort()).append("\t")
+                                    .append(remotePort);
                             bindPorts.add(portItem);
                             LOGGER.info("成功绑定端口: {}", remotePort);
                         } else {
