@@ -1,0 +1,78 @@
+package com.xiaoniucode.etp.server.proxy;
+
+import com.xiaoniucode.etp.core.Lifecycle;
+import com.xiaoniucode.etp.core.NettyEventLoopFactory;
+import com.xiaoniucode.etp.server.handler.visitor.HttpVisitorHandler;
+import com.xiaoniucode.etp.server.handler.visitor.TcpVisitorHandler;
+import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.flush.FlushConsolidationHandler;
+import io.netty.handler.stream.ChunkedWriteHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Http proxy server
+ *
+ * @author xiaoniucode
+ */
+public class HttpProxyServer implements Lifecycle {
+    private final Logger logger = LoggerFactory.getLogger(HttpProxyServer.class);
+    private static final HttpProxyServer instance = new HttpProxyServer();
+    private ServerBootstrap serverBootstrap;
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
+    private int httpProxyPort = 8080;
+
+    private HttpProxyServer() {
+    }
+
+    public static HttpProxyServer get() {
+        return instance;
+    }
+
+    @Override
+    public void start() {
+        try {
+            bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
+            workerGroup = NettyEventLoopFactory.eventLoopGroup();
+            serverBootstrap = new ServerBootstrap();
+            serverBootstrap.group(bossGroup, workerGroup)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .childOption(ChannelOption.TCP_NODELAY, true)
+                    .channel(NettyEventLoopFactory.serverSocketChannelClass())
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel sc) {
+                            sc.pipeline().addLast(new HostSnifferHandler());
+                            sc.pipeline().addLast(new TrafficMetricsHandler());
+                            sc.pipeline().addLast(new HttpVisitorHandler());
+                        }
+                    });
+            serverBootstrap.bind(getHttpProxyPort()).syncUninterruptibly().get();
+            logger.info("HttpProxyServer started on port {}", getHttpProxyPort());
+        } catch (Exception e) {
+            logger.error("HttpProxyServer start error!", e);
+        }
+    }
+
+    @Override
+    public void stop() {
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+    }
+
+    public int getHttpProxyPort() {
+        return httpProxyPort;
+    }
+
+    public void setHttpProxyPort(int httpProxyPort) {
+        this.httpProxyPort = httpProxyPort;
+    }
+}
