@@ -40,7 +40,7 @@
             elem: '#proxy',
             text: "空空如也",
             skin: "line",
-            url: '/api/proxy/list',
+            url: '/api/proxy/list?type=http',
             toolbar: '#headerToobar',
             cellMinWidth: 80,
             headers: {
@@ -48,30 +48,8 @@
             },
             cols: [[
                 {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
-                {field: 'name', title: '映射名称'},
-                {
-                    field: 'type', title: '协议', sort: true, templet: function (d) {
-                        if (d.type === "TCP") {
-                            return ' <span class="layui-badge layui-bg-green">TCP</span>';
-                        } else if (d.type === "HTTP") {
-                            return '<span class="layui-badge">HTTP</span>';
-                        }
-                    }
-                },
-                {
-                    field: 'remotePort', sort: true, title: '公网端口',
-                    templet: function (d) {
-                        return `
-                         <div style="display:flex; align-items:center; gap:2px; font-size:14px; font-weight:600;">
-                           <span>${d.remotePort}</span>
-                          <a href="javascript:;" lay-event="copyPort" class="layui-btn layui-btn-xs layui-btn-primary"
-                              style="border:none; background:transparent; " title="点击复制端口号">
-                             <i class="layui-icon layui-icon-file" style="color:#16baaa; font-size:16px;"></i>
-                           </a>
-                        </div>
-                    `;
-                    }
-                },
+                {field: 'name', title: '隧道名称'},
+                {field: 'domains', sort: true, title: '访问域名'},
                 {field: 'localPort', sort: true, title: '内网端口'},
                 {
                     field: 'status', width: 120, title: '状态', sort: true, templet: function (d) {
@@ -99,12 +77,12 @@
             const data = obj.data;
             if (obj.event === 'edit') {
                 layer.open({
-                    title: '编辑',
+                    title: '编辑隧道',
                     type: 2,
                     offset: '30px',
                     shade: false,
-                    area: ['60%', '60%'],
-                    content: '/proxy/tcp/edit.html?id=' + data.id
+                    area: ['60%', '70%'],
+                    content: '/proxy/http/edit.html?id=' + data.id
                 });
             } else if (obj.event === 'delete') {
                 layer.confirm('确定删除「' + data.name + '」代理吗？<br>此操作将会断开用户已经建立的连接！',
@@ -140,12 +118,12 @@
         table.on('toolbar(proxy)', function (obj) {
             if (obj.event === 'add') {
                 layer.open({
-                    title: '新增映射',
+                    title: '新增隧道',
                     type: 2,
                     offset: '30px',
                     shade: false,
-                    area: ['60%', '60%'],
-                    content: '/proxy/tcp/add.html'
+                    area: ['60%', '70%'],
+                    content: '/proxy/http/add.html'
                 });
             } else if (obj.event === 'flush') {
                 table.reload('proxy')

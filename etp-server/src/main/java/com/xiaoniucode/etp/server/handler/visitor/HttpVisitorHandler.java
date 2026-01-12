@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.handler.visitor;
 
-import com.google.protobuf.ByteString;
 import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.protocol.TunnelMessage;
+import com.xiaoniucode.etp.core.msg.NewVisitorConn;
+import com.xiaoniucode.etp.core.msg.NewWorkConn;
 import com.xiaoniucode.etp.server.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import io.netty.buffer.ByteBuf;
@@ -43,15 +43,9 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             logger.warn("data channel is null");
             return;
         }
-        ByteString payload = ByteString.copyFrom(buf.nioBuffer());
-        TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
-                .setType(TunnelMessage.Message.Type.TRANSFER)
-                .setPayload(payload)
-                .build();
         if (dataChannel.isWritable()) {
-            dataChannel.writeAndFlush(message);
+            dataChannel.writeAndFlush(new NewWorkConn(buf.retain()));
         }
-
     }
 
     private void connectToTarget(Channel visitorChannel, int localPort) {
@@ -64,12 +58,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         }
         ChannelManager.addClientChannelToControlChannel(visitorChannel, sessionId, controllChannel);
         ChannelManager.registerActiveConnection(localPort, visitorChannel);
-        TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
-                .setType(TunnelMessage.Message.Type.CONNECT)
-                .setSessionId(sessionId)
-                .setPort(localPort)
-                .build();
-        controllChannel.writeAndFlush(message);
+        controllChannel.writeAndFlush(new NewVisitorConn(sessionId, localPort));
     }
 
     public static void connectToTarget(ChannelHandlerContext ctx,Channel visitorChannel) {
@@ -78,13 +67,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (cached != null && dataChannel.isWritable()) {
             ctx.pipeline().addAfter(ctx.name(), "chunkedWriteHandler", new ChunkedWriteHandler());
             ctx.pipeline().addAfter(ctx.name(), "httpAggregator", new HttpObjectAggregator(64 * 1024));
-
-            ByteString cachedPayload = ByteString.copyFrom(cached.nioBuffer());
-            TunnelMessage.Message cachedMessage = TunnelMessage.Message.newBuilder()
-                    .setType(TunnelMessage.Message.Type.TRANSFER)
-                    .setPayload(cachedPayload)
-                    .build();
-            dataChannel.writeAndFlush(cachedMessage);
+            dataChannel.writeAndFlush(new NewWorkConn(cached.retain()));
             cached.release();
             visitorChannel.attr(CACHED_FIRST_PACKET).set(null);
         }

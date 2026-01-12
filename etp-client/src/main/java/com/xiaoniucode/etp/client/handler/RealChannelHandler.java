@@ -2,8 +2,8 @@ package com.xiaoniucode.etp.client.handler;
 
 import com.xiaoniucode.etp.client.ChannelManager;
 import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.protocol.TunnelMessage.Message;
-import com.google.protobuf.ByteString;
+import com.xiaoniucode.etp.core.msg.CloseProxy;
+import com.xiaoniucode.etp.core.msg.NewWorkConn;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -28,13 +28,7 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
             logger.warn("数据传输通道为空:{}", sessionId);
             return;
         }
-        Message message = Message
-                .newBuilder()
-                .setSessionId(sessionId)
-                .setType(Message.Type.TRANSFER)
-                .setPayload(ByteString.copyFrom(byteBuf.nioBuffer()))
-                .build();
-        dataChannel.writeAndFlush(message);
+        dataChannel.writeAndFlush(new NewWorkConn(byteBuf.retain(),sessionId));
     }
 
     @Override
@@ -57,12 +51,7 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (dataChannel != null) {
             dataChannel.attr(EtpConstants.REAL_SERVER_CHANNEL).set(null);
             realChannel.attr(EtpConstants.DATA_CHANNEL).set(null);
-            Message message = Message
-                    .newBuilder()
-                    .setType(Message.Type.DISCONNECT)
-                    .setSessionId(sessionId)
-                    .build();
-            dataChannel.writeAndFlush(message);
+            dataChannel.writeAndFlush(new CloseProxy(sessionId));
         }
         super.channelInactive(ctx);
     }

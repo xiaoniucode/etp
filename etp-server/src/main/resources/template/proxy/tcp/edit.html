@@ -19,19 +19,13 @@
         </div>
 
         <div class="layui-form-item">
-            <label class="layui-form-label">名称</label>
+            <label class="layui-form-label">隧道名称</label>
             <div class="layui-input-block">
-                <input type="text" name="name" autocomplete="off" placeholder="请输入名称" lay-verify="required"
+                <input type="text" name="name" autocomplete="off" placeholder="请输入隧道名称" lay-verify="required"
                        class="layui-input">
             </div>
         </div>
 
-        <div class="layui-form-item" pane>
-            <label class="layui-form-label">协议</label>
-            <div class="layui-input-inline">
-                <input type="radio" name="type" value="TCP" title="TCP" checked>
-            </div>
-        </div>
         <div class="layui-form-item">
             <div class="layui-inline">
                 <label class="layui-form-label">公网端口</label>
@@ -116,7 +110,7 @@
             }
             field.id = proxyId
             field.status = field.status ? 1 : 0;
-            Rest.put('/api/proxy/update', field).then(data => {
+            Rest.put('/api/proxy/update-tcp', field).then(data => {
                 layer.msg('更新成功', {icon: 1, time: 400,}, () => {
                     const parentTable = parent.layui.table;
                     parentTable.reload('proxy');

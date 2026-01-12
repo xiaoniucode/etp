@@ -1,11 +1,12 @@
 package com.xiaoniucode.etp.server.handler.visitor;
 
 import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.protocol.TunnelMessage;
+import com.xiaoniucode.etp.core.msg.CloseProxy;
+import com.xiaoniucode.etp.core.msg.NewVisitorConn;
+import com.xiaoniucode.etp.core.msg.NewWorkConn;
 import com.xiaoniucode.etp.server.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.RuntimeState;
-import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -35,14 +36,8 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             logger.warn("data channel is null");
             return;
         }
-
-        ByteString payload = ByteString.copyFrom(buf.nioBuffer());
-        TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
-            .setType(TunnelMessage.Message.Type.TRANSFER)
-            .setPayload(payload)
-            .build();
         if (dataChannel.isWritable()) {
-            dataChannel.writeAndFlush(message);
+            dataChannel.writeAndFlush(new NewWorkConn(buf.retain()));
         }
     }
 
@@ -55,17 +50,12 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             visitorChannel.close();
             return;
         } else {
-            long nextSessionId = GlobalIdGenerator.nextId();
+            long sessionId = GlobalIdGenerator.nextId();
             visitorChannel.config().setOption(ChannelOption.AUTO_READ, false);
             int localPort = runtimeState.getLocalPort(sa.getPort());
-            ChannelManager.addClientChannelToControlChannel(visitorChannel, nextSessionId, controllChannel);
+            ChannelManager.addClientChannelToControlChannel(visitorChannel, sessionId, controllChannel);
             ChannelManager.registerActiveConnection(sa.getPort(), visitorChannel);
-            TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
-                .setType(TunnelMessage.Message.Type.CONNECT)
-                .setSessionId(nextSessionId)
-                .setPort(localPort)
-                .build();
-            controllChannel.writeAndFlush(message);
+            controllChannel.writeAndFlush(new NewVisitorConn(sessionId, localPort));
         }
         super.channelActive(ctx);
     }
@@ -87,11 +77,7 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 dataChannel.attr(EtpConstants.SECRET_KEY).getAndSet(null);
                 dataChannel.attr(EtpConstants.SESSION_ID).getAndSet(null);
                 dataChannel.config().setOption(ChannelOption.AUTO_READ, true);
-                TunnelMessage.Message tunnelMessage = TunnelMessage.Message.newBuilder()
-                    .setType(TunnelMessage.Message.Type.DISCONNECT)
-                    .setSessionId(sessionId)
-                    .build();
-                dataChannel.writeAndFlush(tunnelMessage);
+                dataChannel.writeAndFlush(new CloseProxy(sessionId));
             }
         }
         super.channelInactive(ctx);

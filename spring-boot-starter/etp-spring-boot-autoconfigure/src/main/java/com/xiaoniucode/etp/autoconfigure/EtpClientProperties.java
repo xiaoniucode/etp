@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.autoconfigure;
 
-import com.xiaoniucode.etp.core.protocol.ProtocolType;
+import com.xiaoniucode.etp.core.codec.ProtocolType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**

@@ -1,11 +1,12 @@
 package com.xiaoniucode.etp.server;
 
-import com.xiaoniucode.etp.core.protocol.ProtocolType;
+import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ClientInfo;
 import com.xiaoniucode.etp.server.config.Dashboard;
 import com.xiaoniucode.etp.server.config.PortRange;
 import com.xiaoniucode.etp.server.config.ProxyMapping;
+import com.xiaoniucode.etp.server.manager.PortAllocator;
 import com.xiaoniucode.etp.server.manager.RuntimeState;
 import com.xiaoniucode.etp.server.web.ConfigService;
 import com.xiaoniucode.etp.server.web.ConfigStore;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * 服务初始化
@@ -26,7 +28,7 @@ import java.util.List;
  */
 public final class EtpInitialize {
     private static final Logger logger = LoggerFactory.getLogger(EtpInitialize.class);
-    private final static ConfigStore configStore =ConfigStore.get();
+    private final static ConfigStore configStore = ConfigStore.get();
     private final static RuntimeState runtimeState = RuntimeState.get();
     private final static AppConfig config = AppConfig.get();
     private static SQLiteTransactionTemplate TX;
@@ -114,15 +116,20 @@ public final class EtpInitialize {
         clients.forEach(clientInfo -> {
             String secretKey = clientInfo.getSecretKey();
             String name = clientInfo.getName();
+            Integer clientId = null;
             if (!runtimeState.hasClient(secretKey)) {
-                Integer clientId = null;
                 //如果开启了管理面板，需要将客户端配置同步到数据库
                 if (enableDashboard) {
-                    JSONObject save = new JSONObject();
-                    save.put("secretKey", secretKey);
-                    save.put("name", name);
-                    clientId = configStore.addClient(save);
-                    logger.info("同步静态配置客户端「{}」到数据库", name);
+                    JSONObject clientName = configStore.getClientByName(name);
+                    if (clientName == null) {
+                        JSONObject save = new JSONObject();
+                        save.put("secretKey", secretKey);
+                        save.put("name", name);
+                        clientId = configStore.addClient(save);
+                        logger.info("同步静态配置客户端「{}」到数据库", name);
+                    } else {
+                        logger.warn("无法保存到数据库，已存在同名客户端：{}", clientName);
+                    }
                 }
                 if (clientId == null) {
                     clientId = GlobalIdGenerator.nextId();
@@ -133,26 +140,43 @@ public final class EtpInitialize {
             } else {
                 logger.warn("客户端「{}」 注册失败，已经在数据库被注册", name);
             }
-            List<ProxyMapping> proxies = clientInfo.getTcpProxies();
-            proxies.forEach(proxy -> {
+            List<ProxyMapping> proxies = clientInfo.getProxies();
+            for (ProxyMapping proxy : proxies) {
                 Integer remotePort = proxy.getRemotePort();
                 if (!runtimeState.hasProxy(secretKey, remotePort)) {
                     Integer proxyId = null;
+                    String type = proxy.getType().name().toLowerCase(Locale.ROOT);
+                    if (ProtocolType.TCP.name().equalsIgnoreCase(type) && proxy.getRemotePort() == null) {
+                        int allocatePort = PortAllocator.get().allocateAvailablePort();
+                        proxy.setRemotePort(allocatePort);
+                    }
                     //如果开启了管理面板，需要将映射配置同步到数据库
                     if (enableDashboard) {
-                        JSONObject existClient = configStore.getClientBySecretKey(secretKey);
-                        JSONObject save = new JSONObject();
-                        save.put("clientId", existClient.getInt("id"));
-                        save.put("name", proxy.getName());
-                        save.put("localPort", proxy.getLocalPort());
-                        save.put("remotePort", proxy.getRemotePort());
-                        save.put("status", proxy.getStatus());
-                        save.put("type", proxy.getType().name());
-                        save.put("autoRegistered", 0);
-                        proxyId = configStore.addProxy(save);
-                        logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", existClient.get("id"), proxy.getName(), proxy.getRemotePort());
+                        if (configStore.getProxy(clientId, proxy.getName()) == null) {
+                            JSONObject save = new JSONObject();
+                            save.put("clientId", clientId);
+                            save.put("name", proxy.getName());
+                            save.put("localPort", proxy.getLocalPort());
+                            save.put("status", proxy.getStatus());
+                            save.put("type", type);
+                            save.put("autoRegistered", 0);
+                            if (ProtocolType.HTTP.name().equalsIgnoreCase(type) && !proxy.getDomains().isEmpty()) {
+                                save.put("domains", String.join(",", proxy.getDomains()));
+                            }
+                            if (type.equalsIgnoreCase(ProtocolType.TCP.name())) {
+                                save.put("remotePort", proxy.getRemotePort());
+
+                                proxyId = configStore.addProxy(save);
+                                logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", clientId, proxy.getName(), proxy.getRemotePort());
+                            }
+                            if (type.equalsIgnoreCase(ProtocolType.HTTP.name())) {
+                                proxyId = configStore.addProxy(save);
+                            }
+                        } else {
+                            logger.warn("无法保存代理到数据库，存在同名隧道名：{}", proxy.getName());
+                        }
                     }
-                    //注册端口映射
+                    //生成一个临时业务ID
                     if (proxyId == null) {
                         proxyId = GlobalIdGenerator.nextId();
                     }
@@ -161,7 +185,7 @@ public final class EtpInitialize {
                 } else {
                     logger.warn("同步取消，该客户端公网端口「{}-{}」已经被注册", name, remotePort);
                 }
-            });
+            }
         });
     }
 
@@ -181,15 +205,15 @@ public final class EtpInitialize {
     }
 
     private static void registerDBProxyConfig() {
-        JSONArray proxies = configStore.listAllProxies();
+        JSONArray proxies = configStore.listAllProxies(ProtocolType.TCP.name());
         if (proxies != null) {
             for (int i = 0; i < proxies.length(); i++) {
                 JSONObject proxy = proxies.getJSONObject(i);
                 String secretKey = proxy.getString("secretKey");
                 ProxyMapping proxyMapping = new ProxyMapping(
-                    ProtocolType.getType(proxy.getString("type")),
-                    proxy.getInt("localPort"),
-                    proxy.getInt("remotePort"));
+                        ProtocolType.getType(proxy.getString("type").toLowerCase(Locale.ROOT)),
+                        proxy.getInt("localPort"),
+                        proxy.getInt("remotePort"));
                 proxyMapping.setProxyId(proxy.getInt("id"));
                 proxyMapping.setName(proxy.getString("name"));
                 proxyMapping.setStatus(proxy.getInt("status"));
@@ -213,71 +237,72 @@ public final class EtpInitialize {
 
     private static void createSystemSettingsTable() {
         String sql = """
-            CREATE TABLE IF NOT EXISTS settings (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                key TEXT NOT NULL UNIQUE,       -- 设置键
-                value TEXT NOT NULL             -- 设置值
-            );
-            CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);
-            """;
+                CREATE TABLE IF NOT EXISTS settings (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    key TEXT NOT NULL UNIQUE,       -- 设置键
+                    value TEXT NOT NULL             -- 设置值
+                );
+                CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);
+                """;
         SQLiteUtils.createTable(sql);
     }
 
     private static void createAuthTokenTable() {
         String sql = """
-            CREATE TABLE IF NOT EXISTS auth_tokens (
-                token TEXT PRIMARY KEY,
-                uid INTEGER NOT NULL,
-                username TEXT NOT NULL,
-                expiredAt INTEGER NOT NULL,
-                createdAt INTEGER DEFAULT (datetime('now')),
-                FOREIGN KEY (uid) REFERENCES users(id)
-            );
-            CREATE INDEX IF NOT EXISTS idx_auth_tokens_expiredAt ON auth_tokens(expiredAt);
-            """;
+                CREATE TABLE IF NOT EXISTS auth_tokens (
+                    token TEXT PRIMARY KEY,
+                    uid INTEGER NOT NULL,
+                    username TEXT NOT NULL,
+                    expiredAt INTEGER NOT NULL,
+                    createdAt INTEGER DEFAULT (datetime('now')),
+                    FOREIGN KEY (uid) REFERENCES users(id)
+                );
+                CREATE INDEX IF NOT EXISTS idx_auth_tokens_expiredAt ON auth_tokens(expiredAt);
+                """;
         SQLiteUtils.createTable(sql);
     }
 
     private static void createUserTable() {
         String sql = """
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL
-            );
-            """;
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL
+                );
+                """;
         SQLiteUtils.createTable(sql);
     }
 
     private static void createProxiesTable() {
         String sql = """
-            CREATE TABLE IF NOT EXISTS proxies (
-                id               INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增主键
-                clientId         INTEGER NOT NULL,                   -- 所属客户端ID
-                name             TEXT NOT NULL,                      -- 代理名称
-                type             TEXT NOT NULL,                      -- 协议类型（如 "TCP"、"HTTP"）
-                autoRegistered   INTEGER NOT NULL DEFAULT 0,         -- 注册类型（1：自动注册、0手动注册）
-                localPort        INTEGER NOT NULL,                   -- 内网端口（如 3306）
-                remotePort       INTEGER NOT NULL UNIQUE,            -- 远程服务端口（对外暴露的端口）
-                status           INTEGER NOT NULL DEFAULT 1,         -- 状态：1=开启，0=关闭
-                createdAt        TEXT DEFAULT (datetime('now')),     -- 创建时间
-                updatedAt        TEXT DEFAULT (datetime('now'))      -- 更新时间
-            );
-            """;
+                CREATE TABLE IF NOT EXISTS proxies (
+                    id               INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增主键
+                    clientId         INTEGER NOT NULL,                   -- 所属客户端ID
+                    name             TEXT NOT NULL,                      -- 代理名称
+                    type             TEXT NOT NULL,                      -- 协议类型（如 "TCP"、"HTTP"）
+                    autoRegistered   INTEGER NOT NULL DEFAULT 0,         -- 注册类型（1：自动注册、0手动注册）
+                    localPort        INTEGER NOT NULL,                   -- 内网端口（如 3306）
+                    remotePort       INTEGER,                            -- 远程服务端口（对外暴露的端口）
+                    domains          TEXT,                               -- http协议域名，多个域名用逗号分隔
+                    status           INTEGER NOT NULL DEFAULT 1,         -- 状态：1=开启，0=关闭
+                    createdAt        TEXT DEFAULT (datetime('now')),     -- 创建时间
+                    updatedAt        TEXT DEFAULT (datetime('now'))      -- 更新时间
+                );
+                """;
         SQLiteUtils.createTable(sql);
     }
 
     private static void createClientTable() {
         String sql = """
-            CREATE TABLE IF NOT EXISTS clients (
-                id         INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增ID
-                name       TEXT    NOT NULL UNIQUE,            -- 客户端名称
-                secretKey  TEXT    NOT NULL UNIQUE,            -- 密钥
-                createdAt TEXT    DEFAULT (datetime('now')),   -- 创建时间
-                updatedAt TEXT    DEFAULT (datetime('now'))    -- 更新时间
-            );
-             CREATE INDEX IF NOT EXISTS idx_clients_name_secretkey ON clients (name, secretKey);
-            """;
+                CREATE TABLE IF NOT EXISTS clients (
+                    id         INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增ID
+                    name       TEXT    NOT NULL UNIQUE,            -- 客户端名称
+                    secretKey  TEXT    NOT NULL UNIQUE,            -- 密钥
+                    createdAt TEXT    DEFAULT (datetime('now')),   -- 创建时间
+                    updatedAt TEXT    DEFAULT (datetime('now'))    -- 更新时间
+                );
+                 CREATE INDEX IF NOT EXISTS idx_clients_name_secretkey ON clients (name, secretKey);
+                """;
         SQLiteUtils.createTable(sql);
     }
 }

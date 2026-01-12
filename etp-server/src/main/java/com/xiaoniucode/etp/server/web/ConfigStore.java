@@ -93,17 +93,17 @@ public class ConfigStore {
      */
     public int addProxy(JSONObject data) {
         return SQLiteUtils.insert(
-            "INSERT INTO proxies (clientId, name, type, localPort, remotePort, status,autoRegistered) VALUES (?, ?, ?, ?, ?, ?,?)",
+            "INSERT INTO proxies (clientId, name, type, localPort, remotePort,domains, status,autoRegistered) VALUES (?, ?, ?, ?, ?, ?,?,?)",
             data.optInt("clientId"),
             data.optString("name"),
             data.optString("type"),
             data.optInt("localPort"),
             data.optInt("remotePort"),
+            data.optString("domains",null),
             data.optInt("status", 1),
             data.optInt("autoRegistered")
         );
     }
-
     /**
      * 查询单个
      */
@@ -152,6 +152,10 @@ public class ConfigStore {
             set.append("remotePort = ?, ");
             params.add(data.getInt("remotePort"));
         }
+        if (data.has("domains")) {
+            set.append("domains = ?, ");
+            params.add(data.getInt("domains"));
+        }
         if (data.has("status")) {
             set.append("status = ?, ");
             params.add(data.getInt("status"));
@@ -175,30 +179,41 @@ public class ConfigStore {
     /**
      * 删除代理
      */
-    public boolean deleteProxy(long id) {
+    public boolean deleteProxy(int id) {
         return SQLiteUtils.delete("DELETE FROM proxies WHERE id = ?", id) > 0;
     }
 
-    public JSONArray listAllProxies() {
-        String sql = """
-            SELECT
-                p.id,
-                p.clientId,
-                p.name,
-                p.type,
-                p.localPort,
-                p.remotePort,
-                p.status,
-                p.createdAt,
-                p.updatedAt,
-                p.autoRegistered,
-                c.name AS clientName,
-                c.secretKey
-            FROM
-                proxies p
-            LEFT JOIN clients c ON p.clientId = c.id
-            """;
-        return SQLiteUtils.list(sql);
+    public JSONArray listAllProxies(String type) {
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("""
+        SELECT
+            p.id,
+            p.clientId,
+            p.name,
+            p.type,
+            p.localPort,
+            p.remotePort,
+            p.domains,
+            p.status,
+            p.createdAt,
+            p.updatedAt,
+            p.autoRegistered,
+            c.name AS clientName,
+            c.secretKey
+        FROM
+            proxies p
+        LEFT JOIN clients c ON p.clientId = c.id
+        """);
+
+        if (type != null) {
+            sqlBuilder.append(" WHERE p.type=?");
+        }
+
+        if (type != null) {
+            return SQLiteUtils.list(sqlBuilder.toString(), type);
+        } else {
+            return SQLiteUtils.list(sqlBuilder.toString());
+        }
     }
 
     /**
@@ -209,10 +224,6 @@ public class ConfigStore {
      */
     public int deleteProxiesByClient(int clientId) {
         return SQLiteUtils.delete("DELETE FROM proxies WHERE clientId = ?", clientId);
-    }
-
-    public JSONObject getProxyByName(String name) {
-        return SQLiteUtils.get("SELECT * FROM proxies WHERE name = ?", name);
     }
 
     public JSONObject getUserByUsername(String username) {

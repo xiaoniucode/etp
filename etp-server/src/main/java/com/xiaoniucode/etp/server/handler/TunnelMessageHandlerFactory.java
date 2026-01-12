@@ -1,8 +1,7 @@
 package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.core.MessageHandler;
-import com.xiaoniucode.etp.core.protocol.TunnelMessage;
-
+import com.xiaoniucode.etp.core.msg.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,19 +11,20 @@ import java.util.Map;
  * @author liuxin
  */
 public class TunnelMessageHandlerFactory {
-    private static final Map<TunnelMessage.Message.Type, MessageHandler> handlers = new HashMap<>();
+    private static final Map<Class<? extends Message>, MessageHandler> handlers = new HashMap<>();
 
     static {
-        handlers.put(TunnelMessage.Message.Type.HEARTBEAT, new HeartbeatHandler());
-        handlers.put(TunnelMessage.Message.Type.AUTH, new AuthHandler());
-        handlers.put(TunnelMessage.Message.Type.CONNECT, new ConnectHandler());
-        handlers.put(TunnelMessage.Message.Type.TRANSFER, new TransferHandler());
-        handlers.put(TunnelMessage.Message.Type.DISCONNECT, new DisconnectHandler());
-        handlers.put(TunnelMessage.Message.Type.PROXY_REGISTER, new ProxyRegisterMessageHandler());
-        handlers.put(TunnelMessage.Message.Type.PROXY_UNREGISTER, new ProxyUnregisterMessageHandler());
+        handlers.put(Ping.class, new HeartbeatHandler());
+        handlers.put(Login.class, new LoginHandler());
+        handlers.put(NewVisitorConnResp.class, new NewVisitorConnRespHandler());
+        handlers.put(NewWorkConn.class, new NewWorkConnHandler());
+        handlers.put(CloseProxy.class, new CloseProxyHandler());
+        handlers.put(NewProxy.class, new NewProxyHandler());
+        handlers.put(UnregisterProxy.class, new UnregisterProxyHandler());
+
     }
 
-    public static MessageHandler getHandler(TunnelMessage.Message.Type type) {
-        return handlers.get(type);
+    public static MessageHandler getHandler(Message message) {
+        return handlers.get(message.getClass());
     }
 }

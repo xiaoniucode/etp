@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.common.LogConfig;
 import com.xiaoniucode.etp.common.LogUtils;
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.common.TomlUtils;
-import com.xiaoniucode.etp.core.protocol.ProtocolType;
+import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.moandjiezana.toml.Toml;
 
 import java.util.*;
@@ -124,7 +124,7 @@ public final class AppConfig {
             //创建一个客户端
             ClientInfo clientInfo = new ClientInfo(secretKey, name);
             //解析客户端的所有端口映射信息
-            parseProxes(clientInfo.getTcpProxies(), client);
+            parseProxes(clientInfo.getProxies(), client);
             clients.add(clientInfo);
             tokenTemp.add(secretKey);
             nameTemp.add(name);

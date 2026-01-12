@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.config;
 
-import com.xiaoniucode.etp.core.protocol.ProtocolType;
+import com.xiaoniucode.etp.core.codec.ProtocolType;
 
 import java.util.List;
 import java.util.Set;
@@ -55,6 +55,10 @@ public class ClientInfo {
 
     public void setClientId(Integer clientId) {
         this.clientId = clientId;
+    }
+
+    public List<ProxyMapping> getProxies() {
+        return proxies;
     }
 
     public List<ProxyMapping> getTcpProxies() {

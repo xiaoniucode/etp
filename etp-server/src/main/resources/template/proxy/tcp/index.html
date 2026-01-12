@@ -40,7 +40,7 @@
             elem: '#proxy',
             text: "空空如也",
             skin: "line",
-            url: '/api/proxy/list',
+            url: '/api/proxy/list?type=tcp',
             toolbar: '#headerToobar',
             cellMinWidth: 80,
             headers: {
@@ -48,16 +48,7 @@
             },
             cols: [[
                 {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
-                {field: 'name', title: '映射名称'},
-                {
-                    field: 'type', title: '协议', sort: true, templet: function (d) {
-                        if (d.type === "TCP") {
-                            return ' <span class="layui-badge layui-bg-green">TCP</span>';
-                        } else if (d.type === "HTTP") {
-                            return '<span class="layui-badge">HTTP</span>';
-                        }
-                    }
-                },
+                {field: 'name', title: '隧道名称'},
                 {
                     field: 'remotePort', sort: true, title: '公网端口',
                     templet: function (d) {
@@ -99,11 +90,11 @@
             const data = obj.data;
             if (obj.event === 'edit') {
                 layer.open({
-                    title: '编辑',
+                    title: '编辑隧道',
                     type: 2,
                     offset: '30px',
                     shade: false,
-                    area: ['60%', '60%'],
+                    area: ['60%', '50%'],
                     content: '/proxy/tcp/edit.html?id=' + data.id
                 });
             } else if (obj.event === 'delete') {
@@ -140,11 +131,11 @@
         table.on('toolbar(proxy)', function (obj) {
             if (obj.event === 'add') {
                 layer.open({
-                    title: '新增映射',
+                    title: '新增隧道',
                     type: 2,
                     offset: '30px',
                     shade: false,
-                    area: ['60%', '60%'],
+                    area: ['60%', '50%'],
                     content: '/proxy/tcp/add.html'
                 });
             } else if (obj.event === 'flush') {

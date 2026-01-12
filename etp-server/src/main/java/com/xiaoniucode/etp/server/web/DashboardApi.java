@@ -92,23 +92,26 @@ public class DashboardApi {
             context.setResponseJson(ResponseEntity.ok().toJson());
         });
         router.route(HttpMethod.GET, "/client/list", context ->
-            context.setResponseJson(ResponseEntity.ok(ConfigService.clients()).toJson()));
+                context.setResponseJson(ResponseEntity.ok(ConfigService.clients()).toJson()));
         router.route(HttpMethod.GET, "/client/get", context ->
-            context.setResponseJson(ResponseEntity.ok(ConfigService.getClient(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
+                context.setResponseJson(ResponseEntity.ok(ConfigService.getClient(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
         router.route(HttpMethod.GET, "/proxy/get", context ->
-            context.setResponseJson(ResponseEntity.ok(ConfigService.getProxy(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
-        router.route(HttpMethod.GET, "/proxy/list", context ->
-            context.setResponseJson(ResponseEntity.ok(ConfigService.proxies()).toJson()));
+                context.setResponseJson(ResponseEntity.ok(ConfigService.getProxy(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
+        router.route(HttpMethod.GET, "/proxy/list", context -> {
+                    String type = (String) context.getQueryParam("type");
+                    context.setResponseJson(ResponseEntity.ok(ConfigService.proxies(type)).toJson());
+                }
+        );
         router.route(HttpMethod.GET, "/metrics", context ->
-            context.setResponseJson(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
+                context.setResponseJson(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
         router.route(HttpMethod.GET, "/monitor", context ->
-            context.setResponseJson(ResponseEntity.ok(ConfigService.monitorInfo()).toJson()));
-        router.route(HttpMethod.POST, "/proxy/add", context -> {
-            ConfigService.addProxy(JsonUtils.toJsonObject(context.getRequestBody()));
+                context.setResponseJson(ResponseEntity.ok(ConfigService.monitorInfo()).toJson()));
+        router.route(HttpMethod.POST, "/proxy/add-tcp", context -> {
+            ConfigService.addTcpProxy(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());
         });
-        router.route(HttpMethod.PUT, "/proxy/update", context -> {
-            ConfigService.updateProxy(JsonUtils.toJsonObject(context.getRequestBody()));
+        router.route(HttpMethod.PUT, "/proxy/update-tcp", context -> {
+            ConfigService.updateTcpProxy(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());
         });
         router.route(HttpMethod.PUT, "/proxy/switch-proxy-status", context -> {

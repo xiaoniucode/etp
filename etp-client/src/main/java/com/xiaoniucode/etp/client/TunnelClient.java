@@ -5,17 +5,13 @@ import com.xiaoniucode.etp.client.handler.ControlChannelHandler;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.Lifecycle;
-import com.xiaoniucode.etp.core.protocol.TunnelMessage;
+import com.xiaoniucode.etp.core.msg.Login;
+import com.xiaoniucode.etp.core.codec.TunnelMessageCodec;
 import com.xiaoniucode.etp.core.IdleCheckHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
-import io.netty.handler.codec.protobuf.ProtobufDecoder;
-import io.netty.handler.codec.protobuf.ProtobufEncoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
@@ -108,9 +104,9 @@ public class TunnelClient implements Lifecycle {
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             controlBootstrap.group(tunnelWorkerGroup)
                     .channel(NettyEventLoopFactory.socketChannelClass())
-                    .option(ChannelOption.TCP_NODELAY, true) // 禁用Nagle算法
-                    .option(ChannelOption.SO_KEEPALIVE, true) // TCP保活
-                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT) // 内存池
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
@@ -120,10 +116,7 @@ public class TunnelClient implements Lifecycle {
                                 sc.pipeline().addLast("tls", new SslHandler(engine));
                             }
                             sc.pipeline()
-                                    .addLast(new ProtobufVarint32FrameDecoder())
-                                    .addLast(new ProtobufDecoder(TunnelMessage.Message.getDefaultInstance()))
-                                    .addLast(new ProtobufVarint32LengthFieldPrepender())
-                                    .addLast(new ProtobufEncoder())
+                                    .addLast(new TunnelMessageCodec())
                                     .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
                                     .addLast(new ControlChannelHandler(ctx -> {
                                         // 重置重试计数器
@@ -150,15 +143,9 @@ public class TunnelClient implements Lifecycle {
                 controlChannel.attr(EtpConstants.SERVER_PORT).set(serverPort);
                 controlChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
                 ChannelManager.setControlChannel(controlChannel);
-
                 String os = OSUtils.getOS();
                 String arch = OSUtils.getOSArch();
-                String body = secretKey + ":" + os + ":" + arch;
-                TunnelMessage.Message message = TunnelMessage.Message.newBuilder()
-                        .setType(TunnelMessage.Message.Type.AUTH)
-                        .setExt(body)
-                        .build();
-                future.channel().writeAndFlush(message);
+                future.channel().writeAndFlush(new Login(secretKey, os, arch));
                 retryCount.set(0);
                 logger.info("已连接到ETP服务端: {}:{}", serverAddr, serverPort);
                 if (connectSuccessListener != null) {

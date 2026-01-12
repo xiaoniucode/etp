@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.handler;
 import com.xiaoniucode.etp.core.ChannelUtils;
 import com.xiaoniucode.etp.core.MessageHandler;
 import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.protocol.TunnelMessage;
+import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,12 +17,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author liuxin
  */
-public class ControlTunnelHandler extends SimpleChannelInboundHandler<TunnelMessage.Message> {
+public class ControlTunnelHandler extends SimpleChannelInboundHandler<Message> {
     private final Logger logger = LoggerFactory.getLogger(ControlTunnelHandler.class);
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
-        MessageHandler handler = TunnelMessageHandlerFactory.getHandler(msg.getType());
+    protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+        MessageHandler handler = TunnelMessageHandlerFactory.getHandler(msg);
         if (handler != null) {
             handler.handle(ctx, msg);
         }

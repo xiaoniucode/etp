@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.config;
 
-import com.xiaoniucode.etp.core.protocol.ProtocolType;
+import com.xiaoniucode.etp.core.codec.ProtocolType;
 
 import java.util.Set;
 

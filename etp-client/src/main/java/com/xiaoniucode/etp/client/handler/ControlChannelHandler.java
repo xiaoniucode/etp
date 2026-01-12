@@ -3,7 +3,8 @@ package com.xiaoniucode.etp.client.handler;
 import com.xiaoniucode.etp.client.ChannelManager;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.MessageHandler;
-import com.xiaoniucode.etp.core.protocol.TunnelMessage.Message;
+import com.xiaoniucode.etp.core.msg.Message;
+import com.xiaoniucode.etp.core.msg.Ping;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +26,10 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
-        if (Message.Type.HEARTBEAT.getNumber() == msg.getType().getNumber()) {
+        if (msg instanceof Ping) {
             return;
         }
-        MessageHandler handler = MessageHandlerFactory.getHandler(msg.getType());
+        MessageHandler handler = MessageHandlerFactory.getHandler(msg);
         if (handler != null) {
             handler.handle(ctx, msg);
         }

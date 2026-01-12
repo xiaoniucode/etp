@@ -1,7 +1,8 @@
 package com.xiaoniucode.etp.client;
 
-import com.xiaoniucode.etp.core.protocol.TunnelMessage.ProxyRequest;
-import com.xiaoniucode.etp.core.protocol.TunnelMessage.Message;
+
+import com.xiaoniucode.etp.core.msg.CloseProxy;
+import com.xiaoniucode.etp.core.msg.NewProxy;
 import io.netty.channel.Channel;
 
 /**
@@ -13,24 +14,16 @@ public class ProxyRegisterClient {
     /**
      * 注册端口映射
      */
-    public void registerProxy(ProxyRequest request) {
-        Message message = Message.newBuilder()
-            .setType(Message.Type.PROXY_REGISTER)
-            .setPayload(request.toByteString())
-            .build();
+    public void registerProxy(NewProxy newProxy) {
         Channel controlChannel = ChannelManager.getControlChannel();
-        controlChannel.writeAndFlush(message);
+        controlChannel.writeAndFlush(newProxy);
     }
 
     /**
      * 注销端口映射
      */
-    public void unregisterProxy(Integer proxyId) {
+    public void unregisterProxy(CloseProxy closeProxy) {
         Channel controlChannel = ChannelManager.getControlChannel();
-        Message message = Message.newBuilder()
-            .setType(Message.Type.PROXY_UNREGISTER)
-            .setExt(proxyId.toString())
-            .build();
-        controlChannel.writeAndFlush(message);
+        controlChannel.writeAndFlush(closeProxy);
     }
 }

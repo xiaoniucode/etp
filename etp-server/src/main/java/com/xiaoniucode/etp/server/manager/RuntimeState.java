@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.manager;
 
-import com.xiaoniucode.etp.core.protocol.ProtocolType;
+import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.server.config.ClientInfo;
 import com.xiaoniucode.etp.server.config.ProxyMapping;
 

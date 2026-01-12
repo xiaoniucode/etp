@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.web;
 
 import com.xiaoniucode.etp.common.StringUtils;
-import com.xiaoniucode.etp.core.protocol.ProtocolType;
+import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.server.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.config.AuthInfo;
 import com.xiaoniucode.etp.server.config.PortRange;
@@ -31,13 +31,13 @@ import java.util.*;
  */
 public final class ConfigService {
     private static Logger logger = LoggerFactory.getLogger(ConfigService.class);
-    private final static ConfigStore configStore =ConfigStore.get();
+    private final static ConfigStore configStore = ConfigStore.get();
     private final static AppConfig config = AppConfig.get();
     private final static RuntimeState state = RuntimeState.get();
     private static final SQLiteTransactionTemplate TX = new SQLiteTransactionTemplate();
 
-    public static void addClient(JSONObject client) {
-        TX.execute(() -> {
+    public static int addClient(JSONObject client) {
+        return TX.execute(() -> {
             String name = client.getString("name");
             JSONObject existClient = configStore.getClientByName(name);
             if (existClient != null) {
@@ -50,7 +50,7 @@ public final class ConfigService {
             ClientInfo clientInfo = new ClientInfo(clientId, name, secretKey);
             //注册客户端
             state.registerClient(clientInfo);
-            return null;
+            return clientId;
         });
     }
 
@@ -58,7 +58,7 @@ public final class ConfigService {
         JSONObject res = new JSONObject();
         JSONObject stats = new JSONObject();
         JSONArray clients = clients();
-        JSONArray proxies = proxies();
+        JSONArray proxies = proxies(null);
         stats.put("clientTotal", clients.length());
         stats.put("onlineClient", ChannelManager.onlineClientCount());
         stats.put("mappingTotal", proxies.length());
@@ -89,11 +89,11 @@ public final class ConfigService {
         configStore.deleteAllAutoRegisterProxy();
     }
 
-    public static JSONArray proxies() {
-        return configStore.listAllProxies();
+    public static JSONArray proxies(String type) {
+        return configStore.listAllProxies(type);
     }
 
-    public static JSONObject addProxy(JSONObject req) {
+    public static JSONObject addTcpProxy(JSONObject req) {
         int remotePort = req.getInt("remotePort");
         if (remotePort != -1 && !PortAllocator.get().isPortAvailable(remotePort)) {
             throw new BizException("映射注册失败，公网端口: " + remotePort + "不可用！");
@@ -110,8 +110,8 @@ public final class ConfigService {
         if (!StringUtils.hasText(req.getString("name"))) {
             req.put("name", req.getInt("remotePort"));
         }
+        req.put("type", ProtocolType.TCP.name().toLowerCase(Locale.ROOT));
         JSONObject res = new JSONObject();
-
         int remotePortInt = req.getInt("remotePort");
         //注册端口映射
         state.registerProxy(secretKey, createProxyMapping(req));
@@ -137,7 +137,7 @@ public final class ConfigService {
         return res;
     }
 
-    public static void updateProxy(JSONObject req) {
+    public static void updateTcpProxy(JSONObject req) {
         TX.execute(() -> {
             String newRemotePortString = req.getString("remotePort");
             int newRemotePortInt;
@@ -164,6 +164,7 @@ public final class ConfigService {
                     }
                 }
             }
+            req.put("type", ProtocolType.TCP.name().toLowerCase(Locale.ROOT));
             //检查名称
             String oldName = oldProxy.getString("name");
             String newName = req.getString("name");
@@ -193,10 +194,21 @@ public final class ConfigService {
         });
     }
 
+    public static JSONObject addHttpProxy(JSONObject req) {
+        return TX.execute(() -> {
+            // 检查是否存在
+            req.put("type", ProtocolType.HTTP.name().toLowerCase(Locale.ROOT));
+            int proxyId = configStore.addProxy(req);
+            JSONObject res = new JSONObject();
+            res.put("proxyId", proxyId);
+            return res;
+        });
+    }
+
     private static ProxyMapping createProxyMapping(JSONObject req) {
         ProxyMapping proxyMapping = new ProxyMapping(ProtocolType.getType(req.getString("type")),
-            req.getInt("localPort"),
-            req.getInt("remotePort"));
+                req.getInt("localPort"),
+                req.getInt("remotePort"));
         proxyMapping.setProxyId(req.getInt("clientId"));
         proxyMapping.setName(req.getString("name"));
         proxyMapping.setStatus(req.getInt("status"));
@@ -295,7 +307,15 @@ public final class ConfigService {
     }
 
     public static JSONObject getProxy(JSONObject req) {
-        return configStore.getProxyById(req.getInt("id"));
+        JSONObject res = configStore.getProxyById(req.getInt("id"));
+        String type = res.getString("type");
+        if (ProtocolType.getType(type) == ProtocolType.HTTP) {
+            String domains = res.getString("domains");
+            if (StringUtils.hasText(domains)) {
+                res.put("domains", String.join("\n", domains.split(",")));
+            }
+        }
+        return res;
     }
 
     public static JSONObject login(JSONObject req) {
@@ -369,4 +389,6 @@ public final class ConfigService {
 
         return res;
     }
+
+
 }

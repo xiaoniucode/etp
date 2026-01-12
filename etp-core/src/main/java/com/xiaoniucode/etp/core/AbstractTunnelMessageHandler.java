@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.core;
 
-import com.xiaoniucode.etp.core.protocol.TunnelMessage;
+import com.xiaoniucode.etp.core.msg.Message;
 import io.netty.channel.ChannelHandlerContext;
 
 
@@ -11,7 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 public abstract class AbstractTunnelMessageHandler implements MessageHandler {
 
     @Override
-    public void handle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception {
+    public void handle(ChannelHandlerContext ctx, Message msg) throws Exception {
         try {
             // 检查当前通道是否激活
             if (!ctx.channel().isActive()) {
@@ -25,5 +25,5 @@ public abstract class AbstractTunnelMessageHandler implements MessageHandler {
         }
     }
 
-    protected abstract void doHandle(ChannelHandlerContext ctx, TunnelMessage.Message msg) throws Exception;
+    protected abstract void doHandle(ChannelHandlerContext ctx, Message msg) throws Exception;
 }
