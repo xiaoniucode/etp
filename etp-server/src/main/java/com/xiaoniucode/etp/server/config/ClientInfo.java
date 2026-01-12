@@ -1,7 +1,11 @@
 package com.xiaoniucode.etp.server.config;
 
+import com.xiaoniucode.etp.core.protocol.ProtocolType;
+
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 /**
  * 客户端配置
@@ -53,8 +57,12 @@ public class ClientInfo {
         this.clientId = clientId;
     }
 
-    public List<ProxyMapping> getProxies() {
-        return proxies;
+    public List<ProxyMapping> getTcpProxies() {
+        return proxies.stream().filter(f -> f.getType() == ProtocolType.TCP).collect(Collectors.toList());
+    }
+
+    public Set<ProxyMapping> getHttpProxies() {
+        return proxies.stream().filter(f -> f.getType() == ProtocolType.HTTP).collect(Collectors.toSet());
     }
 
     public void setProxies(List<ProxyMapping> proxies) {

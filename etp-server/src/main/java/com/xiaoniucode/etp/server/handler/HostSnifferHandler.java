@@ -1,12 +1,9 @@
-package com.xiaoniucode.etp.server.proxy;
+package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.core.EtpConstants;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.stream.ChunkedWriteHandler;
-import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,16 +17,12 @@ import java.util.Map;
  */
 public class HostSnifferHandler extends ByteToMessageDecoder {
     private final Logger logger = LoggerFactory.getLogger(HostSnifferHandler.class);
-    private static final Map<String, Integer> DOMAIN_PORT_MAP = new HashMap<>();
+    private final Map<String, Integer> domainMapping;
 
-    static {
-        // todo 测试数据
-        DOMAIN_PORT_MAP.put("a.local.cc", 8081);
-        DOMAIN_PORT_MAP.put("b.local.cc", 8082);
-        DOMAIN_PORT_MAP.put("localhost", 8081);
+    public HostSnifferHandler(Map<String, Integer> domainsMapping) {
+        this.domainMapping = domainsMapping;
     }
 
-    private static final int DEFAULT_PORT = 8081;
     private boolean sniffing = true;
 
     @Override
@@ -43,7 +36,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             return;
         }
         in.markReaderIndex();
-        int port = DEFAULT_PORT;
+        int port = -1;
         boolean isHttp = false;
         try {
             int len = Math.min(in.readableBytes(), 4096);
@@ -57,7 +50,13 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                     if (host.contains(":")) {
                         host = host.split(":")[0];
                     }
-                    port = DOMAIN_PORT_MAP.getOrDefault(host, DEFAULT_PORT);
+                    Integer targetPort = domainMapping.get(host);
+                    if (targetPort == null) {
+                        logger.warn("没有该域名的代理服务");
+                        ctx.close();
+                        return;
+                    }
+                    port = targetPort;
                 }
                 isHttp = true;
             }

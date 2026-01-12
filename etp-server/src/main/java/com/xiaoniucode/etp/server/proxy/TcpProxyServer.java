@@ -77,7 +77,7 @@ public final class TcpProxyServer implements Lifecycle {
             Collection<ClientInfo> clients = state.allClients();
             List<StringBuilder> bindPorts = new ArrayList<>();
             for (ClientInfo client : clients) {
-                List<ProxyMapping> proxyMappings = client.getProxies();
+                List<ProxyMapping> proxyMappings = client.getTcpProxies();
                 for (ProxyMapping proxy : proxyMappings) {
                     if (proxy.getStatus() == 1) {
                         Integer remotePort = proxy.getRemotePort();

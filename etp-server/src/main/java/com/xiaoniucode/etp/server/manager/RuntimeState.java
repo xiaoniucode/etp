@@ -1,13 +1,17 @@
 package com.xiaoniucode.etp.server.manager;
 
+import com.xiaoniucode.etp.core.protocol.ProtocolType;
 import com.xiaoniucode.etp.server.config.ClientInfo;
 import com.xiaoniucode.etp.server.config.ProxyMapping;
+
 import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * 用于统一管理运行时各种配置信息
@@ -34,9 +38,14 @@ public final class RuntimeState {
      */
     private final Map<Integer, Integer> portMapping = new ConcurrentHashMap<>();
     /**
+     * 域名 -> 内网端口
+     */
+    private final Map<String, Integer> domainMapping = new ConcurrentHashMap<>();
+    /**
      * secretKey -> remotePorts 用于客户端与其所有公网端口的映射，实现快速查找
      */
     private final Map<String, List<Integer>> clientRemotePorts = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> clientDomains = new ConcurrentHashMap<>();
 
     /**
      * 注册客户端
@@ -49,6 +58,7 @@ public final class RuntimeState {
         }
         clients.putIfAbsent(client.getSecretKey(), client);
         clientRemotePorts.put(client.getSecretKey(), new CopyOnWriteArrayList<>());
+        clientDomains.put(client.getSecretKey(), new CopyOnWriteArraySet<>());
         logger.debug("客户端: {}-{} 注册成功", client.getClientId(), client.getName());
     }
 
@@ -115,25 +125,33 @@ public final class RuntimeState {
     }
 
     /**
-     * 将端口映射注册到指定的客户端
+     * 代理注册
      *
      * @param secretKey 客户端密钥
      * @param proxy     端口映射信息
      */
     public boolean registerProxy(String secretKey, ProxyMapping proxy) {
         ClientInfo client = clients.get(secretKey);
-        if (!Objects.isNull(client) && !isPortOccupied(proxy.getRemotePort())) {
-            client.getProxies().add(proxy);
+        if (!Objects.isNull(client) && (proxy.getType() == ProtocolType.TCP) && !isPortOccupied(proxy.getRemotePort())) {
+            client.getTcpProxies().add(proxy);
             clientRemotePorts.getOrDefault(secretKey, new CopyOnWriteArrayList<>()).add(proxy.getRemotePort());
             portMapping.put(proxy.getRemotePort(), proxy.getLocalPort());
-            logger.info("映射{} - {} 注册成功", proxy.getName(), proxy.getRemotePort());
+            logger.debug("TCP映射{}注册成功", proxy.getName());
+            return true;
+        }
+        if (!Objects.isNull(client) && (proxy.getType() == ProtocolType.HTTP)) {
+            client.getHttpProxies().add(proxy);
+            Set<String> domains = proxy.getDomains();
+            clientDomains.getOrDefault(secretKey, new CopyOnWriteArraySet<>()).addAll(domains);
+            domains.forEach(domain -> domainMapping.put(domain, proxy.getLocalPort()));
+            logger.debug("HTTP代理{}注册成功", proxy.getName());
             return true;
         }
         return false;
     }
 
     /**
-     * 判断时候已经注册了相同的端口映射
+     * 判断是否已经注册了相同的端口映射
      *
      * @param secretKey  客户端密钥
      * @param remotePort 公网端口
@@ -154,7 +172,7 @@ public final class RuntimeState {
     public boolean removeProxy(String secretKey, Integer remotePort) {
         ClientInfo client = clients.get(secretKey);
         if (!Objects.isNull(client)) {
-            List<ProxyMapping> proxies = client.getProxies();
+            List<ProxyMapping> proxies = client.getTcpProxies();
             proxies.removeIf(proxy -> proxy.getRemotePort().equals(remotePort));
             List<Integer> ports = clientRemotePorts.get(secretKey);
             if (ports != null) {
@@ -176,7 +194,7 @@ public final class RuntimeState {
     public boolean updateProxyStatus(String secretKey, Integer remotePort, Integer status) {
         ClientInfo client = clients.get(secretKey);
         if (!Objects.isNull(client)) {
-            List<ProxyMapping> proxies = client.getProxies();
+            List<ProxyMapping> proxies = client.getTcpProxies();
             for (ProxyMapping proxy : proxies) {
                 if (proxy.getRemotePort().equals(remotePort)) {
                     proxy.setStatus(status);

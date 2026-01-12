@@ -2,18 +2,18 @@ package com.xiaoniucode.etp.server.proxy;
 
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
+import com.xiaoniucode.etp.server.handler.HostSnifferHandler;
 import com.xiaoniucode.etp.server.handler.visitor.HttpVisitorHandler;
-import com.xiaoniucode.etp.server.handler.visitor.TcpVisitorHandler;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.flush.FlushConsolidationHandler;
-import io.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  * Http proxy server
@@ -27,6 +27,7 @@ public class HttpProxyServer implements Lifecycle {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private int httpProxyPort = 8080;
+    private Map<String, Integer> domainMapping;
 
     private HttpProxyServer() {
     }
@@ -50,7 +51,7 @@ public class HttpProxyServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            sc.pipeline().addLast(new HostSnifferHandler());
+                            sc.pipeline().addLast(new HostSnifferHandler(domainMapping));
                             sc.pipeline().addLast(new TrafficMetricsHandler());
                             sc.pipeline().addLast(new HttpVisitorHandler());
                         }
@@ -74,5 +75,13 @@ public class HttpProxyServer implements Lifecycle {
 
     public void setHttpProxyPort(int httpProxyPort) {
         this.httpProxyPort = httpProxyPort;
+    }
+
+    public Map<String, Integer> getDomainMapping() {
+        return domainMapping;
+    }
+
+    public void setDomainMapping(Map<String, Integer> domainMapping) {
+        this.domainMapping = domainMapping;
     }
 }

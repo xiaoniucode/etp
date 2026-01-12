@@ -133,7 +133,7 @@ public final class EtpInitialize {
             } else {
                 logger.warn("客户端「{}」 注册失败，已经在数据库被注册", name);
             }
-            List<ProxyMapping> proxies = clientInfo.getProxies();
+            List<ProxyMapping> proxies = clientInfo.getTcpProxies();
             proxies.forEach(proxy -> {
                 Integer remotePort = proxy.getRemotePort();
                 if (!runtimeState.hasProxy(secretKey, remotePort)) {

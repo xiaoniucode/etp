@@ -2,6 +2,8 @@ package com.xiaoniucode.etp.server.config;
 
 import com.xiaoniucode.etp.core.protocol.ProtocolType;
 
+import java.util.Set;
+
 /**
  * 端口映射信息配置
  *
@@ -21,6 +23,10 @@ public class ProxyMapping {
      */
     private ProtocolType type;
     /**
+     * http协议域名，一个本地服务支持配置多个域名
+     */
+    private Set<String> domains;
+    /**
      * 内网被代理服务的IP地址
      */
     private Integer localPort;
@@ -38,7 +44,11 @@ public class ProxyMapping {
         this.localPort = localPort;
         this.remotePort = remotePort;
     }
-
+    public ProxyMapping(ProtocolType type, Integer localPort, Set<String> domains) {
+        this.type = type;
+        this.localPort = localPort;
+        this.domains = domains;
+    }
     public String getName() {
         return name;
     }
@@ -85,5 +95,13 @@ public class ProxyMapping {
 
     public void setProxyId(Integer proxyId) {
         this.proxyId = proxyId;
+    }
+
+    public Set<String> getDomains() {
+        return domains;
+    }
+
+    public void setDomains(Set<String> domains) {
+        this.domains = domains;
     }
 }

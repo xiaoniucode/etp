@@ -124,7 +124,7 @@ public final class AppConfig {
             //创建一个客户端
             ClientInfo clientInfo = new ClientInfo(secretKey, name);
             //解析客户端的所有端口映射信息
-            parseProxes(clientInfo.getProxies(), client);
+            parseProxes(clientInfo.getTcpProxies(), client);
             clients.add(clientInfo);
             tokenTemp.add(secretKey);
             nameTemp.add(name);
@@ -142,8 +142,9 @@ public final class AppConfig {
             String proxyName = proxy.getString("name");
             Long localPort = proxy.getLong("localPort");
             Long remotePort = proxy.getLong("remotePort");
-            Long status = proxy.getLong("status");
-            if (!Objects.isNull(remotePort)) {
+            Long status = proxy.getLong("status",1L);
+            List<String> domains = proxy.getList("domains", new ArrayList<>());
+            if (ProtocolType.TCP.name().equalsIgnoreCase(type) && !Objects.isNull(remotePort)) {
                 if (portTemp.contains(remotePort.intValue())) {
                     throw new IllegalArgumentException("公网端口不能重复！" + remotePort.intValue());
                 }
@@ -152,9 +153,14 @@ public final class AppConfig {
             if (Objects.isNull(localPort)) {
                 throw new IllegalArgumentException("必须指定内网端口");
             }
-            ProxyMapping proxyMapping = new ProxyMapping(ProtocolType.getType(type), localPort.intValue(), remotePort == null ? null : remotePort.intValue());
+            ProxyMapping proxyMapping;
+            if (ProtocolType.TCP.name().equalsIgnoreCase(type)) {
+                proxyMapping = new ProxyMapping(ProtocolType.getType(type), localPort.intValue(), remotePort == null ? null : remotePort.intValue());
+            } else {
+                proxyMapping = new ProxyMapping(ProtocolType.getType(type), localPort.intValue(), new HashSet<>(domains));
+            }
             proxyMapping.setName(proxyName);
-            proxyMapping.setStatus(status == null ? 1 : status.intValue());
+            proxyMapping.setStatus(status.intValue());
             proxyMapping.setLocalPort(localPort.intValue());
             proxyMappings.add(proxyMapping);
         }

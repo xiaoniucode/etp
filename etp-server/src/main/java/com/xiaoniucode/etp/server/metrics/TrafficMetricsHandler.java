@@ -16,8 +16,12 @@ import java.net.InetSocketAddress;
  */
 public class TrafficMetricsHandler extends ChannelDuplexHandler {
     private final Logger logger = LoggerFactory.getLogger(TrafficMetricsHandler.class);
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (!ctx.channel().isActive()) {
+            return;
+        }
         InetSocketAddress sa = (InetSocketAddress) ctx.channel().localAddress();
         MetricsCollector collector = MetricsCollector.getCollector(sa.getPort());
         collector.incReadMsgs(1);
@@ -29,6 +33,9 @@ public class TrafficMetricsHandler extends ChannelDuplexHandler {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        if (!ctx.channel().isActive()) {
+            return;
+        }
         InetSocketAddress sa = (InetSocketAddress) ctx.channel().localAddress();
         MetricsCollector collector = MetricsCollector.getCollector(sa.getPort());
         collector.incWriteMsgs(1);
@@ -40,6 +47,9 @@ public class TrafficMetricsHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        if (!ctx.channel().isActive()) {
+            return;
+        }
         InetSocketAddress sa = (InetSocketAddress) ctx.channel().localAddress();
         MetricsCollector collector = MetricsCollector.getCollector(sa.getPort());
         collector.incChannels();
@@ -48,6 +58,9 @@ public class TrafficMetricsHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        if (!ctx.channel().isActive()) {
+            return;
+        }
         InetSocketAddress sa = (InetSocketAddress) ctx.channel().localAddress();
         MetricsCollector collector = MetricsCollector.getCollector(sa.getPort());
         collector.decChannels();
@@ -56,7 +69,10 @@ public class TrafficMetricsHandler extends ChannelDuplexHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.warn("流量指标收集出错",cause);
+        if (!ctx.channel().isActive()) {
+            return;
+        }
+        logger.warn("流量指标收集出错", cause);
         super.exceptionCaught(ctx, cause);
     }
 }

@@ -14,6 +14,9 @@ import com.xiaoniucode.etp.server.web.server.NettyWebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 服务启动入口
  *
@@ -56,7 +59,15 @@ public class TunnelServerStartup {
                 logger.info("Dashboard图形面板启动成功，浏览器访问：{}:{}", webServer.getAddr(), webServer.getPort());
             }
             TcpProxyServer.get().start();
-            HttpProxyServer.get().start();
+
+            // todo 测试数据
+            Map<String, Integer> domains = new HashMap<>();
+            domains.put("a.local.cc", 8081);
+            domains.put("b.local.cc", 8082);
+            domains.put("localhost", 8081);
+            HttpProxyServer httpProxyServer = HttpProxyServer.get();
+            httpProxyServer.setDomainMapping(domains);
+            httpProxyServer.start();
         });
         tunnelServer.start();
     }
@@ -64,16 +75,16 @@ public class TunnelServerStartup {
     private static void initLogback() {
         LogConfig log = AppConfig.get().getLogConfig();
         new LogbackConfigurator.Builder()
-            .setPath(log.getPath())
-            .setLogPattern(log.getLogPattern())
-            .setArchivePattern(log.getArchivePattern())
-            .setLogLevel(log.getLevel())
-            .setLogName(log.getName())
-            .setMaxHistory(log.getMaxHistory())
-            .setTotalSizeCap(log.getTotalSizeCap())
-            .addLogger("io.netty.channel.ChannelHandlerMask", Level.INFO)
-            .build()
-            .configure();
+                .setPath(log.getPath())
+                .setLogPattern(log.getLogPattern())
+                .setArchivePattern(log.getArchivePattern())
+                .setLogLevel(log.getLevel())
+                .setLogName(log.getName())
+                .setMaxHistory(log.getMaxHistory())
+                .setTotalSizeCap(log.getTotalSizeCap())
+                .addLogger("io.netty.channel.ChannelHandlerMask", Level.INFO)
+                .build()
+                .configure();
     }
 
     private static void registerShutdownHook(TunnelServer tunnelServer) {
