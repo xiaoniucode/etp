@@ -9,4 +9,9 @@ public class Error implements Message{
         return error;
     }
     public void setError(String error) {}
+
+    @Override
+    public char getType() {
+        return Message.TYPE_ERROR;
+    }
 }

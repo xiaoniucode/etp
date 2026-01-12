@@ -24,4 +24,9 @@ public class NewVisitorConn implements Message{
     public void setLocalPort(Integer localPort) {
         this.localPort = localPort;
     }
+
+    @Override
+    public char getType() {
+        return Message.TYPE_NEW_VISITOR_CONN;
+    }
 }

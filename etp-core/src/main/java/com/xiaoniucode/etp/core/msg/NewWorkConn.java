@@ -27,4 +27,9 @@ public class NewWorkConn implements Message{
     public void setSessionId(Long sessionId) {
         this.sessionId = sessionId;
     }
+
+    @Override
+    public char getType() {
+        return Message.TYPE_NEW_WORK_CONN;
+    }
 }

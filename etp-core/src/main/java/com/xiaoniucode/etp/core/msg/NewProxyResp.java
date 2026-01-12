@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.core.msg;
 
-public class NewProxyResp implements Message{
+public class NewProxyResp implements Message {
     private Integer proxyId;
     private String remoteAddr;
     private Long sessionId;
@@ -38,5 +38,10 @@ public class NewProxyResp implements Message{
 
     public void setSessionId(Long sessionId) {
         this.sessionId = sessionId;
+    }
+
+    @Override
+    public char getType() {
+        return Message.TYPE_NEW_PROXY_RESP;
     }
 }

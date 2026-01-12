@@ -24,4 +24,9 @@ public class NewVisitorConnResp implements Message{
     public void setSessionId(Long sessionId) {
         this.sessionId = sessionId;
     }
+
+    @Override
+    public char getType() {
+        return Message.TYPE_NEW_VISITOR_CONN_RESP;
+    }
 }

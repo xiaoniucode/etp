@@ -22,4 +22,9 @@ public class CloseProxy implements Message{
     public void setProxyId(Integer proxyId) {
         this.proxyId = proxyId;
     }
+
+    @Override
+    public char getType() {
+        return Message.TYPE_CLOSE_PROXY;
+    }
 }

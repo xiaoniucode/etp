@@ -17,8 +17,8 @@ public class MessageHandlerFactory {
 
     static {
         HANDLERS.put(CloseProxy.class, new CloseProxyHandler());
-        HANDLERS.put(NewWorkConn.class, new NewVisitorConnHandler());
-        HANDLERS.put(Transfer.class, new NewWorkConnHandler());
+        HANDLERS.put(NewVisitorConn.class, new NewVisitorConnHandler());
+        HANDLERS.put(NewWorkConn.class, new NewWorkConnHandler());
         HANDLERS.put(Error.class, new ErrorChannelHandler());
         HANDLERS.put(NewProxyResp.class, new NewProxyRespHandler());
     }

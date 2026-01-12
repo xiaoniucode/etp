@@ -13,4 +13,9 @@ public class UnregisterProxy implements Message{
     public void setProxyId(Integer proxyId) {
         this.proxyId = proxyId;
     }
+
+    @Override
+    public char getType() {
+        return Message.TYPE_UNREGISTER_PROXY;
+    }
 }

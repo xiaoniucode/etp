@@ -11,6 +11,8 @@ public interface Message {
     char TYPE_START_WORK_CONN = 's';
     char TYPE_NEW_VISITOR_CONN = 'v';
     char TYPE_NEW_VISITOR_CONN_RESP = '3';
+    char TYPE_UNREGISTER_PROXY = 'u';
+    char TYPE_ERROR = 'e';
     char TYPE_PING = 'h';
     char TYPE_PONG = '4';
     char getType();
