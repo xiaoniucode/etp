@@ -13,7 +13,15 @@ public class SerializerFactory {
     static {
         registerSerializer(new LoginSerializer());
         registerSerializer(new NewWorkConnSerializer());
+        registerSerializer(new CloseProxySerializer());
+        registerSerializer(new ErrorSerializer());
+        registerSerializer(new NewProxyRespSerializer());
+        registerSerializer(new NewProxySerializer());
+        registerSerializer(new NewVisitorConnRespSerializer());
+        registerSerializer(new NewVisitorConnSerializer());
         registerSerializer(new PingSerializer());
+        registerSerializer(new PongSerializer());
+        registerSerializer(new UnregisterProxySerializer());
     }
     
     /**

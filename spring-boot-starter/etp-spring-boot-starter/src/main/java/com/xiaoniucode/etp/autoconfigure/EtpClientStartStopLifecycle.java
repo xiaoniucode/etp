@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.autoconfigure;
 
-import com.xiaoniucode.etp.client.ChannelManager;
+import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.client.ProxyRegisterClient;
 import com.xiaoniucode.etp.client.TunnelClient;
 import com.xiaoniucode.etp.common.StringUtils;

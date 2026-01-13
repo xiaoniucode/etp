@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
-import com.xiaoniucode.etp.core.ChannelUtils;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.Message;

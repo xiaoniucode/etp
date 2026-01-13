@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.client;
+package com.xiaoniucode.etp.client.security;
 
 import com.xiaoniucode.etp.core.AbstractTlsContextFactory;
 import io.netty.handler.ssl.SslContext;

@@ -1,7 +1,6 @@
-package com.xiaoniucode.etp.core;
+package com.xiaoniucode.etp.core.utils;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
 import org.xerial.snappy.Snappy;
 

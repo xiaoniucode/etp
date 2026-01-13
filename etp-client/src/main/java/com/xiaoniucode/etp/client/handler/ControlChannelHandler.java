@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.handler;
 
-import com.xiaoniucode.etp.client.ChannelManager;
+import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.MessageHandler;
 import com.xiaoniucode.etp.core.msg.Message;

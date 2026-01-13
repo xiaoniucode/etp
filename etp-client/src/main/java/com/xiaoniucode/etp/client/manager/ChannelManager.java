@@ -1,6 +1,6 @@
-package com.xiaoniucode.etp.client;
+package com.xiaoniucode.etp.client.manager;
 
-import com.xiaoniucode.etp.core.ChannelUtils;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
