@@ -1,19 +1,21 @@
 package com.xiaoniucode.etp.core.msg;
 
 public interface Message {
-    char TYPE_LOGIN = 'o';
-    char TYPE_LOGIN_RESP = '1';
-    char TYPE_NEW_PROXY = 'p';
-    char TYPE_NEW_PROXY_RESP = '2';
-    char TYPE_CLOSE_PROXY = 'c';
-    char TYPE_NEW_WORK_CONN = 'w';
-    char TYPE_REQ_WORK_CONN = 'r';
-    char TYPE_START_WORK_CONN = 's';
-    char TYPE_NEW_VISITOR_CONN = 'v';
-    char TYPE_NEW_VISITOR_CONN_RESP = '3';
-    char TYPE_UNREGISTER_PROXY = 'u';
-    char TYPE_ERROR = 'e';
-    char TYPE_PING = 'h';
-    char TYPE_PONG = '4';
-    char getType();
+
+    byte TYPE_LOGIN                 = 0x6F;  // 'o'
+    byte TYPE_LOGIN_RESP            = 0x31;  // '1'
+    byte TYPE_NEW_PROXY             = 0x70;  // 'p'
+    byte TYPE_NEW_PROXY_RESP        = 0x32;  // '2'
+    byte TYPE_CLOSE_PROXY           = 0x63;  // 'c'
+    byte TYPE_NEW_WORK_CONN         = 0x77;  // 'w'
+    byte TYPE_REQ_WORK_CONN         = 0x72;  // 'r'
+    byte TYPE_START_WORK_CONN       = 0x73;  // 's'
+    byte TYPE_NEW_VISITOR_CONN      = 0x76;  // 'v'
+    byte TYPE_NEW_VISITOR_CONN_RESP = 0x33;  // '3'
+    byte TYPE_UNREGISTER_PROXY      = 0x75;  // 'u'
+    byte TYPE_ERROR                 = 0x65;  // 'e'
+    byte TYPE_PING                  = 0x68;  // 'h'
+    byte TYPE_PONG                  = 0x34;  // '4'
+
+    byte getType();
 }

@@ -10,7 +10,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 public class TunnelMessageEncoder extends MessageToByteEncoder<Object> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) {
         if (msg == null) {
             return;
         }
@@ -18,10 +18,11 @@ public class TunnelMessageEncoder extends MessageToByteEncoder<Object> {
             MessageSerializer<Message> serializer = SerializerFactory.getSerializer(message);
             ByteBuf bodyBuf = ctx.alloc().ioBuffer();
             try {
-                bodyBuf.writeChar(message.getType());
                 serializer.serialize(message, bodyBuf);
-                int totalLength = bodyBuf.readableBytes();
+                //计算总长度：消息类型(1) + 消息体长度
+                int totalLength =1 + bodyBuf.readableBytes();
                 out.writeInt(totalLength);
+                out.writeByte(message.getType());
                 out.writeBytes(bodyBuf);
             } finally {
                 bodyBuf.release();

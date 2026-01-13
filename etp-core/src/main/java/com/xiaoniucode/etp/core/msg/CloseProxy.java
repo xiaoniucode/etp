@@ -24,7 +24,7 @@ public class CloseProxy implements Message{
     }
 
     @Override
-    public char getType() {
+    public byte getType() {
         return Message.TYPE_CLOSE_PROXY;
     }
 }

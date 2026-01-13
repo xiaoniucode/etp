@@ -4,7 +4,7 @@ public class Ping implements Message{
 
 
     @Override
-    public char getType() {
+    public byte getType() {
         return Message.TYPE_PING;
     }
 }

@@ -26,7 +26,7 @@ public class NewVisitorConn implements Message{
     }
 
     @Override
-    public char getType() {
+    public byte getType() {
         return Message.TYPE_NEW_VISITOR_CONN;
     }
 }

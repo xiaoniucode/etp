@@ -41,7 +41,7 @@ public class NewProxyResp implements Message {
     }
 
     @Override
-    public char getType() {
+    public byte getType() {
         return Message.TYPE_NEW_PROXY_RESP;
     }
 }

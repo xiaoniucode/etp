@@ -8,10 +8,12 @@ import java.util.Map;
  * 序列化器工厂，管理所有消息类型的序列化策略
  */
 public class SerializerFactory {
-    private static final Map<Character, MessageSerializer<? extends Message>> SERIALIZER_MAP = new HashMap<>();
+    private static final Map<Byte, MessageSerializer<? extends Message>> SERIALIZER_MAP = new HashMap<>();
     
     static {
         registerSerializer(new LoginSerializer());
+        registerSerializer(new NewWorkConnSerializer());
+        registerSerializer(new PingSerializer());
     }
     
     /**
@@ -25,7 +27,7 @@ public class SerializerFactory {
      * 根据消息类型ID获取序列化器
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Message> MessageSerializer<T> getSerializer(char messageType) {
+    public static <T extends Message> MessageSerializer<T> getSerializer(byte messageType) {
         return (MessageSerializer<T>) SERIALIZER_MAP.get(messageType);
     }
     

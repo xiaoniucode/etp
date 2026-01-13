@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class LoginSerializer implements MessageSerializer<Login> {
     @Override
-    public char getMessageType() {
+    public byte getMessageType() {
         return Message.TYPE_LOGIN;
     }
     

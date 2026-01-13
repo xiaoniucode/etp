@@ -15,7 +15,7 @@ public class UnregisterProxy implements Message{
     }
 
     @Override
-    public char getType() {
+    public byte getType() {
         return Message.TYPE_UNREGISTER_PROXY;
     }
 }

@@ -11,7 +11,7 @@ public class Error implements Message{
     public void setError(String error) {}
 
     @Override
-    public char getType() {
+    public byte getType() {
         return Message.TYPE_ERROR;
     }
 }

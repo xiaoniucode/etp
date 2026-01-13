@@ -36,7 +36,7 @@ public class Login implements Message{
     }
 
     @Override
-    public char getType() {
+    public byte getType() {
         return Message.TYPE_LOGIN;
     }
 }
