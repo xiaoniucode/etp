@@ -18,30 +18,39 @@ public class TunnelMessageDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        if (in.readableBytes() < 5) {
+        if (in.readableBytes() < 6) {
             return;
         }
         in.markReaderIndex();
         int totalLength = in.readInt();
-        if (totalLength < 1 || in.readableBytes() < totalLength) {
+        if (totalLength < 2 || in.readableBytes() < totalLength) {
             in.resetReaderIndex();
             return;
         }
         byte messageType = in.readByte();
-        int bodyLength = totalLength - 1;
+        byte useCompress = in.readByte();
+        int bodyLength = totalLength - 2;
         ByteBuf bodyBuf = in.readRetainedSlice(bodyLength);
 
         try {
-            ByteBuf decompressedBodyBuf = decompressData(bodyBuf, ctx);
+            boolean isCompressed = (useCompress & 0x01) != 0;
+            ByteBuf finalBodyBuf;
+            
+            if (isCompressed) {
+                finalBodyBuf = decompressData(bodyBuf, ctx);
+            } else {
+                finalBodyBuf = bodyBuf.retain();
+            }
+            
             MessageSerializer<?> serializer = SerializerFactory.getSerializer(messageType);
             if (serializer == null) {
                 throw new IllegalArgumentException("serializer not found");
             }
-            Object message = serializer.deserialize(decompressedBodyBuf);
+            Object message = serializer.deserialize(finalBodyBuf);
             if (message != null) {
                 out.add(message);
             }
-            decompressedBodyBuf.release();
+            finalBodyBuf.release();
         } catch (Exception e) {
             bodyBuf.release();
             in.resetReaderIndex();
@@ -55,14 +64,17 @@ public class TunnelMessageDecoder extends ByteToMessageDecoder {
             return compressedData.retain();
         }
         int compressedLength = compressedData.readableBytes();
+
         try {
             byte[] dataToDecompress = new byte[compressedLength];
             compressedData.getBytes(compressedData.readerIndex(), dataToDecompress);
             byte[] decompressedData = Snappy.uncompress(dataToDecompress);
-            
             logger.debug("解压前大小: {}, 解压后大小: {}, 解压率: {}%", compressedLength, decompressedData.length,
-                String.format("%.2f", ((double)decompressedData.length / compressedLength) * 100));
-            return Unpooled.wrappedBuffer(decompressedData);
+                    String.format("%.2f", ((double) decompressedData.length / compressedLength) * 100));
+            
+            ByteBuf resultBuf = Unpooled.wrappedBuffer(decompressedData);
+            resultBuf.readerIndex(0);
+            return resultBuf;
 
         } catch (Exception e) {
             compressedData.resetReaderIndex();

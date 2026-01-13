@@ -1,6 +1,6 @@
 host = "0.0.0.0"
 bindPort = 9527
-httpProxyPort=8080
+httpProxyPort = 8080
 # TLS
 tls = false
 [keystore]
@@ -15,13 +15,13 @@ name = "客户端"
 name = "web"
 type = "http"
 localPort = 8081
-domains = ["a.local.cc","b.local.cc"]
-status=1 #是否开启代理
+domains = ["a.local.cc", "b.local.cc"]
+status = 1 #是否开启代理
 [[clients.proxies]]
 name = "mysql"
 type = "tcp"
 localPort = 3306
-status=1 #是否开启代理
+status = 1 #是否开启代理
 #日志
 [log]
 level = "debug"
