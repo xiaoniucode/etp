@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.core.msg.UnregisterProxy;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
-import com.xiaoniucode.etp.server.manager.RuntimeState;
+import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.ConfigStore;
 import io.netty.channel.ChannelHandlerContext;
@@ -25,7 +25,7 @@ public class UnregisterProxyHandler implements MessageHandler {
     private final Logger logger = LoggerFactory.getLogger(UnregisterProxyHandler.class);
     private final static ConfigStore configStore = ConfigStore.get();
     private final static AppConfig config = AppConfig.get();
-    private final static RuntimeState state = RuntimeState.get();
+    private final static RuntimeStateManager state = RuntimeStateManager.get();
 
     @Override
     public void handle(ChannelHandlerContext ctx, Message msg) {

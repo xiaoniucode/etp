@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.core.msg.NewVisitorConn;
 import com.xiaoniucode.etp.core.msg.NewWorkConn;
 import com.xiaoniucode.etp.server.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
-import com.xiaoniucode.etp.server.manager.RuntimeState;
+import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -27,7 +27,7 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     /**
      * 运行时状态信息管理器
      */
-    private final RuntimeState runtimeState = RuntimeState.get();
+    private final RuntimeStateManager runtimeState = RuntimeStateManager.get();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {

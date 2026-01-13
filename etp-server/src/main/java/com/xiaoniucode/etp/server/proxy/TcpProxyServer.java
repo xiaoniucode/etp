@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.server.handler.visitor.TcpVisitorHandler;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.PortAllocator;
-import com.xiaoniucode.etp.server.manager.RuntimeState;
+import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import com.xiaoniucode.etp.server.config.*;
@@ -42,7 +42,7 @@ public final class TcpProxyServer implements Lifecycle {
      */
     private final Map<Integer, Channel> remotePortChannelMapping = new ConcurrentHashMap<>();
     private final PortAllocator portAllocator;
-    private final RuntimeState state = RuntimeState.get();
+    private final RuntimeStateManager state = RuntimeStateManager.get();
 
     private TcpProxyServer() {
         this.portAllocator = PortAllocator.get();

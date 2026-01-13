@@ -18,14 +18,14 @@ import java.util.concurrent.CopyOnWriteArraySet;
  *
  * @author liuxin
  */
-public final class RuntimeState {
-    private final Logger logger = LoggerFactory.getLogger(RuntimeState.class);
-    private static final RuntimeState INSTANCE = new RuntimeState();
+public final class RuntimeStateManager {
+    private final Logger logger = LoggerFactory.getLogger(RuntimeStateManager.class);
+    private static final RuntimeStateManager INSTANCE = new RuntimeStateManager();
 
-    private RuntimeState() {
+    private RuntimeStateManager() {
     }
 
-    public static RuntimeState get() {
+    public static RuntimeStateManager get() {
         return INSTANCE;
     }
 

@@ -7,7 +7,7 @@ import com.xiaoniucode.etp.core.msg.Error;
 import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.core.msg.NewProxy;
 import com.xiaoniucode.etp.core.msg.NewProxyResp;
-import com.xiaoniucode.etp.server.manager.RuntimeState;
+import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import com.xiaoniucode.etp.server.web.ConfigService;
 import com.xiaoniucode.etp.server.web.server.BizException;
 import io.netty.channel.Channel;
@@ -71,7 +71,7 @@ public class NewProxyHandler implements MessageHandler {
         String name = newProxy.getName();
         int remotePort = newProxy.getRemotePort();
         boolean start = newProxy.getAutoStart();
-        Integer clientId = RuntimeState.get().getClient(secretKey).getClientId();
+        Integer clientId = RuntimeStateManager.get().getClient(secretKey).getClientId();
         JSONObject body = new JSONObject();
         body.put("clientId", clientId);
         body.put("secretKey", secretKey);

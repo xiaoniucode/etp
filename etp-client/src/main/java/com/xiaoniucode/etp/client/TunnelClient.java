@@ -8,6 +8,7 @@ import com.xiaoniucode.etp.client.utils.OSUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.Lifecycle;
+import com.xiaoniucode.etp.core.event.EventBus;
 import com.xiaoniucode.etp.core.msg.Login;
 import com.xiaoniucode.etp.core.codec.TunnelMessageCodec;
 import com.xiaoniucode.etp.core.IdleCheckHandler;
@@ -18,9 +19,12 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
+
 import java.util.function.Consumer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import javax.net.ssl.SSLEngine;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class TunnelClient implements Lifecycle {
     private final static Logger logger = LoggerFactory.getLogger(TunnelClient.class);
     private final static TunnelClient INSTANCE = new TunnelClient();
-    private  volatile boolean stop = false;
+    private volatile boolean stop = false;
     private String serverAddr;
     private int serverPort;
     private String secretKey;
@@ -77,6 +81,7 @@ public final class TunnelClient implements Lifecycle {
     public static TunnelClient get() {
         return INSTANCE;
     }
+
     @SuppressWarnings("all")
     @Override
     public void start() {
@@ -128,7 +133,7 @@ public final class TunnelClient implements Lifecycle {
                         }
                     });
             ChannelManager.initBootstraps(controlBootstrap, realBootstrap);
-            if (!stop){
+            if (!stop) {
                 //连接到服务器
                 connectTunnelServer();
             }

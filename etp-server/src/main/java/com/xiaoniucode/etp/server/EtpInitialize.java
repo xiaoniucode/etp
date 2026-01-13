@@ -7,7 +7,7 @@ import com.xiaoniucode.etp.server.config.Dashboard;
 import com.xiaoniucode.etp.server.config.PortRange;
 import com.xiaoniucode.etp.server.config.ProxyMapping;
 import com.xiaoniucode.etp.server.manager.PortAllocator;
-import com.xiaoniucode.etp.server.manager.RuntimeState;
+import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import com.xiaoniucode.etp.server.web.ConfigService;
 import com.xiaoniucode.etp.server.web.ConfigStore;
 import com.xiaoniucode.etp.server.web.SQLiteUtils;
@@ -29,7 +29,7 @@ import java.util.Locale;
 public final class EtpInitialize {
     private static final Logger logger = LoggerFactory.getLogger(EtpInitialize.class);
     private final static ConfigStore configStore = ConfigStore.get();
-    private final static RuntimeState runtimeState = RuntimeState.get();
+    private final static RuntimeStateManager runtimeState = RuntimeStateManager.get();
     private final static AppConfig config = AppConfig.get();
     private static SQLiteTransactionTemplate TX;
 

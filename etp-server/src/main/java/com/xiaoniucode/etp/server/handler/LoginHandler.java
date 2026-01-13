@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.core.msg.Login;
 import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
-import com.xiaoniucode.etp.server.manager.RuntimeState;
+import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class LoginHandler extends AbstractTunnelMessageHandler {
     private final Logger logger = LoggerFactory.getLogger(LoginHandler.class);
-    private final RuntimeState state = RuntimeState.get();
+    private final RuntimeStateManager state = RuntimeStateManager.get();
 
     @Override
     protected void doHandle(ChannelHandlerContext ctx, Message msg) {

@@ -12,7 +12,7 @@ import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ClientInfo;
 import com.xiaoniucode.etp.server.config.ProxyMapping;
-import com.xiaoniucode.etp.server.manager.RuntimeState;
+import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import com.xiaoniucode.etp.server.web.digest.DigestUtil;
 import com.xiaoniucode.etp.server.web.manager.CaptchaHolder;
 import com.xiaoniucode.etp.server.web.manager.TokenAuthService;
@@ -35,7 +35,7 @@ public final class ConfigService {
     private static Logger logger = LoggerFactory.getLogger(ConfigService.class);
     private final static ConfigStore configStore = ConfigStore.get();
     private final static AppConfig config = AppConfig.get();
-    private final static RuntimeState state = RuntimeState.get();
+    private final static RuntimeStateManager state = RuntimeStateManager.get();
     private static final SQLiteTransactionTemplate TX = new SQLiteTransactionTemplate();
 
     public static int addClient(JSONObject client) {
