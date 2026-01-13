@@ -2,12 +2,17 @@ package com.xiaoniucode.etp.server.web.server;
 
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,13 +46,20 @@ public class NettyWebServer implements WebServer {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossEventLoopGroup, workerEventLoopGroup)
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())
+                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .childOption(ChannelOption.SO_BACKLOG, 1024)
+                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
                             ch.pipeline()
+                                    .addLast(new IdleStateHandler(0, 0, 60))
                                     .addLast(new HttpServerCodec())
+                                    .addLast(new HttpContentCompressor())
                                     .addLast(new HttpObjectAggregator(64 * 1024))
                                     .addLast(new ChunkedWriteHandler())
+                                    .addLast(new FlushConsolidationHandler(256, true))
                                     .addLast(new HttpRequestHandler(filters, router));
                         }
                     });
