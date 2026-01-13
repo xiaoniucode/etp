@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class EtpTestApplicationTests {
@@ -85,6 +87,7 @@ class EtpTestApplicationTests {
     void testBatchInsert() {
         //1k 1w 5w 10w 20w
         long start = System.currentTimeMillis();
+        ArrayList<User2> batch = new ArrayList<>();
         for (int i = 0; i < 10_0000; i++) {
             User2 user = new User2()
                     .setUsername("xiaoniucode")
@@ -92,8 +95,14 @@ class EtpTestApplicationTests {
                     .setRemark("一笑江湖")
                     .setEmail("xiaoniucode@gmail.com")
                     .setNickname("令狐冲");
-            user2Repository.save(user);
-            System.out.println("insert " + i);
+            if (batch.size()<20000){
+                batch.add(user);
+            }else {
+                user2Repository.saveAll(batch);
+                System.out.println("save " + batch.size());
+                batch.clear();
+
+            }
         }
         long end = System.currentTimeMillis();
         System.out.println("time:" + (end - start));

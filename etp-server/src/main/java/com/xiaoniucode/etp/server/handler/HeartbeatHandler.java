@@ -17,6 +17,5 @@ public class HeartbeatHandler extends AbstractTunnelMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, Message msg) {
         ctx.channel().writeAndFlush(new Pong());
-        logger.debug("连接心跳检查");
     }
 }

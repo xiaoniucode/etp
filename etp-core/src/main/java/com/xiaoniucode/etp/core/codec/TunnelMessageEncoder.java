@@ -67,27 +67,13 @@ public class TunnelMessageEncoder extends MessageToByteEncoder<Object> {
             return originalData.retain();
         }
         int originalLength = originalData.readableBytes();
-
-        if (originalLength < COMPRESSION_THRESHOLD) {
-            logger.debug("数据大小 {} 小于阈值 {}, 跳过压缩", originalLength, COMPRESSION_THRESHOLD);
-            return originalData.retain();
-        }
-
         try {
             byte[] dataToCompress = new byte[originalLength];
             originalData.getBytes(originalData.readerIndex(), dataToCompress);
             byte[] compressedData = Snappy.compress(dataToCompress);
-
-            if (compressedData.length >= originalLength) {
-                logger.debug("压缩前大小: {}, 压缩后大小: {}, 压缩率: {}", originalLength, compressedData.length, "无效");
-                originalData.resetReaderIndex();
-                return originalData.retain();
-            }
-
             logger.debug("压缩前大小: {}, 压缩后大小: {}, 压缩率: {}%", originalLength, compressedData.length,
                     String.format("%.2f", (1 - (double) compressedData.length / originalLength) * 100));
             return Unpooled.wrappedBuffer(compressedData);
-
         } catch (Exception e) {
             originalData.resetReaderIndex();
             return originalData.retain();
