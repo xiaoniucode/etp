@@ -68,7 +68,6 @@ public class TunnelServer implements Lifecycle {
                                     .addLast((new TunnelMessageCodec()))
                                     .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
                                     .addLast(new FlushConsolidationHandler(256, true))
-                                    .addLast(new HttpServerKeepAliveHandler())
                                     .addLast(new ControlTunnelHandler());
                         }
                     });

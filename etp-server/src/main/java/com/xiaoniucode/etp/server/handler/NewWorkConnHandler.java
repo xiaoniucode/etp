@@ -20,8 +20,9 @@ public class NewWorkConnHandler extends AbstractTunnelMessageHandler {
             Channel visitorChannel = dataChannel.attr(EtpConstants.VISITOR_CHANNEL).get();
             if (visitorChannel != null && visitorChannel.isActive()) {
                 dataChannel.config().setAutoRead(visitorChannel.isWritable());
-
-                visitorChannel.writeAndFlush(workConn.getPayload().retain());
+                if (workConn.getPayload().refCnt() > 0) {
+                    visitorChannel.writeAndFlush(workConn.getPayload().retain());
+                }
             }
         }
     }

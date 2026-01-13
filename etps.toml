@@ -21,7 +21,7 @@ status=1 #是否开启代理
 name = "mysql"
 type = "tcp"
 localPort = 3306
-status=0 #是否开启代理
+status=1 #是否开启代理
 #日志
 [log]
 level = "debug"

@@ -12,11 +12,33 @@ public class NewWorkConnSerializer implements MessageSerializer<NewWorkConn> {
 
     @Override
     public void serialize(NewWorkConn message, ByteBuf out) {
+        ByteBuf payload = message.getPayload();
+        int payloadLength = payload.readableBytes();
+        out.writeInt(payloadLength);
+        out.writeBytes(payload.duplicate());
 
+        if (message.getSessionId() != null) {
+            out.writeBoolean(true);
+            out.writeLong(message.getSessionId());
+        } else {
+            out.writeBoolean(false);
+        }
     }
 
     @Override
     public NewWorkConn deserialize(ByteBuf in) {
-        return null;
+        int payloadLength = in.readInt();
+        ByteBuf payload = in.readRetainedSlice(payloadLength);
+        
+        boolean hasSessionId = in.readBoolean();
+        Long sessionId = null;
+        if (hasSessionId) {
+            sessionId = in.readLong();
+        }
+        if (sessionId != null) {
+            return new NewWorkConn(payload, sessionId);
+        } else {
+            return new NewWorkConn(payload);
+        }
     }
 }

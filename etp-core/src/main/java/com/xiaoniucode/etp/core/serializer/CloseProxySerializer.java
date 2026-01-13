@@ -12,11 +12,26 @@ public class CloseProxySerializer implements MessageSerializer <CloseProxy>{
 
     @Override
     public void serialize(CloseProxy message, ByteBuf out) {
-
+        out.writeLong(message.getSessionId());
+        if (message.getProxyId() != null) {
+            out.writeBoolean(true);
+            out.writeInt(message.getProxyId());
+        } else {
+            out.writeBoolean(false);
+        }
     }
 
     @Override
     public CloseProxy deserialize(ByteBuf in) {
-        return null;
+        long sessionId = in.readLong();
+        boolean hasProxyId = in.readBoolean();
+        Integer proxyId = null;
+        if (hasProxyId) {
+            proxyId = in.readInt();
+        }
+
+        CloseProxy closeProxy = new CloseProxy(sessionId);
+        closeProxy.setProxyId(proxyId);
+        return closeProxy;
     }
 }

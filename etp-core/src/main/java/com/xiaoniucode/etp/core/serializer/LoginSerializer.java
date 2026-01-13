@@ -17,11 +17,8 @@ public class LoginSerializer implements MessageSerializer<Login> {
     
     @Override
     public void serialize(Login login, ByteBuf out) {
-        // 序列化secretKey
         serializeString(out, login.getSecretKey());
-        // 序列化os
         serializeString(out, login.getOs());
-        // 序列化arch
         serializeString(out, login.getArch());
     }
     
@@ -33,14 +30,12 @@ public class LoginSerializer implements MessageSerializer<Login> {
         return new Login(secretKey, os, arch);
     }
     
-    // 通用字符串序列化方法
     private void serializeString(ByteBuf out, String value) {
         byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
         out.writeInt(bytes.length);
         out.writeBytes(bytes);
     }
     
-    // 通用字符串反序列化方法
     private String deserializeString(ByteBuf in) {
         int length = in.readInt();
         byte[] bytes = new byte[length];

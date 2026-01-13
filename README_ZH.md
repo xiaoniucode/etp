@@ -2,7 +2,7 @@
   <img src="doc/logo.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
 </div>
 <p align="center" style="font-size:18px;color:#555;margin-top:-10px;margin-bottom:24px;">
-  基于Netty实现的内网穿透
+  由Netty驱动的内网穿透隧道
 </p>
 <div align="center">
   <a href="https://github.com/xiaoniucode/etp/stargazers">
@@ -25,7 +25,7 @@
 
 <div align="center">
   <a href="README.md"><strong>README</strong></a> &nbsp;|&nbsp;
-  <a href="README_ZH.md"><strong>中文文档</strong></a> &nbsp;|&nbsp;
+  <a href="README_ZH.md"><strong>简体中文</strong></a> &nbsp;|&nbsp;
   <a href="https://xiaoniucode.github.io/etp"><strong>文档地址</strong></a>
 </div>
 

@@ -12,11 +12,12 @@ public class UnregisterProxySerializer implements MessageSerializer<UnregisterPr
 
     @Override
     public void serialize(UnregisterProxy message, ByteBuf out) {
-
+        out.writeInt(message.getProxyId());
     }
 
     @Override
     public UnregisterProxy deserialize(ByteBuf in) {
-        return null;
+        int proxyId = in.readInt();
+        return new UnregisterProxy(proxyId);
     }
 }

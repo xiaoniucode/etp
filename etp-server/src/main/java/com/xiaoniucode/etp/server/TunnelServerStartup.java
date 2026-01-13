@@ -63,7 +63,8 @@ public class TunnelServerStartup {
             // todo 测试数据
             Map<String, Integer> domains = new HashMap<>();
             domains.put("a.local.cc", 8081);
-            domains.put("b.local.cc", 8082);
+            domains.put("b.local.cc", 3333);
+            domains.put("c.local.cc", 3000);
             domains.put("localhost", 8081);
             HttpProxyServer httpProxyServer = HttpProxyServer.get();
             httpProxyServer.setDomainMapping(domains);

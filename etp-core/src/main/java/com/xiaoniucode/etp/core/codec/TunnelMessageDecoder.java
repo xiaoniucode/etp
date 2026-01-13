@@ -20,17 +20,15 @@ public class TunnelMessageDecoder extends ByteToMessageDecoder {
             return;
         }
         in.markReaderIndex();
+        int totalLength = in.readInt();
+        if (totalLength < 1 || in.readableBytes() < totalLength) {
+            in.resetReaderIndex();
+            return;
+        }
+        byte messageType = in.readByte();
+        int bodyLength = totalLength - 1;
+        ByteBuf bodyBuf = in.readRetainedSlice(bodyLength);
         try {
-            int totalLength = in.readInt();
-            if (totalLength < 1 || in.readableBytes() < totalLength) {
-                in.resetReaderIndex();
-                return;
-            }
-            byte messageType = in.readByte();
-
-            //读取消息体
-            int bodyLength = totalLength - 1; // 总长度 - 消息类型(1)
-            ByteBuf bodyBuf = in.readSlice(bodyLength);
             MessageSerializer<?> serializer = SerializerFactory.getSerializer(messageType);
             if (serializer == null) {
                 throw new IllegalArgumentException("serializer not found");
@@ -40,6 +38,7 @@ public class TunnelMessageDecoder extends ByteToMessageDecoder {
                 out.add(message);
             }
         } catch (Exception e) {
+            bodyBuf.release();
             in.resetReaderIndex();
             logger.error("decode error", e);
         }

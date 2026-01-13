@@ -3,7 +3,6 @@ package com.xiaoniucode.etp.client.handler;
 import com.xiaoniucode.etp.core.MessageHandler;
 import com.xiaoniucode.etp.core.msg.*;
 import com.xiaoniucode.etp.core.msg.Error;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +21,6 @@ public class MessageHandlerFactory {
         HANDLERS.put(Error.class, new ErrorChannelHandler());
         HANDLERS.put(NewProxyResp.class, new NewProxyRespHandler());
     }
-
     public static MessageHandler getHandler(Message type) {
         return HANDLERS.get(type.getClass());
     }

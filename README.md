@@ -25,7 +25,7 @@
 
 <div align="center">
   <a href="README.md"><strong>README</strong></a> &nbsp;|&nbsp;
-  <a href="README_ZH.md"><strong>中文文档</strong></a> &nbsp;|&nbsp;
+  <a href="README_ZH.md"><strong>简体中文</strong></a> &nbsp;|&nbsp;
   <a href="https://xiaoniucode.github.io/etp"><strong>Documentation</strong></a>
 </div>
 
