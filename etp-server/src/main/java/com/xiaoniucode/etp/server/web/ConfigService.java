@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.web;
 
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
+import com.xiaoniucode.etp.core.msg.KickoutClient;
 import com.xiaoniucode.etp.server.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.config.AuthInfo;
 import com.xiaoniucode.etp.server.config.PortRange;
@@ -17,6 +18,7 @@ import com.xiaoniucode.etp.server.web.manager.CaptchaHolder;
 import com.xiaoniucode.etp.server.web.manager.TokenAuthService;
 import com.xiaoniucode.etp.server.web.server.BizException;
 import com.xiaoniucode.etp.server.web.transaction.SQLiteTransactionTemplate;
+import io.netty.channel.Channel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -298,8 +300,10 @@ public final class ConfigService {
      */
     public static void kickoutClient(JSONObject req) {
         String secretKey = req.getString("secretKey");
-        //关闭客户端控制隧道，同时关闭所有连接
-        ChannelManager.closeControlChannelByClient(secretKey);
+        Channel control = ChannelManager.getControlChannelBySecretKey(secretKey);
+        if (control != null) {
+            control.writeAndFlush(new KickoutClient());
+        }
     }
 
     public static JSONObject getClient(JSONObject req) {

@@ -13,6 +13,7 @@ import com.xiaoniucode.etp.server.config.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.flush.FlushConsolidationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,7 @@ public final class TcpProxyServer implements Lifecycle {
                     @Override
                     protected void initChannel(SocketChannel sc) {
                         sc.pipeline().addLast(new TrafficMetricsHandler());
+                        sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
                         sc.pipeline().addLast(new TcpVisitorHandler());
                     }
                 });

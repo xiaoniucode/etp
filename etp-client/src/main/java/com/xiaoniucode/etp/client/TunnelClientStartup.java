@@ -32,26 +32,30 @@ public class TunnelClientStartup {
         initLogback();
         Config config = Config.get();
         registerShutdownHook();
-        tunnelClient = new TunnelClient(config.getServerAddr(), config.getServerPort(), config.getSecretKey(), config.isTls());
+        tunnelClient = TunnelClient.get();
         tunnelClient.setMaxDelaySec(config.getMaxDelaySec());
         tunnelClient.setInitialDelaySec(config.getInitialDelaySec());
         tunnelClient.setMaxRetries(config.getMaxRetries());
+        tunnelClient.setServerAddr(config.getServerAddr());
+        tunnelClient.setServerPort(config.getServerPort());
+        tunnelClient.setSecretKey(config.getSecretKey());
+        tunnelClient.setTls(config.isTls());
         tunnelClient.start();
     }
 
     private static void initLogback() {
         LogConfig log = Config.get().getLogConfig();
         new LogbackConfigurator.Builder()
-            .setPath(log.getPath())
-            .setLogPattern(log.getLogPattern())
-            .setArchivePattern(log.getArchivePattern())
-            .setLogLevel(log.getLevel())
-            .setLogName(log.getName())
-            .setMaxHistory(log.getMaxHistory())
-            .setTotalSizeCap(log.getTotalSizeCap())
-            .addLogger("io.netty.channel.ChannelHandlerMask", Level.INFO)
-            .build()
-            .configure();
+                .setPath(log.getPath())
+                .setLogPattern(log.getLogPattern())
+                .setArchivePattern(log.getArchivePattern())
+                .setLogLevel(log.getLevel())
+                .setLogName(log.getName())
+                .setMaxHistory(log.getMaxHistory())
+                .setTotalSizeCap(log.getTotalSizeCap())
+                .addLogger("io.netty.channel.ChannelHandlerMask", Level.INFO)
+                .build()
+                .configure();
     }
 
     private static void registerShutdownHook() {

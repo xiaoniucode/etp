@@ -18,12 +18,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
-
 import java.util.function.Consumer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.net.ssl.SSLEngine;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,8 +30,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author liuxin
  */
-public class TunnelClient implements Lifecycle {
+public final class TunnelClient implements Lifecycle {
     private final static Logger logger = LoggerFactory.getLogger(TunnelClient.class);
+    private final static TunnelClient INSTANCE = new TunnelClient();
+    private  volatile boolean stop = false;
     private String serverAddr;
     private int serverPort;
     private String secretKey;
@@ -72,16 +71,12 @@ public class TunnelClient implements Lifecycle {
      */
     private Consumer<Void> connectSuccessListener;
 
-    public TunnelClient() {
+    private TunnelClient() {
     }
 
-    public TunnelClient(String serverAddr, int serverPort, String secretKey, boolean tls) {
-        this.serverAddr = serverAddr;
-        this.serverPort = serverPort;
-        this.secretKey = secretKey;
-        this.tls = tls;
+    public static TunnelClient get() {
+        return INSTANCE;
     }
-
     @SuppressWarnings("all")
     @Override
     public void start() {
@@ -121,17 +116,23 @@ public class TunnelClient implements Lifecycle {
                             sc.pipeline()
                                     .addLast(new TunnelMessageCodec())
                                     .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
+                                    .addLast(new FlushConsolidationHandler(256, true))
                                     .addLast(new ControlChannelHandler(ctx -> {
                                         // 重置重试计数器
                                         retryCount.set(0);
                                         //服务器断开 执行重试 重新连接
-                                        scheduleReconnect();
+                                        if (!stop) {
+                                            scheduleReconnect();
+                                        }
                                     }));
                         }
                     });
             ChannelManager.initBootstraps(controlBootstrap, realBootstrap);
-            //连接到服务器
-            connectTunnelServer();
+            if (!stop){
+                //连接到服务器
+                connectTunnelServer();
+            }
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -192,6 +193,7 @@ public class TunnelClient implements Lifecycle {
     @Override
     public void stop() {
         if (tunnelWorkerGroup != null) {
+            stop = true;
             tunnelWorkerGroup.shutdownGracefully();
         }
     }

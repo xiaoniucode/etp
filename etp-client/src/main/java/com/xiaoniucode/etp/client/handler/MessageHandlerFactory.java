@@ -20,6 +20,7 @@ public class MessageHandlerFactory {
         HANDLERS.put(NewWorkConn.class, new NewWorkConnHandler());
         HANDLERS.put(Error.class, new ErrorChannelHandler());
         HANDLERS.put(NewProxyResp.class, new NewProxyRespHandler());
+        HANDLERS.put(KickoutClient.class, new KickoutClientHandler());
     }
     public static MessageHandler getHandler(Message type) {
         return HANDLERS.get(type.getClass());

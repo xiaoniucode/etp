@@ -39,7 +39,7 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> 
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         //控制通道断开
         if (ctx.channel() == ChannelManager.getControlChannel()) {
-            logger.debug("与服务端断开连接");
+            logger.debug("断开与代理服务端的连接");
             //清除当前控制通道
             ChannelManager.setControlChannel(null);
             ChannelManager.clearAllRealServerChannel();

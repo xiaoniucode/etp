@@ -22,6 +22,7 @@ public class SerializerFactory {
         registerSerializer(new PingSerializer());
         registerSerializer(new PongSerializer());
         registerSerializer(new UnregisterProxySerializer());
+        registerSerializer(new KickoutClientSerializer());
     }
     
     /**

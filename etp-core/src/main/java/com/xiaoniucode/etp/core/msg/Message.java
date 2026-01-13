@@ -14,6 +14,7 @@ public interface Message {
     byte TYPE_NEW_VISITOR_CONN_RESP = 0x33;  // '3'
     byte TYPE_UNREGISTER_PROXY      = 0x75;  // 'u'
     byte TYPE_ERROR                 = 0x65;  // 'e'
+    byte TYPE_KICKOUT_CLIENT        = 0x6B;  // 'k'
     byte TYPE_PING                  = 0x68;  // 'h'
     byte TYPE_PONG                  = 0x34;  // '4'
 
