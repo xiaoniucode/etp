@@ -24,9 +24,6 @@ import java.net.InetSocketAddress;
  */
 public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final Logger logger = LoggerFactory.getLogger(TcpVisitorHandler.class);
-    /**
-     * 运行时状态信息管理器
-     */
     private final RuntimeStateManager runtimeState = RuntimeStateManager.get();
 
     @Override

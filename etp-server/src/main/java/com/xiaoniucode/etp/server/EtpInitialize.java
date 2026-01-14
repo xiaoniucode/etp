@@ -8,11 +8,10 @@ import com.xiaoniucode.etp.server.config.PortRange;
 import com.xiaoniucode.etp.server.config.ProxyMapping;
 import com.xiaoniucode.etp.server.manager.PortAllocator;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
-import com.xiaoniucode.etp.server.web.ConfigService;
-import com.xiaoniucode.etp.server.web.ConfigStore;
-import com.xiaoniucode.etp.server.web.SQLiteUtils;
+import com.xiaoniucode.etp.server.web.core.orm.JdbcFactory;
+import com.xiaoniucode.etp.server.web.dao.*;
 import com.xiaoniucode.etp.server.web.digest.DigestUtil;
-import com.xiaoniucode.etp.server.web.transaction.SQLiteTransactionTemplate;
+import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -28,10 +27,9 @@ import java.util.Locale;
  */
 public final class EtpInitialize {
     private static final Logger logger = LoggerFactory.getLogger(EtpInitialize.class);
-    private final static ConfigStore configStore = ConfigStore.get();
     private final static RuntimeStateManager runtimeState = RuntimeStateManager.get();
     private final static AppConfig config = AppConfig.get();
-    private static SQLiteTransactionTemplate TX;
+    private static JdbcTransactionTemplate TX;
 
     /**
      * 需要先初始化SQLite配置，如果存在和toml中相同的配置，则不同步到SQLite，否则进行同步
@@ -39,7 +37,7 @@ public final class EtpInitialize {
     public static void initDataConfig() {
         //只有管理面板启动才初始化动态数据
         if (config.getDashboard().getEnable()) {
-            TX = new SQLiteTransactionTemplate();
+            TX = new JdbcTransactionTemplate();
             //如果数据库和表不存在则创建
             initDBTable();
             //注册所有客户端配置
@@ -51,7 +49,7 @@ public final class EtpInitialize {
             //同步系统设置
             syncSystemSettings();
             //每次启动或者重启都删除所有自动注册的映射，避免客户端断线重练导致僵尸映射
-            ConfigService.deleteAllAutoRegisterProxy();
+            DaoFactory.INSTANCE.getProxyDao().deleteAllAutoRegisterProxy();
         }
         //注册和同步Toml静态配
         registerTomlConfig();
@@ -63,12 +61,12 @@ public final class EtpInitialize {
             Boolean enableDashboard = config.getDashboard().getEnable();
             if (enableDashboard) {
                 // 同步端口范围设置
-                JSONObject portRange = ConfigService.getSystemSetting("port_range");
+                JSONObject portRange = DaoFactory.INSTANCE.getSettingDao().getByKey("port_range");
                 if (portRange == null) {
                     JSONObject save = new JSONObject();
                     save.put("key", "port_range");
                     save.put("value", config.getPortRange().getStart() + ":" + config.getPortRange().getEnd());
-                    ConfigService.addSystemSetting(save);
+                    DaoFactory.INSTANCE.getSettingDao().insert(save);
                     logger.info("同步端口范围配置到数据库");
                 } else {
                     //如果数据库存在配置，采用数据库配置作为系统全局配置
@@ -92,18 +90,18 @@ public final class EtpInitialize {
             JSONObject save = new JSONObject();
             save.put("username", username);
             save.put("password", DigestUtil.encode(password, username));
-            JSONObject user = ConfigService.getUserByUsername(username);
+            JSONObject user = DaoFactory.INSTANCE.getUserDao().getByUsername(username);
             //没有直接添加用户
             if (user == null) {
-                ConfigService.registerUser(save);
+                DaoFactory.INSTANCE.getUserDao().insert(save);
                 logger.info("注册用户 {}", username);
             }
             //如果数据库已经存在用户了，如果reset=true则重置
             if (reset) {
                 //删除所有用户
-                ConfigService.deleteAll();
+                DaoFactory.INSTANCE.getUserDao().deleteAll();
                 //重新注册
-                ConfigService.registerUser(save);
+                DaoFactory.INSTANCE.getUserDao().insert(save);
                 logger.info("重置面板用户登录信息 {}", username);
             }
             return null;
@@ -120,12 +118,12 @@ public final class EtpInitialize {
             if (!runtimeState.hasClient(secretKey)) {
                 //如果开启了管理面板，需要将客户端配置同步到数据库
                 if (enableDashboard) {
-                    JSONObject clientName = configStore.getClientByName(name);
+                    JSONObject clientName = DaoFactory.INSTANCE.getClientDao().getByName(name);
                     if (clientName == null) {
                         JSONObject save = new JSONObject();
                         save.put("secretKey", secretKey);
                         save.put("name", name);
-                        clientId = configStore.addClient(save);
+                        clientId = DaoFactory.INSTANCE.getClientDao().insert(save);
                         logger.info("同步静态配置客户端「{}」到数据库", name);
                     } else {
                         logger.warn("无法保存到数据库，已存在同名客户端：{}", clientName);
@@ -152,7 +150,7 @@ public final class EtpInitialize {
                     }
                     //如果开启了管理面板，需要将映射配置同步到数据库
                     if (enableDashboard) {
-                        if (configStore.getProxy(clientId, proxy.getName()) == null) {
+                        if (DaoFactory.INSTANCE.getProxyDao().getProxy(clientId, proxy.getName()) == null) {
                             JSONObject save = new JSONObject();
                             save.put("clientId", clientId);
                             save.put("name", proxy.getName());
@@ -166,11 +164,11 @@ public final class EtpInitialize {
                             if (type.equalsIgnoreCase(ProtocolType.TCP.name())) {
                                 save.put("remotePort", proxy.getRemotePort());
 
-                                proxyId = configStore.addProxy(save);
+                                proxyId = DaoFactory.INSTANCE.getProxyDao().insert(save);
                                 logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", clientId, proxy.getName(), proxy.getRemotePort());
                             }
                             if (type.equalsIgnoreCase(ProtocolType.HTTP.name())) {
-                                proxyId = configStore.addProxy(save);
+                                proxyId = DaoFactory.INSTANCE.getProxyDao().insert(save);
                             }
                         } else {
                             logger.warn("无法保存代理到数据库，存在同名隧道名：{}", proxy.getName());
@@ -190,7 +188,7 @@ public final class EtpInitialize {
     }
 
     private static void registerDBClientConfig() {
-        JSONArray clients = configStore.listClients();
+        JSONArray clients = DaoFactory.INSTANCE.getClientDao().list();
         if (clients != null) {
             for (int i = 0; i < clients.length(); i++) {
                 JSONObject client = clients.getJSONObject(i);
@@ -205,7 +203,7 @@ public final class EtpInitialize {
     }
 
     private static void registerDBProxyConfig() {
-        JSONArray proxies = configStore.listAllProxies(ProtocolType.TCP.name());
+        JSONArray proxies = DaoFactory.INSTANCE.getProxyDao().listAllProxies(ProtocolType.TCP.name());
         if (proxies != null) {
             for (int i = 0; i < proxies.length(); i++) {
                 JSONObject proxy = proxies.getJSONObject(i);
@@ -244,7 +242,7 @@ public final class EtpInitialize {
                 );
                 CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);
                 """;
-        SQLiteUtils.createTable(sql);
+        JdbcFactory.getJdbc().execute(sql);
     }
 
     private static void createAuthTokenTable() {
@@ -259,7 +257,7 @@ public final class EtpInitialize {
                 );
                 CREATE INDEX IF NOT EXISTS idx_auth_tokens_expiredAt ON auth_tokens(expiredAt);
                 """;
-        SQLiteUtils.createTable(sql);
+        JdbcFactory.getJdbc().execute(sql);
     }
 
     private static void createUserTable() {
@@ -270,7 +268,7 @@ public final class EtpInitialize {
                     password TEXT NOT NULL
                 );
                 """;
-        SQLiteUtils.createTable(sql);
+        JdbcFactory.getJdbc().execute(sql);
     }
 
     private static void createProxiesTable() {
@@ -289,7 +287,7 @@ public final class EtpInitialize {
                     updatedAt        TEXT DEFAULT (datetime('now'))      -- 更新时间
                 );
                 """;
-        SQLiteUtils.createTable(sql);
+        JdbcFactory.getJdbc().execute(sql);
     }
 
     private static void createClientTable() {
@@ -303,6 +301,6 @@ public final class EtpInitialize {
                 );
                  CREATE INDEX IF NOT EXISTS idx_clients_name_secretkey ON clients (name, secretKey);
                 """;
-        SQLiteUtils.createTable(sql);
+        JdbcFactory.getJdbc().execute(sql);
     }
 }

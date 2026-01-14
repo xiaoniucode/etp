@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.web.transaction;
+package com.xiaoniucode.etp.server.web.core.orm.transaction;
 
 import java.sql.Connection;
 
@@ -7,7 +7,7 @@ import java.sql.Connection;
  *
  * @author liuxin
  */
-public final class SQLiteConnectionHolder {
+public final class JdbcConnectionHolder {
     private static final ThreadLocal<Connection> CURRENT = new ThreadLocal<>();
 
     public static void set(Connection conn) {

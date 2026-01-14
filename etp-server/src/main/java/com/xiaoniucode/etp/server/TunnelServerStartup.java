@@ -6,13 +6,11 @@ import com.xiaoniucode.etp.common.Constants;
 import com.xiaoniucode.etp.common.LogConfig;
 import com.xiaoniucode.etp.common.LogbackConfigurator;
 import com.xiaoniucode.etp.common.PortChecker;
-import com.xiaoniucode.etp.core.event.EventBus;
-import com.xiaoniucode.etp.core.event.GlobalEventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.proxy.HttpProxyServer;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.DashboardApi;
-import com.xiaoniucode.etp.server.web.server.NettyWebServer;
+import com.xiaoniucode.etp.server.web.core.server.NettyWebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

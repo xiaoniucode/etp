@@ -8,8 +8,8 @@ import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.core.msg.NewProxy;
 import com.xiaoniucode.etp.core.msg.NewProxyResp;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
-import com.xiaoniucode.etp.server.web.ConfigService;
-import com.xiaoniucode.etp.server.web.server.BizException;
+import com.xiaoniucode.etp.server.web.core.server.BizException;
+import com.xiaoniucode.etp.server.web.serivce.ServiceFactory;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.json.JSONObject;
@@ -36,8 +36,7 @@ public class NewProxyHandler implements MessageHandler {
                 String secretKey = controlChannel.attr(EtpConstants.SECRET_KEY).get();
                 if (StringUtils.hasText(secretKey)) {
                     JSONObject body = buildAddReq(newProxy, secretKey);
-                    JSONObject proxy = ConfigService.addTcpProxy(body);
-                    //todo 返回注册结果
+                    JSONObject proxy = ServiceFactory.INSTANCE.getProxyService().addTcpProxy(body);
                     NewProxyResp newProxyResp = new NewProxyResp(proxy.getInt("proxyId"),
                             proxy.getInt("remotePort") + "");
                     ctx.channel().writeAndFlush(newProxyResp);

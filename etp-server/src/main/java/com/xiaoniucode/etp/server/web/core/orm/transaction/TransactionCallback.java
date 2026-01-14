@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.web.transaction;
+package com.xiaoniucode.etp.server.web.core.orm.transaction;
 
 /**
  * 事务回调接口，保证业务逻辑在事务中执行

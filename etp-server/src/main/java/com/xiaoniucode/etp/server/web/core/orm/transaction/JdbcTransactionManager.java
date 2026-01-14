@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.web.transaction;
+package com.xiaoniucode.etp.server.web.core.orm.transaction;
 
 import com.xiaoniucode.etp.common.Constants;
 
@@ -10,19 +10,19 @@ import java.sql.DriverManager;
  *
  * @author liuxin
  */
-public class SQLiteTransactionManager {
+public class JdbcTransactionManager {
     public void begin() {
         try {
             Connection conn = DriverManager.getConnection(Constants.SQLITE_DB_URL);
             conn.setAutoCommit(false);
-            SQLiteConnectionHolder.set(conn);
+            JdbcConnectionHolder.set(conn);
         } catch (Exception e) {
             throw new RuntimeException("无法开启事务", e);
         }
     }
 
     public void commit() {
-        Connection conn = SQLiteConnectionHolder.get();
+        Connection conn = JdbcConnectionHolder.get();
         if (conn != null) {
             try {
                 conn.commit();
@@ -35,7 +35,7 @@ public class SQLiteTransactionManager {
     }
 
     public void rollback() {
-        Connection conn = SQLiteConnectionHolder.get();
+        Connection conn = JdbcConnectionHolder.get();
         if (conn != null) {
             try {
                 conn.rollback();
@@ -52,8 +52,8 @@ public class SQLiteTransactionManager {
      * 释放当前线程数据库连接资源
      */
     private void close() {
-        Connection conn = SQLiteConnectionHolder.get();
-        SQLiteConnectionHolder.clear();
+        Connection conn = JdbcConnectionHolder.get();
+        JdbcConnectionHolder.clear();
         if (conn != null) {
             try {
                 conn.close();

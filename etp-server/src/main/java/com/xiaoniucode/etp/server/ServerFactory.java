@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server;
 
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.web.server.NettyWebServer;
+import com.xiaoniucode.etp.server.web.core.server.NettyWebServer;
 
 /**
  * 服务容器创建工厂

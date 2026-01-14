@@ -2,7 +2,6 @@ package com.xiaoniucode.etp.server.manager;
 
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.PortRange;
-import com.xiaoniucode.etp.server.web.server.BizException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.web.server;
+package com.xiaoniucode.etp.server.web.core.server;
 import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieEncoder;

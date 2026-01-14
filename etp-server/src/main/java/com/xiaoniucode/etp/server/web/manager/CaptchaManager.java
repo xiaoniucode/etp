@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author liuxin
  */
-public class CaptchaHolder {
+public class CaptchaManager {
     private static final Map<String, CaptchaEntry> cache = new ConcurrentHashMap<>();
     private static final ScheduledExecutorService CLEANER = Executors.newSingleThreadScheduledExecutor();
 

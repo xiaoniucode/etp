@@ -3,9 +3,11 @@ package com.xiaoniucode.etp.server.web;
 import com.xiaoniucode.etp.common.JsonUtils;
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
-import com.xiaoniucode.etp.server.web.manager.CaptchaHolder;
-import com.xiaoniucode.etp.server.web.manager.TokenAuthService;
-import com.xiaoniucode.etp.server.web.server.*;
+import com.xiaoniucode.etp.server.web.core.server.Filter;
+import com.xiaoniucode.etp.server.web.core.server.Router;
+import com.xiaoniucode.etp.server.web.core.server.Session;
+import com.xiaoniucode.etp.server.web.manager.CaptchaManager;
+import com.xiaoniucode.etp.server.web.serivce.ServiceFactory;
 import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
 
@@ -39,7 +41,7 @@ public class DashboardApi {
                 return;
             }
             String token = auth.substring(7);
-            JSONObject authtoken = TokenAuthService.validateToken(token);
+            JSONObject authtoken = ServiceFactory.INSTANCE.getAuthTokenService().validateToken(token);
             if (authtoken == null) {
                 context.abortWithResponse(ResponseEntity.error(401, "登录过期，请重新登录").toJson());
                 return;
@@ -54,17 +56,18 @@ public class DashboardApi {
 
     public static void initRoutes(Router router) {
         router.setRoutePrefix("/api");
+        //用户接口
         router.route(HttpMethod.POST, "/user/login", context -> {
             JSONObject req = JsonUtils.toJsonObject(context.getRequestBody());
             Session session = (Session) context.getAttribute("session");
             String captchaId = session.getAttribute("captchaId");
             req.put("captchaId", captchaId);
-            context.setResponseJson(ResponseEntity.ok(ConfigService.login(req)).toJson());
+            context.setResponseJson(ResponseEntity.ok(ServiceFactory.INSTANCE.getUserService().login(req)).toJson());
         });
         router.route(HttpMethod.DELETE, "/user/logout", context -> {
             String auth = context.getHeader("Authorization");
             if (StringUtils.hasText(auth) && auth.startsWith("Bearer ")) {
-                TokenAuthService.invalidateToken(auth.substring(7));
+                ServiceFactory.INSTANCE.getAuthTokenService().invalidateToken(auth.substring(7));
             }
             context.setResponseJson(ResponseEntity.ok().toJson());
         });
@@ -75,7 +78,7 @@ public class DashboardApi {
             try {
                 CaptchaGenerator generator = new CaptchaGenerator();
                 String code = generator.generateCaptcha();
-                String captchaId = CaptchaHolder.put(code, 120);
+                String captchaId = CaptchaManager.put(code, 120);
                 Session session = (Session) context.getAttribute("session");
                 session.setAttribute("captchaId", captchaId);
                 context.addResponseHeader("captchaId", captchaId);
@@ -88,55 +91,58 @@ public class DashboardApi {
             }
         });
         router.route(HttpMethod.PUT, "/user/update", context -> {
-            ConfigService.updateUserPassword((Integer) context.getAttribute("userId"), JsonUtils.toJsonObject(context.getRequestBody()));
+            ServiceFactory.INSTANCE.getUserService().updatePassword((Integer) context.getAttribute("userId"), JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok().toJson());
         });
-        router.route(HttpMethod.GET, "/client/list", context ->
-                context.setResponseJson(ResponseEntity.ok(ConfigService.clients()).toJson()));
-        router.route(HttpMethod.GET, "/client/get", context ->
-                context.setResponseJson(ResponseEntity.ok(ConfigService.getClient(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
-        router.route(HttpMethod.GET, "/proxy/get", context ->
-                context.setResponseJson(ResponseEntity.ok(ConfigService.getProxy(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
-        router.route(HttpMethod.GET, "/proxy/list", context -> {
-                    String type = (String) context.getQueryParam("type");
-                    context.setResponseJson(ResponseEntity.ok(ConfigService.proxies(type)).toJson());
-                }
-        );
+        //数据统计接口
         router.route(HttpMethod.GET, "/metrics", context ->
                 context.setResponseJson(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
         router.route(HttpMethod.GET, "/monitor", context ->
-                context.setResponseJson(ResponseEntity.ok(ConfigService.monitorInfo()).toJson()));
+                context.setResponseJson(ResponseEntity.ok(ServiceFactory.INSTANCE.getStatsService().monitorInfo()).toJson()));
+        //代理配置接口
+        router.route(HttpMethod.GET, "/proxy/get", context ->
+                context.setResponseJson(ResponseEntity.ok(ServiceFactory.INSTANCE.getProxyService().getProxy(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
+        router.route(HttpMethod.GET, "/proxy/list", context -> {
+                    String type = (String) context.getQueryParam("type");
+                    context.setResponseJson(ResponseEntity.ok(ServiceFactory.INSTANCE.getProxyService().proxies(type)).toJson());
+                }
+        );
         router.route(HttpMethod.POST, "/proxy/add-tcp", context -> {
-            ConfigService.addTcpProxy(JsonUtils.toJsonObject(context.getRequestBody()));
+            ServiceFactory.INSTANCE.getProxyService().addTcpProxy(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());
         });
         router.route(HttpMethod.PUT, "/proxy/update-tcp", context -> {
-            ConfigService.updateTcpProxy(JsonUtils.toJsonObject(context.getRequestBody()));
+            ServiceFactory.INSTANCE.getProxyService().updateTcpProxy(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());
         });
         router.route(HttpMethod.PUT, "/proxy/switch-proxy-status", context -> {
-            ConfigService.switchProxyStatus(JsonUtils.toJsonObject(context.getRequestBody()));
+            ServiceFactory.INSTANCE.getProxyService().switchProxyStatus(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());
         });
         router.route(HttpMethod.DELETE, "/proxy/del", context -> {
-            ConfigService.deleteProxy(JsonUtils.toJsonObject(context.getRequestBody()));
+            ServiceFactory.INSTANCE.getProxyService().deleteProxy(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());
         });
+        //客户端接口
         router.route(HttpMethod.POST, "/client/add", context -> {
-            ConfigService.addClient(JsonUtils.toJsonObject(context.getRequestBody()));
+            ServiceFactory.INSTANCE.getClientService().addClient(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());
         });
         router.route(HttpMethod.PUT, "/client/update", context -> {
-            ConfigService.updateClient(JsonUtils.toJsonObject(context.getRequestBody()));
+            ServiceFactory.INSTANCE.getClientService().updateClient(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());
         });
         router.route(HttpMethod.DELETE, "/client/del", context -> {
-            ConfigService.deleteClient(JsonUtils.toJsonObject(context.getRequestBody()));
+            ServiceFactory.INSTANCE.getClientService().deleteClient(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());
         });
         router.route(HttpMethod.DELETE, "/client/kickout", context -> {
-            ConfigService.kickoutClient(JsonUtils.toJsonObject(context.getRequestBody()));
+            ServiceFactory.INSTANCE.getClientService().kickoutClient(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());
         });
+        router.route(HttpMethod.GET, "/client/list", context ->
+                context.setResponseJson(ResponseEntity.ok(ServiceFactory.INSTANCE.getClientService().clients()).toJson()));
+        router.route(HttpMethod.GET, "/client/get", context ->
+                context.setResponseJson(ResponseEntity.ok(ServiceFactory.INSTANCE.getClientService().getClient(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));
     }
 }

@@ -8,7 +8,8 @@ import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
-import com.xiaoniucode.etp.server.web.ConfigStore;
+import com.xiaoniucode.etp.server.web.dao.DaoFactory;
+import com.xiaoniucode.etp.server.web.dao.ProxyDao;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.List;
@@ -23,7 +24,6 @@ import org.slf4j.LoggerFactory;
  */
 public class UnregisterProxyHandler implements MessageHandler {
     private final Logger logger = LoggerFactory.getLogger(UnregisterProxyHandler.class);
-    private final static ConfigStore configStore = ConfigStore.get();
     private final static AppConfig config = AppConfig.get();
     private final static RuntimeStateManager state = RuntimeStateManager.get();
 
@@ -34,7 +34,7 @@ public class UnregisterProxyHandler implements MessageHandler {
             String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
 
             if (config.getDashboard().getEnable()) {
-                configStore.deleteProxy(proxyId);
+                DaoFactory.INSTANCE.getProxyDao().deleteById(proxyId);
             }
             List<Integer> ports = state.getClientRemotePorts(secretKey);
             //停掉连接的服务并释放端口

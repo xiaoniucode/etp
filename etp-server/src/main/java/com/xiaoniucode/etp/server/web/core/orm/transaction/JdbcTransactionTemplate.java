@@ -1,13 +1,13 @@
-package com.xiaoniucode.etp.server.web.transaction;
+package com.xiaoniucode.etp.server.web.core.orm.transaction;
 
 /**
  * 事务模版，提供便捷的操作
  *
  * @author liuxin
  */
-public class SQLiteTransactionTemplate {
+public class JdbcTransactionTemplate {
 
-    private final SQLiteTransactionManager txManager = new SQLiteTransactionManager();
+    private final JdbcTransactionManager txManager = new JdbcTransactionManager();
 
     /**
      * 执行事务
