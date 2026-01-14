@@ -9,7 +9,7 @@ import com.xiaoniucode.etp.server.manager.PortAllocator;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
-import com.xiaoniucode.etp.server.web.digest.DigestUtil;
+import com.xiaoniucode.etp.server.web.common.DigestUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;

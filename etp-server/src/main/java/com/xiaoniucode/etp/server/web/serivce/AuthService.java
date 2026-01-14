@@ -15,8 +15,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class AuthTokenService {
-    private final static Logger logger = LoggerFactory.getLogger(AuthTokenService.class);
+public class AuthService {
+    private final static Logger logger = LoggerFactory.getLogger(AuthService.class);
     /**
      * Token有效期
      */
@@ -152,7 +152,7 @@ public class AuthTokenService {
     /**
      * 获取令牌服务实例（单例）
      */
-    public static AuthTokenService getInstance() {
+    public static AuthService getInstance() {
         return AuthTokenServiceHolder.INSTANCE;
     }
 
@@ -160,6 +160,6 @@ public class AuthTokenService {
      * 静态内部类实现单例模式
      */
     private static class AuthTokenServiceHolder {
-        private static final AuthTokenService INSTANCE = new AuthTokenService();
+        private static final AuthService INSTANCE = new AuthService();
     }
 }

@@ -3,11 +3,13 @@ package com.xiaoniucode.etp.server.web;
 import com.xiaoniucode.etp.common.JsonUtils;
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
+import com.xiaoniucode.etp.server.web.common.ResponseEntity;
 import com.xiaoniucode.etp.server.web.core.server.Filter;
 import com.xiaoniucode.etp.server.web.core.server.Router;
 import com.xiaoniucode.etp.server.web.core.server.Session;
 import com.xiaoniucode.etp.server.web.manager.CaptchaManager;
 import com.xiaoniucode.etp.server.web.serivce.ServiceFactory;
+import com.xiaoniucode.etp.server.web.common.CaptchaGenerator;
 import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
 

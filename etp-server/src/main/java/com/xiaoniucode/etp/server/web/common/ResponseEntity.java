@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.web;
+package com.xiaoniucode.etp.server.web.common;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

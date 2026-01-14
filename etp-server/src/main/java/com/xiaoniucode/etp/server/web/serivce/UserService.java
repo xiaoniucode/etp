@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.web.serivce;
 import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
 import com.xiaoniucode.etp.server.web.core.server.BizException;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
-import com.xiaoniucode.etp.server.web.digest.DigestUtil;
+import com.xiaoniucode.etp.server.web.common.DigestUtil;
 import com.xiaoniucode.etp.server.web.manager.CaptchaManager;
 import org.json.JSONObject;
 

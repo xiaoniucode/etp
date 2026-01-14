@@ -4,7 +4,7 @@ public enum ServiceFactory {
     INSTANCE;
     private final ClientService clientService = new ClientService();
     private final ProxyService proxyService = new ProxyService();
-    private final AuthTokenService authTokenService = new AuthTokenService();
+    private final AuthService authTokenService = new AuthService();
     private final SettingService settingService = new SettingService();
     private final StatsService statsService = new StatsService();
     private final UserService userService = new UserService();
@@ -17,7 +17,7 @@ public enum ServiceFactory {
         return proxyService;
     }
 
-    public AuthTokenService getAuthTokenService() {
+    public AuthService getAuthTokenService() {
         return authTokenService;
     }
 
