@@ -24,7 +24,7 @@ localPort = 3306
 status = 1 #是否开启代理
 #日志
 [log]
-level = "debug"
+level = "info"
 path = "log"
 name = "etps.log"
 archivePattern = "etps.%d{yyyy-MM-dd}.log"

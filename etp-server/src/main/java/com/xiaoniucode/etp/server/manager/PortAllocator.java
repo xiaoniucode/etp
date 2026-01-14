@@ -53,7 +53,7 @@ public class PortAllocator {
             throw new IllegalArgumentException("无效的端口范围: " + startPort + "-" + endPort);
         }
 
-        LOGGER.info("端口分配器初始化，范围: {}-{}", startPort, endPort);
+        LOGGER.debug("端口分配器初始化，范围: {}-{}", startPort, endPort);
     }
 
     public int allocateAvailablePort() {

@@ -68,7 +68,7 @@ public final class TcpProxyServer implements Lifecycle {
                     }
                 });
         bindAllProxyPort();
-        LOGGER.info("所有端口映射服务启动完成");
+        LOGGER.debug("所有端口映射服务启动完成");
     }
 
     /**

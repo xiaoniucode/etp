@@ -1,32 +1,24 @@
-package com.xiaoniucode.etp.server;
+package com.xiaoniucode.etp.server.listener;
 
 import com.xiaoniucode.etp.core.codec.ProtocolType;
-import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.ClientInfo;
-import com.xiaoniucode.etp.server.config.Dashboard;
-import com.xiaoniucode.etp.server.config.PortRange;
-import com.xiaoniucode.etp.server.config.ProxyMapping;
+import com.xiaoniucode.etp.core.event.EventListener;
+import com.xiaoniucode.etp.server.GlobalIdGenerator;
+import com.xiaoniucode.etp.server.config.*;
+import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.manager.PortAllocator;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
-import com.xiaoniucode.etp.server.web.core.orm.JdbcFactory;
-import com.xiaoniucode.etp.server.web.dao.*;
-import com.xiaoniucode.etp.server.web.digest.DigestUtil;
 import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
+import com.xiaoniucode.etp.server.web.dao.DaoFactory;
+import com.xiaoniucode.etp.server.web.digest.DigestUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Locale;
 
-/**
- * 服务初始化
- *
- * @author liuxin
- */
-public final class EtpInitialize {
-    private static final Logger logger = LoggerFactory.getLogger(EtpInitialize.class);
+public class StaticConfigInitListener implements EventListener<TunnelBindEvent> {
+    private static final Logger logger = LoggerFactory.getLogger(StaticConfigInitListener.class);
     private final static RuntimeStateManager runtimeState = RuntimeStateManager.get();
     private final static AppConfig config = AppConfig.get();
     private static JdbcTransactionTemplate TX;
@@ -34,12 +26,12 @@ public final class EtpInitialize {
     /**
      * 需要先初始化SQLite配置，如果存在和toml中相同的配置，则不同步到SQLite，否则进行同步
      */
-    public static void initDataConfig() {
+    @Override
+    public void onEvent(TunnelBindEvent event) {
         //只有管理面板启动才初始化动态数据
         if (config.getDashboard().getEnable()) {
             TX = new JdbcTransactionTemplate();
             //如果数据库和表不存在则创建
-            initDBTable();
             //注册所有客户端配置
             registerDBClientConfig();
             //注册所有端口映射配置
@@ -56,7 +48,7 @@ public final class EtpInitialize {
         logger.debug("数据初始化完毕");
     }
 
-    private static void syncSystemSettings() {
+    private void syncSystemSettings() {
         TX.execute(() -> {
             Boolean enableDashboard = config.getDashboard().getEnable();
             if (enableDashboard) {
@@ -81,7 +73,7 @@ public final class EtpInitialize {
         });
     }
 
-    private static void syncDashboardUser() {
+    private void syncDashboardUser() {
         TX.execute(() -> {
             Dashboard dashboard = config.getDashboard();
             Boolean reset = dashboard.getReset();
@@ -108,7 +100,7 @@ public final class EtpInitialize {
         });
     }
 
-    private static void registerTomlConfig() {
+    private void registerTomlConfig() {
         Boolean enableDashboard = config.getDashboard().getEnable();
         List<ClientInfo> clients = AppConfig.get().getClients();
         clients.forEach(clientInfo -> {
@@ -187,7 +179,7 @@ public final class EtpInitialize {
         });
     }
 
-    private static void registerDBClientConfig() {
+    private void registerDBClientConfig() {
         JSONArray clients = DaoFactory.INSTANCE.getClientDao().list();
         if (clients != null) {
             for (int i = 0; i < clients.length(); i++) {
@@ -202,7 +194,7 @@ public final class EtpInitialize {
         }
     }
 
-    private static void registerDBProxyConfig() {
+    private void registerDBProxyConfig() {
         JSONArray proxies = DaoFactory.INSTANCE.getProxyDao().listAllProxies(ProtocolType.TCP.name());
         if (proxies != null) {
             for (int i = 0; i < proxies.length(); i++) {
@@ -218,89 +210,5 @@ public final class EtpInitialize {
                 runtimeState.registerProxy(secretKey, proxyMapping);
             }
         }
-    }
-
-    /**
-     * 只有不存在的时候才会创建表
-     */
-    private static void initDBTable() {
-        logger.debug("开始初始化数据库表");
-        createAuthTokenTable();
-        createUserTable();
-        createClientTable();
-        createProxiesTable();
-        createSystemSettingsTable();
-        logger.debug("数据库表初始化完毕");
-    }
-
-    private static void createSystemSettingsTable() {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS settings (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    key TEXT NOT NULL UNIQUE,       -- 设置键
-                    value TEXT NOT NULL             -- 设置值
-                );
-                CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);
-                """;
-        JdbcFactory.getJdbc().execute(sql);
-    }
-
-    private static void createAuthTokenTable() {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS auth_tokens (
-                    token TEXT PRIMARY KEY,
-                    uid INTEGER NOT NULL,
-                    username TEXT NOT NULL,
-                    expiredAt INTEGER NOT NULL,
-                    createdAt INTEGER DEFAULT (datetime('now')),
-                    FOREIGN KEY (uid) REFERENCES users(id)
-                );
-                CREATE INDEX IF NOT EXISTS idx_auth_tokens_expiredAt ON auth_tokens(expiredAt);
-                """;
-        JdbcFactory.getJdbc().execute(sql);
-    }
-
-    private static void createUserTable() {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT UNIQUE NOT NULL,
-                    password TEXT NOT NULL
-                );
-                """;
-        JdbcFactory.getJdbc().execute(sql);
-    }
-
-    private static void createProxiesTable() {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS proxies (
-                    id               INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增主键
-                    clientId         INTEGER NOT NULL,                   -- 所属客户端ID
-                    name             TEXT NOT NULL,                      -- 代理名称
-                    type             TEXT NOT NULL,                      -- 协议类型（如 "TCP"、"HTTP"）
-                    autoRegistered   INTEGER NOT NULL DEFAULT 0,         -- 注册类型（1：自动注册、0手动注册）
-                    localPort        INTEGER NOT NULL,                   -- 内网端口（如 3306）
-                    remotePort       INTEGER,                            -- 远程服务端口（对外暴露的端口）
-                    domains          TEXT,                               -- http协议域名，多个域名用逗号分隔
-                    status           INTEGER NOT NULL DEFAULT 1,         -- 状态：1=开启，0=关闭
-                    createdAt        TEXT DEFAULT (datetime('now')),     -- 创建时间
-                    updatedAt        TEXT DEFAULT (datetime('now'))      -- 更新时间
-                );
-                """;
-        JdbcFactory.getJdbc().execute(sql);
-    }
-
-    private static void createClientTable() {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS clients (
-                    id         INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增ID
-                    name       TEXT    NOT NULL UNIQUE,            -- 客户端名称
-                    secretKey  TEXT    NOT NULL UNIQUE,            -- 密钥
-                    createdAt TEXT    DEFAULT (datetime('now')),   -- 创建时间
-                    updatedAt TEXT    DEFAULT (datetime('now'))    -- 更新时间
-                );
-                 CREATE INDEX IF NOT EXISTS idx_clients_name_secretkey ON clients (name, secretKey);
-                """;
-        JdbcFactory.getJdbc().execute(sql);
     }
 }

@@ -5,21 +5,29 @@ import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.IdleCheckHandler;
 
 import com.xiaoniucode.etp.core.codec.TunnelMessageCodec;
+import com.xiaoniucode.etp.core.event.GlobalEventBus;
+import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.handler.ControlTunnelHandler;
+import com.xiaoniucode.etp.server.proxy.HttpProxyServer;
+import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
+import com.xiaoniucode.etp.server.web.DashboardApi;
+import com.xiaoniucode.etp.server.web.core.server.NettyWebServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.HttpServerKeepAliveHandler;
 import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 /**
  * 控制隧道服务容器
@@ -34,10 +42,7 @@ public class TunnelServer implements Lifecycle {
     private EventLoopGroup tunnelBossGroup;
     private EventLoopGroup tunnelWorkerGroup;
     private SslContext tlsContext;
-    /**
-     * 用于隧道服务启动成功后回调通知调用者
-     */
-    private Consumer<Void> onSuccessCallback;
+    private NettyWebServer webServer;
 
     @SuppressWarnings("all")
     @Override
@@ -72,10 +77,36 @@ public class TunnelServer implements Lifecycle {
                         }
                     });
             serverBootstrap.bind(host, port).sync();
-            onSuccessCallback.accept(null);
-            logger.info("ETP服务启动成功:{}:{}", host, port);
+            //异步处理
+            CompletableFuture.runAsync(() -> {
+                //初始化管理面板
+                initDashboard();
+                //开启TCP代理
+                TcpProxyServer.get().start();
+                //todo 开启HTTP代理
+                Map<String, Integer> domains = new HashMap<>();
+                domains.put("a.local.cc", 8081);
+                domains.put("b.local.cc", 3333);
+                domains.put("c.local.cc", 3000);
+                domains.put("localhost", 8081);
+                HttpProxyServer httpProxyServer = HttpProxyServer.get();
+                httpProxyServer.setDomainMapping(domains);
+                httpProxyServer.start();
+            });
+            logger.info("ETP隧道已开启:{}:{}", host, port);
+            GlobalEventBus.get().publishAsync(new TunnelBindEvent());
         } catch (Throwable e) {
-            logger.error("ETP服务启动失败", e);
+            logger.error("ETP隧道开启失败", e);
+        }
+    }
+
+    private void initDashboard() {
+        if (AppConfig.get().getDashboard().getEnable()) {
+            webServer = ServerFactory.createWebServer();
+            DashboardApi.initFilters(webServer.getFilters());/*web过滤器*/
+            DashboardApi.initRoutes(webServer.getRouter());/*web接口*/
+            webServer.start();
+            logger.info("Dashboard图形面板启动成功，浏览器访问：{}:{}", webServer.getAddr(), webServer.getPort());
         }
     }
 
@@ -84,18 +115,13 @@ public class TunnelServer implements Lifecycle {
         try {
             tunnelBossGroup.shutdownGracefully().sync();
             tunnelWorkerGroup.shutdownGracefully().sync();
+            TcpProxyServer.get().stop();
+            if (webServer != null) {
+                webServer.stop();
+            }
         } catch (InterruptedException e) {
             logger.error(e.getMessage());
         }
-    }
-
-    /**
-     * 隧道启动和认证成功后回调通知调用者处理后续的逻辑
-     *
-     * @param consumer 消费者
-     */
-    public void onSuccessListener(Consumer<Void> consumer) {
-        this.onSuccessCallback = consumer;
     }
 
     public String getHost() {
@@ -117,4 +143,5 @@ public class TunnelServer implements Lifecycle {
     public void setTls(boolean tls) {
         this.tls = tls;
     }
+
 }

@@ -59,7 +59,7 @@ public class HttpProxyServer implements Lifecycle {
                         }
                     });
             serverBootstrap.bind(getHttpProxyPort()).syncUninterruptibly().get();
-            logger.info("HttpProxyServer started on port {}", getHttpProxyPort());
+            logger.debug("HttpProxyServer started on port {}", getHttpProxyPort());
         } catch (Exception e) {
             logger.error("HttpProxyServer start error!", e);
         }

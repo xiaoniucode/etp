@@ -15,9 +15,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-/**
- * 认证令牌业务服务层
- */
 public class AuthTokenService {
     private final static Logger logger = LoggerFactory.getLogger(AuthTokenService.class);
     /**

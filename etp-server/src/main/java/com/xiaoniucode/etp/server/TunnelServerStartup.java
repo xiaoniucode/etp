@@ -6,16 +6,13 @@ import com.xiaoniucode.etp.common.Constants;
 import com.xiaoniucode.etp.common.LogConfig;
 import com.xiaoniucode.etp.common.LogbackConfigurator;
 import com.xiaoniucode.etp.common.PortChecker;
+import com.xiaoniucode.etp.core.event.GlobalEventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.proxy.HttpProxyServer;
-import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
-import com.xiaoniucode.etp.server.web.DashboardApi;
-import com.xiaoniucode.etp.server.web.core.server.NettyWebServer;
+import com.xiaoniucode.etp.server.event.TunnelBindEvent;
+import com.xiaoniucode.etp.server.listener.DatabaseInitListener;
+import com.xiaoniucode.etp.server.listener.StaticConfigInitListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 服务启动入口
@@ -24,7 +21,6 @@ import java.util.Map;
  */
 public class TunnelServerStartup {
     private static TunnelServer tunnelServer;
-    private static NettyWebServer webServer;
     private static final Logger logger = LoggerFactory.getLogger(TunnelServerStartup.class);
 
     static {
@@ -46,30 +42,11 @@ public class TunnelServerStartup {
             logger.error("{}端口已经被占用", bindPort);
             return;
         }
-        registerShutdownHook(tunnelServer);
-        tunnelServer = ServerFactory.createTunnelServer();
-        tunnelServer.onSuccessListener(v -> {
-            EtpInitialize.initDataConfig();
-            //启动dashboard服务
-            if (config.getDashboard().getEnable()) {
-                webServer = ServerFactory.createWebServer();
-                DashboardApi.initFilters(webServer.getFilters());/*web过滤器*/
-                DashboardApi.initRoutes(webServer.getRouter());/*web接口*/
-                webServer.start();
-                logger.info("Dashboard图形面板启动成功，浏览器访问：{}:{}", webServer.getAddr(), webServer.getPort());
-            }
-            TcpProxyServer.get().start();
+        GlobalEventBus.get().subscribe(TunnelBindEvent.class, new DatabaseInitListener());
+        GlobalEventBus.get().subscribe(TunnelBindEvent.class, new StaticConfigInitListener());
 
-            // todo 测试数据
-            Map<String, Integer> domains = new HashMap<>();
-            domains.put("a.local.cc", 8081);
-            domains.put("b.local.cc", 3333);
-            domains.put("c.local.cc", 3000);
-            domains.put("localhost", 8081);
-            HttpProxyServer httpProxyServer = HttpProxyServer.get();
-            httpProxyServer.setDomainMapping(domains);
-            httpProxyServer.start();
-        });
+        tunnelServer = ServerFactory.createTunnelServer();
+        registerShutdownHook(tunnelServer);
         tunnelServer.start();
     }
 
@@ -93,10 +70,6 @@ public class TunnelServerStartup {
             if (tunnelServer != null) {
                 tunnelServer.stop();
                 PortChecker.killPort(tunnelServer.getPort());
-                TcpProxyServer.get().stop();
-            }
-            if (webServer != null) {
-                webServer.stop();
             }
         }));
     }

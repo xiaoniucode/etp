@@ -155,8 +155,8 @@
         </dependencies>
     </dependencyManagement>
     <build>
-        <plugins>
-            <!--<plugin>
+<!--        <plugins>
+            &lt;!&ndash;<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.5.0</version>
@@ -176,7 +176,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>&ndash;&gt;
 
             <plugin>
                 <groupId>org.sonatype.central</groupId>
@@ -276,7 +276,7 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+        </plugins>-->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
