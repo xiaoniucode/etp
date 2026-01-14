@@ -148,17 +148,10 @@ public class AuthService {
         logger.debug("清理过期令牌完成 - 删除数量: {}", deletedCount);
         return deletedCount;
     }
-
-    /**
-     * 获取令牌服务实例（单例）
-     */
     public static AuthService getInstance() {
         return AuthTokenServiceHolder.INSTANCE;
     }
 
-    /**
-     * 静态内部类实现单例模式
-     */
     private static class AuthTokenServiceHolder {
         private static final AuthService INSTANCE = new AuthService();
     }

@@ -39,6 +39,9 @@ public class ProxyMapping {
      */
     private Integer status;
 
+    public ProxyMapping() {
+    }
+
     public ProxyMapping(ProtocolType type, Integer localPort, Integer remotePort) {
         this.type = type;
         this.localPort = localPort;

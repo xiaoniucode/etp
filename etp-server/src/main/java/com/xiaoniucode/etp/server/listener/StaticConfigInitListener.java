@@ -1,11 +1,12 @@
 package com.xiaoniucode.etp.server.listener;
 
+import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.core.event.EventListener;
 import com.xiaoniucode.etp.server.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.config.*;
-import com.xiaoniucode.etp.server.event.TunnelBindEvent;
-import com.xiaoniucode.etp.server.manager.PortAllocator;
+import com.xiaoniucode.etp.server.event.DatabaseInitEvent;
+import com.xiaoniucode.etp.server.manager.PortPool;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
@@ -14,10 +15,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
-public class StaticConfigInitListener implements EventListener<TunnelBindEvent> {
+public class StaticConfigInitListener implements EventListener<DatabaseInitEvent> {
     private static final Logger logger = LoggerFactory.getLogger(StaticConfigInitListener.class);
     private final static RuntimeStateManager runtimeState = RuntimeStateManager.get();
     private final static AppConfig config = AppConfig.get();
@@ -27,20 +29,19 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
      * 需要先初始化SQLite配置，如果存在和toml中相同的配置，则不同步到SQLite，否则进行同步
      */
     @Override
-    public void onEvent(TunnelBindEvent event) {
+    public void onEvent(DatabaseInitEvent event) {
         //只有管理面板启动才初始化动态数据
         if (config.getDashboard().getEnable()) {
             TX = new JdbcTransactionTemplate();
-            //如果数据库和表不存在则创建
             //注册所有客户端配置
             registerDBClientConfig();
             //注册所有端口映射配置
-            registerDBProxyConfig();
+            registerDbProxyConfig();
             //将Toml中的用户信息同步到数据库
             syncDashboardUser();
             //同步系统设置
             syncSystemSettings();
-            //每次启动或者重启都删除所有自动注册的映射，避免客户端断线重练导致僵尸映射
+            //每次启动或者重启都删除所有自动注册的映射，避免客户端断线重练导致僵尸代理
             DaoFactory.INSTANCE.getProxyDao().deleteAllAutoRegisterProxy();
         }
         //注册和同步Toml静态配
@@ -50,8 +51,7 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
 
     private void syncSystemSettings() {
         TX.execute(() -> {
-            Boolean enableDashboard = config.getDashboard().getEnable();
-            if (enableDashboard) {
+            if (config.getDashboard().getEnable()) {
                 // 同步端口范围设置
                 JSONObject portRange = DaoFactory.INSTANCE.getSettingDao().getByKey("port_range");
                 if (portRange == null) {
@@ -61,7 +61,7 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                     DaoFactory.INSTANCE.getSettingDao().insert(save);
                     logger.info("同步端口范围配置到数据库");
                 } else {
-                    //如果数据库存在配置，采用数据库配置作为系统全局配置
+                    //如果数据库存在配置，采用数据库配置作为全局配置
                     String range = portRange.getString("value");
                     String[] split = range.split(":");
                     PortRange configRange = config.getPortRange();
@@ -110,15 +110,15 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
             if (!runtimeState.hasClient(secretKey)) {
                 //如果开启了管理面板，需要将客户端配置同步到数据库
                 if (enableDashboard) {
-                    JSONObject clientName = DaoFactory.INSTANCE.getClientDao().getByName(name);
-                    if (clientName == null) {
+                    JSONObject existClient = DaoFactory.INSTANCE.getClientDao().getByName(name);
+                    if (existClient == null) {
                         JSONObject save = new JSONObject();
                         save.put("secretKey", secretKey);
                         save.put("name", name);
                         clientId = DaoFactory.INSTANCE.getClientDao().insert(save);
                         logger.info("同步静态配置客户端「{}」到数据库", name);
                     } else {
-                        logger.warn("无法保存到数据库，已存在同名客户端：{}", clientName);
+                        logger.warn("无法保存客户端到数据库，已存在同名客户端：{}", existClient.getString("name"));
                     }
                 }
                 if (clientId == null) {
@@ -128,8 +128,10 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                 clientInfo.setClientId(clientId);
                 runtimeState.registerClient(clientInfo);
             } else {
+                clientId = runtimeState.getClient(secretKey).getClientId();
                 logger.warn("客户端「{}」 注册失败，已经在数据库被注册", name);
             }
+
             List<ProxyMapping> proxies = clientInfo.getProxies();
             for (ProxyMapping proxy : proxies) {
                 Integer remotePort = proxy.getRemotePort();
@@ -137,7 +139,7 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                     Integer proxyId = null;
                     String type = proxy.getType().name().toLowerCase(Locale.ROOT);
                     if (ProtocolType.TCP.name().equalsIgnoreCase(type) && proxy.getRemotePort() == null) {
-                        int allocatePort = PortAllocator.get().allocateAvailablePort();
+                        int allocatePort = PortPool.get().allocateAvailablePort();
                         proxy.setRemotePort(allocatePort);
                     }
                     //如果开启了管理面板，需要将映射配置同步到数据库
@@ -155,7 +157,6 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                             }
                             if (type.equalsIgnoreCase(ProtocolType.TCP.name())) {
                                 save.put("remotePort", proxy.getRemotePort());
-
                                 proxyId = DaoFactory.INSTANCE.getProxyDao().insert(save);
                                 logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", clientId, proxy.getName(), proxy.getRemotePort());
                             }
@@ -189,21 +190,30 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                 String secretKey = client.getString("secretKey");
                 ClientInfo clientInfo = new ClientInfo(clientId, name, secretKey);
                 runtimeState.registerClient(clientInfo);
-                logger.info("Client {} 已注册", name);
             }
         }
     }
 
-    private void registerDBProxyConfig() {
-        JSONArray proxies = DaoFactory.INSTANCE.getProxyDao().listAllProxies(ProtocolType.TCP.name());
+    private void registerDbProxyConfig() {
+        JSONArray proxies = DaoFactory.INSTANCE.getProxyDao().listAllProxies(null);
         if (proxies != null) {
             for (int i = 0; i < proxies.length(); i++) {
                 JSONObject proxy = proxies.getJSONObject(i);
                 String secretKey = proxy.getString("secretKey");
-                ProxyMapping proxyMapping = new ProxyMapping(
-                        ProtocolType.getType(proxy.getString("type").toLowerCase(Locale.ROOT)),
-                        proxy.getInt("localPort"),
-                        proxy.getInt("remotePort"));
+                ProtocolType type = ProtocolType.getType(proxy.getString("type").toLowerCase(Locale.ROOT));
+
+                ProxyMapping proxyMapping = new ProxyMapping();
+                proxyMapping.setType(type);
+                proxyMapping.setLocalPort(proxy.getInt("localPort"));
+                if (ProtocolType.TCP.equals(type)) {
+                    proxyMapping.setRemotePort(proxy.getInt("remotePort"));
+                } else if (ProtocolType.HTTP.equals(type)) {
+                    String d = proxy.getString("domains");
+                    if (StringUtils.hasText(d)) {
+                        String[] split = d.split(",");
+                        proxyMapping.setDomains(new HashSet<>(List.of(split)));
+                    }
+                }
                 proxyMapping.setProxyId(proxy.getInt("id"));
                 proxyMapping.setName(proxy.getString("name"));
                 proxyMapping.setStatus(proxy.getInt("status"));

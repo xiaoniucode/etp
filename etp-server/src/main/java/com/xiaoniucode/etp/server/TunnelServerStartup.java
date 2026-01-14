@@ -8,6 +8,7 @@ import com.xiaoniucode.etp.common.LogbackConfigurator;
 import com.xiaoniucode.etp.common.PortChecker;
 import com.xiaoniucode.etp.core.event.GlobalEventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.event.DatabaseInitEvent;
 import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.listener.DatabaseInitListener;
 import com.xiaoniucode.etp.server.listener.StaticConfigInitListener;
@@ -43,7 +44,7 @@ public class TunnelServerStartup {
             return;
         }
         GlobalEventBus.get().subscribe(TunnelBindEvent.class, new DatabaseInitListener());
-        GlobalEventBus.get().subscribe(TunnelBindEvent.class, new StaticConfigInitListener());
+        GlobalEventBus.get().subscribe(DatabaseInitEvent.class, new StaticConfigInitListener());
 
         tunnelServer = ServerFactory.createTunnelServer();
         registerShutdownHook(tunnelServer);

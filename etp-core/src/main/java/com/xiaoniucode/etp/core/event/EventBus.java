@@ -49,7 +49,7 @@ public class EventBus {
                 try {
                     typedListener.onEvent(event);
                 } catch (Exception e) {
-                    logger.error("事件监听器处理异常: {}", e.getMessage());
+                    logger.error("事件监听器处理异常", e);
                 }
             }
         }

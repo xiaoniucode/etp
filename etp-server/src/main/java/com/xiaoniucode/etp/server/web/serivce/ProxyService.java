@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.server.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ProxyMapping;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
-import com.xiaoniucode.etp.server.manager.PortAllocator;
+import com.xiaoniucode.etp.server.manager.PortPool;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
@@ -44,7 +44,7 @@ public class ProxyService {
 
     public JSONObject addTcpProxy(JSONObject req) {
         int remotePort = req.getInt("remotePort");
-        if (remotePort != -1 && !PortAllocator.get().isPortAvailable(remotePort)) {
+        if (remotePort != -1 && !PortPool.get().isPortAvailable(remotePort)) {
             throw new BizException("映射注册失败，公网端口: " + remotePort + "不可用！");
         }
         String secretKey = req.getString("secretKey");
@@ -53,7 +53,7 @@ public class ProxyService {
         }
         //-1表示用户没有自定义端口
         if (remotePort == -1) {
-            int allocatePort = PortAllocator.get().allocateAvailablePort();
+            int allocatePort = PortPool.get().allocateAvailablePort();
             req.put("remotePort", allocatePort);
         }
         if (!StringUtils.hasText(req.getString("name"))) {
@@ -71,7 +71,7 @@ public class ProxyService {
             TcpProxyServer.get().startRemotePort(remotePortInt);
         } else {
             //将公网端口添加到已分配缓存
-            PortAllocator.get().addRemotePort(remotePortInt);
+            PortPool.get().addRemotePort(remotePortInt);
         }
         //最后执行持久化
         int proxyId;
@@ -96,7 +96,7 @@ public class ProxyService {
             //如果没有设置公网端口，自动分配一个
             boolean remotePortChanged = false;
             if (!StringUtils.hasText(newRemotePortString)) {
-                int allocatePort = PortAllocator.get().allocateAvailablePort();
+                int allocatePort = PortPool.get().allocateAvailablePort();
                 req.put("remotePort", allocatePort);
                 newRemotePortInt = allocatePort;
                 remotePortChanged = true;
@@ -108,7 +108,7 @@ public class ProxyService {
                     if (state.isPortOccupied(newRemotePortInt)) {
                         throw new BizException("公网端口已被占用");
                     }
-                    if (!PortAllocator.get().isPortAvailable(newRemotePortInt)) {
+                    if (!PortPool.get().isPortAvailable(newRemotePortInt)) {
                         throw new BizException("公网端口无效");
                     }
                 }

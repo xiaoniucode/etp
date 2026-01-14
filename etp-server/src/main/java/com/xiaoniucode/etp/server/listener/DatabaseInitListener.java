@@ -1,7 +1,9 @@
 package com.xiaoniucode.etp.server.listener;
 
 import com.xiaoniucode.etp.core.event.EventListener;
+import com.xiaoniucode.etp.core.event.GlobalEventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.event.DatabaseInitEvent;
 import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.web.core.orm.JdbcFactory;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ public class DatabaseInitListener implements EventListener<TunnelBindEvent> {
             createProxiesTable();
             createSystemSettingsTable();
             logger.debug("数据库表初始化完毕");
+            GlobalEventBus.get().publishAsync(new DatabaseInitEvent());
         }
     }
 

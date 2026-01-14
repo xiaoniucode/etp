@@ -5,7 +5,7 @@ import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.server.handler.visitor.TcpVisitorHandler;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
-import com.xiaoniucode.etp.server.manager.PortAllocator;
+import com.xiaoniucode.etp.server.manager.PortPool;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
@@ -41,11 +41,11 @@ public final class TcpProxyServer implements Lifecycle {
      * 公网端口和启动的服务channel映射，用于通过端口快速找到对应的channel
      */
     private final Map<Integer, Channel> remotePortChannelMapping = new ConcurrentHashMap<>();
-    private final PortAllocator portAllocator;
+    private final PortPool portPool;
     private final RuntimeStateManager state = RuntimeStateManager.get();
 
     private TcpProxyServer() {
-        this.portAllocator = PortAllocator.get();
+        this.portPool = PortPool.get();
     }
 
     @Override
@@ -83,7 +83,7 @@ public final class TcpProxyServer implements Lifecycle {
                 for (ProxyMapping proxy : proxyMappings) {
                     if (proxy.getStatus() == 1) {
                         Integer remotePort = proxy.getRemotePort();
-                        if (portAllocator.isPortAvailable(remotePort)) {
+                        if (portPool.isPortAvailable(remotePort)) {
                             ChannelFuture future = serverBootstrap.bind(remotePort).sync();
                             remotePortChannelMapping.put(remotePort, future.channel());
                             StringBuilder portItem = new StringBuilder();
@@ -98,7 +98,7 @@ public final class TcpProxyServer implements Lifecycle {
                             LOGGER.warn("未成功启动服务，remotePort:{}端口不可用！", remotePort);
                         }
                     }
-                    PortAllocator.get().addRemotePort(proxy.getRemotePort());
+                    PortPool.get().addRemotePort(proxy.getRemotePort());
                 }
                 if (!bindPorts.isEmpty()) {
                     PortFileUtil.writePortsToFile(bindPorts);
@@ -119,7 +119,7 @@ public final class TcpProxyServer implements Lifecycle {
             if (!remotePortChannelMapping.containsKey(remotePort)) {
                 ChannelFuture future = serverBootstrap.bind(remotePort).sync();
                 remotePortChannelMapping.put(remotePort, future.channel());
-                portAllocator.addRemotePort(remotePort);
+                portPool.addRemotePort(remotePort);
                 LOGGER.info("{} 服务启动成功", remotePort);
             }
         } catch (InterruptedException e) {
@@ -159,7 +159,7 @@ public final class TcpProxyServer implements Lifecycle {
             }
             // 3. 释放端口
             if (releasePort) {
-                portAllocator.releasePort(remotePort);
+                portPool.releasePort(remotePort);
                 LOGGER.info("成功停止并释放公网端口: {}", remotePort);
                 //4.如果释放了端口，说明映射被删掉了，需要清空流量指标收集器
                 MetricsCollector.removeCollector(remotePort);
@@ -185,7 +185,7 @@ public final class TcpProxyServer implements Lifecycle {
                     channel.close().sync();
                     int port = channel.localAddress() != null ? ((InetSocketAddress) channel.localAddress()).getPort() : -1;
                     if (port != -1) {
-                        portAllocator.releasePort(port);
+                        portPool.releasePort(port);
                         LOGGER.info("成功释放端口: {}", port);
                     }
                 } catch (Exception e) {
