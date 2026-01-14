@@ -46,8 +46,10 @@
             const field = data.field;
             Rest.put('/api/client/update', {id: id, name: field.name}).then(res => {
                 layer.msg('更新成功', {icon: 1, time: 400,}, () => {
-                    const parentTable = parent.layui.table;
-                    parentTable.reload('client');
+                    // 调用父页面的刷新函数
+                    if (parent.loadClientData) {
+                        parent.loadClientData();
+                    }
                     parent.layer.close(parent.layer.getFrameIndex(window.name));
                 });
             })

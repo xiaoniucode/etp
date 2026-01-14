@@ -10,33 +10,38 @@
     <link href="/static/css/client-index.css" rel="stylesheet">
 </head>
 <body>
-<table class="layui-hide" id="client" lay-filter="client"></table>
-<script type="text/html" id="headerToolbar">
-    <div class="layui-btn-container">
-        <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add">
+<div class="page-container">
+    <div class="toolbar-section">
+        <button class="layui-btn layui-btn-sm layui-btn-normal" id="addClientBtn">
             <i class="layui-icon layui-icon-add-1"></i> 新增
         </button>
-        <button class="layui-btn layui-btn-sm" lay-event="flush">
+        <button class="layui-btn layui-btn-sm" id="refreshBtn">
             <i class="layui-icon layui-icon-refresh-3"></i> 刷新
         </button>
     </div>
-</script>
-<script type="text/html" id="tableToolbar">
-    <div class="layui-clear-space">
-        {{# if(d.status === 1){ }}
-        <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="kickout">
-            <i class="layui-icon layui-icon-logout"></i> 踢掉
-        </a>
-        {{# } else { }}
-        <a class="layui-btn layui-btn-xs layui-btn-disabled" title="客户端离线，无法踢掉">
-            <i class="layui-icon layui-icon-logout"></i> 踢掉
-        </a>
-        {{# } }}
-        <a class="layui-btn layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i> 编辑</a>
-        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete"><i
-                class="layui-icon layui-icon-delete"></i> 删除</a>
+
+    <div class="cards-section">
+        <div id="loadingState" class="loading-state" style="display: none;">
+            <div class="loading-spinner">
+                <i class="layui-icon layui-icon-loading layui-anim layui-anim-rotate"></i>
+            </div>
+            <div class="loading-text">加载中...</div>
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">
+                <i class="layui-icon layui-icon-face-cry"></i>
+            </div>
+            <div class="empty-text">暂无客户端数据</div>
+            <button class="layui-btn layui-btn-sm layui-btn-normal" id="addFirstClientBtn">
+                <i class="layui-icon layui-icon-add-1"></i> 添加第一个客户端
+            </button>
+        </div>
+
+        <div id="cardContainer" class="cards-grid"></div>
     </div>
-</script>
+</div>
+
 <script src="/static/layui/layui.js"></script>
 <script src="/static/js/ajax.js"></script>
 <script src="/static/js/copy.js"></script>
@@ -55,132 +60,218 @@
         }
     }
 
-    layui.use(['table', 'dropdown', 'jquery', 'Rest'], function () {
-        var table = layui.table;
-        var Rest = layui.Rest;
-        const $ = layui.$;
-        table.render({
-            elem: '#client',
-            url: '/api/client/list',
-            toolbar: '#headerToolbar',
-            height: 'full-35',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
-            },
-            cols: [[
-                {field: 'name', fixed: 'left', width: 150, title: '客户端名'},
-                {
-                    field: 'secretKey',
-                    title: 'Token',
-                    templet: function (d) {
-                        return `
-                         <div style="display:flex; align-items:center; gap:2px; font-size:14px; font-weight:600;">
-                           <span>${d.secretKey}</span>
-                          <a href="javascript:;" lay-event="copyToken" class="layui-btn layui-btn-xs layui-btn-primary"
-                              style="border:none; background:transparent; " title="点击复制Token">
-                             <i class="layui-icon layui-icon-file" style="color:#16baaa; font-size:16px;"></i>
-                           </a>
+    function showLoading() {
+        document.getElementById('loadingState').style.display = 'flex';
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('cardContainer').style.display = 'none';
+    }
+
+    function hideLoading() {
+        document.getElementById('loadingState').style.display = 'none';
+    }
+
+    function showEmptyState() {
+        document.getElementById('emptyState').style.display = 'flex';
+        document.getElementById('cardContainer').style.display = 'none';
+    }
+
+    function showCards() {
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('cardContainer').style.display = 'grid';
+    }
+
+    function renderClientCards(clients) {
+        const container = document.getElementById('cardContainer');
+        container.innerHTML = '';
+
+        if (!clients || clients.length === 0) {
+            showEmptyState();
+            return;
+        }
+
+        showCards();
+
+        clients.forEach(client => {
+            const cardHtml = `
+                <div class="client-card" data-client-id="${client.id}">
+                    <div class="card-header">
+                        <div class="card-title" title="${client.name}">${client.name}</div>
+                        <div class="card-actions">
+                            <div class="card-action-btn edit-btn" data-id="${client.id}" style="color: #1E9FFF;">编辑</div>
+                            <div class="card-action-btn delete-btn" data-id="${client.id}" style="color: #FF5722;">删除</div>
                         </div>
-                    `;
-                    }
-                },
-                {
-                    field: 'status', title: '状态', sort: true,
-                    templet: function (d) {
-                        if (d.status === 1) {
-                            return `
-                <div style="display: flex; justify-content: space-between; align-items: center">
-                    <div style="display: flex; align-items: center;">
-                        <i class="layui-icon layui-icon-circle-dot status-breath"
-                        style="font-size:16px; color:#16b777; margin-right:6px;"></i>
-                        <span style="color:#16b777; font-weight:500;">在线</span>
                     </div>
-                    <div style="display: flex; align-items: center;">
-                        <img  style="height: 24px;width: 24px;margin-right: 2px"  src="${getOsIcon(d.os)}">
-                        <span style="font-weight:500;color: #333;font-size: 15px">${d.os || ''}</span>
-                        <span class="layui-badge layui-bg-cyan" style=" font-size:15px; margin-left:15px;">${d.arch || ''}</span>
+                    <div class="card-body">
+                        <div class="status-icon">
+                            <img src="/static/image/icon/${client.status === 1 ? 'connected' : 'disconnect'}.svg" style="width: 50px;height: 50px;">
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="footer-action copy-token-btn" data-token="${client.secretKey}" style="color: #16baaa;">复制Token</div>
+                        <div class="footer-action kickout-btn" data-id="${client.id}" data-name="${client.name}" data-token="${client.secretKey}" style="color: #FFB800;${client.status !== 1 ? 'opacity: 0.5; pointer-events: none;' : ''}">强制下线</div>
                     </div>
                 </div>
             `;
-                        } else {
-                            return `
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; align-items: center;">
-                        <i class="layui-icon layui-icon-circle-dot"
-                        style="font-size:16px; color:gray; margin-right:6px;"></i>
-                        <span style="color:#999;">离线</span>
-                    </div>
-                    <div></div>
-                </div>
-            `;
-                        }
-                    }
-                },
-                {fixed: 'right', title: '操作', width: 240, templet: '#tableToolbar'}
-            ]],
-            error: function (res, msg) {
-                console.log(res, msg)
-            }
+            container.innerHTML += cardHtml;
         });
-        //单元格操作事件
-        table.on('tool(client)', function (obj) {
-            const data = obj.data;
-            if (obj.event === 'kickout') {
-                layer.confirm('确定踢掉「' + data.name + '」客户端吗？<br>此操作将会断开所有已建立的连接！',
-                    {
-                        icon: 2,
-                        title: '危险操作确认',
-                        skin: 'layui-layer-molv',
-                        btn: ['确认踢掉', '我再想想'],
-                    }, function (index) {
-                        Rest.delete('/api/client/kickout', {id: data.id, secretKey: data.secretKey}).then(res => {
-                            table.reload('client')
-                            layer.msg("已跌掉", {time: 2000});
-                        })
-                    })
-            } else if (obj.event === 'edit') {
+
+        bindCardEvents();
+    }
+
+    function updateCardStatus(clientId, isOnline) {
+        const card = document.querySelector(`.client-card[data-client-id="${clientId}"]`);
+        if (!card) return;
+
+        // 更新状态图标
+        const statusIcon = card.querySelector('.status-icon img');
+        if (statusIcon) {
+            statusIcon.src = `/static/image/icon/${isOnline ? 'connected' : 'disconnect'}.svg`;
+        }
+
+        // 更新强制下线按钮状态
+        const kickoutBtn = card.querySelector('.kickout-btn');
+        if (kickoutBtn) {
+            if (isOnline) {
+                kickoutBtn.style.opacity = '1';
+                kickoutBtn.style.pointerEvents = 'auto';
+            } else {
+                kickoutBtn.style.opacity = '0.5';
+                kickoutBtn.style.pointerEvents = 'none';
+            }
+        }
+    }
+
+    function bindCardEvents() {
+        // 编辑事件
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const clientId = this.getAttribute('data-id');
                 layer.open({
                     title: '编辑',
                     type: 2,
                     offset: '30px',
                     shade: false,
                     area: ['40%', '30%'],
-                    content: '/client/edit.html?id=' + data.id
+                    content: '/client/edit.html?id=' + clientId
                 });
-            } else if (obj.event === 'delete') {
-                layer.confirm('确定删除「' + data.name + '」客户端吗？<br>此操作将会删除所有端口映射，包括运行中的映射！',
+            });
+        });
+
+        // 删除事件
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const clientId = this.getAttribute('data-id');
+                const clientName = this.closest('.client-card').querySelector('.card-title').textContent;
+
+                layer.confirm('确定删除「' + clientName + '」客户端吗？',
                     {
                         icon: 2,
                         title: '危险操作确认',
                         skin: 'layui-layer-molv',
                         btn: ['确认删除', '我再想想'],
                     }, function (index) {
-                        Rest.delete('/api/client/del', {id: data.id}).then(res => {
-                            table.reload('client')
+                        layui.Rest.delete('/api/client/del', {id: clientId}).then(res => {
+                            loadClientData();
                             layer.msg("删除成功", {time: 2000});
-                        })
+                        });
                     });
+            });
+        });
 
-            } else if (obj.event === 'copyToken') {
-                ClipMaster.copy(data.secretKey);
-            }
-        })
-        //操作工具栏
-        table.on('toolbar(client)', function (obj) {
-            if (obj.event === 'add') {
-                layer.open({
-                    title: '新增客户端',
-                    type: 2,
-                    offset: '30px',
-                    shade: false,
-                    area: ['40%', '30%'],
-                    content: '/client/add.html'
-                });
-            } else if (obj.event === 'flush') {
-                table.reload('client')
-            }
-        })
-    })
+        // 复制Token事件
+        document.querySelectorAll('.copy-token-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const token = this.getAttribute('data-token');
+                ClipMaster.copy(token);
+            });
+        });
+
+        // 强制下线事件
+        document.querySelectorAll('.kickout-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const clientId = this.getAttribute('data-id');
+                const clientName = this.getAttribute('data-name');
+                const token = this.getAttribute('data-token');
+
+                layer.confirm('确定踢掉「' + clientName + '」客户端吗？',
+                    {
+                        icon: 2,
+                        title: '危险操作确认',
+                        skin: 'layui-layer-molv',
+                        btn: ['确认踢掉', '我再想想'],
+                    }, function (index) {
+                        layui.Rest.delete('/api/client/kickout', {id: clientId, secretKey: token}).then(res => {
+                            updateCardStatus(clientId, false);
+                            layer.msg("已踢掉", {time: 2000});
+                        }).catch(err => {
+                            layer.msg('强制下线失败: ' + err.message, {icon: 2});
+                        });
+                    });
+            });
+        });
+    }
+
+    function loadClientData() {
+        showLoading();
+
+        layui.use(['jquery', 'Rest'], function () {
+            const Rest = layui.Rest;
+            const $ = layui.$;
+
+            Rest.get('/api/client/list', {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+                }
+            }).then(res => {
+                hideLoading();
+                if (res) {
+                    renderClientCards(res || []);
+                }
+            }).catch(err => {
+                hideLoading();
+                renderClientCards([]);
+                layer.msg('网络错误: ' + err.message, {icon: 2});
+            });
+        });
+    }
+
+    layui.use(['layer', 'jquery', 'Rest'], function () {
+        const layer = layui.layer;
+        const $ = layui.$;
+
+        // 加载数据
+        loadClientData();
+
+        // 新增按钮事件
+        $('#addClientBtn').on('click', function () {
+            layer.open({
+                title: '新增客户端',
+                type: 2,
+                offset: '30px',
+                shade: false,
+                area: ['40%', '30%'],
+                content: '/client/add.html'
+            });
+        });
+
+        // 刷新按钮事件
+        $('#refreshBtn').on('click', function () {
+            loadClientData();
+            layer.msg('刷新成功', {time: 1000});
+        });
+
+        // 空状态添加按钮事件
+        $('#addFirstClientBtn').on('click', function () {
+            layer.open({
+                title: '新增客户端',
+                type: 2,
+                offset: '30px',
+                shade: false,
+                area: ['40%', '30%'],
+                content: '/client/add.html'
+            });
+        });
+    });
 </script>
 </body>
 </html>

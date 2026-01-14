@@ -23,7 +23,7 @@ public class StaticResourceHandler {
      */
     private static final String[] STATIC_PATHS = {"/static/", "/template/"};
     private static final String WEB_ROOT = "src/main/resources";
-    private static final boolean DEV_MODE = false;
+    private static final boolean DEV_MODE = true;
     /**
      * 文件类型映射
      */

@@ -35,7 +35,7 @@ totalSizeCap = "3GB"
 [dashboard]
 enable = true
 #addr = "localhost"
-port = 8020
+port = 8030
 reset = true
 username = "admin"
 password = "123456"

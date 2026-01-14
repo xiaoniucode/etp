@@ -35,8 +35,10 @@
             const field = data.field;
             Rest.post('/api/client/add', field).then(res => {
                 layer.msg('创建成功', {icon: 1, time: 400,}, () => {
-                    const parentTable = parent.layui.table;
-                    parentTable.reload('client');
+                    // 调用父页面的刷新函数
+                    if (parent.loadClientData) {
+                        parent.loadClientData();
+                    }
                     parent.layer.close(parent.layer.getFrameIndex(window.name));
                 });
             })
