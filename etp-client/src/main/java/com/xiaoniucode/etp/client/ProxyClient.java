@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.NewProxy;
+import com.xiaoniucode.etp.core.msg.NewProxyResp;
 import io.netty.channel.Channel;
 
 /**
@@ -27,9 +28,8 @@ public class ProxyClient {
     public void unregisterProxy() {
         Channel controlChannel = ChannelManager.getControlChannel();
         if (controlChannel != null) {
-            Integer proxyId = controlChannel.attr(EtpConstants.PROXY_ID).get();
-            Long sessionId = controlChannel.attr(EtpConstants.SESSION_ID).get();
-            CloseProxy closeProxy = new CloseProxy(sessionId, proxyId);
+            NewProxyResp resp = ProxyRespHelper.get();
+            CloseProxy closeProxy = new CloseProxy(resp.getSessionId(), resp.getProxyId());
             controlChannel.writeAndFlush(closeProxy);
         }
     }

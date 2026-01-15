@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.client.handler;
 
+import com.xiaoniucode.etp.client.ProxyRespHelper;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.MessageHandler;
 import com.xiaoniucode.etp.core.msg.Message;
@@ -21,9 +22,7 @@ public class NewProxyRespHandler implements MessageHandler {
         Channel controlChannel = ctx.channel();
         if (msg instanceof NewProxyResp) {
             NewProxyResp resp = (NewProxyResp) msg;
-            //用于下线时通知服务端清理对应的资源
-            controlChannel.attr(EtpConstants.PROXY_ID).set(resp.getProxyId());
-            controlChannel.attr(EtpConstants.SESSION_ID).set(resp.getSessionId());
+            ProxyRespHelper.set(resp);
             String serverAddr = controlChannel.attr(EtpConstants.SERVER_DDR).get();
             logger.info("公网访问地址：{}:{}", serverAddr, resp.getRemoteAddr());
         }
