@@ -2,13 +2,9 @@ package com.xiaoniucode.etp.autoconfigure;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.DefaultAppConfig;
-import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.client.ProxyClient;
 import com.xiaoniucode.etp.client.TunnelClient;
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.NewProxy;
-import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
@@ -73,19 +69,7 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
 
     @Override
     public void stop() {
-        //注销端口映射
-        Channel controlChannel = ChannelManager.getControlChannel();
-        if (controlChannel != null) {
-            //发送下线消息
-            Integer proxyId = controlChannel.attr(EtpConstants.PROXY_ID).get();
-            Long sessionId = controlChannel.attr(EtpConstants.SESSION_ID).get();
-            proxyClient.unregisterProxy(new CloseProxy(sessionId,proxyId));
-        } else {
-            logger.warn("control channel is null");
-        }
-        System.clearProperty("client.truststore.path");
-        System.clearProperty("client.truststore.storePass");
-        //停掉客户端
+        proxyClient.unregisterProxy();
         if (isRunning() && tunnelClient != null) {
             tunnelClient.stop();
             logger.info("etp client stopped");

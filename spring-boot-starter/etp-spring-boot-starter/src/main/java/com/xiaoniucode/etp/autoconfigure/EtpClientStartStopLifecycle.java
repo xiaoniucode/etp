@@ -78,19 +78,7 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
 
     @Override
     public void stop() {
-        //注销端口映射
-        Channel controlChannel = ChannelManager.getControlChannel();
-        if (controlChannel != null) {
-            //发送下线消息
-            Integer proxyId = controlChannel.attr(EtpConstants.PROXY_ID).get();
-            Long sessionId = controlChannel.attr(EtpConstants.SESSION_ID).get();
-            proxyClient.unregisterProxy(new CloseProxy(sessionId,proxyId));
-        } else {
-            logger.warn("control channel is null");
-        }
-        System.clearProperty("client.truststore.path");
-        System.clearProperty("client.truststore.storePass");
-        //停掉客户端
+        proxyClient.unregisterProxy();
         if (isRunning() && tunnelClient != null) {
             tunnelClient.stop();
             logger.info("etp client stopped");

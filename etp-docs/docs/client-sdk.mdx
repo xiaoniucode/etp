@@ -1,0 +1,70 @@
+---
+sidebar_position: 8
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# 客户端SDK
+
+下文介绍如何在Java客户端中集成etp客户端。
+
+## 引入依赖
+
+<Tabs>
+    <TabItem value="Maven" label="Maven" default>
+        ```xml
+        <dependency>
+            <groupId>io.github.xiaoniucode</groupId>
+            <artifactId>etp-client</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        ```
+    </TabItem>
+    <TabItem value="Gradle" label="Gradle">
+        ```groovy
+        implementation("io.github.xiaoniucode:etp-client:0.3.0")
+        ```
+    </TabItem>
+</Tabs>
+
+## 创建etp客户端
+
+```java
+AppConfig config = new DefaultAppConfig
+        .Builder()
+        .serverAddr("localhost")
+        .serverPort(9527)
+        .secretKey("your-secret-key")
+        .build();
+tunnelClient = new TunnelClient(config);
+tunnelClient.start();//启动
+```
+停掉客户端:
+```java
+  tunnelClient.stop();
+```
+## 注册代理
+
+```java
+ProxyClient proxyClient = new ProxyClient();
+//启动成功后回调
+tunnelClient.onConnectSuccessListener((callback) -> {
+    NewProxy newProxy = new NewProxy();
+    newProxy.setLocalPort(3306);
+    newProxy.setAutoStart(true);
+    newProxy.setRemotePort(3307);
+    newProxy.setProtocol("tcp");
+    newProxy.setName("mysql");
+    //注册代理
+    proxyClient.registerProxy(newProxy);
+});
+```
+下线代理：
+
+```java
+proxyClient.unregisterProxy();
+```
+:::tip 提示
+当前不支持使用SDK在一个客户端中注册多个代理！
+:::
