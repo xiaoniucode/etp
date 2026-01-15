@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.manager;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.server.config.AuthInfo;
+import com.xiaoniucode.etp.server.config.domain.AuthInfo;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public final class ChannelManager {
     /**
      * 用于记录每个公网端口下有哪些活跃的连接channel
      */
-    private static Map<Integer, Set<Channel>> activeChannels = new ConcurrentHashMap<>();
+    private static final Map<Integer, Set<Channel>> activeChannels = new ConcurrentHashMap<>();
 
     /**
      * 只会在客户端认证的时候执行一次

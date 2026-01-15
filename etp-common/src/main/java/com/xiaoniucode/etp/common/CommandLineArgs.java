@@ -113,19 +113,6 @@ public class CommandLineArgs {
         }
         return Boolean.parseBoolean(value);
     }
-
-    public void printHelp(String appName) {
-        System.out.println(appName + " 命令行工具");
-        System.out.println("用法: " + appName + " [选项]");
-        System.out.println();
-        System.out.println("选项:");
-        for (Option option : options.values()) {
-            String shortOpt = option.shortName != null ? "-" + option.shortName : "  ";
-            String longOpt = "--" + option.name;
-            System.out.printf("  %-4s %-20s %s%n", shortOpt, longOpt, option.description);
-        }
-    }
-
     private static class Option {
         String name;
         String shortName;

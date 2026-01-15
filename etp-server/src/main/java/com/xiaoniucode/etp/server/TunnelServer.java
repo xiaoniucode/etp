@@ -7,6 +7,7 @@ import com.xiaoniucode.etp.core.IdleCheckHandler;
 import com.xiaoniucode.etp.core.codec.TunnelMessageCodec;
 import com.xiaoniucode.etp.core.event.GlobalEventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.handler.ControlTunnelHandler;
 import com.xiaoniucode.etp.server.proxy.HttpProxyServer;
@@ -36,20 +37,22 @@ import java.util.concurrent.TimeUnit;
  */
 public class TunnelServer implements Lifecycle {
     private static final Logger logger = LoggerFactory.getLogger(TunnelServer.class);
-    private String host;
-    private int port;
-    private boolean tls;
+    private final AppConfig config;
     private EventLoopGroup tunnelBossGroup;
     private EventLoopGroup tunnelWorkerGroup;
     private SslContext tlsContext;
     private NettyWebServer webServer;
+
+    public TunnelServer(AppConfig config) {
+        this.config = config;
+    }
 
     @SuppressWarnings("all")
     @Override
     public void start() {
         try {
             logger.debug("正在启动ETP服务");
-            if (tls) {
+            if (config.isTls()) {
                 tlsContext = new ServerTlsContextFactory().createContext();
             }
             tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
@@ -65,7 +68,7 @@ public class TunnelServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            if (tls) {
+                            if (config.isTls()) {
                                 sc.pipeline().addLast("tls", tlsContext.newHandler(sc.alloc()));
                                 logger.debug("TLS加密处理器添加成功");
                             }
@@ -76,7 +79,8 @@ public class TunnelServer implements Lifecycle {
                                     .addLast(new ControlTunnelHandler());
                         }
                     });
-            serverBootstrap.bind(host, port).sync();
+            serverBootstrap.bind(config.getHost(), config.getBindPort()).sync();
+            ConfigHelper.set(config);
             //异步处理
             CompletableFuture.runAsync(() -> {
                 //初始化管理面板
@@ -93,7 +97,7 @@ public class TunnelServer implements Lifecycle {
                 httpProxyServer.setDomainMapping(domains);
                 httpProxyServer.start();
             });
-            logger.info("ETP隧道已开启:{}:{}", host, port);
+            logger.info("ETP隧道已开启:{}:{}", config.getHost(), config.getBindPort());
             GlobalEventBus.get().publishAsync(new TunnelBindEvent());
         } catch (Throwable e) {
             logger.error("ETP隧道开启失败", e);
@@ -101,10 +105,12 @@ public class TunnelServer implements Lifecycle {
     }
 
     private void initDashboard() {
-        if (AppConfig.get().getDashboard().getEnable()) {
-            webServer = ServerFactory.createWebServer();
-            DashboardApi.initFilters(webServer.getFilters());/*web过滤器*/
-            DashboardApi.initRoutes(webServer.getRouter());/*web接口*/
+        if (config.getDashboard().getEnable()) {
+            webServer = new NettyWebServer();
+            webServer.setAddr(config.getDashboard().getAddr());
+            webServer.setPort(config.getDashboard().getPort());
+            DashboardApi.initFilters(webServer.getFilters());
+            DashboardApi.initRoutes(webServer.getRouter());
             webServer.start();
             logger.info("Dashboard图形面板启动成功，浏览器访问：{}:{}", webServer.getAddr(), webServer.getPort());
         }
@@ -124,24 +130,7 @@ public class TunnelServer implements Lifecycle {
         }
     }
 
-    public String getHost() {
-        return host;
+    public AppConfig getConfig() {
+        return config;
     }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public void setTls(boolean tls) {
-        this.tls = tls;
-    }
-
 }

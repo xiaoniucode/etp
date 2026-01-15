@@ -1,12 +1,13 @@
 package com.xiaoniucode.etp.server.web.serivce;
 
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.PortRange;
+import com.xiaoniucode.etp.server.config.ConfigHelper;
+import com.xiaoniucode.etp.server.config.domain.PortRange;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
 import org.json.JSONObject;
 
 public class SettingService {
-    private final AppConfig config = AppConfig.get();
+    private final AppConfig config = ConfigHelper.get();
 
     public JSONObject getSetting(String key) {
         return DaoFactory.INSTANCE.getSettingDao().getByKey(key);

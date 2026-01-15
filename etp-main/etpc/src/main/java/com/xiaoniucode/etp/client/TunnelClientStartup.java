@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class TunnelClientStartup {
@@ -131,11 +130,11 @@ public class TunnelClientStartup {
         System.out.println("用法: etpc [选项]");
         System.out.println();
         System.out.println("选项:");
-        System.out.println("  -c, --config <path>        配置文件路径");
-        System.out.println("  -h, --host <address>       服务器地址");
-        System.out.println("  -p, --port <port>          服务器端口");
-        System.out.println("  -sk, --secretKey <key>     认证密钥");
-        System.out.println("  --help                     显示帮助信息");
+        System.out.println("  -c, --config <path>           配置文件路径");
+        System.out.println("  -h, --host <serverAddr>       服务器地址");
+        System.out.println("  -p, --port <serverPort>       服务器端口");
+        System.out.println("  -sk, --secretKey <Token>      认证密钥");
+        System.out.println("  --help                        显示帮助信息");
         System.out.println();
         System.out.println("示例:");
         System.out.println("  etpc -c etpc.toml");

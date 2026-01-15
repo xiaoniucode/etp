@@ -1,8 +1,6 @@
-package com.xiaoniucode.etp.server.config;
+package com.xiaoniucode.etp.server.config.domain;
 
 /**
- * 已认证客户端信息
- *
  * @author liuxin
  */
 public class AuthInfo {

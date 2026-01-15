@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.listener;
 
 import com.xiaoniucode.etp.core.event.EventListener;
 import com.xiaoniucode.etp.core.event.GlobalEventBus;
-import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.event.DatabaseInitEvent;
 import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.web.core.orm.JdbcFactory;
@@ -17,7 +17,7 @@ public class DatabaseInitListener implements EventListener<TunnelBindEvent> {
 
     @Override
     public void onEvent(TunnelBindEvent event) {
-        if (AppConfig.get().getDashboard().getEnable()) {
+        if (ConfigHelper.get().getDashboard().getEnable()) {
             logger.debug("开始初始化数据库表");
             createAuthTokenTable();
             createUserTable();

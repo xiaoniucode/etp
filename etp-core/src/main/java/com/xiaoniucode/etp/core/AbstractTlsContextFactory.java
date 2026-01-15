@@ -60,9 +60,5 @@ public abstract class AbstractTlsContextFactory {
         tmf.init(trustStore);
         return tmf;
     }
-
-    /**
-     * 创建具体的SslContext
-     */
     public abstract SslContext createContext() throws Exception;
 }

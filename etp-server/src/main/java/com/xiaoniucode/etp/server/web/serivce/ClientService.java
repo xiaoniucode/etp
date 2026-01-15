@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.web.serivce;
 
 import com.xiaoniucode.etp.core.msg.KickoutClient;
-import com.xiaoniucode.etp.server.config.AuthInfo;
-import com.xiaoniucode.etp.server.config.ClientInfo;
+import com.xiaoniucode.etp.server.config.domain.AuthInfo;
+import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
@@ -99,7 +99,7 @@ public class ClientService {
             client.put("secretKey", secretKey);
             //添加到数据库
             int clientId = DaoFactory.INSTANCE.getClientDao().insert(client);
-            ClientInfo clientInfo = new ClientInfo(clientId, name, secretKey);
+            ClientInfo clientInfo = new ClientInfo(name, secretKey,clientId);
             //注册客户端
             state.registerClient(clientInfo);
             return clientId;

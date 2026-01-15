@@ -1,7 +1,9 @@
 package com.xiaoniucode.etp.server.manager;
 
+
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.PortRange;
+import com.xiaoniucode.etp.server.config.ConfigHelper;
+import com.xiaoniucode.etp.server.config.domain.PortRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +22,7 @@ public class PortPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(PortPool.class);
     private static final PortPool instance = new PortPool();
     private final Set<Integer> allocatedPorts = new HashSet<>(32);
-    private final PortRange portRange = AppConfig.get().getPortRange();
+    private final PortRange portRange = ConfigHelper.get().getPortRange();
     private int startPort;
     private int endPort;
 

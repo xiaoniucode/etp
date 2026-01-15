@@ -3,8 +3,9 @@ package com.xiaoniucode.etp.server.web.serivce;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.server.GlobalIdGenerator;
+import com.xiaoniucode.etp.server.config.domain.ProxyMapping;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.ProxyMapping;
+import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.PortPool;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
@@ -18,7 +19,7 @@ import org.json.JSONObject;
 import java.util.Locale;
 
 public class ProxyService {
-    private final AppConfig config = AppConfig.get();
+    private final AppConfig config = ConfigHelper.get();
     private final RuntimeStateManager state = RuntimeStateManager.get();
     private final JdbcTransactionTemplate TX = new JdbcTransactionTemplate();
 
@@ -155,9 +156,10 @@ public class ProxyService {
     }
 
     private ProxyMapping createProxyMapping(JSONObject req) {
-        ProxyMapping proxyMapping = new ProxyMapping(ProtocolType.getType(req.getString("type")),
-                req.getInt("localPort"),
-                req.getInt("remotePort"));
+        ProxyMapping proxyMapping = new ProxyMapping();
+        proxyMapping.setType(ProtocolType.getType(req.getString("type")));
+        proxyMapping.setLocalPort(req.getInt("localPort"));
+        proxyMapping.setRemotePort(req.getInt("remotePort"));
         proxyMapping.setProxyId(req.getInt("clientId"));
         proxyMapping.setName(req.getString("name"));
         proxyMapping.setStatus(req.getInt("status"));

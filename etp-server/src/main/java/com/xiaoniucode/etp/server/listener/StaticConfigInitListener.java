@@ -4,7 +4,9 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.core.event.EventListener;
 import com.xiaoniucode.etp.server.GlobalIdGenerator;
-import com.xiaoniucode.etp.server.config.*;
+import com.xiaoniucode.etp.server.config.domain.*;
+import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.event.DatabaseInitEvent;
 import com.xiaoniucode.etp.server.manager.PortPool;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
@@ -22,7 +24,7 @@ import java.util.Locale;
 public class StaticConfigInitListener implements EventListener<DatabaseInitEvent> {
     private static final Logger logger = LoggerFactory.getLogger(StaticConfigInitListener.class);
     private final static RuntimeStateManager runtimeState = RuntimeStateManager.get();
-    private final static AppConfig config = AppConfig.get();
+    private final static AppConfig config = ConfigHelper.get();
     private static JdbcTransactionTemplate TX;
 
     /**
@@ -102,10 +104,11 @@ public class StaticConfigInitListener implements EventListener<DatabaseInitEvent
 
     private void registerTomlConfig() {
         Boolean enableDashboard = config.getDashboard().getEnable();
-        List<ClientInfo> clients = AppConfig.get().getClients();
+        List<ClientInfo> clients = ConfigHelper.get().getClients();
         clients.forEach(clientInfo -> {
-            String secretKey = clientInfo.getSecretKey();
-            String name = clientInfo.getName();
+            ClientInfo client = clientInfo;
+            String secretKey = client.getSecretKey();
+            String name = client.getName();
             Integer clientId = null;
             if (!runtimeState.hasClient(secretKey)) {
                 //如果开启了管理面板，需要将客户端配置同步到数据库
@@ -125,14 +128,14 @@ public class StaticConfigInitListener implements EventListener<DatabaseInitEvent
                     clientId = GlobalIdGenerator.nextId();
                 }
                 //注册客户端
-                clientInfo.setClientId(clientId);
-                runtimeState.registerClient(clientInfo);
+                client.setClientId(clientId);
+                runtimeState.registerClient(client);
             } else {
                 clientId = runtimeState.getClient(secretKey).getClientId();
                 logger.warn("客户端「{}」 注册失败，已经在数据库被注册", name);
             }
 
-            List<ProxyMapping> proxies = clientInfo.getProxies();
+            List<ProxyMapping> proxies = client.getProxies();
             for (ProxyMapping proxy : proxies) {
                 Integer remotePort = proxy.getRemotePort();
                 if (!runtimeState.hasProxy(secretKey, remotePort)) {
@@ -188,7 +191,7 @@ public class StaticConfigInitListener implements EventListener<DatabaseInitEvent
                 int clientId = client.getInt("id");
                 String name = client.getString("name");
                 String secretKey = client.getString("secretKey");
-                ClientInfo clientInfo = new ClientInfo(clientId, name, secretKey);
+                ClientInfo clientInfo = new ClientInfo(name,secretKey,clientId);
                 runtimeState.registerClient(clientInfo);
             }
         }

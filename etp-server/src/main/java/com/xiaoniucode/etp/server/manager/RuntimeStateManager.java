@@ -1,17 +1,15 @@
 package com.xiaoniucode.etp.server.manager;
 
 import com.xiaoniucode.etp.core.codec.ProtocolType;
-import com.xiaoniucode.etp.server.config.ClientInfo;
-import com.xiaoniucode.etp.server.config.ProxyMapping;
-
-import java.util.concurrent.CopyOnWriteArrayList;
-
+import com.xiaoniucode.etp.server.config.domain.ClientInfo;
+import com.xiaoniucode.etp.server.config.domain.ProxyMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 用于统一管理运行时各种配置信息
