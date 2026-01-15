@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.manager;
 
-import com.xiaoniucode.etp.common.StringUtils;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.server.config.AuthInfo;
 import io.netty.channel.Channel;
@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 通道管理器

@@ -5,7 +5,7 @@ import com.xiaoniucode.etp.client.config.DefaultAppConfig;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.client.ProxyClient;
 import com.xiaoniucode.etp.client.TunnelClient;
-import com.xiaoniucode.etp.common.StringUtils;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.NewProxy;

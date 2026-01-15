@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.config;
 
-import com.xiaoniucode.etp.common.LogConfig;
+import com.xiaoniucode.etp.common.log.LogConfig;
 
 public class DefaultAppConfig implements AppConfig {
     private final String serverAddr;

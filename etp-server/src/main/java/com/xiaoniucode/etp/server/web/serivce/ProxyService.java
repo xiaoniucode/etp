@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.serivce;
 
-import com.xiaoniucode.etp.common.StringUtils;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.server.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.config.AppConfig;

@@ -1,7 +1,10 @@
-package com.xiaoniucode.etp.common;
+package com.xiaoniucode.etp.common.utils;
 
 import ch.qos.logback.classic.Level;
 import com.moandjiezana.toml.Toml;
+import com.xiaoniucode.etp.common.Constants;
+import com.xiaoniucode.etp.common.log.LogConfig;
+
 import java.io.File;
 
 /**

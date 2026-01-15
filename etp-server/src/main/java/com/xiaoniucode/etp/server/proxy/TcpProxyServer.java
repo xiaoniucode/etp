@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.proxy;
 
-import com.xiaoniucode.etp.common.PortFileUtil;
+import com.xiaoniucode.etp.common.utils.PortFileUtil;
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.server.handler.visitor.TcpVisitorHandler;

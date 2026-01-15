@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.common;
+package com.xiaoniucode.etp.common.utils;
 
 /**
  * 字符串相关工具函数

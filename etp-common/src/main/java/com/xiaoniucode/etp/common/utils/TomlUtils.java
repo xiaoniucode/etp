@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.common;
+package com.xiaoniucode.etp.common.utils;
 
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;

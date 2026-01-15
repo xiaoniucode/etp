@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.client.config;
 
 import com.xiaoniucode.etp.common.config.Config;
-import com.xiaoniucode.etp.common.LogConfig;
+import com.xiaoniucode.etp.common.log.LogConfig;
 
 public interface AppConfig extends Config {
     String getServerAddr();

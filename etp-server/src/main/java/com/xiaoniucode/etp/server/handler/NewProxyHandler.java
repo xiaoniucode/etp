@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.handler;
 
-import com.xiaoniucode.etp.common.StringUtils;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.MessageHandler;
 import com.xiaoniucode.etp.core.msg.Error;

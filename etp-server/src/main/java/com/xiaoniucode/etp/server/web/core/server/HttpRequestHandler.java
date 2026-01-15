@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.core.server;
 
-import com.xiaoniucode.etp.common.StringUtils;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.server.web.common.ResponseEntity;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

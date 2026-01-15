@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.core.server;
 
-import com.xiaoniucode.etp.common.StringUtils;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 
 /**
  * @author liuxin

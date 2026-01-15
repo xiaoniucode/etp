@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.serivce;
 
-import com.xiaoniucode.etp.common.StringUtils;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
 import org.json.JSONObject;
 import org.slf4j.Logger;

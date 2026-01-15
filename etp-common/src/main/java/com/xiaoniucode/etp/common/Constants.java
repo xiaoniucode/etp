@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.common;
 
 import ch.qos.logback.classic.Level;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 
 /**
  * 系统常量

@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.common;
+package com.xiaoniucode.etp.common.log;
 
 import ch.qos.logback.classic.Level;
 

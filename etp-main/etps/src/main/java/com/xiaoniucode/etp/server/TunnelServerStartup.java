@@ -2,6 +2,8 @@ package com.xiaoniucode.etp.server;
 
 import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.common.*;
+import com.xiaoniucode.etp.common.log.LogConfig;
+import com.xiaoniucode.etp.common.log.LogbackConfigurator;
 import com.xiaoniucode.etp.core.event.GlobalEventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.DatabaseInitEvent;
@@ -11,13 +13,16 @@ import com.xiaoniucode.etp.server.listener.StaticConfigInitListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * 服务启动入口
  *
  * @author liuxin
  */
 public class TunnelServerStartup {
-    private static TunnelServer tunnelServer;
     private static final Logger logger = LoggerFactory.getLogger(TunnelServerStartup.class);
 
     static {
@@ -25,26 +30,80 @@ public class TunnelServerStartup {
     }
 
     public static void main(String[] args) {
-        String configPath = ConfigUtils.getConfigPath(args, Constants.SERVER_CONFIG_NAME);
-        if (configPath == null) {
-            System.err.println("请指定配置文件路径！");
-            return;
-        }
-        //1.加载配置文件
-        AppConfig config = AppConfig.get().load(configPath);
-        //2.初始化日志配置
-        initLogback();
-        int bindPort = config.getBindPort();
-        if (PortChecker.isPortOccupied(bindPort)) {
-            logger.error("{}端口已经被占用", bindPort);
-            return;
-        }
-        GlobalEventBus.get().subscribe(TunnelBindEvent.class, new DatabaseInitListener());
-        GlobalEventBus.get().subscribe(DatabaseInitEvent.class, new StaticConfigInitListener());
+        try {
+            String configPath = getConfigPath(args);
+            if (configPath == null) {
+                System.err.println("请指定配置文件路径！");
+                return;
+            }
+            
+            AppConfig config = AppConfig.get().load(configPath);
+            initLogback();
+            int bindPort = config.getBindPort();
+            if (PortChecker.isPortOccupied(bindPort)) {
+                logger.error("{}端口已经被占用", bindPort);
+                return;
+            }
+            GlobalEventBus.get().subscribe(TunnelBindEvent.class, new DatabaseInitListener());
+            GlobalEventBus.get().subscribe(DatabaseInitEvent.class, new StaticConfigInitListener());
 
-        tunnelServer = ServerFactory.createTunnelServer();
-        registerShutdownHook(tunnelServer);
-        tunnelServer.start();
+            TunnelServer tunnelServer = ServerFactory.createTunnelServer();
+            registerShutdownHook(tunnelServer);
+            tunnelServer.start();
+        } catch (IllegalArgumentException e) {
+            logger.error("参数错误: {}", e.getMessage());
+            System.err.println("错误: " + e.getMessage());
+            System.exit(1);
+        } catch (Exception e) {
+            logger.error("启动失败", e);
+            System.err.println("启动失败: " + e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    private static String getConfigPath(String[] args) {
+        CommandLineArgs cmdArgs = new CommandLineArgs();
+        cmdArgs.registerOption("config", "c", "配置文件路径", false, true);
+        cmdArgs.registerOption("help", "h", "显示帮助信息", false, false);
+        
+        try {
+            cmdArgs.parse(args);
+            
+            if (cmdArgs.has("help")) {
+                printHelp();
+                System.exit(0);
+            }
+            
+            if (cmdArgs.has("config")) {
+                String configFilePath = cmdArgs.get("config");
+                if (!Files.exists(Paths.get(configFilePath))) {
+                    throw new IllegalArgumentException("配置文件不存在: " + configFilePath);
+                }
+                return configFilePath;
+            }
+            //从当前路径获取
+            Path currentDir = Paths.get("").toAbsolutePath();
+            Path defaultConfig = currentDir.resolve(Constants.SERVER_CONFIG_NAME);
+            if (Files.exists(defaultConfig)) {
+                return defaultConfig.toString();
+            }
+            
+            return null;
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+    }
+
+    private static void printHelp() {
+        System.out.println("用法: etps [选项]");
+        System.out.println();
+        System.out.println("选项:");
+        System.out.println("  -c, --config <path>         配置文件路径");
+        System.out.println("  --help                     显示帮助信息");
+        System.out.println();
+        System.out.println("示例:");
+        System.out.println("  etps -c etps.toml");
+        System.out.println("  etps");
     }
 
     private static void initLogback() {
