@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 创建并缓存隧道消息处理器
  *
  * @author liuxin
  */

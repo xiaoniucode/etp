@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 将从内网真实服务接收到的数据通过数据隧道发送到代理服务器
  *
  * @author liuxin
  */
@@ -36,9 +35,6 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
         super.channelActive(ctx);
     }
 
-    /**
-     * 该方法执行情况：1.公网连接者客户端主动断开连接. 2.公网客户端已经通过代理服务器连接上了，此时内网服务主动断开（如停机）
-     */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel realChannel = ctx.channel();
@@ -56,10 +52,6 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
         super.channelInactive(ctx);
     }
 
-    /**
-     * 背压，流量控制
-     * 当内网真实服务（realChannel）写缓冲区满,暂停数据隧道（dataTunnelChannel）的自动读取数据。
-     */
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel realChannel = ctx.channel();

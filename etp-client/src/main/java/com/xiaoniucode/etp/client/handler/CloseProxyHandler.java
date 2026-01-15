@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 数据传输隧道断开，归还连接到连接池，资源清理
  *
  * @author liuxin
  */

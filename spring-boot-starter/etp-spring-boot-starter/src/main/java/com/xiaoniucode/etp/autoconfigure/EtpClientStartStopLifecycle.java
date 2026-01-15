@@ -5,7 +5,6 @@ import com.xiaoniucode.etp.client.ProxyRegisterClient;
 import com.xiaoniucode.etp.client.TunnelClient;
 import com.xiaoniucode.etp.common.StringUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.codec.TunnelMessage;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Consumer;
 
 /**
- * 处理各种控制指令，分配给对应的处理器处理
  *
  * @author liuxin
  */

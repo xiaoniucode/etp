@@ -136,7 +136,7 @@ public final class RuntimeStateManager {
             client.getTcpProxies().add(proxy);
             clientRemotePorts.getOrDefault(secretKey, new CopyOnWriteArrayList<>()).add(proxy.getRemotePort());
             portMapping.put(proxy.getRemotePort(), proxy.getLocalPort());
-            logger.debug("TCP映射{}注册成功", proxy.getName());
+            logger.debug("TCP代理 {} 注册成功", proxy.getName());
             return true;
         }
         if (!Objects.isNull(client) && (proxy.getType() == ProtocolType.HTTP)) {
@@ -144,7 +144,7 @@ public final class RuntimeStateManager {
             Set<String> domains = proxy.getDomains();
             clientDomains.getOrDefault(secretKey, new CopyOnWriteArraySet<>()).addAll(domains);
             domains.forEach(domain -> domainMapping.put(domain, proxy.getLocalPort()));
-            logger.debug("HTTP代理{}注册成功", proxy.getName());
+            logger.debug("HTTP代理 {} 注册成功", proxy.getName());
             return true;
         }
         return false;

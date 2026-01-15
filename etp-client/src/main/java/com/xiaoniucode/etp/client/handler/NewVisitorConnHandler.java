@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 与内网真实目标服务建立连接，同时建立数据传输隧道
  *
  * @author liuxin
  */
@@ -31,7 +30,6 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
             int localPort = msg.getLocalPort();
             Bootstrap realBootstrap = ChannelManager.getRealBootstrap();
             Bootstrap controlBootstrap = ChannelManager.getControlBootstrap();
-            //与内网真实服务建立连接
             realBootstrap.connect(LOCALHOST, localPort).addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
                     logger.debug("成功连接到内网服务{}:{}", LOCALHOST, localPort);

@@ -21,7 +21,6 @@ public class TunnelMessageHandlerFactory {
         handlers.put(CloseProxy.class, new CloseProxyHandler());
         handlers.put(NewProxy.class, new NewProxyHandler());
         handlers.put(UnregisterProxy.class, new UnregisterProxyHandler());
-
     }
 
     public static MessageHandler getHandler(Message message) {

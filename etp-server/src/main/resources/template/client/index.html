@@ -193,19 +193,17 @@
                 const clientName = this.getAttribute('data-name');
                 const token = this.getAttribute('data-token');
 
-                layer.confirm('确定踢掉「' + clientName + '」客户端吗？',
+                layer.confirm('确定强制下线「' + clientName + '」？',
                     {
                         icon: 2,
                         title: '危险操作确认',
                         skin: 'layui-layer-molv',
-                        btn: ['确认踢掉', '我再想想'],
+                        btn: ['确认', '再想想'],
                     }, function (index) {
                         layui.Rest.delete('/api/client/kickout', {id: clientId, secretKey: token}).then(res => {
                             updateCardStatus(clientId, false);
-                            layer.msg("已踢掉", {time: 2000});
-                        }).catch(err => {
-                            layer.msg('强制下线失败: ' + err.message, {icon: 2});
-                        });
+                            layer.msg("强制下线", {time: 2000});
+                        })
                     });
             });
         });

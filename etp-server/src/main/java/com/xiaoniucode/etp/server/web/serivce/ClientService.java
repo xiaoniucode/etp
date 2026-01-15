@@ -46,7 +46,7 @@ public class ClientService {
         });
 
     }
-
+    //todo 客户端下线有bug
     public void deleteClient(JSONObject req) {
         TX.execute(() -> {
             JSONObject client = DaoFactory.INSTANCE.getClientDao().getById(req.getInt("id"));
@@ -62,6 +62,11 @@ public class ClientService {
             DaoFactory.INSTANCE.getClientDao().deleteById(id);
             //删除客户端所有的代理映射
              ServiceFactory.INSTANCE.getProxyService().deleteProxiesByClient(id);
+            //发消息通知客户端断开连接
+            Channel control = ChannelManager.getControlChannelBySecretKey(secretKey);
+            if (control != null) {
+                control.writeAndFlush(new KickoutClient());
+            }
             return null;
         });
 

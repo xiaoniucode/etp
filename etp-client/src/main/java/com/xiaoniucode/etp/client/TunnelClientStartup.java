@@ -1,6 +1,9 @@
 package com.xiaoniucode.etp.client;
 
 import ch.qos.logback.classic.Level;
+import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.config.DefaultAppConfig;
+import com.xiaoniucode.etp.client.config.TomlConfigSource;
 import com.xiaoniucode.etp.common.ConfigUtils;
 import com.xiaoniucode.etp.common.Constants;
 import com.xiaoniucode.etp.common.LogConfig;
@@ -24,27 +27,21 @@ public class TunnelClientStartup {
 
     public static void main(String[] args) {
         String configPath = ConfigUtils.getConfigPath(args, Constants.CLIENT_CONFIG_NAME);
-        if (!StringUtils.hasText(configPath)) {
-            System.err.println("请指定配置文件路径！");
-            return;
+        AppConfig config;
+        if (StringUtils.hasText(configPath)) {
+            TomlConfigSource configSource = new TomlConfigSource(configPath);
+            config = configSource.load();
+        } else {
+            config = new DefaultAppConfig.Builder().build();
         }
-        Config.init(configPath);
-        initLogback();
-        Config config = Config.get();
+        initLogback(config);
         registerShutdownHook();
-        tunnelClient = TunnelClient.get();
-        tunnelClient.setMaxDelaySec(config.getMaxDelaySec());
-        tunnelClient.setInitialDelaySec(config.getInitialDelaySec());
-        tunnelClient.setMaxRetries(config.getMaxRetries());
-        tunnelClient.setServerAddr(config.getServerAddr());
-        tunnelClient.setServerPort(config.getServerPort());
-        tunnelClient.setSecretKey(config.getSecretKey());
-        tunnelClient.setTls(config.isTls());
+        tunnelClient = new TunnelClient(config);
         tunnelClient.start();
     }
 
-    private static void initLogback() {
-        LogConfig log = Config.get().getLogConfig();
+    private static void initLogback(AppConfig config) {
+        LogConfig log = config.getLogConfig();
         new LogbackConfigurator.Builder()
                 .setPath(log.getPath())
                 .setLogPattern(log.getLogPattern())

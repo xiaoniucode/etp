@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.client;
 
+import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.handler.RealChannelHandler;
 import com.xiaoniucode.etp.client.handler.ControlChannelHandler;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
@@ -8,7 +9,6 @@ import com.xiaoniucode.etp.client.utils.OSUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.Lifecycle;
-import com.xiaoniucode.etp.core.event.EventBus;
 import com.xiaoniucode.etp.core.msg.Login;
 import com.xiaoniucode.etp.core.codec.TunnelMessageCodec;
 import com.xiaoniucode.etp.core.IdleCheckHandler;
@@ -20,6 +20,7 @@ import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -27,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLEngine;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 代理客户端服务容器
@@ -36,27 +36,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class TunnelClient implements Lifecycle {
     private final static Logger logger = LoggerFactory.getLogger(TunnelClient.class);
-    private final static TunnelClient INSTANCE = new TunnelClient();
     private volatile boolean stop = false;
-    private String serverAddr;
-    private int serverPort;
-    private String secretKey;
-    private boolean tls;
-    /**
-     * 初始化重连延迟时间 单位：秒
-     */
-    private int initialDelaySec = 2;
-    /**
-     * 最大重试次数 超过以后关闭workerGroup
-     */
-    private int maxRetries = 5;
-    /**
-     * 最大延迟时间 如果超过了则取maxDelaySec为最大延迟时间 单位：秒
-     */
-    private int maxDelaySec = 8;
-    /**
-     * 用于记录当前重试次数
-     */
+    private volatile boolean start = false;
+    private final AppConfig config;
     private final AtomicInteger retryCount = new AtomicInteger(0);
     /**
      * 控制隧道BootStrap
@@ -75,17 +57,17 @@ public final class TunnelClient implements Lifecycle {
      */
     private Consumer<Void> connectSuccessListener;
 
-    private TunnelClient() {
-    }
-
-    public static TunnelClient get() {
-        return INSTANCE;
+    public TunnelClient(AppConfig config) {
+        this.config = config;
     }
 
     @SuppressWarnings("all")
     @Override
     public void start() {
         try {
+            if (start) {
+                return;
+            }
             controlBootstrap = new Bootstrap();
             Bootstrap realBootstrap = new Bootstrap();
 
@@ -101,7 +83,7 @@ public final class TunnelClient implements Lifecycle {
                         }
                     });
 
-            if (tls) {
+            if (config.isTls()) {
                 tlsContext = new ClientTlsContextFactory().createContext();
             }
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
@@ -113,8 +95,8 @@ public final class TunnelClient implements Lifecycle {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            if (tls) {
-                                SSLEngine engine = tlsContext.newEngine(sc.alloc(), serverAddr, serverPort);
+                            if (config.isTls()) {
+                                SSLEngine engine = tlsContext.newEngine(sc.alloc(), config.getServerAddr(), config.getServerPort());
                                 engine.setUseClientMode(true);
                                 sc.pipeline().addLast("tls", new SslHandler(engine));
                             }
@@ -137,26 +119,27 @@ public final class TunnelClient implements Lifecycle {
                 //连接到服务器
                 connectTunnelServer();
             }
-
+            TunnelClientHelper.setTunnelClient(this);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
     }
 
     private void connectTunnelServer() {
-        ChannelFuture future = controlBootstrap.connect(serverAddr, serverPort);
+        ChannelFuture future = controlBootstrap.connect(config.getServerAddr(), config.getServerPort());
         future.addListener((ChannelFutureListener) channelFuture -> {
             if (channelFuture.isSuccess()) {
                 Channel controlChannel = channelFuture.channel();
-                controlChannel.attr(EtpConstants.SERVER_DDR).set(serverAddr);
-                controlChannel.attr(EtpConstants.SERVER_PORT).set(serverPort);
-                controlChannel.attr(EtpConstants.SECRET_KEY).set(secretKey);
+                controlChannel.attr(EtpConstants.SERVER_DDR).set(config.getServerAddr());
+                controlChannel.attr(EtpConstants.SERVER_PORT).set(config.getServerPort());
+                controlChannel.attr(EtpConstants.SECRET_KEY).set(config.getSecretKey());
                 ChannelManager.setControlChannel(controlChannel);
                 String os = OSUtils.getOS();
                 String arch = OSUtils.getOSArch();
-                future.channel().writeAndFlush(new Login(secretKey, os, arch));
+                future.channel().writeAndFlush(new Login(config.getSecretKey(), os, arch));
                 retryCount.set(0);
-                logger.info("已连接到ETP服务端: {}:{}", serverAddr, serverPort);
+                logger.info("已连接到ETP服务端: {}:{}", config.getServerAddr(), config.getServerPort());
+                start = true;
                 if (connectSuccessListener != null) {
                     connectSuccessListener.accept(null);
                 }
@@ -168,7 +151,7 @@ public final class TunnelClient implements Lifecycle {
     }
 
     private void scheduleReconnect() {
-        if (retryCount.get() >= getMaxRetries()) {
+        if (retryCount.get() >= config.getMaxRetries()) {
             logger.error("达到最大重试次数，停止重连");
             this.stop();
             return;
@@ -187,12 +170,12 @@ public final class TunnelClient implements Lifecycle {
     private long calculateDelay() {
         int retries = retryCount.get();
         if (retries == 0) {
-            return getInitialDelaySec();
+            return config.getInitialDelaySec();
         }
         // 指数退避 + 随机抖动(±30%)
-        long delay = Math.min((1L << retries), getMaxDelaySec());
+        long delay = Math.min((1L << retries), config.getMaxDelaySec());
         long jitter = (long) (delay * 0.3 * (Math.random() * 2 - 1));
-        return Math.min(delay + jitter, getMaxDelaySec());
+        return Math.min(delay + jitter, config.getMaxDelaySec());
     }
 
     @Override
@@ -203,65 +186,11 @@ public final class TunnelClient implements Lifecycle {
         }
     }
 
-    public String getServerAddr() {
-        return serverAddr;
-    }
-
-    public void setServerAddr(String serverAddr) {
-        this.serverAddr = serverAddr;
-    }
-
-    public int getServerPort() {
-        return serverPort;
-    }
-
-    public void setServerPort(int serverPort) {
-        this.serverPort = serverPort;
-    }
-
-    public String getSecretKey() {
-        return secretKey;
-    }
-
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }
-
-    public void setTls(boolean tls) {
-        this.tls = tls;
-    }
-
-    public int getInitialDelaySec() {
-        return initialDelaySec;
-    }
-
-    public void setInitialDelaySec(int initialDelaySec) {
-        if (initialDelaySec > 0) {
-            this.initialDelaySec = initialDelaySec;
-        }
-    }
-
-    public int getMaxRetries() {
-        return maxRetries;
-    }
-
-    public void setMaxRetries(int maxRetries) {
-        if (maxRetries > 0) {
-            this.maxRetries = maxRetries;
-        }
-    }
-
-    public int getMaxDelaySec() {
-        return maxDelaySec;
-    }
-
-    public void setMaxDelaySec(int maxDelaySec) {
-        if (maxDelaySec > 0) {
-            this.maxDelaySec = maxDelaySec;
-        }
-    }
-
     public void onConnectSuccessListener(Consumer<Void> connectCallback) {
         this.connectSuccessListener = connectCallback;
+    }
+
+    public AppConfig getConfig() {
+        return config;
     }
 }

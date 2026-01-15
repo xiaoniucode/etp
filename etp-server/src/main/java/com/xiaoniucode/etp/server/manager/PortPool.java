@@ -13,23 +13,22 @@ import java.util.Set;
 
 /**
  * 端口分配管理器
- * todo 需要优化
  *
  * @author liuxin
  */
-public class PortAllocator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PortAllocator.class);
-    private static final PortAllocator instance = new PortAllocator();
+public class PortPool {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PortPool.class);
+    private static final PortPool instance = new PortPool();
     private final Set<Integer> allocatedPorts = new HashSet<>(32);
     private final PortRange portRange = AppConfig.get().getPortRange();
     private int startPort;
     private int endPort;
 
-    private PortAllocator() {
+    private PortPool() {
         initPortRange();
     }
 
-    public static PortAllocator get() {
+    public static PortPool get() {
         return instance;
     }
 
