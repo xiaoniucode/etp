@@ -50,11 +50,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <shade.mainClass>custom</shade.mainClass>
         <!--核心依赖-->
         <netty.version>4.1.80.Final</netty.version>
         <protobuf.version>4.32.1</protobuf.version>
-        <native-maven-plugin.version>0.10.6</native-maven-plugin.version>
         <maven.compiler>3.8.1</maven.compiler>
         <toml4j.version>0.7.2</toml4j.version>
         <maven-assembly-plugin>3.3.0</maven-assembly-plugin>
@@ -155,29 +153,7 @@
         </dependencies>
     </dependencyManagement>
     <build>
-<!--        <plugins>
-            &lt;!&ndash;<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer
-                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>${shade.mainClass}</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>&ndash;&gt;
-
+        <plugins>
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
@@ -276,7 +252,7 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>-->
+        </plugins>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

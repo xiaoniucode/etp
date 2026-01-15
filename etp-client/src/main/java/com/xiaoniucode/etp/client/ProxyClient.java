@@ -11,7 +11,7 @@ import io.netty.channel.Channel;
  *
  * @author liuxin
  */
-public class ProxyRegisterClient {
+public class ProxyClient {
     /**
      * 注册端口映射
      */

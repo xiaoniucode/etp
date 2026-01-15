@@ -1,10 +1,13 @@
 package com.xiaoniucode.etp.autoconfigure;
 
+import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.config.DefaultAppConfig;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
-import com.xiaoniucode.etp.client.ProxyRegisterClient;
+import com.xiaoniucode.etp.client.ProxyClient;
 import com.xiaoniucode.etp.client.TunnelClient;
 import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.codec.TunnelMessage;
+import com.xiaoniucode.etp.core.msg.CloseProxy;
+import com.xiaoniucode.etp.core.msg.NewProxy;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +26,13 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
     private TunnelClient tunnelClient;
     private final Environment environment;
     private final WebServerPortListener webServerPortListener;
-    private final ProxyRegisterClient proxyRegisterClient;
+    private final ProxyClient proxyClient;
 
     public EtpClientStartStopLifecycle(Environment environment, WebServerPortListener webServerPortListener,
-        ProxyRegisterClient proxyRegisterClient, EtpClientProperties properties) {
+                                       ProxyClient proxyClient, EtpClientProperties properties) {
         this.environment = environment;
         this.properties = properties;
-        this.proxyRegisterClient = proxyRegisterClient;
+        this.proxyClient = proxyClient;
         this.webServerPortListener = webServerPortListener;
     }
 
@@ -39,25 +42,31 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
             System.setProperty("client.truststore.path", properties.getTruststore().getPath());
             System.setProperty("client.truststore.storePass", properties.getTruststore().getStorePass());
         }
-        tunnelClient = new TunnelClient(properties.getServerAddr(), properties.getServerPort(), properties.getSecretKey(), properties.isTls());
-        tunnelClient.setMaxDelaySec(properties.getMaxDelaySec());
-        tunnelClient.setInitialDelaySec(properties.getInitialDelaySec());
-        tunnelClient.setMaxRetries(properties.getMaxRetries());
+        AppConfig config = new DefaultAppConfig
+                .Builder()
+                .serverAddr(properties.getServerAddr())
+                .serverPort(properties.getServerPort())
+                .secretKey(properties.getSecretKey())
+                .tls(properties.isTls())
+                .maxDelaySec(properties.getMaxDelaySec())
+                .initialDelaySec(properties.getInitialDelaySec())
+                .maxRetries(properties.getMaxRetries())
+                .build();
+        tunnelClient = new TunnelClient(config);
+        tunnelClient.start();
         tunnelClient.start();
         //等代理客户端成功连接到服务端的时候再注册端口映射
         tunnelClient.onConnectSuccessListener((callback) -> {
             int localPort = webServerPortListener.getActualPort();
             String appName = environment.getProperty("spring.application.name", "Spring-Boot");
-            TunnelMessage.ProxyRequest request = TunnelMessage
-                .ProxyRequest
-                .newBuilder()
-                .setLocalPort(localPort)
-                .setAutoStart(properties.isAutoStart())
-                .setProxyName(appName)
-                .setRemotePort(properties.getRemotePort())
-                .setProtocol(properties.getProtocol().name())
-                .build();
-            proxyRegisterClient.registerProxy(request);
+            NewProxy newProxy = new NewProxy();
+            newProxy.setLocalPort(localPort);
+            newProxy.setAutoStart(properties.isAutoStart());
+            newProxy.setRemotePort(properties.getRemotePort());
+            newProxy.setProtocol(properties.getProtocol().name());
+            newProxy.setName(appName);
+
+            proxyClient.registerProxy(newProxy);
             logger.info("Etp client start success: {}：{}", properties.getServerAddr(), properties.getServerPort());
         });
         running = true;
@@ -70,7 +79,8 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
         if (controlChannel != null) {
             //发送下线消息
             Integer proxyId = controlChannel.attr(EtpConstants.PROXY_ID).get();
-            proxyRegisterClient.unregisterProxy(proxyId);
+            Long sessionId = controlChannel.attr(EtpConstants.SESSION_ID).get();
+            proxyClient.unregisterProxy(new CloseProxy(sessionId,proxyId));
         } else {
             logger.warn("control channel is null");
         }

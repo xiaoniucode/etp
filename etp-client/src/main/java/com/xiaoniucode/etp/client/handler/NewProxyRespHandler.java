@@ -23,6 +23,7 @@ public class NewProxyRespHandler implements MessageHandler {
             NewProxyResp resp = (NewProxyResp) msg;
             //用于下线时通知服务端清理对应的资源
             controlChannel.attr(EtpConstants.PROXY_ID).set(resp.getProxyId());
+            controlChannel.attr(EtpConstants.SESSION_ID).set(resp.getSessionId());
             String serverAddr = controlChannel.attr(EtpConstants.SERVER_DDR).get();
             logger.info("公网访问地址：{}:{}", serverAddr, resp.getRemoteAddr());
         }

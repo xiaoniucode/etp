@@ -7,6 +7,11 @@ public class CloseProxy implements Message{
         this.sessionId = sessionId;
     }
 
+    public CloseProxy(Long sessionId, Integer proxyId) {
+        this.sessionId = sessionId;
+        this.proxyId = proxyId;
+    }
+
     public Long getSessionId() {
         return sessionId;
     }

@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.autoconfigure;
 
-import com.xiaoniucode.etp.client.ProxyRegisterClient;
+import com.xiaoniucode.etp.client.ProxyClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -20,9 +20,9 @@ import org.springframework.core.env.Environment;
 @EnableConfigurationProperties(EtpClientProperties.class)
 public class EtpClientAutoConfiguration {
     @Bean
-    public SmartLifecycle etpClientLifecycle(Environment environment,WebServerPortListener webServerPortListener,ProxyRegisterClient proxyRegisterClient,
-        EtpClientProperties properties) {
-        return new EtpClientStartStopLifecycle(environment,webServerPortListener,proxyRegisterClient, properties);
+    public SmartLifecycle etpClientLifecycle(Environment environment, WebServerPortListener webServerPortListener, ProxyClient proxyClient,
+                                             EtpClientProperties properties) {
+        return new EtpClientStartStopLifecycle(environment,webServerPortListener, proxyClient, properties);
     }
 
     @Bean
@@ -31,7 +31,7 @@ public class EtpClientAutoConfiguration {
     }
 
     @Bean
-    public ProxyRegisterClient proxyRegisterClient() {
-        return new ProxyRegisterClient();
+    public ProxyClient proxyRegisterClient() {
+        return new ProxyClient();
     }
 }

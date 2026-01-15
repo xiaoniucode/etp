@@ -34,5 +34,4 @@ public class Constants {
     public static final String SERVER_CONFIG_NAME = "etps.toml";
     public static final String SERVER_LOG_ARCHIVE_PATTERN = "etps.%d{yyyy-MM-dd}.log.gz";
     public static final String SERVER_LOG_NAME = "etps.log";
-
 }

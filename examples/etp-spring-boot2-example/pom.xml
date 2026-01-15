@@ -8,7 +8,7 @@
         <version>2.7.18</version>
         <relativePath/>
     </parent>
-    <groupId>io.github.xiaoniucode</groupId>
+    <groupId>com.xiaoniucode.etp</groupId>
     <artifactId>etp-spring-boot2-example</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>etp-spring-boot2-example</name>

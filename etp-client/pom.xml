@@ -9,62 +9,10 @@
     <artifactId>etp-client</artifactId>
     <packaging>jar</packaging>
     <name>etp-client</name>
-    <properties>
-            <shade.mainClass>com.xiaoniucode.etp.client.TunnelClientStartup</shade.mainClass>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-core</artifactId>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <profiles>
-        <profile>
-            <id>native</id>
-            <activation>
-                <property>
-                    <name>env.GRAALVM_HOME</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.graalvm.buildtools</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <version>${native-maven-plugin.version}</version>
-                        <configuration>
-                            <mainClass>com.xiaoniucode.etp.client.TunnelClientStartup</mainClass>
-                            <imageName>etp-client</imageName>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>add-reachability-metadata</id>
-                                <goals>
-                                    <goal>add-reachability-metadata</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>native-compile</id>
-                                <goals>
-                                    <goal>compile</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
