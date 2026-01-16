@@ -56,7 +56,7 @@
                 </div>
                 <div class="card-content">
                     <div class="card-title">已启动隧道数</div>
-                    <div class="card-value" id="startMapping">--</div>
+                    <div class="card-value" id="runningTunnel">--</div>
                 </div>
             </div>
         </div>
@@ -180,15 +180,133 @@
         const $ = layui.$;
         var form = layui.form;
         let charts = [];
+        let protocolChart = null;
+
+        function initChart() {
+            const chartConfig = [
+                {id: 'cpu-chart', name: 'CPU', value: 0, total: '100%'},
+                {id: 'heap-chart', name: '堆内存', value: 0, total: '100%'},
+                {id: 'ram-chart', name: '物理内存', value: 0, total: '100%'}
+            ];
+
+            chartConfig.forEach(config => {
+                var chartDom = document.getElementById(config.id);
+                var myChart = echarts.init(chartDom);
+
+                var option = {
+                    series: [
+                        {
+                            name: '使用率',
+                            type: 'gauge',
+                            detail: {
+                                formatter: '{value}%',
+                                color: getColorByValue(config.value)
+                            },
+                            axisLine: {
+                                lineStyle: {
+                                    color: [
+                                        [0.3, '#52c41a'], // 0-30% 绿色
+                                        [0.7, '#faad14'], // 30-70% 黄色
+                                        [1, '#f5222d']    // 70-100% 红色
+                                    ]
+                                }
+                            },
+                            pointer: {
+                                itemStyle: {
+                                    color: getColorByValue(config.value)
+                                }
+                            },
+                            data: [
+                                {
+                                    value: config.value,
+                                    name: config.name
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                myChart.setOption(option);
+                charts.push({
+                    chart: myChart,
+                    name: config.name,
+                    config: config
+                });
+            });
+
+            // 饼图配置
+            const pieChartConfig = [
+                {
+                    id: 'protocol-chart',
+                    name: '隧道数量',
+                    data: [
+                        {value: 1048, name: 'TCP'},
+                        {value: 735, name: 'HTTP'}
+                    ]
+                },
+                {
+                    id: 'traffic-chart',
+                    name: '实时流量',
+                    data: [
+                        {value: 1500, name: '入站流量'},
+                        {value: 800, name: '出站流量'}
+                    ]
+                }
+            ];
+
+            pieChartConfig.forEach(config => {
+                var chartDom = document.getElementById(config.id);
+                var myChart = echarts.init(chartDom);
+
+                var option = {
+                    title: {
+                        text: config.name,
+                        left: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left'
+                    },
+                    series: [
+                        {
+                            name: config.name,
+                            type: 'pie',
+                            radius: '50%',
+                            data: config.data,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+
+                myChart.setOption(option);
+                charts.push({
+                    chart: myChart,
+                    name: config.name,
+                    config: config,
+                    type: 'pie'
+                });
+                if (config.id === 'protocol-chart') {
+                    protocolChart = myChart;
+                }
+            });
+        }
 
         $(function () {
-            // 获取基础监控数据
             Rest.get('/api/monitor').then(data => {
                 const {stats, sysConfig} = data
                 $('#clientTotal').text(stats.clientTotal);
                 $('#onlineClient').text(stats.onlineClient);
-                $('#mappingTotal').text(stats.mappingTotal);
-                $('#startMapping').text(stats.startMapping);
+                $('#mappingTotal').text(stats.proxy.total);
+                $('#runningTunnel').text(stats.runningTunnel);
 
                 // 系统配置
                 const start = sysConfig.port_range_start || '';
@@ -200,9 +318,23 @@
                     bind_port: sysConfig.bind_port,
                     port_range: portRange
                 });
-            });
 
-            charts = initChart();
+                initChart();
+                
+                // 更新隧道数量饼图
+                if (protocolChart) {
+                    protocolChart.setOption({
+                        series: [
+                            {
+                                data: [
+                                    {value: stats.proxy.tcpCount, name: 'TCP'},
+                                    {value: stats.proxy.httpCount, name: 'HTTP'}
+                                ]
+                            }
+                        ]
+                    });
+                }
+            });
 
             // 初始加载服务器监控数据
             loadServerMonitorData();
@@ -216,6 +348,17 @@
             Rest.get('/api/monitor/server', {}, {loading: false}).then(data => {
                 updateCharts(data);
             });
+        }
+
+        // 根据值获取对应的颜色
+        function getColorByValue(value) {
+            if (value <= 30) {
+                return '#52c41a'; // 绿色
+            } else if (value <= 70) {
+                return '#faad14'; // 黄色
+            } else {
+                return '#f5222d'; // 红色
+            }
         }
 
         function updateCharts(serverData) {
@@ -246,10 +389,18 @@
                     total = osMem.total;
                     $('#ram-info').html(`<span>物理内存：${used} / ${total}</span>`);
                 }
-                // 更新仪表盘
+                // 更新仪表盘，包括颜色和指针颜色
                 chart.setOption({
                     series: [
                         {
+                            detail: {
+                                color: getColorByValue(value)
+                            },
+                            pointer: {
+                                itemStyle: {
+                                    color: getColorByValue(value)
+                                }
+                            },
                             data: [{value: value, name: config.name}]
                         }
                     ]
@@ -257,109 +408,6 @@
             });
         }
     });
-
-    function initChart() {
-        const chartConfig = [
-            {id: 'cpu-chart', name: 'CPU', value: 45, total: '100%'},
-            {id: 'heap-chart', name: '堆内存', value: 68, total: '4GB'},
-            {id: 'ram-chart', name: '物理内存', value: 32, total: '16GB'}
-        ];
-        const charts = [];
-
-        chartConfig.forEach(config => {
-            var chartDom = document.getElementById(config.id);
-            var myChart = echarts.init(chartDom);
-
-            var option = {
-                series: [
-                    {
-                        name: '使用率',
-                        type: 'gauge',
-                        detail: {
-                            formatter: '{value}%'
-                        },
-                        data: [
-                            {
-                                value: config.value,
-                                name: config.name
-                            }
-                        ]
-                    }
-                ]
-            };
-
-            myChart.setOption(option);
-            charts.push({
-                chart: myChart,
-                name: config.name,
-                config: config
-            });
-        });
-
-        // 饼图配置
-        const pieChartConfig = [
-            {
-                id: 'protocol-chart',
-                name: '隧道数量',
-                data: [
-                    {value: 1048, name: 'TCP'},
-                    {value: 735, name: 'HTTP'}
-                ]
-            },
-            {
-                id: 'traffic-chart',
-                name: '实时流量',
-                data: [
-                    {value: 1500, name: '入站流量'},
-                    {value: 800, name: '出站流量'}
-                ]
-            }
-        ];
-
-        pieChartConfig.forEach(config => {
-            var chartDom = document.getElementById(config.id);
-            var myChart = echarts.init(chartDom);
-
-            var option = {
-                title: {
-                    text: config.name,
-                    left: 'center'
-                },
-                tooltip: {
-                    trigger: 'item'
-                },
-                legend: {
-                    orient: 'vertical',
-                    left: 'left'
-                },
-                series: [
-                    {
-                        name: config.name,
-                        type: 'pie',
-                        radius: '50%',
-                        data: config.data,
-                        emphasis: {
-                            itemStyle: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    }
-                ]
-            };
-
-            myChart.setOption(option);
-            charts.push({
-                chart: myChart,
-                name: config.name,
-                config: config,
-                type: 'pie'
-            });
-        });
-
-        return charts;
-    }
 </script>
 </body>
 </html>

@@ -11,11 +11,28 @@ public class StatsService {
         JSONObject res = new JSONObject();
         JSONObject stats = new JSONObject();
         JSONArray clients = ServiceFactory.INSTANCE.getClientService().clients();
+
         JSONArray proxies = ServiceFactory.INSTANCE.getProxyService().proxies(null);
+        int tcpCount = 0;
+        int httpCount = 0;
+        for (Object p : proxies) {
+            JSONObject proxy = (JSONObject) p;
+            if (proxy.getString("type").equalsIgnoreCase("TCP")) {
+                tcpCount++;
+            } else if (proxy.getString("type").equalsIgnoreCase("HTTP")) {
+                httpCount++;
+            }
+        }
+        JSONObject proxy = new JSONObject();
+        proxy.put("tcpCount", tcpCount);
+        proxy.put("httpCount", httpCount);
+        proxy.put("total", tcpCount + httpCount);
+
         stats.put("clientTotal", clients.length());
         stats.put("onlineClient", ChannelManager.onlineClientCount());
-        stats.put("mappingTotal", proxies.length());
-        stats.put("startMapping", TcpProxyServer.get().runningPortCount());
+        stats.put("proxy", proxy);
+        stats.put("runningTunnel", TcpProxyServer.get().runningPortCount());
+
         JSONObject sysConfig = ServiceFactory.INSTANCE.getSettingService().getAppConfig();
         res.put("stats", stats);
         res.put("sysConfig", sysConfig);

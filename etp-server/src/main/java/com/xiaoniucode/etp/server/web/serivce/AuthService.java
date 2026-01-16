@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class AuthService {
     private final static Logger logger = LoggerFactory.getLogger(AuthService.class);
     /**
-     * Token有效期
+     * Token有效期 默认1天
      */
     private static final long TOKEN_EXPIRE_SECONDS = 24 * 60 * 60;
 
@@ -82,7 +82,7 @@ public class AuthService {
         result.put("auth_token", token);
         result.put("expired_in", expiresAt);
 
-        logger.debug("创建认证令牌成功 - 用户: {}, 令牌: {}", username, token);
+        logger.debug("创建认证令牌成功");
         return result;
     }
 
@@ -97,9 +97,9 @@ public class AuthService {
 
         JSONObject tokenInfo = DaoFactory.INSTANCE.getAuthTokenDao().getByToken(token);
         if (tokenInfo != null) {
-            logger.debug("令牌验证成功 - 令牌: {}, 用户: {}", token, tokenInfo.getString("username"));
+            logger.debug("令牌验证成功 -  用户: {}", tokenInfo.getString("username"));
         } else {
-            logger.debug("令牌验证失败 - 令牌无效或已过期: {}", token);
+            logger.debug("令牌验证失败，令牌无效或已过期");
         }
 
         return tokenInfo;
@@ -112,9 +112,9 @@ public class AuthService {
         if (StringUtils.hasText(token)) {
             boolean deleted = DaoFactory.INSTANCE.getAuthTokenDao().deleteByToken(token);
             if (deleted) {
-                logger.debug("令牌已失效 - 令牌: {}", token);
+                logger.debug("令牌已失效");
             } else {
-                logger.debug("令牌失效失败 - 令牌不存在: {}", token);
+                logger.debug("令牌失效失败，令牌不存在" );
             }
         }
     }
@@ -136,7 +136,7 @@ public class AuthService {
             return createToken(oldTokenInfo.getInt("uid"), oldTokenInfo.getString("username"));
         }
 
-        logger.debug("令牌刷新失败 - 旧令牌无效: {}", oldToken);
+        logger.debug("令牌刷新失败，旧令牌无效");
         return null;
     }
 
@@ -148,6 +148,7 @@ public class AuthService {
         logger.debug("清理过期令牌完成 - 删除数量: {}", deletedCount);
         return deletedCount;
     }
+
     public static AuthService getInstance() {
         return AuthTokenServiceHolder.INSTANCE;
     }
