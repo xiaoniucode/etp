@@ -11,6 +11,7 @@ import com.xiaoniucode.etp.server.config.TomlConfigSource;
 import com.xiaoniucode.etp.server.event.DatabaseInitEvent;
 import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.listener.DatabaseInitListener;
+import com.xiaoniucode.etp.server.listener.ConfigRegisterListener;
 import com.xiaoniucode.etp.server.listener.StaticConfigInitListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,20 +34,15 @@ public class TunnelServerStartup {
     public static void main(String[] args) {
         try {
             AppConfig config = buildConfig(args);
-            ConfigHelper.set(config);
             initLogback(config);
             int bindPort = config.getBindPort();
             if (PortChecker.isPortOccupied(bindPort)) {
                 logger.error("{} 端口已经被占用", bindPort);
                 return;
             }
-            GlobalEventBus.get().subscribe(TunnelBindEvent.class, new DatabaseInitListener());
-            GlobalEventBus.get().subscribe(DatabaseInitEvent.class, new StaticConfigInitListener());
-
             TunnelServer tunnelServer = new TunnelServer(config);
             registerShutdownHook(tunnelServer);
             tunnelServer.start();
-
         } catch (IllegalArgumentException e) {
             logger.error("参数错误: {}", e.getMessage());
             System.err.println("错误: " + e.getMessage());

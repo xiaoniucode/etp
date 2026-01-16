@@ -205,9 +205,9 @@
                             axisLine: {
                                 lineStyle: {
                                     color: [
-                                        [0.3, '#52c41a'], // 0-30% 绿色
-                                        [0.7, '#faad14'], // 30-70% 黄色
-                                        [1, '#f5222d']    // 70-100% 红色
+                                        [0.4, '#52c41a'], // 0-40% 绿色
+                                        [0.8, '#faad14'], // 40-80% 黄色
+                                        [1, '#f5222d']    // 80-100% 红色
                                     ]
                                 }
                             },
@@ -352,9 +352,9 @@
 
         // 根据值获取对应的颜色
         function getColorByValue(value) {
-            if (value <= 30) {
+            if (value <= 40) {
                 return '#52c41a'; // 绿色
-            } else if (value <= 70) {
+            } else if (value <= 80) {
                 return '#faad14'; // 黄色
             } else {
                 return '#f5222d'; // 红色

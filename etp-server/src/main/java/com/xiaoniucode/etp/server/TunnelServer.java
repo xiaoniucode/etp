@@ -8,8 +8,12 @@ import com.xiaoniucode.etp.core.codec.TunnelMessageCodec;
 import com.xiaoniucode.etp.core.event.GlobalEventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
+import com.xiaoniucode.etp.server.event.DatabaseInitEvent;
 import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.handler.ControlTunnelHandler;
+import com.xiaoniucode.etp.server.listener.ConfigRegisterListener;
+import com.xiaoniucode.etp.server.listener.DatabaseInitListener;
+import com.xiaoniucode.etp.server.listener.StaticConfigInitListener;
 import com.xiaoniucode.etp.server.proxy.HttpProxyServer;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.security.ServerTlsContextFactory;
@@ -52,6 +56,10 @@ public class TunnelServer implements Lifecycle {
     @Override
     public void start() {
         try {
+            GlobalEventBus.get().subscribe(TunnelBindEvent.class, new DatabaseInitListener());
+            GlobalEventBus.get().subscribe(TunnelBindEvent.class, new StaticConfigInitListener());
+            GlobalEventBus.get().subscribe(DatabaseInitEvent.class, new ConfigRegisterListener());
+            ConfigHelper.set(config);
             logger.debug("正在启动ETP服务");
             if (config.isTls()) {
                 tlsContext = new ServerTlsContextFactory().createContext();
@@ -81,7 +89,6 @@ public class TunnelServer implements Lifecycle {
                         }
                     });
             serverBootstrap.bind(config.getHost(), config.getBindPort()).sync();
-            ConfigHelper.set(config);
             //异步处理
             CompletableFuture.runAsync(() -> {
                 //初始化管理面板
