@@ -101,6 +101,9 @@ public class DashboardApi {
                 context.setResponseJson(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
         router.route(HttpMethod.GET, "/monitor", context ->
                 context.setResponseJson(ResponseEntity.ok(ServiceFactory.INSTANCE.getStatsService().monitorInfo()).toJson()));
+        router.route(HttpMethod.GET, "/monitor/server", context ->
+                context.setResponseJson(ResponseEntity.ok(ServiceFactory.INSTANCE.getStatsService().getServerInfo()).toJson()));
+
         //代理配置接口
         router.route(HttpMethod.GET, "/proxy/get", context ->
                 context.setResponseJson(ResponseEntity.ok(ServiceFactory.INSTANCE.getProxyService().getProxy(JsonUtils.toJsonObject(context.getQueryParams()))).toJson()));

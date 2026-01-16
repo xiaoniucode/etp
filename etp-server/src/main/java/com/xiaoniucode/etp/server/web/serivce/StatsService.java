@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.web.serivce;
 
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
+import com.xiaoniucode.etp.server.web.common.ServerHelper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -19,5 +20,9 @@ public class StatsService {
         res.put("stats", stats);
         res.put("sysConfig", sysConfig);
         return res;
+    }
+
+    public JSONObject getServerInfo() {
+        return ServerHelper.getServerInfo();
     }
 }

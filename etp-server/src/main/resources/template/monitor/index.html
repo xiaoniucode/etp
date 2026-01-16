@@ -113,7 +113,7 @@
             </div>
         </div>
     </div>
-    
+
     <!--系统配置信息 -->
     <div class="layui-row layui-col-space20" style="margin-top: 20px;">
         <div class="layui-col-md12">
@@ -179,8 +179,10 @@
         var Rest = layui.Rest;
         const $ = layui.$;
         var form = layui.form;
+        let charts = [];
 
         $(function () {
+            // 获取基础监控数据
             Rest.get('/api/monitor').then(data => {
                 const {stats, sysConfig} = data
                 $('#clientTotal').text(stats.clientTotal);
@@ -198,11 +200,62 @@
                     bind_port: sysConfig.bind_port,
                     port_range: portRange
                 });
-            })
+            });
+
+            charts = initChart();
+
+            // 初始加载服务器监控数据
+            loadServerMonitorData();
+
+            // 每3秒刷新一次服务器监控数据
+            setInterval(loadServerMonitorData, 3000);
         });
 
-        initChart()
+        // 加载服务器监控数据
+        function loadServerMonitorData() {
+            Rest.get('/api/monitor/server', {}, {loading: false}).then(data => {
+                updateCharts(data);
+            });
+        }
 
+        function updateCharts(serverData) {
+            const {cpu, jvmMem, osMem} = serverData;
+
+            charts.forEach(item => {
+                const {chart, config, type} = item;
+
+                if (type === 'pie') {
+                    return;
+                }
+
+                let value = 0;
+                let used = '';
+                let total = '';
+
+                if (config.id === 'cpu-chart') {
+                    value = cpu.usage;
+                    $('#cpu-info').html(`<span>CPU使用率：${value}%</span>`);
+                } else if (config.id === 'heap-chart') {
+                    value = jvmMem.usage;
+                    used = jvmMem.used;
+                    total = jvmMem.total;
+                    $('#heap-info').html(`<span>堆内存：${used} / ${total}</span>`);
+                } else if (config.id === 'ram-chart') {
+                    value = osMem.usage;
+                    used = osMem.used;
+                    total = osMem.total;
+                    $('#ram-info').html(`<span>物理内存：${used} / ${total}</span>`);
+                }
+                // 更新仪表盘
+                chart.setOption({
+                    series: [
+                        {
+                            data: [{value: value, name: config.name}]
+                        }
+                    ]
+                });
+            });
+        }
     });
 
     function initChart() {
@@ -305,49 +358,7 @@
             });
         });
 
-        setInterval(() => {
-            charts.forEach(item => {
-                const {chart, name, config, type} = item;
-                
-                if (type === 'pie') {
-                    if (config.id === 'traffic-chart') {
-                        const newData = config.data.map(item => ({
-                            name: item.name,
-                            value: Math.floor(Math.random() * 2000) + 500
-                        }));
-                        chart.setOption({
-                            series: [
-                                {
-                                    data: newData
-                                }
-                            ]
-                        });
-                    }
-                } else {
-                    // 仪表盘更新逻辑
-                    const newValue = Math.floor(Math.random() * 100);
-
-                    chart.setOption({
-                        series: [
-                            {
-                                data: [{value: newValue, name: name}]
-                            }
-                        ]
-                    });
-
-                    // 更新下方HTML标签
-                    const infoElement = document.getElementById(config.id.replace('-chart', '-info'));
-                    if (infoElement) {
-                        if (config.id === 'cpu-chart') {
-                            infoElement.innerHTML = `<span>CPU使用率：${newValue}%</span>`;
-                        } else {
-                            const used = (newValue / 100 * parseInt(config.total)).toFixed(1);
-                            infoElement.innerHTML = `<span>${name}：${used}GB / ${config.total}</span>`;
-                        }
-                    }
-                }
-            });
-        }, 3000);
+        return charts;
     }
 </script>
 </body>
