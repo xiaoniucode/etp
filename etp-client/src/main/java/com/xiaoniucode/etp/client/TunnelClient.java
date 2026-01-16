@@ -1,8 +1,10 @@
 package com.xiaoniucode.etp.client;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.config.ConfigHelper;
 import com.xiaoniucode.etp.client.handler.RealChannelHandler;
 import com.xiaoniucode.etp.client.handler.ControlChannelHandler;
+import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.client.security.ClientTlsContextFactory;
 import com.xiaoniucode.etp.client.utils.OSUtils;
@@ -68,6 +70,8 @@ public final class TunnelClient implements Lifecycle {
             if (start) {
                 return;
             }
+            ConfigHelper.set(config);
+            TunnelClientHelper.setTunnelClient(this);
             controlBootstrap = new Bootstrap();
             Bootstrap realBootstrap = new Bootstrap();
 
@@ -119,7 +123,7 @@ public final class TunnelClient implements Lifecycle {
                 //连接到服务器
                 connectTunnelServer();
             }
-            TunnelClientHelper.setTunnelClient(this);
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

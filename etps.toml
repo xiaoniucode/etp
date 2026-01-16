@@ -2,7 +2,7 @@ host = "0.0.0.0"
 bindPort = 9527
 httpProxyPort = 8080
 # TLS
-tls = false
+tls =true
 [keystore]
 path = "cert/server.p12"
 keyPass = "3FbV8R8VW49O"

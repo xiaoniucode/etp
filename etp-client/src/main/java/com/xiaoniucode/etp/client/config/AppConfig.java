@@ -22,9 +22,5 @@ public interface AppConfig extends Config {
 
     LogConfig getLogConfig();
 
-    interface TruststoreConfig {
-        String getPath();
 
-        String getStorePass();
-    }
 }

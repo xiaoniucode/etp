@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.handler;
 
-import com.xiaoniucode.etp.client.ProxyRespHelper;
+import com.xiaoniucode.etp.client.helper.ProxyRespHelper;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.MessageHandler;
 import com.xiaoniucode.etp.core.msg.Message;

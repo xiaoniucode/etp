@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.NewVisitorConn;
 import com.xiaoniucode.etp.core.msg.NewWorkConn;
-import com.xiaoniucode.etp.server.GlobalIdGenerator;
+import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
 import io.netty.buffer.ByteBuf;

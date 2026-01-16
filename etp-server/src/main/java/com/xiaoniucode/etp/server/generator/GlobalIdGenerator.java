@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server;
+package com.xiaoniucode.etp.server.generator;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

@@ -102,10 +102,6 @@ public class TomlConfigSource implements ConfigSource {
             if (StringUtils.hasText(keyPath) && StringUtils.hasText(keyPass) && StringUtils.hasText(storePass)) {
                 KeystoreConfig keystoreConfig = new KeystoreConfig(keyPath, keyPass, storePass);
                 builder.keystoreConfig(keystoreConfig);
-
-                System.setProperty("server.keystore.path", keystoreConfig.getPath());
-                System.setProperty("server.keystore.keyPass", keystoreConfig.getKeyPass());
-                System.setProperty("server.keystore.storePass", keystoreConfig.getStorePass());
             }
         }
     }

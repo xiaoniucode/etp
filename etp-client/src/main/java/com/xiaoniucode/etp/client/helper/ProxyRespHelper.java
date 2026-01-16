@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.client;
+package com.xiaoniucode.etp.client.helper;
 
 import com.xiaoniucode.etp.core.msg.NewProxyResp;
 

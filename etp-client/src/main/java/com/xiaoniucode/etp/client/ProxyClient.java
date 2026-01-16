@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.client;
 
 
+import com.xiaoniucode.etp.client.helper.ProxyRespHelper;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
-import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.NewProxy;
 import com.xiaoniucode.etp.core.msg.NewProxyResp;

@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.client.handler;
 
 import com.xiaoniucode.etp.client.TunnelClient;
-import com.xiaoniucode.etp.client.TunnelClientHelper;
+import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
 import com.xiaoniucode.etp.core.MessageHandler;
 import com.xiaoniucode.etp.core.msg.KickoutClient;
 import com.xiaoniucode.etp.core.msg.Message;

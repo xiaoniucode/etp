@@ -1,4 +1,6 @@
-package com.xiaoniucode.etp.client;
+package com.xiaoniucode.etp.client.helper;
+
+import com.xiaoniucode.etp.client.TunnelClient;
 
 /**
  * 方便在其他地方调用隧道方法，如stop

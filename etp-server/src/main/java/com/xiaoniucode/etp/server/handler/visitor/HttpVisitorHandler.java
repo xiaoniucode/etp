@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.handler.visitor;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.NewVisitorConn;
 import com.xiaoniucode.etp.core.msg.NewWorkConn;
-import com.xiaoniucode.etp.server.GlobalIdGenerator;
+import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;

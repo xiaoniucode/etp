@@ -45,11 +45,11 @@ function HomepageHeader() {
 
 const features = [
     {title: '管理面板', description: '提供直观易与操作的高颜值Web管理界面，简化配置操作，功能丰富，提供实时流量观测统计'},
-    {title: '高性能传输', description: '采用全链路零拷贝通信协议、数据压缩等技术实现高性能数据传输,GraalVM原生编译实现毫秒级启动'},
+    {title: '高性能传输', description: '全链路零拷贝通信协议设计、数据压缩等技术实现高性能数据传输,GraalVM原生编译实现毫秒级启动'},
     {title: '协议支持', description: '支持TCP/HTTP协议及TCP上层协议代理,TLS1.3高效加密协议,使用PKCS#12格式存储密钥与证书'},
     {title: '简单易用', description: '聚焦核心，资源占用少，零外部依赖，即装即用, 支持纯Toml静态配置或管理界面动态配置使用'},
     {title: '跨平台支持', description: '支持Linux、Windows、macOS、Docker，兼容ARM64、AMD64架构；SpringBoot、Java SDK'},
-    {title: '功能丰富', description: '支持断线重连、流量观测统计、代理重启、端口池、多客户端、无客户端模式、强制下线等'},
+    {title: '功能丰富', description: '支持数据压缩、流量观测统计、端口复用、端口池、多客户端、无客户端模式、强制下线等'},
 ];
 
 export default function Home() {

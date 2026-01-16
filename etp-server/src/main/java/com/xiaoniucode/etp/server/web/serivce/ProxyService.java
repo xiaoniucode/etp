@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.web.serivce;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
-import com.xiaoniucode.etp.server.GlobalIdGenerator;
+import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.config.domain.ProxyMapping;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
