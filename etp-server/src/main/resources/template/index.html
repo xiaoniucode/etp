@@ -9,6 +9,7 @@
     <link href="/static/layui/css/layui.css" rel="stylesheet">
     <link href="/static/css/index.css" rel="stylesheet">
     <link rel="icon" href="/static/image/favicon.ico">
+    <link href="/static/css/app.css" rel="stylesheet">
 </head>
 <body class="layui-layout-body">
 
@@ -50,10 +51,12 @@
                         监控</a>
                 </li>
                 <li class="layui-nav-item">
-                    <a href="javascript:;" data-url="/proxy/tcp/index.html"><i class="layui-icon layui-icon-link"></i> TCP</a>
+                    <a href="javascript:;" data-url="/proxy/tcp/index.html"><i class="layui-icon layui-icon-link"></i>
+                        TCP</a>
                 </li>
                 <li class="layui-nav-item">
-                    <a href="javascript:;" data-url="/proxy/http/index.html"><i class="layui-icon layui-icon-link"></i> HTTP</a>
+                    <a href="javascript:;" data-url="/proxy/http/index.html"><i class="layui-icon layui-icon-link"></i>
+                        HTTP</a>
                 </li>
                 <li class="layui-nav-item">
                     <a href="javascript:;" data-url="/client/index.html"><i class="layui-icon layui-icon-app"></i> 客户端</a>
@@ -83,7 +86,7 @@
             if (url && url !== '') {
                 $('#mainFrame').attr('src', url);
                 // 高亮当前菜单
-                $menuItems.parent().removeClass('layui-this');
+                $('.layui-nav-item').removeClass('layui-this');
                 $(this).parent().addClass('layui-this');
             }
         });

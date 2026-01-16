@@ -1,12 +1,43 @@
 .layui-body {
-    overflow: hidden;
-    margin: 15px;
+    padding: 15px;
+    padding-bottom: 0!important;
+    background: #f5f7fa;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 #mainFrame {
     width: 100%;
     height: 100%;
     border: none;
 }
-html {
-    background-color: #f2f2f2;
+
+/* 全局隐藏所有滚动条 - WebKit浏览器 */
+::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: transparent !important;
+}
+
+/* 全局隐藏所有滚动条 - Firefox */
+* {
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+}
+
+/* 确保所有元素都不显示滚动条 */
+* {
+    overflow: -moz-hidden-unscrollable !important;
+    -ms-overflow-style: none !important;
+}
+
+/* 允许body和.layui-body滚动但隐藏滚动条 */
+body, .layui-body {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important;
 }
