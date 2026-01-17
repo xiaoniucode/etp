@@ -51,6 +51,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private void connectToTarget(Channel visitorChannel, int localPort) {
         long sessionId = GlobalIdGenerator.nextId();
         visitorChannel.config().setOption(ChannelOption.AUTO_READ, false);
+        //todo 待修复
         Channel controllChannel = ChannelManager.getControlChannelBySecretKey("your-secret-key");
         if (controllChannel == null) {
             logger.warn("channel is null");
