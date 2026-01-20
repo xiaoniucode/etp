@@ -6,9 +6,10 @@ import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.config.domain.ProxyMapping;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
-import com.xiaoniucode.etp.server.manager.ChannelManager;
+import com.xiaoniucode.etp.server.manager.ChannelManager3;
 import com.xiaoniucode.etp.server.manager.PortPool;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
+import com.xiaoniucode.etp.server.manager.re.ChannelManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
 import com.xiaoniucode.etp.server.web.core.server.BizException;
@@ -198,7 +199,7 @@ public class ProxyService {
             //删除注册的端口映射
             state.removeProxy(secretKey, remotePort);
             //删除公网端口与已认证客户端的绑定
-            ChannelManager.removeRemotePortToControlChannel(remotePort);
+            ChannelManager3.removeRemotePortToControlChannel(remotePort);
             //停掉连接的服务并释放端口
             TcpProxyServer.get().stopRemotePort(remotePort, true);
             DaoFactory.INSTANCE.getProxyDao().deleteById(id);

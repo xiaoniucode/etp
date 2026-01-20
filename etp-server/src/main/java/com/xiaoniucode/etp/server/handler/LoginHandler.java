@@ -2,9 +2,10 @@ package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.core.msg.Login;
 import com.xiaoniucode.etp.core.msg.Message;
-import com.xiaoniucode.etp.server.manager.ChannelManager;
+import com.xiaoniucode.etp.server.manager.ChannelManager3;
 import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
+import com.xiaoniucode.etp.server.manager.re.ChannelManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -32,12 +33,12 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
                 ctx.channel().close();
                 return;
             }
-            Channel controlChannel = ChannelManager.getControlChannelBySecretKey(secretKey);
-            if (controlChannel != null) {
+            Channel control = ChannelManager.getControl(secretKey);
+            if (control != null) {
                 ctx.channel().close();
             }
             List<Integer> remotePorts = state.getClientRemotePorts(secretKey);
-            ChannelManager.addControlChannel(remotePorts, secretKey, os, arch, ctx.channel());
+            ChannelManager3.addControlChannel(remotePorts, secretKey, os, arch, ctx.channel());
             logger.debug("客户端: {} 认证成功", secretKey);
         }
     }

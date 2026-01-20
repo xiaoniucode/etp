@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.core.EtpConstants;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.util.CharsetUtil;
@@ -26,6 +27,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+        Channel visitor = ctx.channel();
         if (!sniffing) {
             // 嗅探结束，直接透传
             out.add(in.retain());
@@ -37,6 +39,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
         in.markReaderIndex();
         int port = -1;
         boolean isHttp = false;
+        String domain = null;
         try {
             int len = Math.min(in.readableBytes(), 4096);
             byte[] bytes = new byte[len];
@@ -47,9 +50,9 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                 String host = parseHost(content);
                 if (host != null) {
                     if (host.contains(":")) {
-                        host = host.split(":")[0];
+                        domain = host.split(":")[0];
                     }
-                    Integer targetPort = domainMapping.get(host);
+                    Integer targetPort = domainMapping.get(domain);
                     if (targetPort == null) {
                         logger.warn("没有该域名的代理服务");
                         ctx.close();
@@ -65,7 +68,8 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             in.resetReaderIndex();
             sniffing = false;
         }
-        ctx.channel().attr(EtpConstants.TARGET_PORT).set(port);
+        visitor.attr(EtpConstants.TARGET_PORT).set(port);
+        visitor.attr(EtpConstants.VISITOR_DOMAIN).set(domain);
         ctx.pipeline().remove(this);
     }
 

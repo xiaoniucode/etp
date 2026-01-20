@@ -4,9 +4,7 @@ import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.NewVisitorConn;
 import com.xiaoniucode.etp.core.msg.NewWorkConn;
-import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
-import com.xiaoniucode.etp.server.manager.ChannelManager;
-import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
+import com.xiaoniucode.etp.server.manager.re.ChannelManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,7 +13,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
+import java.util.function.BiConsumer;
 
 /**
  * 处理来自公网访问者连接读写请求
@@ -24,59 +22,41 @@ import java.net.InetSocketAddress;
  */
 public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final Logger logger = LoggerFactory.getLogger(TcpVisitorHandler.class);
-    private final RuntimeStateManager runtimeState = RuntimeStateManager.get();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
-        Channel dataChannel = ctx.channel().attr(EtpConstants.DATA_CHANNEL).get();
-        if (dataChannel == null || !dataChannel.isActive()) {
+        Channel tunnel = ctx.channel().attr(EtpConstants.DATA_CHANNEL).get();
+        if (tunnel == null || !tunnel.isActive()) {
             logger.warn("data channel is null");
             return;
         }
-        if (dataChannel.isWritable()) {
-            dataChannel.writeAndFlush(new NewWorkConn(buf.retain()));
+        if (tunnel.isWritable()) {
+            tunnel.writeAndFlush(new NewWorkConn(buf.retain()));
         }
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        Channel visitorChannel = ctx.channel();
-        InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
-        Channel controllChannel = ChannelManager.getControlChannelByPort(sa.getPort());
-        if (controllChannel == null) {
-            visitorChannel.close();
-            return;
-        } else {
-            long sessionId = GlobalIdGenerator.nextId();
-            visitorChannel.config().setOption(ChannelOption.AUTO_READ, false);
-            int localPort = runtimeState.getLocalPort(sa.getPort());
-            ChannelManager.addClientChannelToControlChannel(visitorChannel, sessionId, controllChannel);
-            ChannelManager.registerActiveConnection(sa.getPort(), visitorChannel);
-            controllChannel.writeAndFlush(new NewVisitorConn(sessionId, localPort));
-        }
+        Channel visitor = ctx.channel();
+        visitor.config().setOption(ChannelOption.AUTO_READ, false);
+        ChannelManager.registerTcpVisitor(visitor, pair -> {
+            Channel control = pair.getControl();
+            //通知代理客户端与目标端口建立连接
+            control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), pair.getLocalPort()));
+        });
         super.channelActive(ctx);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel visitorChannel = ctx.channel();
-        InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
-        Channel controlChannel = ChannelManager.getControlChannelByPort(sa.getPort());
-        if (controlChannel == null) {
-            ctx.channel().close();
-        } else {
-            Long sessionId = ChannelManager.getSessionIdByClientChannel(visitorChannel);
-            ChannelManager.removeClientChannelFromControlChannel(controlChannel, sessionId);
-            ChannelManager.unregisterActiveConnection(sa.getPort(), visitorChannel);
-            Channel dataChannel = visitorChannel.attr(EtpConstants.DATA_CHANNEL).get();
-            if (dataChannel != null && dataChannel.isActive()) {
-                dataChannel.attr(EtpConstants.REAL_SERVER_CHANNEL).getAndSet(null);
-                dataChannel.attr(EtpConstants.SECRET_KEY).getAndSet(null);
-                dataChannel.attr(EtpConstants.SESSION_ID).getAndSet(null);
-                dataChannel.config().setOption(ChannelOption.AUTO_READ, true);
-                dataChannel.writeAndFlush(new CloseProxy(sessionId));
+        ChannelManager.unregisterTcpVisitor(visitorChannel, new BiConsumer<Long, Channel>() {
+            @Override
+            public void accept(Long sessionId, Channel tunnel) {
+                //通知代理客户端连接断开
+                tunnel.writeAndFlush(new CloseProxy(sessionId));
             }
-        }
+        });
         super.channelInactive(ctx);
     }
 
@@ -88,15 +68,14 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        Channel visitorChannel = ctx.channel();
-        InetSocketAddress sa = (InetSocketAddress) visitorChannel.localAddress();
-        Channel controlChannel = ChannelManager.getControlChannelByPort(sa.getPort());
-        if (controlChannel == null) {
-            ctx.channel().close();
+        Channel visitor = ctx.channel();
+        Channel control = ChannelManager.getControlByVisitor(visitor);
+        if (control == null) {
+            visitor.close();
         } else {
-            Channel dataChannel = visitorChannel.attr(EtpConstants.DATA_CHANNEL).get();
-            if (dataChannel != null) {
-                dataChannel.config().setOption(ChannelOption.AUTO_READ, visitorChannel.isWritable());
+            Channel tunnel = visitor.attr(EtpConstants.DATA_CHANNEL).get();
+            if (tunnel != null) {
+                tunnel.config().setOption(ChannelOption.AUTO_READ, visitor.isWritable());
             }
         }
         super.channelWritabilityChanged(ctx);

@@ -21,13 +21,13 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) {
-        Channel dataChannel = ctx.channel().attr(EtpConstants.DATA_CHANNEL).get();
+        Channel tunnel = ctx.channel().attr(EtpConstants.DATA_CHANNEL).get();
         Long sessionId = ctx.channel().attr(EtpConstants.SESSION_ID).get();
-        if (dataChannel == null) {
+        if (tunnel == null) {
             logger.warn("数据传输通道为空:{}", sessionId);
             return;
         }
-        dataChannel.writeAndFlush(new NewWorkConn(byteBuf.retain(),sessionId));
+        tunnel.writeAndFlush(new NewWorkConn(byteBuf.retain(),sessionId));
     }
 
     @Override
@@ -43,11 +43,11 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
         ChannelManager.removeRealServerChannel(sessionId);
         realChannel.attr(EtpConstants.SESSION_ID).set(null);
 
-        Channel dataChannel = realChannel.attr(EtpConstants.DATA_CHANNEL).get();
-        if (dataChannel != null) {
-            dataChannel.attr(EtpConstants.REAL_SERVER_CHANNEL).set(null);
+        Channel tunnel = realChannel.attr(EtpConstants.DATA_CHANNEL).get();
+        if (tunnel != null) {
+            tunnel.attr(EtpConstants.REAL_SERVER_CHANNEL).set(null);
             realChannel.attr(EtpConstants.DATA_CHANNEL).set(null);
-            dataChannel.writeAndFlush(new CloseProxy(sessionId));
+            tunnel.writeAndFlush(new CloseProxy(sessionId));
         }
         super.channelInactive(ctx);
     }
@@ -55,9 +55,9 @@ public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel realChannel = ctx.channel();
-        Channel dataChannel = realChannel.attr(EtpConstants.DATA_CHANNEL).get();
-        if (dataChannel != null) {
-            dataChannel.config().setOption(ChannelOption.AUTO_READ, realChannel.isWritable());
+        Channel tunnel = realChannel.attr(EtpConstants.DATA_CHANNEL).get();
+        if (tunnel != null) {
+            tunnel.config().setOption(ChannelOption.AUTO_READ, realChannel.isWritable());
         }
         super.channelWritabilityChanged(ctx);
     }

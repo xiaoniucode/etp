@@ -3,8 +3,9 @@ package com.xiaoniucode.etp.server.web.serivce;
 import com.xiaoniucode.etp.core.msg.KickoutClient;
 import com.xiaoniucode.etp.server.config.domain.AuthInfo;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
-import com.xiaoniucode.etp.server.manager.ChannelManager;
+import com.xiaoniucode.etp.server.manager.ChannelManager3;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
+import com.xiaoniucode.etp.server.manager.re.ChannelManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
 import com.xiaoniucode.etp.server.web.core.server.BizException;
@@ -19,7 +20,7 @@ public class ClientService {
     private final RuntimeStateManager state = RuntimeStateManager.get();
     public void kickoutClient(JSONObject req) {
         String secretKey = req.getString("secretKey");
-        Channel control = ChannelManager.getControlChannelBySecretKey(secretKey);
+        Channel control = ChannelManager.getControl(secretKey);
         if (control != null) {
             control.writeAndFlush(new KickoutClient());
         }
@@ -54,7 +55,7 @@ public class ClientService {
             String secretKey = client.getString("secretKey");
 
             state.removeClient(secretKey);
-            ChannelManager.closeControlChannelByClient(secretKey);
+            ChannelManager3.closeControlChannelByClient(secretKey);
             //关闭该客户端所有运行状态的代理服务
             state.getClientRemotePorts(secretKey).forEach(remotePort -> {
                 TcpProxyServer.get().stopRemotePort(remotePort, true);
@@ -63,7 +64,7 @@ public class ClientService {
             //删除客户端所有的代理映射
              ServiceFactory.INSTANCE.getProxyService().deleteProxiesByClient(id);
             //发消息通知客户端断开连接
-            Channel control = ChannelManager.getControlChannelBySecretKey(secretKey);
+            Channel control = ChannelManager.getControl(secretKey);
             if (control != null) {
                 control.writeAndFlush(new KickoutClient());
             }

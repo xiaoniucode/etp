@@ -16,12 +16,12 @@ public class NewWorkConnHandler extends AbstractTunnelMessageHandler {
     @Override
     protected void doHandle(ChannelHandlerContext ctx, Message msg) {
         if (msg instanceof NewWorkConn workConn) {
-            Channel dataChannel = ctx.channel();
-            Channel visitorChannel = dataChannel.attr(EtpConstants.VISITOR_CHANNEL).get();
-            if (visitorChannel != null && visitorChannel.isActive()) {
-                dataChannel.config().setAutoRead(visitorChannel.isWritable());
+            Channel tunnel = ctx.channel();
+            Channel visitor = tunnel.attr(EtpConstants.VISITOR_CHANNEL).get();
+            if (visitor != null && visitor.isActive()) {
+                tunnel.config().setAutoRead(visitor.isWritable());
                 if (workConn.getPayload().refCnt() > 0) {
-                    visitorChannel.writeAndFlush(workConn.getPayload().retain());
+                    visitor.writeAndFlush(workConn.getPayload().retain());
                 }
             }
         }

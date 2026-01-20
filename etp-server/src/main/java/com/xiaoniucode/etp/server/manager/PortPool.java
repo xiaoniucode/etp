@@ -1,7 +1,6 @@
 package com.xiaoniucode.etp.server.manager;
 
 
-import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.config.domain.PortRange;
 import org.slf4j.Logger;

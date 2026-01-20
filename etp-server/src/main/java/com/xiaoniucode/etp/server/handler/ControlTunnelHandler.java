@@ -4,7 +4,8 @@ import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.core.MessageHandler;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.Message;
-import com.xiaoniucode.etp.server.manager.ChannelManager;
+import com.xiaoniucode.etp.server.manager.ChannelManager3;
+import com.xiaoniucode.etp.server.manager.re.ChannelManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
@@ -28,35 +29,32 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<Message> {
         }
     }
 
-    /**
-     * 服务端与某个客户端断开连接 可能是客户端们主动断开，也可能是代理服务器断开。
-     */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Channel clientChannel = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
+        Channel visitor = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
         //数据连接的断开
-        if (clientChannel != null) {
+        if (visitor != null) {
             String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
             Long sessionId = ctx.channel().attr(EtpConstants.SESSION_ID).get();
-            Channel controlTunnelChannel = ChannelManager.getControlChannelBySecretKey(secretKey);
-            if (controlTunnelChannel != null) {
-                ChannelManager.removeClientChannelFromControlChannel(controlTunnelChannel, sessionId);
-                ChannelUtils.closeOnFlush(controlTunnelChannel);
-                clientChannel.close();
+            Channel control = ChannelManager.getControl(secretKey);
+            if (control != null) {
+                ChannelManager3.removeClientChannelFromControlChannel(control, sessionId);
+                ChannelUtils.closeOnFlush(control);
+                visitor.close();
             }
         } else {
-            ChannelManager.clearControlChannel(ctx.channel());
+            ChannelManager3.clearControlChannel(ctx.channel());
         }
         super.channelInactive(ctx);
     }
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        Channel visitorChannel = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
-        if (visitorChannel != null) {
-            visitorChannel.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
+        Channel visitor = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
+        if (visitor != null) {
+            visitor.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
         } else {
-            logger.warn("channel wriability changed and visitorChannel is null");
+            logger.warn("channel wriability changed and visitor is null");
         }
 
         super.channelWritabilityChanged(ctx);

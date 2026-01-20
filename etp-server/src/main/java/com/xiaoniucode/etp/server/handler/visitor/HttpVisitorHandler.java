@@ -1,10 +1,11 @@
 package com.xiaoniucode.etp.server.handler.visitor;
 
 import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.NewVisitorConn;
 import com.xiaoniucode.etp.core.msg.NewWorkConn;
-import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
-import com.xiaoniucode.etp.server.manager.ChannelManager;
+import com.xiaoniucode.etp.server.manager.re.ChannelManager;
+import com.xiaoniucode.etp.server.manager.re.HttpVisitorPair;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,6 +16,9 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * http visitor handler
@@ -27,61 +31,62 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
-        Channel visitorChannel = ctx.channel();
-        int port = visitorChannel.attr(EtpConstants.TARGET_PORT).get();
+        Channel visitor = ctx.channel();
 
-        Boolean connected = visitorChannel.attr(EtpConstants.CONNECTED).get();
+        Boolean connected = visitor.attr(EtpConstants.CONNECTED).get();
         if (connected == null || !connected) {
-            visitorChannel.attr(EtpConstants.CONNECTED).set(false);
+            visitor.attr(EtpConstants.CONNECTED).set(false);
             buf.retain();
-            visitorChannel.attr(CACHED_FIRST_PACKET).set(buf);
-            connectToTarget(visitorChannel, port);
+            visitor.attr(CACHED_FIRST_PACKET).set(buf);
+            connectToTarget(visitor);
             return;
         }
-        Channel dataChannel = ctx.channel().attr(EtpConstants.DATA_CHANNEL).get();
-        if (dataChannel == null || !dataChannel.isActive()) {
+        Channel tunnel = ctx.channel().attr(EtpConstants.DATA_CHANNEL).get();
+        if (tunnel == null || !tunnel.isActive()) {
             logger.warn("data channel is null");
             return;
         }
-        if (dataChannel.isWritable()) {
-            dataChannel.writeAndFlush(new NewWorkConn(buf.retain()));
+        if (tunnel.isWritable()) {
+            tunnel.writeAndFlush(new NewWorkConn(buf.retain()));
         }
     }
 
-    private void connectToTarget(Channel visitorChannel, int localPort) {
-        long sessionId = GlobalIdGenerator.nextId();
-        visitorChannel.config().setOption(ChannelOption.AUTO_READ, false);
-        //todo 待修复
-        Channel controllChannel = ChannelManager.getControlChannelBySecretKey("your-secret-key");
-        if (controllChannel == null) {
-            logger.warn("channel is null");
-            return;
-        }
-        ChannelManager.addClientChannelToControlChannel(visitorChannel, sessionId, controllChannel);
-        ChannelManager.registerActiveConnection(localPort, visitorChannel);
-        controllChannel.writeAndFlush(new NewVisitorConn(sessionId, localPort));
+    private void connectToTarget(Channel visitor) {
+        visitor.config().setOption(ChannelOption.AUTO_READ, false);
+        ChannelManager.registerHttpVisitor(visitor, new Consumer<HttpVisitorPair>() {
+            @Override
+            public void accept(HttpVisitorPair pair) {
+                Channel control = pair.getControl();
+                control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), pair.getLocalPort()));
+            }
+        });
     }
 
-    public static void connectToTarget(ChannelHandlerContext ctx,Channel visitorChannel) {
-        Channel dataChannel = visitorChannel.attr(EtpConstants.DATA_CHANNEL).get();
-        ByteBuf cached = visitorChannel.attr(CACHED_FIRST_PACKET).get();
-        if (cached != null && dataChannel.isWritable()) {
-            ctx.pipeline().addAfter(ctx.name(), "chunkedWriteHandler", new ChunkedWriteHandler());
-            ctx.pipeline().addAfter(ctx.name(), "httpAggregator", new HttpObjectAggregator(64 * 1024));
-            dataChannel.writeAndFlush(new NewWorkConn(cached.retain()));
+    public static void sendFirstPackage(Channel visitor) {
+        Channel tunnel = visitor.attr(EtpConstants.DATA_CHANNEL).get();
+        ByteBuf cached = visitor.attr(CACHED_FIRST_PACKET).get();
+        if (cached != null && tunnel.isWritable()) {
+            tunnel.writeAndFlush(new NewWorkConn(cached.retain()));
             cached.release();
-            visitorChannel.attr(CACHED_FIRST_PACKET).set(null);
+            visitor.attr(CACHED_FIRST_PACKET).set(null);
         }
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Channel visitor = ctx.channel();
         // 清理缓存的数据包
         ByteBuf cachedPacket = ctx.channel().attr(CACHED_FIRST_PACKET).get();
         if (cachedPacket != null) {
             cachedPacket.release();
             ctx.channel().attr(CACHED_FIRST_PACKET).set(null);
         }
+        ChannelManager.unregisterHttpVisitor(visitor, new BiConsumer<Long, Channel>() {
+            @Override
+            public void accept(Long sessionId, Channel control) {
+                control.writeAndFlush(new CloseProxy(sessionId));
+            }
+        });
         super.channelInactive(ctx);
     }
 }

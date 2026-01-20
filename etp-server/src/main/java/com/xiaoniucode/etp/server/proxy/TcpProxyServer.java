@@ -6,12 +6,12 @@ import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.config.domain.ProxyMapping;
 import com.xiaoniucode.etp.server.handler.visitor.TcpVisitorHandler;
-import com.xiaoniucode.etp.server.manager.ChannelManager;
+import com.xiaoniucode.etp.server.manager.ChannelManager3;
 import com.xiaoniucode.etp.server.manager.PortPool;
 import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
+import com.xiaoniucode.etp.server.manager.re.ChannelManager;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
-import com.xiaoniucode.etp.server.config.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
@@ -145,14 +145,7 @@ public final class TcpProxyServer implements Lifecycle {
     public void stopRemotePort(Integer remotePort, boolean releasePort) {
         try {
             // 1. 先关闭所有已建立的连接
-            Set<Channel> connections = ChannelManager.getActiveChannelsByRemotePort(remotePort);
-            if (connections != null) {
-                for (Channel ch : connections) {
-                    ch.close();
-                }
-                LOGGER.info("已关闭 {} 个活跃连接", connections.size());
-                ChannelManager.removeActiveChannels(remotePort);
-            }
+            ChannelManager.closeVisitor(remotePort);
             // 2. 再关闭监听通道
             Channel serverChannel = remotePortChannelMapping.get(remotePort);
             if (serverChannel != null) {

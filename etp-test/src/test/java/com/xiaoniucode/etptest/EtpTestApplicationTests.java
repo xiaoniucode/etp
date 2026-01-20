@@ -88,14 +88,14 @@ class EtpTestApplicationTests {
         //1k 1w 5w 10w 20w
         long start = System.currentTimeMillis();
         ArrayList<User2> batch = new ArrayList<>();
-        for (int i = 0; i < 10_0000; i++) {
+        for (int i = 0; i < 20_0000; i++) {
             User2 user = new User2()
                     .setUsername("xiaoniucode")
                     .setPassword("4b0063baa5ae47c2910fc25265aae4132")
                     .setRemark("一笑江湖")
                     .setEmail("xiaoniucode@gmail.com")
                     .setNickname("令狐冲");
-            if (batch.size()<20000){
+            if (batch.size()<5000){
                 batch.add(user);
             }else {
                 user2Repository.saveAll(batch);

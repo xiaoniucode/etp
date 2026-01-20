@@ -37,11 +37,11 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                     realChannel.config().setOption(ChannelOption.AUTO_READ, false);
 
                     ChannelManager.borrowDataTunnelChannel(controlBootstrap)
-                            .thenAccept(dataChannel -> {
-                                dataChannel.attr(EtpConstants.REAL_SERVER_CHANNEL).set(realChannel);
-                                realChannel.attr(EtpConstants.DATA_CHANNEL).set(dataChannel);
+                            .thenAccept(tunnel -> {
+                                tunnel.attr(EtpConstants.REAL_SERVER_CHANNEL).set(realChannel);
+                                realChannel.attr(EtpConstants.DATA_CHANNEL).set(tunnel);
 
-                                dataChannel.writeAndFlush(new NewVisitorConnResp(secretKey,sessionId)).addListener(f -> {
+                                tunnel.writeAndFlush(new NewVisitorConnResp(secretKey,sessionId)).addListener(f -> {
                                     if (f.isSuccess()) {
                                         ChannelManager.addRealServerChannel(sessionId, realChannel);
                                         realChannel.attr(EtpConstants.SESSION_ID).set(sessionId);

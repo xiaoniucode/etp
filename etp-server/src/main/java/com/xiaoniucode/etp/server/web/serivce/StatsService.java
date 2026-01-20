@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.serivce;
 
-import com.xiaoniucode.etp.server.manager.ChannelManager;
+import com.xiaoniucode.etp.server.manager.re.ChannelManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.common.ServerHelper;
 import org.json.JSONArray;

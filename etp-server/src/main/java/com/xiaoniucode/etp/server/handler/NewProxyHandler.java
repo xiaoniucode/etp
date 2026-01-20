@@ -28,12 +28,12 @@ public class NewProxyHandler implements MessageHandler {
     public void handle(ChannelHandlerContext ctx, Message msg) {
         try {
             if (msg instanceof NewProxy newProxy) {
-                Channel controlChannel = ctx.channel();
-                if (controlChannel == null || !controlChannel.isActive()) {
+                Channel control = ctx.channel();
+                if (control == null || !control.isActive()) {
                     logger.warn("控制隧道不存在或隧道未激活！");
                     return;
                 }
-                String secretKey = controlChannel.attr(EtpConstants.SECRET_KEY).get();
+                String secretKey = control.attr(EtpConstants.SECRET_KEY).get();
                 if (StringUtils.hasText(secretKey)) {
                     JSONObject body = buildAddReq(newProxy, secretKey);
                     JSONObject proxy = ServiceFactory.INSTANCE.getProxyService().addTcpProxy(body);
