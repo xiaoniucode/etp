@@ -43,14 +43,22 @@ public final class Jdbc {
     }
 
     public void execute(String sql, Object... params) {
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
             setParameters(stmt, params);
             stmt.execute();
-
         } catch (SQLException e) {
             throw new RuntimeException("SQL执行失败: " + sql + " → " + e.getMessage(), e);
+        } finally {
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException e) {
+            }
         }
     }
 
@@ -151,27 +159,39 @@ public final class Jdbc {
             JSONArray results = new JSONArray();
             SqlParseResult parseResult = parseSql(originalSql, paramMap);
 
-            try (Connection conn = jdbc.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(parseResult.sql)) {
-
+            Connection conn = null;
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+            try {
+                conn = jdbc.getConnection();
+                stmt = conn.prepareStatement(parseResult.sql);
                 jdbc.setParameters(stmt, parseResult.params);
+                rs = stmt.executeQuery();
+                ResultSetMetaData meta = rs.getMetaData();
+                int columnCount = meta.getColumnCount();
 
-                try (ResultSet rs = stmt.executeQuery()) {
-                    ResultSetMetaData meta = rs.getMetaData();
-                    int columnCount = meta.getColumnCount();
-
-                    while (rs.next()) {
-                        JSONObject row = new JSONObject();
-                        for (int i = 1; i <= columnCount; i++) {
-                            Object value = rs.getObject(i);
-                            row.put(meta.getColumnLabel(i), value == null ? JSONObject.NULL : value);
-                        }
-                        results.put(row);
+                while (rs.next()) {
+                    JSONObject row = new JSONObject();
+                    for (int i = 1; i <= columnCount; i++) {
+                        Object value = rs.getObject(i);
+                        row.put(meta.getColumnLabel(i), value == null ? JSONObject.NULL : value);
                     }
+                    results.put(row);
                 }
-
             } catch (SQLException e) {
                 throw new RuntimeException("SQL查询失败: " + parseResult.sql + " → " + e.getMessage(), e);
+            } finally {
+                // 不要关闭连接，因为连接可能是事务管理器提供的
+                try {
+                    if (rs != null) {
+                        rs.close();
+                    }
+                    if (stmt != null) {
+                        stmt.close();
+                    }
+                } catch (SQLException e) {
+                    // 忽略关闭异常
+                }
             }
 
             return results;
@@ -206,14 +226,24 @@ public final class Jdbc {
         public int execute() {
             SqlParseResult parseResult = parseSql(originalSql, paramMap);
 
-            try (Connection conn = jdbc.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(parseResult.sql)) {
-
+            Connection conn = null;
+            PreparedStatement stmt = null;
+            try {
+                conn = jdbc.getConnection();
+                stmt = conn.prepareStatement(parseResult.sql);
                 jdbc.setParameters(stmt, parseResult.params);
                 return stmt.executeUpdate();
-
             } catch (SQLException e) {
                 throw new RuntimeException("SQL更新失败: " + parseResult.sql + " → " + e.getMessage(), e);
+            } finally {
+                // 不要关闭连接，因为连接可能是事务管理器提供的
+                try {
+                    if (stmt != null) {
+                        stmt.close();
+                    }
+                } catch (SQLException e) {
+                    // 忽略关闭异常
+                }
             }
         }
     }
@@ -246,14 +276,24 @@ public final class Jdbc {
         public int execute() {
             SqlParseResult parseResult = parseSql(originalSql, paramMap);
 
-            try (Connection conn = jdbc.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(parseResult.sql)) {
-
+            Connection conn = null;
+            PreparedStatement stmt = null;
+            try {
+                conn = jdbc.getConnection();
+                stmt = conn.prepareStatement(parseResult.sql);
                 jdbc.setParameters(stmt, parseResult.params);
                 return stmt.executeUpdate();
-
             } catch (SQLException e) {
                 throw new RuntimeException("SQL插入失败: " + parseResult.sql + " → " + e.getMessage(), e);
+            } finally {
+                // 不要关闭连接，因为连接可能是事务管理器提供的
+                try {
+                    if (stmt != null) {
+                        stmt.close();
+                    }
+                } catch (SQLException e) {
+                    // 忽略关闭异常
+                }
             }
         }
     }

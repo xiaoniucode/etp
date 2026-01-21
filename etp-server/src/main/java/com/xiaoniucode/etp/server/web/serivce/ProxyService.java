@@ -3,13 +3,12 @@ package com.xiaoniucode.etp.server.web.serivce;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
-import com.xiaoniucode.etp.server.config.domain.ProxyMapping;
+import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
-import com.xiaoniucode.etp.server.manager.ChannelManager3;
-import com.xiaoniucode.etp.server.manager.PortPool;
-import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
-import com.xiaoniucode.etp.server.manager.re.ChannelManager;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.manager.bak.PortPool;
+import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
 import com.xiaoniucode.etp.server.web.core.server.BizException;
@@ -21,7 +20,6 @@ import java.util.Locale;
 
 public class ProxyService {
     private final AppConfig config = ConfigHelper.get();
-    private final RuntimeStateManager state = RuntimeStateManager.get();
     private final JdbcTransactionTemplate TX = new JdbcTransactionTemplate();
 
     public JSONObject getProxy(JSONObject req) {
@@ -50,7 +48,7 @@ public class ProxyService {
             throw new BizException("映射注册失败，公网端口: " + remotePort + "不可用！");
         }
         String secretKey = req.getString("secretKey");
-        if (state.isPortOccupied(remotePort)) {
+        if (ProxyManager.isPortOccupied(remotePort)) {
             throw new BizException("公网端口:" + remotePort + "已被占用");
         }
         //-1表示用户没有自定义端口
@@ -65,7 +63,7 @@ public class ProxyService {
         JSONObject res = new JSONObject();
         int remotePortInt = req.getInt("remotePort");
         //注册端口映射
-        state.registerProxy(secretKey, createProxyMapping(req));
+        ProxyManager.addProxy(secretKey, createProxyMapping(req));
         //如果客户度已经启动认证
         ChannelManager.addPortToControlChannelIfOnline(secretKey, remotePortInt);
         //如果状态是1，需要启动代理服务
@@ -107,7 +105,7 @@ public class ProxyService {
                 //如果有公网端口，如果发生改变，需要判断端口是否可用
                 if (newRemotePortInt != oldRemotePort) {
                     remotePortChanged = true;
-                    if (state.isPortOccupied(newRemotePortInt)) {
+                    if (ProxyManager.isPortOccupied(newRemotePortInt)) {
                         throw new BizException("公网端口已被占用");
                     }
                     if (!PortPool.get().isPortAvailable(newRemotePortInt)) {
@@ -125,9 +123,9 @@ public class ProxyService {
             }
             DaoFactory.INSTANCE.getProxyDao().update(req);
             //删除已经注册的映射
-            state.removeProxy(secretKey, oldRemotePort);
+            ProxyManager.removeProxy(secretKey, oldRemotePort);
             //重新注册更新后的映射
-            state.registerProxy(secretKey, createProxyMapping(req));
+            ProxyManager.addProxy(secretKey, createProxyMapping(req));
             //如果客户度已经启动认证
             ChannelManager.addPortToControlChannelIfOnline(secretKey, newRemotePortInt);
             //公网端口发生更新，需要停掉之前的服务连接
@@ -156,15 +154,15 @@ public class ProxyService {
         });
     }
 
-    private ProxyMapping createProxyMapping(JSONObject req) {
-        ProxyMapping proxyMapping = new ProxyMapping();
-        proxyMapping.setType(ProtocolType.getType(req.getString("type")));
-        proxyMapping.setLocalPort(req.getInt("localPort"));
-        proxyMapping.setRemotePort(req.getInt("remotePort"));
-        proxyMapping.setProxyId(req.getInt("clientId"));
-        proxyMapping.setName(req.getString("name"));
-        proxyMapping.setStatus(req.getInt("status"));
-        return proxyMapping;
+    private ProxyConfig createProxyMapping(JSONObject req) {
+        ProxyConfig proxyConfig = new ProxyConfig();
+        proxyConfig.setType(ProtocolType.getType(req.getString("type")));
+        proxyConfig.setLocalPort(req.getInt("localPort"));
+        proxyConfig.setRemotePort(req.getInt("remotePort"));
+        proxyConfig.setProxyId(req.getInt("clientId"));
+        proxyConfig.setName(req.getString("name"));
+        proxyConfig.setStatus(req.getInt("status"));
+        return proxyConfig;
     }
 
     /**
@@ -177,7 +175,7 @@ public class ProxyService {
             String secretKey = req.getString("secretKey");
             int remotePort = proxy.getInt("remotePort");
             int updateStatus = status == 1 ? 0 : 1;
-            state.updateProxyStatus(secretKey, remotePort, updateStatus);
+            ProxyManager.updateProxyStatus(secretKey, remotePort, updateStatus);
             if (updateStatus == 1) {
                 TcpProxyServer.get().startRemotePort(remotePort);
             } else {
@@ -197,9 +195,9 @@ public class ProxyService {
             JSONObject proxy = DaoFactory.INSTANCE.getProxyDao().getById(id);
             int remotePort = proxy.getInt("remotePort");
             //删除注册的端口映射
-            state.removeProxy(secretKey, remotePort);
+            ProxyManager.removeProxy(secretKey, remotePort);
             //删除公网端口与已认证客户端的绑定
-            ChannelManager3.removeRemotePortToControlChannel(remotePort);
+            ChannelManager.removePort(remotePort);
             //停掉连接的服务并释放端口
             TcpProxyServer.get().stopRemotePort(remotePort, true);
             DaoFactory.INSTANCE.getProxyDao().deleteById(id);

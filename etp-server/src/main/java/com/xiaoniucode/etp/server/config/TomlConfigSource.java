@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.common.utils.TomlUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.moandjiezana.toml.Toml;
 import com.xiaoniucode.etp.server.config.domain.*;
+
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -147,7 +148,7 @@ public class TomlConfigSource implements ConfigSource {
                 throw new IllegalArgumentException("客户端[名称]冲突，不能存在重复的名称！ " + name);
             }
 
-            List<ProxyMapping> proxies = parseProxies(client);
+            List<ProxyConfig> proxies = parseProxies(client);
             ClientInfo clientInfo = new ClientInfo(name, secretKey, null, proxies);
             clients.add(clientInfo);
 
@@ -158,18 +159,19 @@ public class TomlConfigSource implements ConfigSource {
         builder.clients(clients);
     }
 
-    private List<ProxyMapping> parseProxies(Toml client) {
+    private List<ProxyConfig> parseProxies(Toml client) {
         List<Toml> proxies = client.getTables("proxies");
         if (proxies == null) {
             return new ArrayList<>();
         }
 
-        List<ProxyMapping> proxyMappings = new CopyOnWriteArrayList<>();
+        List<ProxyConfig> proxyConfigs = new CopyOnWriteArrayList<>();
         Set<Integer> portTemp = new HashSet<>();
 
         for (Toml proxy : proxies) {
             String type = proxy.getString("type");
             String proxyName = proxy.getString("name");
+            String localIP = proxy.getString("localIP", "127.0.0.1");
             Long localPort = proxy.getLong("localPort");
             Long remotePort = proxy.getLong("remotePort");
             Long status = proxy.getLong("status", 1L);
@@ -186,21 +188,22 @@ public class TomlConfigSource implements ConfigSource {
                 throw new IllegalArgumentException("必须指定内网端口");
             }
 
-            ProxyMapping proxyMapping = new ProxyMapping();
-            proxyMapping.setType(ProtocolType.getType(type));
-            proxyMapping.setName(proxyName);
-            proxyMapping.setLocalPort(localPort.intValue());
-            proxyMapping.setStatus(status.intValue());
+            ProxyConfig proxyConfig = new ProxyConfig();
+            proxyConfig.setType(ProtocolType.getType(type));
+            proxyConfig.setName(proxyName);
+            proxyConfig.setLocalIP(localIP.trim());
+            proxyConfig.setLocalPort(localPort.intValue());
+            proxyConfig.setStatus(status.intValue());
 
             if (ProtocolType.TCP.name().equalsIgnoreCase(type)) {
-                proxyMapping.setRemotePort(remotePort == null ? null : remotePort.intValue());
+                proxyConfig.setRemotePort(remotePort == null ? null : remotePort.intValue());
             } else if (ProtocolType.HTTP.name().equalsIgnoreCase(type)) {
-                proxyMapping.setDomains(new HashSet<>(domains));
+                proxyConfig.setDomains(new HashSet<>(domains));
             }
-            proxyMappings.add(proxyMapping);
+            proxyConfigs.add(proxyConfig);
         }
 
-        return proxyMappings;
+        return proxyConfigs;
     }
 
     @Override

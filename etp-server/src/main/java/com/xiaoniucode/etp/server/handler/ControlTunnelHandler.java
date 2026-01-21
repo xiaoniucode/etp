@@ -4,8 +4,7 @@ import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.core.MessageHandler;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.Message;
-import com.xiaoniucode.etp.server.manager.ChannelManager3;
-import com.xiaoniucode.etp.server.manager.re.ChannelManager;
+import com.xiaoniucode.etp.server.manager.ChannelManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
@@ -31,20 +30,18 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Channel control = ctx.channel();
         Channel visitor = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
         //数据连接的断开
         if (visitor != null) {
             String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
             Long sessionId = ctx.channel().attr(EtpConstants.SESSION_ID).get();
-            Channel control = ChannelManager.getControl(secretKey);
-            if (control != null) {
-                ChannelManager3.removeClientChannelFromControlChannel(control, sessionId);
-                ChannelUtils.closeOnFlush(control);
-                visitor.close();
-            }
-        } else {
-            ChannelManager3.clearControlChannel(ctx.channel());
+            ChannelManager.closeVisitor(secretKey, sessionId);
+            ChannelUtils.closeOnFlush(control);
+            visitor.close();
         }
+        ChannelManager.closeControl(control);
+
         super.channelInactive(ctx);
     }
 

@@ -91,19 +91,12 @@ public class TunnelServer implements Lifecycle {
             serverBootstrap.bind(config.getHost(), config.getBindPort()).sync();
             //异步处理
             CompletableFuture.runAsync(() -> {
-                //初始化管理面板
+                //1.初始化管理面板
                 initDashboard();
-                //开启TCP代理
+                //2.开启TCP代理
                 TcpProxyServer.get().start();
-                //todo 开启HTTP代理
-                Map<String, Integer> domains = new HashMap<>();
-                domains.put("a.local.cc", 8081);
-                domains.put("b.local.cc", 3333);
-                domains.put("c.local.cc", 3000);
-                domains.put("localhost", 8081);
-                HttpProxyServer httpProxyServer = HttpProxyServer.get();
-                httpProxyServer.setDomainMapping(domains);
-                httpProxyServer.start();
+                //3.开启HTTP代理
+                HttpProxyServer.get().start();
             });
             logger.info("ETP隧道已开启:{}:{}", config.getHost(), config.getBindPort());
             GlobalEventBus.get().publishAsync(new TunnelBindEvent());

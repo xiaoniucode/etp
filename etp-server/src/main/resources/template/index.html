@@ -79,19 +79,26 @@
     layui.use(['element', 'layer', 'jquery', 'Rest'], function () {
         const Rest = layui.Rest;
         const $ = layui.$;
-        setLoginInfo()
+        
+        setLoginInfo();
+        initRoute();
+        
         // 左侧菜单切换页面
         $('.layui-nav-tree .layui-nav-item a').on('click', function () {
             const url = $(this).data('url');
             if (url && url !== '') {
                 $('#mainFrame').attr('src', url);
+                // 将当前页面URL存储到URL哈希中
+                window.location.hash = url;
                 // 高亮当前菜单
                 $('.layui-nav-item').removeClass('layui-this');
                 $(this).parent().addClass('layui-this');
             }
         });
+        
         $('#openAccountSetting').on('click', function () {
             $('#mainFrame').attr('src', '/account.html');
+            window.location.hash = '/account.html';
         });
 
         $('#logout').on('click', function () {
@@ -117,6 +124,30 @@
             } catch (e) {
                 console.warn("解析用户信息失败", e);
             }
+        }
+        
+        // 初始化路由，从URL哈希恢复当前页面
+        function initRoute() {
+            const hash = window.location.hash;
+            if (hash && hash.length > 1) {
+                // 从哈希中获取页面URL
+                const targetUrl = hash.substring(1);
+                $('#mainFrame').attr('src', targetUrl);
+                // 高亮对应的菜单
+                highlightMenuByUrl(targetUrl);
+            }
+        }
+        
+        // 根据URL高亮对应的菜单
+        function highlightMenuByUrl(url) {
+            $('.layui-nav-item').removeClass('layui-this');
+            $('.layui-nav-item a').each(function() {
+                const itemUrl = $(this).data('url');
+                if (itemUrl === url) {
+                    $(this).parent().addClass('layui-this');
+                    return false;
+                }
+            });
         }
     });
 </script>

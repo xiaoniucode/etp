@@ -1,12 +1,15 @@
-package com.xiaoniucode.etp.server.manager.re;
+package com.xiaoniucode.etp.server.manager;
 
 import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.core.msg.Login;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.config.domain.AuthInfo;
 import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +35,28 @@ public class ChannelManager {
      * value: （访问者连接）visitor channel
      */
     private static final Map<String, Set<Channel>> domainToVisitorChannels = new ConcurrentHashMap<>();
+
+    public static void registerClient(Channel control, Login login) {
+        String secretKey = login.getSecretKey();
+        Set<Integer> remotePorts = ProxyManager.getClientRemotePorts(secretKey);
+        Set<String> domains = ProxyManager.getClientDomains(secretKey);
+        for (Integer remotePort : remotePorts) {
+            portToControlChannel.put(remotePort, control);
+        }
+        for (String domain : domains) {
+            domainToControlChannel.put(domain, control);
+        }
+        control.attr(EtpConstants.CHANNEL_REMOTE_PORT).set(remotePorts);
+        control.attr(EtpConstants.SECRET_KEY).set(secretKey);
+        control.attr(EtpConstants.OS).set(login.getOs());
+        control.attr(EtpConstants.ARCH).set(login.getArch());
+        control.attr(EtpConstants.VISITOR_CHANNELS).set(new ConcurrentHashMap<>());
+        clientToControlChannel.put(secretKey, control);
+    }
+
+    public static void removePort(Integer remotePort) {
+        portToControlChannel.remove(remotePort);
+    }
 
     /**
      * 注册公网访问者
@@ -224,5 +249,55 @@ public class ChannelManager {
 
     public static int onlineClientCount() {
         return clientToControlChannel.size();
+    }
+
+    public static void closeVisitor(String secretKey, Long sessionId) {
+        Channel control = getControl(secretKey);
+        if (control.attr(EtpConstants.VISITOR_CHANNELS).get() != null) {
+            Channel visitor = control.attr(EtpConstants.VISITOR_CHANNELS).get().remove(sessionId);
+            if (visitor != null) {
+                visitor.attr(EtpConstants.DATA_CHANNEL).getAndSet(null);
+                visitor.attr(EtpConstants.SECRET_KEY).getAndSet(null);
+                visitor.attr(EtpConstants.SESSION_ID).getAndSet(null);
+                ChannelUtils.closeOnFlush(visitor);
+            }
+        }
+    }
+
+    public static void closeControl(String secretKey) {
+        Channel control = getControl(secretKey);
+        if (control != null) {
+            closeControl(control);
+        }
+    }
+
+    public static void closeControl(Channel control) {
+        if (control.attr(EtpConstants.CHANNEL_REMOTE_PORT).get() == null) {
+            return;
+        }
+        String secretKey = control.attr(EtpConstants.SECRET_KEY).get();
+        Channel existingChannel = clientToControlChannel.get(secretKey);
+        if (control == existingChannel) {
+            clientToControlChannel.remove(secretKey);
+        }
+        Set<Integer> remotePorts = control.attr(EtpConstants.CHANNEL_REMOTE_PORT).get();
+        if (remotePorts != null) {
+            for (int port : remotePorts) {
+                portToControlChannel.remove(port);
+            }
+        }
+        if (control.isActive()) {
+            control.close();
+        }
+        //将该隧道上所有用户连接都给关闭掉
+        Map<Long, Channel> clientChannels = control.attr(EtpConstants.VISITOR_CHANNELS).get();
+        if (clientChannels != null) {
+            clientChannels.keySet().forEach(sessionId -> {
+                Channel clientChannel = clientChannels.get(sessionId);
+                if (clientChannel.isActive()) {
+                    clientChannel.close();
+                }
+            });
+        }
     }
 }

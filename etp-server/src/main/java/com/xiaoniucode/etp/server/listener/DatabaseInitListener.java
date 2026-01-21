@@ -23,11 +23,14 @@ public class DatabaseInitListener implements EventListener<TunnelBindEvent> {
             createUserTable();
             createClientTable();
             createProxiesTable();
+            createProxyDomainTable();
+
             createSystemSettingsTable();
             logger.debug("数据库表初始化完毕");
             GlobalEventBus.get().publishAsync(new DatabaseInitEvent());
         }
     }
+
 
     private void createSystemSettingsTable() {
         String sql = """
@@ -77,10 +80,23 @@ public class DatabaseInitListener implements EventListener<TunnelBindEvent> {
                     autoRegistered   INTEGER NOT NULL DEFAULT 0,         -- 注册类型（1：自动注册、0手动注册）
                     localPort        INTEGER NOT NULL,                   -- 内网端口（如 3306）
                     remotePort       INTEGER,                            -- 远程服务端口（对外暴露的端口）
-                    domains          TEXT,                               -- http协议域名，多个域名用逗号分隔
                     status           INTEGER NOT NULL DEFAULT 1,         -- 状态：1=开启，0=关闭
                     createdAt        TEXT DEFAULT (datetime('now')),     -- 创建时间
                     updatedAt        TEXT DEFAULT (datetime('now'))      -- 更新时间
+                );
+                """;
+        JdbcFactory.getJdbc().execute(sql);
+    }
+
+    private void createProxyDomainTable() {
+        String sql = """
+                CREATE TABLE IF NOT EXISTS proxy_domains (
+                    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                    proxyId   INTEGER NOT NULL, 
+                    domain    TEXT NOT NULL,
+                    createdAt TEXT DEFAULT (datetime('now')),
+                    UNIQUE(domain),
+                    FOREIGN KEY (proxyId) REFERENCES proxies(id) ON DELETE CASCADE
                 );
                 """;
         JdbcFactory.getJdbc().execute(sql);

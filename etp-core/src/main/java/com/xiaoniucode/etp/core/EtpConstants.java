@@ -5,6 +5,7 @@ import io.netty.util.AttributeKey;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 通道相关常量
@@ -20,7 +21,7 @@ public class EtpConstants {
     public static final AttributeKey<Boolean> CONNECTED = AttributeKey.valueOf("etp.connected");
 
     public static final AttributeKey<Map<Long, Channel>> VISITOR_CHANNELS = AttributeKey.newInstance("etp.visitorChannels");
-    public static final AttributeKey<List<Integer>> CHANNEL_REMOTE_PORT = AttributeKey.valueOf("etp.channelRemotePort");
+    public static final AttributeKey<Set<Integer>> CHANNEL_REMOTE_PORT = AttributeKey.valueOf("etp.channelRemotePort");
 
     public static final AttributeKey<String> SERVER_DDR = AttributeKey.valueOf("etp.serverAddr");
     public static final AttributeKey<Integer> SERVER_PORT = AttributeKey.valueOf("etp.serverPort");

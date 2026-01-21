@@ -4,10 +4,11 @@ import com.xiaoniucode.etp.core.codec.ProtocolType;
 
 import java.util.Set;
 
-public class ProxyMapping {
+public class ProxyConfig {
     private Integer proxyId;
     private String name;
     private ProtocolType type;
+    private String localIP;
     private Integer localPort;
     private Integer remotePort;
     private Integer status;
@@ -22,6 +23,10 @@ public class ProxyMapping {
 
     public ProtocolType getType() {
         return type;
+    }
+
+    public String getLocalIP() {
+        return localIP;
     }
 
     public Integer getLocalPort() {
@@ -50,6 +55,10 @@ public class ProxyMapping {
 
     public void setType(ProtocolType type) {
         this.type = type;
+    }
+
+    public void setLocalIP(String localIP) {
+        this.localIP = localIP;
     }
 
     public void setLocalPort(Integer localPort) {

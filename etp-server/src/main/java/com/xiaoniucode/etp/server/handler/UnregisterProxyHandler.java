@@ -6,13 +6,14 @@ import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.core.msg.UnregisterProxy;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
-import com.xiaoniucode.etp.server.manager.ChannelManager3;
-import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,6 @@ import org.slf4j.LoggerFactory;
 public class UnregisterProxyHandler implements MessageHandler {
     private final Logger logger = LoggerFactory.getLogger(UnregisterProxyHandler.class);
     private final static AppConfig config = ConfigHelper.get();
-    private final static RuntimeStateManager state = RuntimeStateManager.get();
 
     @Override
     public void handle(ChannelHandlerContext ctx, Message msg) {
@@ -36,13 +36,13 @@ public class UnregisterProxyHandler implements MessageHandler {
             if (config.getDashboard().getEnable()) {
                 DaoFactory.INSTANCE.getProxyDao().deleteById(proxyId);
             }
-            List<Integer> ports = state.getClientRemotePorts(secretKey);
+            Set<Integer> ports = ProxyManager.getClientRemotePorts(secretKey);
             //停掉连接的服务并释放端口
             ports.forEach(remotePort -> {
                 //删除注册的端口映射
-                state.removeProxy(secretKey, remotePort);
+                ProxyManager.removeProxy(secretKey, remotePort);
                 //删除公网端口与已认证客户端的绑定
-                ChannelManager3.removeRemotePortToControlChannel(remotePort);
+                ChannelManager.removePort(remotePort);
                 TcpProxyServer.get().stopRemotePort(remotePort, true);
             });
 

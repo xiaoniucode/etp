@@ -4,12 +4,11 @@ import com.xiaoniucode.etp.common.utils.PortFileUtil;
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
-import com.xiaoniucode.etp.server.config.domain.ProxyMapping;
+import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.handler.visitor.TcpVisitorHandler;
-import com.xiaoniucode.etp.server.manager.ChannelManager3;
-import com.xiaoniucode.etp.server.manager.PortPool;
-import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
-import com.xiaoniucode.etp.server.manager.re.ChannelManager;
+import com.xiaoniucode.etp.server.manager.ClientManager;
+import com.xiaoniucode.etp.server.manager.bak.PortPool;
+import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -44,8 +43,6 @@ public final class TcpProxyServer implements Lifecycle {
      */
     private final Map<Integer, Channel> remotePortChannelMapping = new ConcurrentHashMap<>();
     private final PortPool portPool;
-    private final RuntimeStateManager state = RuntimeStateManager.get();
-
     private TcpProxyServer() {
         this.portPool = PortPool.get();
     }
@@ -74,15 +71,15 @@ public final class TcpProxyServer implements Lifecycle {
     }
 
     /**
-     * 如果端口映射的status=1则启动
+     * todo 如果端口映射的status=1则启动
      */
     private void bindAllProxyPort() {
         try {
-            Collection<ClientInfo> clients = state.allClients();
+            Collection<ClientInfo> clients = ClientManager.allClients();
             List<StringBuilder> bindPorts = new ArrayList<>();
             for (ClientInfo client : clients) {
-                List<ProxyMapping> proxyMappings = client.getTcpProxies();
-                for (ProxyMapping proxy : proxyMappings) {
+                List<ProxyConfig> proxyConfigs = client.getTcpProxies();
+                for (ProxyConfig proxy : proxyConfigs) {
                     if (proxy.getStatus() == 1) {
                         Integer remotePort = proxy.getRemotePort();
                         if (portPool.isPortAvailable(remotePort)) {

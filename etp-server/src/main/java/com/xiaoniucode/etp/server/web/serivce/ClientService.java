@@ -3,9 +3,9 @@ package com.xiaoniucode.etp.server.web.serivce;
 import com.xiaoniucode.etp.core.msg.KickoutClient;
 import com.xiaoniucode.etp.server.config.domain.AuthInfo;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
-import com.xiaoniucode.etp.server.manager.ChannelManager3;
-import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
-import com.xiaoniucode.etp.server.manager.re.ChannelManager;
+import com.xiaoniucode.etp.server.manager.ClientManager;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
 import com.xiaoniucode.etp.server.web.core.server.BizException;
@@ -13,11 +13,12 @@ import com.xiaoniucode.etp.server.web.dao.DaoFactory;
 import io.netty.channel.Channel;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.util.UUID;
 
 public class ClientService {
     private final JdbcTransactionTemplate TX = new JdbcTransactionTemplate();
-    private final RuntimeStateManager state = RuntimeStateManager.get();
+
     public void kickoutClient(JSONObject req) {
         String secretKey = req.getString("secretKey");
         Channel control = ChannelManager.getControl(secretKey);
@@ -41,12 +42,13 @@ public class ClientService {
                     throw new BizException("客户端名不能重复");
                 }
             }
-            state.updateClientName(client.getString("secretKey"), name);
+            ClientManager.updateClientName(client.getString("secretKey"), name);
             DaoFactory.INSTANCE.getClientDao().update(id, name);
             return null;
         });
 
     }
+
     //todo 客户端下线有bug
     public void deleteClient(JSONObject req) {
         TX.execute(() -> {
@@ -54,15 +56,15 @@ public class ClientService {
             int id = client.getInt("id");
             String secretKey = client.getString("secretKey");
 
-            state.removeClient(secretKey);
-            ChannelManager3.closeControlChannelByClient(secretKey);
+            ClientManager.removeClient(secretKey);
+            ChannelManager.closeControl(secretKey);
             //关闭该客户端所有运行状态的代理服务
-            state.getClientRemotePorts(secretKey).forEach(remotePort -> {
+            ProxyManager.getClientRemotePorts(secretKey).forEach(remotePort -> {
                 TcpProxyServer.get().stopRemotePort(remotePort, true);
             });
             DaoFactory.INSTANCE.getClientDao().deleteById(id);
             //删除客户端所有的代理映射
-             ServiceFactory.INSTANCE.getProxyService().deleteProxiesByClient(id);
+            ServiceFactory.INSTANCE.getProxyService().deleteProxiesByClient(id);
             //发消息通知客户端断开连接
             Channel control = ChannelManager.getControl(secretKey);
             if (control != null) {
@@ -100,9 +102,9 @@ public class ClientService {
             client.put("secretKey", secretKey);
             //添加到数据库
             int clientId = DaoFactory.INSTANCE.getClientDao().insert(client);
-            ClientInfo clientInfo = new ClientInfo(name, secretKey,clientId);
+            ClientInfo clientInfo = new ClientInfo(name, secretKey, clientId);
             //注册客户端
-            state.registerClient(clientInfo);
+            ClientManager.addClient(clientInfo);
             return clientId;
         });
     }

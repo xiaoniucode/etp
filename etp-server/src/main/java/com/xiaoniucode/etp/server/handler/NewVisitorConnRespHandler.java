@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.core.msg.NewVisitorConnResp;
 import com.xiaoniucode.etp.server.handler.visitor.HttpVisitorHandler;
 import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
-import com.xiaoniucode.etp.server.manager.re.ChannelManager;
+import com.xiaoniucode.etp.server.manager.ChannelManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;

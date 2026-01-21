@@ -4,12 +4,14 @@ import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.core.event.EventListener;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
-import com.xiaoniucode.etp.server.config.domain.ProxyMapping;
+import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
-import com.xiaoniucode.etp.server.manager.PortPool;
-import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
+import com.xiaoniucode.etp.server.manager.ClientManager;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.manager.bak.PortPool;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,6 @@ import java.util.Locale;
 
 public class StaticConfigInitListener implements EventListener<TunnelBindEvent> {
     private final static Logger logger = LoggerFactory.getLogger(StaticConfigInitListener.class);
-    private final static RuntimeStateManager runtimeState = RuntimeStateManager.get();
     @Override
     public void onEvent(TunnelBindEvent event) {
         registerTomlConfig();
@@ -32,7 +33,7 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
             String secretKey = client.getSecretKey();
             String name = client.getName();
             Integer clientId = null;
-            if (!runtimeState.hasClient(secretKey)) {
+            if (!ClientManager.hasClient(secretKey)) {
                 //如果开启了管理面板，需要将客户端配置同步到数据库
                 if (enableDashboard) {
                     JSONObject existClient = DaoFactory.INSTANCE.getClientDao().getByName(name);
@@ -51,16 +52,16 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                 }
                 //注册客户端
                 client.setClientId(clientId);
-                runtimeState.registerClient(client);
+                ClientManager.addClient(client);
             } else {
-                clientId = runtimeState.getClient(secretKey).getClientId();
+                clientId = ClientManager.getClient(secretKey).getClientId();
                 logger.warn("客户端「{}」 注册失败，已经在数据库被注册", name);
             }
 
-            List<ProxyMapping> proxies = client.getProxies();
-            for (ProxyMapping proxy : proxies) {
+            List<ProxyConfig> proxies = client.getProxies();
+            for (ProxyConfig proxy : proxies) {
                 Integer remotePort = proxy.getRemotePort();
-                if (!runtimeState.hasProxy(secretKey, remotePort)) {
+                if (!ProxyManager.hasProxy(secretKey, remotePort)) {
                     Integer proxyId = null;
                     String type = proxy.getType().name().toLowerCase(Locale.ROOT);
                     if (ProtocolType.TCP.name().equalsIgnoreCase(type) && proxy.getRemotePort() == null) {
@@ -78,7 +79,13 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                             save.put("type", type);
                             save.put("autoRegistered", 0);
                             if (ProtocolType.HTTP.name().equalsIgnoreCase(type) && !proxy.getDomains().isEmpty()) {
-                                save.put("domains", String.join(",", proxy.getDomains()));
+                                JSONArray domains = new JSONArray();
+                                for (String domain : proxy.getDomains()) {
+                                    JSONObject item = new JSONObject();
+                                    item.put("domain", domain);
+                                    domains.put(item);
+                                }
+                                save.put("domains", domains);
                             }
                             if (type.equalsIgnoreCase(ProtocolType.TCP.name())) {
                                 save.put("remotePort", proxy.getRemotePort());
@@ -97,7 +104,7 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                         proxyId = GlobalIdGenerator.nextId();
                     }
                     proxy.setProxyId(proxyId);
-                    runtimeState.registerProxy(secretKey, proxy);
+                    ProxyManager.addProxy(secretKey, proxy);
                 } else {
                     logger.warn("同步取消，该客户端公网端口「{}-{}」已经被注册", name, remotePort);
                 }

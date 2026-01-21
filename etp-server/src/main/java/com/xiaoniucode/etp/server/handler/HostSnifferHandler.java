@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,12 +18,6 @@ import java.util.Map;
  */
 public class HostSnifferHandler extends ByteToMessageDecoder {
     private final Logger logger = LoggerFactory.getLogger(HostSnifferHandler.class);
-    private final Map<String, Integer> domainMapping;
-
-    public HostSnifferHandler(Map<String, Integer> domainsMapping) {
-        this.domainMapping = domainsMapping;
-    }
-
     private boolean sniffing = true;
 
     @Override
@@ -52,8 +47,8 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                     if (host.contains(":")) {
                         domain = host.split(":")[0];
                     }
-                    Integer targetPort = domainMapping.get(domain);
-                    if (targetPort == null) {
+                    int targetPort = ProxyManager.getLocalPortByDomain(domain);
+                    if (targetPort == -1) {
                         logger.warn("没有该域名的代理服务");
                         ctx.close();
                         return;

@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.manager.re;
+package com.xiaoniucode.etp.server.manager;
 
 import io.netty.channel.Channel;
 

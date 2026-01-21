@@ -3,13 +3,12 @@ package com.xiaoniucode.etp.server.listener;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.core.event.EventListener;
-import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.config.domain.*;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.event.DatabaseInitEvent;
-import com.xiaoniucode.etp.server.manager.PortPool;
-import com.xiaoniucode.etp.server.manager.RuntimeStateManager;
+import com.xiaoniucode.etp.server.manager.ClientManager;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
 import com.xiaoniucode.etp.server.web.common.DigestUtil;
@@ -17,13 +16,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> {
     private static final Logger logger = LoggerFactory.getLogger(ConfigRegisterListener.class);
-    private final static RuntimeStateManager runtimeState = RuntimeStateManager.get();
     private static JdbcTransactionTemplate TX;
 
     @Override
@@ -48,20 +48,20 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
 
     private void syncSystemSettings() {
         TX.execute(() -> {
-            if ( ConfigHelper.get().getDashboard().getEnable()) {
+            if (ConfigHelper.get().getDashboard().getEnable()) {
                 // 同步端口范围设置
                 JSONObject portRange = DaoFactory.INSTANCE.getSettingDao().getByKey("port_range");
                 if (portRange == null) {
                     JSONObject save = new JSONObject();
                     save.put("key", "port_range");
-                    save.put("value",  ConfigHelper.get().getPortRange().getStart() + ":" +  ConfigHelper.get().getPortRange().getEnd());
+                    save.put("value", ConfigHelper.get().getPortRange().getStart() + ":" + ConfigHelper.get().getPortRange().getEnd());
                     DaoFactory.INSTANCE.getSettingDao().insert(save);
                     logger.info("同步端口范围配置到数据库");
                 } else {
                     //如果数据库存在配置，采用数据库配置作为全局配置
                     String range = portRange.getString("value");
                     String[] split = range.split(":");
-                    PortRange configRange =  ConfigHelper.get().getPortRange();
+                    PortRange configRange = ConfigHelper.get().getPortRange();
                     configRange.setStart(Integer.parseInt(split[0]));
                     configRange.setEnd(Integer.parseInt(split[1]));
                 }
@@ -72,7 +72,7 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
 
     private void syncDashboardUser() {
         TX.execute(() -> {
-            Dashboard dashboard =  ConfigHelper.get().getDashboard();
+            Dashboard dashboard = ConfigHelper.get().getDashboard();
             Boolean reset = dashboard.getReset();
             String username = dashboard.getUsername();
             String password = dashboard.getPassword();
@@ -96,6 +96,7 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
             return null;
         });
     }
+
     private void registerDBClientConfig() {
         JSONArray clients = DaoFactory.INSTANCE.getClientDao().list();
         if (clients != null) {
@@ -104,8 +105,8 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
                 int clientId = client.getInt("id");
                 String name = client.getString("name");
                 String secretKey = client.getString("secretKey");
-                ClientInfo clientInfo = new ClientInfo(name,secretKey,clientId);
-                runtimeState.registerClient(clientInfo);
+                ClientInfo clientInfo = new ClientInfo(name, secretKey, clientId);
+                ClientManager.addClient(clientInfo);
             }
         }
     }
@@ -118,22 +119,23 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
                 String secretKey = proxy.getString("secretKey");
                 ProtocolType type = ProtocolType.getType(proxy.getString("type").toLowerCase(Locale.ROOT));
 
-                ProxyMapping proxyMapping = new ProxyMapping();
-                proxyMapping.setType(type);
-                proxyMapping.setLocalPort(proxy.getInt("localPort"));
+                ProxyConfig proxyConfig = new ProxyConfig();
+                proxyConfig.setType(type);
+                proxyConfig.setLocalPort(proxy.getInt("localPort"));
                 if (ProtocolType.TCP.equals(type)) {
-                    proxyMapping.setRemotePort(proxy.getInt("remotePort"));
+                    proxyConfig.setRemotePort(proxy.getInt("remotePort"));
                 } else if (ProtocolType.HTTP.equals(type)) {
-                    String d = proxy.getString("domains");
-                    if (StringUtils.hasText(d)) {
-                        String[] split = d.split(",");
-                        proxyMapping.setDomains(new HashSet<>(List.of(split)));
+                    JSONArray d = proxy.getJSONArray("domains");
+                    Set<String> domains = new HashSet<>();
+                    for (Object domain : d) {
+                        domains.add((String) domain);
                     }
+                    proxyConfig.setDomains(domains);
                 }
-                proxyMapping.setProxyId(proxy.getInt("id"));
-                proxyMapping.setName(proxy.getString("name"));
-                proxyMapping.setStatus(proxy.getInt("status"));
-                runtimeState.registerProxy(secretKey, proxyMapping);
+                proxyConfig.setProxyId(proxy.getInt("id"));
+                proxyConfig.setName(proxy.getString("name"));
+                proxyConfig.setStatus(proxy.getInt("status"));
+                ProxyManager.addProxy(secretKey, proxyConfig);
             }
         }
     }

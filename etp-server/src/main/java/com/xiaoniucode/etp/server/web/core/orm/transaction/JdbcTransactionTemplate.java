@@ -6,9 +6,7 @@ package com.xiaoniucode.etp.server.web.core.orm.transaction;
  * @author liuxin
  */
 public class JdbcTransactionTemplate {
-
     private final JdbcTransactionManager txManager = new JdbcTransactionManager();
-
     /**
      * 执行事务
      *

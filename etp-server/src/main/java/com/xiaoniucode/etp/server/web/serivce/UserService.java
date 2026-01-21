@@ -8,7 +8,7 @@ import com.xiaoniucode.etp.server.web.manager.CaptchaManager;
 import org.json.JSONObject;
 
 public class UserService {
-    private static final JdbcTransactionTemplate TX = new JdbcTransactionTemplate();
+    private static final JdbcTransactionTemplate TX =new  JdbcTransactionTemplate();
 
     public JSONObject login(JSONObject req) {
         String captchaId = req.optString("captchaId");

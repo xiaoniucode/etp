@@ -11,7 +11,7 @@ public class ClientInfo {
     private String name;
     private String secretKey;
     private Integer clientId;
-    private List<ProxyMapping> proxies = new CopyOnWriteArrayList<>();
+    private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
 
     public ClientInfo(String name, String secretKey, Integer clientId) {
         this.name = name;
@@ -19,7 +19,7 @@ public class ClientInfo {
         this.clientId = clientId;
     }
 
-    public ClientInfo(String name, String secretKey, Integer clientId, List<ProxyMapping> proxies) {
+    public ClientInfo(String name, String secretKey, Integer clientId, List<ProxyConfig> proxies) {
         this.name = name;
         this.secretKey = secretKey;
         this.clientId = clientId;
@@ -38,15 +38,15 @@ public class ClientInfo {
         return clientId;
     }
 
-    public List<ProxyMapping> getTcpProxies() {
+    public List<ProxyConfig> getTcpProxies() {
         return proxies.stream().filter(f -> f.getType() == ProtocolType.TCP).collect(Collectors.toList());
     }
 
-    public Set<ProxyMapping> getHttpProxies() {
+    public Set<ProxyConfig> getHttpProxies() {
         return proxies.stream().filter(f -> f.getType() == ProtocolType.HTTP).collect(Collectors.toSet());
     }
 
-    public List<ProxyMapping> getProxies() {
+    public List<ProxyConfig> getProxies() {
         return proxies;
     }
 
@@ -62,7 +62,7 @@ public class ClientInfo {
         this.clientId = clientId;
     }
 
-    public void setProxies(List<ProxyMapping> proxies) {
+    public void setProxies(List<ProxyConfig> proxies) {
         this.proxies = proxies;
     }
 }
