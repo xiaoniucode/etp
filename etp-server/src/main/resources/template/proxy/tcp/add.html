@@ -28,10 +28,9 @@
         </div>
         <div class="layui-form-item">
             <div class="layui-inline">
-                <label class="layui-form-label">公网端口</label>
+                <label class="layui-form-label">内网IP</label>
                 <div class="layui-input-block">
-                    <input type="number" lay-verify="number" placeholder="不填自动分配" name="remotePort"
-                           id="remotePort" autocomplete="off"
+                    <input type="text" name="localIP" autocomplete="off" placeholder="默认: 127.0.0.1"
                            class="layui-input">
                 </div>
             </div>
@@ -41,6 +40,14 @@
                     <input type="number" lay-verify="required" placeholder="请输入" name="localPort" autocomplete="off"
                            class="layui-input">
                 </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">公网端口</label>
+            <div class="layui-input-inline">
+                <input type="number" lay-verify="number" placeholder="不填自动分配" name="remotePort"
+                       id="remotePort" autocomplete="off"
+                       class="layui-input">
             </div>
         </div>
         <div class="layui-form-item" pane>

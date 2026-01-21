@@ -27,12 +27,22 @@
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">内网端口</label>
-            <div class="layui-input-inline">
-                <input type="number" lay-verify="required" placeholder="请输入目标服务端口" name="localPort" autocomplete="off"
-                       class="layui-input">
+            <div class="layui-inline">
+                <label class="layui-form-label">内网IP</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="localIP" autocomplete="off" placeholder="默认: 127.0.0.1"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">内网端口</label>
+                <div class="layui-input-inline">
+                    <input type="number" lay-verify="required" placeholder="请输入目标服务端口" name="localPort" autocomplete="off"
+                           class="layui-input">
+                </div>
             </div>
         </div>
+
         <div class="layui-form-item">
             <label class="layui-form-label">访问域名</label>
             <div class="layui-input-block">
