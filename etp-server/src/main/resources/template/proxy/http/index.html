@@ -50,7 +50,22 @@
             cols: [[
                 {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
                 {field: 'name', title: '隧道名称'},
-                {field: 'domains', sort: true, title: '访问域名'},
+                {field: 'domains', sort: true, title: '访问域名', templet: function(d) {
+                        if (d.domains && d.domains.length > 0) {
+                            let domainStr = '';
+                            for (let i = 0; i < d.domains.length; i++) {
+                                const protocol = d.type === 'https' ? 'https' : 'http';
+                                const fullUrl = protocol + '://' + d.domains[i].domain;
+                                domainStr += '<a href="' + fullUrl + '" target="_blank">' + d.domains[i].domain + '</a>';
+                                
+                                if (i < d.domains.length - 1) {
+                                    domainStr += '<br>';
+                                }
+                            }
+                            return domainStr;
+                        }
+                        return '';
+                    }},
                 {field: 'localPort', sort: true, title: '内网端口'},
                 {
                     field: 'status', width: 120, title: '状态', sort: true, templet: function (d) {
