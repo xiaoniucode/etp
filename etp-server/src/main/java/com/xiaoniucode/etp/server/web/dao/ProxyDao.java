@@ -19,7 +19,7 @@ public class ProxyDao extends BaseDao {
                 .bind("status", data.optInt("status", 1))
                 .bind("autoRegistered", data.optInt("autoRegistered"))
                 .execute();
-        
+
         if (proxyId > 0 && "http".equals(data.optString("type"))) {
             JSONArray domains = data.optJSONArray("domains");
             if (domains != null && !domains.isEmpty()) {
@@ -35,7 +35,7 @@ public class ProxyDao extends BaseDao {
                 }
             }
         }
-        
+
         return proxyId;
     }
 
@@ -61,12 +61,12 @@ public class ProxyDao extends BaseDao {
         JSONArray proxies = jdbc.query("SELECT * FROM proxies WHERE clientId = :clientId")
                 .bind("clientId", clientId)
                 .list();
-        
+
         if (!proxies.isEmpty()) {
             JSONArray domains = jdbc.query("SELECT proxyId, domain FROM proxy_domains WHERE proxyId IN (SELECT id FROM proxies WHERE clientId = :clientId)")
                     .bind("clientId", clientId)
                     .list();
-            
+
             java.util.HashMap<Integer, JSONArray> domainMap = new java.util.HashMap<>();
             for (int i = 0; i < domains.length(); i++) {
                 JSONObject domainObj = domains.getJSONObject(i);
@@ -79,12 +79,12 @@ public class ProxyDao extends BaseDao {
                 domainEntry.put("domain", domain);
                 proxyDomains.put(domainEntry);
             }
-            
+
             for (int i = 0; i < proxies.length(); i++) {
                 JSONObject proxy = proxies.getJSONObject(i);
                 int proxyId = proxy.optInt("id");
                 String type = proxy.optString("type");
-                
+
                 if ("http".equals(type)) {
                     proxy.put("domains", domainMap.getOrDefault(proxyId, new JSONArray()));
                 } else {
@@ -92,18 +92,18 @@ public class ProxyDao extends BaseDao {
                 }
             }
         }
-        
+
         return proxies;
     }
 
     public JSONArray listActive() {
         JSONArray proxies = jdbc.query("SELECT * FROM proxies WHERE status = 1 ORDER BY clientId, remotePort")
                 .list();
-        
+
         if (!proxies.isEmpty()) {
             JSONArray domains = jdbc.query("SELECT proxyId, domain FROM proxy_domains WHERE proxyId IN (SELECT id FROM proxies WHERE status = 1)")
                     .list();
-            
+
             java.util.HashMap<Integer, JSONArray> domainMap = new java.util.HashMap<>();
             for (int i = 0; i < domains.length(); i++) {
                 JSONObject domainObj = domains.getJSONObject(i);
@@ -116,12 +116,12 @@ public class ProxyDao extends BaseDao {
                 domainEntry.put("domain", domain);
                 proxyDomains.put(domainEntry);
             }
-            
+
             for (int i = 0; i < proxies.length(); i++) {
                 JSONObject proxy = proxies.getJSONObject(i);
                 int proxyId = proxy.optInt("id");
                 String type = proxy.optString("type");
-                
+
                 if ("http".equals(type)) {
                     proxy.put("domains", domainMap.getOrDefault(proxyId, new JSONArray()));
                 } else {
@@ -129,7 +129,7 @@ public class ProxyDao extends BaseDao {
                 }
             }
         }
-        
+
         return proxies;
     }
 
@@ -189,14 +189,14 @@ public class ProxyDao extends BaseDao {
         }
 
         int rows = updateBuilder.bind("id", id).execute();
-        
+
         if (rows > 0 && data.has("domains")) {
             JSONObject proxy = getById((int) id);
             if (proxy != null && "http".equals(proxy.optString("type"))) {
                 jdbc.update("DELETE FROM proxy_domains WHERE proxyId = :proxyId")
                         .bind("proxyId", id)
                         .execute();
-                
+
                 JSONArray domains = data.getJSONArray("domains");
                 for (int i = 0; i < domains.length(); i++) {
                     JSONObject domainObj = domains.getJSONObject(i);
@@ -210,7 +210,7 @@ public class ProxyDao extends BaseDao {
                 }
             }
         }
-        
+
         return rows > 0;
     }
 
@@ -218,7 +218,7 @@ public class ProxyDao extends BaseDao {
         jdbc.update("DELETE FROM proxy_domains WHERE proxyId = :proxyId")
                 .bind("proxyId", id)
                 .execute();
-        
+
         int rows = jdbc.update("DELETE FROM proxies WHERE id = :id")
                 .bind("id", id)
                 .execute();
@@ -227,13 +227,13 @@ public class ProxyDao extends BaseDao {
 
     public JSONArray listAllProxies(String type) {
         String sql = """
-            SELECT
-                p.id, p.clientId, p.name, p.type, p.localPort, p.remotePort, p.status,
-                p.createdAt, p.updatedAt, p.autoRegistered, c.name AS clientName, c.secretKey
-            FROM proxies p
-            LEFT JOIN clients c ON p.clientId = c.id
-            """;
-        
+                SELECT
+                    p.id, p.clientId, p.name, p.type, p.localPort, p.remotePort, p.status,
+                    p.createdAt, p.updatedAt, p.autoRegistered, c.name AS clientName, c.secretKey
+                FROM proxies p
+                LEFT JOIN clients c ON p.clientId = c.id
+                """;
+
         JSONArray proxies;
         if (type != null) {
             sql += " WHERE p.type = :type";
@@ -244,12 +244,12 @@ public class ProxyDao extends BaseDao {
             proxies = jdbc.query(sql)
                     .list();
         }
-        
+
         if (!proxies.isEmpty()) {
             JSONArray allDomains = jdbc.query("SELECT proxyId, domain FROM proxy_domains")
                     .list();
-            
-           HashMap<Integer, JSONArray> domainMap = new HashMap<>();
+
+            HashMap<Integer, JSONArray> domainMap = new HashMap<>();
             for (int i = 0; i < allDomains.length(); i++) {
                 JSONObject domainObj = allDomains.getJSONObject(i);
                 int proxyId = domainObj.optInt("proxyId");
@@ -261,22 +261,26 @@ public class ProxyDao extends BaseDao {
                 domainEntry.put("domain", domain);
                 domains.put(domainEntry);
             }
-            int httpProxyPort = ConfigHelper.get().getHttpProxyPort();
+
             for (int i = 0; i < proxies.length(); i++) {
                 JSONObject proxy = proxies.getJSONObject(i);
                 int proxyId = proxy.optInt("id");
                 String proxyType = proxy.optString("type");
-                
-                if ("http".equals(proxyType)) {
+
+                if ("http".equalsIgnoreCase(proxyType)) {
                     JSONArray domains = domainMap.getOrDefault(proxyId, new JSONArray());
                     proxy.put("domains", domains);
+                    proxy.put("httpProxyPort", ConfigHelper.get().getHttpProxyPort());
+                } else if ("https".equalsIgnoreCase(proxyType)) {
+                    JSONArray domains = domainMap.getOrDefault(proxyId, new JSONArray());
+                    proxy.put("domains", domains);
+                    proxy.put("httpsProxyPort", ConfigHelper.get().getHttpsProxyPort());
                 } else {
                     proxy.put("domains", new JSONArray());
                 }
-                proxy.put("httpProxyPort",httpProxyPort);
             }
         }
-        
+
         return proxies;
     }
 
@@ -284,7 +288,7 @@ public class ProxyDao extends BaseDao {
         jdbc.update("DELETE FROM proxy_domains WHERE proxyId IN (SELECT id FROM proxies WHERE clientId = :clientId)")
                 .bind("clientId", clientId)
                 .execute();
-        
+
         return jdbc.update("DELETE FROM proxies WHERE clientId = :clientId")
                 .bind("clientId", clientId)
                 .execute();
@@ -313,7 +317,7 @@ public class ProxyDao extends BaseDao {
     public int deleteAllAutoRegisterProxy() {
         jdbc.update("DELETE FROM proxy_domains WHERE proxyId IN (SELECT id FROM proxies WHERE autoRegistered = 1)")
                 .execute();
-        
+
         return jdbc.update("DELETE FROM proxies WHERE autoRegistered = 1")
                 .execute();
     }

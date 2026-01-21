@@ -59,6 +59,12 @@ public class TomlConfigSource implements ConfigSource {
             validatePort(httpPort);
             builder.httpProxyPort(httpPort);
         }
+        Long httpsProxyPort = root.getLong("httpsProxyPort", 443L);
+        if (httpsProxyPort != null) {
+            int httpsPort = httpsProxyPort.intValue();
+            validatePort(httpsPort);
+            builder.httpsProxyPort(httpsPort);
+        }
         Boolean tlsValue = root.getBoolean("tls", false);
         if (tlsValue != null) {
             builder.tls(tlsValue);

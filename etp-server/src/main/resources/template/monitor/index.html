@@ -122,7 +122,6 @@
                 <div class="layui-card-body">
                     <form class="layui-form" lay-filter="sysConfigForm">
 
-                        <!-- 第一行-->
                         <div class="layui-row layui-col-space20">
                             <div class="layui-col-md6">
                                 <div class="layui-form-item">
@@ -142,7 +141,28 @@
                             </div>
                         </div>
 
-                        <!-- 第二行 -->
+                        <div class="layui-row layui-col-space20">
+                            <div class="layui-col-md6">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">HTTP代理</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" class="layui-input config-display" readonly
+                                               name="httpProxyPort">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-md6">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">HTTPS代理</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" class="layui-input config-display" readonly
+                                               name="httpsProxyPort">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                         <div class="layui-row layui-col-space20">
                             <div class="layui-col-md6">
                                 <div class="layui-form-item">
@@ -163,6 +183,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </form>
                 </div>
             </div>
@@ -316,7 +337,9 @@
                     tls_enabled: sysConfig.tls_enabled,
                     host: sysConfig.host,
                     bind_port: sysConfig.bind_port,
-                    port_range: portRange
+                    port_range: portRange,
+                    httpProxyPort:sysConfig.httpProxyPort,
+                    httpsProxyPort:sysConfig.httpsProxyPort
                 });
 
                 initChart();
@@ -336,17 +359,41 @@
                 }
             });
 
-            // 初始加载服务器监控数据
+            // 初始加载服务器监控数据和流量数据
             loadServerMonitorData();
+            loadTrafficData();
 
             // 每3秒刷新一次服务器监控数据
             setInterval(loadServerMonitorData, 3000);
+            // 每3秒刷新一次流量数据
+            setInterval(loadTrafficData, 3000);
         });
 
         // 加载服务器监控数据
         function loadServerMonitorData() {
             Rest.get('/api/monitor/server', {}, {loading: false}).then(data => {
                 updateCharts(data);
+            });
+        }
+
+        // 加载流量数据
+        function loadTrafficData() {
+            Rest.get('/api/metrics/summery', {}, {loading: false}).then(data => {
+                // 查找流量图表
+                const trafficChartItem = charts.find(item => item.config.id === 'traffic-chart');
+                if (trafficChartItem) {
+                    const { chart } = trafficChartItem;
+                    chart.setOption({
+                        series: [
+                            {
+                                data: [
+                                    {value: data.in, name: '入站流量'},
+                                    {value: data.out, name: '出站流量'}
+                                ]
+                            }
+                        ]
+                    });
+                }
             });
         }
 

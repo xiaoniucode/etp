@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>映射</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link href="/static/layui/css/layui.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
+</head>
+<body>
+<table class="layui-hide" id="proxy" lay-filter="proxy"></table>
+<script type="text/html" id="headerToobar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add">
+            <i class="layui-icon layui-icon-add-1"></i> 新增
+        </button>
+        <button class="layui-btn layui-btn-sm" lay-event="flush">
+            <i class="layui-icon layui-icon-refresh"></i> 刷新
+        </button>
+    </div>
+</script>
+<script type="text/html" id="post_table_tool">
+    <div class="layui-clear-space">
+        <a class="layui-btn layui-btn-xs " lay-event="edit" title="编辑">
+            <i class="layui-icon layui-icon-edit"></i> 编辑
+        </a>
+        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete" title="删除">
+            <i class="layui-icon layui-icon-delete"></i> 删除
+        </a>
+    </div>
+</script>
+<script src="/static/layui/layui.js"></script>
+<script src="/static/js/ajax.js"></script>
+<script src="/static/js/copy.js"></script>
+<script>
+    layui.use(['form', 'table', 'dropdown', 'jquery', 'Rest'], function () {
+        const table = layui.table;
+        var Rest = layui.Rest;
+        const $ = layui.$;
+        table.render({
+            elem: '#proxy',
+            text: "空空如也",
+            skin: "line",
+            url: '/api/proxy/list?type=http',
+            toolbar: '#headerToobar',
+            cellMinWidth: 80,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+            },
+            cols: [[
+                {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
+                {field: 'name', title: '隧道名称'},
+                {
+                    field: 'domains', sort: true, title: '访问域名', templet: function (d) {
+                        if (d.domains && d.domains.length > 0) {
+                            let domainStr = '';
+                            for (let i = 0; i < d.domains.length; i++) {
+                                const protocol = d.type === 'https' ? 'https' : 'http';
+                                const fullUrl = protocol + '://' + d.domains[i].domain + ":" + d.httpProxyPort;
+                                domainStr += '<a href="' + fullUrl + '" target="_blank">' + d.domains[i].domain + '</a>';
+
+                                if (i < d.domains.length - 1) {
+                                    domainStr += '<br>';
+                                }
+                            }
+                            return domainStr;
+                        }
+                        return '';
+                    }
+                },
+                {field: 'localPort', sort: true, title: '内网端口'},
+                {
+                    field: 'status', width: 120, title: '状态', sort: true, templet: function (d) {
+                        const isChecked = d.status === 1 ? 'checked' : '';
+                        return '<input type="checkbox" lay-skin="switch" lay-text="开启|关闭" lay-event="statusSwitch" ' + isChecked + '>';
+                    }
+                },
+                {
+                    field: 'autoRegistered', title: '映射来源', sort: true, templet: function (d) {
+                        if (d.autoRegistered === 1) {
+                            return ' <span class="layui-badge layui-bg-orange">自动注册</span>';
+                        } else if (d.autoRegistered === 0) {
+                            return '<span class="layui-badge layui-bg-green">手动添加</span>';
+                        }
+                    }
+                },
+                {fixed: 'right', title: '操作', width: 180, templet: '#post_table_tool'}
+            ]],
+            error: function (res, msg) {
+                console.log(res, msg)
+            }
+        });
+        //单元格操作事件
+        table.on('tool(proxy)', function (obj) {
+            const data = obj.data;
+            if (obj.event === 'edit') {
+                layer.open({
+                    title: '编辑隧道',
+                    type: 2,
+                    offset: '30px',
+                    shade: false,
+                    area: ['60%', '65%'],
+                    content: '/proxy/https/edit.html?id=' + data.id
+                });
+            } else if (obj.event === 'delete') {
+                layer.confirm('确定删除「' + data.name + '」代理吗？<br>此操作将会断开用户已经建立的连接！',
+                    {
+                        icon: 2,
+                        title: '危险操作确认',
+                        skin: 'layui-layer-molv',
+                        btn: ['确认删除', '我再想想'],
+                    }, function (index) {
+                        Rest.delete('/api/proxy/del', {id: data.id, secretKey: data.secretKey}).then(data => {
+                            table.reload('proxy')
+                            layer.msg("删除成功", {time: 2000});
+                        })
+                    })
+
+            } else if (obj.event === 'statusSwitch') {
+                const loading = layer.msg('正在切换...', {icon: 16, shade: 0.3, time: 0});
+                Rest.put('/api/proxy/switch-proxy-status', {id: data.id, secretKey: data.secretKey}).then(data => {
+                    layer.close(loading);
+                    layer.msg('切换成功', {icon: 1});
+                }).catch(err => {
+                    layer.msg("切换失败", {icon: 2});
+                    obj.update({status: data.status});//回滚状态
+                })
+            } else if (obj.event === 'copyPort') {
+                const port = obj.data.remotePort + '';
+                ClipMaster.copy(port, function () {
+                    layer.msg('已复制公网端口', {icon: 1, time: 1200});
+                });
+            }
+        })
+        //操作工具栏
+        table.on('toolbar(proxy)', function (obj) {
+            if (obj.event === 'add') {
+                layer.open({
+                    title: '新增隧道',
+                    type: 2,
+                    offset: '30px',
+                    shade: false,
+                    area: ['60%', '65%'],
+                    content: '/proxy/https/add.html'
+                });
+            } else if (obj.event === 'flush') {
+                table.reload('proxy')
+            }
+        })
+    });
+</script>
+</body>

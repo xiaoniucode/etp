@@ -1,6 +1,7 @@
 host = "0.0.0.0"
 bindPort = 9527
 httpProxyPort = 8080
+httpsProxyPort = 8443
 # TLS
 tls =true
 [keystore]

@@ -41,7 +41,7 @@
                 'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
             },
             cols: [[
-                {field: 'remotePort', fixed: 'left', width: 120, title: '公网端口', sort: true},
+                {field: 'key', fixed: 'left', width: 120, title: '隧道', sort: true},
                 {field: 'channels', title: '连接数', sort: true, align: 'center'},
 
                 // 上行（外网 → 你服务器）

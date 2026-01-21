@@ -99,6 +99,8 @@ public class DashboardApi {
         //数据统计接口
         router.route(HttpMethod.GET, "/metrics", context ->
                 context.setResponseJson(ResponseEntity.ok(MetricsCollector.getAllMetrics()).toJson()));
+        router.route(HttpMethod.GET, "/metrics/summery", context ->
+                context.setResponseJson(ResponseEntity.ok(MetricsCollector.summaryMetrics()).toJson()));
         router.route(HttpMethod.GET, "/monitor", context ->
                 context.setResponseJson(ResponseEntity.ok(ServiceFactory.INSTANCE.getStatsService().monitorInfo()).toJson()));
         router.route(HttpMethod.GET, "/monitor/server", context ->

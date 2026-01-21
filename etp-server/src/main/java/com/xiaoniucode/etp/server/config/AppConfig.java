@@ -14,6 +14,7 @@ public class AppConfig implements Config {
     private String host;
     private int bindPort;
     private int httpProxyPort;
+    private int httpsProxyPort;
     private boolean tls;
     private KeystoreConfig keystoreConfig;
     private LogConfig logConfig;
@@ -25,6 +26,7 @@ public class AppConfig implements Config {
         this.host = builder.host;
         this.bindPort = builder.bindPort;
         this.httpProxyPort = builder.httpProxyPort;
+        this.httpsProxyPort = builder.httpsProxyPort;
         this.tls = builder.tls;
         this.keystoreConfig = builder.keystoreConfig;
         this.logConfig = builder.logConfig;
@@ -33,10 +35,12 @@ public class AppConfig implements Config {
         this.clients = builder.clients;
     }
 
+
     public static class Builder {
         private String host = "0.0.0.0";
         private int bindPort = 9527;
         private int httpProxyPort = 80;
+        private int httpsProxyPort = 443;
         private boolean tls = false;
         private KeystoreConfig keystoreConfig;
         private LogConfig logConfig;
@@ -82,8 +86,15 @@ public class AppConfig implements Config {
         public Builder clients(List<ClientInfo> clients) {
             this.clients = clients;
             return this;
-        }public Builder httpProxyPort(int httpProxyPort) {
+        }
+
+        public Builder httpProxyPort(int httpProxyPort) {
             this.httpProxyPort = httpProxyPort;
+            return this;
+        }
+
+        public Builder httpsProxyPort(int httpsProxyPort) {
+            this.httpsProxyPort = httpsProxyPort;
             return this;
         }
 
@@ -162,6 +173,14 @@ public class AppConfig implements Config {
 
     public int getHttpProxyPort() {
         return httpProxyPort;
+    }
+
+    public int getHttpsProxyPort() {
+        return httpsProxyPort;
+    }
+
+    public void setHttpsProxyPort(int httpsProxyPort) {
+        this.httpsProxyPort = httpsProxyPort;
     }
 
     public static Builder builder() {

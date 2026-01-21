@@ -43,6 +43,7 @@ public final class TcpProxyServer implements Lifecycle {
      */
     private final Map<Integer, Channel> remotePortChannelMapping = new ConcurrentHashMap<>();
     private final PortPool portPool;
+
     private TcpProxyServer() {
         this.portPool = PortPool.get();
     }
@@ -154,7 +155,7 @@ public final class TcpProxyServer implements Lifecycle {
                 portPool.releasePort(remotePort);
                 LOGGER.info("成功停止并释放公网端口: {}", remotePort);
                 //4.如果释放了端口，说明映射被删掉了，需要清空流量指标收集器
-                MetricsCollector.removeCollector(remotePort);
+                MetricsCollector.removeCollector(remotePort + "");
                 LOGGER.debug("删除公网端口: {} 流量指标收集器", remotePort);
             } else {
                 LOGGER.info("{} 端口映射服务已停止（保留端口）", remotePort);
