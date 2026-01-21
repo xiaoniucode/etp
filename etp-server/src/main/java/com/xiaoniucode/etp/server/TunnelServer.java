@@ -15,6 +15,7 @@ import com.xiaoniucode.etp.server.listener.ConfigRegisterListener;
 import com.xiaoniucode.etp.server.listener.DatabaseInitListener;
 import com.xiaoniucode.etp.server.listener.StaticConfigInitListener;
 import com.xiaoniucode.etp.server.proxy.HttpProxyServer;
+import com.xiaoniucode.etp.server.proxy.HttpsProxyServer;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.security.ServerTlsContextFactory;
 import com.xiaoniucode.etp.server.web.DashboardApi;
@@ -97,6 +98,8 @@ public class TunnelServer implements Lifecycle {
                 TcpProxyServer.get().start();
                 //3.开启HTTP代理
                 HttpProxyServer.get().start();
+                //4.开启HTTPS代理
+                HttpsProxyServer.get().start();
             });
             logger.info("ETP隧道已开启:{}:{}", config.getHost(), config.getBindPort());
             GlobalEventBus.get().publishAsync(new TunnelBindEvent());
