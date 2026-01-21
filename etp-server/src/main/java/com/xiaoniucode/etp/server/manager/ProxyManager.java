@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.manager;
 
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
@@ -111,7 +112,11 @@ public class ProxyManager {
     public static Set<String> getClientDomains(String secretKey) {
         return clientDomains.getOrDefault(secretKey, new HashSet<>());
     }
+
     public static int getLocalPortByDomain(String domain) {
+        if (!StringUtils.hasText(domain)) {
+            throw new IllegalArgumentException("domain is empty");
+        }
         return domainMapping.getOrDefault(domain, -1);
     }
 }

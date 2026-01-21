@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.web.dao;
 
+import com.xiaoniucode.etp.server.config.ConfigHelper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -260,7 +261,7 @@ public class ProxyDao extends BaseDao {
                 domainEntry.put("domain", domain);
                 domains.put(domainEntry);
             }
-            
+            int httpProxyPort = ConfigHelper.get().getHttpProxyPort();
             for (int i = 0; i < proxies.length(); i++) {
                 JSONObject proxy = proxies.getJSONObject(i);
                 int proxyId = proxy.optInt("id");
@@ -272,6 +273,7 @@ public class ProxyDao extends BaseDao {
                 } else {
                     proxy.put("domains", new JSONArray());
                 }
+                proxy.put("httpProxyPort",httpProxyPort);
             }
         }
         

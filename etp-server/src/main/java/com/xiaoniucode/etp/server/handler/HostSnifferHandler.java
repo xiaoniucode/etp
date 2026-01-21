@@ -46,6 +46,8 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                 if (host != null) {
                     if (host.contains(":")) {
                         domain = host.split(":")[0];
+                    }else {
+                        domain = host;
                     }
                     int targetPort = ProxyManager.getLocalPortByDomain(domain);
                     if (targetPort == -1) {

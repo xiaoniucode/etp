@@ -13,6 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class AppConfig implements Config {
     private String host;
     private int bindPort;
+    private int httpProxyPort;
     private boolean tls;
     private KeystoreConfig keystoreConfig;
     private LogConfig logConfig;
@@ -23,6 +24,7 @@ public class AppConfig implements Config {
     private AppConfig(Builder builder) {
         this.host = builder.host;
         this.bindPort = builder.bindPort;
+        this.httpProxyPort = builder.httpProxyPort;
         this.tls = builder.tls;
         this.keystoreConfig = builder.keystoreConfig;
         this.logConfig = builder.logConfig;
@@ -34,6 +36,7 @@ public class AppConfig implements Config {
     public static class Builder {
         private String host = "0.0.0.0";
         private int bindPort = 9527;
+        private int httpProxyPort = 80;
         private boolean tls = false;
         private KeystoreConfig keystoreConfig;
         private LogConfig logConfig;
@@ -78,6 +81,9 @@ public class AppConfig implements Config {
 
         public Builder clients(List<ClientInfo> clients) {
             this.clients = clients;
+            return this;
+        }public Builder httpProxyPort(int httpProxyPort) {
+            this.httpProxyPort = httpProxyPort;
             return this;
         }
 
@@ -148,6 +154,14 @@ public class AppConfig implements Config {
 
     public void setClients(List<ClientInfo> clients) {
         this.clients = clients;
+    }
+
+    public void setHttpProxyPort(int httpProxyPort) {
+        this.httpProxyPort = httpProxyPort;
+    }
+
+    public int getHttpProxyPort() {
+        return httpProxyPort;
     }
 
     public static Builder builder() {

@@ -127,8 +127,9 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
                 } else if (ProtocolType.HTTP.equals(type)) {
                     JSONArray d = proxy.getJSONArray("domains");
                     Set<String> domains = new HashSet<>();
-                    for (Object domain : d) {
-                        domains.add((String) domain);
+                    for (Object item : d) {
+                        JSONObject itemJson = (JSONObject) item;
+                        domains.add(itemJson.getString("domain"));
                     }
                     proxyConfig.setDomains(domains);
                 }

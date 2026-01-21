@@ -2,6 +2,8 @@ package com.xiaoniucode.etp.server.proxy;
 
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
+import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.handler.HostSnifferHandler;
 import com.xiaoniucode.etp.server.handler.visitor.HttpVisitorHandler;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
@@ -27,7 +29,7 @@ public class HttpProxyServer implements Lifecycle {
     private ServerBootstrap serverBootstrap;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private int httpProxyPort = 8080;
+    //private int httpProxyPort = 8080;
     private HttpProxyServer() {
     }
 
@@ -38,6 +40,7 @@ public class HttpProxyServer implements Lifecycle {
     @Override
     public void start() {
         try {
+            int httpProxyPort= ConfigHelper.get().getHttpProxyPort();
             bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             workerGroup = NettyEventLoopFactory.eventLoopGroup();
             serverBootstrap = new ServerBootstrap();
@@ -56,8 +59,8 @@ public class HttpProxyServer implements Lifecycle {
                             sc.pipeline().addLast(new HttpVisitorHandler());
                         }
                     });
-            serverBootstrap.bind(getHttpProxyPort()).syncUninterruptibly().get();
-            logger.debug("HttpProxyServer started on port {}", getHttpProxyPort());
+            serverBootstrap.bind(httpProxyPort).syncUninterruptibly().get();
+            logger.debug("HttpProxyServer started on port {}", httpProxyPort);
         } catch (Exception e) {
             logger.error("HttpProxyServer start error!", e);
         }
@@ -67,13 +70,5 @@ public class HttpProxyServer implements Lifecycle {
     public void stop() {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
-    }
-
-    public int getHttpProxyPort() {
-        return httpProxyPort;
-    }
-
-    public void setHttpProxyPort(int httpProxyPort) {
-        this.httpProxyPort = httpProxyPort;
     }
 }

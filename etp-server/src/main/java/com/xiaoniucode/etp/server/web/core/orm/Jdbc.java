@@ -278,16 +278,26 @@ public final class Jdbc {
 
             Connection conn = null;
             PreparedStatement stmt = null;
+            ResultSet generatedKeys = null;
             try {
                 conn = jdbc.getConnection();
-                stmt = conn.prepareStatement(parseResult.sql);
+                stmt = conn.prepareStatement(parseResult.sql, Statement.RETURN_GENERATED_KEYS);
                 jdbc.setParameters(stmt, parseResult.params);
-                return stmt.executeUpdate();
+                stmt.executeUpdate();
+                
+                generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                }
+                return 0;
             } catch (SQLException e) {
                 throw new RuntimeException("SQL插入失败: " + parseResult.sql + " → " + e.getMessage(), e);
             } finally {
                 // 不要关闭连接，因为连接可能是事务管理器提供的
                 try {
+                    if (generatedKeys != null) {
+                        generatedKeys.close();
+                    }
                     if (stmt != null) {
                         stmt.close();
                     }

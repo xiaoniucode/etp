@@ -4,15 +4,11 @@ import com.xiaoniucode.etp.core.msg.Login;
 import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.server.manager.ClientManager;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * 处理客户端连接认证
