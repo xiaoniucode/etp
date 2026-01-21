@@ -55,7 +55,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             @Override
             public void accept(HttpVisitorPair pair) {
                 Channel control = pair.getControl();
-                control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), pair.getLocalPort()));
+                control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), pair.getLocalIP(), pair.getLocalPort()));
             }
         });
     }

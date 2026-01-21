@@ -46,13 +46,18 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                 if (host != null) {
                     if (host.contains(":")) {
                         domain = host.split(":")[0];
-                    }else {
+                    } else {
                         domain = host;
+                    }
+                    if (ProxyManager.getProxyStatus(domain) == 0) {
+                        visitor.close();
+                        logger.debug("隧道状态为关闭状态");
+                        return;
                     }
                     int targetPort = ProxyManager.getLocalPortByDomain(domain);
                     if (targetPort == -1) {
                         logger.warn("没有该域名的代理服务");
-                        ctx.close();
+                        visitor.close();
                         return;
                     }
                     port = targetPort;

@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.listener;
 
-import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.core.event.EventListener;
 import com.xiaoniucode.etp.server.config.domain.*;
@@ -18,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -124,7 +122,7 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
                 proxyConfig.setLocalPort(proxy.getInt("localPort"));
                 if (ProtocolType.TCP.equals(type)) {
                     proxyConfig.setRemotePort(proxy.getInt("remotePort"));
-                } else if (ProtocolType.HTTP.equals(type)) {
+                } else if (ProtocolType.HTTP.equals(type)||ProtocolType.HTTPS.equals(type)) {
                     JSONArray d = proxy.getJSONArray("domains");
                     Set<String> domains = new HashSet<>();
                     for (Object item : d) {

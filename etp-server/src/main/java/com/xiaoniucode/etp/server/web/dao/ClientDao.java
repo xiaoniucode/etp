@@ -48,4 +48,9 @@ public class ClientDao extends BaseDao {
                 .execute();
         return rows > 0;
     }
+
+    public int count() {
+        return jdbc.query("SELECT count(id) as count FROM clients ")
+                .one().getInt("count");
+    }
 }

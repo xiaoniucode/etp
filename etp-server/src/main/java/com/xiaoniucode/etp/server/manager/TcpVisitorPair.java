@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 
 public class TcpVisitorPair {
     private Channel control;
+    private String localIP;
     private Integer localPort;
     private Integer remotePort;
     private Long sessionId;
@@ -11,8 +12,9 @@ public class TcpVisitorPair {
     public TcpVisitorPair() {
     }
 
-    public TcpVisitorPair(Channel control, Integer localPort, Integer remotePort, Long sessionId) {
+    public TcpVisitorPair(Channel control,String localIP, Integer localPort, Integer remotePort, Long sessionId) {
         this.control = control;
+        this.localIP = localIP;
         this.localPort = localPort;
         this.remotePort = remotePort;
         this.sessionId = sessionId;
@@ -25,6 +27,15 @@ public class TcpVisitorPair {
     public void setControl(Channel control) {
         this.control = control;
     }
+
+    public String getLocalIP() {
+        return localIP;
+    }
+
+    public void setLocalIP(String localIP) {
+        this.localIP = localIP;
+    }
+
     public Integer getLocalPort() {
         return localPort;
     }

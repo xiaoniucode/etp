@@ -19,8 +19,8 @@ public class ProxyDao extends BaseDao {
                 .bind("status", data.optInt("status", 1))
                 .bind("autoRegistered", data.optInt("autoRegistered"))
                 .execute();
-
-        if (proxyId > 0 && "http".equals(data.optString("type"))) {
+        String type = data.optString("type");
+        if (proxyId > 0 && "http".equalsIgnoreCase(type)||"https".equalsIgnoreCase(type)) {
             JSONArray domains = data.optJSONArray("domains");
             if (domains != null && !domains.isEmpty()) {
                 for (int i = 0; i < domains.length(); i++) {
@@ -45,7 +45,7 @@ public class ProxyDao extends BaseDao {
                 .one();
         if (proxy != null) {
             String type = proxy.optString("type");
-            if ("http".equals(type)) {
+            if ("http".equalsIgnoreCase(type) || "https".equalsIgnoreCase(type)) {
                 JSONArray domains = jdbc.query("SELECT domain FROM proxy_domains WHERE proxyId = :proxyId")
                         .bind("proxyId", id)
                         .list();
@@ -85,7 +85,7 @@ public class ProxyDao extends BaseDao {
                 int proxyId = proxy.optInt("id");
                 String type = proxy.optString("type");
 
-                if ("http".equals(type)) {
+                if ("http".equalsIgnoreCase(type) || "https".equalsIgnoreCase(type)) {
                     proxy.put("domains", domainMap.getOrDefault(proxyId, new JSONArray()));
                 } else {
                     proxy.put("domains", new JSONArray());
@@ -122,7 +122,7 @@ public class ProxyDao extends BaseDao {
                 int proxyId = proxy.optInt("id");
                 String type = proxy.optString("type");
 
-                if ("http".equals(type)) {
+                if ("http".equalsIgnoreCase(type) || "https".equalsIgnoreCase(type)) {
                     proxy.put("domains", domainMap.getOrDefault(proxyId, new JSONArray()));
                 } else {
                     proxy.put("domains", new JSONArray());
@@ -192,7 +192,7 @@ public class ProxyDao extends BaseDao {
 
         if (rows > 0 && data.has("domains")) {
             JSONObject proxy = getById((int) id);
-            if (proxy != null && "http".equals(proxy.optString("type"))) {
+            if (proxy != null && ("http".equalsIgnoreCase(proxy.optString("type")) || "https".equalsIgnoreCase(proxy.optString("type")))) {
                 jdbc.update("DELETE FROM proxy_domains WHERE proxyId = :proxyId")
                         .bind("proxyId", id)
                         .execute();
@@ -302,7 +302,7 @@ public class ProxyDao extends BaseDao {
         if (proxy != null) {
             String type = proxy.optString("type");
             int proxyId = proxy.optInt("id");
-            if ("http".equals(type)) {
+            if ("http".equalsIgnoreCase(type) || "https".equalsIgnoreCase(type)) {
                 JSONArray domains = jdbc.query("SELECT domain FROM proxy_domains WHERE proxyId = :proxyId")
                         .bind("proxyId", proxyId)
                         .list();

@@ -187,7 +187,7 @@ public class TomlConfigSource implements ConfigSource {
             Long remotePort = proxy.getLong("remotePort");
             Long status = proxy.getLong("status", 1L);
             List<String> domains = proxy.getList("domains", new ArrayList<>());
-
+            //todo 需要检查域名是否重复
             if (ProtocolType.TCP.name().equalsIgnoreCase(type) && remotePort != null) {
                 if (portTemp.contains(remotePort.intValue())) {
                     throw new IllegalArgumentException("公网端口不能重复！" + remotePort.intValue());
@@ -208,7 +208,8 @@ public class TomlConfigSource implements ConfigSource {
 
             if (ProtocolType.TCP.name().equalsIgnoreCase(type)) {
                 proxyConfig.setRemotePort(remotePort == null ? null : remotePort.intValue());
-            } else if (ProtocolType.HTTP.name().equalsIgnoreCase(type)) {
+            } else {
+                //http or https
                 proxyConfig.setDomains(new HashSet<>(domains));
             }
             proxyConfigs.add(proxyConfig);

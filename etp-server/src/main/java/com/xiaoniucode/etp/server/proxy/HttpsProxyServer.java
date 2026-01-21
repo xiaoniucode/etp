@@ -2,7 +2,6 @@ package com.xiaoniucode.etp.server.proxy;
 
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
-import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.handler.HostSnifferHandler;
 import com.xiaoniucode.etp.server.handler.visitor.HttpVisitorHandler;
@@ -16,32 +15,28 @@ import io.netty.handler.flush.FlushConsolidationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 /**
- * Http proxy server
+ * Https proxy server
  *
  * @author xiaoniucode
  */
-public class HttpProxyServer implements Lifecycle {
-    private final Logger logger = LoggerFactory.getLogger(HttpProxyServer.class);
-    private static final HttpProxyServer instance = new HttpProxyServer();
+public class HttpsProxyServer implements Lifecycle {
+    private final Logger logger = LoggerFactory.getLogger(HttpsProxyServer.class);
+    private static final HttpsProxyServer instance = new HttpsProxyServer();
     private ServerBootstrap serverBootstrap;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-
-    //private int httpProxyPort = 8080;
-    private HttpProxyServer() {
+    private HttpsProxyServer() {
     }
 
-    public static HttpProxyServer get() {
+    public static HttpsProxyServer get() {
         return instance;
     }
 
     @Override
     public void start() {
         try {
-            int httpProxyPort = ConfigHelper.get().getHttpProxyPort();
+            int httpsProxyPort= ConfigHelper.get().getHttpsProxyPort();
             bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             workerGroup = NettyEventLoopFactory.eventLoopGroup();
             serverBootstrap = new ServerBootstrap();
@@ -60,10 +55,10 @@ public class HttpProxyServer implements Lifecycle {
                             sc.pipeline().addLast(new HttpVisitorHandler());
                         }
                     });
-            serverBootstrap.bind(httpProxyPort).syncUninterruptibly().get();
-            logger.debug("http proxy server started on port {}", httpProxyPort);
+            serverBootstrap.bind(httpsProxyPort).syncUninterruptibly().get();
+            logger.debug("Https server started on port {}", httpsProxyPort);
         } catch (Exception e) {
-            logger.error("http proxy server start error!", e);
+            logger.error("Https proxy server start error!", e);
         }
     }
 

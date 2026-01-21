@@ -34,6 +34,10 @@ public class ProxyManager {
      * secretKey -> domains 用于客户端与其所有域名的映射，实现快速查找
      */
     private static final Map<String, Set<String>> clientDomains = new ConcurrentHashMap<>();
+    /**
+     * remotePort|domain -> 代理状态
+     */
+    private static final Map<String, Integer> proxyStatus = new ConcurrentHashMap<>();
 
     public static Set<Integer> getClientRemotePorts(String secretKey) {
         return clientRemotePorts.getOrDefault(secretKey, new HashSet<>());
@@ -53,17 +57,22 @@ public class ProxyManager {
             return false;
         }
         client.getProxies().add(proxy);
+
         if (proxy.getType() == ProtocolType.TCP && !isPortOccupied(proxy.getRemotePort())) {
             clientRemotePorts.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).add(proxy.getRemotePort());
             portMapping.put(proxy.getRemotePort(), proxy.getLocalPort());
+            proxyStatus.put(proxy.getRemotePort() + "", proxy.getStatus());
             logger.debug("TCP代理 {} 注册成功", proxy.getName());
             return true;
         }
 
-        if (proxy.getType() == ProtocolType.HTTP) {
+        if (proxy.getType() == ProtocolType.HTTP||proxy.getType() == ProtocolType.HTTPS) {
             Set<String> domains = proxy.getDomains();
             clientDomains.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).addAll(domains);
-            domains.forEach(domain -> domainMapping.put(domain, proxy.getLocalPort()));
+            domains.forEach(domain -> {
+                domainMapping.put(domain, proxy.getLocalPort());
+                proxyStatus.put(domain, proxy.getStatus());
+            });
             logger.debug("HTTP代理 {} 注册成功", proxy.getName());
             return true;
         }
@@ -118,5 +127,9 @@ public class ProxyManager {
             throw new IllegalArgumentException("domain is empty");
         }
         return domainMapping.getOrDefault(domain, -1);
+    }
+
+    public static int getProxyStatus(String domain) {
+        return proxyStatus.getOrDefault(domain, -1);
     }
 }

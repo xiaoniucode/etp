@@ -41,7 +41,7 @@
             elem: '#proxy',
             text: "空空如也",
             skin: "line",
-            url: '/api/proxy/list?type=http',
+            url: '/api/proxy/list?type=https',
             toolbar: '#headerToobar',
             cellMinWidth: 80,
             headers: {
@@ -51,14 +51,12 @@
                 {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
                 {field: 'name', title: '隧道名称'},
                 {
-                    field: 'domains', sort: true, title: '访问域名', templet: function (d) {
+                    field: 'domains', sort: true, title: '访问地址', templet: function (d) {
                         if (d.domains && d.domains.length > 0) {
                             let domainStr = '';
                             for (let i = 0; i < d.domains.length; i++) {
-                                const protocol = d.type === 'https' ? 'https' : 'http';
-                                const fullUrl = protocol + '://' + d.domains[i].domain + ":" + d.httpProxyPort;
-                                domainStr += '<a href="' + fullUrl + '" target="_blank">' + d.domains[i].domain + '</a>';
-
+                                const fullUrl = 'https' + '://' + d.domains[i].domain + ":" + d.httpsProxyPort;
+                                domainStr += '<a href="' + fullUrl + '" target="_blank">' + d.domains[i].domain +':'+d.httpsProxyPort+ '</a>';
                                 if (i < d.domains.length - 1) {
                                     domainStr += '<br>';
                                 }

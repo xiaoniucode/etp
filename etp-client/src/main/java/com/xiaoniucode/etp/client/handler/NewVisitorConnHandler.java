@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
  */
 public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
     private final Logger logger = LoggerFactory.getLogger(NewVisitorConnHandler.class);
-    private final String LOCALHOST = "127.0.0.1";
 
     @Override
     protected void doHandle(ChannelHandlerContext ctx, Message message) {
@@ -27,12 +26,13 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
             Channel controlTunnelChannel = ctx.channel();
             String secretKey = controlTunnelChannel.attr(EtpConstants.SECRET_KEY).get();
             long sessionId = msg.getSessionId();
+            String localIP = msg.getLocalIP();
             int localPort = msg.getLocalPort();
             Bootstrap realBootstrap = ChannelManager.getRealBootstrap();
             Bootstrap controlBootstrap = ChannelManager.getControlBootstrap();
-            realBootstrap.connect(LOCALHOST, localPort).addListener((ChannelFutureListener) future -> {
+            realBootstrap.connect(localIP, localPort).addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
-                    logger.debug("成功连接到内网服务{}:{}", LOCALHOST, localPort);
+                    logger.debug("成功连接到内网服务{}:{}", localIP, localPort);
                     Channel realChannel = future.channel();
                     realChannel.config().setOption(ChannelOption.AUTO_READ, false);
 
@@ -57,7 +57,7 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                                 return null;
                             });
                 } else {
-                    logger.error("内网目标服务[{}:{}]不可用!", LOCALHOST, localPort);
+                    logger.error("内网目标服务[{}:{}]不可用!", localIP, localPort);
                 }
             });
         }

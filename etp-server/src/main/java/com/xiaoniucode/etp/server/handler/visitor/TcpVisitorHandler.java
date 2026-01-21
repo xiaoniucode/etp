@@ -42,7 +42,7 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         ChannelManager.registerTcpVisitor(visitor, pair -> {
             Channel control = pair.getControl();
             //通知代理客户端与目标端口建立连接
-            control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), pair.getLocalPort()));
+            control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), pair.getLocalIP(), pair.getLocalPort()));
         });
         super.channelActive(ctx);
     }

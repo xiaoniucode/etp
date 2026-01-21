@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.web.serivce;
 
 import com.xiaoniucode.etp.server.manager.ChannelManager;
+import com.xiaoniucode.etp.server.manager.ClientManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.common.ServerHelper;
 import org.json.JSONArray;
@@ -10,25 +11,27 @@ public class StatsService {
     public JSONObject monitorInfo() {
         JSONObject res = new JSONObject();
         JSONObject stats = new JSONObject();
-        JSONArray clients = ServiceFactory.INSTANCE.getClientService().clients();
-
         JSONArray proxies = ServiceFactory.INSTANCE.getProxyService().proxies(null);
         int tcpCount = 0;
         int httpCount = 0;
+        int httpsCount = 0;
         for (Object p : proxies) {
             JSONObject proxy = (JSONObject) p;
             if (proxy.getString("type").equalsIgnoreCase("TCP")) {
                 tcpCount++;
             } else if (proxy.getString("type").equalsIgnoreCase("HTTP")) {
                 httpCount++;
+            } else if (proxy.getString("type").equalsIgnoreCase("HTTPS")) {
+                httpsCount++;
             }
         }
         JSONObject proxy = new JSONObject();
         proxy.put("tcpCount", tcpCount);
         proxy.put("httpCount", httpCount);
-        proxy.put("total", tcpCount + httpCount);
+        proxy.put("httpsCount", httpsCount);
+        proxy.put("total", tcpCount + httpCount + httpsCount);
 
-        stats.put("clientTotal", clients.length());
+        stats.put("clientTotal", ClientManager.getClientCount());
         stats.put("onlineClient", ChannelManager.onlineClientCount());
         stats.put("proxy", proxy);
         stats.put("runningTunnel", TcpProxyServer.get().runningPortCount());

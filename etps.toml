@@ -28,6 +28,13 @@ localPort = 3000
 domains = ["c.local.cc"]
 status = 1 #是否开启代理
 
+[[clients.proxies]]
+name = "web_https"
+type = "https"
+localIP="localhost"
+localPort = 8089
+domains = ["d.local.cc", "g.local.cc"]
+status = 1 #是否开启代理
 
 [[clients.proxies]]
 name = "mysql"

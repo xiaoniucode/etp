@@ -72,6 +72,7 @@ public class ChannelManager {
             return;
         }
         long sessionId = GlobalIdGenerator.nextId();
+        String localIP="localhost";//todo ip
         int localPort = ProxyManager.getLocalPort(remotePort);
         //
         control.attr(EtpConstants.VISITOR_CHANNELS).get().put(sessionId, visitor);
@@ -79,7 +80,7 @@ public class ChannelManager {
         //记录公网端口上的访问者连接
         portToVisitorChannels.computeIfAbsent(remotePort, k -> ConcurrentHashMap.newKeySet()).add(visitor);
         //回调
-        callback.accept(new TcpVisitorPair(control, localPort, remotePort, sessionId));
+        callback.accept(new TcpVisitorPair(control,localIP, localPort, remotePort, sessionId));
     }
 
 
@@ -123,6 +124,7 @@ public class ChannelManager {
             return;
         }
         long sessionId = GlobalIdGenerator.nextId();
+        String localIP="localhost";//todo ip
         Integer localPort = visitor.attr(EtpConstants.TARGET_PORT).get();
 
         control.attr(EtpConstants.VISITOR_CHANNELS).get().put(sessionId, visitor);
@@ -130,7 +132,7 @@ public class ChannelManager {
 
         domainToVisitorChannels.computeIfAbsent(domain, k -> ConcurrentHashMap.newKeySet()).add(visitor);
         //回调
-        callback.accept(new HttpVisitorPair(control, sessionId, domain, localPort));
+        callback.accept(new HttpVisitorPair(control, sessionId, domain,localIP, localPort));
 
     }
 

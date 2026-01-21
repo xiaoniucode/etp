@@ -90,6 +90,9 @@ public class ClientService {
         }
         return clients;
     }
+    public int getClientCount() {
+      return   DaoFactory.INSTANCE.getClientDao().count();
+    }
 
     public int addClient(JSONObject client) {
         return TX.execute(() -> {

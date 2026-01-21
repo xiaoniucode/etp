@@ -10,7 +10,7 @@ import java.util.Map;
  * @author liuxin
  */
 public enum ProtocolType {
-    TCP,HTTP;
+    TCP,HTTP,HTTPS;
     private static final Map<String, ProtocolType> NAME_MAP;
 
     static {

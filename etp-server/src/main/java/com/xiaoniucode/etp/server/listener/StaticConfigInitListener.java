@@ -21,12 +21,14 @@ import java.util.Locale;
 
 public class StaticConfigInitListener implements EventListener<TunnelBindEvent> {
     private final static Logger logger = LoggerFactory.getLogger(StaticConfigInitListener.class);
+
     @Override
     public void onEvent(TunnelBindEvent event) {
         registerTomlConfig();
     }
+
     private void registerTomlConfig() {
-        Boolean enableDashboard =  ConfigHelper.get().getDashboard().getEnable();
+        Boolean enableDashboard = ConfigHelper.get().getDashboard().getEnable();
         List<ClientInfo> clients = ConfigHelper.get().getClients();
         clients.forEach(clientInfo -> {
             ClientInfo client = clientInfo;
@@ -78,7 +80,13 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                             save.put("status", proxy.getStatus());
                             save.put("type", type);
                             save.put("autoRegistered", 0);
-                            if (ProtocolType.HTTP.name().equalsIgnoreCase(type) && !proxy.getDomains().isEmpty()) {
+
+                            if (type.equalsIgnoreCase(ProtocolType.TCP.name())) {
+                                save.put("remotePort", proxy.getRemotePort());
+                                proxyId = DaoFactory.INSTANCE.getProxyDao().insert(save);
+                                logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", clientId, proxy.getName(), proxy.getRemotePort());
+                            }
+                            if ((ProtocolType.HTTP.name().equalsIgnoreCase(type) || ProtocolType.HTTPS.name().equalsIgnoreCase(type)) && !proxy.getDomains().isEmpty()) {
                                 JSONArray domains = new JSONArray();
                                 for (String domain : proxy.getDomains()) {
                                     JSONObject item = new JSONObject();
@@ -87,12 +95,7 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                                 }
                                 save.put("domains", domains);
                             }
-                            if (type.equalsIgnoreCase(ProtocolType.TCP.name())) {
-                                save.put("remotePort", proxy.getRemotePort());
-                                proxyId = DaoFactory.INSTANCE.getProxyDao().insert(save);
-                                logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", clientId, proxy.getName(), proxy.getRemotePort());
-                            }
-                            if (type.equalsIgnoreCase(ProtocolType.HTTP.name())) {
+                            if (type.equalsIgnoreCase(ProtocolType.HTTP.name()) || type.equalsIgnoreCase(ProtocolType.HTTPS.name())) {
                                 proxyId = DaoFactory.INSTANCE.getProxyDao().insert(save);
                             }
                         } else {
