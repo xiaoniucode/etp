@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.client.handler;
 import com.xiaoniucode.etp.client.ConnectionPool;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
-import com.xiaoniucode.etp.core.ChannelBridge;
+import com.xiaoniucode.etp.core.codec.ChannelBridge;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.Message;
@@ -45,8 +45,6 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                                 tunnel.writeAndFlush(new NewVisitorConnResp(secretKey,sessionId)).addListener(f -> {
                                     if (f.isSuccess()) {
                                         ChannelManager.addRealServerChannel(sessionId, realChannel);
-
-
                                         //控制通道转换为数据通道
                                         tunnel.pipeline().remove("tunnelMessageCodec");
                                         tunnel.pipeline().remove("controlChannelHandler");

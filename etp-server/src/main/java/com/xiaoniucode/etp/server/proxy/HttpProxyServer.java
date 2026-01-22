@@ -2,7 +2,6 @@ package com.xiaoniucode.etp.server.proxy;
 
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
-import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.handler.HostSnifferHandler;
 import com.xiaoniucode.etp.server.handler.visitor.HttpVisitorHandler;
@@ -12,11 +11,8 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.flush.FlushConsolidationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * Http proxy server
@@ -47,15 +43,15 @@ public class HttpProxyServer implements Lifecycle {
             serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .option(ChannelOption.TCP_NODELAY, true)
-                    .option(ChannelOption.SO_KEEPALIVE, true)
+                    .option(ChannelOption.SO_BACKLOG, 1024)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
-                    .childOption(ChannelOption.TCP_NODELAY, true)
+                    .childOption(ChannelOption.SO_RCVBUF, 64 * 1024)
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
+                            sc.pipeline().addLast(new TrafficMetricsHandler());
                             sc.pipeline().addLast(new HostSnifferHandler());
-                           // sc.pipeline().addLast(new TrafficMetricsHandler());
                             sc.pipeline().addLast(new HttpVisitorHandler());
                         }
                     });

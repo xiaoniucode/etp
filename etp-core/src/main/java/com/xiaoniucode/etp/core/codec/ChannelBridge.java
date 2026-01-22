@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.core;
+package com.xiaoniucode.etp.core.codec;
 
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;

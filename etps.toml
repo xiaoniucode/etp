@@ -3,7 +3,7 @@ bindPort = 9527
 httpProxyPort = 8081
 httpsProxyPort = 8443
 # TLS
-tls =false
+tls =true
 [keystore]
 path = "cert/server.p12"
 keyPass = "3FbV8R8VW49O"
@@ -32,7 +32,7 @@ status = 1 #是否开启代理
 name = "web_https"
 type = "https"
 localIP="localhost"
-localPort = 8089
+localPort = 8082
 domains = ["d.local.cc", "g.local.cc"]
 status = 1 #是否开启代理
 
