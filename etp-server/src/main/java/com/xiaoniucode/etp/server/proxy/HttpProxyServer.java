@@ -55,8 +55,7 @@ public class HttpProxyServer implements Lifecycle {
                         @Override
                         protected void initChannel(SocketChannel sc) {
                             sc.pipeline().addLast(new HostSnifferHandler());
-                            sc.pipeline().addLast(new TrafficMetricsHandler());
-                            sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
+                           // sc.pipeline().addLast(new TrafficMetricsHandler());
                             sc.pipeline().addLast(new HttpVisitorHandler());
                         }
                     });

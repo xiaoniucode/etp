@@ -45,7 +45,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             return;
         }
         if (tunnel.isWritable()) {
-            tunnel.writeAndFlush(new NewWorkConn(buf.retain()));
+            tunnel.writeAndFlush(buf.retain());
         }
     }
 
@@ -64,7 +64,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Channel tunnel = visitor.attr(EtpConstants.DATA_CHANNEL).get();
         ByteBuf cached = visitor.attr(CACHED_FIRST_PACKET).get();
         if (cached != null && tunnel.isWritable()) {
-            tunnel.writeAndFlush(new NewWorkConn(cached.retain()));
+            tunnel.writeAndFlush(cached.retain());
             cached.release();
             visitor.attr(CACHED_FIRST_PACKET).set(null);
         }

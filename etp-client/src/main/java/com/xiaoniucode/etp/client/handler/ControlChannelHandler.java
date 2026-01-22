@@ -1,11 +1,14 @@
 package com.xiaoniucode.etp.client.handler;
 
+import com.xiaoniucode.etp.client.ConnectionPool;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.MessageHandler;
 import com.xiaoniucode.etp.core.msg.Message;
+import com.xiaoniucode.etp.core.msg.NewVisitorConnResp;
 import com.xiaoniucode.etp.core.msg.Ping;
 import io.netty.channel.*;
+import io.netty.handler.codec.http.FullHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +18,7 @@ import java.util.function.Consumer;
  *
  * @author liuxin
  */
-public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> {
+public class ControlChannelHandler extends ChannelInboundHandlerAdapter {
     private final Logger logger = LoggerFactory.getLogger(ControlChannelHandler.class);
     private final Consumer<ChannelHandlerContext> channelStatusCallback;
 
@@ -24,14 +27,21 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> 
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
-        if (msg instanceof Ping) {
+    public void channelRead(ChannelHandlerContext ctx, Object message) throws Exception {
+        //控制消息
+        if (message instanceof Message) {
+            Message msg = (Message) message;
+            if (msg instanceof Ping) {
+                return;
+            }
+            MessageHandler handler = MessageHandlerFactory.getHandler(msg);
+            if (handler != null) {
+                handler.handle(ctx, msg);
+            }
             return;
         }
-        MessageHandler handler = MessageHandlerFactory.getHandler(msg);
-        if (handler != null) {
-            handler.handle(ctx, msg);
-        }
+
+        super.channelRead(ctx, message);
     }
 
     @Override
@@ -45,7 +55,7 @@ public class ControlChannelHandler extends SimpleChannelInboundHandler<Message> 
             channelStatusCallback.accept(ctx);
         } else {
             //当前传输数据的通道断开
-            ChannelManager.removeDataTunnelChanel(ctx.channel());
+            ConnectionPool.removeDataTunnelChanel(ctx.channel());
             Channel realChannel = ctx.channel().attr(EtpConstants.REAL_SERVER_CHANNEL).get();
             if (realChannel != null) {
                 Long sessionId = realChannel.attr(EtpConstants.SESSION_ID).get();

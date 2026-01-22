@@ -15,7 +15,6 @@ import com.xiaoniucode.etp.server.listener.ConfigRegisterListener;
 import com.xiaoniucode.etp.server.listener.DatabaseInitListener;
 import com.xiaoniucode.etp.server.listener.StaticConfigInitListener;
 import com.xiaoniucode.etp.server.proxy.HttpProxyServer;
-import com.xiaoniucode.etp.server.proxy.HttpsProxyServer;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.security.ServerTlsContextFactory;
 import com.xiaoniucode.etp.server.web.DashboardApi;
@@ -26,13 +25,10 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -83,10 +79,9 @@ public class TunnelServer implements Lifecycle {
                                 logger.debug("TLS加密处理器添加成功");
                             }
                             sc.pipeline()
-                                    .addLast((new TunnelMessageCodec()))
+                                    .addLast("tunnelMessageCodec",new TunnelMessageCodec())
                                     .addLast(new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
-                                    .addLast(new FlushConsolidationHandler(256, true))
-                                    .addLast(new ControlTunnelHandler());
+                                    .addLast("controlTunnelHandler",new ControlTunnelHandler());
                         }
                     });
             serverBootstrap.bind(config.getHost(), config.getBindPort()).sync();
@@ -99,7 +94,8 @@ public class TunnelServer implements Lifecycle {
                 //3.开启HTTP代理
                 HttpProxyServer.get().start();
                 //4.开启HTTPS代理
-                HttpsProxyServer.get().start();
+               // HttpsProxyServer.get().start();
+                //HttpProxyServerX.get().start();
             });
             logger.info("ETP隧道已开启:{}:{}", config.getHost(), config.getBindPort());
             GlobalEventBus.get().publishAsync(new TunnelBindEvent());

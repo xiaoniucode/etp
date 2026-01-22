@@ -3,12 +3,7 @@ package com.xiaoniucode.etp.client.handler;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
-import com.xiaoniucode.etp.core.msg.NewWorkConn;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,25 +11,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author liuxin
  */
-public class RealChannelHandler extends SimpleChannelInboundHandler<ByteBuf> {
+public class RealChannelHandler extends ChannelInboundHandlerAdapter {
     private final Logger logger = LoggerFactory.getLogger(RealChannelHandler.class);
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) {
-        Channel tunnel = ctx.channel().attr(EtpConstants.DATA_CHANNEL).get();
-        Long sessionId = ctx.channel().attr(EtpConstants.SESSION_ID).get();
-        if (tunnel == null) {
-            logger.warn("数据传输通道为空:{}", sessionId);
-            return;
-        }
-        tunnel.writeAndFlush(new NewWorkConn(byteBuf.retain(),sessionId));
-    }
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        super.channelActive(ctx);
-    }
-
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel realChannel = ctx.channel();

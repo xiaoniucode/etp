@@ -31,16 +31,7 @@ public final class ChannelManager {
      * 当前控制隧道通道，每个客户端和远程代理服务器只有一条认证成功的控制隧道
      */
     private static Channel controlChannel;
-    /**
-     * 最大数据隧道通道池大小，超过该大小则关闭当前的通道丢弃
-     */
-    private static final int MAX_DATA_TUNNEL_CHANNEL_POOL_SIZE = 1000;
-    /**
-     *
-     */
-    private static final Queue<Channel> dataTunnelChannelPool = new ConcurrentLinkedQueue<>();
-
-    public static void initBootstraps(Bootstrap control, Bootstrap real) {
+       public static void initBootstraps(Bootstrap control, Bootstrap real) {
         controlBootstrap = control;
         realBootstrap = real;
     }
@@ -52,7 +43,6 @@ public final class ChannelManager {
     public static Bootstrap getControlBootstrap() {
         return controlBootstrap;
     }
-
     public static Channel getControlChannel() {
         return controlChannel;
     }
@@ -81,57 +71,4 @@ public final class ChannelManager {
             iterator.remove();//清除缓存
         }
     }
-
-    /**
-     * 归还数据隧道通道
-     * 如果数据隧道通道池已满则关闭该通道
-     *
-     * @param dataTunnelChannel 数据隧道通道
-     */
-    public static void returnDataTunnelChanel(Channel dataTunnelChannel) {
-        if (dataTunnelChannelPool.size() > MAX_DATA_TUNNEL_CHANNEL_POOL_SIZE) {
-            dataTunnelChannel.close();
-        } else {
-            dataTunnelChannel.config().setOption(ChannelOption.AUTO_READ, true);
-            dataTunnelChannel.attr(EtpConstants.REAL_SERVER_CHANNEL).getAndSet(null);
-            dataTunnelChannelPool.offer(dataTunnelChannel);
-        }
-    }
-
-    /**
-     * 删除数据隧道通道
-     *
-     * @param dataTunnelChannel 数据隧道通道
-     */
-    public static void removeDataTunnelChanel(Channel dataTunnelChannel) {
-        dataTunnelChannelPool.remove(dataTunnelChannel);
-    }
-
-    /**
-     * 获取数据隧道，没有则新建一个
-     *
-     * @param tunnelBootstrap 隧道
-     */
-    public static CompletableFuture<Channel> borrowDataTunnelChannel(Bootstrap tunnelBootstrap) {
-        CompletableFuture<Channel> future = new CompletableFuture<>();
-        Channel dataTunnelChannel = dataTunnelChannelPool.poll();
-        if (dataTunnelChannel != null) {
-            future.complete(dataTunnelChannel);
-            return future;
-        }
-
-        Channel controlChannel = getControlChannel();
-        String serverAddr = controlChannel.attr(EtpConstants.SERVER_DDR).get();
-        Integer serverPort = controlChannel.attr(EtpConstants.SERVER_PORT).get();
-        tunnelBootstrap.connect(serverAddr, serverPort).addListener((ChannelFutureListener) f -> {
-            if (f.isSuccess()) {
-                future.complete(f.channel());
-            } else {
-                future.completeExceptionally(f.cause());
-            }
-        });
-
-        return future;
-    }
-
 }

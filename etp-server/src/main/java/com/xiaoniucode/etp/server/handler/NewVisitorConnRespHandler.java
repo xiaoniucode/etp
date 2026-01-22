@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.handler;
 
+import com.xiaoniucode.etp.core.ChannelBridge;
 import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.core.msg.NewVisitorConnResp;
 import com.xiaoniucode.etp.server.handler.visitor.HttpVisitorHandler;
@@ -31,8 +32,14 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
             ChannelManager.bindVisitorAndTunnel(tunnel, sessionId, secretKey, new Consumer<Channel>() {
                 @Override
                 public void accept(Channel visitor) {
+                    ctx.pipeline().remove("tunnelMessageCodec");
+                    ctx.pipeline().remove("controlTunnelHandler");
+
+                    //桥接，双向透明转发
+                    ChannelBridge.bridge(visitor, tunnel);
                     visitor.config().setOption(ChannelOption.AUTO_READ, true);
                     HttpVisitorHandler.sendFirstPackage(visitor);
+
                     logger.debug("已连接到目标服务");
                 }
             });

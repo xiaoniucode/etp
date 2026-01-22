@@ -3,7 +3,7 @@
 #认证密钥[必填]
 secretKey = "your-secret-key"
 #SSL安全加密密码配置
-tls =true
+tls =false
 [truststore]
 path = "cert/client.p12"
 storePass = "jesjH9JNLKY3"

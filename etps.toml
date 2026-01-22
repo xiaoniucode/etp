@@ -1,9 +1,9 @@
 host = "0.0.0.0"
 bindPort = 9527
-httpProxyPort = 8080
+httpProxyPort = 8081
 httpsProxyPort = 8443
 # TLS
-tls =true
+tls =false
 [keystore]
 path = "cert/server.p12"
 keyPass = "3FbV8R8VW49O"
@@ -16,7 +16,7 @@ name = "客户端"
 name = "web"
 type = "http"
 localIP="localhost"
-localPort = 8081
+localPort = 8082
 domains = ["a.local.cc", "b.local.cc"]
 status = 1 #是否开启代理
 
@@ -24,7 +24,7 @@ status = 1 #是否开启代理
 name = "web2"
 type = "http"
 localIP="localhost"
-localPort = 3000
+localPort = 1024
 domains = ["c.local.cc"]
 status = 1 #是否开启代理
 

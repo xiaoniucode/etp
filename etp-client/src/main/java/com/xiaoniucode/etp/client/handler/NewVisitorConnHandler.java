@@ -1,7 +1,9 @@
 package com.xiaoniucode.etp.client.handler;
 
+import com.xiaoniucode.etp.client.ConnectionPool;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
+import com.xiaoniucode.etp.core.ChannelBridge;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.Message;
@@ -29,14 +31,13 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
             String localIP = msg.getLocalIP();
             int localPort = msg.getLocalPort();
             Bootstrap realBootstrap = ChannelManager.getRealBootstrap();
-            Bootstrap controlBootstrap = ChannelManager.getControlBootstrap();
             realBootstrap.connect(localIP, localPort).addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
                     logger.debug("成功连接到内网服务{}:{}", localIP, localPort);
                     Channel realChannel = future.channel();
                     realChannel.config().setOption(ChannelOption.AUTO_READ, false);
 
-                    ChannelManager.borrowDataTunnelChannel(controlBootstrap)
+                    ConnectionPool.borrowDataTunnelChannel()
                             .thenAccept(tunnel -> {
                                 tunnel.attr(EtpConstants.REAL_SERVER_CHANNEL).set(realChannel);
                                 realChannel.attr(EtpConstants.DATA_CHANNEL).set(tunnel);
@@ -44,6 +45,13 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                                 tunnel.writeAndFlush(new NewVisitorConnResp(secretKey,sessionId)).addListener(f -> {
                                     if (f.isSuccess()) {
                                         ChannelManager.addRealServerChannel(sessionId, realChannel);
+
+
+                                        //控制通道转换为数据通道
+                                        tunnel.pipeline().remove("tunnelMessageCodec");
+                                        tunnel.pipeline().remove("controlChannelHandler");
+                                        //桥接，双向透明转发
+                                        ChannelBridge.bridge(realChannel, tunnel);
                                         realChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
                                         realChannel.config().setOption(ChannelOption.AUTO_READ, true);
                                         logger.debug("成功建立数据传输通道:[sessionId:{},localPort:{}]", sessionId, localPort);

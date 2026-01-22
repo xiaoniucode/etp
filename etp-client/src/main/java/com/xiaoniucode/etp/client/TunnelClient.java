@@ -49,7 +49,7 @@ public final class TunnelClient implements Lifecycle {
     /**
      * 控制隧道工作线程组
      */
-    private EventLoopGroup tunnelWorkerGroup;
+    private EventLoopGroup controlWorkerGroup;
     /**
      * SSL加密上下文
      */
@@ -90,8 +90,8 @@ public final class TunnelClient implements Lifecycle {
             if (config.isTls()) {
                 tlsContext = new ClientTlsContextFactory().createContext();
             }
-            tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
-            controlBootstrap.group(tunnelWorkerGroup)
+            controlWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
+            controlBootstrap.group(controlWorkerGroup)
                     .channel(NettyEventLoopFactory.socketChannelClass())
                     .option(ChannelOption.TCP_NODELAY, true)
                     .option(ChannelOption.SO_KEEPALIVE, true)
@@ -105,10 +105,9 @@ public final class TunnelClient implements Lifecycle {
                                 sc.pipeline().addLast("tls", new SslHandler(engine));
                             }
                             sc.pipeline()
-                                    .addLast(new TunnelMessageCodec())
+                                    .addLast("tunnelMessageCodec",new TunnelMessageCodec())
                                     .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
-                                    .addLast(new FlushConsolidationHandler(256, true))
-                                    .addLast(new ControlChannelHandler(ctx -> {
+                                    .addLast("controlChannelHandler",new ControlChannelHandler(ctx -> {
                                         // 重置重试计数器
                                         retryCount.set(0);
                                         //服务器断开 执行重试 重新连接
@@ -118,6 +117,7 @@ public final class TunnelClient implements Lifecycle {
                                     }));
                         }
                     });
+
             ChannelManager.initBootstraps(controlBootstrap, realBootstrap);
             if (!stop) {
                 //连接到服务器
@@ -163,7 +163,7 @@ public final class TunnelClient implements Lifecycle {
         int retries = retryCount.getAndIncrement();
         long delay = calculateDelay();
         logger.error("连接失败，第{}次重连将在{}秒后执行", retries + 1, delay);
-        tunnelWorkerGroup.schedule(this::connectTunnelServer, delay, TimeUnit.SECONDS);
+        controlWorkerGroup.schedule(this::connectTunnelServer, delay, TimeUnit.SECONDS);
     }
 
     /**
@@ -184,9 +184,9 @@ public final class TunnelClient implements Lifecycle {
 
     @Override
     public void stop() {
-        if (tunnelWorkerGroup != null) {
+        if (controlWorkerGroup != null) {
             stop = true;
-            tunnelWorkerGroup.shutdownGracefully();
+            controlWorkerGroup.shutdownGracefully();
         }
     }
 

@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.client.handler;
 
+import com.xiaoniucode.etp.client.ConnectionPool;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
@@ -21,7 +22,7 @@ public class CloseProxyHandler extends AbstractTunnelMessageHandler {
     protected void doHandle(ChannelHandlerContext ctx, Message msg) {
         Channel realChannel = ctx.channel().attr(EtpConstants.REAL_SERVER_CHANNEL).get();
         if (realChannel != null) {
-            ChannelManager.returnDataTunnelChanel(ctx.channel());
+            ConnectionPool.returnDataTunnelChanel(ctx.channel());
             ChannelUtils.closeOnFlush(realChannel);
         } else {
             logger.debug("与内网真实服务器连接的channel为空！");
