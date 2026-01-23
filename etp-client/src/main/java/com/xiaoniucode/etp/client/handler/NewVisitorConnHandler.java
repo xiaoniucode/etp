@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.client.handler;
 import com.xiaoniucode.etp.client.ConnectionPool;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
+import com.xiaoniucode.etp.core.ChannelSwitcher;
 import com.xiaoniucode.etp.core.codec.ChannelBridge;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
@@ -25,8 +26,8 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
     protected void doHandle(ChannelHandlerContext ctx, Message message) {
         if (message instanceof NewVisitorConn) {
             NewVisitorConn msg = (NewVisitorConn) message;
-            Channel controlTunnelChannel = ctx.channel();
-            String secretKey = controlTunnelChannel.attr(EtpConstants.SECRET_KEY).get();
+            Channel control = ctx.channel();
+            String secretKey = control.attr(EtpConstants.SECRET_KEY).get();
             long sessionId = msg.getSessionId();
             String localIP = msg.getLocalIP();
             int localPort = msg.getLocalPort();
@@ -37,7 +38,7 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                     Channel realChannel = future.channel();
                     realChannel.config().setOption(ChannelOption.AUTO_READ, false);
 
-                    ConnectionPool.borrowDataTunnelChannel()
+                    ConnectionPool.borrowConnection()
                             .thenAccept(tunnel -> {
                                 tunnel.attr(EtpConstants.REAL_SERVER_CHANNEL).set(realChannel);
                                 realChannel.attr(EtpConstants.DATA_CHANNEL).set(tunnel);
@@ -46,8 +47,7 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                                     if (f.isSuccess()) {
                                         ChannelManager.addRealServerChannel(sessionId, realChannel);
                                         //控制通道转换为数据通道
-                                        tunnel.pipeline().remove("tunnelMessageCodec");
-                                        tunnel.pipeline().remove("controlChannelHandler");
+                                        ChannelSwitcher.switchToDataTunnel(tunnel.pipeline());
                                         //桥接，双向透明转发
                                         ChannelBridge.bridge(realChannel, tunnel);
                                         realChannel.attr(EtpConstants.SESSION_ID).set(sessionId);
@@ -59,10 +59,11 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                             .exceptionally(cause -> {
                                 logger.error(cause.getMessage(), cause);
                                 //如果发生错误，通知服务端断开连接
-                                controlTunnelChannel.writeAndFlush(new CloseProxy(sessionId));
+                                control.writeAndFlush(new CloseProxy(sessionId));
                                 return null;
                             });
                 } else {
+                    control.writeAndFlush(new CloseProxy(sessionId));
                     logger.error("内网目标服务[{}:{}]不可用!", localIP, localPort);
                 }
             });

@@ -11,6 +11,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.flush.FlushConsolidationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,7 @@ public class HttpProxyServer implements Lifecycle {
                         protected void initChannel(SocketChannel sc) {
                             sc.pipeline().addLast(new TrafficMetricsHandler());
                             sc.pipeline().addLast(new HostSnifferHandler());
+                            sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
                             sc.pipeline().addLast(new HttpVisitorHandler());
                         }
                     });

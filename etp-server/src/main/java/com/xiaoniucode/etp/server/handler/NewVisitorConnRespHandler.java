@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.handler;
 
+import com.xiaoniucode.etp.core.ChannelSwitcher;
 import com.xiaoniucode.etp.core.codec.ChannelBridge;
 import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.core.msg.NewVisitorConnResp;
@@ -11,8 +12,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.function.Consumer;
 
 /**
  * 处理来自代理客户端连接成功消息
@@ -29,19 +28,14 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
             String secretKey = resp.getSecretKey();
             Channel tunnel = ctx.channel();
 
-            ChannelManager.bindVisitorAndTunnel(tunnel, sessionId, secretKey, new Consumer<Channel>() {
-                @Override
-                public void accept(Channel visitor) {
-                    ctx.pipeline().remove("tunnelMessageCodec");
-                    ctx.pipeline().remove("controlTunnelHandler");
-
-                    //桥接，双向透明转发
-                    ChannelBridge.bridge(visitor, tunnel);
-                    visitor.config().setOption(ChannelOption.AUTO_READ, true);
-
-                    HttpVisitorHandler.sendFirstPackage(visitor);
-                    logger.debug("已连接到目标服务");
-                }
+            ChannelManager.bindVisitorAndTunnel(tunnel, sessionId, secretKey, visitor -> {
+                //将控制隧道切换为数据传输隧道
+                ChannelSwitcher.switchToDataTunnel(ctx.pipeline());
+                //桥接，双向透明转发
+                ChannelBridge.bridge(visitor, tunnel);
+                visitor.config().setOption(ChannelOption.AUTO_READ, true);
+                HttpVisitorHandler.sendFirstPackage(visitor);
+                logger.debug("已连接到目标服务");
             });
         }
     }

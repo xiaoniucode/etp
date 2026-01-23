@@ -9,28 +9,30 @@ import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * 隧道连接池
+ */
 public class ConnectionPool {
-    private static final int MAX_DATA_TUNNEL_CHANNEL_POOL_SIZE = 1000;
+    private static final int MAX_TUNNEL_POOL_SIZE = 1000;
     private static final Queue<Channel> tunnelChannelPool = new ConcurrentLinkedQueue<>();
-
 
     public static void removeDataTunnelChanel(Channel dataTunnelChannel) {
         tunnelChannelPool.remove(dataTunnelChannel);
     }
-    public static CompletableFuture<Channel> borrowDataTunnelChannel(){
+    public static CompletableFuture<Channel> borrowConnection(){
         CompletableFuture<Channel> future = new CompletableFuture<>();
-        Channel dataTunnelChannel = tunnelChannelPool.poll();
-        if (dataTunnelChannel != null) {
-            future.complete(dataTunnelChannel);
+        Channel connection = tunnelChannelPool.poll();
+        if (connection != null) {
+            future.complete(connection);
             return future;
         }
 
-        Bootstrap tunnelBootstrap = ChannelManager.getControlBootstrap();
+        Bootstrap controlBootstrap = ChannelManager.getControlBootstrap();
         Channel control = ChannelManager.getControlChannel();
         String serverAddr = control.attr(EtpConstants.SERVER_DDR).get();
         Integer serverPort = control.attr(EtpConstants.SERVER_PORT).get();
 
-        tunnelBootstrap.connect(serverAddr, serverPort).addListener((ChannelFutureListener) f -> {
+        controlBootstrap.connect(serverAddr, serverPort).addListener((ChannelFutureListener) f -> {
             if (f.isSuccess()) {
                 future.complete(f.channel());
             } else {
@@ -41,8 +43,8 @@ public class ConnectionPool {
         return future;
     }
 
-    public static void returnDataTunnelChanel(Channel tunnel) {
-        if (tunnelChannelPool.size() > MAX_DATA_TUNNEL_CHANNEL_POOL_SIZE) {
+    public static void returnConnection(Channel tunnel) {
+        if (tunnelChannelPool.size() > MAX_TUNNEL_POOL_SIZE) {
             tunnel.close();
         } else {
             tunnel.config().setOption(ChannelOption.AUTO_READ, true);
