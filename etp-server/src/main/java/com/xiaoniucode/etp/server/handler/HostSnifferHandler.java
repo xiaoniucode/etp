@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.core.LanInfo;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 解析出域名
@@ -32,7 +32,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             return;
         }
         in.markReaderIndex();
-        int port = -1;
+        LanInfo lanInfo=null;
         boolean isHttp = false;
         String domain = null;
         try {
@@ -54,13 +54,12 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                         logger.debug("隧道状态为关闭状态");
                         return;
                     }
-                    int targetPort = ProxyManager.getLocalPortByDomain(domain);
-                    if (targetPort == -1) {
+                    lanInfo = ProxyManager.getLanInfoByDomain(domain);
+                    if (lanInfo == null) {
                         logger.warn("没有该域名的代理服务");
                         visitor.close();
                         return;
                     }
-                    port = targetPort;
                 }
                 isHttp = true;
             }
@@ -70,7 +69,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             in.resetReaderIndex();
             sniffing = false;
         }
-        visitor.attr(EtpConstants.TARGET_PORT).set(port);
+        visitor.attr(EtpConstants.LAN_INFO).set(lanInfo);
         visitor.attr(EtpConstants.VISITOR_DOMAIN).set(domain);
         ctx.pipeline().remove(this);
     }

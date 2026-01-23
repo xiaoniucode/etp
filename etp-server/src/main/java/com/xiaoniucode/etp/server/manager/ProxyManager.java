@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.manager;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
+import com.xiaoniucode.etp.core.LanInfo;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
@@ -9,21 +10,20 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public class ProxyManager {
     private static final Logger logger = LoggerFactory.getLogger(ProxyManager.class);
 
     /**
-     * 公网端口 -> 内网端口
+     * 公网端口 -> 内网信息
      */
-    private static final Map<Integer, Integer> portMapping = new ConcurrentHashMap<>();
+    private static final Map<Integer, LanInfo> portMapping = new ConcurrentHashMap<>();
 
     /**
      * 域名 -> 内网端口
      */
-    private static final Map<String, Integer> domainMapping = new ConcurrentHashMap<>();
+    private static final Map<String, LanInfo> domainMapping = new ConcurrentHashMap<>();
 
     /**
      * secretKey -> remotePorts 用于客户端与其所有公网端口的映射，实现快速查找
@@ -43,7 +43,7 @@ public class ProxyManager {
         return clientRemotePorts.getOrDefault(secretKey, new HashSet<>());
     }
 
-    public static int getLocalPort(int remotePort) {
+    public static LanInfo getLanInfo(int remotePort) {
         return portMapping.get(remotePort);
     }
 
@@ -60,7 +60,7 @@ public class ProxyManager {
 
         if (proxy.getType() == ProtocolType.TCP && !isPortOccupied(proxy.getRemotePort())) {
             clientRemotePorts.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).add(proxy.getRemotePort());
-            portMapping.put(proxy.getRemotePort(), proxy.getLocalPort());
+            portMapping.put(proxy.getRemotePort(), new LanInfo(proxy.getLocalIP(),proxy.getLocalPort()));
             proxyStatus.put(proxy.getRemotePort() + "", proxy.getStatus());
             logger.debug("TCP代理 {} 注册成功", proxy.getName());
             return true;
@@ -70,7 +70,7 @@ public class ProxyManager {
             Set<String> domains = proxy.getDomains();
             clientDomains.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).addAll(domains);
             domains.forEach(domain -> {
-                domainMapping.put(domain, proxy.getLocalPort());
+                domainMapping.put(domain,new LanInfo(proxy.getLocalIP(), proxy.getLocalPort()));
                 proxyStatus.put(domain, proxy.getStatus());
             });
             logger.debug("HTTP代理 {} 注册成功", proxy.getName());
@@ -122,11 +122,11 @@ public class ProxyManager {
         return clientDomains.getOrDefault(secretKey, new HashSet<>());
     }
 
-    public static int getLocalPortByDomain(String domain) {
+    public static LanInfo getLanInfoByDomain(String domain) {
         if (!StringUtils.hasText(domain)) {
             throw new IllegalArgumentException("domain is empty");
         }
-        return domainMapping.getOrDefault(domain, -1);
+       return domainMapping.get(domain);
     }
 
     public static int getProxyStatus(String domain) {

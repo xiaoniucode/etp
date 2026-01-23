@@ -1,11 +1,10 @@
 package com.xiaoniucode.etp.server.handler.visitor;
 
 import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.core.LanInfo;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.NewVisitorConn;
-import com.xiaoniucode.etp.core.msg.NewWorkConn;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
-import com.xiaoniucode.etp.server.manager.HttpVisitorPair;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * http visitor handler
@@ -53,7 +51,8 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
         ChannelManager.registerHttpVisitor(visitor, pair -> {
             Channel control = pair.getControl();
-            control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), pair.getLocalIP(), pair.getLocalPort()));
+            LanInfo lanInfo = pair.getLanInfo();
+            control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), lanInfo.getLocalIP(), lanInfo.getLocalPort()));
         });
     }
 
@@ -66,6 +65,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             visitor.attr(CACHED_FIRST_PACKET).set(null);
         }
     }
+
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel visitor = ctx.channel();

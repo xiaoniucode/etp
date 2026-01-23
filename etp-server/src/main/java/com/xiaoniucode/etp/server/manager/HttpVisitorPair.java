@@ -1,20 +1,20 @@
 package com.xiaoniucode.etp.server.manager;
 
+import com.xiaoniucode.etp.core.LanInfo;
 import io.netty.channel.Channel;
 
 public class HttpVisitorPair {
     private Channel control;
-    private String localIP;
-    private Integer localPort;
+    private LanInfo lanInfo;
     private String domain;
     private Long sessionId;
 
-    public HttpVisitorPair(Channel control, long sessionId, String domain,String localIP, Integer localPort) {
+    public HttpVisitorPair(Channel control, long sessionId, String domain,LanInfo lanInfo) {
         this.control = control;
         this.sessionId = sessionId;
         this.domain = domain;
-        this.localIP = localIP;
-        this.localPort = localPort;
+        this.lanInfo = lanInfo;
+
     }
 
     public Channel getControl() {
@@ -25,20 +25,12 @@ public class HttpVisitorPair {
         this.control = control;
     }
 
-    public String getLocalIP() {
-        return localIP;
+    public LanInfo getLanInfo() {
+        return lanInfo;
     }
 
-    public void setLocalIP(String localIP) {
-        this.localIP = localIP;
-    }
-
-    public Integer getLocalPort() {
-        return localPort;
-    }
-
-    public void setLocalPort(Integer localPort) {
-        this.localPort = localPort;
+    public void setLanInfo(LanInfo lanInfo) {
+        this.lanInfo = lanInfo;
     }
 
     public String getDomain() {

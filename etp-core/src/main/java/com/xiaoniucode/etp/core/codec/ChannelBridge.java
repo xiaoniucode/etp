@@ -29,9 +29,7 @@ public class ChannelBridge extends ChannelDuplexHandler {
                 log.debug("bridge write failed: {}", f.cause().getMessage());
                 closeOnFlush(ctx.channel());
                 closeOnFlush(peer);
-                return;
             }
-            log.debug("bridge read");
         });
     }
 

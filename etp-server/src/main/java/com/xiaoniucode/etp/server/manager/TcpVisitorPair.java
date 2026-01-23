@@ -1,21 +1,17 @@
 package com.xiaoniucode.etp.server.manager;
 
+import com.xiaoniucode.etp.core.LanInfo;
 import io.netty.channel.Channel;
 
 public class TcpVisitorPair {
     private Channel control;
-    private String localIP;
-    private Integer localPort;
+    private LanInfo lanInfo;
     private Integer remotePort;
     private Long sessionId;
 
-    public TcpVisitorPair() {
-    }
-
-    public TcpVisitorPair(Channel control,String localIP, Integer localPort, Integer remotePort, Long sessionId) {
+    public TcpVisitorPair(Channel control, LanInfo lanInfo, Integer remotePort, Long sessionId) {
         this.control = control;
-        this.localIP = localIP;
-        this.localPort = localPort;
+        this.lanInfo = lanInfo;
         this.remotePort = remotePort;
         this.sessionId = sessionId;
     }
@@ -28,20 +24,12 @@ public class TcpVisitorPair {
         this.control = control;
     }
 
-    public String getLocalIP() {
-        return localIP;
+    public LanInfo getLanInfo() {
+        return lanInfo;
     }
 
-    public void setLocalIP(String localIP) {
-        this.localIP = localIP;
-    }
-
-    public Integer getLocalPort() {
-        return localPort;
-    }
-
-    public void setLocalPort(Integer localPort) {
-        this.localPort = localPort;
+    public void setLanInfo(LanInfo lanInfo) {
+        this.lanInfo = lanInfo;
     }
 
     public Integer getRemotePort() {

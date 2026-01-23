@@ -25,7 +25,7 @@ public class EtpConstants {
 
     public static final AttributeKey<String> SERVER_DDR = AttributeKey.valueOf("etp.serverAddr");
     public static final AttributeKey<Integer> SERVER_PORT = AttributeKey.valueOf("etp.serverPort");
-    public static final AttributeKey<Integer> TARGET_PORT = AttributeKey.valueOf("etp.targetPort");
+    public static final AttributeKey<LanInfo> LAN_INFO = AttributeKey.valueOf("etp.lanInfo");
     public static final AttributeKey<String> VISITOR_DOMAIN = AttributeKey.valueOf("etp.visitorDomain");
     public static final AttributeKey<String> OS = AttributeKey.valueOf("etp.os");
     public static final AttributeKey<String> ARCH = AttributeKey.valueOf("etp.arch");

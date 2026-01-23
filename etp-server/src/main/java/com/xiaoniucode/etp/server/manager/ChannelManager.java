@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.manager;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.core.LanInfo;
 import com.xiaoniucode.etp.core.msg.Login;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.config.domain.AuthInfo;
@@ -10,7 +11,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,15 +73,16 @@ public class ChannelManager {
             return;
         }
         long sessionId = GlobalIdGenerator.nextId();
-        String localIP = "localhost";//todo ip
-        int localPort = ProxyManager.getLocalPort(remotePort);
-        //
+        LanInfo lanInfo = ProxyManager.getLanInfo(remotePort);
+        if (lanInfo == null) {
+            throw new IllegalArgumentException("隧道不存在!");
+        }
         control.attr(EtpConstants.VISITOR_CHANNELS).get().put(sessionId, visitor);
         visitor.attr(EtpConstants.SESSION_ID).set(sessionId);
         //记录公网端口上的访问者连接
         portToVisitorChannels.computeIfAbsent(remotePort, k -> ConcurrentHashMap.newKeySet()).add(visitor);
         //回调
-        callback.accept(new TcpVisitorPair(control, localIP, localPort, remotePort, sessionId));
+        callback.accept(new TcpVisitorPair(control,lanInfo, remotePort, sessionId));
     }
 
 
@@ -125,15 +126,14 @@ public class ChannelManager {
             return;
         }
         long sessionId = GlobalIdGenerator.nextId();
-        String localIP = "localhost";//todo ip
-        Integer localPort = visitor.attr(EtpConstants.TARGET_PORT).get();
+        LanInfo lanInfo = visitor.attr(EtpConstants.LAN_INFO).get();
 
         control.attr(EtpConstants.VISITOR_CHANNELS).get().put(sessionId, visitor);
         visitor.attr(EtpConstants.SESSION_ID).set(sessionId);
 
         domainToVisitorChannels.computeIfAbsent(domain, k -> ConcurrentHashMap.newKeySet()).add(visitor);
         //回调
-        callback.accept(new HttpVisitorPair(control, sessionId, domain, localIP, localPort));
+        callback.accept(new HttpVisitorPair(control, sessionId, domain,lanInfo));
 
     }
 

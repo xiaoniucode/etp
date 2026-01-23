@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.handler.visitor;
 
 import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.core.LanInfo;
 import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.NewVisitorConn;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
@@ -18,8 +19,9 @@ public class TcpVisitorHandler extends ChannelInboundHandlerAdapter {
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
         ChannelManager.registerTcpVisitor(visitor, pair -> {
             Channel control = pair.getControl();
-            //通知代理客户端与目标端口建立连接
-            control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), pair.getLocalIP(), pair.getLocalPort()));
+            //通知代理客户端与目标真实服务建立连接并建立传输隧道
+            LanInfo lanInfo = pair.getLanInfo();
+            control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), lanInfo.getLocalIP(), lanInfo.getLocalPort()));
         });
         super.channelActive(ctx);
     }
