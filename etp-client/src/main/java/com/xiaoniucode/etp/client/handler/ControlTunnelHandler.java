@@ -5,10 +5,8 @@ import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.MessageHandler;
 import com.xiaoniucode.etp.core.msg.Message;
-import com.xiaoniucode.etp.core.msg.NewVisitorConnResp;
 import com.xiaoniucode.etp.core.msg.Ping;
 import io.netty.channel.*;
-import io.netty.handler.codec.http.FullHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,30 +16,23 @@ import java.util.function.Consumer;
  *
  * @author liuxin
  */
-public class ControlChannelHandler extends ChannelInboundHandlerAdapter {
-    private final Logger logger = LoggerFactory.getLogger(ControlChannelHandler.class);
+public class ControlTunnelHandler extends SimpleChannelInboundHandler<Message> {
+    private final Logger logger = LoggerFactory.getLogger(ControlTunnelHandler.class);
     private final Consumer<ChannelHandlerContext> channelStatusCallback;
 
-    public ControlChannelHandler(Consumer<ChannelHandlerContext> channelStatusCallback) {
+    public ControlTunnelHandler(Consumer<ChannelHandlerContext> channelStatusCallback) {
         this.channelStatusCallback = channelStatusCallback;
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object message) throws Exception {
-        //控制消息
-        if (message instanceof Message) {
-            Message msg = (Message) message;
-            if (msg instanceof Ping) {
-                return;
-            }
-            MessageHandler handler = MessageHandlerFactory.getHandler(msg);
-            if (handler != null) {
-                handler.handle(ctx, msg);
-            }
+    protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+        if (msg instanceof Ping) {
             return;
         }
-
-        super.channelRead(ctx, message);
+        MessageHandler handler = MessageHandlerFactory.getHandler(msg);
+        if (handler != null) {
+            handler.handle(ctx, msg);
+        }
     }
 
     @Override

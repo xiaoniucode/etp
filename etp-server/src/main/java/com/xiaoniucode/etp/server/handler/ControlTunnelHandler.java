@@ -14,21 +14,17 @@ import org.slf4j.LoggerFactory;
  *
  * @author liuxin
  */
-public class ControlTunnelHandler extends ChannelInboundHandlerAdapter{
+public class ControlTunnelHandler extends SimpleChannelInboundHandler<Message> {
     private final Logger logger = LoggerFactory.getLogger(ControlTunnelHandler.class);
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object message) throws Exception {
-        //控制消息
-        if(message instanceof Message msg){
-            MessageHandler handler = TunnelMessageHandlerFactory.getHandler(msg);
-            if (handler != null) {
-                handler.handle(ctx, msg);
-            }
-            return;
-        }
 
-        super.channelRead(ctx, message);
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+        MessageHandler handler = TunnelMessageHandlerFactory.getHandler(msg);
+        if (handler != null) {
+            handler.handle(ctx, msg);
+        }
     }
+
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel control = ctx.channel();

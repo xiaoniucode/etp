@@ -10,6 +10,6 @@ public class ChannelSwitcher {
      */
     public static void switchToDataTunnel(ChannelPipeline pipeline) {
         pipeline.remove("tunnelMessageCodec");
-        pipeline.remove("controlChannelHandler");
+        pipeline.remove("controlTunnelHandler");
     }
 }

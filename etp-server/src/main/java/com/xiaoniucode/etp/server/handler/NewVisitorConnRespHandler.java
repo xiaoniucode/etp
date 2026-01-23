@@ -34,7 +34,9 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
                 //桥接，双向透明转发
                 ChannelBridge.bridge(visitor, tunnel);
                 visitor.config().setOption(ChannelOption.AUTO_READ, true);
-                HttpVisitorHandler.sendFirstPackage(visitor);
+                if (ChannelManager.isHttp(visitor)){
+                    HttpVisitorHandler.sendFirstPackage(visitor);
+                }
                 logger.debug("已连接到目标服务");
             });
         }

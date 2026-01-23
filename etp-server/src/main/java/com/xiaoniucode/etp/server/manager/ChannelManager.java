@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.manager;
 
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.msg.Login;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
@@ -72,7 +73,7 @@ public class ChannelManager {
             return;
         }
         long sessionId = GlobalIdGenerator.nextId();
-        String localIP="localhost";//todo ip
+        String localIP = "localhost";//todo ip
         int localPort = ProxyManager.getLocalPort(remotePort);
         //
         control.attr(EtpConstants.VISITOR_CHANNELS).get().put(sessionId, visitor);
@@ -80,7 +81,7 @@ public class ChannelManager {
         //记录公网端口上的访问者连接
         portToVisitorChannels.computeIfAbsent(remotePort, k -> ConcurrentHashMap.newKeySet()).add(visitor);
         //回调
-        callback.accept(new TcpVisitorPair(control,localIP, localPort, remotePort, sessionId));
+        callback.accept(new TcpVisitorPair(control, localIP, localPort, remotePort, sessionId));
     }
 
 
@@ -124,7 +125,7 @@ public class ChannelManager {
             return;
         }
         long sessionId = GlobalIdGenerator.nextId();
-        String localIP="localhost";//todo ip
+        String localIP = "localhost";//todo ip
         Integer localPort = visitor.attr(EtpConstants.TARGET_PORT).get();
 
         control.attr(EtpConstants.VISITOR_CHANNELS).get().put(sessionId, visitor);
@@ -132,7 +133,7 @@ public class ChannelManager {
 
         domainToVisitorChannels.computeIfAbsent(domain, k -> ConcurrentHashMap.newKeySet()).add(visitor);
         //回调
-        callback.accept(new HttpVisitorPair(control, sessionId, domain,localIP, localPort));
+        callback.accept(new HttpVisitorPair(control, sessionId, domain, localIP, localPort));
 
     }
 
@@ -301,5 +302,10 @@ public class ChannelManager {
                 }
             });
         }
+    }
+
+    public static boolean isHttp(Channel visitor) {
+        String domain = visitor.attr(EtpConstants.VISITOR_DOMAIN).get();
+        return StringUtils.hasText(domain);
     }
 }

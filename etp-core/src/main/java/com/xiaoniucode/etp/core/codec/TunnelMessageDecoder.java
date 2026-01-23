@@ -37,7 +37,7 @@ public class TunnelMessageDecoder extends ByteToMessageDecoder {
             ByteBuf finalBodyBuf;
             
             if (isCompressed) {
-                finalBodyBuf = decompressData(bodyBuf, ctx);
+                finalBodyBuf = decompressData(bodyBuf);
             } else {
                 finalBodyBuf = bodyBuf.retain();
             }
@@ -58,7 +58,7 @@ public class TunnelMessageDecoder extends ByteToMessageDecoder {
         }
     }
 
-    private ByteBuf decompressData(ByteBuf compressedData, ChannelHandlerContext ctx) {
+    private ByteBuf decompressData(ByteBuf compressedData) {
         if (compressedData == null || !compressedData.isReadable()) {
             assert compressedData != null;
             return compressedData.retain();

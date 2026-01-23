@@ -51,12 +51,9 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private void connectToTarget(Channel visitor) {
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
-        ChannelManager.registerHttpVisitor(visitor, new Consumer<HttpVisitorPair>() {
-            @Override
-            public void accept(HttpVisitorPair pair) {
-                Channel control = pair.getControl();
-                control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), pair.getLocalIP(), pair.getLocalPort()));
-            }
+        ChannelManager.registerHttpVisitor(visitor, pair -> {
+            Channel control = pair.getControl();
+            control.writeAndFlush(new NewVisitorConn(pair.getSessionId(), pair.getLocalIP(), pair.getLocalPort()));
         });
     }
 
@@ -69,7 +66,6 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             visitor.attr(CACHED_FIRST_PACKET).set(null);
         }
     }
-
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel visitor = ctx.channel();

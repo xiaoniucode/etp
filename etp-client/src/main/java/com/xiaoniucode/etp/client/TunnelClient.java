@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.client;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.ConfigHelper;
 import com.xiaoniucode.etp.client.handler.RealChannelHandler;
-import com.xiaoniucode.etp.client.handler.ControlChannelHandler;
+import com.xiaoniucode.etp.client.handler.ControlTunnelHandler;
 import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.client.security.ClientTlsContextFactory;
@@ -107,7 +107,7 @@ public final class TunnelClient implements Lifecycle {
                             sc.pipeline()
                                     .addLast("tunnelMessageCodec",new TunnelMessageCodec())
                                     .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
-                                    .addLast("controlChannelHandler",new ControlChannelHandler(ctx -> {
+                                    .addLast("controlTunnelHandler",new ControlTunnelHandler(ctx -> {
                                         // 重置重试计数器
                                         retryCount.set(0);
                                         //服务器断开 执行重试 重新连接
