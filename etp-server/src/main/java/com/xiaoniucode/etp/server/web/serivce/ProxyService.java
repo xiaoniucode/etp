@@ -7,7 +7,7 @@ import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.manager.bak.PortPool;
+import com.xiaoniucode.etp.server.manager.PortManager;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.core.orm.transaction.JdbcTransactionTemplate;
@@ -44,7 +44,7 @@ public class ProxyService {
 
     public JSONObject addTcpProxy(JSONObject req) {
         int remotePort = req.getInt("remotePort");
-        if (remotePort != -1 && !PortPool.get().isPortAvailable(remotePort)) {
+        if (remotePort != -1 && !PortManager.isPortAvailable(remotePort)) {
             throw new BizException("映射注册失败，公网端口: " + remotePort + "不可用！");
         }
         String secretKey = req.getString("secretKey");
@@ -53,7 +53,7 @@ public class ProxyService {
         }
         //-1表示用户没有自定义端口
         if (remotePort == -1) {
-            int allocatePort = PortPool.get().allocateAvailablePort();
+            int allocatePort = PortManager.acquire();
             req.put("remotePort", allocatePort);
         }
         if (!StringUtils.hasText(req.getString("name"))) {
@@ -71,7 +71,7 @@ public class ProxyService {
             TcpProxyServer.get().startRemotePort(remotePortInt);
         } else {
             //将公网端口添加到已分配缓存
-            PortPool.get().addRemotePort(remotePortInt);
+            PortManager.addRemotePort(remotePortInt);
         }
         //最后执行持久化
         int proxyId;
@@ -96,7 +96,7 @@ public class ProxyService {
             //如果没有设置公网端口，自动分配一个
             boolean remotePortChanged = false;
             if (!StringUtils.hasText(newRemotePortString)) {
-                int allocatePort = PortPool.get().allocateAvailablePort();
+                int allocatePort = PortManager.acquire();
                 req.put("remotePort", allocatePort);
                 newRemotePortInt = allocatePort;
                 remotePortChanged = true;
@@ -108,7 +108,7 @@ public class ProxyService {
                     if (ProxyManager.isPortOccupied(newRemotePortInt)) {
                         throw new BizException("公网端口已被占用");
                     }
-                    if (!PortPool.get().isPortAvailable(newRemotePortInt)) {
+                    if (!PortManager.isPortAvailable(newRemotePortInt)) {
                         throw new BizException("公网端口无效");
                     }
                 }

@@ -41,6 +41,18 @@ name = "mysql"
 type = "tcp"
 localPort = 3306
 status = 1 #是否开启代理
+[[clients.proxies]]
+name = "redis"
+type = "tcp"
+localIP="localhost"
+localPort = 6379
+status = 1 #是否开启代理
+[[clients.proxies]]
+name = "redis2"
+type = "tcp"
+localIP="192.168.0.151"
+localPort = 6379
+status = 1 #是否开启代理
 #日志
 [log]
 level = "debug"

@@ -9,7 +9,7 @@ import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.manager.ClientManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.manager.bak.PortPool;
+import com.xiaoniucode.etp.server.manager.PortManager;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -67,7 +67,7 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                     Integer proxyId = null;
                     String type = proxy.getType().name().toLowerCase(Locale.ROOT);
                     if (ProtocolType.TCP.name().equalsIgnoreCase(type) && proxy.getRemotePort() == null) {
-                        int allocatePort = PortPool.get().allocateAvailablePort();
+                        int allocatePort = PortManager.acquire();
                         proxy.setRemotePort(allocatePort);
                     }
                     //如果开启了管理面板，需要将映射配置同步到数据库

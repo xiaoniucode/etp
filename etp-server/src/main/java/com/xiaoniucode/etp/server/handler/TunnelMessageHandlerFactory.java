@@ -17,7 +17,6 @@ public class TunnelMessageHandlerFactory {
         handlers.put(Ping.class, new HeartbeatHandler());
         handlers.put(Login.class, new LoginHandler());
         handlers.put(NewVisitorConnResp.class, new NewVisitorConnRespHandler());
-        handlers.put(NewWorkConn.class, new NewWorkConnHandler());
         handlers.put(CloseProxy.class, new CloseProxyHandler());
         handlers.put(NewProxy.class, new NewProxyHandler());
         handlers.put(UnregisterProxy.class, new UnregisterProxyHandler());

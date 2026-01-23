@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.manager.bak;
+package com.xiaoniucode.etp.server.manager;
 
 
 import com.xiaoniucode.etp.server.config.ConfigHelper;
@@ -11,61 +11,56 @@ import java.net.ServerSocket;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 端口分配管理器
  *
  * @author liuxin
  */
-public class PortPool {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PortPool.class);
-    private static final PortPool instance = new PortPool();
-    private final Set<Integer> allocatedPorts = new HashSet<>(32);
-    private final PortRange portRange = ConfigHelper.get().getPortRange();
-    private int startPort;
-    private int endPort;
-
-    private PortPool() {
-        initPortRange();
-    }
-
-    public static PortPool get() {
-        return instance;
-    }
+public class PortManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PortManager.class);
+    private static final Set<Integer> allocatedPorts = new HashSet<>(32);
+    private static int startPort;
+    private static int endPort;
+    private static final AtomicBoolean init = new AtomicBoolean(false);
 
     /**
-     * 初始化端口范围：如果为-1则使用标准范围
+     * 初始化端口范围,默认范围：1024-49151
      */
-    private void initPortRange() {
+    public static void init() {
+        if (init.get()) {
+            init.set(true);
+            return;
+        }
+        PortRange portRange = ConfigHelper.get().getPortRange();
         startPort = portRange.getStart();
         endPort = portRange.getEnd();
 
-        // 标准范围：1024-49151
+
         if (startPort == -1) {
             startPort = 1024;
         }
         if (endPort == -1) {
             endPort = 49151;
         }
-
-        // 验证范围
-        if (startPort < 1 || startPort > 65535 || endPort < 1 || endPort > 65535 || startPort > endPort) {
+        if (startPort < 1 || endPort < 1 || endPort > 65535 || startPort > endPort) {
             throw new IllegalArgumentException("无效的端口范围: " + startPort + "-" + endPort);
         }
 
         LOGGER.debug("端口分配器初始化，范围: {}-{}", startPort, endPort);
     }
 
-    public int allocateAvailablePort() {
+    public static int acquire() {
         // 检查端口是否足够
         int totalPorts = endPort - startPort + 1;
         if (allocatedPorts.size() >= totalPorts) {
-            throw new IllegalArgumentException("可用公网端口已用完！");
+            throw new IllegalArgumentException("可用端口已用完！");
         }
         Random random = new Random();
         int rangeSize = endPort - startPort + 1;
-        // 最多尝试50次
-        for (int i = 0; i < 50; i++) {
+        // 最多尝试20次
+        for (int i = 0; i < 20; i++) {
             int port = startPort + random.nextInt(rangeSize);
 
             if (allocatedPorts.contains(port)) {
@@ -95,7 +90,7 @@ public class PortPool {
         return -1;
     }
 
-    private boolean tryBindPort(int port) {
+    private static boolean tryBindPort(int port) {
         try (ServerSocket socket = new ServerSocket(port)) {
             return true;
         } catch (IOException e) {
@@ -103,7 +98,7 @@ public class PortPool {
         }
     }
 
-    public boolean releasePort(int port) {
+    public static boolean release(int port) {
         if (allocatedPorts.remove(port)) {
             LOGGER.info("成功释放端口: {}", port);
             return true;
@@ -113,12 +108,7 @@ public class PortPool {
         }
     }
 
-    public boolean isPortAvailable(int port) {
-        if (port < 1 || port > 65535) {
-            String errorMsg = String.format("无效端口号: %d，必须在1到65535之间", port);
-            LOGGER.error(errorMsg);
-            return false;
-        }
+    public static boolean isPortAvailable(int port) {
         if (port < startPort || port > endPort) {
             LOGGER.warn("端口 {} 不在允许范围 {}-{} 内", port, startPort, endPort);
             return false;
@@ -129,7 +119,8 @@ public class PortPool {
         return tryBindPort(port);
     }
 
-    public void addRemotePort(Integer port) {
+    public static void addRemotePort(Integer port) {
         allocatedPorts.add(port);
     }
+
 }
