@@ -8,6 +8,7 @@ import com.xiaoniucode.etp.server.config.domain.PortRange;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AppConfig implements Config {
@@ -21,6 +22,7 @@ public class AppConfig implements Config {
     private Dashboard dashboard;
     private PortRange portRange;
     private List<ClientInfo> clients;
+    private Set<String> baseDomains;
 
     private AppConfig(Builder builder) {
         this.host = builder.host;
@@ -33,6 +35,8 @@ public class AppConfig implements Config {
         this.dashboard = builder.dashboard;
         this.portRange = builder.portRange;
         this.clients = builder.clients;
+        this.baseDomains = builder.baseDomains;
+
     }
 
 
@@ -42,6 +46,7 @@ public class AppConfig implements Config {
         private int httpProxyPort = 80;
         private int httpsProxyPort = 443;
         private boolean tls = false;
+        private Set<String> baseDomains;
         private KeystoreConfig keystoreConfig;
         private LogConfig logConfig;
         private Dashboard dashboard = new Dashboard(false);
@@ -95,6 +100,10 @@ public class AppConfig implements Config {
 
         public Builder httpsProxyPort(int httpsProxyPort) {
             this.httpsProxyPort = httpsProxyPort;
+            return this;
+        }
+        public Builder baseDomains(Set<String> baseDomains) {
+            this.baseDomains = baseDomains;
             return this;
         }
 
@@ -181,6 +190,14 @@ public class AppConfig implements Config {
 
     public void setHttpsProxyPort(int httpsProxyPort) {
         this.httpsProxyPort = httpsProxyPort;
+    }
+
+    public void setBaseDomains(Set<String> baseDomains) {
+        this.baseDomains = baseDomains;
+    }
+
+    public Set<String> getBaseDomains() {
+        return baseDomains;
     }
 
     public static Builder builder() {

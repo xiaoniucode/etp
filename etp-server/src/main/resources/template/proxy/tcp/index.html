@@ -72,10 +72,10 @@
                     }
                 },
                 {
-                    field: 'autoRegistered', title: '映射来源', sort: true, templet: function (d) {
-                        if (d.autoRegistered === 1) {
+                    field: 'source', title: '映射来源', sort: true, templet: function (d) {
+                        if (d.source === 1) {
                             return ' <span class="layui-badge layui-bg-orange">自动注册</span>';
-                        } else if (d.autoRegistered === 0) {
+                        } else if (d.source === 0) {
                             return '<span class="layui-badge layui-bg-green">手动添加</span>';
                         }
                     }

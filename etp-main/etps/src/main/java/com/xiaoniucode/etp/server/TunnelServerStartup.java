@@ -44,7 +44,7 @@ public class TunnelServerStartup {
             registerShutdownHook(tunnelServer);
             tunnelServer.start();
         } catch (IllegalArgumentException e) {
-            logger.error("参数错误: {}", e.getMessage());
+            logger.error(e.getMessage(), e);
             System.err.println("错误: " + e.getMessage());
             printHelp();
             System.exit(1);

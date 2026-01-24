@@ -30,7 +30,7 @@ public class UnregisterProxyHandler implements MessageHandler {
     public void handle(ChannelHandlerContext ctx, Message msg) {
         if (msg instanceof UnregisterProxy proxy) {
             Integer proxyId = proxy.getProxyId();
-            String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
+            String secretKey = ctx.channel().attr(EtpConstants.AUTH_CLIENT_INFO).get().getSecretKey();
 
             if (config.getDashboard().getEnable()) {
                 DaoFactory.INSTANCE.getProxyDao().deleteProxyById(proxyId);

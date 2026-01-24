@@ -5,7 +5,8 @@ import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.LanInfo;
 import com.xiaoniucode.etp.core.msg.Login;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
-import com.xiaoniucode.etp.server.config.domain.AuthInfo;
+import com.xiaoniucode.etp.core.AuthClientInfo;
+import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -40,17 +41,15 @@ public class ChannelManager {
     public static void registerClient(Channel control, Login login) {
         String secretKey = login.getSecretKey();
         Set<Integer> remotePorts = ProxyManager.getClientRemotePorts(secretKey);
-        Set<String> domains = ProxyManager.getClientDomains(secretKey);
+        Set<String> customDomains = ProxyManager.getClientDomains(secretKey);
         for (Integer remotePort : remotePorts) {
             portToControlChannel.put(remotePort, control);
         }
-        for (String domain : domains) {
+        for (String domain : customDomains) {
             domainToControlChannel.put(domain, control);
         }
+        control.attr(EtpConstants.AUTH_CLIENT_INFO).set(new AuthClientInfo(login.getSecretKey(), login.getArch(), login.getOs()));
         control.attr(EtpConstants.CHANNEL_REMOTE_PORT).set(remotePorts);
-        control.attr(EtpConstants.SECRET_KEY).set(secretKey);
-        control.attr(EtpConstants.OS).set(login.getOs());
-        control.attr(EtpConstants.ARCH).set(login.getArch());
         control.attr(EtpConstants.VISITOR_CHANNELS).set(new ConcurrentHashMap<>());
         clientToControlChannel.put(secretKey, control);
     }
@@ -82,7 +81,7 @@ public class ChannelManager {
         //记录公网端口上的访问者连接
         portToVisitorChannels.computeIfAbsent(remotePort, k -> ConcurrentHashMap.newKeySet()).add(visitor);
         //回调
-        callback.accept(new TcpVisitorPair(control,lanInfo, remotePort, sessionId));
+        callback.accept(new TcpVisitorPair(control, lanInfo, remotePort, sessionId));
     }
 
 
@@ -110,7 +109,7 @@ public class ChannelManager {
         Channel tunnel = visitor.attr(EtpConstants.DATA_CHANNEL).get();
         if (tunnel != null && tunnel.isActive()) {
             tunnel.attr(EtpConstants.REAL_SERVER_CHANNEL).getAndSet(null);
-            tunnel.attr(EtpConstants.SECRET_KEY).getAndSet(null);
+            tunnel.attr(EtpConstants.AUTH_CLIENT_INFO).getAndSet(null);
             tunnel.attr(EtpConstants.SESSION_ID).getAndSet(null);
             tunnel.attr(EtpConstants.CONNECTED).getAndSet(null);
             tunnel.config().setOption(ChannelOption.AUTO_READ, true);
@@ -133,7 +132,7 @@ public class ChannelManager {
 
         domainToVisitorChannels.computeIfAbsent(domain, k -> ConcurrentHashMap.newKeySet()).add(visitor);
         //回调
-        callback.accept(new HttpVisitorPair(control, sessionId, domain,lanInfo));
+        callback.accept(new HttpVisitorPair(control, sessionId, domain, lanInfo));
 
     }
 
@@ -159,7 +158,7 @@ public class ChannelManager {
         Channel tunnel = visitor.attr(EtpConstants.DATA_CHANNEL).get();
         if (tunnel != null && tunnel.isActive()) {
             tunnel.attr(EtpConstants.REAL_SERVER_CHANNEL).getAndSet(null);
-            tunnel.attr(EtpConstants.SECRET_KEY).getAndSet(null);
+            tunnel.attr(EtpConstants.AUTH_CLIENT_INFO).getAndSet(null);
             tunnel.attr(EtpConstants.SESSION_ID).getAndSet(null);
             tunnel.attr(EtpConstants.CONNECTED).getAndSet(null);
             tunnel.config().setOption(ChannelOption.AUTO_READ, true);
@@ -184,8 +183,8 @@ public class ChannelManager {
         if (visitor == null) {
             return;
         }
-
-        tunnel.attr(EtpConstants.SECRET_KEY).set(secretKey);
+        AuthClientInfo authClientInfo = control.attr(EtpConstants.AUTH_CLIENT_INFO).get();
+        tunnel.attr(EtpConstants.AUTH_CLIENT_INFO).set(authClientInfo);
         tunnel.attr(EtpConstants.SESSION_ID).set(sessionId);
         visitor.attr(EtpConstants.CONNECTED).set(true);
 
@@ -227,12 +226,14 @@ public class ChannelManager {
         return sa.getPort();
     }
 
-    public static AuthInfo getAuthInfo(String secretKey) {
+    public static AuthClientInfo getAuthClientInfo(Channel control) {
+        return control.attr(EtpConstants.AUTH_CLIENT_INFO).get();
+    }
+
+    public static AuthClientInfo getAuthClientInfo(String secretKey) {
         Channel control = clientToControlChannel.get(secretKey);
         if (control != null) {
-            String os = control.attr(EtpConstants.OS).get();
-            String arch = control.attr(EtpConstants.ARCH).get();
-            return new AuthInfo(os, arch);
+            return control.attr(EtpConstants.AUTH_CLIENT_INFO).get();
         }
         return null;
     }
@@ -260,7 +261,7 @@ public class ChannelManager {
             Channel visitor = control.attr(EtpConstants.VISITOR_CHANNELS).get().remove(sessionId);
             if (visitor != null) {
                 visitor.attr(EtpConstants.DATA_CHANNEL).getAndSet(null);
-                visitor.attr(EtpConstants.SECRET_KEY).getAndSet(null);
+                visitor.attr(EtpConstants.AUTH_CLIENT_INFO).getAndSet(null);
                 visitor.attr(EtpConstants.SESSION_ID).getAndSet(null);
                 ChannelUtils.closeOnFlush(visitor);
             }
@@ -278,7 +279,8 @@ public class ChannelManager {
         if (control.attr(EtpConstants.CHANNEL_REMOTE_PORT).get() == null) {
             return;
         }
-        String secretKey = control.attr(EtpConstants.SECRET_KEY).get();
+        AuthClientInfo authClientInfo = control.attr(EtpConstants.AUTH_CLIENT_INFO).get();
+        String secretKey = authClientInfo.getSecretKey();
         Channel existingChannel = clientToControlChannel.get(secretKey);
         if (control == existingChannel) {
             clientToControlChannel.remove(secretKey);
@@ -308,4 +310,6 @@ public class ChannelManager {
         String domain = visitor.attr(EtpConstants.VISITOR_DOMAIN).get();
         return StringUtils.hasText(domain);
     }
+
+
 }

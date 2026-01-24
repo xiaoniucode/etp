@@ -3,7 +3,6 @@ package com.xiaoniucode.etp.core;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +13,7 @@ import java.util.Set;
 public class EtpConstants {
     public static final AttributeKey<Long> SESSION_ID = AttributeKey.valueOf("etp.sessionId");
     public static final AttributeKey<String> SECRET_KEY = AttributeKey.valueOf("etp.secretKey");
-
+    public static final AttributeKey<AuthClientInfo> AUTH_CLIENT_INFO = AttributeKey.valueOf("etp.auth_client_info");
     public static final AttributeKey<Channel> DATA_CHANNEL = AttributeKey.valueOf("etp.tunnel");
     public static final AttributeKey<Channel> REAL_SERVER_CHANNEL = AttributeKey.valueOf("etp.realServerChannel");
     public static final AttributeKey<Channel> VISITOR_CHANNEL = AttributeKey.valueOf("etp.visitorChannel");
@@ -27,7 +26,7 @@ public class EtpConstants {
     public static final AttributeKey<Integer> SERVER_PORT = AttributeKey.valueOf("etp.serverPort");
     public static final AttributeKey<LanInfo> LAN_INFO = AttributeKey.valueOf("etp.lanInfo");
     public static final AttributeKey<String> VISITOR_DOMAIN = AttributeKey.valueOf("etp.visitorDomain");
-    public static final AttributeKey<String> OS = AttributeKey.valueOf("etp.os");
-    public static final AttributeKey<String> ARCH = AttributeKey.valueOf("etp.arch");
+//    public static final AttributeKey<String> OS = AttributeKey.valueOf("etp.os");
+//    public static final AttributeKey<String> ARCH = AttributeKey.valueOf("etp.arch");
 
 }

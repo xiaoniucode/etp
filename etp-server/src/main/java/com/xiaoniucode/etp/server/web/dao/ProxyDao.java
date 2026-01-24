@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ProxyDao extends BaseDao {
     public int insert(JSONObject data) {
-        return jdbc.insert("INSERT INTO proxies (clientId, name, type,localIP, localPort, remotePort, status, autoRegistered) VALUES (:clientId, :name, :type,:localIP, :localPort, :remotePort, :status, :autoRegistered)")
+        return jdbc.insert("INSERT INTO proxies (clientId, name, type,localIP, localPort, remotePort, status, source) VALUES (:clientId, :name, :type,:localIP, :localPort, :remotePort, :status, :source)")
                 .bind("clientId", data.optInt("clientId"))
                 .bind("name", data.optString("name"))
                 .bind("type", data.optString("type"))
@@ -18,7 +18,7 @@ public class ProxyDao extends BaseDao {
                 .bind("localPort", data.optInt("localPort"))
                 .bind("remotePort", data.optInt("remotePort"))
                 .bind("status", data.optInt("status", 1))
-                .bind("autoRegistered", data.optInt("autoRegistered"))
+                .bind("source", data.optInt("source"))
                 .execute();
     }
     public JSONObject getProxyById(int id) {
@@ -28,10 +28,10 @@ public class ProxyDao extends BaseDao {
         if (proxy != null) {
             String type = proxy.optString("type");
             if ("http".equalsIgnoreCase(type) || "https".equalsIgnoreCase(type)) {
-                JSONArray domains = DaoFactory.INSTANCE.getProxyDomainDao().listByProxyId(id);
-                proxy.put("domains", domains);
+                JSONArray customDomains = DaoFactory.INSTANCE.getProxyDomainDao().listByProxyId(id);
+                proxy.put("customDomains", customDomains);
             } else {
-                proxy.put("domains", new JSONArray());
+                proxy.put("customDomains", new JSONArray());
             }
         }
         return proxy;
@@ -77,10 +77,10 @@ public class ProxyDao extends BaseDao {
             paramNames.add("status");
             paramValues.add(data.getInt("status"));
         }
-        if (data.has("autoRegistered")) {
-            set.append("autoRegistered = :autoRegistered, ");
-            paramNames.add("autoRegistered");
-            paramValues.add(data.getInt("autoRegistered"));
+        if (data.has("source")) {
+            set.append("source = :source, ");
+            paramNames.add("source");
+            paramValues.add(data.getInt("source"));
         }
 
         set.setLength(Math.max(set.length() - 2, 0));
@@ -99,14 +99,14 @@ public class ProxyDao extends BaseDao {
 
         int rows = updateBuilder.bind("id", id).execute();
 
-        if (rows > 0 && data.has("domains")) {
+        if (rows > 0 && data.has("customDomains")) {
             JSONObject proxy = getProxyById((int) id);
             if (proxy != null && ("http".equalsIgnoreCase(proxy.optString("type")) || "https".equalsIgnoreCase(proxy.optString("type")))) {
                 DaoFactory.INSTANCE.getProxyDomainDao().deleteByProxyId((int) id);
 
-                JSONArray domains = data.getJSONArray("domains");
-                for (int i = 0; i < domains.length(); i++) {
-                    JSONObject domainObj = domains.getJSONObject(i);
+                JSONArray customDomains = data.getJSONArray("customDomains");
+                for (int i = 0; i < customDomains.length(); i++) {
+                    JSONObject domainObj = customDomains.getJSONObject(i);
                     String domain = domainObj.optString("domain");
                     if (!domain.isEmpty()) {
                         DaoFactory.INSTANCE.getProxyDomainDao().insert((int) id, domain);
@@ -131,7 +131,7 @@ public class ProxyDao extends BaseDao {
         String sql = """
                 SELECT
                     p.id, p.clientId, p.name, p.type,p.localIP, p.localPort, p.remotePort, p.status,
-                    p.createdAt, p.updatedAt, p.autoRegistered, c.name AS clientName, c.secretKey
+                    p.createdAt, p.updatedAt, p.source, c.name AS clientName, c.secretKey
                 FROM proxies p
                 LEFT JOIN clients c ON p.clientId = c.id
                 """;
@@ -156,11 +156,11 @@ public class ProxyDao extends BaseDao {
                 int proxyId = domainObj.optInt("proxyId");
                 String domain = domainObj.optString("domain");
 
-                JSONArray domains = domainMap.computeIfAbsent(proxyId, k -> new JSONArray());
+                JSONArray customDomains = domainMap.computeIfAbsent(proxyId, k -> new JSONArray());
 
                 JSONObject domainEntry = new JSONObject();
                 domainEntry.put("domain", domain);
-                domains.put(domainEntry);
+                customDomains.put(domainEntry);
             }
 
             for (int i = 0; i < proxies.length(); i++) {
@@ -169,15 +169,15 @@ public class ProxyDao extends BaseDao {
                 String proxyType = proxy.optString("type");
 
                 if ("http".equalsIgnoreCase(proxyType)) {
-                    JSONArray domains = domainMap.getOrDefault(proxyId, new JSONArray());
-                    proxy.put("domains", domains);
+                    JSONArray customDomains = domainMap.getOrDefault(proxyId, new JSONArray());
+                    proxy.put("customDomains", customDomains);
                     proxy.put("httpProxyPort", ConfigHelper.get().getHttpProxyPort());
                 } else if ("https".equalsIgnoreCase(proxyType)) {
-                    JSONArray domains = domainMap.getOrDefault(proxyId, new JSONArray());
-                    proxy.put("domains", domains);
+                    JSONArray customDomains = domainMap.getOrDefault(proxyId, new JSONArray());
+                    proxy.put("customDomains", customDomains);
                     proxy.put("httpsProxyPort", ConfigHelper.get().getHttpsProxyPort());
                 } else {
-                    proxy.put("domains", new JSONArray());
+                    proxy.put("customDomains", new JSONArray());
                 }
             }
         }
@@ -216,10 +216,10 @@ public class ProxyDao extends BaseDao {
             String type = proxy.optString("type");
             int proxyId = proxy.optInt("id");
             if ("http".equalsIgnoreCase(type) || "https".equalsIgnoreCase(type)) {
-                JSONArray domains = DaoFactory.INSTANCE.getProxyDomainDao().listByProxyId(proxyId);
-                proxy.put("domains", domains);
+                JSONArray customDomains = DaoFactory.INSTANCE.getProxyDomainDao().listByProxyId(proxyId);
+                proxy.put("customDomains", customDomains);
             } else {
-                proxy.put("domains", new JSONArray());
+                proxy.put("customDomains", new JSONArray());
             }
         }
         return proxy;
@@ -227,7 +227,7 @@ public class ProxyDao extends BaseDao {
 
     public int deleteAllAutoRegisterProxy() {
         // 先获取所有自动注册的代理ID
-        JSONArray proxies = jdbc.query("SELECT id FROM proxies WHERE autoRegistered = 1").list();
+        JSONArray proxies = jdbc.query("SELECT id FROM proxies WHERE source = 1").list();
         
         List<Integer> proxyIds = new ArrayList<>();
         for (int i = 0; i < proxies.length(); i++) {
@@ -240,7 +240,7 @@ public class ProxyDao extends BaseDao {
             DaoFactory.INSTANCE.getProxyDomainDao().deleteByProxyIds(proxyIds);
         }
 
-        return jdbc.update("DELETE FROM proxies WHERE autoRegistered = 1")
+        return jdbc.update("DELETE FROM proxies WHERE source = 1")
                 .execute();
     }
 }

@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.common.utils.TomlUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.moandjiezana.toml.Toml;
 import com.xiaoniucode.etp.server.config.domain.*;
+import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -155,7 +156,8 @@ public class TomlConfigSource implements ConfigSource {
             }
 
             List<ProxyConfig> proxies = parseProxies(client);
-            ClientInfo clientInfo = new ClientInfo(name, secretKey, null, proxies);
+            int clientId = GlobalIdGenerator.nextId();
+            ClientInfo clientInfo = new ClientInfo(name, secretKey, clientId, proxies);
             clients.add(clientInfo);
 
             tokenTemp.add(secretKey);
@@ -181,7 +183,7 @@ public class TomlConfigSource implements ConfigSource {
             Long localPort = proxy.getLong("localPort");
             Long remotePort = proxy.getLong("remotePort");
             Long status = proxy.getLong("status", 1L);
-            List<String> domains = proxy.getList("domains", new ArrayList<>());
+            List<String> customDomains = proxy.getList("customDomains", new ArrayList<>());
             //todo 需要检查域名是否重复
             if (ProtocolType.TCP.name().equalsIgnoreCase(type) && remotePort != null) {
                 if (portTemp.contains(remotePort.intValue())) {
@@ -205,7 +207,7 @@ public class TomlConfigSource implements ConfigSource {
                 proxyConfig.setRemotePort(remotePort == null ? null : remotePort.intValue());
             } else {
                 //http or https
-                proxyConfig.setDomains(new HashSet<>(domains));
+                proxyConfig.setCustomDomains(new HashSet<>(customDomains));
             }
             proxyConfigs.add(proxyConfig);
         }

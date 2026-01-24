@@ -1,11 +1,17 @@
 package com.xiaoniucode.etp.core.msg;
 
+import com.xiaoniucode.etp.core.codec.ProtocolType;
+
+import java.util.Set;
+
 public class NewProxy implements Message{
     private String name;
+    private String localIP;
     private Integer localPort;
-    private String protocol;
+    private ProtocolType protocol;
     private Integer remotePort;
-    private Boolean autoStart;
+    private Integer status;
+    private Set<String> customDomains;
 
     public String getName() {
         return name;
@@ -13,6 +19,14 @@ public class NewProxy implements Message{
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLocalIP() {
+        return localIP;
+    }
+
+    public void setLocalIP(String localIP) {
+        this.localIP = localIP;
     }
 
     public Integer getLocalPort() {
@@ -23,11 +37,11 @@ public class NewProxy implements Message{
         this.localPort = localPort;
     }
 
-    public String getProtocol() {
+    public ProtocolType getProtocol() {
         return protocol;
     }
 
-    public void setProtocol(String protocol) {
+    public void setProtocol(ProtocolType protocol) {
         this.protocol = protocol;
     }
 
@@ -39,12 +53,20 @@ public class NewProxy implements Message{
         this.remotePort = remotePort;
     }
 
-    public Boolean getAutoStart() {
-        return autoStart;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setAutoStart(Boolean autoStart) {
-        this.autoStart = autoStart;
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Set<String> getDomains() {
+        return customDomains;
+    }
+
+    public void setDomains(Set<String> customDomains) {
+        this.customDomains = customDomains;
     }
 
     @Override

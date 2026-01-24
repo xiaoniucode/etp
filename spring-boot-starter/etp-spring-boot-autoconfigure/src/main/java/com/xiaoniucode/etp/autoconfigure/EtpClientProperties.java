@@ -29,6 +29,10 @@ public class EtpClientProperties {
      */
     private int remotePort = -1;
     /**
+     * 内网IP
+     */
+    private String localIP = "127.0.0.1";
+    /**
      * 协议
      */
     private ProtocolType protocol = ProtocolType.TCP;
@@ -102,6 +106,14 @@ public class EtpClientProperties {
 
     public String getServerAddr() {
         return serverAddr;
+    }
+
+    public String getLocalIP() {
+        return localIP;
+    }
+
+    public void setLocalIP(String localIP) {
+        this.localIP = localIP;
     }
 
     public void setServerAddr(String serverAddr) {

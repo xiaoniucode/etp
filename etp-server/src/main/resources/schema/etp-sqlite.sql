@@ -41,8 +41,8 @@ CREATE TABLE IF NOT EXISTS proxies (
     clientId         INTEGER NOT NULL,                   -- 所属客户端ID
     name             TEXT NOT NULL UNIQUE,               -- 代理名称
     type             TEXT NOT NULL,                      -- 协议类型（如 "TCP"、"HTTP"）
-    autoRegistered   INTEGER NOT NULL DEFAULT 0,         -- 注册类型（1：自动注册、0手动注册）
-    localIP          TEXT NOT NULL,                   -- 内网IP
+    source           INTEGER NOT NULL DEFAULT 0,         -- 注册类型（1：自动注册、0手动注册）
+    localIP          TEXT NOT NULL,                      -- 内网IP
     localPort        INTEGER NOT NULL,                   -- 内网端口
     remotePort       INTEGER,                            -- 远程服务端口
     status           INTEGER NOT NULL DEFAULT 1,         -- 状态：1=开启，0=关闭

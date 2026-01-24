@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.core.msg;
 
 public class Error implements Message{
-    private String error;
+    private final String error;
     public Error(String error) {
         this.error = error;
     }

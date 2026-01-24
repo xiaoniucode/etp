@@ -51,14 +51,14 @@
                 {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
                 {field: 'name', title: '隧道名称'},
                 {
-                    field: 'domains', sort: true, title: '访问地址', templet: function (d) {
-                        if (d.domains && d.domains.length > 0) {
+                    field: 'customDomains', sort: true, title: '访问地址', templet: function (d) {
+                        if (d.customDomains && d.customDomains.length > 0) {
                             let domainStr = '';
-                            for (let i = 0; i < d.domains.length; i++) {
-                                const fullUrl = 'http' + '://' + d.domains[i].domain + ":" + d.httpProxyPort;
-                                domainStr += '<a href="' + fullUrl + '" target="_blank">' + d.domains[i].domain +':'+d.httpProxyPort+ '</a>';
+                            for (let i = 0; i < d.customDomains.length; i++) {
+                                const fullUrl = 'http' + '://' + d.customDomains[i].domain + ":" + d.httpProxyPort;
+                                domainStr += '<a href="' + fullUrl + '" target="_blank">' + d.customDomains[i].domain +':'+d.httpProxyPort+ '</a>';
 
-                                if (i < d.domains.length - 1) {
+                                if (i < d.customDomains.length - 1) {
                                     domainStr += '<br>';
                                 }
                             }
@@ -75,10 +75,10 @@
                     }
                 },
                 {
-                    field: 'autoRegistered', title: '映射来源', sort: true, templet: function (d) {
-                        if (d.autoRegistered === 1) {
+                    field: 'source', title: '映射来源', sort: true, templet: function (d) {
+                        if (d.source === 1) {
                             return ' <span class="layui-badge layui-bg-orange">自动注册</span>';
-                        } else if (d.autoRegistered === 0) {
+                        } else if (d.source === 0) {
                             return '<span class="layui-badge layui-bg-green">手动添加</span>';
                         }
                     }

@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.config.domain;
 
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 
 import java.util.List;
@@ -14,12 +15,26 @@ public class ClientInfo {
     private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
 
     public ClientInfo(String name, String secretKey, Integer clientId) {
+        check(name, secretKey, clientId);
         this.name = name;
         this.secretKey = secretKey;
         this.clientId = clientId;
     }
 
+    private void check(String name, String secretKey, Integer clientId) {
+        if (!StringUtils.hasText(name)) {
+            throw new IllegalArgumentException("客户端名称不能为空");
+        }
+        if (!StringUtils.hasText(secretKey)) {
+            throw new IllegalArgumentException("客户端密钥不能为空");
+        }
+        if (clientId == null) {
+            throw new IllegalArgumentException("客户端ID不能为空");
+        }
+    }
+
     public ClientInfo(String name, String secretKey, Integer clientId, List<ProxyConfig> proxies) {
+        check(name, secretKey, clientId);
         this.name = name;
         this.secretKey = secretKey;
         this.clientId = clientId;

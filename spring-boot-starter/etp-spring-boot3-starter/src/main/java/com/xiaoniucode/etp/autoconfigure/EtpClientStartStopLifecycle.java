@@ -56,10 +56,11 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
             int localPort = webServerPortListener.getActualPort();
             String appName = environment.getProperty("spring.application.name", "Spring-Boot");
             NewProxy newProxy = new NewProxy();
+            newProxy.setLocalIP(properties.getLocalIP());
             newProxy.setLocalPort(localPort);
-            newProxy.setAutoStart(properties.isAutoStart());
+            newProxy.setStatus(properties.isAutoStart()?1:0);
             newProxy.setRemotePort(properties.getRemotePort());
-            newProxy.setProtocol(properties.getProtocol().name());
+            newProxy.setProtocol(properties.getProtocol());
             newProxy.setName(appName);
 
             proxyClient.registerProxy(newProxy);

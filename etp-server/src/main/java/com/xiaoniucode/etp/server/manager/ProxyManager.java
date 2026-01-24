@@ -31,7 +31,7 @@ public class ProxyManager {
     private static final Map<String, Set<Integer>> clientRemotePorts = new ConcurrentHashMap<>();
 
     /**
-     * secretKey -> domains 用于客户端与其所有域名的映射，实现快速查找
+     * secretKey -> customDomains 用于客户端与其所有域名的映射，实现快速查找
      */
     private static final Map<String, Set<String>> clientDomains = new ConcurrentHashMap<>();
     /**
@@ -67,9 +67,9 @@ public class ProxyManager {
         }
 
         if (proxy.getType() == ProtocolType.HTTP||proxy.getType() == ProtocolType.HTTPS) {
-            Set<String> domains = proxy.getDomains();
-            clientDomains.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).addAll(domains);
-            domains.forEach(domain -> {
+            Set<String> customDomains = proxy.getCustomDomains();
+            clientDomains.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).addAll(customDomains);
+            customDomains.forEach(domain -> {
                 domainMapping.put(domain,new LanInfo(proxy.getLocalIP(), proxy.getLocalPort()));
                 proxyStatus.put(domain, proxy.getStatus());
             });

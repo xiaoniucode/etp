@@ -99,13 +99,15 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
         JSONArray clients = DaoFactory.INSTANCE.getClientDao().list();
         if (clients != null) {
             for (int i = 0; i < clients.length(); i++) {
-                //todo 需要检查配置中是否存在了
                 JSONObject client = clients.getJSONObject(i);
-                int clientId = client.getInt("id");
-                String name = client.getString("name");
                 String secretKey = client.getString("secretKey");
-                ClientInfo clientInfo = new ClientInfo(name, secretKey, clientId);
-                ClientManager.addClient(clientInfo);
+                if (!ClientManager.hasClient(secretKey)) {
+                    int clientId = client.getInt("id");
+                    String name = client.getString("name");
+                    ClientInfo clientInfo = new ClientInfo(name, secretKey, clientId);
+                    ClientManager.addClient(clientInfo);
+                }
+
             }
         }
     }
@@ -120,18 +122,18 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
 
                 ProxyConfig proxyConfig = new ProxyConfig();
                 proxyConfig.setType(type);
-                proxyConfig.setLocalIP(proxy.getString("localIP"));
+                proxyConfig.setLocalIP(proxy.optString("localIP","127.0.0.1"));
                 proxyConfig.setLocalPort(proxy.getInt("localPort"));
                 if (ProtocolType.TCP.equals(type)) {
                     proxyConfig.setRemotePort(proxy.getInt("remotePort"));
                 } else if (ProtocolType.HTTP.equals(type)||ProtocolType.HTTPS.equals(type)) {
-                    JSONArray d = proxy.getJSONArray("domains");
-                    Set<String> domains = new HashSet<>();
+                    JSONArray d = proxy.getJSONArray("customDomains");
+                    Set<String> customDomains = new HashSet<>();
                     for (Object item : d) {
                         JSONObject itemJson = (JSONObject) item;
-                        domains.add(itemJson.getString("domain"));
+                        customDomains.add(itemJson.getString("domain"));
                     }
-                    proxyConfig.setDomains(domains);
+                    proxyConfig.setCustomDomains(customDomains);
                 }
                 proxyConfig.setProxyId(proxy.getInt("id"));
                 proxyConfig.setName(proxy.getString("name"));

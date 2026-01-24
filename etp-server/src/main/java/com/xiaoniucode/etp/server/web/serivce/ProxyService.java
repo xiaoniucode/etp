@@ -25,10 +25,10 @@ public class ProxyService {
     public JSONObject getProxy(JSONObject req) {
         JSONObject res = DaoFactory.INSTANCE.getProxyDao().getProxyById(req.getInt("id"));
         String type = res.getString("type");
-        if (ProtocolType.getType(type) == ProtocolType.HTTP) {
-            String domains = res.getString("domains");
-            if (StringUtils.hasText(domains)) {
-                res.put("domains", String.join("\n", domains.split(",")));
+        if (ProtocolType.getType(type) == ProtocolType.HTTP || ProtocolType.getType(type) == ProtocolType.HTTPS) {
+            String customDomains = res.getString("customDomains");
+            if (StringUtils.hasText(customDomains)) {
+                res.put("customDomains", String.join("\n", customDomains.split(",")));
             }
         }
         return res;
@@ -56,7 +56,6 @@ public class ProxyService {
             req.put("name", req.getInt("remotePort"));
         }
         req.put("type", ProtocolType.TCP.name().toLowerCase(Locale.ROOT));
-        JSONObject res = new JSONObject();
         int remotePortInt = req.getInt("remotePort");
         //注册端口映射
         ProxyManager.addProxy(secretKey, createProxyMapping(req));
@@ -77,9 +76,8 @@ public class ProxyService {
             //纯TOML模式
             proxyId = GlobalIdGenerator.nextId();
         }
-        res.put("proxyId", proxyId);
-        res.put("remotePort", remotePortInt);
-        return res;
+        req.put("proxyId", proxyId);
+        return req;
     }
 
     public void updateTcpProxy(JSONObject req) {
@@ -147,27 +145,27 @@ public class ProxyService {
     public JSONObject addHttpProxy(JSONObject req) {
         return TX.execute(() -> {
             req.put("type", ProtocolType.HTTP.name().toLowerCase(Locale.ROOT));
-            String domains = req.getString("domains");
+            String customDomains = req.optString("customDomains");
             int proxyId = DaoFactory.INSTANCE.getProxyDao().insert(req);
-            String[] arr = domains.split("\n");
+            String[] arr = customDomains.split("\n");
             for (String domain : arr) {
                 if (DaoFactory.INSTANCE.getProxyDomainDao().findProxyName(domain) != null) {
                     throw new BizException("域名已经存在：" + domain);
                 }
-                DaoFactory.INSTANCE.getProxyDomainDao().insert(proxyId, domain);
+               DaoFactory.INSTANCE.getProxyDomainDao().insert(proxyId, domain);
             }
-            JSONObject res = new JSONObject();
-            res.put("proxyId", proxyId);
-            return res;
+
+            req.put("proxyId", proxyId);
+            return req;
         });
     }
 
     private ProxyConfig createProxyMapping(JSONObject req) {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setType(ProtocolType.getType(req.getString("type")));
-        proxyConfig.setLocalIP(req.getString("localIP"));
+        proxyConfig.setLocalIP(req.optString("localIP","127.0.0.1"));
         proxyConfig.setLocalPort(req.getInt("localPort"));
-        proxyConfig.setRemotePort(req.getInt("remotePort"));
+        proxyConfig.setRemotePort(req.optInt("remotePort",-1));
         proxyConfig.setProxyId(req.getInt("clientId"));
         proxyConfig.setName(req.getString("name"));
         proxyConfig.setStatus(req.getInt("status"));

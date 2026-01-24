@@ -31,7 +31,7 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<Message> {
         Channel visitor = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
         //数据连接的断开
         if (visitor != null) {
-            String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
+            String secretKey = ctx.channel().attr(EtpConstants.AUTH_CLIENT_INFO).get().getSecretKey();
             Long sessionId = ctx.channel().attr(EtpConstants.SESSION_ID).get();
             ChannelManager.closeVisitor(secretKey, sessionId);
             ChannelUtils.closeOnFlush(control);

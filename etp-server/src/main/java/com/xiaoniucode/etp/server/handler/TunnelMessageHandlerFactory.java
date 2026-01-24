@@ -18,7 +18,7 @@ public class TunnelMessageHandlerFactory {
         handlers.put(Login.class, new LoginHandler());
         handlers.put(NewVisitorConnResp.class, new NewVisitorConnRespHandler());
         handlers.put(CloseProxy.class, new CloseProxyHandler());
-        handlers.put(NewProxy.class, new NewProxyHandler());
+        handlers.put(NewProxy.class, new NewProxyRespHandler());
         handlers.put(UnregisterProxy.class, new UnregisterProxyHandler());
     }
 

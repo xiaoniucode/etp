@@ -1,7 +1,10 @@
 package com.xiaoniucode.etp.core.codec;
 
+import com.xiaoniucode.etp.common.utils.StringUtils;
+
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -10,7 +13,7 @@ import java.util.Map;
  * @author liuxin
  */
 public enum ProtocolType {
-    TCP,HTTP,HTTPS;
+    TCP, HTTP, HTTPS;
     private static final Map<String, ProtocolType> NAME_MAP;
 
     static {
@@ -27,5 +30,37 @@ public enum ProtocolType {
             throw new IllegalArgumentException("无效协议类型,暂不支持： " + type);
         }
         return protocol;
+    }
+
+    public static boolean isHttpOrHttps(ProtocolType protocolType) {
+        return protocolType == HTTP || protocolType == HTTPS;
+    }
+
+    public static boolean isTcp(ProtocolType protocolType) {
+        return protocolType == TCP;
+    }
+
+    public static boolean isHttps(ProtocolType protocolType) {
+        return protocolType == HTTPS;
+    }
+
+    public static boolean isHttp(ProtocolType protocolType) {
+        return protocolType == HTTP;
+    }
+
+    public static boolean isHttp(String protocol) {
+        return StringUtils.hasText(protocol) && HTTP.name().equalsIgnoreCase(protocol);
+    }
+
+    public static boolean isHttps(String protocol) {
+        return StringUtils.hasText(protocol) && HTTPS.name().equalsIgnoreCase(protocol);
+    }
+
+    public static boolean isTcp(String protocol) {
+        return StringUtils.hasText(protocol) && TCP.name().equalsIgnoreCase(protocol);
+    }
+
+    public static boolean isHttpOrHttps(String protocol) {
+        return StringUtils.hasText(protocol) && (isHttps(protocol) || isHttp(protocol));
     }
 }

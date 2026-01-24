@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.web.serivce;
 
 import com.xiaoniucode.etp.core.msg.KickoutClient;
-import com.xiaoniucode.etp.server.config.domain.AuthInfo;
+import com.xiaoniucode.etp.core.AuthClientInfo;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.manager.ClientManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
@@ -82,16 +82,13 @@ public class ClientService {
             String secretKey = client.getString("secretKey");
             client.put("status", ChannelManager.clientIsOnline(client.getString("secretKey")) ? 1 : 0);
             //获取在线客户端信息
-            AuthInfo authInfo = ChannelManager.getAuthInfo(secretKey);
-            if (authInfo != null) {
-                client.put("os", authInfo.getOs());
-                client.put("arch", authInfo.getArch());
+            AuthClientInfo authClientInfo = ChannelManager.getAuthClientInfo(secretKey);
+            if (authClientInfo != null) {
+                client.put("os", authClientInfo.getOs());
+                client.put("arch", authClientInfo.getArch());
             }
         }
         return clients;
-    }
-    public int getClientCount() {
-      return   DaoFactory.INSTANCE.getClientDao().count();
     }
 
     public int addClient(JSONObject client) {

@@ -22,7 +22,7 @@ public class CloseProxyHandler extends AbstractTunnelMessageHandler {
     protected void doHandle(ChannelHandlerContext ctx, Message msg) {
         if (msg instanceof CloseProxy closeProxy) {
             Channel control = ctx.channel();
-            String secretKey = control.attr(EtpConstants.SECRET_KEY).get();
+            String secretKey = control.attr(EtpConstants.AUTH_CLIENT_INFO).get().getSecretKey();
             ChannelManager.closeVisitor(secretKey, closeProxy.getSessionId());
             logger.debug("客户端:{} 断开连接", secretKey);
         }
