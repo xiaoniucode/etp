@@ -7,6 +7,7 @@ public enum DaoFactory {
     private final ProxyDao proxyDao = new ProxyDao();
     private final AuthTokenDao authTokenDao = new AuthTokenDao();
     private final SettingDao settingDao = new SettingDao();
+    private final ProxyDomainDao proxyDomainDao = new ProxyDomainDao();
 
     public ClientDao getClientDao() {
         return clientDao;
@@ -26,5 +27,8 @@ public enum DaoFactory {
 
     public SettingDao getSettingDao() {
         return settingDao;
+    }
+    public ProxyDomainDao getProxyDomainDao() {
+        return proxyDomainDao;
     }
 }

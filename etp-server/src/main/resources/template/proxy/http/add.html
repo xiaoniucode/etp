@@ -30,7 +30,7 @@
             <div class="layui-inline">
                 <label class="layui-form-label">内网IP</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="localIP" autocomplete="off" placeholder="默认: 127.0.0.1"
+                    <input type="text" name="localIP" value="127.0.0.1" autocomplete="off" placeholder="默认: 127.0.0.1"
                            class="layui-input">
                 </div>
             </div>
@@ -107,7 +107,7 @@
                 delete field.client;
             }
             field.status = field.status ? 1 : 0;
-            Rest.post('/api/proxy/add', field).then(data => {
+            Rest.post('/api/proxy/add-http', field).then(data => {
                 layer.msg('创建成功', {icon: 1, time: 400,}, () => {
                     const parentTable = parent.layui.table;
                     parentTable.reload('proxy');

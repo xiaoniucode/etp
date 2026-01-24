@@ -49,26 +49,21 @@ public class TomlConfigSource implements ConfigSource {
         }
 
         Long bindPortValue = root.getLong("bindPort", (long) DEFAULT_BIND_PORT);
-        if (bindPortValue != null) {
-            validatePort(bindPortValue.intValue());
-            builder.bindPort(bindPortValue.intValue());
-        }
+        validatePort(bindPortValue.intValue());
+        builder.bindPort(bindPortValue.intValue());
+
         Long httpProxyPort = root.getLong("httpProxyPort", 80L);
-        if (httpProxyPort != null) {
-            int httpPort = httpProxyPort.intValue();
-            validatePort(httpPort);
-            builder.httpProxyPort(httpPort);
-        }
+        int httpPort = httpProxyPort.intValue();
+        validatePort(httpPort);
+        builder.httpProxyPort(httpPort);
+
         Long httpsProxyPort = root.getLong("httpsProxyPort", 443L);
-        if (httpsProxyPort != null) {
-            int httpsPort = httpsProxyPort.intValue();
-            validatePort(httpsPort);
-            builder.httpsProxyPort(httpsPort);
-        }
+        int httpsPort = httpsProxyPort.intValue();
+        validatePort(httpsPort);
+        builder.httpsProxyPort(httpsPort);
+
         Boolean tlsValue = root.getBoolean("tls", false);
-        if (tlsValue != null) {
-            builder.tls(tlsValue);
-        }
+        builder.tls(tlsValue);
     }
 
     private void parseLogConfig(AppConfig.Builder builder, Toml root) {

@@ -1,12 +1,8 @@
 package com.xiaoniucode.etp.server.proxy;
 
-import com.xiaoniucode.etp.common.utils.PortFileUtil;
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
-import com.xiaoniucode.etp.server.config.domain.ClientInfo;
-import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.handler.visitor.TcpVisitorHandler;
-import com.xiaoniucode.etp.server.manager.ClientManager;
 import com.xiaoniucode.etp.server.manager.PortManager;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
@@ -21,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * TCP服务启动、停止、管理
@@ -38,16 +35,18 @@ public final class TcpProxyServer implements Lifecycle {
     private ServerBootstrap serverBootstrap;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    /**
-     * 公网端口和启动的服务channel映射，用于通过端口快速找到对应的channel
-     */
-    private final Map<Integer, Channel> remotePortChannelMapping = new ConcurrentHashMap<>();
+    private final AtomicBoolean init = new AtomicBoolean(false);
+
+    private final Map<Integer, Channel> portToChannel = new ConcurrentHashMap<>();
 
     private TcpProxyServer() {
     }
 
     @Override
     public void start() {
+        if (init.get()) {
+            return;
+        }
         bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
         workerGroup = NettyEventLoopFactory.eventLoopGroup();
         serverBootstrap = new ServerBootstrap();
@@ -60,52 +59,16 @@ public final class TcpProxyServer implements Lifecycle {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
-                       sc.pipeline().addLast(new TrafficMetricsHandler());
-                       sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
-                        sc.pipeline().addLast("tcpVisitorHandler",new TcpVisitorHandler());
+                        sc.pipeline().addLast(new TrafficMetricsHandler());
+                        sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
+                        sc.pipeline().addLast("tcpVisitorHandler", new TcpVisitorHandler());
                     }
                 });
-        bindAllProxyPort();
-        LOGGER.debug("所有端口映射服务启动完成");
+        init.set(true);
+        LOGGER.debug("TCP代理服务初始化成功");
     }
 
-    /**
-     * todo 如果端口映射的status=1则启动
-     */
-    private void bindAllProxyPort() {
-        try {
-            Collection<ClientInfo> clients = ClientManager.allClients();
-            List<StringBuilder> bindPorts = new ArrayList<>();
-            for (ClientInfo client : clients) {
-                List<ProxyConfig> proxyConfigs = client.getTcpProxies();
-                for (ProxyConfig proxy : proxyConfigs) {
-                    if (proxy.getStatus() == 1) {
-                        Integer remotePort = proxy.getRemotePort();
-                        if (PortManager.isPortAvailable(remotePort)) {
-                            ChannelFuture future = serverBootstrap.bind(remotePort).sync();
-                            remotePortChannelMapping.put(remotePort, future.channel());
-                            StringBuilder portItem = new StringBuilder();
-                            portItem.append(client.getName()).append("\t")
-                                    .append(proxy.getName()).append("\t")
-                                    .append(proxy.getType().name()).append("\t")
-                                    .append(proxy.getLocalPort()).append("\t")
-                                    .append(remotePort);
-                            bindPorts.add(portItem);
-                            LOGGER.info("成功绑定端口: {}", remotePort);
-                        } else {
-                            LOGGER.warn("未成功启动服务，remotePort:{}端口不可用！", remotePort);
-                        }
-                    }
-                    PortManager.addRemotePort(proxy.getRemotePort());
-                }
-                if (!bindPorts.isEmpty()) {
-                    PortFileUtil.writePortsToFile(bindPorts);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
+
 
     /**
      * 启动一个指定的公网端口服务
@@ -114,9 +77,9 @@ public final class TcpProxyServer implements Lifecycle {
      */
     public void startRemotePort(Integer remotePort) {
         try {
-            if (!remotePortChannelMapping.containsKey(remotePort)) {
+            if (!portToChannel.containsKey(remotePort)) {
                 ChannelFuture future = serverBootstrap.bind(remotePort).sync();
-                remotePortChannelMapping.put(remotePort, future.channel());
+                portToChannel.put(remotePort, future.channel());
                 PortManager.addRemotePort(remotePort);
                 LOGGER.info("{} 服务启动成功", remotePort);
             }
@@ -129,24 +92,18 @@ public final class TcpProxyServer implements Lifecycle {
      * 获取正在运行的服务数量
      */
     public int runningPortCount() {
-        return remotePortChannelMapping.size();
+        return portToChannel.size();
     }
 
-    /**
-     * 停掉一个指定的公网端口服务,停止继续监听，后面无法再连接
-     *
-     * @param remotePort  需要停止的公网端口
-     * @param releasePort 是否释放remotePort端口
-     */
     public void stopRemotePort(Integer remotePort, boolean releasePort) {
         try {
             // 1. 先关闭所有已建立的连接
             ChannelManager.closeVisitor(remotePort);
             // 2. 再关闭监听通道
-            Channel serverChannel = remotePortChannelMapping.get(remotePort);
+            Channel serverChannel = portToChannel.get(remotePort);
             if (serverChannel != null) {
                 serverChannel.close().sync();
-                remotePortChannelMapping.remove(remotePort);
+                portToChannel.remove(remotePort);
             }
             // 3. 释放端口
             if (releasePort) {
@@ -163,15 +120,17 @@ public final class TcpProxyServer implements Lifecycle {
         }
     }
 
-    /**
-     * 停止TCP代理服务器，关闭所有绑定通道并释放资源
-     */
+
     @Override
     public void stop() {
         try {
+            if (!init.get()) {
+                LOGGER.warn("尚未初始化TCP服务");
+                return;
+            }
             LOGGER.info("开始停止TCP代理服务器");
             // 关闭所有绑定的通道
-            for (Channel channel : remotePortChannelMapping.values()) {
+            for (Channel channel : portToChannel.values()) {
                 try {
                     channel.close().sync();
                     int port = channel.localAddress() != null ? ((InetSocketAddress) channel.localAddress()).getPort() : -1;
@@ -183,7 +142,7 @@ public final class TcpProxyServer implements Lifecycle {
                     LOGGER.error("关闭通道失败: {}", e.getMessage());
                 }
             }
-            remotePortChannelMapping.clear();
+            portToChannel.clear();
             if (bossGroup != null) {
                 bossGroup.shutdownGracefully();
             }
@@ -194,5 +153,12 @@ public final class TcpProxyServer implements Lifecycle {
         } catch (Exception e) {
             LOGGER.error("TCP代理服务器停止失败", e);
         }
+    }
+    public ServerBootstrap getServerBootstrap() {
+        return serverBootstrap;
+    }
+
+    public Map<Integer, Channel> getPortToChannel() {
+        return portToChannel;
     }
 }

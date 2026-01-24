@@ -1,4 +1,5 @@
 #serverAddr = "127.0.0.1"
+serverAddr = "etp.local.cc"
 #serverPort = 9527
 #认证密钥[必填]
 secretKey = "your-secret-key"

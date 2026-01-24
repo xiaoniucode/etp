@@ -2,14 +2,17 @@ package com.xiaoniucode.etp.server.listener;
 
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.core.event.EventListener;
+import com.xiaoniucode.etp.core.event.GlobalEventBus;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
+import com.xiaoniucode.etp.server.event.ConfigInitializedEvent;
 import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.manager.ClientManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.PortManager;
+import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -76,6 +79,7 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                             JSONObject save = new JSONObject();
                             save.put("clientId", clientId);
                             save.put("name", proxy.getName());
+                            save.put("localIP", proxy.getLocalIP());
                             save.put("localPort", proxy.getLocalPort());
                             save.put("status", proxy.getStatus());
                             save.put("type", type);
@@ -86,17 +90,15 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                                 proxyId = DaoFactory.INSTANCE.getProxyDao().insert(save);
                                 logger.info("客户端 {}-映射名 {}-公网端口 {} 已同步到数据库", clientId, proxy.getName(), proxy.getRemotePort());
                             }
-                            if ((ProtocolType.HTTP.name().equalsIgnoreCase(type) || ProtocolType.HTTPS.name().equalsIgnoreCase(type)) && !proxy.getDomains().isEmpty()) {
-                                JSONArray domains = new JSONArray();
-                                for (String domain : proxy.getDomains()) {
-                                    JSONObject item = new JSONObject();
-                                    item.put("domain", domain);
-                                    domains.put(item);
-                                }
-                                save.put("domains", domains);
-                            }
                             if (type.equalsIgnoreCase(ProtocolType.HTTP.name()) || type.equalsIgnoreCase(ProtocolType.HTTPS.name())) {
                                 proxyId = DaoFactory.INSTANCE.getProxyDao().insert(save);
+                                if (!proxy.getDomains().isEmpty()) {
+                                    for (String domain : proxy.getDomains()) {
+                                        JSONObject item = new JSONObject();
+                                        item.put("domain", domain);
+                                        DaoFactory.INSTANCE.getProxyDomainDao().insert(proxyId, domain);
+                                    }
+                                }
                             }
                         } else {
                             logger.warn("无法保存代理到数据库，存在同名隧道名：{}", proxy.getName());
@@ -113,5 +115,7 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                 }
             }
         });
+
+        GlobalEventBus.get().publishAsync(new ConfigInitializedEvent(TcpProxyServer.get()));
     }
 }

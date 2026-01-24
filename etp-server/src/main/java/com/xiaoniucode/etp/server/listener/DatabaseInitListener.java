@@ -9,110 +9,61 @@ import com.xiaoniucode.etp.server.web.core.orm.JdbcFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
+
 /**
  * 当隧道开启成功且管理面板是开启状态时初始化数据库表
  */
 public class DatabaseInitListener implements EventListener<TunnelBindEvent> {
     private final Logger logger = LoggerFactory.getLogger(DatabaseInitListener.class);
+    private static final String SCHEMA_PATH = "schema/etp-sqlite.sql";
 
     @Override
     public void onEvent(TunnelBindEvent event) {
         if (ConfigHelper.get().getDashboard().getEnable()) {
             logger.debug("开始初始化数据库表");
-            createAuthTokenTable();
-            createUserTable();
-            createClientTable();
-            createProxiesTable();
-            createProxyDomainTable();
-
-            createSystemSettingsTable();
+            initDatabase();
             logger.debug("数据库表初始化完毕");
             GlobalEventBus.get().publishAsync(new DatabaseInitEvent());
         }
     }
 
-
-    private void createSystemSettingsTable() {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS settings (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    key TEXT NOT NULL UNIQUE,       -- 设置键
-                    value TEXT NOT NULL             -- 设置值
-                );
-                CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key);
-                """;
-        JdbcFactory.getJdbc().execute(sql);
+    private void initDatabase() {
+        try {
+            //从资源文件中读取SQL语句
+            String sqlContent = readSqlFile(SCHEMA_PATH);
+            // 分割并执行每个SQL语句
+            executeSqlStatements(sqlContent);
+        } catch (Exception e) {
+            logger.error("数据库表初始化失败", e);
+            throw new RuntimeException("数据库表初始化失败", e);
+        }
     }
 
-    private void createAuthTokenTable() {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS auth_tokens (
-                    token TEXT PRIMARY KEY,
-                    uid INTEGER NOT NULL,
-                    username TEXT NOT NULL,
-                    expiredAt INTEGER NOT NULL,
-                    createdAt INTEGER DEFAULT (datetime('now')),
-                    FOREIGN KEY (uid) REFERENCES users(id)
-                );
-                CREATE INDEX IF NOT EXISTS idx_auth_tokens_expiredAt ON auth_tokens(expiredAt);
-                """;
-        JdbcFactory.getJdbc().execute(sql);
+    private void executeSqlStatements(String sqlContent) {
+        // 分割SQL语句
+        String[] statements = sqlContent.split(";");
+        for (String statement : statements) {
+            logger.debug("执行SQL语句: {}", statement);
+            JdbcFactory.getJdbc().execute(statement);
+        }
     }
 
-    private void createUserTable() {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT UNIQUE NOT NULL,
-                    password TEXT NOT NULL
-                );
-                """;
-        JdbcFactory.getJdbc().execute(sql);
-    }
-
-    private void createProxiesTable() {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS proxies (
-                    id               INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增主键
-                    clientId         INTEGER NOT NULL,                   -- 所属客户端ID
-                    name             TEXT NOT NULL,                      -- 代理名称
-                    type             TEXT NOT NULL,                      -- 协议类型（如 "TCP"、"HTTP"）
-                    autoRegistered   INTEGER NOT NULL DEFAULT 0,         -- 注册类型（1：自动注册、0手动注册）
-                    localPort        INTEGER NOT NULL,                   -- 内网端口（如 3306）
-                    remotePort       INTEGER,                            -- 远程服务端口（对外暴露的端口）
-                    status           INTEGER NOT NULL DEFAULT 1,         -- 状态：1=开启，0=关闭
-                    createdAt        TEXT DEFAULT (datetime('now')),     -- 创建时间
-                    updatedAt        TEXT DEFAULT (datetime('now'))      -- 更新时间
-                );
-                """;
-        JdbcFactory.getJdbc().execute(sql);
-    }
-
-    private void createProxyDomainTable() {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS proxy_domains (
-                    id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                    proxyId   INTEGER NOT NULL, 
-                    domain    TEXT NOT NULL,
-                    createdAt TEXT DEFAULT (datetime('now')),
-                    UNIQUE(domain),
-                    FOREIGN KEY (proxyId) REFERENCES proxies(id) ON DELETE CASCADE
-                );
-                """;
-        JdbcFactory.getJdbc().execute(sql);
-    }
-
-    private void createClientTable() {
-        String sql = """
-                CREATE TABLE IF NOT EXISTS clients (
-                    id         INTEGER PRIMARY KEY AUTOINCREMENT,  -- 自增ID
-                    name       TEXT    NOT NULL UNIQUE,            -- 客户端名称
-                    secretKey  TEXT    NOT NULL UNIQUE,            -- 密钥
-                    createdAt TEXT    DEFAULT (datetime('now')),   -- 创建时间
-                    updatedAt TEXT    DEFAULT (datetime('now'))    -- 更新时间
-                );
-                 CREATE INDEX IF NOT EXISTS idx_clients_name_secretkey ON clients (name, secretKey);
-                """;
-        JdbcFactory.getJdbc().execute(sql);
+    /**
+     * 加载资源文件
+     */
+    private String readSqlFile(String filePath) throws IOException {
+        // 使用ClassLoader
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filePath)) {
+            assert inputStream != null;
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                // 读取文件内容
+                return reader.lines().collect(Collectors.joining("\n"));
+            }
+        }
     }
 }

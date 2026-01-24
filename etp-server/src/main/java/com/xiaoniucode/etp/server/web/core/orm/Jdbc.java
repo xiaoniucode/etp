@@ -43,7 +43,7 @@ public final class Jdbc {
     }
 
     public void execute(String sql, Object... params) {
-        Connection conn = null;
+        Connection conn;
         PreparedStatement stmt = null;
         try {
             conn = getConnection();

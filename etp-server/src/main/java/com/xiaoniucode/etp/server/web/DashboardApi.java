@@ -8,52 +8,23 @@ import com.xiaoniucode.etp.server.web.core.server.Filter;
 import com.xiaoniucode.etp.server.web.core.server.Router;
 import com.xiaoniucode.etp.server.web.core.server.Session;
 import com.xiaoniucode.etp.server.web.manager.CaptchaManager;
+import com.xiaoniucode.etp.server.web.security.AuthFilter;
 import com.xiaoniucode.etp.server.web.serivce.ServiceFactory;
 import com.xiaoniucode.etp.server.web.common.CaptchaGenerator;
 import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
 
 import java.util.List;
-import java.util.Set;
 
 /**
- * Dashboard 管理、认证接口
+ * Dashboard 管理接口
  *
  * @author liuxin
  */
 public class DashboardApi {
-    private static final Set<String> WHITE_LIST = Set.of("/api/user/login", "/login.html", "/api/captcha", "/layui/");
 
     public static void initFilters(List<Filter> filters) {
-        filters.add((context, chain) -> {
-            String path = context.getRequest().uri();
-            // 白名单直接放行
-            if (WHITE_LIST.stream().anyMatch(path::startsWith)) {
-                chain.doFilter();
-                return;
-            }
-            //只有接口才检查登录
-            if (!path.startsWith("/api")) {
-                chain.doFilter();
-                return;
-            }
-            String auth = context.getHeader("Authorization");
-            if (auth == null || !auth.startsWith("Bearer ")) {
-                context.abortWithResponse(ResponseEntity.error(401, "未登录").toJson());
-                return;
-            }
-            String token = auth.substring(7);
-            JSONObject authtoken = ServiceFactory.INSTANCE.getAuthTokenService().validateToken(token);
-            if (authtoken == null) {
-                context.abortWithResponse(ResponseEntity.error(401, "登录过期，请重新登录").toJson());
-                return;
-            }
-            // 把用户信息放进上下文，后面业务方便用
-            context.setAttribute("userId", authtoken.getInt("uid"));
-            context.setAttribute("username", authtoken.getString("username"));
-            context.setAttribute("auth_token", token);
-            chain.doFilter();
-        });
+        filters.add(new AuthFilter());
     }
 
     public static void initRoutes(Router router) {
@@ -116,6 +87,14 @@ public class DashboardApi {
         );
         router.route(HttpMethod.POST, "/proxy/add-tcp", context -> {
             ServiceFactory.INSTANCE.getProxyService().addTcpProxy(JsonUtils.toJsonObject(context.getRequestBody()));
+            context.setResponseJson(ResponseEntity.ok("ok").toJson());
+        });
+        router.route(HttpMethod.POST, "/proxy/add-http", context -> {
+            ServiceFactory.INSTANCE.getProxyService().addHttpProxy(JsonUtils.toJsonObject(context.getRequestBody()));
+            context.setResponseJson(ResponseEntity.ok("ok").toJson());
+        });
+        router.route(HttpMethod.POST, "/proxy/add-https", context -> {
+            ServiceFactory.INSTANCE.getProxyService().addHttpsProxy(JsonUtils.toJsonObject(context.getRequestBody()));
             context.setResponseJson(ResponseEntity.ok("ok").toJson());
         });
         router.route(HttpMethod.PUT, "/proxy/update-tcp", context -> {

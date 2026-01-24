@@ -99,6 +99,7 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
         JSONArray clients = DaoFactory.INSTANCE.getClientDao().list();
         if (clients != null) {
             for (int i = 0; i < clients.length(); i++) {
+                //todo 需要检查配置中是否存在了
                 JSONObject client = clients.getJSONObject(i);
                 int clientId = client.getInt("id");
                 String name = client.getString("name");
@@ -119,6 +120,7 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
 
                 ProxyConfig proxyConfig = new ProxyConfig();
                 proxyConfig.setType(type);
+                proxyConfig.setLocalIP(proxy.getString("localIP"));
                 proxyConfig.setLocalPort(proxy.getInt("localPort"));
                 if (ProtocolType.TCP.equals(type)) {
                     proxyConfig.setRemotePort(proxy.getInt("remotePort"));

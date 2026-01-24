@@ -23,7 +23,7 @@ public class ProxyService {
     private final JdbcTransactionTemplate TX = new JdbcTransactionTemplate();
 
     public JSONObject getProxy(JSONObject req) {
-        JSONObject res = DaoFactory.INSTANCE.getProxyDao().getById(req.getInt("id"));
+        JSONObject res = DaoFactory.INSTANCE.getProxyDao().getProxyById(req.getInt("id"));
         String type = res.getString("type");
         if (ProtocolType.getType(type) == ProtocolType.HTTP) {
             String domains = res.getString("domains");
@@ -32,10 +32,6 @@ public class ProxyService {
             }
         }
         return res;
-    }
-
-    public void deleteAllAutoRegisterProxy() {
-        DaoFactory.INSTANCE.getProxyDao().deleteAllAutoRegisterProxy();
     }
 
     public JSONArray proxies(String type) {
@@ -91,7 +87,7 @@ public class ProxyService {
             String newRemotePortString = req.getString("remotePort");
             int newRemotePortInt;
 
-            JSONObject oldProxy = DaoFactory.INSTANCE.getProxyDao().getById(req.getInt("id"));
+            JSONObject oldProxy = DaoFactory.INSTANCE.getProxyDao().getProxyById(req.getInt("id"));
             int oldRemotePort = oldProxy.getInt("remotePort");
             //如果没有设置公网端口，自动分配一个
             boolean remotePortChanged = false;
@@ -121,7 +117,7 @@ public class ProxyService {
             if (!oldName.equals(newName) && (DaoFactory.INSTANCE.getProxyDao().getProxy(req.getInt("clientId"), newName) != null)) {
                 throw new BizException("该客户端存在同名映射");
             }
-            DaoFactory.INSTANCE.getProxyDao().update(req);
+            DaoFactory.INSTANCE.getProxyDao().updateProxy(req);
             //删除已经注册的映射
             ProxyManager.removeProxy(secretKey, oldRemotePort);
             //重新注册更新后的映射
@@ -143,11 +139,23 @@ public class ProxyService {
         });
     }
 
+    public JSONObject addHttpsProxy(JSONObject req) {
+        req.put("type", ProtocolType.HTTPS.name().toLowerCase(Locale.ROOT));
+        return addTcpProxy(req);
+    }
+
     public JSONObject addHttpProxy(JSONObject req) {
         return TX.execute(() -> {
-            // 检查是否存在
             req.put("type", ProtocolType.HTTP.name().toLowerCase(Locale.ROOT));
+            String domains = req.getString("domains");
             int proxyId = DaoFactory.INSTANCE.getProxyDao().insert(req);
+            String[] arr = domains.split("\n");
+            for (String domain : arr) {
+                if (DaoFactory.INSTANCE.getProxyDomainDao().findProxyName(domain) != null) {
+                    throw new BizException("域名已经存在：" + domain);
+                }
+                DaoFactory.INSTANCE.getProxyDomainDao().insert(proxyId, domain);
+            }
             JSONObject res = new JSONObject();
             res.put("proxyId", proxyId);
             return res;
@@ -157,6 +165,7 @@ public class ProxyService {
     private ProxyConfig createProxyMapping(JSONObject req) {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setType(ProtocolType.getType(req.getString("type")));
+        proxyConfig.setLocalIP(req.getString("localIP"));
         proxyConfig.setLocalPort(req.getInt("localPort"));
         proxyConfig.setRemotePort(req.getInt("remotePort"));
         proxyConfig.setProxyId(req.getInt("clientId"));
@@ -170,7 +179,7 @@ public class ProxyService {
      */
     public void switchProxyStatus(JSONObject req) {
         TX.execute(() -> {
-            JSONObject proxy = DaoFactory.INSTANCE.getProxyDao().getById(req.getInt("id"));
+            JSONObject proxy = DaoFactory.INSTANCE.getProxyDao().getProxyById(req.getInt("id"));
             int status = proxy.getInt("status");
             String secretKey = req.getString("secretKey");
             int remotePort = proxy.getInt("remotePort");
@@ -183,7 +192,7 @@ public class ProxyService {
             }
             //持久化数据库
             proxy.put("status", updateStatus);
-            DaoFactory.INSTANCE.getProxyDao().update(proxy);
+            DaoFactory.INSTANCE.getProxyDao().updateProxy(proxy);
             return null;
         });
     }
@@ -192,7 +201,7 @@ public class ProxyService {
         TX.execute(() -> {
             int id = req.getInt("id");
             String secretKey = req.getString("secretKey");
-            JSONObject proxy = DaoFactory.INSTANCE.getProxyDao().getById(id);
+            JSONObject proxy = DaoFactory.INSTANCE.getProxyDao().getProxyById(id);
             int remotePort = proxy.getInt("remotePort");
             //删除注册的端口映射
             ProxyManager.removeProxy(secretKey, remotePort);
@@ -200,7 +209,7 @@ public class ProxyService {
             ChannelManager.removePort(remotePort);
             //停掉连接的服务并释放端口
             TcpProxyServer.get().stopRemotePort(remotePort, true);
-            DaoFactory.INSTANCE.getProxyDao().deleteById(id);
+            DaoFactory.INSTANCE.getProxyDao().deleteProxyById(id);
             return null;
         });
     }

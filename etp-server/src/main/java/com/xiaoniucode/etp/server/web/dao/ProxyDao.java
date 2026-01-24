@@ -10,45 +10,25 @@ import java.util.List;
 
 public class ProxyDao extends BaseDao {
     public int insert(JSONObject data) {
-        int proxyId = jdbc.insert("INSERT INTO proxies (clientId, name, type, localPort, remotePort, status, autoRegistered) VALUES (:clientId, :name, :type, :localPort, :remotePort, :status, :autoRegistered)")
+        return jdbc.insert("INSERT INTO proxies (clientId, name, type,localIP, localPort, remotePort, status, autoRegistered) VALUES (:clientId, :name, :type,:localIP, :localPort, :remotePort, :status, :autoRegistered)")
                 .bind("clientId", data.optInt("clientId"))
                 .bind("name", data.optString("name"))
                 .bind("type", data.optString("type"))
+                .bind("localIP", data.optString("localIP"))
                 .bind("localPort", data.optInt("localPort"))
                 .bind("remotePort", data.optInt("remotePort"))
                 .bind("status", data.optInt("status", 1))
                 .bind("autoRegistered", data.optInt("autoRegistered"))
                 .execute();
-        String type = data.optString("type");
-        if (proxyId > 0 && "http".equalsIgnoreCase(type)||"https".equalsIgnoreCase(type)) {
-            JSONArray domains = data.optJSONArray("domains");
-            if (domains != null && !domains.isEmpty()) {
-                for (int i = 0; i < domains.length(); i++) {
-                    JSONObject domainObj = domains.getJSONObject(i);
-                    String domain = domainObj.optString("domain");
-                    if (!domain.isEmpty()) {
-                        jdbc.insert("INSERT OR IGNORE INTO proxy_domains (proxyId, domain) VALUES (:proxyId, :domain)")
-                                .bind("proxyId", proxyId)
-                                .bind("domain", domain)
-                                .execute();
-                    }
-                }
-            }
-        }
-
-        return proxyId;
     }
-
-    public JSONObject getById(int id) {
+    public JSONObject getProxyById(int id) {
         JSONObject proxy = jdbc.query("SELECT * FROM proxies WHERE id = :id")
                 .bind("id", id)
                 .one();
         if (proxy != null) {
             String type = proxy.optString("type");
             if ("http".equalsIgnoreCase(type) || "https".equalsIgnoreCase(type)) {
-                JSONArray domains = jdbc.query("SELECT domain FROM proxy_domains WHERE proxyId = :proxyId")
-                        .bind("proxyId", id)
-                        .list();
+                JSONArray domains = DaoFactory.INSTANCE.getProxyDomainDao().listByProxyId(id);
                 proxy.put("domains", domains);
             } else {
                 proxy.put("domains", new JSONArray());
@@ -57,83 +37,7 @@ public class ProxyDao extends BaseDao {
         return proxy;
     }
 
-    public JSONArray listByClientId(long clientId) {
-        JSONArray proxies = jdbc.query("SELECT * FROM proxies WHERE clientId = :clientId")
-                .bind("clientId", clientId)
-                .list();
-
-        if (!proxies.isEmpty()) {
-            JSONArray domains = jdbc.query("SELECT proxyId, domain FROM proxy_domains WHERE proxyId IN (SELECT id FROM proxies WHERE clientId = :clientId)")
-                    .bind("clientId", clientId)
-                    .list();
-
-            java.util.HashMap<Integer, JSONArray> domainMap = new java.util.HashMap<>();
-            for (int i = 0; i < domains.length(); i++) {
-                JSONObject domainObj = domains.getJSONObject(i);
-                int proxyId = domainObj.optInt("proxyId");
-                String domain = domainObj.optString("domain");
-
-                JSONArray proxyDomains = domainMap.computeIfAbsent(proxyId, k -> new JSONArray());
-
-                JSONObject domainEntry = new JSONObject();
-                domainEntry.put("domain", domain);
-                proxyDomains.put(domainEntry);
-            }
-
-            for (int i = 0; i < proxies.length(); i++) {
-                JSONObject proxy = proxies.getJSONObject(i);
-                int proxyId = proxy.optInt("id");
-                String type = proxy.optString("type");
-
-                if ("http".equalsIgnoreCase(type) || "https".equalsIgnoreCase(type)) {
-                    proxy.put("domains", domainMap.getOrDefault(proxyId, new JSONArray()));
-                } else {
-                    proxy.put("domains", new JSONArray());
-                }
-            }
-        }
-
-        return proxies;
-    }
-
-    public JSONArray listActive() {
-        JSONArray proxies = jdbc.query("SELECT * FROM proxies WHERE status = 1 ORDER BY clientId, remotePort")
-                .list();
-
-        if (!proxies.isEmpty()) {
-            JSONArray domains = jdbc.query("SELECT proxyId, domain FROM proxy_domains WHERE proxyId IN (SELECT id FROM proxies WHERE status = 1)")
-                    .list();
-
-            java.util.HashMap<Integer, JSONArray> domainMap = new java.util.HashMap<>();
-            for (int i = 0; i < domains.length(); i++) {
-                JSONObject domainObj = domains.getJSONObject(i);
-                int proxyId = domainObj.optInt("proxyId");
-                String domain = domainObj.optString("domain");
-
-                JSONArray proxyDomains = domainMap.computeIfAbsent(proxyId, k -> new JSONArray());
-
-                JSONObject domainEntry = new JSONObject();
-                domainEntry.put("domain", domain);
-                proxyDomains.put(domainEntry);
-            }
-
-            for (int i = 0; i < proxies.length(); i++) {
-                JSONObject proxy = proxies.getJSONObject(i);
-                int proxyId = proxy.optInt("id");
-                String type = proxy.optString("type");
-
-                if ("http".equalsIgnoreCase(type) || "https".equalsIgnoreCase(type)) {
-                    proxy.put("domains", domainMap.getOrDefault(proxyId, new JSONArray()));
-                } else {
-                    proxy.put("domains", new JSONArray());
-                }
-            }
-        }
-
-        return proxies;
-    }
-
-    public boolean update(JSONObject data) {
+    public boolean updateProxy(JSONObject data) {
         long id = data.optLong("id");
         if (id <= 0) {
             return false;
@@ -152,6 +56,11 @@ public class ProxyDao extends BaseDao {
             set.append("type = :type, ");
             paramNames.add("type");
             paramValues.add(data.getString("type"));
+        }
+        if (data.has("localIP")) {
+            set.append("localIP = :localIP, ");
+            paramNames.add("localIP");
+            paramValues.add(data.getString("localIP"));
         }
         if (data.has("localPort")) {
             set.append("localPort = :localPort, ");
@@ -191,21 +100,16 @@ public class ProxyDao extends BaseDao {
         int rows = updateBuilder.bind("id", id).execute();
 
         if (rows > 0 && data.has("domains")) {
-            JSONObject proxy = getById((int) id);
+            JSONObject proxy = getProxyById((int) id);
             if (proxy != null && ("http".equalsIgnoreCase(proxy.optString("type")) || "https".equalsIgnoreCase(proxy.optString("type")))) {
-                jdbc.update("DELETE FROM proxy_domains WHERE proxyId = :proxyId")
-                        .bind("proxyId", id)
-                        .execute();
+                DaoFactory.INSTANCE.getProxyDomainDao().deleteByProxyId((int) id);
 
                 JSONArray domains = data.getJSONArray("domains");
                 for (int i = 0; i < domains.length(); i++) {
                     JSONObject domainObj = domains.getJSONObject(i);
                     String domain = domainObj.optString("domain");
                     if (!domain.isEmpty()) {
-                        jdbc.insert("INSERT OR IGNORE INTO proxy_domains (proxyId, domain) VALUES (:proxyId, :domain)")
-                                .bind("proxyId", id)
-                                .bind("domain", domain)
-                                .execute();
+                        DaoFactory.INSTANCE.getProxyDomainDao().insert((int) id, domain);
                     }
                 }
             }
@@ -214,10 +118,8 @@ public class ProxyDao extends BaseDao {
         return rows > 0;
     }
 
-    public boolean deleteById(int id) {
-        jdbc.update("DELETE FROM proxy_domains WHERE proxyId = :proxyId")
-                .bind("proxyId", id)
-                .execute();
+    public boolean deleteProxyById(int id) {
+        DaoFactory.INSTANCE.getProxyDomainDao().deleteByProxyId(id);
 
         int rows = jdbc.update("DELETE FROM proxies WHERE id = :id")
                 .bind("id", id)
@@ -228,7 +130,7 @@ public class ProxyDao extends BaseDao {
     public JSONArray listAllProxies(String type) {
         String sql = """
                 SELECT
-                    p.id, p.clientId, p.name, p.type, p.localPort, p.remotePort, p.status,
+                    p.id, p.clientId, p.name, p.type,p.localIP, p.localPort, p.remotePort, p.status,
                     p.createdAt, p.updatedAt, p.autoRegistered, c.name AS clientName, c.secretKey
                 FROM proxies p
                 LEFT JOIN clients c ON p.clientId = c.id
@@ -246,8 +148,7 @@ public class ProxyDao extends BaseDao {
         }
 
         if (!proxies.isEmpty()) {
-            JSONArray allDomains = jdbc.query("SELECT proxyId, domain FROM proxy_domains")
-                    .list();
+            JSONArray allDomains = DaoFactory.INSTANCE.getProxyDomainDao().listAllProxyDomains();
 
             HashMap<Integer, JSONArray> domainMap = new HashMap<>();
             for (int i = 0; i < allDomains.length(); i++) {
@@ -285,9 +186,21 @@ public class ProxyDao extends BaseDao {
     }
 
     public int deleteProxiesByClient(int clientId) {
-        jdbc.update("DELETE FROM proxy_domains WHERE proxyId IN (SELECT id FROM proxies WHERE clientId = :clientId)")
+        // 先获取该客户端的所有代理ID
+        JSONArray proxies = jdbc.query("SELECT id FROM proxies WHERE clientId = :clientId")
                 .bind("clientId", clientId)
-                .execute();
+                .list();
+        
+        List<Integer> proxyIds = new ArrayList<>();
+        for (int i = 0; i < proxies.length(); i++) {
+            JSONObject proxy = proxies.getJSONObject(i);
+            proxyIds.add(proxy.optInt("id"));
+        }
+        
+        // 使用ProxyDomainDao删除相关域名
+        if (!proxyIds.isEmpty()) {
+            DaoFactory.INSTANCE.getProxyDomainDao().deleteByProxyIds(proxyIds);
+        }
 
         return jdbc.update("DELETE FROM proxies WHERE clientId = :clientId")
                 .bind("clientId", clientId)
@@ -303,9 +216,7 @@ public class ProxyDao extends BaseDao {
             String type = proxy.optString("type");
             int proxyId = proxy.optInt("id");
             if ("http".equalsIgnoreCase(type) || "https".equalsIgnoreCase(type)) {
-                JSONArray domains = jdbc.query("SELECT domain FROM proxy_domains WHERE proxyId = :proxyId")
-                        .bind("proxyId", proxyId)
-                        .list();
+                JSONArray domains = DaoFactory.INSTANCE.getProxyDomainDao().listByProxyId(proxyId);
                 proxy.put("domains", domains);
             } else {
                 proxy.put("domains", new JSONArray());
@@ -315,8 +226,19 @@ public class ProxyDao extends BaseDao {
     }
 
     public int deleteAllAutoRegisterProxy() {
-        jdbc.update("DELETE FROM proxy_domains WHERE proxyId IN (SELECT id FROM proxies WHERE autoRegistered = 1)")
-                .execute();
+        // 先获取所有自动注册的代理ID
+        JSONArray proxies = jdbc.query("SELECT id FROM proxies WHERE autoRegistered = 1").list();
+        
+        List<Integer> proxyIds = new ArrayList<>();
+        for (int i = 0; i < proxies.length(); i++) {
+            JSONObject proxy = proxies.getJSONObject(i);
+            proxyIds.add(proxy.optInt("id"));
+        }
+        
+        // 使用ProxyDomainDao删除相关域名
+        if (!proxyIds.isEmpty()) {
+            DaoFactory.INSTANCE.getProxyDomainDao().deleteByProxyIds(proxyIds);
+        }
 
         return jdbc.update("DELETE FROM proxies WHERE autoRegistered = 1")
                 .execute();

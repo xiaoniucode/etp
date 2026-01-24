@@ -12,7 +12,6 @@ public class SerializerFactory {
     
     static {
         registerSerializer(new LoginSerializer());
-        registerSerializer(new NewWorkConnSerializer());
         registerSerializer(new CloseProxySerializer());
         registerSerializer(new ErrorSerializer());
         registerSerializer(new NewProxyRespSerializer());

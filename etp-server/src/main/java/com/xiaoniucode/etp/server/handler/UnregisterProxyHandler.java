@@ -12,7 +12,6 @@ import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
 import io.netty.channel.ChannelHandlerContext;
 
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ public class UnregisterProxyHandler implements MessageHandler {
             String secretKey = ctx.channel().attr(EtpConstants.SECRET_KEY).get();
 
             if (config.getDashboard().getEnable()) {
-                DaoFactory.INSTANCE.getProxyDao().deleteById(proxyId);
+                DaoFactory.INSTANCE.getProxyDao().deleteProxyById(proxyId);
             }
             Set<Integer> ports = ProxyManager.getClientRemotePorts(secretKey);
             //停掉连接的服务并释放端口
