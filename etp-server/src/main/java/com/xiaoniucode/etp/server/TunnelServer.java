@@ -16,6 +16,7 @@ import com.xiaoniucode.etp.server.listener.ConfigRegisterListener;
 import com.xiaoniucode.etp.server.listener.DatabaseInitListener;
 import com.xiaoniucode.etp.server.listener.StaticConfigInitListener;
 import com.xiaoniucode.etp.server.listener.BindTcpPortListener;
+import com.xiaoniucode.etp.server.manager.DomainManager;
 import com.xiaoniucode.etp.server.manager.PortManager;
 import com.xiaoniucode.etp.server.proxy.HttpProxyServer;
 import com.xiaoniucode.etp.server.proxy.HttpsProxyServer;
@@ -62,7 +63,8 @@ public class TunnelServer implements Lifecycle {
             GlobalEventBus.get().subscribe(DatabaseInitEvent.class, new ConfigRegisterListener());
             GlobalEventBus.get().subscribe(ConfigInitializedEvent.class, new BindTcpPortListener());
             ConfigHelper.set(config);
-            PortManager.init();
+            PortManager.init(config);
+            DomainManager.init(config);
             logger.debug("正在启动ETP服务");
             if (config.isTls()) {
                 tlsContext = new ServerTlsContextFactory().createContext();

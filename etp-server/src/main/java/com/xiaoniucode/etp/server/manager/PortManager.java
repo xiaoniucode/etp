@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.manager;
 
 
+import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.config.domain.PortRange;
 import org.slf4j.Logger;
@@ -21,19 +22,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class PortManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(PortManager.class);
     private static final Set<Integer> allocatedPorts = new HashSet<>(32);
-    private static int startPort;
-    private static int endPort;
+    private static int startPort = 1024;
+    private static int endPort = 49151;
     private static final AtomicBoolean init = new AtomicBoolean(false);
 
     /**
      * 初始化端口范围,默认范围：1024-49151
      */
-    public static void init() {
+    public static void init(AppConfig appConfig) {
         if (init.get()) {
             init.set(true);
             return;
         }
-        PortRange portRange = ConfigHelper.get().getPortRange();
+        PortRange portRange = appConfig.getPortRange();
         startPort = portRange.getStart();
         endPort = portRange.getEnd();
 
