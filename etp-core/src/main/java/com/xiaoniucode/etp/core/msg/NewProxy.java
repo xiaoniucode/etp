@@ -12,6 +12,8 @@ public class NewProxy implements Message{
     private Integer remotePort;
     private Integer status;
     private Set<String> customDomains;
+    private Set<String>subDomains;
+    private Boolean autoDomain;
 
     public String getName() {
         return name;
@@ -61,12 +63,28 @@ public class NewProxy implements Message{
         this.status = status;
     }
 
-    public Set<String> getDomains() {
+    public Set<String> getCustomDomains() {
         return customDomains;
     }
 
-    public void setDomains(Set<String> customDomains) {
+    public void setCustomDomains(Set<String> customDomains) {
         this.customDomains = customDomains;
+    }
+
+    public Set<String> getSubDomains() {
+        return subDomains;
+    }
+
+    public void setSubDomains(Set<String> subDomains) {
+        this.subDomains = subDomains;
+    }
+
+    public Boolean getAutoDomain() {
+        return autoDomain;
+    }
+
+    public void setAutoDomain(Boolean autoDomain) {
+        this.autoDomain = autoDomain;
     }
 
     @Override

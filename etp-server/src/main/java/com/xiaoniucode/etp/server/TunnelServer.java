@@ -62,6 +62,7 @@ public class TunnelServer implements Lifecycle {
             GlobalEventBus.get().subscribe(TunnelBindEvent.class, new StaticConfigInitListener());
             GlobalEventBus.get().subscribe(DatabaseInitEvent.class, new ConfigRegisterListener());
             GlobalEventBus.get().subscribe(ConfigInitializedEvent.class, new BindTcpPortListener());
+            //todo 需要优化，避免影响启动速度
             ConfigHelper.set(config);
             PortManager.init(config);
             DomainManager.init(config);
@@ -103,7 +104,6 @@ public class TunnelServer implements Lifecycle {
                 HttpProxyServer.get().start();
                 //4.开启HTTPS代理
                 HttpsProxyServer.get().start();
-                //HttpProxyServerX.get().start();
             });
             logger.info("ETP隧道已开启:{}:{}", config.getHost(), config.getBindPort());
             GlobalEventBus.get().publishAsync(new TunnelBindEvent());

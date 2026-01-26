@@ -2,18 +2,16 @@ package com.xiaoniucode.etp.autoconfigure;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.DefaultAppConfig;
-import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.client.ProxyClient;
 import com.xiaoniucode.etp.client.TunnelClient;
 import com.xiaoniucode.etp.common.utils.StringUtils;
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.msg.CloseProxy;
 import com.xiaoniucode.etp.core.msg.NewProxy;
-import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.core.env.Environment;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * etp启动停止生命周期
@@ -64,14 +62,19 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
         tunnelClient.onConnectSuccessListener((callback) -> {
             int localPort = webServerPortListener.getActualPort();
             String appName = environment.getProperty("spring.application.name", "Spring-Boot");
-            NewProxy newProxy = new NewProxy();
-            newProxy.setLocalIP(properties.getLocalIP());
-            newProxy.setLocalPort(localPort);
-            newProxy.setStatus(properties.isAutoStart()?1:0);
-            newProxy.setRemotePort(properties.getRemotePort());
-            newProxy.setProtocol(properties.getProtocol());
-            newProxy.setName(appName);
-
+            Set<String> customDomains = properties.getCustomDomains() != null ? new HashSet<>(properties.getCustomDomains()) : null;
+            Set<String> subDomains = properties.getSubDomain() != null ? new HashSet<>(properties.getSubDomain()) : null;
+            NewProxy newProxy = ProxyClient.NewProxyBuilder.builder()
+                    .localIP(properties.getLocalIP())
+                    .localPort(localPort)
+                    .status(properties.isAutoStart() ? 1 : 0)
+                    .remotePort(properties.getRemotePort())
+                    .protocol(properties.getProtocol())
+                    .name(appName)
+                    .customDomains(customDomains)
+                    .subDomains(subDomains)
+                    .autoDomain(properties.isAutoDomain())
+                    .build();
             proxyClient.registerProxy(newProxy);
         });
         running = true;

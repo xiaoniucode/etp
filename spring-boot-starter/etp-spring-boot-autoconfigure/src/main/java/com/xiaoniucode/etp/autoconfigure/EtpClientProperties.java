@@ -2,6 +2,8 @@ package com.xiaoniucode.etp.autoconfigure;
 
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * etp客户端配置属性
@@ -44,6 +46,21 @@ public class EtpClientProperties {
      * 是否自动启动代理服务
      */
     private boolean autoStart = true;
+
+    /**
+     * 自定义域名列表
+     */
+    private List<String> customDomains = new ArrayList<>();
+
+    /**
+     * 是否自动生成域名，默认自动生成子域名
+     */
+    private boolean autoDomain = true;
+
+    /**
+     * 子域名列表
+     */
+    private List<String> subDomain = new ArrayList<>();
 
     /**
      * 是否启用 TLS 加密
@@ -198,5 +215,29 @@ public class EtpClientProperties {
 
     public void setAutoStart(boolean autoStart) {
         this.autoStart = autoStart;
+    }
+
+    public List<String> getCustomDomains() {
+        return customDomains;
+    }
+
+    public void setCustomDomains(List<String> customDomains) {
+        this.customDomains = customDomains;
+    }
+
+    public boolean isAutoDomain() {
+        return autoDomain;
+    }
+
+    public void setAutoDomain(boolean autoDomain) {
+        this.autoDomain = autoDomain;
+    }
+
+    public List<String> getSubDomain() {
+        return subDomain;
+    }
+
+    public void setSubDomain(List<String> subDomain) {
+        this.subDomain = subDomain;
     }
 }

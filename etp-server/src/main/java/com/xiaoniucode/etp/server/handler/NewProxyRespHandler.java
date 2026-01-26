@@ -68,7 +68,12 @@ public class NewProxyRespHandler implements MessageHandler {
             body.put("remotePort", remotePort);
         }
         if (ProtocolType.isHttpOrHttps(protocolType)) {
-            Set<String> customDomains = newProxy.getDomains();
+            Set<String> domains = newProxy.getCustomDomains();
+            if (domains != null && !domains.isEmpty()) {
+                String customDomainsStr = String.join("\n", domains);
+                body.put("customDomains", customDomainsStr);
+            }
+
         }
         return switch (protocolType) {
             case TCP -> ServiceFactory.INSTANCE.getProxyService().addTcpProxy(body);
@@ -82,15 +87,15 @@ public class NewProxyRespHandler implements MessageHandler {
         int proxyId = proxy.getInt("proxyId");
         String host = ConfigHelper.get().getHost();
         StringBuilder remoteAddr = new StringBuilder();
-        if (newProxy.getDomains() != null && ProtocolType.isHttp(protocol)) {
+        if (newProxy.getCustomDomains() != null && ProtocolType.isHttp(protocol)) {
             int httpProxyPort = ConfigHelper.get().getHttpProxyPort();
-            Set<String> customDomains = newProxy.getDomains();
+            Set<String> customDomains = newProxy.getCustomDomains();
             for (String domain : customDomains) {
                 remoteAddr.append("http://").append(domain).append(":").append(httpProxyPort).append("\n");
             }
-        } else if (newProxy.getDomains() != null && ProtocolType.isHttps(protocol)) {
+        } else if (newProxy.getCustomDomains() != null && ProtocolType.isHttps(protocol)) {
             int httpsProxyPort = ConfigHelper.get().getHttpsProxyPort();
-            Set<String> customDomains = newProxy.getDomains();
+            Set<String> customDomains = newProxy.getCustomDomains();
             for (String domain : customDomains) {
                 remoteAddr.append("https://").append(domain).append(":").append(httpsProxyPort).append("\n");
             }

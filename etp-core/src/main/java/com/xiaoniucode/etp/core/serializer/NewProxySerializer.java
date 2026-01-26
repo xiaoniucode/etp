@@ -29,12 +29,27 @@ public class NewProxySerializer implements MessageSerializer<NewProxy>{
             out.writeBoolean(false);
         }
         out.writeInt(message.getStatus());
-        if (message.getDomains() != null) {
+        if (message.getCustomDomains() != null) {
             out.writeBoolean(true);
-            out.writeInt(message.getDomains().size());
-            for (String domain : message.getDomains()) {
+            out.writeInt(message.getCustomDomains().size());
+            for (String domain : message.getCustomDomains()) {
                 serializeString(out, domain);
             }
+        } else {
+            out.writeBoolean(false);
+        }
+        if (message.getSubDomains() != null) {
+            out.writeBoolean(true);
+            out.writeInt(message.getSubDomains().size());
+            for (String domain : message.getSubDomains()) {
+                serializeString(out, domain);
+            }
+        } else {
+            out.writeBoolean(false);
+        }
+        if (message.getAutoDomain() != null) {
+            out.writeBoolean(true);
+            out.writeBoolean(message.getAutoDomain());
         } else {
             out.writeBoolean(false);
         }
@@ -59,6 +74,18 @@ public class NewProxySerializer implements MessageSerializer<NewProxy>{
                 customDomains.add(deserializeString(in));
             }
         }
+        Set<String> subDomains = null;
+        if (in.readBoolean()) {
+            int size = in.readInt();
+            subDomains = new HashSet<>();
+            for (int i = 0; i < size; i++) {
+                subDomains.add(deserializeString(in));
+            }
+        }
+        Boolean autoDomain = null;
+        if (in.readBoolean()) {
+            autoDomain = in.readBoolean();
+        }
 
         NewProxy newProxy = new NewProxy();
         newProxy.setName(name);
@@ -67,7 +94,9 @@ public class NewProxySerializer implements MessageSerializer<NewProxy>{
         newProxy.setProtocol(ProtocolType.getType(protocol));
         newProxy.setRemotePort(remotePort);
         newProxy.setStatus(status);
-        newProxy.setDomains(customDomains);
+        newProxy.setCustomDomains(customDomains);
+        newProxy.setSubDomains(subDomains);
+        newProxy.setAutoDomain(autoDomain);
         return newProxy;
     }
 

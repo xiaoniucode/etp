@@ -58,7 +58,7 @@ public class ProxyManager {
         }
         client.getProxies().add(proxy);
 
-        if (proxy.getType() == ProtocolType.TCP && !isPortOccupied(proxy.getRemotePort())) {
+        if (ProtocolType.isTcp(proxy.getType())&& !isPortOccupied(proxy.getRemotePort())) {
             clientRemotePorts.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).add(proxy.getRemotePort());
             portMapping.put(proxy.getRemotePort(), new LanInfo(proxy.getLocalIP(),proxy.getLocalPort()));
             proxyStatus.put(proxy.getRemotePort() + "", proxy.getStatus());
@@ -66,7 +66,7 @@ public class ProxyManager {
             return true;
         }
 
-        if (proxy.getType() == ProtocolType.HTTP||proxy.getType() == ProtocolType.HTTPS) {
+        if (ProtocolType.isHttpOrHttps(proxy.getType())) {
             Set<String> customDomains = proxy.getCustomDomains();
             clientDomains.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).addAll(customDomains);
             customDomains.forEach(domain -> {
