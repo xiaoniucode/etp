@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.autoconfigure;
 
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,19 +82,12 @@ public class EtpClientProperties {
     private int maxDelaySec = 8;
 
     /**
-     * ==================== TLS 加密配置 ====================
+     * TLS 加密配置
      */
     private Truststore truststore = new Truststore();
 
     public static class Truststore {
-        /**
-         * 客户端信任库路径（PKCS12 格式）
-         */
         private String path;
-
-        /**
-         * 信任库密码
-         */
         private String storePass;
 
         public String getPath() {

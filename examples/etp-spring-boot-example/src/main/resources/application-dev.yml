@@ -4,12 +4,7 @@ etp:
     server-addr: localhost #服务器地址
     secret-key: your-secret-key #认证Token
     custom-domains:
-      - a.local.cc
-      - b.local.cc
-    sub-domain:
-      - a
-      - b
-    auto-domain: true
+      - h.local.cc
     protocol: http
 #    local-host: 127.0.0.1
 #    remote-port: 8025
