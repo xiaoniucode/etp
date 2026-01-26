@@ -127,13 +127,13 @@ public class ConfigRegisterListener implements EventListener<DatabaseInitEvent> 
                 if (ProtocolType.TCP.equals(type)) {
                     proxyConfig.setRemotePort(proxy.getInt("remotePort"));
                 } else if (ProtocolType.HTTP.equals(type)||ProtocolType.HTTPS.equals(type)) {
-                    JSONArray d = proxy.getJSONArray("customDomains");
-                    Set<String> customDomains = new HashSet<>();
+                    JSONArray d = proxy.getJSONArray("domains");
+                    Set<String> domains = new HashSet<>();
                     for (Object item : d) {
                         JSONObject itemJson = (JSONObject) item;
-                        customDomains.add(itemJson.getString("domain"));
+                        domains.add(itemJson.getString("domain"));
                     }
-                    proxyConfig.setCustomDomains(customDomains);
+                    proxyConfig.setCustomDomains(domains);
                 }
                 proxyConfig.setProxyId(proxy.getInt("id"));
                 proxyConfig.setName(proxy.getString("name"));

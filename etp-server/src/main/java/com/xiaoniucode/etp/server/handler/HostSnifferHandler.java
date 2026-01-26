@@ -2,6 +2,8 @@ package com.xiaoniucode.etp.server.handler;
 
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.LanInfo;
+import com.xiaoniucode.etp.server.manager.DomainInfo;
+import com.xiaoniucode.etp.server.manager.DomainManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -49,7 +51,8 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                     } else {
                         domain = host;
                     }
-                    if (ProxyManager.getProxyStatus(domain) == 0) {
+                    DomainInfo domainInfo = DomainManager.getDomainInfo(domain);
+                    if (!domainInfo.isActive()) {
                         visitor.close();
                         logger.debug("隧道状态为关闭状态");
                         return;

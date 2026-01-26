@@ -29,11 +29,11 @@ public class ProxyService {
     public JSONObject getProxy(JSONObject req) {
         JSONObject res = DaoFactory.INSTANCE.getProxyDao().getProxyById(req.getInt("id"));
         String type = res.getString("type");
-        if (ProtocolType.getType(type) == ProtocolType.HTTP || ProtocolType.getType(type) == ProtocolType.HTTPS) {
-            String customDomains = res.getString("customDomains");
-            if (StringUtils.hasText(customDomains)) {
-                res.put("customDomains", String.join("\n", customDomains.split(",")));
-            }
+        if (ProtocolType.isHttpOrHttps(type)) {
+//            JSONArray domains = res.getJSONArray("domains");
+//            if (StringUtils.hasText(domains)) {
+//                res.put("domains", String.join("\n", customDomains.split(",")));
+//            }
         }
         return res;
     }
@@ -148,15 +148,17 @@ public class ProxyService {
             req.put("type", ProtocolType.HTTP.name().toLowerCase(Locale.ROOT));
             int proxyId = DaoFactory.INSTANCE.getProxyDao().insert(req);
             req.put("proxyId", proxyId);
+
             ProxyConfig proxyConfig = createProxyMapping(req);
-            Set<String> domains = DomainManager.addDomainsSmartly(proxyConfig);
+            ProxyManager.addProxy(req.getString("secretKey"),proxyConfig);
+            Set<String> domains = DomainManager.getDomainsByProxy(proxyConfig);
             for (String domain : domains) {
                 if (DaoFactory.INSTANCE.getProxyDomainDao().findProxyName(domain) != null) {
                     throw new BizException("域名已经存在：" + domain);
                 }
                 DaoFactory.INSTANCE.getProxyDomainDao().insert(proxyId, domain);
             }
-
+            req.put("domains", domains);
             req.put("proxyId", proxyId);
             return req;
         });
@@ -214,6 +216,7 @@ public class ProxyService {
 
     public void deleteProxy(JSONObject req) {
         TX.execute(() -> {
+            //todo 需要完善
             int id = req.getInt("id");
             String secretKey = req.getString("secretKey");
             JSONObject proxy = DaoFactory.INSTANCE.getProxyDao().getProxyById(id);

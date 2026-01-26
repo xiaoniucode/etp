@@ -13,6 +13,7 @@ import com.xiaoniucode.etp.server.manager.ClientManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.PortManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
+import com.xiaoniucode.etp.server.config.domain.DomainType;
 import com.xiaoniucode.etp.server.web.dao.DaoFactory;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -80,6 +81,7 @@ public class StaticConfigInitListener implements EventListener<TunnelBindEvent> 
                             save.put("status", proxy.getStatus());
                             save.put("type", type);
                             save.put("source", 0);
+                            save.put("domainType", DomainType.CUSTOM_DOMAIN.getType());
 
                             if (type.equalsIgnoreCase(ProtocolType.TCP.name())) {
                                 save.put("remotePort", proxy.getRemotePort());

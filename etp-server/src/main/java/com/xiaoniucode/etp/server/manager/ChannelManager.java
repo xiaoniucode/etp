@@ -26,6 +26,9 @@ public class ChannelManager {
      * value: （已认证并活跃的控制通道）control channel
      */
     private static final Map<Integer, Channel> portToControlChannel = new ConcurrentHashMap<>();
+    /**
+     * domain -> control channel
+     */
     private static final Map<String, Channel> domainToControlChannel = new ConcurrentHashMap<>();
     /**
      * key: (远程端口号)remotePort
@@ -41,11 +44,11 @@ public class ChannelManager {
     public static void registerClient(Channel control, Login login) {
         String secretKey = login.getSecretKey();
         Set<Integer> remotePorts = ProxyManager.getClientRemotePorts(secretKey);
-        Set<String> customDomains = ProxyManager.getClientDomains(secretKey);
+        Set<String> domains = ProxyManager.getClientDomains(secretKey);
         for (Integer remotePort : remotePorts) {
             portToControlChannel.put(remotePort, control);
         }
-        for (String domain : customDomains) {
+        for (String domain : domains) {
             domainToControlChannel.put(domain, control);
         }
         control.attr(EtpConstants.AUTH_CLIENT_INFO).set(new AuthClientInfo(login.getSecretKey(), login.getArch(), login.getOs()));
@@ -312,4 +315,7 @@ public class ChannelManager {
     }
 
 
+    public static void addDomainToControl(String domain, Channel control) {
+        domainToControlChannel.put(domain, control);
+    }
 }

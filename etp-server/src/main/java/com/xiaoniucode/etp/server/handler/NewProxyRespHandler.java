@@ -10,10 +10,12 @@ import com.xiaoniucode.etp.core.msg.NewProxyResp;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.manager.ClientManager;
+import com.xiaoniucode.etp.server.config.domain.DomainType;
 import com.xiaoniucode.etp.server.web.core.server.BizException;
 import com.xiaoniucode.etp.server.web.serivce.ServiceFactory;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,10 +57,11 @@ public class NewProxyRespHandler implements MessageHandler {
         body.put("secretKey", secretKey);
         body.put("localPort", newProxy.getLocalPort());
         body.put("type", protocolType.name().toLowerCase(Locale.ROOT));
-        body.put("name", newProxy.getName());
+        body.put("name", newProxy.getName() + "." + System.currentTimeMillis());
         body.put("status", newProxy.getStatus());
         body.put("source", 1);
         body.put("autoDomain", newProxy.getAutoDomain());
+        body.put("domainType", getDomainType(newProxy).getType());
 
         if (ProtocolType.isTcp(protocolType)) {
             body.put("remotePort", newProxy.getRemotePort());
@@ -83,22 +86,42 @@ public class NewProxyRespHandler implements MessageHandler {
         };
     }
 
+    private static DomainType getDomainType(NewProxy newProxy) {
+        if (newProxy.getCustomDomains() != null && !newProxy.getCustomDomains().isEmpty()) {
+            return DomainType.CUSTOM_DOMAIN;
+        }
+        if (newProxy.getSubDomains() != null && !newProxy.getSubDomains().isEmpty()) {
+            return DomainType.SUBDOMAIN;
+        }
+        return DomainType.AUTO;
+    }
+
     private NewProxyResp buildResponse(JSONObject proxy, NewProxy newProxy) {
         ProtocolType protocol = newProxy.getProtocol();
         int proxyId = proxy.getInt("proxyId");
         String host = ConfigHelper.get().getHost();
         StringBuilder remoteAddr = new StringBuilder();
+        JSONArray domains = proxy.getJSONArray("domains");
         if (newProxy.getCustomDomains() != null && ProtocolType.isHttp(protocol)) {
             int httpProxyPort = ConfigHelper.get().getHttpProxyPort();
-            Set<String> customDomains = newProxy.getCustomDomains();
-            for (String domain : customDomains) {
-                remoteAddr.append("http://").append(domain).append(":").append(httpProxyPort).append("\n");
+            for (int i = 0; i < domains.length(); i++) {
+                String domain = domains.getString(i);
+                remoteAddr.append("http://").append(domain);
+                if (httpProxyPort != 80) {
+                    remoteAddr.append(":").append(httpProxyPort);
+                }
+                remoteAddr.append("\n");
             }
+
         } else if (newProxy.getCustomDomains() != null && ProtocolType.isHttps(protocol)) {
             int httpsProxyPort = ConfigHelper.get().getHttpsProxyPort();
-            Set<String> customDomains = newProxy.getCustomDomains();
-            for (String domain : customDomains) {
-                remoteAddr.append("https://").append(domain).append(":").append(httpsProxyPort).append("\n");
+            for (int i = 0; i < domains.length(); i++) {
+                String domain = domains.getString(i);
+                remoteAddr.append("https://").append(domain);
+                if (httpsProxyPort != 443) {
+                    remoteAddr.append(":").append(httpsProxyPort);
+                }
+                remoteAddr.append("\n");
             }
 
         } else if (ProtocolType.isTcp(protocol)) {

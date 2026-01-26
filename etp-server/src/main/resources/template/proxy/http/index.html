@@ -51,14 +51,17 @@
                 {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
                 {field: 'name', title: '隧道名称'},
                 {
-                    field: 'customDomains', sort: true, title: '访问地址', templet: function (d) {
-                        if (d.customDomains && d.customDomains.length > 0) {
+                    field: 'domains', sort: true, title: '访问地址', templet: function (d) {
+                        if (d.domains && d.domains.length > 0) {
                             let domainStr = '';
-                            for (let i = 0; i < d.customDomains.length; i++) {
-                                const fullUrl = 'http' + '://' + d.customDomains[i].domain + ":" + d.httpProxyPort;
-                                domainStr += '<a href="' + fullUrl + '" target="_blank">' + d.customDomains[i].domain +':'+d.httpProxyPort+ '</a>';
+                            for (let i = 0; i < d.domains.length; i++) {
+                                let fullUrl = 'http' + '://' + d.domains[i].domain;
+                                if (d.httpProxyPort !== 80) {
+                                    fullUrl = fullUrl + ":" + d.httpProxyPort;
+                                }
+                                domainStr += '<a href="' + fullUrl + '" target="_blank">' + fullUrl + '</a>';
 
-                                if (i < d.customDomains.length - 1) {
+                                if (i < d.domains.length - 1) {
                                     domainStr += '<br>';
                                 }
                             }
@@ -67,9 +70,9 @@
                         return '';
                     }
                 },
-                {field: 'localPort', sort: true, title: '内网端口'},
+                {field: 'localPort', sort: true,width:110, title: '内网端口'},
                 {
-                    field: 'status', width: 120, title: '状态', sort: true, templet: function (d) {
+                    field: 'status', width: 90, title: '状态', sort: true, templet: function (d) {
                         const isChecked = d.status === 1 ? 'checked' : '';
                         return '<input type="checkbox" lay-skin="switch" lay-text="开启|关闭" lay-event="statusSwitch" ' + isChecked + '>';
                     }

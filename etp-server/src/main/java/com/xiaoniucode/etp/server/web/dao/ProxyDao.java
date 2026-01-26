@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.web.dao;
 
+import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class ProxyDao extends BaseDao {
     public int insert(JSONObject data) {
-        return jdbc.insert("INSERT INTO proxies (clientId, name, type,localIP, localPort, remotePort, status, source) VALUES (:clientId, :name, :type,:localIP, :localPort, :remotePort, :status, :source)")
+        return jdbc.insert("INSERT INTO proxies (clientId, name, type,localIP, localPort, remotePort, status, source,domainType) VALUES (:clientId, :name, :type,:localIP, :localPort, :remotePort, :status, :source,:domainType)")
                 .bind("clientId", data.optInt("clientId"))
                 .bind("name", data.optString("name"))
                 .bind("type", data.optString("type"))
@@ -19,6 +20,7 @@ public class ProxyDao extends BaseDao {
                 .bind("remotePort", data.optInt("remotePort"))
                 .bind("status", data.optInt("status", 1))
                 .bind("source", data.optInt("source"))
+                .bind("domainType", data.optInt("domainType"))
                 .execute();
     }
     public JSONObject getProxyById(int id) {
@@ -27,18 +29,18 @@ public class ProxyDao extends BaseDao {
                 .one();
         if (proxy != null) {
             String type = proxy.optString("type");
-            if ("http".equalsIgnoreCase(type) || "https".equalsIgnoreCase(type)) {
-                JSONArray customDomains = DaoFactory.INSTANCE.getProxyDomainDao().listByProxyId(id);
-                proxy.put("customDomains", customDomains);
+            if (ProtocolType.isHttpOrHttps(type)) {
+                JSONArray domains = DaoFactory.INSTANCE.getProxyDomainDao().listByProxyId(id);
+                proxy.put("domains", domains);
             } else {
-                proxy.put("customDomains", new JSONArray());
+                proxy.put("domains", new JSONArray());
             }
         }
         return proxy;
     }
 
     public boolean updateProxy(JSONObject data) {
-        long id = data.optLong("id");
+        int id = data.optInt("id");
         if (id <= 0) {
             return false;
         }
@@ -82,7 +84,11 @@ public class ProxyDao extends BaseDao {
             paramNames.add("source");
             paramValues.add(data.getInt("source"));
         }
-
+        if (data.has("domainType")) {
+            set.append("domainType = :domainType, ");
+            paramNames.add("domainType");
+            paramValues.add(data.getInt("domainType"));
+        }
         set.setLength(Math.max(set.length() - 2, 0));
         if (!set.isEmpty()) {
             set.append(", updatedAt = datetime('now')");
@@ -109,7 +115,7 @@ public class ProxyDao extends BaseDao {
                     JSONObject domainObj = customDomains.getJSONObject(i);
                     String domain = domainObj.optString("domain");
                     if (!domain.isEmpty()) {
-                        DaoFactory.INSTANCE.getProxyDomainDao().insert((int) id, domain);
+                        DaoFactory.INSTANCE.getProxyDomainDao().insert(id, domain);
                     }
                 }
             }
@@ -131,7 +137,7 @@ public class ProxyDao extends BaseDao {
         String sql = """
                 SELECT
                     p.id, p.clientId, p.name, p.type,p.localIP, p.localPort, p.remotePort, p.status,
-                    p.createdAt, p.updatedAt, p.source, c.name AS clientName, c.secretKey
+                    p.createdAt, p.updatedAt, p.source, c.name AS clientName, c.secretKey,p.domainType
                 FROM proxies p
                 LEFT JOIN clients c ON p.clientId = c.id
                 """;
@@ -170,14 +176,14 @@ public class ProxyDao extends BaseDao {
 
                 if ("http".equalsIgnoreCase(proxyType)) {
                     JSONArray customDomains = domainMap.getOrDefault(proxyId, new JSONArray());
-                    proxy.put("customDomains", customDomains);
+                    proxy.put("domains", customDomains);
                     proxy.put("httpProxyPort", ConfigHelper.get().getHttpProxyPort());
                 } else if ("https".equalsIgnoreCase(proxyType)) {
                     JSONArray customDomains = domainMap.getOrDefault(proxyId, new JSONArray());
-                    proxy.put("customDomains", customDomains);
+                    proxy.put("domains", customDomains);
                     proxy.put("httpsProxyPort", ConfigHelper.get().getHttpsProxyPort());
                 } else {
-                    proxy.put("customDomains", new JSONArray());
+                    proxy.put("domains", new JSONArray());
                 }
             }
         }

@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.core.LanInfo;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
+import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,7 @@ public class ProxyManager {
         }
         client.getProxies().add(proxy);
         proxyConfigs.put(proxy.getProxyId(), proxy);
+        Channel control = ChannelManager.getControl(secretKey);
 
         if (ProtocolType.isTcp(proxy.getType()) && !isPortOccupied(proxy.getRemotePort())) {
             clientRemotePorts.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).add(proxy.getRemotePort());
@@ -72,11 +74,12 @@ public class ProxyManager {
         }
 
         if (ProtocolType.isHttpOrHttps(proxy.getType())) {
-            Set<String> customDomains = proxy.getCustomDomains();
-            clientDomains.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).addAll(customDomains);
-            customDomains.forEach(domain -> {
+            Set<String> domains = DomainManager.addDomainsSmartly(proxy);
+            clientDomains.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).addAll(domains);
+            domains.forEach(domain -> {
                 domainMapping.put(domain, new LanInfo(proxy.getLocalIP(), proxy.getLocalPort()));
                 proxyStatus.put(domain, proxy.getStatus());
+                ChannelManager.addDomainToControl(domain,control);
             });
             logger.debug("HTTP代理 {} 注册成功", proxy.getName());
             return true;

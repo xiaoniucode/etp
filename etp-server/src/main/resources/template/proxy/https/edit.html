@@ -61,7 +61,7 @@
         
         <div class="layui-form-item" id="subDomainsGroup" style="display: none;">
             <div class="layui-input-block">
-                <textarea name="subDomain" placeholder="子域名，一行一个" class="layui-textarea"></textarea>
+                <textarea name="subDomains" placeholder="子域名，一行一个" class="layui-textarea"></textarea>
             </div>
         </div>
         <div class="layui-form-item" pane>
@@ -110,7 +110,19 @@
         })
         //渲染表单详情
         Rest.get('/api/proxy/get?id=' + proxyId).then(data => {
-            form.val('editForm', data);
+            // 将数字domainType转换为字符串值，用于表单渲染
+            let domainTypeStr = 'auto';
+            if (data.domainType === 1) {
+                domainTypeStr = 'sub';
+            } else if (data.domainType === 2) {
+                domainTypeStr = 'custom';
+            }
+            
+            // 复制数据对象，避免直接修改原数据
+            const formData = {...data};
+            formData.domainType = domainTypeStr;
+            
+            form.val('editForm', formData);
             const targetClient = clientList.find(function (item) {
                 return item.id === data.clientId;
             });
@@ -131,7 +143,7 @@
                 $('input[name="autoDomain"]').val('false');
                 $('#customDomainsGroup').show();
                 $('#subDomainsGroup').hide();
-            } else if (data.subDomain) {
+            } else if (data.subDomains) {
                 $('input[name="domainType"][value="sub"]').prop('checked', true);
                 $('input[name="autoDomain"]').val('false');
                 $('#customDomainsGroup').hide();
@@ -169,8 +181,14 @@
             }
             field.id = proxyId
             field.status = field.status ? 1 : 0;
-            // 移除domainType字段，后端不需要
-            delete field.domainType;
+            // 将domainType映射为数字值
+            if (field.domainType === 'auto') {
+                field.domainType = 0;
+            } else if (field.domainType === 'sub') {
+                field.domainType = 1;
+            } else if (field.domainType === 'custom') {
+                field.domainType = 2;
+            }
             Rest.put('/api/proxy/update-https', field).then(data => {
                 layer.msg('更新成功', {icon: 1, time: 400,}, () => {
                     const parentTable = parent.layui.table;

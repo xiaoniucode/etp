@@ -10,6 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DomainManager {
     private static final Logger logger = LoggerFactory.getLogger(DomainManager.class);
+    /**
+     * domain -> DomainInfo
+     */
     private static final Map<String, DomainInfo> domainMap = new ConcurrentHashMap<>();
     private static final Set<String> baseDomains = new HashSet<>();
 
@@ -44,6 +47,9 @@ public class DomainManager {
         for (String domain : domains) {
             addDomain(domain, proxyConfig);
         }
+    }
+    public static DomainInfo getDomainInfo(String domain) {
+        return domainMap.get(domain);
     }
 
     public static void removeDomain(String domain) {
@@ -137,6 +143,7 @@ public class DomainManager {
         DomainInfo domainInfo = domainMap.get(domain);
         if (domainInfo != null) {
             domainInfo.setActive(false);
+            domainInfo.getProxyConfig().setStatus(1);
             logger.debug("停用域名: {}", domain);
         }
     }
@@ -149,6 +156,7 @@ public class DomainManager {
         DomainInfo domainInfo = domainMap.get(domain);
         if (domainInfo != null) {
             domainInfo.setActive(true);
+            domainInfo.getProxyConfig().setStatus(1);
             logger.debug("启用域名: {}", domain);
         }
     }

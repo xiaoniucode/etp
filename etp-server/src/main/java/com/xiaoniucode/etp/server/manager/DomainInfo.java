@@ -10,7 +10,7 @@ public class DomainInfo {
     public DomainInfo(String domain, ProxyConfig proxyConfig) {
         this.domain = domain;
         this.proxyConfig = proxyConfig;
-        this.active = true;
+        this.active = proxyConfig.getStatus() == 1;
     }
 
     public String getDomain() {

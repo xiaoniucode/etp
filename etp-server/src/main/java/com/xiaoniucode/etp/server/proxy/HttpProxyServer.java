@@ -27,7 +27,6 @@ public class HttpProxyServer implements Lifecycle {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-    //private int httpProxyPort = 8080;
     private HttpProxyServer() {
     }
 

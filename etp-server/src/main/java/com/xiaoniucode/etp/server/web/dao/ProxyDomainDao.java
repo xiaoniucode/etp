@@ -5,9 +5,9 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class ProxyDomainDao extends BaseDao{
+public class ProxyDomainDao extends BaseDao {
     public int insert(int proxyId, String domain) {
-        return jdbc.insert("INSERT OR IGNORE INTO proxy_domains (proxyId, domain) VALUES (:proxyId, :domain)")
+        return jdbc.insert("INSERT OR IGNORE INTO proxy_domains (proxyId, domain) VALUES (:proxyId,:domain)")
                 .bind("proxyId", proxyId)
                 .bind("domain", domain)
                 .execute();

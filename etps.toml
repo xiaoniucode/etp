@@ -1,6 +1,6 @@
 host = "0.0.0.0"
 bindPort = 9527
-httpProxyPort = 8081
+httpProxyPort = 80
 httpsProxyPort = 8443
 baseDomains = ["domain1.com", "domain2.com"]
 # TLS

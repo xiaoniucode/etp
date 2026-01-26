@@ -70,7 +70,7 @@ jobs:
           restore-keys: |
             ${{ matrix.platform }}-${{ matrix.arch }}-maven-
       - name: 构建 模块原生镜像
-        run: mvn clean install native:compile -Pnative -am -DskipTests --no-transfer-progress
+        run: cd etp-main && mvn clean install native:compile -Pnative -am -DskipTests --no-transfer-progress
       # Linux/macOS 打包
       - name: 打包Unix发布文件
         if: matrix.os != 'windows-latest'
@@ -80,11 +80,11 @@ jobs:
           RELEASE_NAME="etp_${VERSION}_${{ matrix.artifact_suffix }}"
 
           mkdir -p "$RELEASE_NAME"
-          cp "etp-server/target/etp-server" "$RELEASE_NAME/etps"
-          cp "etp-client/target/etp-client" "$RELEASE_NAME/etpc"
+          cp "etp-main/etps/target/etp-server" "$RELEASE_NAME/etps"
+          cp "etp-main/etpc/target/etp-client" "$RELEASE_NAME/etpc"
 
-          cp etp-server/target/classes/etps.toml "$RELEASE_NAME/" 2>/dev/null || true
-          cp etp-client/target/classes/etpc.toml "$RELEASE_NAME/" 2>/dev/null || true
+          cp etp-main/etps/target/classes/etps.toml "$RELEASE_NAME/" 2>/dev/null || true
+          cp etp-main/etpc/target/classes/etpc.toml "$RELEASE_NAME/" 2>/dev/null || true
 
           tar -czf "$RELEASE_NAME.tar.gz" "$RELEASE_NAME"
           echo "✅ Unix打包完成: $RELEASE_NAME.tar.gz"
@@ -97,11 +97,11 @@ jobs:
           $RELEASE_NAME = "etp_${VERSION}_${{ matrix.artifact_suffix }}"
 
           New-Item -ItemType Directory -Force -Path $RELEASE_NAME
-          Copy-Item "etp-server\target\etp-server.exe" "$RELEASE_NAME\etps.exe"
-          Copy-Item "etp-client\target\etp-client.exe" "$RELEASE_NAME\etpc.exe"
+          Copy-Item "etp-main\etps\target\etp-server.exe" "$RELEASE_NAME\etps.exe"
+          Copy-Item "etp-main\etpc\target\etp-client.exe" "$RELEASE_NAME\etpc.exe"
 
-          Copy-Item "etp-server/target/classes/etps.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
-          Copy-Item "etp-client/target/classes/etpc.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
+          Copy-Item "etp-main/etps/target/classes/etps.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
+          Copy-Item "etp-main/etpc/target/classes/etpc.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
 
           Compress-Archive -Path "$RELEASE_NAME\*" -DestinationPath "$RELEASE_NAME.zip"
           Write-Host "✅ Windows打包完成: $RELEASE_NAME.zip"

@@ -61,7 +61,7 @@
         
         <div class="layui-form-item" id="subDomainsGroup" style="display: none;">
             <div class="layui-input-block">
-                <textarea name="subDomain" placeholder="子域名，一行一个" class="layui-textarea"></textarea>
+                <textarea name="subDomains" placeholder="子域名，一行一个" class="layui-textarea"></textarea>
             </div>
         </div>
         <div class="layui-form-item" pane>
@@ -141,8 +141,14 @@
                 delete field.client;
             }
             field.status = field.status ? 1 : 0;
-            // 移除domainType字段，后端不需要
-            delete field.domainType;
+            // 将domainType映射为数字值
+            if (field.domainType === 'auto') {
+                field.domainType = 0;
+            } else if (field.domainType === 'sub') {
+                field.domainType = 1;
+            } else if (field.domainType === 'custom') {
+                field.domainType = 2;
+            }
             Rest.post('/api/proxy/add-https', field).then(data => {
                 layer.msg('创建成功', {icon: 1, time: 400,}, () => {
                     const parentTable = parent.layui.table;

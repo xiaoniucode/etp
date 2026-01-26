@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS proxies (
     localPort        INTEGER NOT NULL,                   -- 内网端口
     remotePort       INTEGER,                            -- 远程服务端口
     status           INTEGER NOT NULL DEFAULT 1,         -- 状态：1=开启，0=关闭
+    domainType       INTEGER,                            -- 域名类型：0-自动生成 1-自定义子域名 2-自定义域名
     createdAt        TEXT DEFAULT (datetime('now')),     -- 创建时间
     updatedAt        TEXT DEFAULT (datetime('now'))      -- 更新时间
 );

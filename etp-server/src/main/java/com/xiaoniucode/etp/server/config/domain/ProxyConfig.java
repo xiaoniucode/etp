@@ -15,6 +15,7 @@ public class ProxyConfig {
     private Set<String> customDomains;
     private Set<String> subDomains;
     private Boolean autoDomain;
+
     public Integer getProxyId() {
         return proxyId;
     }
@@ -93,5 +94,23 @@ public class ProxyConfig {
 
     public void setAutoDomain(Boolean autoDomain) {
         this.autoDomain = autoDomain;
+    }
+
+    /**
+     * 计算域名的类型
+     *
+     * @return 域名类型
+     */
+    public DomainType getDomainType() {
+        if (this.customDomains != null && !this.customDomains.isEmpty()) {
+            return DomainType.CUSTOM_DOMAIN;
+        }
+        if (this.subDomains != null && !this.subDomains.isEmpty()) {
+            return DomainType.SUBDOMAIN;
+        }
+        if (getAutoDomain() != null && getAutoDomain()) {
+            return DomainType.AUTO;
+        }
+        return null;
     }
 }
