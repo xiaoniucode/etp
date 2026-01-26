@@ -38,7 +38,7 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
 
     @Override
     public void start() {
-        if (properties.isTls()) {
+        if (properties.getTls()) {
             System.setProperty("client.truststore.path", properties.getTruststore().getPath());
             System.setProperty("client.truststore.storePass", properties.getTruststore().getStorePass());
         }
@@ -52,7 +52,7 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
                 .serverAddr(properties.getServerAddr())
                 .serverPort(properties.getServerPort())
                 .secretKey(properties.getSecretKey())
-                .tls(properties.isTls())
+                .tls(properties.getTls())
                 .maxDelaySec(properties.getMaxDelaySec())
                 .initialDelaySec(properties.getInitialDelaySec())
                 .maxRetries(properties.getMaxRetries())
@@ -68,13 +68,13 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
             NewProxy newProxy = ProxyClient.NewProxyBuilder.builder()
                     .localIP(properties.getLocalIP())
                     .localPort(localPort)
-                    .status(properties.isAutoStart() ? 1 : 0)
+                    .status(properties.getAutoStart() ? 1 : 0)
                     .remotePort(properties.getRemotePort())
                     .protocol(properties.getProtocol())
                     .name(appName)
                     .customDomains(customDomains)
                     .subDomains(subDomains)
-                    .autoDomain(properties.isAutoDomain())
+                    .autoDomain(properties.getAutoDomain())
                     .build();
             proxyClient.registerProxy(newProxy);
         });

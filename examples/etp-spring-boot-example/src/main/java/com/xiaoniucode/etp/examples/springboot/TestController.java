@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.examples.springboot3;
+package com.xiaoniucode.etp.examples.springboot;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;

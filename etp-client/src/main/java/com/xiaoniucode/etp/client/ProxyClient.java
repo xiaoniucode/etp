@@ -21,8 +21,13 @@ public class ProxyClient {
      * 注册端口映射
      */
     public void registerProxy(NewProxy newProxy) {
+        check(newProxy);
         Channel controlChannel = ChannelManager.getControlChannel();
         controlChannel.writeAndFlush(newProxy);
+    }
+
+    private void check(NewProxy newProxy) {
+
     }
 
     /**

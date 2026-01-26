@@ -20,6 +20,7 @@ public class SettingService {
         JSONObject res = new JSONObject();
         PortRange range = config.getPortRange();
         res.put("tls_enabled", config.isTls() ? "已开启" : "未开启");
+        res.put("baseDomains", config.getBaseDomains());
         res.put("host", config.getHost());
         res.put("bind_port", config.getBindPort());
         res.put("httpProxyPort",config.getHttpProxyPort());

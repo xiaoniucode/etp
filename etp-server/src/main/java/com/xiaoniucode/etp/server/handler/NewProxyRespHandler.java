@@ -36,9 +36,7 @@ public class NewProxyRespHandler implements MessageHandler {
                 Channel control = ctx.channel();
                 AuthClientInfo authClientInfo = ChannelManager.getAuthClientInfo(control);
                 String secretKey = authClientInfo.getSecretKey();
-                //todo 合法性检查，端口、域名、支持自动生成一个域名（http/https）、生成一个唯一的名字
                 JSONObject proxy = createProxy(newProxy, secretKey);
-
                 ctx.channel().writeAndFlush(buildResponse(proxy, newProxy));
             }
         } catch (Exception e) {
@@ -49,29 +47,32 @@ public class NewProxyRespHandler implements MessageHandler {
 
 
     private static JSONObject createProxy(NewProxy newProxy, String secretKey) {
-        int localPort = newProxy.getLocalPort();
         ProtocolType protocolType = newProxy.getProtocol();
-        String name = newProxy.getName();
-        int remotePort = newProxy.getRemotePort();
-        int status = newProxy.getStatus();
+
         Integer clientId = ClientManager.getClient(secretKey).getClientId();
         JSONObject body = new JSONObject();
         body.put("clientId", clientId);
         body.put("secretKey", secretKey);
-        body.put("localPort", localPort);
+        body.put("localPort", newProxy.getLocalPort());
         body.put("type", protocolType.name().toLowerCase(Locale.ROOT));
-        body.put("name", name);
-        body.put("status", status);
+        body.put("name", newProxy.getName());
+        body.put("status", newProxy.getStatus());
         body.put("source", 1);
+        body.put("autoDomain", newProxy.getAutoDomain());
 
         if (ProtocolType.isTcp(protocolType)) {
-            body.put("remotePort", remotePort);
+            body.put("remotePort", newProxy.getRemotePort());
         }
         if (ProtocolType.isHttpOrHttps(protocolType)) {
             Set<String> domains = newProxy.getCustomDomains();
             if (domains != null && !domains.isEmpty()) {
                 String customDomainsStr = String.join("\n", domains);
                 body.put("customDomains", customDomainsStr);
+            }
+            Set<String> subDomains = newProxy.getSubDomains();
+            if (subDomains != null && !subDomains.isEmpty()) {
+                String subDomainsStr = String.join("\n", subDomains);
+                body.put("subDomains", subDomainsStr);
             }
 
         }

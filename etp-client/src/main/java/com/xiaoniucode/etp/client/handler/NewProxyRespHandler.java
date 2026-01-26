@@ -19,12 +19,10 @@ public class NewProxyRespHandler implements MessageHandler {
 
     @Override
     public void handle(ChannelHandlerContext ctx, Message msg) {
-        Channel controlChannel = ctx.channel();
         if (msg instanceof NewProxyResp) {
             NewProxyResp resp = (NewProxyResp) msg;
             ProxyRespHelper.set(resp);
-            String serverAddr = controlChannel.attr(EtpConstants.SERVER_DDR).get();
-            logger.info("公网访问地址：{}:{}", serverAddr, resp.getRemoteAddr());
+            logger.info("公网访问地址:{}", resp.getRemoteAddr());
         }
     }
 }

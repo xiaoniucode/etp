@@ -3,9 +3,10 @@ etp:
     enabled: true #是否开启etp代理，默认为关闭状态
     server-addr: localhost #服务器地址
     secret-key: your-secret-key #认证Token
-    custom-domains:
-      - h.local.cc
+#    custom-domains:
+#      - c.domain1.com
     protocol: http
+#    auto-domain: true
 #    local-host: 127.0.0.1
 #    remote-port: 8025
 #

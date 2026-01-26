@@ -183,7 +183,17 @@
                                 </div>
                             </div>
                         </div>
-
+                        
+                        <div class="layui-row layui-col-space20">
+                            <div class="layui-col-md12">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">基础域名</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" class="layui-input config-display" readonly name="baseDomains">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -334,13 +344,15 @@
                 const start = sysConfig.port_range_start || '';
                 const end = sysConfig.port_range_end || '';
                 const portRange = start && end ? `${start} - ${end}` : (start || end || '未设置');
+                const baseDomains = Array.isArray(sysConfig.baseDomains) ? sysConfig.baseDomains.join(', ') : (sysConfig.baseDomains || '未设置');
                 form.val('sysConfigForm', {
                     tls_enabled: sysConfig.tls_enabled,
                     host: sysConfig.host,
                     bind_port: sysConfig.bind_port,
                     port_range: portRange,
                     httpProxyPort:sysConfig.httpProxyPort,
-                    httpsProxyPort:sysConfig.httpsProxyPort
+                    httpsProxyPort:sysConfig.httpsProxyPort,
+                    baseDomains: baseDomains
                 });
 
                 initChart();

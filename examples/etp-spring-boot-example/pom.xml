@@ -12,7 +12,6 @@
     <artifactId>etp-spring-boot-example</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>etp-spring-boot-example</name>
-    <description>etp-spring-boot-example</description>
     <properties>
         <java.version>17</java.version>
         <etp.version>0.2.1</etp.version>
