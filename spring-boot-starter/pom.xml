@@ -3,20 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.xiaoniucode</groupId>
-    <artifactId>etp-spring-boot-starter-parent</artifactId>
+    <artifactId>etp-spring-boot-starter</artifactId>
     <version>0.2.1</version>
-    <name>etp-spring-boot-parent</name>
-    <packaging>pom</packaging>
-    <description>etp-spring-boot-parent</description>
+    <name>etp-spring-boot-starter</name>
+   <packaging>jar</packaging>
+    <description>etp-spring-boot-starter</description>
     <properties>
         <java.version>21</java.version>
         <etp.version>0.5.1</etp.version>
         <etp-spring-boot.version>0.2.1</etp-spring-boot.version>
-
-        <spring-boot.version>2.7.18</spring-boot.version>
-        <spring-boot3.version>3.4.1</spring-boot3.version>
-        <spring-boot4.version>4.0.0</spring-boot4.version>
-
+        <spring-boot.version>3.5.9</spring-boot.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -66,13 +62,45 @@
             <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+    <dependencies>
+        <dependency>
+            <groupId>io.github.xiaoniucode</groupId>
+            <artifactId>etp-client</artifactId>
+            <version>${etp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.xiaoniucode</groupId>
+            <artifactId>etp-common</artifactId>
+            <version>${etp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.xiaoniucode</groupId>
+            <artifactId>etp-core</artifactId>
+            <version>${etp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure-processor</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
 
-    <modules>
-        <module>etp-spring-boot-starter</module>
-        <module>etp-spring-boot3-starter</module>
-        <module>etp-spring-boot4-starter</module>
-        <module>etp-spring-boot-autoconfigure</module>
-    </modules>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>

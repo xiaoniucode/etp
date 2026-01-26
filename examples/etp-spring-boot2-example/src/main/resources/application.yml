@@ -1,7 +1,0 @@
-server:
-  port: 8085
-spring:
-  profiles:
-    active: dev
-  application:
-    name: 物流服务http
