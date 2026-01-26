@@ -6,6 +6,7 @@ import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
+import com.xiaoniucode.etp.server.manager.DomainManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.PortManager;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
@@ -16,7 +17,10 @@ import com.xiaoniucode.etp.server.web.dao.DaoFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class ProxyService {
     private final AppConfig config = ConfigHelper.get();
@@ -47,7 +51,6 @@ public class ProxyService {
         if (ProxyManager.isPortOccupied(remotePort)) {
             throw new BizException("公网端口:" + remotePort + "已被占用");
         }
-        //-1表示用户没有自定义端口
         if (remotePort == -1) {
             int allocatePort = PortManager.acquire();
             req.put("remotePort", allocatePort);
@@ -56,19 +59,7 @@ public class ProxyService {
             req.put("name", req.getInt("remotePort"));
         }
         req.put("type", ProtocolType.TCP.name().toLowerCase(Locale.ROOT));
-        int remotePortInt = req.getInt("remotePort");
-        //注册端口映射
-        ProxyManager.addProxy(secretKey, createProxyMapping(req));
-        //如果客户度已经启动认证
-        ChannelManager.addPortToControlChannelIfOnline(secretKey, remotePortInt);
-        //如果状态是1，需要启动代理服务
-        if (req.getInt("status") == 1) {
-            TcpProxyServer.get().startRemotePort(remotePortInt);
-        } else {
-            //将公网端口添加到已分配缓存
-            PortManager.addRemotePort(remotePortInt);
-        }
-        //最后执行持久化
+
         int proxyId;
         if (config.getDashboard().getEnable()) {
             proxyId = DaoFactory.INSTANCE.getProxyDao().insert(req);
@@ -76,7 +67,17 @@ public class ProxyService {
             //纯TOML模式
             proxyId = GlobalIdGenerator.nextId();
         }
+
+        int status = req.getInt("status");
+
+        ChannelManager.addPortToControlChannelIfOnline(secretKey, remotePort);
+        if (status == 1) {
+            TcpProxyServer.get().startRemotePort(remotePort);
+        } else {
+            PortManager.addRemotePort(remotePort);
+        }
         req.put("proxyId", proxyId);
+        ProxyManager.addProxy(secretKey, createProxyMapping(req));
         return req;
     }
 
@@ -145,14 +146,15 @@ public class ProxyService {
     public JSONObject addHttpProxy(JSONObject req) {
         return TX.execute(() -> {
             req.put("type", ProtocolType.HTTP.name().toLowerCase(Locale.ROOT));
-            String customDomains = req.optString("customDomains");
             int proxyId = DaoFactory.INSTANCE.getProxyDao().insert(req);
-            String[] arr = customDomains.split("\n");
-            for (String domain : arr) {
+            req.put("proxyId", proxyId);
+            ProxyConfig proxyConfig = createProxyMapping(req);
+            Set<String> domains = DomainManager.addDomainsSmartly(proxyConfig);
+            for (String domain : domains) {
                 if (DaoFactory.INSTANCE.getProxyDomainDao().findProxyName(domain) != null) {
                     throw new BizException("域名已经存在：" + domain);
                 }
-               DaoFactory.INSTANCE.getProxyDomainDao().insert(proxyId, domain);
+                DaoFactory.INSTANCE.getProxyDomainDao().insert(proxyId, domain);
             }
 
             req.put("proxyId", proxyId);
@@ -161,14 +163,29 @@ public class ProxyService {
     }
 
     private ProxyConfig createProxyMapping(JSONObject req) {
+        ProtocolType protocol = ProtocolType.getType(req.getString("type"));
         ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.setType(ProtocolType.getType(req.getString("type")));
-        proxyConfig.setLocalIP(req.optString("localIP","127.0.0.1"));
+        proxyConfig.setProxyId(req.getInt("proxyId"));
+        proxyConfig.setType(protocol);
+        proxyConfig.setLocalIP(req.optString("localIP", "127.0.0.1"));
         proxyConfig.setLocalPort(req.getInt("localPort"));
-        proxyConfig.setRemotePort(req.optInt("remotePort",-1));
+        proxyConfig.setRemotePort(req.optInt("remotePort", -1));
         proxyConfig.setProxyId(req.getInt("clientId"));
         proxyConfig.setName(req.getString("name"));
         proxyConfig.setStatus(req.getInt("status"));
+        if (ProtocolType.isHttpOrHttps(protocol)) {
+            String customDomains = req.optString("customDomains");
+            if (StringUtils.hasText(customDomains)) {
+                String[] arr = customDomains.split("\n");
+                proxyConfig.setCustomDomains(new HashSet<>(List.of(arr)));
+            }
+            String subDomains = req.optString("subDomains");
+            if (StringUtils.hasText(subDomains)) {
+                String[] arr = subDomains.split("\n");
+                proxyConfig.setSubDomains(new HashSet<>(List.of(arr)));
+            }
+            proxyConfig.setAutoDomain(req.optBoolean("autoDomain", true));
+        }
         return proxyConfig;
     }
 

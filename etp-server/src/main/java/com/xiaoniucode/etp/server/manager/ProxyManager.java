@@ -38,6 +38,10 @@ public class ProxyManager {
      * remotePort|domain -> 代理状态
      */
     private static final Map<String, Integer> proxyStatus = new ConcurrentHashMap<>();
+    /**
+     * proxyId -> ProxyConfig
+     */
+    private static final Map<Integer, ProxyConfig> proxyConfigs = new ConcurrentHashMap<>();
 
     public static Set<Integer> getClientRemotePorts(String secretKey) {
         return clientRemotePorts.getOrDefault(secretKey, new HashSet<>());
@@ -57,10 +61,11 @@ public class ProxyManager {
             return false;
         }
         client.getProxies().add(proxy);
+        proxyConfigs.put(proxy.getProxyId(), proxy);
 
-        if (ProtocolType.isTcp(proxy.getType())&& !isPortOccupied(proxy.getRemotePort())) {
+        if (ProtocolType.isTcp(proxy.getType()) && !isPortOccupied(proxy.getRemotePort())) {
             clientRemotePorts.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).add(proxy.getRemotePort());
-            portMapping.put(proxy.getRemotePort(), new LanInfo(proxy.getLocalIP(),proxy.getLocalPort()));
+            portMapping.put(proxy.getRemotePort(), new LanInfo(proxy.getLocalIP(), proxy.getLocalPort()));
             proxyStatus.put(proxy.getRemotePort() + "", proxy.getStatus());
             logger.debug("TCP代理 {} 注册成功", proxy.getName());
             return true;
@@ -70,7 +75,7 @@ public class ProxyManager {
             Set<String> customDomains = proxy.getCustomDomains();
             clientDomains.computeIfAbsent(secretKey, k -> new CopyOnWriteArraySet<>()).addAll(customDomains);
             customDomains.forEach(domain -> {
-                domainMapping.put(domain,new LanInfo(proxy.getLocalIP(), proxy.getLocalPort()));
+                domainMapping.put(domain, new LanInfo(proxy.getLocalIP(), proxy.getLocalPort()));
                 proxyStatus.put(domain, proxy.getStatus());
             });
             logger.debug("HTTP代理 {} 注册成功", proxy.getName());
@@ -126,10 +131,14 @@ public class ProxyManager {
         if (!StringUtils.hasText(domain)) {
             throw new IllegalArgumentException("domain is empty");
         }
-       return domainMapping.get(domain);
+        return domainMapping.get(domain);
     }
 
     public static int getProxyStatus(String domain) {
         return proxyStatus.getOrDefault(domain, -1);
+    }
+
+    public static ProxyConfig getProxyConfig(Integer proxyId) {
+        return proxyConfigs.get(proxyId);
     }
 }

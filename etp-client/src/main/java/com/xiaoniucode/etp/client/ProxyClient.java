@@ -37,8 +37,10 @@ public class ProxyClient {
         Channel controlChannel = ChannelManager.getControlChannel();
         if (controlChannel != null) {
             NewProxyResp resp = ProxyRespHelper.get();
-            CloseProxy closeProxy = new CloseProxy(resp.getSessionId(), resp.getProxyId());
-            controlChannel.writeAndFlush(closeProxy);
+            if (resp != null) {
+                CloseProxy closeProxy = new CloseProxy(resp.getSessionId(), resp.getProxyId());
+                controlChannel.writeAndFlush(closeProxy);
+            }
         }
     }
 

@@ -1,11 +1,12 @@
 package com.xiaoniucode.etp.server.handler;
 
-import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.MessageHandler;
+import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.core.msg.UnregisterProxy;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
+import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.ChannelManager;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
@@ -30,10 +31,19 @@ public class UnregisterProxyHandler implements MessageHandler {
     public void handle(ChannelHandlerContext ctx, Message msg) {
         if (msg instanceof UnregisterProxy proxy) {
             Integer proxyId = proxy.getProxyId();
-            String secretKey = ctx.channel().attr(EtpConstants.AUTH_CLIENT_INFO).get().getSecretKey();
+            String secretKey = ChannelManager.getAuthClientInfo(ctx.channel()).getSecretKey();
+            unregister(secretKey, proxy);
+            logger.info("代理：proxyId-{}下线", proxyId);
+        }
+    }
 
+    private void unregister(String secretKey, UnregisterProxy proxy) {
+        Integer proxyId = proxy.getProxyId();
+        ProxyConfig proxyConfig = ProxyManager.getProxyConfig(proxyId);
+        ProtocolType protocolType = proxyConfig.getType();
+        if (ProtocolType.isTcp(protocolType)) {
             if (config.getDashboard().getEnable()) {
-                DaoFactory.INSTANCE.getProxyDao().deleteProxyById(proxyId);
+                DaoFactory.INSTANCE.getProxyDao().deleteProxyById(proxy.getProxyId());
             }
             Set<Integer> ports = ProxyManager.getClientRemotePorts(secretKey);
             //停掉连接的服务并释放端口
@@ -44,8 +54,9 @@ public class UnregisterProxyHandler implements MessageHandler {
                 ChannelManager.removePort(remotePort);
                 TcpProxyServer.get().stopRemotePort(remotePort, true);
             });
+        }
+        if (ProtocolType.isHttpOrHttps(protocolType)) {
 
-            logger.info("代理：proxyId-{}下线", proxyId);
         }
     }
 }

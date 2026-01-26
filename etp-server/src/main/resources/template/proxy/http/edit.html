@@ -44,9 +44,24 @@
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">自定义域名</label>
+            <label class="layui-form-label">域名类型</label>
+            <div class="layui-input-block">
+                <input type="radio" name="domainType" value="auto" title="自动生成" lay-filter="domainType">
+                <input type="radio" name="domainType" value="sub" title="子域名" lay-filter="domainType">
+                <input type="radio" name="domainType" value="custom" title="自定义域名" lay-filter="domainType">
+            </div>
+        </div>
+        <input type="hidden" name="autoDomain">
+        
+        <div class="layui-form-item" id="customDomainsGroup" style="display: none;">
             <div class="layui-input-block">
                 <textarea name="customDomains" placeholder="域名，一行一个" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        
+        <div class="layui-form-item" id="subDomainsGroup" style="display: none;">
+            <div class="layui-input-block">
+                <textarea name="subDomain" placeholder="子域名，一行一个" class="layui-textarea"></textarea>
             </div>
         </div>
         <div class="layui-form-item" pane>
@@ -104,7 +119,45 @@
                 $('select[name="client"]').val(fullValue);
                 form.render('select');
             }
+            
+            // 设置域名类型和显示状态
+            if (data.autoDomain) {
+                $('input[name="domainType"][value="auto"]').prop('checked', true);
+                $('input[name="autoDomain"]').val('true');
+                $('#customDomainsGroup').hide();
+                $('#subDomainsGroup').hide();
+            } else if (data.customDomains) {
+                $('input[name="domainType"][value="custom"]').prop('checked', true);
+                $('input[name="autoDomain"]').val('false');
+                $('#customDomainsGroup').show();
+                $('#subDomainsGroup').hide();
+            } else if (data.subDomain) {
+                $('input[name="domainType"][value="sub"]').prop('checked', true);
+                $('input[name="autoDomain"]').val('false');
+                $('#customDomainsGroup').hide();
+                $('#subDomainsGroup').show();
+            }
+            form.render('radio');
         })
+        
+        // 域名类型切换逻辑
+        form.on('radio(domainType)', function(data) {
+            const domainType = data.value;
+            // 隐藏所有域名输入组
+            $('#customDomainsGroup').hide();
+            $('#subDomainsGroup').hide();
+            // 根据选择的类型显示对应输入组并设置autoDomain值
+            if (domainType === 'auto') {
+                $('input[name="autoDomain"]').val('true');
+            } else if (domainType === 'custom') {
+                $('input[name="autoDomain"]').val('false');
+                $('#customDomainsGroup').show();
+            } else if (domainType === 'sub') {
+                $('input[name="autoDomain"]').val('false');
+                $('#subDomainsGroup').show();
+            }
+        });
+        
         //保存数据
         form.on('submit(proxyForm)', function (data) {
             const field = data.field;
@@ -116,6 +169,8 @@
             }
             field.id = proxyId
             field.status = field.status ? 1 : 0;
+            // 移除domainType字段，后端不需要
+            delete field.domainType;
             Rest.put('/api/proxy/update-http', field).then(data => {
                 layer.msg('更新成功', {icon: 1, time: 400,}, () => {
                     const parentTable = parent.layui.table;

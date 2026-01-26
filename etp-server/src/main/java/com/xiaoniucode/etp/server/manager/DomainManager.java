@@ -333,7 +333,7 @@ public class DomainManager {
     public static Set<String> generateSubDomains(ProxyConfig proxyConfig) {
         Set<String> subDomains = new HashSet<>();
 
-        if (proxyConfig == null || proxyConfig.getSubdomains() == null || proxyConfig.getSubdomains().isEmpty()) {
+        if (proxyConfig == null || proxyConfig.getSubDomains() == null || proxyConfig.getSubDomains().isEmpty()) {
             return subDomains;
         }
 
@@ -348,7 +348,7 @@ public class DomainManager {
         Random random = new Random();
 
         // 为每个子域名前缀生成完整域名，随机选择基础域名
-        for (String subDomainPrefix : proxyConfig.getSubdomains()) {
+        for (String subDomainPrefix : proxyConfig.getSubDomains()) {
             // 随机选择一个基础域名
             String baseDomain = baseDomainList.get(random.nextInt(baseDomainList.size()));
             String subDomain = subDomainPrefix + "." + baseDomain;
@@ -409,7 +409,7 @@ public class DomainManager {
         }
 
         // 2. 处理 subDomains（优先级次之）
-        if (proxyConfig.getSubdomains() != null && !proxyConfig.getSubdomains().isEmpty()) {
+        if (proxyConfig.getSubDomains() != null && !proxyConfig.getSubDomains().isEmpty()) {
             if (baseDomains.isEmpty()) {
                 String errorMsg = "未配置基础域名，无法生成子域名";
                 logger.error(errorMsg);

@@ -13,7 +13,7 @@ public class ProxyConfig {
     private Integer remotePort;
     private Integer status;
     private Set<String> customDomains;
-    private Set<String> subdomains;
+    private Set<String> subDomains;
     private Boolean autoDomain;
     public Integer getProxyId() {
         return proxyId;
@@ -79,12 +79,12 @@ public class ProxyConfig {
         this.customDomains = customDomains;
     }
 
-    public Set<String> getSubdomains() {
-        return subdomains;
+    public Set<String> getSubDomains() {
+        return subDomains;
     }
 
-    public void setSubdomains(Set<String> subdomains) {
-        this.subdomains = subdomains;
+    public void setSubDomains(Set<String> subDomains) {
+        this.subDomains = subDomains;
     }
 
     public Boolean getAutoDomain() {

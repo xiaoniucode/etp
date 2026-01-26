@@ -10,9 +10,6 @@ public class ProxyRespHelper {
     }
 
     public static NewProxyResp get() {
-        if (newProxyResp == null) {
-            throw new NullPointerException("NewProxyResp is null");
-        }
         return newProxyResp;
     }
 }

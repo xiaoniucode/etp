@@ -38,6 +38,7 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<Message> {
             visitor.close();
         }
         ChannelManager.closeControl(control);
+        //todo 清理自动注册的客户端以及数据记录
 
         super.channelInactive(ctx);
     }
