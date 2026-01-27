@@ -6,7 +6,7 @@ on:
     tags:
       - 'v*'           # push版本标签时候触发
 env:
-  JAVA_VERSION: '21'
+  JAVA_VERSION: '25'
 
 jobs:
   # 构建跨平台Native镜像

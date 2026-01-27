@@ -36,6 +36,9 @@
                         <artifactId>native-maven-plugin</artifactId>
                         <version>${native-maven-plugin.version}</version>
                         <configuration>
+                            <buildArgs>
+                                <buildArg>--initialize-at-build-time=org.sqlite.util.ProcessRunner</buildArg>
+                            </buildArgs>
                             <mainClass>com.xiaoniucode.etp.server.TunnelServerStartup</mainClass>
                             <imageName>etp-server</imageName>
                         </configuration>

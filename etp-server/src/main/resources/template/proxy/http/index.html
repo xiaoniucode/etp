@@ -14,6 +14,9 @@
         <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add">
             <i class="layui-icon layui-icon-add-1"></i> 新增
         </button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="batchDelete">
+            <i class="layui-icon layui-icon-delete"></i> 批量删除
+        </button>
         <button class="layui-btn layui-btn-sm" lay-event="flush">
             <i class="layui-icon layui-icon-refresh"></i> 刷新
         </button>
@@ -48,6 +51,7 @@
                 'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
             },
             cols: [[
+                {type: 'checkbox', fixed: 'left'},
                 {field: 'clientName', fixed: 'left', width: 150, title: '客户端', sort: true},
                 {field: 'name', title: '隧道名称'},
                 {
@@ -105,7 +109,7 @@
                     content: '/proxy/http/edit.html?id=' + data.id
                 });
             } else if (obj.event === 'delete') {
-                layer.confirm('确定删除「' + data.name + '」代理吗？<br>此操作将会断开用户已经建立的连接！',
+                layer.confirm('确定删除「' + data.name + '」代理吗？',
                     {
                         icon: 2,
                         title: '危险操作确认',
@@ -147,6 +151,29 @@
                 });
             } else if (obj.event === 'flush') {
                 table.reload('proxy')
+            } else if (obj.event === 'batchDelete') {
+                const checkStatus = table.checkStatus('proxy');
+                const data = checkStatus.data;
+                if (data.length === 0) {
+                    layer.msg('请选择要删除的隧道', {icon: 2});
+                    return;
+                }
+                layer.confirm('确定删除选中的 ' + data.length + ' 个隧道吗？',
+                    {
+                        icon: 2,
+                        title: '危险操作确认',
+                        skin: 'layui-layer-molv',
+                        btn: ['确认删除', '我再想想'],
+                    }, function (index) {
+                        const ids = data.map(item => item.id);
+                        const secretKeys = data.map(item => item.secretKey);
+                        Rest.post('/api/proxy/batch-del', {ids: ids, secretKeys: secretKeys}).then(data => {
+                            table.reload('proxy')
+                            layer.msg('删除成功', {time: 2000});
+                        }).catch(err => {
+                            layer.msg('删除失败', {icon: 2});
+                        })
+                    })
             }
         })
     });

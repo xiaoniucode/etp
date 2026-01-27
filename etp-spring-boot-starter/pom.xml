@@ -9,7 +9,7 @@
    <packaging>jar</packaging>
     <description>etp-spring-boot-starter</description>
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <etp.version>0.5.1</etp.version>
         <etp-spring-boot.version>0.2.1</etp-spring-boot.version>
         <spring-boot.version>3.5.9</spring-boot.version>
