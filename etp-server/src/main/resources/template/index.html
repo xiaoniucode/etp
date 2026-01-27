@@ -21,6 +21,11 @@
                  onerror="this.style.display='none'">
         </div>
         <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a id="fullscreenBtn" href="javascript:;">
+                    <i class="layui-icon layui-icon-screen-full"></i> 全屏
+                </a>
+            </li>
             <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
                 <a href="javascript:;">
                     <img src="/static/image/logo_white.png" class="layui-nav-img">
@@ -115,6 +120,63 @@
             })
 
         });
+
+        // 全屏功能
+        $('#fullscreenBtn').on('click', function () {
+            toggleFullscreen();
+        });
+
+        // 监听全屏状态变化
+        document.addEventListener('fullscreenchange', function () {
+            updateFullscreenButton();
+        });
+        document.addEventListener('webkitfullscreenchange', function () {
+            updateFullscreenButton();
+        });
+        document.addEventListener('mozfullscreenchange', function () {
+            updateFullscreenButton();
+        });
+        document.addEventListener('MSFullscreenChange', function () {
+            updateFullscreenButton();
+        });
+
+        // 切换全屏
+        function toggleFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+                // 进入全屏
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.mozRequestFullScreen) {
+                    document.documentElement.mozRequestFullScreen();
+                } else if (document.documentElement.msRequestFullscreen) {
+                    document.documentElement.msRequestFullscreen();
+                }
+            } else {
+                // 退出全屏
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // 更新全屏按钮状态
+        function updateFullscreenButton() {
+            const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+            const fullscreenBtn = $('#fullscreenBtn');
+            if (isFullscreen) {
+                fullscreenBtn.html('<i class="layui-icon layui-icon-screen-restore"></i> 退出全屏');
+            } else {
+                fullscreenBtn.html('<i class="layui-icon layui-icon-screen-full"></i> 全屏');
+            }
+        }
 
         function setLoginInfo() {
             try {

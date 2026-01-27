@@ -10,7 +10,6 @@
     border: none;
 }
 
-/* 全局隐藏所有滚动条 - WebKit浏览器 */
 ::-webkit-scrollbar {
     width: 0 !important;
     height: 0 !important;
@@ -24,20 +23,30 @@
     background: transparent !important;
 }
 
-/* 全局隐藏所有滚动条 - Firefox */
 * {
     scrollbar-width: none !important;
     scrollbar-color: transparent transparent !important;
 }
 
-/* 确保所有元素都不显示滚动条 */
 * {
     overflow: -moz-hidden-unscrollable !important;
     -ms-overflow-style: none !important;
 }
 
-/* 允许body和.layui-body滚动但隐藏滚动条 */
 body, .layui-body {
     overflow: auto !important;
     -webkit-overflow-scrolling: touch !important;
+}
+
+.layui-nav .layui-this:after, .layui-nav-bar {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 3px;
+    background-color: transparent !important;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+    pointer-events: none;
 }
