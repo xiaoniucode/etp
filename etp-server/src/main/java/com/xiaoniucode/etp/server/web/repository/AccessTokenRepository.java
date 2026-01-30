@@ -1,0 +1,17 @@
+package com.xiaoniucode.etp.server.web.repository;
+
+import com.xiaoniucode.etp.server.web.domain.AccessToken;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+/**
+ * 访问令牌 Repository
+ */
+@Repository
+public interface AccessTokenRepository extends JpaRepository<AccessToken, Integer> {
+    
+    /**
+     * 根据token查询访问令牌
+     */
+    AccessToken findByToken(String token);
+}
