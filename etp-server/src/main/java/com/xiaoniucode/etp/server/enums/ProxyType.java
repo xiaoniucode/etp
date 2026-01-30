@@ -5,8 +5,7 @@ package com.xiaoniucode.etp.server.enums;
  */
 public enum ProxyType {
     TCP("TCP", "TCP 代理"),
-    HTTP("HTTP", "HTTP 代理"),
-    HTTPS("HTTPS", "HTTPS 代理");
+    HTTP("HTTP", "HTTP 代理");
 
     private final String type;
     private final String description;

@@ -51,7 +51,10 @@ public class DomainManager {
         }
     }
     public static DomainInfo getDomainInfo(String domain) {
-        return domainMap.get(domain);
+        ProxyConfig proxyConfig = new ProxyConfig();
+        proxyConfig.setStatus(ProxyStatus.OPEN);
+        return new DomainInfo("a.domain1.com",proxyConfig);
+        //todo return domainMap.get(domain);
     }
 
     public static void removeDomain(String domain) {

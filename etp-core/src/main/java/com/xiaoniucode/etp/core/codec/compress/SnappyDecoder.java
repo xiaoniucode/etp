@@ -16,7 +16,11 @@ public class SnappyDecoder extends SnappyFrameDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        if (logger.isDebugEnabled() && in.readableBytes() > 4) {
+        if (logger.isDebugEnabled()) {
+            final int inSize = in.readableBytes();
+            if (inSize < 4) {
+                return;
+            }
             //读取类型，判断是否压缩了，不要移动指针
             final int chunkTypeVal = in.getUnsignedByte(in.readerIndex());
             if (chunkTypeVal != 0) {

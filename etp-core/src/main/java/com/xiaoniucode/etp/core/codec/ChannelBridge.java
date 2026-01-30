@@ -38,6 +38,7 @@ public class ChannelBridge extends ChannelDuplexHandler {
     public void channelInactive(ChannelHandlerContext ctx) {
         // 先传递给下一个handler
         closeOnFlush(peer);
+        ctx.fireChannelInactive();
     }
 
     @Override
@@ -45,6 +46,7 @@ public class ChannelBridge extends ChannelDuplexHandler {
         log.debug("bridge exception: {}", cause.getMessage());
         closeOnFlush(ctx.channel());
         closeOnFlush(peer);
+        ctx.fireExceptionCaught(cause);
     }
 
     public static void bridge(Channel a, Channel b) {

@@ -7,46 +7,46 @@
     <packaging>pom</packaging>
     <name>etp-main</name>
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <shade.mainClass>custom</shade.mainClass>
         <native-maven-plugin.version>0.10.6</native-maven-plugin.version>
     </properties>
-   <modules>
-       <module>etps</module>
-       <module>etpc</module>
-   </modules>
+    <modules>
+        <module>etps</module>
+        <module>etpc</module>
+    </modules>
     <build>
-  <!--      <plugins>
-            <plugin>
-             <groupId>org.apache.maven.plugins</groupId>
-             <artifactId>maven-shade-plugin</artifactId>
-             <version>3.5.0</version>
-             <executions>
-                 <execution>
-                     <phase>package</phase>
-                     <goals>
-                         <goal>shade</goal>
-                     </goals>
-                     <configuration>
-                         <transformers>
-                             <transformer
-                                 implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                 <mainClass>${shade.mainClass}</mainClass>
-                             </transformer>
-                         </transformers>
-                     </configuration>
-                 </execution>
-             </executions>
-         </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-        </plugins>-->
+        <!--      <plugins>
+                  <plugin>
+                   <groupId>org.apache.maven.plugins</groupId>
+                   <artifactId>maven-shade-plugin</artifactId>
+                   <version>3.5.0</version>
+                   <executions>
+                       <execution>
+                           <phase>package</phase>
+                           <goals>
+                               <goal>shade</goal>
+                           </goals>
+                           <configuration>
+                               <transformers>
+                                   <transformer
+                                       implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                       <mainClass>${shade.mainClass}</mainClass>
+                                   </transformer>
+                               </transformers>
+                           </configuration>
+                       </execution>
+                   </executions>
+               </plugin>
+                  <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-compiler-plugin</artifactId>
+                      <configuration>
+                          <source>${java.version}</source>
+                          <target>${java.version}</target>
+                      </configuration>
+                  </plugin>
+              </plugins>-->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

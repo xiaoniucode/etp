@@ -13,7 +13,6 @@ public interface ProxyService {
 
     void updateTcpProxy(Proxy req);
 
-    Proxy addHttpsProxy(Proxy req);
 
     Proxy addHttpProxy(Proxy req);
 

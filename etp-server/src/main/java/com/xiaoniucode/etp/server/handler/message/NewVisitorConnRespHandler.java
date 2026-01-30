@@ -5,7 +5,10 @@ import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.codec.ChannelBridge;
 import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
-import com.xiaoniucode.etp.server.handler.tunnel.VisitorHandler;
+import com.xiaoniucode.etp.server.handler.tunnel.HttpVisitorHandler;
+import com.xiaoniucode.etp.server.handler.tunnel.ResourceReleaseHandler;
+import com.xiaoniucode.etp.server.handler.tunnel.TcpVisitorHandler;
+import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.ProtocolDetection;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
@@ -27,10 +30,9 @@ import org.springframework.stereotype.Component;
 public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
     private final Logger logger = LoggerFactory.getLogger(NewVisitorConnRespHandler.class);
     @Autowired
-    private VisitorHandler visitorHandler;
-    @Autowired
     private VisitorSessionManager visitorSessionManager;
-
+    @Autowired
+    private HttpVisitorHandler httpVisitorHandler;
     @Override
     protected void doHandle(ChannelHandlerContext ctx, ControlMessage msg) {
         Message.NewVisitorConnResp resp = msg.getNewVisitorConnResp();
@@ -52,7 +54,7 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
         visitor.config().setOption(ChannelOption.AUTO_READ, true);
         if (ProtocolDetection.isHttp(visitor)) {
             visitor.attr(EtpConstants.CONNECTED).set(true);
-            visitorHandler.sendFirstPackage(visitorSession);
+            httpVisitorHandler.sendFirstPackage(visitorSession);
         }
         logger.debug("已连接到目标服务");
     }

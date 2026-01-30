@@ -9,7 +9,6 @@ import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
-import com.xiaoniucode.etp.server.manager.domain.ProxyConfigExt;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,9 +53,15 @@ public class AgentSessionManager {
     @Autowired
     private SessionIdGenerator sessionIdGenerator;
     @Autowired
-    private EventBus eventBus;
+    private ProxyManager proxyManager;
 
-    public AgentSession registerAgent(AgentSession agentSession) {
+    /**
+     * 注册Agent 客户端
+     * @param agentSession 客户端信息
+     * @return 客户端信息
+     */
+    public synchronized AgentSession registerAgent(AgentSession agentSession) {
+        //为客户端生成一个唯一的 sessionId
         String sessionId = sessionIdGenerator.nextAgentSessionId();
         agentSession.setSessionId(sessionId);
         agentSession.getControl().attr(EtpConstants.SESSION_ID).set(sessionId);
@@ -65,18 +70,18 @@ public class AgentSessionManager {
 
         String token = agentSession.getToken();
 
-        tokenToAgentSessions.computeIfAbsent(token, k -> new CopyOnWriteArraySet<>())
-                .add(agentSession);
-
-        ProxyManager proxyManager = BeanHelper.getBean(ProxyManager.class);
-        List<ProxyConfigExt> proxyConfigs = proxyManager.getProxyConfigsBySessionId(sessionId);
-        for (ProxyConfigExt proxy : proxyConfigs) {
+        tokenToAgentSessions.computeIfAbsent(token,
+                k -> new CopyOnWriteArraySet<>()).add(agentSession);
+        String clientId = agentSession.getClientId();
+        Set<ProxyConfig> proxyConfigs = proxyManager.getProxyConfigsByClientId(clientId);
+        for (ProxyConfig proxy : proxyConfigs) {
             ProtocolType protocol = proxy.getProtocol();
             if (ProtocolType.isTcp(protocol)) {
                 portToAgentSession.putIfAbsent(proxy.getRemotePort(), agentSession);
+                continue;
             }
             if (ProtocolType.isHttp(protocol)) {
-                Set<String> domains = proxy.getDomains();
+                Set<String> domains = proxy.getFullDomains();
                 for (String domain : domains) {
                     domainToAgentSession.putIfAbsent(domain, agentSession);
                 }
@@ -112,7 +117,6 @@ public class AgentSessionManager {
         //清理自动注册的客户端以及数据记录
         //todo 还需要清理visitor相关资源、启动的服务资源
         //需要清空与该agent有关的所有session连接
-        eventBus.publishAsync(new ClientDisconnectEvent());
     }
 
     /**

@@ -8,7 +8,6 @@ import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.event.NewProxyRegisterEvent;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.manager.domain.ProxyConfigExt;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -37,15 +36,15 @@ public class NewProxyRespHandler implements MessageHandler {
     public void handle(ChannelHandlerContext ctx, ControlMessage msg) {
         Channel control = ctx.channel();
         Message.NewProxy newProxy = msg.getNewProxy();
-        ProxyConfig proxyConfig = buildProxyConfig(newProxy);
+        ProxyConfig config = buildProxyConfig(newProxy);
         //保存到代理到配置管理器
-        proxyManager.addProxy(proxyConfig, proxyConfigExt -> {
+        proxyManager.addProxy("1",config, proxyConfig -> {
             //发布事件，可订阅事件对其进行持久化或其他操作
             NewProxyRegisterEvent event = new NewProxyRegisterEvent();
-            event.setProxyConfigExt(proxyConfigExt);
+            event.setProxyConfig(proxyConfig);
             eventBus.publishAsync(event);
-            control.writeAndFlush(buildResponse(proxyConfigExt));
-            logger.debug("代理: {} 注册成功", proxyConfigExt.getName());
+            control.writeAndFlush(buildResponse(proxyConfig));
+            logger.debug("代理: {} 注册成功", proxyConfig.getName());
         });
     }
 
@@ -53,9 +52,9 @@ public class NewProxyRespHandler implements MessageHandler {
         return new ProxyConfig();
     }
 
-    private Message.NewProxyResp buildResponse(ProxyConfigExt ext) {
+    private Message.NewProxyResp buildResponse(ProxyConfig ext) {
         ProtocolType protocol = ext.getProtocol();
-        Set<String> domains = ext.getDomains();
+        Set<String> domains = ext.getFullDomains();
         Message.NewProxyResp.Builder builder = Message.NewProxyResp.newBuilder();
         if (domains == null || domains.isEmpty()) {
             return builder.build();
@@ -72,15 +71,6 @@ public class NewProxyRespHandler implements MessageHandler {
                 remoteAddr.append("\n");
             }
 
-        } else if (ProtocolType.isHttps(protocol)) {
-            int httpsProxyPort = ConfigHelper.get().getHttpsProxyPort();
-            for (String domain : domains) {
-                remoteAddr.append("https://").append(domain);
-                if (httpsProxyPort != 443) {
-                    remoteAddr.append(":").append(httpsProxyPort);
-                }
-                remoteAddr.append("\n");
-            }
         } else if (ProtocolType.isTcp(protocol)) {
             Integer remotePort = ext.getRemotePort();
             remoteAddr.append(host).append(":").append(remotePort);

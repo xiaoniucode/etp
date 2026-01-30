@@ -13,7 +13,7 @@ import java.util.Map;
  * @author liuxin
  */
 public enum ProtocolType {
-    TCP, HTTP, HTTPS;
+    TCP, HTTP;
     private static final Map<String, ProtocolType> NAME_MAP;
 
     static {
@@ -32,16 +32,8 @@ public enum ProtocolType {
         return protocol;
     }
 
-    public static boolean isHttpOrHttps(ProtocolType protocolType) {
-        return protocolType == HTTP || protocolType == HTTPS;
-    }
-
     public static boolean isTcp(ProtocolType protocolType) {
         return protocolType == TCP;
-    }
-
-    public static boolean isHttps(ProtocolType protocolType) {
-        return protocolType == HTTPS;
     }
 
     public static boolean isHttp(ProtocolType protocolType) {
@@ -52,15 +44,7 @@ public enum ProtocolType {
         return StringUtils.hasText(protocol) && HTTP.name().equalsIgnoreCase(protocol);
     }
 
-    public static boolean isHttps(String protocol) {
-        return StringUtils.hasText(protocol) && HTTPS.name().equalsIgnoreCase(protocol);
-    }
-
     public static boolean isTcp(String protocol) {
         return StringUtils.hasText(protocol) && TCP.name().equalsIgnoreCase(protocol);
-    }
-
-    public static boolean isHttpOrHttps(String protocol) {
-        return StringUtils.hasText(protocol) && (isHttps(protocol) || isHttp(protocol));
     }
 }

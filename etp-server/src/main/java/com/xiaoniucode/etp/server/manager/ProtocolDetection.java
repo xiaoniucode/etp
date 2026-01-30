@@ -14,14 +14,6 @@ public class ProtocolDetection {
         return protocolType != null && ProtocolType.isHttp(protocolType);
     }
 
-//    public static boolean isHttps(Channel visitor) {
-//
-//    }
-//
-//    public static boolean isHttpOrHttps(Channel visitor) {
-//
-//    }
-
     public static boolean isTcp(Channel visitor) {
         ProtocolType protocolType = getProtocolType(visitor);
         return protocolType == null || ProtocolType.isTcp(protocolType);

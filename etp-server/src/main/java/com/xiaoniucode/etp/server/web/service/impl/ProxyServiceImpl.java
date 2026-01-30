@@ -51,12 +51,6 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     @Override
-    public Proxy addHttpsProxy(Proxy req) {
-        req.setType(ProtocolType.HTTPS.name().toLowerCase(Locale.ROOT));
-        return addTcpProxy(req);
-    }
-
-    @Override
     @Transactional(rollbackOn = Exception.class)
     public Proxy addHttpProxy(Proxy req) {
 

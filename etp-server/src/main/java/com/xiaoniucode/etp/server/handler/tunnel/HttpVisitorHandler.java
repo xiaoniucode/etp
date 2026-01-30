@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.handler.tunnel;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.LanInfo;
 import com.xiaoniucode.etp.core.msg.Message;
-import com.xiaoniucode.etp.server.manager.ProtocolDetection;
+import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
 import io.netty.buffer.ByteBuf;
@@ -18,52 +18,24 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ChannelHandler.Sharable
-public class VisitorHandler extends ChannelInboundHandlerAdapter {
-    private final Logger logger = LoggerFactory.getLogger(VisitorHandler.class);
+public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
+    private final Logger logger = LoggerFactory.getLogger(HttpVisitorHandler.class);
     @Autowired
     private VisitorSessionManager visitorSessionManager;
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
         Channel visitor = ctx.channel();
-        if (ProtocolDetection.isTcp(visitor)) {
+        Boolean connected = visitor.attr(EtpConstants.CONNECTED).get();
+        if (connected == null || !connected) {
+            visitor.attr(EtpConstants.CONNECTED).set(false);
+            buf.retain();
+            visitor.attr(EtpConstants.HTTP_FIRST_PACKET).set(buf);
             visitor.config().setOption(ChannelOption.AUTO_READ, false);
             visitorSessionManager.registerVisitor(visitor, this::connectToTarget);
+            ctx.pipeline().remove(this);
         }
-
-        super.channelActive(ctx);
     }
-
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        Channel visitor = ctx.channel();
-        if (ProtocolDetection.isTcp(visitor)) {
-            super.channelRead(ctx, msg);
-            return;
-        }
-        if (msg instanceof ByteBuf buf){
-            Boolean connected = visitor.attr(EtpConstants.CONNECTED).get();
-            if (connected == null || !connected) {
-                visitor.attr(EtpConstants.CONNECTED).set(false);
-                buf.retain();
-                visitor.attr(EtpConstants.HTTP_FIRST_PACKET).set(buf);
-                visitor.config().setOption(ChannelOption.AUTO_READ, false);
-                visitorSessionManager.registerVisitor(visitor, this::connectToTarget);
-                return;
-            }
-            VisitorSession visitorSession = visitorSessionManager.getVisitorSession(visitor);
-            Channel tunnel = visitorSession.getTunnel();
-            if (tunnel == null || !tunnel.isActive()) {
-                logger.warn("数据连接为空或未激活");
-                return;
-            }
-            if (tunnel.isWritable()) {
-                tunnel.writeAndFlush(buf.retain());
-            }
-        }
-
-    }
-
 
     private void connectToTarget(VisitorSession session) {
         Channel control = session.getControl();
@@ -88,7 +60,7 @@ public class VisitorHandler extends ChannelInboundHandlerAdapter {
      */
     public void sendFirstPackage(VisitorSession session) {
         Channel visitor = session.getVisitor();
-        Channel tunnel = visitor.attr(EtpConstants.DATA_CHANNEL).get();
+        Channel tunnel = session.getTunnel();
         ByteBuf cached = visitor.attr(EtpConstants.HTTP_FIRST_PACKET).get();
         if (cached != null && tunnel.isWritable()) {
             tunnel.writeAndFlush(cached.retain());
@@ -96,7 +68,7 @@ public class VisitorHandler extends ChannelInboundHandlerAdapter {
             visitor.attr(EtpConstants.HTTP_FIRST_PACKET).set(null);
         }
     }
-
+    //todo 需要迁移到桥接器
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel visitor = ctx.channel();
@@ -113,17 +85,18 @@ public class VisitorHandler extends ChannelInboundHandlerAdapter {
         });
         super.channelInactive(ctx);
     }
-
+    //todo 需要迁移到桥接器
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error(cause.getMessage(), cause);
         ctx.close();
     }
-
+    //todo 需要迁移到桥接器
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel visitor = ctx.channel();
-        Channel tunnel = visitor.attr(EtpConstants.DATA_CHANNEL).get();
+        VisitorSession visitorSession = visitorSessionManager.getVisitorSession(visitor);
+        Channel tunnel = visitorSession.getTunnel();
         if (tunnel != null) {
             tunnel.config().setOption(ChannelOption.AUTO_READ, visitor.isWritable());
         }

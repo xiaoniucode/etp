@@ -4,7 +4,8 @@ import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.event.TcpServerInitializedEvent;
-import com.xiaoniucode.etp.server.handler.tunnel.VisitorHandler;
+import com.xiaoniucode.etp.server.handler.tunnel.ResourceReleaseHandler;
+import com.xiaoniucode.etp.server.handler.tunnel.TcpVisitorHandler;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.TcpServerManager;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
@@ -50,7 +51,7 @@ public final class TcpProxyServer implements Lifecycle {
                     protected void initChannel(SocketChannel sc) {
                         sc.pipeline().addLast(new TrafficMetricsHandler());
                         sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
-                        sc.pipeline().addLast(BeanHelper.getBean(VisitorHandler.class));
+                        sc.pipeline().addLast(BeanHelper.getBean(TcpVisitorHandler.class));
                     }
                 });
         init.set(true);

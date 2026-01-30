@@ -57,6 +57,8 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
         AgentSession agent = new AgentSession(control, token);
         agent.setArch(login.getArch());
         agent.setOs(login.getOs());
+        //todo test clientId
+        agent.setClientId("1");
         agentSessionManager.registerAgent(agent);
         logger.debug("Agent: {} login success", token);
         //可返回登陆成功消息给客户端 Agent

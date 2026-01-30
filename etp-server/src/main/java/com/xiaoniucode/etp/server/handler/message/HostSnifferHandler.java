@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.handler.message;
 
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
+import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
 import com.xiaoniucode.etp.server.manager.DomainManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
@@ -20,13 +21,9 @@ import java.util.List;
 /**
  * 解析出域名
  */
-@Component
 public class HostSnifferHandler extends ByteToMessageDecoder {
     private final Logger logger = LoggerFactory.getLogger(HostSnifferHandler.class);
     private boolean sniffing = true;
-    @Autowired
-    private ProxyManager proxyManager;
-
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         Channel visitor = ctx.channel();
@@ -61,7 +58,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                         logger.debug("隧道状态为关闭状态");
                         return;
                     }
-                    if (!proxyManager.hasDomain(domain)) {
+                    if (!BeanHelper.getBean(ProxyManager.class).hasDomain(domain)) {
                         logger.warn("没有该域名的代理服务");
                         visitor.close();
                         return;
