@@ -6,6 +6,7 @@ package com.xiaoniucode.etp.core.msg;
 enum MessageType {
   UNKNOWN = 0;              // 未知类型
   LOGIN = 101;          // 登录请求
+  LOGIN_RESP = 104;          //登录响应
   NEW_PROXY = 102;       // 创建代理请求
   CLOSE_PROXY = 103;     // 关闭代理请求
   PING = 105;            // 心跳请求
@@ -21,7 +22,6 @@ enum MessageType {
 enum ProtocolType {
   TCP = 0;
   HTTP = 1;
-  HTTPS = 2;
 }
 
 message MessageHeader {
@@ -33,6 +33,10 @@ message Login {
   string os = 1;
   string arch = 2;
   string token = 3;
+  string clientId=4;
+}
+message LoginResp {
+  string sessionId = 1;
 }
 
 // 创建代理
@@ -100,5 +104,6 @@ message ControlMessage {
     Kickout kickout = 30;
     NewVisitorConn newVisitorConn = 31;
     NewVisitorConnResp newVisitorConnResp = 32;
+    LoginResp loginResp = 33;
   }
 }

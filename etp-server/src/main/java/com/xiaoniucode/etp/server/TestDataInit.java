@@ -5,8 +5,10 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.event.TcpServerInitializedEvent;
+import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.DomainManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.manager.TcpServerManager;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,13 @@ public class TestDataInit implements EventListener<TcpServerInitializedEvent> {
         proxyConfig1.setLocalIp("localhost");
         proxyConfig1.setLocalPort(3306);
 
+        ProxyConfig redicConfig = new ProxyConfig();
+        redicConfig.setName("redis");
+        redicConfig.setProtocol(ProtocolType.TCP);
+        redicConfig.setRemotePort(3308);
+        redicConfig.setLocalIp("localhost");
+        redicConfig.setLocalPort(6379);
+
         ProxyConfig proxyConfig2 = new ProxyConfig();
         proxyConfig2.setName("web");
         proxyConfig2.setProtocol(ProtocolType.HTTP);
@@ -54,6 +63,10 @@ public class TestDataInit implements EventListener<TcpServerInitializedEvent> {
 
         proxyManager.createProxy("1", proxyConfig1, null);
         proxyManager.createProxy("1", proxyConfig2, null);
+        proxyManager.createProxy("1", redicConfig, null);
+
+        BeanHelper.getBean(TcpServerManager.class).bindPort(3307);
+        BeanHelper.getBean(TcpServerManager.class).bindPort(3308);
         logger.info("初始化测试数据");
     }
 }

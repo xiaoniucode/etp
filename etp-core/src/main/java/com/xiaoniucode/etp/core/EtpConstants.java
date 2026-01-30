@@ -14,19 +14,14 @@ import java.util.Set;
  */
 public class EtpConstants {
     public static final AttributeKey<String> SESSION_ID = AttributeKey.valueOf("etp.sessionId");
-    public static final AttributeKey<String> SECRET_KEY = AttributeKey.valueOf("etp.secretKey");
-    public static final AttributeKey<AuthClientInfo> AUTH_CLIENT_INFO = AttributeKey.valueOf("etp.auth_client_info");
+    public static final AttributeKey<String> CLIENT_ID = AttributeKey.valueOf("etp.client_id");
     public static final AttributeKey<Channel> DATA_CHANNEL = AttributeKey.valueOf("etp.tunnel");
     public static final AttributeKey<Channel> REAL_SERVER_CHANNEL = AttributeKey.valueOf("etp.realServerChannel");
     public static final AttributeKey<Channel> VISITOR_CHANNEL = AttributeKey.valueOf("etp.visitorChannel");
     public static final AttributeKey<Boolean> CONNECTED = AttributeKey.valueOf("etp.connected");
 
-    public static final AttributeKey<Map<Long, Channel>> VISITOR_CHANNELS = AttributeKey.newInstance("etp.visitorChannels");
-    public static final AttributeKey<Set<Integer>> CHANNEL_REMOTE_PORT = AttributeKey.valueOf("etp.channelRemotePort");
-
     public static final AttributeKey<String> SERVER_DDR = AttributeKey.valueOf("etp.serverAddr");
     public static final AttributeKey<Integer> SERVER_PORT = AttributeKey.valueOf("etp.serverPort");
-    public static final AttributeKey<LanInfo> LAN_INFO = AttributeKey.valueOf("etp.lanInfo");
     public static final AttributeKey<ProtocolType> PROTOCOL_TYPE = AttributeKey.valueOf("etp.protocol_type");
     public static final AttributeKey<String> VISIT_DOMAIN = AttributeKey.valueOf("etp.visitorDomain");
     public static final AttributeKey<ByteBuf> HTTP_FIRST_PACKET = AttributeKey.newInstance("cachedFirstPacket");

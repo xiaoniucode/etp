@@ -15,7 +15,8 @@ public class MessageHandlerFactory {
     private static final Map<MessageType, MessageHandler> HANDLERS = new HashMap<>();
 
     static {
-        HANDLERS.put(MessageType.LOGIN, new CloseProxyHandler());
+        HANDLERS.put(MessageType.CLOSE_PROXY, new CloseProxyHandler());
+        HANDLERS.put(MessageType.LOGIN_RESP, new LoginRespHandler());
         HANDLERS.put(MessageType.NEW_VISITOR, new NewVisitorConnHandler());
         HANDLERS.put(MessageType.ERROR, new ErrorChannelHandler());
         HANDLERS.put(MessageType.NEW_PROXY_RESP, new NewProxyRespHandler());

@@ -23,8 +23,9 @@ public class AgentSession {
      */
     private long lastHeartbeat;
 
-    public AgentSession(Channel control, String token) {
-        this.control = control;
+    public AgentSession(String clientId, String token, Channel control) {
+        this.clientId = clientId;
         this.token = token;
+        this.control = control;
     }
 }

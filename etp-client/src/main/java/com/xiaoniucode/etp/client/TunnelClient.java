@@ -146,18 +146,23 @@ public final class TunnelClient implements Lifecycle {
                 Channel controlChannel = channelFuture.channel();
                 controlChannel.attr(EtpConstants.SERVER_DDR).set(config.getServerAddr());
                 controlChannel.attr(EtpConstants.SERVER_PORT).set(config.getServerPort());
-                controlChannel.attr(EtpConstants.SECRET_KEY).set(config.getSecretKey());
                 ChannelManager.setControlChannel(controlChannel);
                 String os = OSUtils.getOS();
                 String arch = OSUtils.getOSArch();
                 Message.MessageHeader header = Message.MessageHeader.newBuilder().setType(Message.MessageType.LOGIN).build();
-
+                //todo clientId
                 Message.Login login = Message.Login.newBuilder()
+                        .setClientId("1")
                         .setToken(config.getSecretKey())
                         .setArch(arch)
                         .setOs(os).build();
                 Message.ControlMessage loginMessage = Message.ControlMessage.newBuilder().setHeader(header).setLogin(login).build();
-                future.channel().writeAndFlush(loginMessage);
+                Channel control = future.channel();
+                control.writeAndFlush(loginMessage).addListener(f -> {
+                    if (f.isSuccess()) {
+                        control.attr(EtpConstants.CLIENT_ID).set("1");
+                    }
+                });
                 retryCount.set(0);
                 logger.info("已连接到ETP服务端: {}:{}", config.getServerAddr(), config.getServerPort());
                 start = true;

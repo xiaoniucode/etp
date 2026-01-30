@@ -41,7 +41,7 @@ public class PortBinder implements EventListener<TcpServerInitializedEvent> {
     public void onEvent(TcpServerInitializedEvent event) {
 //        try {
             //todo test
-            BeanHelper.getBean(TcpServerManager.class).bindPort(3307);
+
 
 //
 //            ServerBootstrap serverBootstrap = event.getServerBootstrap();
