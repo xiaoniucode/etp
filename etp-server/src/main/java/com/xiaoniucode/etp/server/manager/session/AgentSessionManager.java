@@ -2,11 +2,8 @@ package com.xiaoniucode.etp.server.manager.session;
 
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
-import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.event.ClientDisconnectEvent;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
-import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
 import io.netty.channel.Channel;
@@ -16,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,7 +69,7 @@ public class AgentSessionManager {
         tokenToAgentSessions.computeIfAbsent(token,
                 k -> new CopyOnWriteArraySet<>()).add(agentSession);
         String clientId = agentSession.getClientId();
-        Set<ProxyConfig> proxyConfigs = proxyManager.getProxyConfigsByClientId(clientId);
+        Set<ProxyConfig> proxyConfigs = proxyManager.getByClientId(clientId);
         for (ProxyConfig proxy : proxyConfigs) {
             ProtocolType protocol = proxy.getProtocol();
             if (ProtocolType.isTcp(protocol)) {

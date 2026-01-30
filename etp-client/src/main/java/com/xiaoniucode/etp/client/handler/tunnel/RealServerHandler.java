@@ -11,8 +11,8 @@ import com.xiaoniucode.etp.core.msg.Message.*;
  *
  * @author liuxin
  */
-public class RealChannelHandler extends ChannelInboundHandlerAdapter {
-    private final Logger logger = LoggerFactory.getLogger(RealChannelHandler.class);
+public class RealServerHandler extends ChannelInboundHandlerAdapter {
+    private final Logger logger = LoggerFactory.getLogger(RealServerHandler.class);
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel realChannel = ctx.channel();

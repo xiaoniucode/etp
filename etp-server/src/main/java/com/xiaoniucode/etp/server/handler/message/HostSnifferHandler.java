@@ -52,7 +52,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                     } else {
                         domain = host;
                     }
-                    DomainInfo domainInfo = DomainManager.getDomainInfo(domain);
+                    DomainInfo domainInfo = BeanHelper.getBean(DomainManager.class).getDomainInfo(domain);
                     if (!domainInfo.isActive()) {
                         visitor.close();
                         logger.debug("隧道状态为关闭状态");

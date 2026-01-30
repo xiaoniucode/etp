@@ -38,7 +38,7 @@ public class NewProxyRespHandler implements MessageHandler {
         Message.NewProxy newProxy = msg.getNewProxy();
         ProxyConfig config = buildProxyConfig(newProxy);
         //保存到代理到配置管理器
-        proxyManager.addProxy("1",config, proxyConfig -> {
+        proxyManager.createProxy("1",config, proxyConfig -> {
             //发布事件，可订阅事件对其进行持久化或其他操作
             NewProxyRegisterEvent event = new NewProxyRegisterEvent();
             event.setProxyConfig(proxyConfig);

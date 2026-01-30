@@ -6,27 +6,29 @@ import com.xiaoniucode.etp.server.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component
 public class DomainManager {
-    private static final Logger logger = LoggerFactory.getLogger(DomainManager.class);
+    private final Logger logger = LoggerFactory.getLogger(DomainManager.class);
     /**
      * domain -> DomainInfo
      */
-    private static final Map<String, DomainInfo> domainMap = new ConcurrentHashMap<>();
-    private static final Set<String> baseDomains = new HashSet<>();
+    private final Map<String, DomainInfo> domainMap = new ConcurrentHashMap<>();
+    private final Set<String> baseDomains = new HashSet<>();
 
 
-    public static void init(AppConfig appConfig) {
+    public void init(AppConfig appConfig) {
         if (appConfig.getBaseDomains() != null) {
             baseDomains.addAll(appConfig.getBaseDomains());
             logger.info("DomainManager初始化完成，基础域名: {}", baseDomains);
         }
     }
 
-    public static void addDomain(String domain, ProxyConfig proxyConfig) {
+    public void addDomain(String domain, ProxyConfig proxyConfig) {
         if (domain == null || domain.isEmpty()) {
             logger.warn("尝试添加空域名");
             return;
@@ -41,7 +43,7 @@ public class DomainManager {
         logger.debug("添加域名: {} 到代理: {}", domain, proxyConfig.getName());
     }
 
-    public static void addDomains(Collection<String> domains, ProxyConfig proxyConfig) {
+    public void addDomains(Collection<String> domains, ProxyConfig proxyConfig) {
         if (domains == null || domains.isEmpty()) {
             return;
         }
@@ -50,14 +52,15 @@ public class DomainManager {
             addDomain(domain, proxyConfig);
         }
     }
-    public static DomainInfo getDomainInfo(String domain) {
+
+    public DomainInfo getDomainInfo(String domain) {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setStatus(ProxyStatus.OPEN);
-        return new DomainInfo("a.domain1.com",proxyConfig);
+        return new DomainInfo("a.domain1.com", proxyConfig);
         //todo return domainMap.get(domain);
     }
 
-    public static void removeDomain(String domain) {
+    public void removeDomain(String domain) {
         if (domain == null || domain.isEmpty()) {
             return;
         }
@@ -68,7 +71,7 @@ public class DomainManager {
         }
     }
 
-    public static void removeDomains(Collection<String> domains) {
+    public void removeDomains(Collection<String> domains) {
         if (domains == null || domains.isEmpty()) {
             return;
         }
@@ -78,7 +81,7 @@ public class DomainManager {
         }
     }
 
-    public static void removeDomainsByProxy(ProxyConfig proxyConfig) {
+    public void removeDomainsByProxy(ProxyConfig proxyConfig) {
         if (proxyConfig == null) {
             return;
         }
@@ -94,7 +97,7 @@ public class DomainManager {
         logger.debug("移除代理 {} 的所有域名", proxyConfig.getName());
     }
 
-    public static ProxyConfig getProxyConfigByDomain(String domain) {
+    public ProxyConfig getProxyConfigByDomain(String domain) {
         if (domain == null || domain.isEmpty()) {
             return null;
         }
@@ -107,7 +110,7 @@ public class DomainManager {
         return null;
     }
 
-    public static boolean containsDomain(String domain) {
+    public boolean containsDomain(String domain) {
         if (domain == null || domain.isEmpty()) {
             return false;
         }
@@ -116,7 +119,7 @@ public class DomainManager {
         return domainInfo != null && domainInfo.isActive();
     }
 
-    public static Set<String> getAllDomains() {
+    public Set<String> getAllDomains() {
         Set<String> activeDomains = new HashSet<>();
         for (Map.Entry<String, DomainInfo> entry : domainMap.entrySet()) {
             if (entry.getValue().isActive()) {
@@ -126,7 +129,7 @@ public class DomainManager {
         return activeDomains;
     }
 
-    public static Set<String> getDomainsByProxy(ProxyConfig proxyConfig) {
+    public Set<String> getDomainsByProxy(ProxyConfig proxyConfig) {
         if (proxyConfig == null) {
             return Collections.emptySet();
         }
@@ -140,7 +143,7 @@ public class DomainManager {
         return domains;
     }
 
-    public static void deactivateDomain(String domain) {
+    public void deactivateDomain(String domain) {
         if (domain == null || domain.isEmpty()) {
             return;
         }
@@ -153,7 +156,7 @@ public class DomainManager {
         }
     }
 
-    public static void activateDomain(String domain) {
+    public void activateDomain(String domain) {
         if (domain == null || domain.isEmpty()) {
             return;
         }
@@ -166,11 +169,11 @@ public class DomainManager {
         }
     }
 
-    public static Set<String> getBaseDomains() {
+    public Set<String> getBaseDomains() {
         return Collections.unmodifiableSet(baseDomains);
     }
 
-    public static void addBaseDomain(String baseDomain) {
+    public void addBaseDomain(String baseDomain) {
         if (baseDomain == null || baseDomain.isEmpty()) {
             return;
         }
@@ -179,7 +182,7 @@ public class DomainManager {
         logger.debug("添加基础域名: {}", baseDomain);
     }
 
-    public static void removeBaseDomain(String baseDomain) {
+    public void removeBaseDomain(String baseDomain) {
         if (baseDomain == null || baseDomain.isEmpty()) {
             return;
         }
@@ -188,7 +191,7 @@ public class DomainManager {
         logger.debug("移除基础域名: {}", baseDomain);
     }
 
-    public static boolean isBaseDomain(String domain) {
+    public boolean isBaseDomain(String domain) {
         if (domain == null || domain.isEmpty()) {
             return false;
         }
@@ -196,12 +199,12 @@ public class DomainManager {
         return baseDomains.contains(domain);
     }
 
-    public static String generateAutoDomain(ProxyConfig proxyConfig) {
+    public String generateAutoDomain(ProxyConfig proxyConfig) {
         Set<String> autoDomains = generateAutoDomains(proxyConfig, 1);
         return autoDomains.isEmpty() ? null : autoDomains.iterator().next();
     }
 
-    public static Set<String> generateAutoDomains(ProxyConfig proxyConfig, int count) {
+    public Set<String> generateAutoDomains(ProxyConfig proxyConfig, int count) {
         Set<String> autoDomains = new HashSet<>();
 
         if (proxyConfig == null || !Boolean.TRUE.equals(proxyConfig.getAutoDomain())) {
@@ -250,7 +253,7 @@ public class DomainManager {
         return autoDomains;
     }
 
-    private static String generateShortestAvailableDomain(String baseDomain) {
+    private String generateShortestAvailableDomain(String baseDomain) {
         // 从1位开始尝试生成
         for (int length = 1; length <= 10; length++) { // 最多尝试10位
             // 尝试纯数字
@@ -276,7 +279,7 @@ public class DomainManager {
         return "auto" + System.currentTimeMillis() + "." + baseDomain;
     }
 
-    private static String generateRandomDomain(int length, String baseDomain, String chars) {
+    private String generateRandomDomain(int length, String baseDomain, String chars) {
         // 最多尝试100次
         for (int i = 0; i < 100; i++) {
             StringBuilder sb = new StringBuilder();
@@ -293,7 +296,7 @@ public class DomainManager {
     }
 
 
-    private static String generateValidPrefix(String proxyName) {
+    private String generateValidPrefix(String proxyName) {
         // 移除特殊字符，只保留字母、数字和连字符
         String prefix = proxyName.toLowerCase().replaceAll("[^a-z0-9-]", "-");
 
@@ -313,7 +316,7 @@ public class DomainManager {
         return prefix;
     }
 
-    private static boolean isValidDomain(String domain) {
+    private boolean isValidDomain(String domain) {
         if (domain == null || domain.isEmpty()) {
             return false;
         }
@@ -343,7 +346,7 @@ public class DomainManager {
         return true;
     }
 
-    public static Set<String> generateSubDomains(ProxyConfig proxyConfig) {
+    public Set<String> generateSubDomains(ProxyConfig proxyConfig) {
         Set<String> subDomains = new HashSet<>();
 
         if (proxyConfig == null || proxyConfig.getSubDomains() == null || proxyConfig.getSubDomains().isEmpty()) {
@@ -379,12 +382,12 @@ public class DomainManager {
         return subDomains;
     }
 
-    public static void clear() {
+    public void clear() {
         domainMap.clear();
         logger.debug("清空所有域名");
     }
 
-    public static int size() {
+    public int size() {
         int count = 0;
         for (DomainInfo domainInfo : domainMap.values()) {
             if (domainInfo.isActive()) {
@@ -400,7 +403,7 @@ public class DomainManager {
      * @param proxyConfig 代理配置信息
      * @return 域名列表
      */
-    public static Set<String> addDomainsSmartly(ProxyConfig proxyConfig) {
+    public Set<String> addDomainsSmartly(ProxyConfig proxyConfig) {
         Set<String> domains = new HashSet<>();
 
         if (proxyConfig == null) {
@@ -448,6 +451,76 @@ public class DomainManager {
             }
         }
 
+        return domains;
+    }
+
+    /**
+     * 检查域名是否可用
+     *
+     * @param domain
+     * @return
+     */
+    public boolean checkAvailable(String domain) {
+        return true;
+    }
+
+    /**
+     * 判断所有域名是否可用
+     *
+     * @param domains
+     * @return
+     */
+    public boolean isAllDomainsAvailable(Set<String> domains) {
+        return true;
+    }
+
+    /**
+     * 判断某个域名是否可用
+     *
+     * @param domain
+     * @return
+     */
+    public boolean isDomainAvailable(String domain) {
+        return true;
+    }
+
+    /**
+     * 获取可用域名
+     *
+     * @param domains
+     * @return
+     */
+    public Set<String> getAllAvailableDomains(Set<String> domains) {
+        return domains;
+    }
+
+    /**
+     * 获取不可用域名
+     *
+     * @param domains
+     * @return
+     */
+    public Set<String> getUnavailableDomains(Set<String> domains) {
+        return domains;
+    }
+
+    /**
+     * 获取被其他代理占用的域名
+     *
+     * @param domains
+     * @return
+     */
+    public Set<String> getOccupiedDomains(Set<String> domains) {
+        return domains;
+    }
+
+    /**
+     * 获取无效域名，格式错误
+     *
+     * @param domains
+     * @return
+     */
+    public Set<String> getInvalidDomains(Set<String> domains) {
         return domains;
     }
 }

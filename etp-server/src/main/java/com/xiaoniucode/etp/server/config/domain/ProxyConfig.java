@@ -7,47 +7,60 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
-@Setter
 @Getter
 public class ProxyConfig {
     /**
      * 代理的名称，不能重复
      */
+    @Setter
     private String name;
+    @Setter
     private ProtocolType protocol;
+    @Setter
     private String localIp;
+    @Setter
     private Integer localPort;
+    @Setter
     private Integer remotePort;
     /**
      * 代理的状态
      */
+    @Setter
     private ProxyStatus status;
     /**
      * 任意自定义域名
      */
-    private Set<String> customDomains;
+    private final Set<String> customDomains = new CopyOnWriteArraySet<>();
     /**
      * 根据基础域名生成子域名
      */
-    private Set<String> subDomains;
+    private final Set<String> subDomains = new CopyOnWriteArraySet<>();
+    /**
+     * 最终完整域名列表
+     */
+    private final Set<String> fullDomains = new CopyOnWriteArraySet<>();
     /**
      * 是否自动生成域名
      */
+    @Setter
     private Boolean autoDomain;
     /**
      * 是否加密
      */
+    @Setter
     private Boolean encrypt;
     /**
      * 是否压缩
      */
+    @Setter
     private Boolean compress;
-    /**
-     * 最终完整域名列表
-     */
-    private Set<String> fullDomains;
+    @Setter
+    private Map<String, String> metadata = new ConcurrentHashMap<>();
 
     /**
      * 计算域名的类型
@@ -55,10 +68,10 @@ public class ProxyConfig {
      * @return 域名类型
      */
     public DomainType getDomainType() {
-        if (this.customDomains != null && !this.customDomains.isEmpty()) {
+        if (!this.customDomains.isEmpty()) {
             return DomainType.CUSTOM_DOMAIN;
         }
-        if (this.subDomains != null && !this.subDomains.isEmpty()) {
+        if (!this.subDomains.isEmpty()) {
             return DomainType.SUBDOMAIN;
         }
         if (getAutoDomain() != null && getAutoDomain()) {

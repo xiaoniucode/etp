@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.manager.session;
 
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.LanInfo;
+import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.ProtocolDetection;
@@ -47,7 +48,7 @@ public class VisitorSessionManager {
         ProxyManager proxyManager = BeanHelper.getBean(ProxyManager.class);
         AgentSessionManager agentSessionManager = BeanHelper.getBean(AgentSessionManager.class);
         AgentSession agentSession = null;
-        LanInfo lanInfo = null;
+        ProxyConfig proxyConfig = null;
         if (ProtocolDetection.isTcp(visitor)) {
             int remotePort = getListenerPort(visitor);
             agentSession = agentSessionManager.getAgentSessionByPort(remotePort);
@@ -57,7 +58,7 @@ public class VisitorSessionManager {
             }
             remotePortToVisitorChannels.computeIfAbsent(remotePort, k ->
                     ConcurrentHashMap.newKeySet()).add(visitor);
-            lanInfo = proxyManager.getLanInfoByRemotePort(remotePort);
+            proxyConfig = proxyManager.getByRemotePort(remotePort);
 
         }
         if (ProtocolDetection.isHttp(visitor)) {
@@ -69,7 +70,7 @@ public class VisitorSessionManager {
             }
             domainToVisitorChannels.computeIfAbsent(domain, k ->
                     ConcurrentHashMap.newKeySet()).add(visitor);
-            lanInfo = proxyManager.getLanInfoByDomain(domain);
+            proxyConfig = proxyManager.getByDomain(domain);
         }
         if (agentSession == null) {
             return;
@@ -80,7 +81,7 @@ public class VisitorSessionManager {
         visitorSession.setVisitor(visitor);
         visitorSession.setControl(agentSession.getControl());
         visitorSession.setSessionId(sessionId);
-        visitorSession.setLanInfo(lanInfo);
+        visitorSession.setLanInfo(new LanInfo(proxyConfig.getLocalIp(), proxyConfig.getLocalPort()));
 
         sessionIdToVisitorSession.put(sessionId, visitorSession);
         if (callback != null) {

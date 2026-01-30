@@ -5,7 +5,6 @@ import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.PortRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -111,7 +110,7 @@ public class PortManager {
         }
     }
 
-    public boolean isPortAvailable(int port) {
+    public boolean isAvailable(int port) {
         if (port < startPort || port > endPort) {
             LOGGER.warn("端口 {} 不在允许范围 {}-{} 内", port, startPort, endPort);
             return false;

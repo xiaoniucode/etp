@@ -52,7 +52,7 @@ public class TunnelServer implements Lifecycle {
         try {
             ConfigHelper.set(config);
             BeanHelper.getBean(PortManager.class).init(config);
-            DomainManager.init(config);
+            BeanHelper.getBean(DomainManager.class).init(config);
             logger.debug("正在启动ETP服务");
 //            if (config.isTls()) {
 //                tlsContext = new ServerTlsContextFactory().createContext();

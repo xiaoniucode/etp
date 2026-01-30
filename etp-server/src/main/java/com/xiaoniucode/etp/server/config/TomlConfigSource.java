@@ -207,7 +207,7 @@ public class TomlConfigSource implements ConfigSource {
                 proxyConfig.setRemotePort(remotePort == null ? null : remotePort.intValue());
             } else {
                 //http or https
-                proxyConfig.setCustomDomains(new HashSet<>(customDomains));
+                proxyConfig.getCustomDomains().addAll(new HashSet<>(customDomains));
             }
             proxyConfigs.add(proxyConfig);
         }

@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.client;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.ConfigHelper;
-import com.xiaoniucode.etp.client.handler.tunnel.RealChannelHandler;
+import com.xiaoniucode.etp.client.handler.tunnel.RealServerHandler;
 import com.xiaoniucode.etp.client.handler.tunnel.ControlTunnelHandler;
 import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
@@ -86,7 +86,7 @@ public final class TunnelClient implements Lifecycle {
                         @Override
                         protected void initChannel(SocketChannel ch) {
                             ch.pipeline().addLast(new FlushConsolidationHandler(256, true));
-                            ch.pipeline().addLast(new RealChannelHandler());
+                            ch.pipeline().addLast(new RealServerHandler());
                         }
                     });
 
