@@ -1,10 +1,9 @@
 package com.xiaoniucode.etp.core;
 
-import com.xiaoniucode.etp.core.msg.Ping;
+import com.xiaoniucode.etp.core.msg.Message;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,7 +19,7 @@ public class IdleCheckHandler extends IdleStateHandler {
     @Override
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
         if (IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT == evt) {
-            ctx.channel().writeAndFlush(new Ping());
+            ctx.channel().writeAndFlush(Message.Ping.newBuilder().build());
         } else if (IdleStateEvent.FIRST_READER_IDLE_STATE_EVENT == evt) {
             ctx.channel().close();
         }

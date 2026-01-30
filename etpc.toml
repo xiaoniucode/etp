@@ -1,13 +1,39 @@
 #serverAddr = "127.0.0.1"
 serverAddr = "etp.local.cc"
 #serverPort = 9527
-#认证密钥[必填]
-secretKey = "your-secret-key"
-#SSL安全加密密码配置
-tls =true
-[truststore]
-path = "cert/client.p12"
-storePass = "jesjH9JNLKY3"
+#认证
+#[auth]
+#token = "your-secret-key"
+#SSL
+#[tls]
+#eable = false
+#certPath = "cert/client.p12"
+#storePassPath = "jesjH9JNLKY3"
+
+# 三个字段互斥，优先级：customDomains > subDomains > autoDomain 后面两个必须配置基础域名
+#[[proxies]]
+#name = "web1"
+#protocol = "http"
+#localIp = "localhost"
+#localPort = 1024
+#autoDomain = true
+#customDomains = ["a.domain1.com"]
+#
+#[[proxies]]
+#name = "web2"
+#protocol = "https"
+#localIp = "localhost"
+#localPort = 8082
+#customDomains = ["a.domain2.com", "b.domain2.com"]
+#
+#[[proxies]]
+#name = "mysql"
+#protocol = "tcp"
+#localPort = 3306
+#status = 1
+#encrypt = true
+#compress = true
+
 #日志
 [log]
 level = "debug"

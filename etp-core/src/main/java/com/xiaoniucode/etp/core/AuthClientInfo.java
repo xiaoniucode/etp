@@ -6,29 +6,28 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
  * @author liuxin
  */
 public class AuthClientInfo {
-    private String secretKey;
+    private String token;
     private String arch;
     private String os;
 
-    public AuthClientInfo(String secretKey, String arch, String os) {
-        check(secretKey);
-        this.secretKey = secretKey;
+    public AuthClientInfo(String token, String arch, String os) {
+        check(token);
+        this.token = token;
         this.arch = arch;
         this.os = os;
     }
-
-    private void check(String secretKey) {
-        if (!StringUtils.hasText(secretKey)) {
-            throw new IllegalArgumentException("secretKey不能为空");
+    private void check(String token) {
+        if (!StringUtils.hasText(token)) {
+            throw new IllegalArgumentException("token不能为空");
         }
     }
 
-    public String getSecretKey() {
-        return secretKey;
+    public String getToken() {
+        return token;
     }
 
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getArch() {

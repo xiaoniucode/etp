@@ -4,17 +4,13 @@ import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.common.*;
 import com.xiaoniucode.etp.common.log.LogConfig;
 import com.xiaoniucode.etp.common.log.LogbackConfigurator;
-import com.xiaoniucode.etp.core.event.GlobalEventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.config.TomlConfigSource;
-import com.xiaoniucode.etp.server.event.DatabaseInitEvent;
-import com.xiaoniucode.etp.server.event.TunnelBindEvent;
-import com.xiaoniucode.etp.server.listener.DatabaseInitListener;
-import com.xiaoniucode.etp.server.listener.ConfigRegisterListener;
-import com.xiaoniucode.etp.server.listener.StaticConfigInitListener;
+import com.xiaoniucode.etp.server.proxy.TunnelServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,6 +20,7 @@ import java.nio.file.Paths;
  *
  * @author liuxin
  */
+@SpringBootApplication
 public class TunnelServerStartup {
     private static final Logger logger = LoggerFactory.getLogger(TunnelServerStartup.class);
 
@@ -33,6 +30,8 @@ public class TunnelServerStartup {
 
     public static void main(String[] args) {
         try {
+            SpringApplication.run(TunnelServerStartup.class, args);
+
             AppConfig config = buildConfig(args);
             initLogback(config);
             int bindPort = config.getBindPort();

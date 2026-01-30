@@ -14,10 +14,7 @@ public final class GlobalIdGenerator {
     private GlobalIdGenerator() {
     }
 
-    /**
-     * 返回全局自增ID
-     */
-    public static int nextId() {
+    public static Integer nextId() {
         return ID.incrementAndGet();
     }
 }

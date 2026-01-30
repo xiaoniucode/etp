@@ -1,10 +1,11 @@
 package com.xiaoniucode.etp.server.event;
 
-import com.xiaoniucode.etp.core.event.EventObject;
+
+import com.xiaoniucode.etp.core.notify.Event;
 
 /**
- * 隧道开启成功事件
+ * 隧道监听成功事件
  */
-public class TunnelBindEvent extends EventObject {
+public class TunnelBindEvent extends Event {
 
 }

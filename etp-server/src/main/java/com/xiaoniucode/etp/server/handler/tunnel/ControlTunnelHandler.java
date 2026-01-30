@@ -1,0 +1,58 @@
+package com.xiaoniucode.etp.server.handler.tunnel;
+
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
+import com.xiaoniucode.etp.core.MessageHandler;
+import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.server.handler.factory.TunnelMessageHandlerFactory;
+import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
+import io.netty.channel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.xiaoniucode.etp.core.msg.Message.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+/**
+ * 控制指令处理，负责消息分发
+ *
+ * @author liuxin
+ */
+@Component
+@ChannelHandler.Sharable
+public class ControlTunnelHandler extends SimpleChannelInboundHandler<ControlMessage> {
+    private final Logger logger = LoggerFactory.getLogger(ControlTunnelHandler.class);
+    @Autowired
+    private TunnelMessageHandlerFactory factory;
+    @Autowired
+    private AgentSessionManager agentSessionManager;
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, ControlMessage msg) throws Exception {
+        MessageType messageType = msg.getHeader().getType();
+        MessageHandler handler = factory.getHandler(messageType);
+        if (handler != null) {
+            handler.handle(ctx, msg);
+        }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Channel control = ctx.channel();
+        //断开 agent 连接
+        agentSessionManager.disconnect(control);
+        ChannelUtils.closeOnFlush(control);
+        super.channelInactive(ctx);
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        Channel visitor = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
+        if (visitor != null) {
+            visitor.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
+        } else {
+            logger.warn("channel wriability changed and visitor is null");
+        }
+
+        super.channelWritabilityChanged(ctx);
+    }
+}

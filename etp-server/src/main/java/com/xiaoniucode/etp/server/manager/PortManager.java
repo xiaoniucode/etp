@@ -2,10 +2,11 @@ package com.xiaoniucode.etp.server.manager;
 
 
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.config.domain.PortRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -19,17 +20,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author liuxin
  */
+@Component
 public class PortManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PortManager.class);
-    private static final Set<Integer> allocatedPorts = new HashSet<>(32);
-    private static int startPort = 1024;
-    private static int endPort = 49151;
-    private static final AtomicBoolean init = new AtomicBoolean(false);
+    private final Logger LOGGER = LoggerFactory.getLogger(PortManager.class);
+    private final Set<Integer> allocatedPorts = new HashSet<>(32);
+    private int startPort = 1024;
+    private int endPort = 49151;
+    private final AtomicBoolean init = new AtomicBoolean(false);
 
     /**
      * 初始化端口范围,默认范围：1024-49151
      */
-    public static void init(AppConfig appConfig) {
+    public void init(AppConfig appConfig) {
         if (init.get()) {
             init.set(true);
             return;
@@ -52,7 +54,7 @@ public class PortManager {
         LOGGER.debug("端口分配器初始化，范围: {}-{}", startPort, endPort);
     }
 
-    public static int acquire() {
+    public int acquire() {
         // 检查端口是否足够
         int totalPorts = endPort - startPort + 1;
         if (allocatedPorts.size() >= totalPorts) {
@@ -91,7 +93,7 @@ public class PortManager {
         return -1;
     }
 
-    private static boolean tryBindPort(int port) {
+    private boolean tryBindPort(int port) {
         try (ServerSocket socket = new ServerSocket(port)) {
             return true;
         } catch (IOException e) {
@@ -99,7 +101,7 @@ public class PortManager {
         }
     }
 
-    public static boolean release(int port) {
+    public boolean release(int port) {
         if (allocatedPorts.remove(port)) {
             LOGGER.info("成功释放端口: {}", port);
             return true;
@@ -109,7 +111,7 @@ public class PortManager {
         }
     }
 
-    public static boolean isPortAvailable(int port) {
+    public boolean isPortAvailable(int port) {
         if (port < startPort || port > endPort) {
             LOGGER.warn("端口 {} 不在允许范围 {}-{} 内", port, startPort, endPort);
             return false;
@@ -120,7 +122,7 @@ public class PortManager {
         return tryBindPort(port);
     }
 
-    public static void addRemotePort(Integer port) {
+    public void addPort(Integer port) {
         allocatedPorts.add(port);
     }
 

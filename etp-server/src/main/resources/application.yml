@@ -1,0 +1,11 @@
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+    servlet:
+      path: /api
+  profiles:
+    active: h2
+logging:
+  level:
+    com.xiaoniucode.etp: debug

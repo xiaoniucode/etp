@@ -4,58 +4,22 @@ httpProxyPort = 80
 httpsProxyPort = 8443
 baseDomains = ["domain1.com", "domain2.com"]
 # TLS
-tls = false
-[keystore]
-path = "cert/server.p12"
-keyPass = "3FbV8R8VW49O"
-storePass = "3FbV8R8VW49O"
-#客户端
-[[clients]]
-secretKey = "your-secret-key"
-name = "客户端"
-[[clients.proxies]]
-name = "web"
-type = "http"
-localIP = "localhost"
-localPort = 8082
-customDomains = ["a.local.cc", "b.local.cc"]
-status = 1 #是否开启代理
-# 三个字段互斥，优先级：customDomains > subDomains > autoDomain 后面两个必须配置基础域名
-[[clients.proxies]]
-name = "web2"
-type = "http"
-localIP = "localhost"
-localPort = 1024
-status = 1
-autoDomain = true
-subDomains = ["a", "b"]
-customDomains = ["c.local.cc"]
+[tls]
+enable = false
+certPath = "cert/server.p12"
+keyPath = "3FbV8R8VW49O"
+storePassPath = "3FbV8R8VW49O"
 
-[[clients.proxies]]
-name = "web_https"
-type = "https"
-localIP = "localhost"
-localPort = 8082
-customDomains = ["d.local.cc", "g.local.cc"]
-status = 1 #是否开启代理
+[access_tokens]
+desc = "windows"
+token = "token"
+maxClients = 2
 
-[[clients.proxies]]
-name = "mysql"
-type = "tcp"
-localPort = 3306
-status = 1 #是否开启代理
-[[clients.proxies]]
-name = "redis"
-type = "tcp"
-localIP = "localhost"
-localPort = 6379
-status = 1 #是否开启代理
-[[clients.proxies]]
-name = "redis2"
-type = "tcp"
-localIP = "192.168.0.151"
-localPort = 6379
-status = 1 #是否开启代理
+[access_tokens]
+desc = "mac"
+token = "token2"
+maxClients = 2
+
 #日志
 [log]
 level = "debug"
@@ -65,6 +29,7 @@ archivePattern = "etps.%d{yyyy-MM-dd}.log"
 logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 maxHistory = 30
 totalSizeCap = "3GB"
+
 #管理界面
 [dashboard]
 enable = true

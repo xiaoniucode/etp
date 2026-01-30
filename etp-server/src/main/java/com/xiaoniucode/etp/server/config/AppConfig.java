@@ -6,22 +6,23 @@ import com.xiaoniucode.etp.server.config.domain.Dashboard;
 import com.xiaoniucode.etp.server.config.domain.KeystoreConfig;
 import com.xiaoniucode.etp.server.config.domain.PortRange;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@Getter
+@Setter
 public class AppConfig implements Config {
     private String host;
     private int bindPort;
     private int httpProxyPort;
     private int httpsProxyPort;
-    private boolean tls;
-    private KeystoreConfig keystoreConfig;
     private LogConfig logConfig;
     private Dashboard dashboard;
     private PortRange portRange;
-    private List<ClientInfo> clients;
     private Set<String> baseDomains;
 
     private AppConfig(Builder builder) {
@@ -29,14 +30,10 @@ public class AppConfig implements Config {
         this.bindPort = builder.bindPort;
         this.httpProxyPort = builder.httpProxyPort;
         this.httpsProxyPort = builder.httpsProxyPort;
-        this.tls = builder.tls;
-        this.keystoreConfig = builder.keystoreConfig;
         this.logConfig = builder.logConfig;
         this.dashboard = builder.dashboard;
         this.portRange = builder.portRange;
-        this.clients = builder.clients;
         this.baseDomains = builder.baseDomains;
-
     }
 
 
@@ -102,6 +99,7 @@ public class AppConfig implements Config {
             this.httpsProxyPort = httpsProxyPort;
             return this;
         }
+
         public Builder baseDomains(Set<String> baseDomains) {
             this.baseDomains = baseDomains;
             return this;
@@ -112,93 +110,6 @@ public class AppConfig implements Config {
         }
     }
 
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getBindPort() {
-        return bindPort;
-    }
-
-    public void setBindPort(int bindPort) {
-        this.bindPort = bindPort;
-    }
-
-    public boolean isTls() {
-        return tls;
-    }
-
-    public void setTls(boolean tls) {
-        this.tls = tls;
-    }
-
-    public KeystoreConfig getKeystoreConfig() {
-        return keystoreConfig;
-    }
-
-    public void setKeystoreConfig(KeystoreConfig keystoreConfig) {
-        this.keystoreConfig = keystoreConfig;
-    }
-
-    public LogConfig getLogConfig() {
-        return logConfig;
-    }
-
-    public void setLogConfig(LogConfig logConfig) {
-        this.logConfig = logConfig;
-    }
-
-    public Dashboard getDashboard() {
-        return dashboard;
-    }
-
-    public void setDashboard(Dashboard dashboard) {
-        this.dashboard = dashboard;
-    }
-
-    public PortRange getPortRange() {
-        return portRange;
-    }
-
-    public void setPortRange(PortRange portRange) {
-        this.portRange = portRange;
-    }
-
-    public List<ClientInfo> getClients() {
-        return clients;
-    }
-
-    public void setClients(List<ClientInfo> clients) {
-        this.clients = clients;
-    }
-
-    public void setHttpProxyPort(int httpProxyPort) {
-        this.httpProxyPort = httpProxyPort;
-    }
-
-    public int getHttpProxyPort() {
-        return httpProxyPort;
-    }
-
-    public int getHttpsProxyPort() {
-        return httpsProxyPort;
-    }
-
-    public void setHttpsProxyPort(int httpsProxyPort) {
-        this.httpsProxyPort = httpsProxyPort;
-    }
-
-    public void setBaseDomains(Set<String> baseDomains) {
-        this.baseDomains = baseDomains;
-    }
-
-    public Set<String> getBaseDomains() {
-        return baseDomains;
-    }
 
     public static Builder builder() {
         return new Builder();

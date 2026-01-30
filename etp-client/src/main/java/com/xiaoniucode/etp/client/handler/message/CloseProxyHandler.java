@@ -1,0 +1,29 @@
+package com.xiaoniucode.etp.client.handler.message;
+
+import com.xiaoniucode.etp.client.ConnectionPool;
+import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
+import com.xiaoniucode.etp.core.EtpConstants;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.xiaoniucode.etp.core.msg.Message.*;
+/**
+ *
+ * @author liuxin
+ */
+public class CloseProxyHandler extends AbstractTunnelMessageHandler {
+    private final Logger logger = LoggerFactory.getLogger(CloseProxyHandler.class);
+
+    @Override
+    protected void doHandle(ChannelHandlerContext ctx, ControlMessage msg) {
+        Channel realChannel = ctx.channel().attr(EtpConstants.REAL_SERVER_CHANNEL).get();
+        if (realChannel != null) {
+            ConnectionPool.returnConnection(ctx.channel());
+            ChannelUtils.closeOnFlush(realChannel);
+        } else {
+            logger.debug("与内网真实服务器连接的channel为空！");
+        }
+    }
+}

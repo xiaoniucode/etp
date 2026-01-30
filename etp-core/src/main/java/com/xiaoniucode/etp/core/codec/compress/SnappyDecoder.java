@@ -16,7 +16,14 @@ public class SnappyDecoder extends SnappyFrameDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled() && in.readableBytes() > 4) {
+            //读取类型，判断是否压缩了，不要移动指针
+            final int chunkTypeVal = in.getUnsignedByte(in.readerIndex());
+            if (chunkTypeVal != 0) {
+                //不是压缩类型，直接跳过，不需要打印日志
+                super.decode(ctx, in, out);
+                return;
+            }
             int beforeDecompressSize = in.readableBytes();
             int initialOutSize = out.size();
 
@@ -32,8 +39,13 @@ public class SnappyDecoder extends SnappyFrameDecoder {
                 }
             }
 
-            if (beforeDecompressSize > 0) {
-                logger.debug("解压前: {} 字节, 解压后: {} 字节", beforeDecompressSize, afterDecompressSize);
+            if (beforeDecompressSize > 0 && afterDecompressSize > 0) {
+                // 压缩率 = (1 - 压缩前大小 / 解压后大小) * 100%
+                double compressionRatio = (1 - (double) beforeDecompressSize / afterDecompressSize) * 100;
+                logger.debug("解压前: {} 字节, 解压后: {} 字节, 压缩率: {}%",
+                        beforeDecompressSize,
+                        afterDecompressSize,
+                        String.format("%.2f", compressionRatio));
             }
         } else {
             super.decode(ctx, in, out);

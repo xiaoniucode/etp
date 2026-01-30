@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class ChannelManager {
     private volatile static Bootstrap realBootstrap;
     private volatile static Bootstrap controlBootstrap;
-    private final static Map<Long, Channel> realServerChannels = new ConcurrentHashMap<>();
+    private final static Map<String, Channel> realServerChannels = new ConcurrentHashMap<>();
     private static Channel controlChannel;
        public static void initBootstraps(Bootstrap control, Bootstrap real) {
         controlBootstrap = control;
@@ -33,17 +33,17 @@ public final class ChannelManager {
         ChannelManager.controlChannel = controlChannel;
     }
 
-    public static void removeRealServerChannel(Long sessionId) {
+    public static void removeRealServerChannel(String sessionId) {
         realServerChannels.remove(sessionId);
     }
 
-    public static void addRealServerChannel(long sessionId, Channel realChannel) {
+    public static void addRealServerChannel(String sessionId, Channel realChannel) {
         realServerChannels.put(sessionId, realChannel);
     }
     public static void clearAllRealServerChannel() {
-        Iterator<Map.Entry<Long, Channel>> iterator = realServerChannels.entrySet().iterator();
+        Iterator<Map.Entry<String, Channel>> iterator = realServerChannels.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<Long, Channel> entry = iterator.next();
+            Map.Entry<String, Channel> entry = iterator.next();
             Channel channel = entry.getValue();
             ChannelUtils.closeOnFlush(channel);
             iterator.remove();

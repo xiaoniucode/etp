@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package com.xiaoniucode.etp.core.msg;
+
+// 消息类型枚举
+enum MessageType {
+  UNKNOWN = 0;              // 未知类型
+  LOGIN = 101;          // 登录请求
+  NEW_PROXY = 102;       // 创建代理请求
+  CLOSE_PROXY = 103;     // 关闭代理请求
+  PING = 105;            // 心跳请求
+  NEW_PROXY_RESP = 202;  // 创建代理响应
+  ERROR = 205;           // 错误响应
+  PONG = 206;            // 心跳响应
+  KICKOUT = 301;       // 踢出客户端通知
+  NEW_VISITOR = 302;    // 新访问者连接请求
+  NEW_VISITOR_RESP = 303;   // 访问者连接响应
+}
+
+// 协议类型枚举
+enum ProtocolType {
+  TCP = 0;
+  HTTP = 1;
+  HTTPS = 2;
+}
+
+message MessageHeader {
+  MessageType type = 1;// 消息类型
+}
+
+// 登录请求
+message Login {
+  string os = 1;
+  string arch = 2;
+  string token = 3;
+}
+
+// 创建代理
+message NewProxy {
+  string name = 1;
+  string localIp = 2;
+  int32 localPort = 3;
+  int32 status = 4;
+  ProtocolType protocol = 5;
+  int32 remotePort = 6;
+  bool autoDomain = 7;
+  repeated string customDomains = 8;
+  repeated string subDomains = 9;
+}
+
+// 创建代理响应
+message NewProxyResp {
+  string proxyName = 1;
+  string remoteAddr = 2;
+}
+
+// 关闭代理
+message CloseProxy {
+  int32 proxyId = 1;
+  string sessionId = 2;
+}
+
+// 新访问者连接
+message NewVisitorConn {
+  string sessionId = 1;
+  string localIp = 2;
+  int32 localPort = 3;
+  int32 proxyId = 4;
+}
+
+// 访问者连接响应
+message NewVisitorConnResp {
+  string sessionId = 2;
+}
+
+// 错误响应
+message Error {
+  int32 code = 1;
+  string message = 2;
+}
+
+// 心跳消息
+message Ping {}
+message Pong {}
+
+// 踢出客户端
+message Kickout {}
+
+// 统一消息容器
+message ControlMessage {
+  MessageHeader header = 1;
+  oneof payload {
+    Login login = 10;
+    NewProxy newProxy = 11;
+    CloseProxy closeProxy = 12;
+    Ping ping = 13;
+    NewProxyResp newProxyResp = 20;
+    Error error = 21;
+    Pong pong = 22;
+    Kickout kickout = 30;
+    NewVisitorConn newVisitorConn = 31;
+    NewVisitorConnResp newVisitorConnResp = 32;
+  }
+}

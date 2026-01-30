@@ -6,7 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 桥接器，用于实现两个channel双向透明转发
+ * 桥接器，核心代码，用于实现两个channel双向透明转发。
+ * [visitor <-> tunnel] <--> [tunnel <-> server]
  */
 public class ChannelBridge extends ChannelDuplexHandler {
     private static final Logger log = LoggerFactory.getLogger(ChannelBridge.class);
@@ -35,6 +36,7 @@ public class ChannelBridge extends ChannelDuplexHandler {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
+        // 先传递给下一个handler
         closeOnFlush(peer);
     }
 

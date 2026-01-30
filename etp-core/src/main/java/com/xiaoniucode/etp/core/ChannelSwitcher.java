@@ -11,8 +11,12 @@ public class ChannelSwitcher {
      * @param pipeline pipeline
      */
     public static void switchToDataTunnel(ChannelPipeline pipeline) {
-        pipeline.remove("tunnelMessageCodec");
+        pipeline.remove("protoBufVarint32FrameDecoder");
+        pipeline.remove("protoBufDecoder");
+        pipeline.remove("protoBufVarint32LengthFieldPrepender");
+        pipeline.remove("protoBufEncoder");
         pipeline.remove("controlTunnelHandler");
+        pipeline.remove("idleCheckHandler");
         //添加字节压缩编解码器
         pipeline.addLast("snappyDecoder", new SnappyDecoder());
         pipeline.addLast("snappyEncoder", new SnappyEncoder());

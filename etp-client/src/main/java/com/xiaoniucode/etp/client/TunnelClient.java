@@ -2,8 +2,8 @@ package com.xiaoniucode.etp.client;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.ConfigHelper;
-import com.xiaoniucode.etp.client.handler.RealChannelHandler;
-import com.xiaoniucode.etp.client.handler.ControlTunnelHandler;
+import com.xiaoniucode.etp.client.handler.tunnel.RealChannelHandler;
+import com.xiaoniucode.etp.client.handler.tunnel.ControlTunnelHandler;
 import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.client.security.ClientTlsContextFactory;
@@ -11,13 +11,16 @@ import com.xiaoniucode.etp.client.utils.OSUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.Lifecycle;
-import com.xiaoniucode.etp.core.msg.Login;
-import com.xiaoniucode.etp.core.codec.TunnelMessageCodec;
 import com.xiaoniucode.etp.core.IdleCheckHandler;
+import com.xiaoniucode.etp.core.msg.Message;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
@@ -90,6 +93,17 @@ public final class TunnelClient implements Lifecycle {
             if (config.isTls()) {
                 tlsContext = new ClientTlsContextFactory().createContext();
             }
+            /**
+             * 控制消息处理，单例
+             */
+            ControlTunnelHandler controlTunnelHandler = new ControlTunnelHandler(ctx -> {
+                // 重置重试计数器
+                retryCount.set(0);
+                //服务器断开 执行重试 重新连接
+                if (!stop) {
+                    scheduleReconnect();
+                }
+            });
             controlWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             controlBootstrap.group(controlWorkerGroup)
                     .channel(NettyEventLoopFactory.socketChannelClass())
@@ -105,16 +119,12 @@ public final class TunnelClient implements Lifecycle {
                                 sc.pipeline().addLast("tls", new SslHandler(engine));
                             }
                             sc.pipeline()
-                                    .addLast("tunnelMessageCodec",new TunnelMessageCodec())
-                                    .addLast(new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
-                                    .addLast("controlTunnelHandler",new ControlTunnelHandler(ctx -> {
-                                        // 重置重试计数器
-                                        retryCount.set(0);
-                                        //服务器断开 执行重试 重新连接
-                                        if (!stop) {
-                                            scheduleReconnect();
-                                        }
-                                    }));
+                                    .addLast("protoBufVarint32FrameDecoder", new ProtobufVarint32FrameDecoder())
+                                    .addLast("protoBufDecoder", new ProtobufDecoder(Message.ControlMessage.getDefaultInstance()))
+                                    .addLast("protoBufVarint32LengthFieldPrepender", new ProtobufVarint32LengthFieldPrepender())
+                                    .addLast("protoBufEncoder", new ProtobufEncoder())
+                                    .addLast("idleCheckHandler", new IdleCheckHandler(60, 30, 0, TimeUnit.SECONDS))
+                                    .addLast("controlTunnelHandler", controlTunnelHandler);
                         }
                     });
 
@@ -140,7 +150,14 @@ public final class TunnelClient implements Lifecycle {
                 ChannelManager.setControlChannel(controlChannel);
                 String os = OSUtils.getOS();
                 String arch = OSUtils.getOSArch();
-                future.channel().writeAndFlush(new Login(config.getSecretKey(), os, arch));
+                Message.MessageHeader header = Message.MessageHeader.newBuilder().setType(Message.MessageType.LOGIN).build();
+
+                Message.Login login = Message.Login.newBuilder()
+                        .setToken(config.getSecretKey())
+                        .setArch(arch)
+                        .setOs(os).build();
+                Message.ControlMessage loginMessage = Message.ControlMessage.newBuilder().setHeader(header).setLogin(login).build();
+                future.channel().writeAndFlush(loginMessage);
                 retryCount.set(0);
                 logger.info("已连接到ETP服务端: {}:{}", config.getServerAddr(), config.getServerPort());
                 start = true;

@@ -105,7 +105,7 @@ public class TunnelClientStartup {
                 .setPath(log.getPath())
                 .setLogPattern(log.getLogPattern())
                 .setArchivePattern(log.getArchivePattern())
-                .setLogLevel(log.getLevel())
+                .setLogLevel(Level.DEBUG)
                 .setLogName(log.getName())
                 .setMaxHistory(log.getMaxHistory())
                 .setTotalSizeCap(log.getTotalSizeCap())

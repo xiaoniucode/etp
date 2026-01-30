@@ -200,11 +200,8 @@ public class TomlConfigSource implements ConfigSource {
             }
 
             ProxyConfig proxyConfig = new ProxyConfig();
-            proxyConfig.setType(ProtocolType.getType(type));
             proxyConfig.setName(proxyName);
-            proxyConfig.setLocalIP(localIP.trim());
             proxyConfig.setLocalPort(localPort.intValue());
-            proxyConfig.setStatus(status.intValue());
 
             if (ProtocolType.TCP.name().equalsIgnoreCase(type)) {
                 proxyConfig.setRemotePort(remotePort == null ? null : remotePort.intValue());

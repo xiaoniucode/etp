@@ -26,6 +26,7 @@ class EtpTestApplicationTests {
     @Transactional
     void clear() {
         userRepository.deleteAll();
+        user2Repository.deleteAll();
     }
     @Autowired
     private EntityManager entityManager;
@@ -76,7 +77,7 @@ class EtpTestApplicationTests {
                         .setEmail("xiaoniucode@gmail.com")
                         .setNickname("令狐冲");
                 userRepository.save(user);
-                System.out.println("insert " + i2);
+              //  System.out.println("insert " + i2);
             }
             long end = System.currentTimeMillis();
             System.out.println("time:" + (end - start));
@@ -88,7 +89,7 @@ class EtpTestApplicationTests {
         //1k 1w 5w 10w 20w
         long start = System.currentTimeMillis();
         ArrayList<User2> batch = new ArrayList<>();
-        for (int i = 0; i < 20_0000; i++) {
+        for (int i = 0; i < 10_0000; i++) {
             User2 user = new User2()
                     .setUsername("xiaoniucode")
                     .setPassword("4b0063baa5ae47c2910fc25265aae4132")

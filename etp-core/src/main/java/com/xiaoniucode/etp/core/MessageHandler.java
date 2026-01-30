@@ -1,8 +1,7 @@
 package com.xiaoniucode.etp.core;
 
-import com.xiaoniucode.etp.core.msg.Message;
 import io.netty.channel.ChannelHandlerContext;
-
+import com.xiaoniucode.etp.core.msg.Message.ControlMessage;
 /**
  * 隧道消息处理器接口
  * @author liuxin
@@ -15,5 +14,5 @@ public interface MessageHandler {
      * @param msg 消息内容
      * @throws Exception 异常
      */
-    void handle(ChannelHandlerContext ctx, Message msg) throws Exception;
+    void handle(ChannelHandlerContext ctx, ControlMessage msg) throws Exception;
 }

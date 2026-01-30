@@ -53,14 +53,6 @@ public class ClientInfo {
         return clientId;
     }
 
-    public List<ProxyConfig> getTcpProxies() {
-        return proxies.stream().filter(f -> f.getType() == ProtocolType.TCP).collect(Collectors.toList());
-    }
-
-    public Set<ProxyConfig> getHttpProxies() {
-        return proxies.stream().filter(f -> f.getType() == ProtocolType.HTTP).collect(Collectors.toSet());
-    }
-
     public List<ProxyConfig> getProxies() {
         return proxies;
     }

@@ -4,13 +4,14 @@ package com.xiaoniucode.etp.server.metrics;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
+import com.xiaoniucode.etp.server.metrics.domain.Metrics;
+import com.xiaoniucode.etp.server.metrics.domain.Count;
 import io.netty.channel.Channel;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -58,7 +59,7 @@ public class MetricsCollector {
 
 
     public static void doCollector(Channel visitor, Consumer<MetricsCollector> callback) {
-        String domain = visitor.attr(EtpConstants.VISITOR_DOMAIN).get();
+        String domain = visitor.attr(EtpConstants.VISIT_DOMAIN).get();
         InetSocketAddress sa = (InetSocketAddress) visitor.localAddress();
         int remotePort = sa.getPort();
         String key;
@@ -74,16 +75,16 @@ public class MetricsCollector {
         callback.accept(metricsCollector);
 
     }
-    public static JSONObject summaryMetrics(){
-        JSONObject res = new JSONObject();
+    public static Count count(){
+        Count res = new Count();
         long totalInBytes = 0;
         long totalOutBytes = 0;
         for (MetricsCollector collector : COLLECTORS.values()) {
             totalInBytes += collector.readBytes.sum();
             totalOutBytes += collector.writeBytes.sum();
         }
-        res.put("in", totalInBytes);
-        res.put("out", totalOutBytes);
+        res.setIn(totalInBytes);
+        res.setOut(totalOutBytes);
         return res;
     }
 
@@ -96,23 +97,22 @@ public class MetricsCollector {
      *
      * @return 指标数据
      */
-    public JSONObject getMetrics() {
-        JSONObject json = new JSONObject();
-        json.put("key", key);
-        json.put("channels", channels.get());
-        json.put("readBytes", readBytes.sum());
-        json.put("writeBytes", writeBytes.sum());
-        json.put("readMsgs", readMsgs.sum());
-        json.put("writeMsgs", writeMsgs.sum());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        json.put("time", LocalDateTime.now().format(formatter));
-        return json;
+    public Metrics getMetrics() {
+        Metrics metrics = new Metrics();
+        metrics.setKey(key);
+        metrics.setChannels(channels.get());
+        metrics.setReadBytes(readBytes.sum());
+        metrics.setWriteBytes(writeBytes.sum());
+        metrics.setReadMsgs(readMsgs.sum());
+        metrics.setWriteMsgs(writeMsgs.sum());
+        metrics.setTime(LocalDateTime.now());
+        return metrics;
     }
 
-    public static JSONArray getAllMetrics() {
-        JSONArray res = new JSONArray();
+    public static List<Metrics> getAllMetrics() {
+        List<Metrics> res = new ArrayList<>();
         for (MetricsCollector c : COLLECTORS.values()) {
-            res.put(c.getMetrics());
+            res.add(c.getMetrics());
         }
         return res;
     }

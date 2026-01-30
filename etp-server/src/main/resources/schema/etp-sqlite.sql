@@ -1,4 +1,3 @@
---必须分号分隔，否则脚本执行会出错
 -- 系统设置表
 CREATE TABLE IF NOT EXISTS settings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

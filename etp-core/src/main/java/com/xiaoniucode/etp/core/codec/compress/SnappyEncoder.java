@@ -14,7 +14,7 @@ public class SnappyEncoder extends SnappyFrameEncoder {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) throws Exception {
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled() && in.readableBytes() > MIN_COMPRESSIBLE_LENGTH) {
             int beforeCompressSize = in.readableBytes();
             int initialOutSize = out.writerIndex();
 
@@ -22,21 +22,12 @@ public class SnappyEncoder extends SnappyFrameEncoder {
 
             int afterCompressSize = out.writerIndex() - initialOutSize;
             if (beforeCompressSize > 0) {
-                if (afterCompressSize < beforeCompressSize) {
-                    // 压缩率 = (1 - 压缩后大小 / 压缩前大小) * 100%
-                    double compressionRatio = (1 - (double) afterCompressSize / beforeCompressSize) * 100;
-                    logger.debug("压缩前: {} 字节, 压缩后: {} 字节, 压缩率: {}%",
-                            beforeCompressSize,
-                            afterCompressSize,
-                            String.format("%.2f", compressionRatio));
-                } else {
-                    // 膨胀率 = (压缩后大小 / 压缩前大小 - 1) * 100%
-                    double expansionRatio = ((double) afterCompressSize / beforeCompressSize - 1) * 100;
-                    logger.debug("压缩前 {} 字节, 压缩后 {} 字节, 膨胀率 {}%",
-                            beforeCompressSize,
-                            afterCompressSize,
-                            String.format("%.2f", expansionRatio));
-                }
+                // 压缩率 = (1 - 压缩后大小 / 压缩前大小) * 100%
+                double compressionRatio = (1 - (double) afterCompressSize / beforeCompressSize) * 100;
+                logger.debug("压缩前: {} 字节, 压缩后: {} 字节, 压缩率: {}%",
+                        beforeCompressSize,
+                        afterCompressSize,
+                        String.format("%.2f", compressionRatio));
             }
         } else {
             super.encode(ctx, in, out);

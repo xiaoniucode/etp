@@ -3,8 +3,9 @@ package com.xiaoniucode.etp.server.proxy;
 import com.xiaoniucode.etp.core.Lifecycle;
 import com.xiaoniucode.etp.core.NettyEventLoopFactory;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
-import com.xiaoniucode.etp.server.handler.HostSnifferHandler;
-import com.xiaoniucode.etp.server.handler.visitor.HttpVisitorHandler;
+import com.xiaoniucode.etp.server.handler.message.HostSnifferHandler;
+import com.xiaoniucode.etp.server.handler.tunnel.VisitorHandler;
+import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -22,17 +23,9 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpProxyServer implements Lifecycle {
     private final Logger logger = LoggerFactory.getLogger(HttpProxyServer.class);
-    private static final HttpProxyServer instance = new HttpProxyServer();
     private ServerBootstrap serverBootstrap;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-
-    private HttpProxyServer() {
-    }
-
-    public static HttpProxyServer get() {
-        return instance;
-    }
 
     @Override
     public void start() {
@@ -53,7 +46,7 @@ public class HttpProxyServer implements Lifecycle {
                             sc.pipeline().addLast(new TrafficMetricsHandler());
                             sc.pipeline().addLast(new HostSnifferHandler());
                             sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
-                            sc.pipeline().addLast(new HttpVisitorHandler());
+                            sc.pipeline().addLast(BeanHelper.getBean(VisitorHandler.class));
                         }
                     });
             serverBootstrap.bind(httpProxyPort).syncUninterruptibly().get();
