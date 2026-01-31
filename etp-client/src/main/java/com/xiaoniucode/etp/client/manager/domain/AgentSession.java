@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.client.manager;
+package com.xiaoniucode.etp.client.manager.domain;
 
 import io.netty.channel.Channel;
 

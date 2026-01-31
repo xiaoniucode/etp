@@ -1,9 +1,9 @@
 package com.xiaoniucode.etp.client.handler.tunnel;
 
-import com.xiaoniucode.etp.client.ConnectionPool;
 import com.xiaoniucode.etp.client.handler.factory.MessageHandlerFactory;
-import com.xiaoniucode.etp.client.manager.ChannelManager;
-import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.client.manager.domain.AgentSession;
+import com.xiaoniucode.etp.client.manager.AgentSessionManager;
+import com.xiaoniucode.etp.client.manager.ServerSessionManager;
 import com.xiaoniucode.etp.core.MessageHandler;
 import io.netty.channel.*;
 import org.slf4j.Logger;
@@ -35,35 +35,23 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<ControlMes
         }
     }
 
+    /**
+     * 代理客户端断开
+     * 1. 清理所有隧道连接资源
+     * 2. 清理代理客户端资源
+     */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        //控制通道断开
-        if (ctx.channel() == ChannelManager.getControlChannel()) {
-            logger.debug("断开与代理服务端的连接");
-            //清除当前控制通道
-            ChannelManager.setControlChannel(null);
-            ChannelManager.clearAllRealServerChannel();
-            channelStatusCallback.accept(ctx);
-        } else {
-            //当前传输数据的通道断开
-            ConnectionPool.removeDataTunnelChanel(ctx.channel());
-            Channel realChannel = ctx.channel().attr(EtpConstants.REAL_SERVER_CHANNEL).get();
-            if (realChannel != null) {
-                String sessionId = realChannel.attr(EtpConstants.SESSION_ID).get();
-                logger.debug("session-id-{} 断开数据传输", sessionId);
-                ctx.channel().close();
+        //清理和关闭隧道会话和连接
+        ServerSessionManager.removeAllServerSession();
+        //清理代理客户端资源
+        AgentSessionManager.removeAgentSession(new Consumer<AgentSession>() {
+            @Override
+            public void accept(AgentSession agent) {
+                logger.debug("代理客户端断开连接 - [客户端标识={}，会话标识={}]", agent.getClientId(), agent.getSessionId());
             }
-        }
-
+        });
+        channelStatusCallback.accept(ctx);
         super.channelInactive(ctx);
-    }
-
-    @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        Channel realChannel = ctx.channel().attr(EtpConstants.REAL_SERVER_CHANNEL).get();
-        if (realChannel != null && realChannel.isActive()) {
-            realChannel.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
-        }
-        super.channelWritabilityChanged(ctx);
     }
 }

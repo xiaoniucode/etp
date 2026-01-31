@@ -19,6 +19,6 @@ public class NewProxyRespHandler implements MessageHandler {
     public void handle(ChannelHandlerContext ctx, ControlMessage msg) {
         Message.NewProxyResp resp = msg.getNewProxyResp();
         ProxyRespHelper.set(resp);
-        logger.info("公网访问地址:{}", resp.getRemoteAddr());
+        logger.info("公网访问地址: {}", resp.getRemoteAddr());
     }
 }

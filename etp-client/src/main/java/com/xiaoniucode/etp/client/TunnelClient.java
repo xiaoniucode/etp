@@ -211,12 +211,4 @@ public final class TunnelClient implements Lifecycle {
             controlWorkerGroup.shutdownGracefully();
         }
     }
-
-    public void onConnectSuccessListener(Consumer<Void> connectCallback) {
-        this.connectSuccessListener = connectCallback;
-    }
-
-    public AppConfig getConfig() {
-        return config;
-    }
 }

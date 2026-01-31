@@ -2,11 +2,7 @@ package com.xiaoniucode.etp.core;
 
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  * 通道相关常量
@@ -16,9 +12,6 @@ public class EtpConstants {
     public static final AttributeKey<String> SESSION_ID = AttributeKey.valueOf("etp.sessionId");
     public static final AttributeKey<String> CLIENT_ID = AttributeKey.valueOf("etp.client_id");
     public static final AttributeKey<String> TOKEN = AttributeKey.valueOf("etp.token");
-    public static final AttributeKey<Channel> DATA_CHANNEL = AttributeKey.valueOf("etp.tunnel");
-    public static final AttributeKey<Channel> REAL_SERVER_CHANNEL = AttributeKey.valueOf("etp.realServerChannel");
-    public static final AttributeKey<Channel> VISITOR_CHANNEL = AttributeKey.valueOf("etp.visitorChannel");
     public static final AttributeKey<Boolean> CONNECTED = AttributeKey.valueOf("etp.connected");
 
     public static final AttributeKey<String> SERVER_DDR = AttributeKey.valueOf("etp.serverAddr");

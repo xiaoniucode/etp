@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.core.msg.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.event.NewProxyRegisterEvent;
+import com.xiaoniucode.etp.server.event.ProxyRegisterEvent;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -40,7 +40,7 @@ public class NewProxyRespHandler implements MessageHandler {
         //保存到代理到配置管理器
         proxyManager.createProxy("1",config, proxyConfig -> {
             //发布事件，可订阅事件对其进行持久化或其他操作
-            NewProxyRegisterEvent event = new NewProxyRegisterEvent();
+            ProxyRegisterEvent event = new ProxyRegisterEvent();
             event.setProxyConfig(proxyConfig);
             eventBus.publishAsync(event);
             control.writeAndFlush(buildResponse(proxyConfig));

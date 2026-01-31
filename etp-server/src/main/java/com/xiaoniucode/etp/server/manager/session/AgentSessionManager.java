@@ -3,8 +3,9 @@ package com.xiaoniucode.etp.server.manager.session;
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
 import com.xiaoniucode.etp.core.notify.EventBus;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.event.tunnel.AgentRegisteredEvent;
+import com.xiaoniucode.etp.server.event.AgentRegisteredEvent;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
@@ -113,6 +114,7 @@ public class AgentSessionManager {
         if (agentSessions.isEmpty()) {
             tokenToAgentSessions.remove(token);
         }
+        ChannelUtils.closeOnFlush(control);
         //清理自动注册的客户端以及数据记录
         //todo 还需要清理visitor相关资源、启动的服务资源
         //需要清空与该agent有关的所有session连接

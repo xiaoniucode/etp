@@ -55,21 +55,18 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
 //            });
 //        }
         //认证通过，注册Agent连接
-        AgentSession agentSession = new AgentSession(clientId, token, control);
-        agentSession.setArch(login.getArch());
-        agentSession.setOs(login.getOs());
-        agentSessionManager.createAgentSession(clientId,token,control,login.getArch(),login.getOs());
+        agentSessionManager.createAgentSession(clientId, token, control, login.getArch(), login.getOs()).ifPresent(agentSession -> {
+            //返回登陆成功消息
+            Message.MessageHeader heder = Message.MessageHeader.newBuilder().setType(Message.MessageType.LOGIN_RESP).build();
+            Message.LoginResp loginResp = Message.LoginResp.newBuilder().setSessionId(agentSession.getSessionId()).build();
 
-        //返回登陆成功消息
-        Message.MessageHeader heder = Message.MessageHeader.newBuilder().setType(Message.MessageType.LOGIN_RESP).build();
-        Message.LoginResp loginResp = Message.LoginResp.newBuilder().setSessionId(agentSession.getSessionId()).build();
-
-        ControlMessage message = ControlMessage.newBuilder().setHeader(heder).setLoginResp(loginResp).build();
-        control.writeAndFlush(message).addListener(future -> {
-            if (!future.isSuccess()) {
-                logger.warn("登陆成功返回结果消息发送失败");
-            }
+            ControlMessage message = ControlMessage.newBuilder().setHeader(heder).setLoginResp(loginResp).build();
+            control.writeAndFlush(message).addListener(future -> {
+                if (!future.isSuccess()) {
+                    logger.warn("登陆成功返回结果消息发送失败");
+                }
+            });
+            logger.debug("客户端登陆成功：[客户端ID={}，令牌={}，会话标识={}]", clientId, token, agentSession.getSessionId());
         });
-        logger.debug("客户端登陆成功：[客户端ID={}，令牌={}，会话标识={}]", clientId, token, agentSession.getSessionId());
     }
 }

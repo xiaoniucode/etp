@@ -1,9 +1,11 @@
 package com.xiaoniucode.etp.client.manager;
 
+import com.xiaoniucode.etp.client.manager.domain.AgentSession;
 import com.xiaoniucode.etp.core.EtpConstants;
 import io.netty.channel.Channel;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class AgentSessionManager {
     private static AgentSession agentSession;
@@ -23,14 +25,23 @@ public class AgentSessionManager {
         agentSession.setToken(token);
         agentSession.setServerAddr(serverAddr);
         agentSession.setServerPort(serverPort);
+
+        AgentSessionManager.agentSession = agentSession;
         return Optional.of(agentSession);
     }
 
     public static Optional<AgentSession> getAgentSession() {
-        return Optional.of(agentSession);
+        return Optional.ofNullable(agentSession);
     }
 
     public static void removeAgentSession() {
-        agentSession = null;
+        removeAgentSession(null);
+    }
+
+    public static void removeAgentSession(Consumer<AgentSession> callback) {
+        if (callback != null) {
+            callback.accept(agentSession);
+        }
+        AgentSessionManager.agentSession = null;
     }
 }

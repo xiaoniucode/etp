@@ -9,7 +9,6 @@ public abstract class Event implements Serializable {
 
     private long sequence = -1;
     private boolean endOfBatch = false;
-
     public long getSequence() {
         return sequence;
     }

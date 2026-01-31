@@ -60,8 +60,7 @@ message NewProxyResp {
 
 // 关闭代理
 message CloseProxy {
-  int32 proxyId = 1;
-  string sessionId = 2;
+  string sessionId = 1;
 }
 
 // 新访问者连接

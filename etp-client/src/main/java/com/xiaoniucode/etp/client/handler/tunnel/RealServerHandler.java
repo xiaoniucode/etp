@@ -1,46 +1,39 @@
 package com.xiaoniucode.etp.client.handler.tunnel;
 
-import com.xiaoniucode.etp.client.manager.ChannelManager;
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.msg.Message;
+import com.xiaoniucode.etp.client.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.client.manager.ServerSessionManager;
+import com.xiaoniucode.etp.core.LanInfo;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.xiaoniucode.etp.core.msg.Message.*;
+
 /**
  *
  * @author liuxin
  */
 public class RealServerHandler extends ChannelInboundHandlerAdapter {
     private final Logger logger = LoggerFactory.getLogger(RealServerHandler.class);
+
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Channel realChannel = ctx.channel();
-        String sessionId = realChannel.attr(EtpConstants.SESSION_ID).get();
-        logger.debug("session-id-{} 断开连接", sessionId);
-        ChannelManager.removeRealServerChannel(sessionId);
-        realChannel.attr(EtpConstants.SESSION_ID).set(null);
-        Channel control = ChannelManager.getControlChannel();
-        Channel tunnel = realChannel.attr(EtpConstants.DATA_CHANNEL).get();
-        if (tunnel != null) {
-            tunnel.attr(EtpConstants.REAL_SERVER_CHANNEL).set(null);
-            realChannel.attr(EtpConstants.DATA_CHANNEL).set(null);
-            MessageHeader header = MessageHeader.newBuilder().setType(MessageType.CLOSE_PROXY).build();
-
-            Message.CloseProxy closeProxy = Message.CloseProxy.newBuilder().setSessionId(sessionId).build();
-            ControlMessage message = ControlMessage.newBuilder().setHeader(header).setCloseProxy(closeProxy).build();
-            control.writeAndFlush(message);
-        }
+        Channel server = ctx.channel();
+        ServerSessionManager.removeServerSession(server).ifPresent(serverSession -> {
+            Channel control = serverSession.getAgentSession().getControl();
+            String sessionId = serverSession.getSessionId();
+            LanInfo lanInfo = serverSession.getLanInfo();
+            control.writeAndFlush(MessageWrapper.buildCloseProxy(sessionId));
+            logger.debug("隧道关闭 - [会话标识={}，目标地址={}，目标端口={}]", sessionId, lanInfo.getLocalIP(), lanInfo.getLocalPort());
+        });
         super.channelInactive(ctx);
     }
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        Channel realChannel = ctx.channel();
-        Channel tunnel = realChannel.attr(EtpConstants.DATA_CHANNEL).get();
-        if (tunnel != null) {
-            tunnel.config().setOption(ChannelOption.AUTO_READ, realChannel.isWritable());
-        }
+        Channel server = ctx.channel();
+        ServerSessionManager.getServerSession(server).ifPresent(session -> {
+            Channel tunnel = session.getTunnel();
+            tunnel.config().setOption(ChannelOption.AUTO_READ, server.isWritable());
+        });
         super.channelWritabilityChanged(ctx);
     }
 

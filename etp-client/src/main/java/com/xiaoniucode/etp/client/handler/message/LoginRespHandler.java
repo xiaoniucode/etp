@@ -20,6 +20,6 @@ public class LoginRespHandler implements MessageHandler {
         String clientId = control.attr(EtpConstants.CLIENT_ID).get();
 
         AgentSessionManager.createAgentSession(clientId, sessionId, control);
-        logger.info("登陆成功 - 客户端ID={}，会话标识={}", clientId, sessionId);
+        logger.info("登陆成功 - [客户端标识={}，会话标识={}]", clientId, sessionId);
     }
 }

@@ -38,21 +38,7 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<ControlMes
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel control = ctx.channel();
-        //断开 agent 连接
         agentSessionManager.disconnect(control);
-        ChannelUtils.closeOnFlush(control);
         super.channelInactive(ctx);
-    }
-
-    @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        Channel visitor = ctx.channel().attr(EtpConstants.VISITOR_CHANNEL).get();
-        if (visitor != null) {
-            visitor.config().setOption(ChannelOption.AUTO_READ, ctx.channel().isWritable());
-        } else {
-            logger.warn("channel wriability changed and visitor is null");
-        }
-
-        super.channelWritabilityChanged(ctx);
     }
 }

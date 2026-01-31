@@ -7,6 +7,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NewProxyRegisterEvent extends Event {
+public class ProxyRegisterEvent extends Event {
    private ProxyConfig proxyConfig;
 }

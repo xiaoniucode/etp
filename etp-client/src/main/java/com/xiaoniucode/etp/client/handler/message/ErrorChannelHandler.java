@@ -17,6 +17,6 @@ public class ErrorChannelHandler implements MessageHandler {
     @Override
     public void handle(ChannelHandlerContext ctx, ControlMessage msg) {
         Message.Error error = msg.getError();
-        logger.error("error: {}-{}", error.getCode(), error.getMessage());
+        logger.error("错误: {}", error.getMessage());
     }
 }
