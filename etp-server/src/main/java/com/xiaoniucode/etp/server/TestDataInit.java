@@ -61,9 +61,9 @@ public class TestDataInit implements EventListener<TcpServerInitializedEvent> {
         proxyConfig2.getFullDomains().addAll(domains);
 
 
-        proxyManager.createProxy("1", proxyConfig1, null);
-        proxyManager.createProxy("1", proxyConfig2, null);
-        proxyManager.createProxy("1", redicConfig, null);
+        proxyManager.createProxy("35D60D12469E8A3F", proxyConfig1, null);
+        proxyManager.createProxy("35D60D12469E8A3F", proxyConfig2, null);
+        proxyManager.createProxy("35D60D12469E8A3F", redicConfig, null);
 
         BeanHelper.getBean(TcpServerManager.class).bindPort(3307);
         BeanHelper.getBean(TcpServerManager.class).bindPort(3308);

@@ -10,7 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
+
 import com.xiaoniucode.etp.core.message.Message.*;
+
 /**
  *
  * @author liuxin
@@ -46,6 +48,9 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<ControlMes
         AgentSessionManager.removeAgentSession(new Consumer<AgentSession>() {
             @Override
             public void accept(AgentSession agent) {
+                if (agent == null) {
+                    return;
+                }
                 logger.debug("代理客户端断开连接 - [客户端标识={}，会话标识={}]", agent.getClientId(), agent.getSessionId());
             }
         });

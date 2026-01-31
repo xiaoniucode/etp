@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.client;
 
+import com.xiaoniucode.etp.client.common.utils.DeviceUtils;
 import com.xiaoniucode.etp.client.common.utils.MavenArchiverUtil;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.ConfigHelper;
@@ -24,10 +25,13 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
+
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import javax.net.ssl.SSLEngine;
 import java.util.concurrent.TimeUnit;
 
@@ -146,8 +150,8 @@ public final class TunnelClient implements Lifecycle {
                 ChannelManager.setControlChannel(control);
                 //获取客户端版本
                 String version = MavenArchiverUtil.getVersion();
-                //todo clientId 设备指纹生成
-                String clientId = "1";
+                //设备指纹作为客户端 ID
+                String clientId = DeviceUtils.generate16Id();
                 Message.MessageHeader header = Message.MessageHeader.newBuilder().setType(Message.MessageType.LOGIN).build();
 
                 Message.Login login = Message.Login.newBuilder()
