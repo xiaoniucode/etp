@@ -2,7 +2,9 @@ package com.xiaoniucode.etp.server.manager.session;
 
 import com.xiaoniucode.etp.core.EtpConstants;
 import com.xiaoniucode.etp.core.codec.ProtocolType;
+import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
+import com.xiaoniucode.etp.server.event.tunnel.AgentRegisteredEvent;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
@@ -14,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -50,25 +53,23 @@ public class AgentSessionManager {
     private SessionIdGenerator sessionIdGenerator;
     @Autowired
     private ProxyManager proxyManager;
+    @Autowired
+    private EventBus eventBus;
 
     /**
-     * 注册Agent 客户端
-     * @param agentSession 客户端信息
-     * @return 客户端信息
+     * 创建代理客户端会话
      */
-    public synchronized AgentSession registerAgent(AgentSession agentSession) {
+    public Optional<AgentSession> createAgentSession(String clientId, String token, Channel control, String arch, String os) {
         //为客户端生成一个唯一的 sessionId
         String sessionId = sessionIdGenerator.nextAgentSessionId();
-        agentSession.setSessionId(sessionId);
+        AgentSession agentSession = new AgentSession(clientId, token, control, sessionId, arch, os);
+
         agentSession.getControl().attr(EtpConstants.SESSION_ID).set(sessionId);
-
         sessionIdToAgentSession.putIfAbsent(sessionId, agentSession);
-
-        String token = agentSession.getToken();
 
         tokenToAgentSessions.computeIfAbsent(token,
                 k -> new CopyOnWriteArraySet<>()).add(agentSession);
-        String clientId = agentSession.getClientId();
+
         Set<ProxyConfig> proxyConfigs = proxyManager.getByClientId(clientId);
         for (ProxyConfig proxy : proxyConfigs) {
             ProtocolType protocol = proxy.getProtocol();
@@ -83,10 +84,12 @@ public class AgentSessionManager {
                 }
             }
         }
-        return agentSession;
+        //发布代理客户端注册成功事件
+        eventBus.publishAsync(new AgentRegisteredEvent(agentSession));
+        return Optional.of(agentSession);
     }
 
-    public synchronized void disconnect(Channel control) {
+    public void disconnect(Channel control) {
         String sessionId = control.attr(EtpConstants.SESSION_ID).get();
         disconnect(sessionId);
     }
@@ -96,7 +99,7 @@ public class AgentSessionManager {
      *
      * @param sessionId sessionId
      */
-    public synchronized void disconnect(String sessionId) {
+    public void disconnect(String sessionId) {
         AgentSession agentSession = sessionIdToAgentSession.remove(sessionId);
         if (agentSession == null) {
             return;
@@ -156,4 +159,6 @@ public class AgentSessionManager {
     public AgentSession getAgentSessionByDomain(String domain) {
         return domainToAgentSession.get(domain);
     }
+
+
 }

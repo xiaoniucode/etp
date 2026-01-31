@@ -58,7 +58,7 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
         AgentSession agentSession = new AgentSession(clientId, token, control);
         agentSession.setArch(login.getArch());
         agentSession.setOs(login.getOs());
-        agentSessionManager.registerAgent(agentSession);
+        agentSessionManager.createAgentSession(clientId,token,control,login.getArch(),login.getOs());
 
         //返回登陆成功消息
         Message.MessageHeader heder = Message.MessageHeader.newBuilder().setType(Message.MessageType.LOGIN_RESP).build();

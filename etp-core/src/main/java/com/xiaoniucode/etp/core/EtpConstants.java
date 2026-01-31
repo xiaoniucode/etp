@@ -15,6 +15,7 @@ import java.util.Set;
 public class EtpConstants {
     public static final AttributeKey<String> SESSION_ID = AttributeKey.valueOf("etp.sessionId");
     public static final AttributeKey<String> CLIENT_ID = AttributeKey.valueOf("etp.client_id");
+    public static final AttributeKey<String> TOKEN = AttributeKey.valueOf("etp.token");
     public static final AttributeKey<Channel> DATA_CHANNEL = AttributeKey.valueOf("etp.tunnel");
     public static final AttributeKey<Channel> REAL_SERVER_CHANNEL = AttributeKey.valueOf("etp.realServerChannel");
     public static final AttributeKey<Channel> VISITOR_CHANNEL = AttributeKey.valueOf("etp.visitorChannel");

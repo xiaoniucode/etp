@@ -5,6 +5,10 @@ import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Getter
 @Setter
 public class AgentSession {
@@ -18,14 +22,25 @@ public class AgentSession {
     private String token;
     private String arch;
     private String os;
+    private Map<String, String> extend = new HashMap<>();
     /**
      * 最后心跳时间
      */
     private long lastHeartbeat;
 
-    public AgentSession(String clientId, String token, Channel control) {
+    public AgentSession(String clientId, String token, Channel control, String sessionId) {
         this.clientId = clientId;
         this.token = token;
         this.control = control;
+        this.sessionId = sessionId;
+    }
+
+    public AgentSession(String clientId, String token, Channel control, String sessionId, String arch, String os) {
+        this.clientId = clientId;
+        this.token = token;
+        this.control = control;
+        this.sessionId = sessionId;
+        this.arch = arch;
+        this.os = os;
     }
 }
