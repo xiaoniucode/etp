@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.manager.session;
 
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.codec.ProtocolType;
+import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
@@ -60,12 +60,12 @@ public class AgentSessionManager {
     /**
      * 创建代理客户端会话
      */
-    public Optional<AgentSession> createAgentSession(String clientId, String token, Channel control, String arch, String os) {
+    public Optional<AgentSession> createAgentSession(String clientId, String token, Channel control, String arch, String os, String version) {
         //为客户端生成一个唯一的 sessionId
         String sessionId = sessionIdGenerator.nextAgentSessionId();
-        AgentSession agentSession = new AgentSession(clientId, token, control, sessionId, arch, os);
+        AgentSession agentSession = new AgentSession(clientId, token, control, sessionId, arch, os,version);
 
-        agentSession.getControl().attr(EtpConstants.SESSION_ID).set(sessionId);
+        agentSession.getControl().attr(ChannelConstants.SESSION_ID).set(sessionId);
         sessionIdToAgentSession.putIfAbsent(sessionId, agentSession);
 
         tokenToAgentSessions.computeIfAbsent(token,
@@ -91,7 +91,7 @@ public class AgentSessionManager {
     }
 
     public void disconnect(Channel control) {
-        String sessionId = control.attr(EtpConstants.SESSION_ID).get();
+        String sessionId = control.attr(ChannelConstants.SESSION_ID).get();
         disconnect(sessionId);
     }
 
@@ -106,7 +106,7 @@ public class AgentSessionManager {
             return;
         }
         Channel control = agentSession.getControl();
-        control.attr(EtpConstants.SESSION_ID).set(null);
+        control.attr(ChannelConstants.SESSION_ID).set(null);
 
         String token = agentSession.getToken();
         Set<AgentSession> agentSessions = tokenToAgentSessions.get(token);
@@ -124,7 +124,7 @@ public class AgentSessionManager {
      * 心跳更新，用于如果连接者长时间没有心跳，释放连接资源
      */
     public void updateHeartbeat(Channel control) {
-        String sessionId = control.attr(EtpConstants.SESSION_ID).get();
+        String sessionId = control.attr(ChannelConstants.SESSION_ID).get();
         if (sessionId == null) {
             return;
         }

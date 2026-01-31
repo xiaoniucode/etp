@@ -1,9 +1,10 @@
 package com.xiaoniucode.etp.client.handler.message;
 
 import com.xiaoniucode.etp.client.manager.AgentSessionManager;
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.MessageHandler;
-import com.xiaoniucode.etp.core.msg.Message;
+import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.handler.MessageHandler;
+import com.xiaoniucode.etp.core.message.Message;
+import com.xiaoniucode.etp.core.message.Message.*;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ public class LoginRespHandler implements MessageHandler {
         Message.LoginResp loginResp = msg.getLoginResp();
         String sessionId = loginResp.getSessionId();
         Channel control = ctx.channel();
-        String clientId = control.attr(EtpConstants.CLIENT_ID).get();
+        String clientId = control.attr(ChannelConstants.CLIENT_ID).get();
 
         AgentSessionManager.createAgentSession(clientId, sessionId, control);
         logger.info("登陆成功 - [客户端标识={}，会话标识={}]", clientId, sessionId);

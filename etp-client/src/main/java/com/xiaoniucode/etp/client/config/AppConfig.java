@@ -1,26 +1,23 @@
 package com.xiaoniucode.etp.client.config;
 
+import com.xiaoniucode.etp.client.config.domain.AuthConfig;
+import com.xiaoniucode.etp.client.config.domain.TlsConfig;
+import com.xiaoniucode.etp.client.config.domain.LogConfig;
 import com.xiaoniucode.etp.common.config.Config;
-import com.xiaoniucode.etp.common.log.LogConfig;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
+
+import java.util.List;
 
 public interface AppConfig extends Config {
     String getServerAddr();
 
     int getServerPort();
 
-    String getSecretKey();
+    AuthConfig getAuthConfig();
 
-    boolean isTls();
+    TlsConfig getTlsConfig();
 
-    TruststoreConfig getTruststore();
-
-    int getInitialDelaySec();
-
-    int getMaxRetries();
-
-    int getMaxDelaySec();
+    List<ProxyConfig> getProxies();
 
     LogConfig getLogConfig();
-
-
 }

@@ -1,15 +1,14 @@
 package com.xiaoniucode.etp.server.handler.message;
 
-import com.xiaoniucode.etp.core.msg.Message;
-import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
+import com.xiaoniucode.etp.core.message.Message;
+import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import com.xiaoniucode.etp.server.manager.AccessTokenManager;
-import com.xiaoniucode.etp.server.manager.domain.AgentSession;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.xiaoniucode.etp.core.msg.Message.ControlMessage;
+import com.xiaoniucode.etp.core.message.Message.ControlMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -55,7 +54,7 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
 //            });
 //        }
         //认证通过，注册Agent连接
-        agentSessionManager.createAgentSession(clientId, token, control, login.getArch(), login.getOs()).ifPresent(agentSession -> {
+        agentSessionManager.createAgentSession(clientId, token, control, login.getArch(), login.getOs(),login.getVersion()).ifPresent(agentSession -> {
             //返回登陆成功消息
             Message.MessageHeader heder = Message.MessageHeader.newBuilder().setType(Message.MessageType.LOGIN_RESP).build();
             Message.LoginResp loginResp = Message.LoginResp.newBuilder().setSessionId(agentSession.getSessionId()).build();
@@ -66,7 +65,7 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
                     logger.warn("登陆成功返回结果消息发送失败");
                 }
             });
-            logger.debug("客户端登陆成功：[客户端ID={}，令牌={}，会话标识={}]", clientId, token, agentSession.getSessionId());
+            logger.debug("客户端登陆成功：[客户端ID={}，令牌={}，版本号={}]", clientId, token, agentSession.getVersion());
         });
     }
 }

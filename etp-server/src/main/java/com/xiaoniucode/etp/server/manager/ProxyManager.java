@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.manager;
 
-import com.xiaoniucode.etp.core.codec.ProtocolType;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

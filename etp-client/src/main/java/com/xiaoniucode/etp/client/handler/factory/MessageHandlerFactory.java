@@ -1,9 +1,8 @@
 package com.xiaoniucode.etp.client.handler.factory;
 
 import com.xiaoniucode.etp.client.handler.message.*;
-import com.xiaoniucode.etp.core.MessageHandler;
-import com.xiaoniucode.etp.core.msg.Message.MessageType;
-
+import com.xiaoniucode.etp.core.handler.MessageHandler;
+import com.xiaoniucode.etp.core.message.Message.MessageType;
 import java.util.HashMap;
 import java.util.Map;
 

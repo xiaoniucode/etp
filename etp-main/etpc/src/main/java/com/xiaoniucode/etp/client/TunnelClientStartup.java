@@ -3,9 +3,10 @@ package com.xiaoniucode.etp.client;
 import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.DefaultAppConfig;
-import com.xiaoniucode.etp.client.config.TomlConfigSource;
+import com.xiaoniucode.etp.client.config.TomlConfigLoader;
+import com.xiaoniucode.etp.client.config.domain.AuthConfig;
+import com.xiaoniucode.etp.client.config.domain.LogConfig;
 import com.xiaoniucode.etp.common.*;
-import com.xiaoniucode.etp.common.log.LogConfig;
 import com.xiaoniucode.etp.common.log.LogbackConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +18,9 @@ public class TunnelClientStartup {
     private static final Logger logger = LoggerFactory.getLogger(TunnelClientStartup.class);
     private static TunnelClient tunnelClient;
 
-    static {
-        System.setProperty("io.netty.leakDetection.level", "DISABLED");
-    }
-
     public static void main(String[] args) {
         try {
+            System.setProperty("io.netty.leakDetection.level", "DISABLED");
             AppConfig config = buildConfig(args);
             initLogback(config);
             registerShutdownHook();
@@ -46,7 +44,7 @@ public class TunnelClientStartup {
         cmdArgs.registerOption("config", "c", "配置文件路径", false, true);
         cmdArgs.registerOption("host", "h", "服务器地址", false, true);
         cmdArgs.registerOption("port", "p", "隧道端口", false, true);
-        cmdArgs.registerOption("secretKey", "sk", "认证密钥", false, true);
+        cmdArgs.registerOption("token", "t", "认证密钥", false, true);
         cmdArgs.registerOption("help", "help", "显示帮助信息", false, false);
 
         try {
@@ -73,7 +71,7 @@ public class TunnelClientStartup {
         if (!Files.exists(Paths.get(configPath))) {
             throw new IllegalArgumentException("配置文件不存在: " + configPath);
         }
-        TomlConfigSource configSource = new TomlConfigSource(configPath);
+        TomlConfigLoader configSource = new TomlConfigLoader(configPath);
         return configSource.load();
     }
 
@@ -90,8 +88,10 @@ public class TunnelClientStartup {
             }
             builder.serverPort(port);
         }
-        if (cmdArgs.has("secretKey")) {
-            builder.secretKey(cmdArgs.get("secretKey"));
+        if (cmdArgs.has("token")) {
+            AuthConfig authConfig = new AuthConfig();
+            authConfig.setToken(cmdArgs.get("token"));
+            builder.authConfig(authConfig);
         }
         return builder.build();
     }
@@ -105,7 +105,7 @@ public class TunnelClientStartup {
                 .setPath(log.getPath())
                 .setLogPattern(log.getLogPattern())
                 .setArchivePattern(log.getArchivePattern())
-                .setLogLevel(Level.DEBUG)
+                .setLogLevel(Level.toLevel(log.getLevel(),Level.INFO))
                 .setLogName(log.getName())
                 .setMaxHistory(log.getMaxHistory())
                 .setTotalSizeCap(log.getTotalSizeCap())
@@ -133,14 +133,13 @@ public class TunnelClientStartup {
         System.out.println("  -c, --config <path>           配置文件路径");
         System.out.println("  -h, --host <serverAddr>       服务器地址");
         System.out.println("  -p, --port <serverPort>       服务器端口");
-        System.out.println("  -sk, --secretKey <Token>      认证密钥");
+        System.out.println("  -t, --token <Token>           登陆令牌");
         System.out.println("  --help                        显示帮助信息");
         System.out.println();
         System.out.println("示例:");
-        System.out.println("  etpc -c etpc.toml");
-        System.out.println("  etpc -sk your-secret-key");
-        System.out.println("  etpc -h localhost -p 9527 -sk your-secret-key");
-        System.out.println("  etpc -host localhost -port 9527 -secretKey your-secret-key");
+        System.out.println("  ./etpc -c etpc.toml");
+        System.out.println("  ./etpc -t your-token");
+        System.out.println("  ./etpc -h localhost -p 9527 -t token");
         System.out.println();
     }
 }

@@ -1,18 +1,18 @@
 package com.xiaoniucode.etp.client;
 
+import com.xiaoniucode.etp.client.common.utils.MavenArchiverUtil;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.ConfigHelper;
 import com.xiaoniucode.etp.client.handler.tunnel.RealServerHandler;
 import com.xiaoniucode.etp.client.handler.tunnel.ControlTunnelHandler;
 import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
-import com.xiaoniucode.etp.client.security.ClientTlsContextFactory;
-import com.xiaoniucode.etp.client.utils.OSUtils;
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.NettyEventLoopFactory;
-import com.xiaoniucode.etp.core.Lifecycle;
-import com.xiaoniucode.etp.core.IdleCheckHandler;
-import com.xiaoniucode.etp.core.msg.Message;
+import com.xiaoniucode.etp.client.common.utils.OSUtils;
+import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
+import com.xiaoniucode.etp.core.message.Message;
+import com.xiaoniucode.etp.core.server.Lifecycle;
+import com.xiaoniucode.etp.core.handler.IdleCheckHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -24,13 +24,10 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
-
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.net.ssl.SSLEngine;
 import java.util.concurrent.TimeUnit;
 
@@ -90,9 +87,9 @@ public final class TunnelClient implements Lifecycle {
                         }
                     });
 
-            if (config.isTls()) {
-                tlsContext = new ClientTlsContextFactory().createContext();
-            }
+//            if (config.getTlsConfig().getEnable()) {
+//                tlsContext = new ClientTlsContextFactory().createContext();
+//            }
             /**
              * 控制消息处理，单例
              */
@@ -113,7 +110,7 @@ public final class TunnelClient implements Lifecycle {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            if (config.isTls()) {
+                            if (config.getTlsConfig().getEnable()) {
                                 SSLEngine engine = tlsContext.newEngine(sc.alloc(), config.getServerAddr(), config.getServerPort());
                                 engine.setUseClientMode(true);
                                 sc.pipeline().addLast("tls", new SslHandler(engine));
@@ -140,31 +137,33 @@ public final class TunnelClient implements Lifecycle {
     }
 
     private void connectTunnelServer() {
-        ChannelFuture future = controlBootstrap.connect(config.getServerAddr(), config.getServerPort());
-        future.addListener((ChannelFutureListener) channelFuture -> {
-            if (channelFuture.isSuccess()) {
-                Channel controlChannel = channelFuture.channel();
-                controlChannel.attr(EtpConstants.SERVER_DDR).set(config.getServerAddr());
-                controlChannel.attr(EtpConstants.SERVER_PORT).set(config.getServerPort());
-                ChannelManager.setControlChannel(controlChannel);
-                String os = OSUtils.getOS();
-                String arch = OSUtils.getOSArch();
+        ChannelFuture channelFuture = controlBootstrap.connect(config.getServerAddr(), config.getServerPort());
+        channelFuture.addListener((ChannelFutureListener) f -> {
+            if (f.isSuccess()) {
+                Channel control = channelFuture.channel();
+                control.attr(ChannelConstants.SERVER_DDR).set(config.getServerAddr());
+                control.attr(ChannelConstants.SERVER_PORT).set(config.getServerPort());
+                ChannelManager.setControlChannel(control);
+                //获取客户端版本
+                String version = MavenArchiverUtil.getVersion();
+                //todo clientId 设备指纹生成
+                String clientId = "1";
                 Message.MessageHeader header = Message.MessageHeader.newBuilder().setType(Message.MessageType.LOGIN).build();
-                //todo clientId
+
                 Message.Login login = Message.Login.newBuilder()
-                        .setClientId("1")
-                        .setToken(config.getSecretKey())
-                        .setArch(arch)
-                        .setOs(os).build();
+                        .setClientId(clientId)
+                        .setVersion(version)
+                        .setToken(config.getAuthConfig().getToken())
+                        .setArch(OSUtils.getOSArch())
+                        .setOs(OSUtils.getOS()).build();
                 Message.ControlMessage loginMessage = Message.ControlMessage.newBuilder().setHeader(header).setLogin(login).build();
-                Channel control = future.channel();
-                control.writeAndFlush(loginMessage).addListener(f -> {
-                    if (f.isSuccess()) {
-                        control.attr(EtpConstants.CLIENT_ID).set("1");
+                control.writeAndFlush(loginMessage).addListener(future -> {
+                    if (future.isSuccess()) {
+                        control.attr(ChannelConstants.CLIENT_ID).set(clientId);
                     }
                 });
                 retryCount.set(0);
-                logger.info("已连接到ETP服务端: {}:{}", config.getServerAddr(), config.getServerPort());
+                logger.debug("连接到ETP服务端: {}:{}", config.getServerAddr(), config.getServerPort());
                 start = true;
                 if (connectSuccessListener != null) {
                     connectSuccessListener.accept(null);
@@ -177,7 +176,7 @@ public final class TunnelClient implements Lifecycle {
     }
 
     private void scheduleReconnect() {
-        if (retryCount.get() >= config.getMaxRetries()) {
+        if (retryCount.get() >= config.getAuthConfig().getMaxRetries()) {
             logger.error("达到最大重试次数，停止重连");
             this.stop();
             return;
@@ -196,12 +195,12 @@ public final class TunnelClient implements Lifecycle {
     private long calculateDelay() {
         int retries = retryCount.get();
         if (retries == 0) {
-            return config.getInitialDelaySec();
+            return config.getAuthConfig().getInitialDelay();
         }
         // 指数退避 + 随机抖动(±30%)
-        long delay = Math.min((1L << retries), config.getMaxDelaySec());
+        long delay = Math.min((1L << retries), config.getAuthConfig().getMaxDelay());
         long jitter = (long) (delay * 0.3 * (Math.random() * 2 - 1));
-        return Math.min(delay + jitter, config.getMaxDelaySec());
+        return Math.min(delay + jitter, config.getAuthConfig().getMaxDelay());
     }
 
     @Override

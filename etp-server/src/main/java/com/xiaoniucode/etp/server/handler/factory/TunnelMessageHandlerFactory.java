@@ -1,11 +1,11 @@
 package com.xiaoniucode.etp.server.handler.factory;
 
-import com.xiaoniucode.etp.core.MessageHandler;
+import com.xiaoniucode.etp.core.handler.MessageHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.xiaoniucode.etp.core.msg.Message.MessageType;
+import com.xiaoniucode.etp.core.message.Message.MessageType;
 import com.xiaoniucode.etp.server.handler.message.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

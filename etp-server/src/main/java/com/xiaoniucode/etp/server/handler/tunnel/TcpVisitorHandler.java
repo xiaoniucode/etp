@@ -1,12 +1,9 @@
 package com.xiaoniucode.etp.server.handler.tunnel;
 
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.LanInfo;
-import com.xiaoniucode.etp.core.msg.Message;
-import com.xiaoniucode.etp.server.manager.ProtocolDetection;
+import com.xiaoniucode.etp.core.domain.LanInfo;
+import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

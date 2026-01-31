@@ -4,15 +4,13 @@ import com.xiaoniucode.etp.client.handler.factory.MessageHandlerFactory;
 import com.xiaoniucode.etp.client.manager.domain.AgentSession;
 import com.xiaoniucode.etp.client.manager.AgentSessionManager;
 import com.xiaoniucode.etp.client.manager.ServerSessionManager;
-import com.xiaoniucode.etp.core.MessageHandler;
+import com.xiaoniucode.etp.core.handler.MessageHandler;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
-
-import com.xiaoniucode.etp.core.msg.Message.*;
-
+import com.xiaoniucode.etp.core.message.Message.*;
 /**
  *
  * @author liuxin

@@ -1,12 +1,9 @@
 package com.xiaoniucode.etp.server.config.domain;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
-import com.xiaoniucode.etp.core.codec.ProtocolType;
 
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 public class ClientInfo {
     private String name;

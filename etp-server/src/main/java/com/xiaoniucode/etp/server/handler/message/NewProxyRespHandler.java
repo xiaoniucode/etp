@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.handler.message;
 
-import com.xiaoniucode.etp.core.MessageHandler;
-import com.xiaoniucode.etp.core.codec.ProtocolType;
-import com.xiaoniucode.etp.core.msg.Message;
+import com.xiaoniucode.etp.core.handler.MessageHandler;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
-import com.xiaoniucode.etp.core.msg.Message.ControlMessage;
+import com.xiaoniucode.etp.core.message.Message.ControlMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.manager.session;
 
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.LanInfo;
+import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.domain.LanInfo;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
@@ -62,7 +62,7 @@ public class VisitorSessionManager {
 
         }
         if (ProtocolDetection.isHttp(visitor)) {
-            String domain = visitor.attr(EtpConstants.VISIT_DOMAIN).get();
+            String domain = visitor.attr(ChannelConstants.VISIT_DOMAIN).get();
             agentSession = agentSessionManager.getAgentSessionByDomain(domain);
             if (agentSession == null) {
                 visitor.close();
@@ -76,7 +76,7 @@ public class VisitorSessionManager {
             return;
         }
         String sessionId = sessionIdGenerator.nextVisitorSessionId();
-        visitor.attr(EtpConstants.SESSION_ID).set(sessionId);
+        visitor.attr(ChannelConstants.SESSION_ID).set(sessionId);
         VisitorSession visitorSession = new VisitorSession();
         visitorSession.setVisitor(visitor);
         visitorSession.setControl(agentSession.getControl());
@@ -110,10 +110,10 @@ public class VisitorSessionManager {
                 domainToVisitorChannels.remove(domain);
             }
 
-            ByteBuf cachedPacket = visitor.attr(EtpConstants.HTTP_FIRST_PACKET).get();
+            ByteBuf cachedPacket = visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).get();
             if (cachedPacket != null) {
                 cachedPacket.release();
-                visitor.attr(EtpConstants.HTTP_FIRST_PACKET).set(null);
+                visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).set(null);
             }
         }
 
@@ -181,7 +181,7 @@ public class VisitorSessionManager {
     }
 
     public VisitorSession getVisitorSession(Channel visitor) {
-        String sessionId = visitor.attr(EtpConstants.SESSION_ID).get();
+        String sessionId = visitor.attr(ChannelConstants.SESSION_ID).get();
         if (sessionId == null) {
             return null;
         }
@@ -194,6 +194,6 @@ public class VisitorSessionManager {
     }
 
     private String getDomain(Channel visitor) {
-        return visitor.attr(EtpConstants.VISIT_DOMAIN).get();
+        return visitor.attr(ChannelConstants.VISIT_DOMAIN).get();
     }
 }

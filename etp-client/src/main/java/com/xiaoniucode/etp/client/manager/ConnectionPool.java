@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.manager;
 
-import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 
@@ -22,8 +22,8 @@ public class ConnectionPool {
 
         Bootstrap controlBootstrap = ChannelManager.getControlBootstrap();
         Channel control = ChannelManager.getControlChannel();
-        String serverAddr = control.attr(EtpConstants.SERVER_DDR).get();
-        Integer serverPort = control.attr(EtpConstants.SERVER_PORT).get();
+        String serverAddr = control.attr(ChannelConstants.SERVER_DDR).get();
+        Integer serverPort = control.attr(ChannelConstants.SERVER_PORT).get();
 
         controlBootstrap.connect(serverAddr, serverPort).addListener((ChannelFutureListener) f -> {
             if (f.isSuccess()) {

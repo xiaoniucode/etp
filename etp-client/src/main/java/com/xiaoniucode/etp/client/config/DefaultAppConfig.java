@@ -1,40 +1,37 @@
 package com.xiaoniucode.etp.client.config;
 
-import com.xiaoniucode.etp.common.log.LogConfig;
+import com.xiaoniucode.etp.client.config.domain.AuthConfig;
+import com.xiaoniucode.etp.client.config.domain.TlsConfig;
+import com.xiaoniucode.etp.client.config.domain.LogConfig;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DefaultAppConfig implements AppConfig {
     private final String serverAddr;
     private final int serverPort;
-    private final String secretKey;
-    private final boolean tls;
-    private final TruststoreConfig truststore;
-    private final int initialDelaySec;
-    private final int maxRetries;
-    private final int maxDelaySec;
+    private final AuthConfig authConfig;
+    private final TlsConfig tlsConfig;
+    private final List<ProxyConfig> proxies;
     private final LogConfig logConfig;
 
     private DefaultAppConfig(Builder builder) {
         this.serverAddr = builder.serverAddr;
         this.serverPort = builder.serverPort;
-        this.secretKey = builder.secretKey;
-        this.tls = builder.tls;
-        this.truststore = builder.truststore;
-        this.initialDelaySec = builder.initialDelaySec;
-        this.maxRetries = builder.maxRetries;
-        this.maxDelaySec = builder.maxDelaySec;
+        this.authConfig = builder.authConfig;
+        this.tlsConfig = builder.tlsConfig;
+        this.proxies = builder.proxies;
         this.logConfig = builder.logConfig;
     }
 
     public static class Builder {
         private String serverAddr = "127.0.0.1";
         private int serverPort = 9527;
-        private String secretKey;
-        private boolean tls = false;
-        private TruststoreConfig truststore;
-        private int initialDelaySec = 2;
-        private int maxRetries = 5;
-        private int maxDelaySec = 8;
-        private LogConfig logConfig;
+        private AuthConfig authConfig = new AuthConfig();
+        private TlsConfig tlsConfig = new TlsConfig();
+        private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
+        private LogConfig logConfig = new LogConfig();
 
         public Builder serverAddr(String serverAddr) {
             this.serverAddr = serverAddr;
@@ -46,33 +43,18 @@ public class DefaultAppConfig implements AppConfig {
             return this;
         }
 
-        public Builder secretKey(String secretKey) {
-            this.secretKey = secretKey;
+        public Builder authConfig(AuthConfig authConfig) {
+            this.authConfig = authConfig;
             return this;
         }
 
-        public Builder tls(boolean tls) {
-            this.tls = tls;
+        public Builder tlsConfig(TlsConfig tlsConfig) {
+            this.tlsConfig = tlsConfig;
             return this;
         }
 
-        public Builder truststore(TruststoreConfig truststore) {
-            this.truststore = truststore;
-            return this;
-        }
-
-        public Builder initialDelaySec(int initialDelaySec) {
-            this.initialDelaySec = initialDelaySec;
-            return this;
-        }
-
-        public Builder maxRetries(int maxRetries) {
-            this.maxRetries = maxRetries;
-            return this;
-        }
-
-        public Builder maxDelaySec(int maxDelaySec) {
-            this.maxDelaySec = maxDelaySec;
+        public Builder proxies(List<ProxyConfig> proxies) {
+            this.proxies = proxies;
             return this;
         }
 
@@ -82,9 +64,6 @@ public class DefaultAppConfig implements AppConfig {
         }
 
         public AppConfig build() {
-            if (secretKey == null || secretKey.trim().isEmpty()) {
-                throw new IllegalArgumentException("secretKey must not be empty");
-            }
             return new DefaultAppConfig(this);
         }
     }
@@ -100,60 +79,26 @@ public class DefaultAppConfig implements AppConfig {
     }
 
     @Override
-    public String getSecretKey() {
-        return secretKey;
+    public AuthConfig getAuthConfig() {
+        return authConfig;
     }
 
     @Override
-    public boolean isTls() {
-        return tls;
+    public TlsConfig getTlsConfig() {
+        return tlsConfig;
     }
 
     @Override
-    public TruststoreConfig getTruststore() {
-        return truststore;
+    public List<ProxyConfig> getProxies() {
+        return proxies;
     }
 
     @Override
-    public int getInitialDelaySec() {
-        return initialDelaySec;
-    }
-
-    @Override
-    public int getMaxRetries() {
-        return maxRetries;
-    }
-
-    @Override
-    public int getMaxDelaySec() {
-        return maxDelaySec;
-    }
-
     public LogConfig getLogConfig() {
         return logConfig;
     }
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    public static class DefaultTruststoreConfig implements TruststoreConfig {
-        private final String path;
-        private final String storePass;
-
-        public DefaultTruststoreConfig(String path, String storePass) {
-            this.path = path;
-            this.storePass = storePass;
-        }
-
-        @Override
-        public String getPath() {
-            return path;
-        }
-
-        @Override
-        public String getStorePass() {
-            return storePass;
-        }
     }
 }

@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.helper;
 
-import com.xiaoniucode.etp.core.msg.Message;
+import com.xiaoniucode.etp.core.message.Message;
 
 public class ProxyRespHelper {
     private static Message.NewProxyResp newProxyResp;

@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.client.manager;
 
 import com.xiaoniucode.etp.client.manager.domain.AgentSession;
-import com.xiaoniucode.etp.core.EtpConstants;
+import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import io.netty.channel.Channel;
 
 import java.util.Optional;
@@ -18,9 +18,9 @@ public class AgentSessionManager {
             return Optional.empty();
         }
         AgentSession agentSession = new AgentSession(clientId, sessionId, control);
-        String token = control.attr(EtpConstants.TOKEN).get();
-        String serverAddr = control.attr(EtpConstants.SERVER_DDR).get();
-        Integer serverPort = control.attr(EtpConstants.SERVER_PORT).get();
+        String token = control.attr(ChannelConstants.TOKEN).get();
+        String serverAddr = control.attr(ChannelConstants.SERVER_DDR).get();
+        Integer serverPort = control.attr(ChannelConstants.SERVER_PORT).get();
 
         agentSession.setToken(token);
         agentSession.setServerAddr(serverAddr);

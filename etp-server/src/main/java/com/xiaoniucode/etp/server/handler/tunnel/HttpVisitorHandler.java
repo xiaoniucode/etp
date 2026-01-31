@@ -1,9 +1,8 @@
 package com.xiaoniucode.etp.server.handler.tunnel;
 
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.LanInfo;
-import com.xiaoniucode.etp.core.msg.Message;
-import com.xiaoniucode.etp.server.helper.BeanHelper;
+import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.domain.LanInfo;
+import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
 import io.netty.buffer.ByteBuf;
@@ -26,11 +25,11 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
         Channel visitor = ctx.channel();
-        Boolean connected = visitor.attr(EtpConstants.CONNECTED).get();
+        Boolean connected = visitor.attr(ChannelConstants.CONNECTED).get();
         if (connected == null || !connected) {
-            visitor.attr(EtpConstants.CONNECTED).set(false);
+            visitor.attr(ChannelConstants.CONNECTED).set(false);
             buf.retain();
-            visitor.attr(EtpConstants.HTTP_FIRST_PACKET).set(buf);
+            visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).set(buf);
             visitor.config().setOption(ChannelOption.AUTO_READ, false);
             visitorSessionManager.registerVisitor(visitor, this::connectToTarget);
             ctx.pipeline().remove(this);
@@ -61,11 +60,11 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void sendFirstPackage(VisitorSession session) {
         Channel visitor = session.getVisitor();
         Channel tunnel = session.getTunnel();
-        ByteBuf cached = visitor.attr(EtpConstants.HTTP_FIRST_PACKET).get();
+        ByteBuf cached = visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).get();
         if (cached != null && tunnel.isWritable()) {
             tunnel.writeAndFlush(cached.retain());
             cached.release();
-            visitor.attr(EtpConstants.HTTP_FIRST_PACKET).set(null);
+            visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).set(null);
         }
     }
     //todo 需要迁移到桥接器

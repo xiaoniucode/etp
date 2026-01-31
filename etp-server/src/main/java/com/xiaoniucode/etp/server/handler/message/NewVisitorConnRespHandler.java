@@ -1,14 +1,11 @@
 package com.xiaoniucode.etp.server.handler.message;
 
-import com.xiaoniucode.etp.core.ChannelSwitcher;
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.codec.ChannelBridge;
-import com.xiaoniucode.etp.core.msg.Message;
-import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
+import com.xiaoniucode.etp.core.handler.ChannelSwitcher;
+import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.handler.bridge.ChannelBridge;
+import com.xiaoniucode.etp.core.message.Message;
+import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.server.handler.tunnel.HttpVisitorHandler;
-import com.xiaoniucode.etp.server.handler.tunnel.ResourceReleaseHandler;
-import com.xiaoniucode.etp.server.handler.tunnel.TcpVisitorHandler;
-import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.ProtocolDetection;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
@@ -17,7 +14,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.xiaoniucode.etp.core.msg.Message.ControlMessage;
+import com.xiaoniucode.etp.core.message.Message.ControlMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,7 +50,7 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
         ChannelBridge.bridge(visitor, tunnel);
         visitor.config().setOption(ChannelOption.AUTO_READ, true);
         if (ProtocolDetection.isHttp(visitor)) {
-            visitor.attr(EtpConstants.CONNECTED).set(true);
+            visitor.attr(ChannelConstants.CONNECTED).set(true);
             httpVisitorHandler.sendFirstPackage(visitorSession);
         }
         logger.debug("已连接到目标服务");

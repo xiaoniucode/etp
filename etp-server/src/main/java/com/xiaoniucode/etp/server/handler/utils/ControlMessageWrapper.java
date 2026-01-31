@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.handler.utils;
 
-import com.xiaoniucode.etp.core.msg.Message;
+import com.xiaoniucode.etp.core.message.Message;
 
 public class ControlMessageWrapper {
 

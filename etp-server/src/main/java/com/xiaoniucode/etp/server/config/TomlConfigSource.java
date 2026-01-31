@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.common.log.LogConfig;
 import com.xiaoniucode.etp.common.utils.LogUtils;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.common.utils.TomlUtils;
-import com.xiaoniucode.etp.core.codec.ProtocolType;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.moandjiezana.toml.Toml;
 import com.xiaoniucode.etp.server.config.domain.*;
 import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;

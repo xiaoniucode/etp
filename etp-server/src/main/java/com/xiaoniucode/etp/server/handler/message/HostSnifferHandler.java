@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.handler.message;
 
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.codec.ProtocolType;
+import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
 import com.xiaoniucode.etp.server.manager.DomainManager;
@@ -13,8 +13,6 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -73,8 +71,8 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             sniffing = false;
         }
         if (isHttp) {
-            visitor.attr(EtpConstants.PROTOCOL_TYPE).set(ProtocolType.HTTP);
-            visitor.attr(EtpConstants.VISIT_DOMAIN).set(domain);
+            visitor.attr(ChannelConstants.PROTOCOL_TYPE).set(ProtocolType.HTTP);
+            visitor.attr(ChannelConstants.VISIT_DOMAIN).set(domain);
         }
         ctx.pipeline().remove(this);
     }

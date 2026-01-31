@@ -1,12 +1,11 @@
 package com.xiaoniucode.etp.server.config.domain;
 
-import com.xiaoniucode.etp.core.codec.ProtocolType;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.enums.DomainType;
 import com.xiaoniucode.etp.server.enums.ProxyStatus;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

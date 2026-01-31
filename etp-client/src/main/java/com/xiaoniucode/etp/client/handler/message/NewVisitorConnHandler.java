@@ -4,17 +4,16 @@ import com.xiaoniucode.etp.client.manager.ConnectionPool;
 import com.xiaoniucode.etp.client.handler.utils.MessageWrapper;
 import com.xiaoniucode.etp.client.manager.ChannelManager;
 import com.xiaoniucode.etp.client.manager.ServerSessionManager;
-import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
-import com.xiaoniucode.etp.core.ChannelSwitcher;
-import com.xiaoniucode.etp.core.LanInfo;
-import com.xiaoniucode.etp.core.codec.ChannelBridge;
-import com.xiaoniucode.etp.core.msg.Message;
+import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
+import com.xiaoniucode.etp.core.handler.ChannelSwitcher;
+import com.xiaoniucode.etp.core.domain.LanInfo;
+import com.xiaoniucode.etp.core.handler.bridge.ChannelBridge;
+import com.xiaoniucode.etp.core.message.Message;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.xiaoniucode.etp.core.msg.Message.*;
-
+import com.xiaoniucode.etp.core.message.Message.*;
 /**
  *
  * @author liuxin

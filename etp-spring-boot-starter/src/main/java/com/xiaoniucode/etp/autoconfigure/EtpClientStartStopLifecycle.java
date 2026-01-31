@@ -5,7 +5,7 @@ import com.xiaoniucode.etp.client.config.DefaultAppConfig;
 import com.xiaoniucode.etp.client.ProxyClient;
 import com.xiaoniucode.etp.client.TunnelClient;
 import com.xiaoniucode.etp.common.utils.StringUtils;
-import com.xiaoniucode.etp.core.msg.NewProxy;
+import com.xiaoniucode.etp.core.message.NewProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;

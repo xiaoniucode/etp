@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.client.handler.tunnel;
 
 import com.xiaoniucode.etp.client.handler.utils.MessageWrapper;
 import com.xiaoniucode.etp.client.manager.ServerSessionManager;
-import com.xiaoniucode.etp.core.LanInfo;
+import com.xiaoniucode.etp.core.domain.LanInfo;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.manager.domain;
 
-import com.xiaoniucode.etp.core.LanInfo;
+import com.xiaoniucode.etp.core.domain.LanInfo;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;

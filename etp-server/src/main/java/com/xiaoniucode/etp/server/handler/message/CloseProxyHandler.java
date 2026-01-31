@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.handler.message;
 
-import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
-import com.xiaoniucode.etp.core.msg.Message.*;
+import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
+import com.xiaoniucode.etp.core.message.Message.*;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
 import io.netty.channel.ChannelHandlerContext;

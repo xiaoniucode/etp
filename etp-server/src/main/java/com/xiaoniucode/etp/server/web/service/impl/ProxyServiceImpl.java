@@ -1,8 +1,5 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
-import com.xiaoniucode.etp.core.codec.ProtocolType;
-import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.web.domain.Proxy;
 import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
@@ -13,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Locale;
 
 @Service
 public class ProxyServiceImpl implements ProxyService {

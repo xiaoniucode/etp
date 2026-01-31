@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package com.xiaoniucode.etp.core.msg;
+package com.xiaoniucode.etp.core.message;
 
 // 消息类型枚举
 enum MessageType {
@@ -30,10 +30,11 @@ message MessageHeader {
 
 // 登录请求
 message Login {
-  string os = 1;
-  string arch = 2;
+  optional string os = 1;
+  optional  string arch = 2;
   string token = 3;
-  string clientId=4;
+  string clientId = 4;
+  optional  string version = 5;
 }
 message LoginResp {
   string sessionId = 1;

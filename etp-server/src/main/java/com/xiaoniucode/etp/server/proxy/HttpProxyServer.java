@@ -1,12 +1,10 @@
 package com.xiaoniucode.etp.server.proxy;
 
-import com.xiaoniucode.etp.core.Lifecycle;
-import com.xiaoniucode.etp.core.NettyEventLoopFactory;
+import com.xiaoniucode.etp.core.server.Lifecycle;
+import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.server.config.ConfigHelper;
 import com.xiaoniucode.etp.server.handler.message.HostSnifferHandler;
 import com.xiaoniucode.etp.server.handler.tunnel.HttpVisitorHandler;
-import com.xiaoniucode.etp.server.handler.tunnel.ResourceReleaseHandler;
-import com.xiaoniucode.etp.server.handler.tunnel.TcpVisitorHandler;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import io.netty.bootstrap.ServerBootstrap;

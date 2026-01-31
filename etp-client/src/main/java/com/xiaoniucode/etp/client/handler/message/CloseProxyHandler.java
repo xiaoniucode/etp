@@ -2,13 +2,13 @@ package com.xiaoniucode.etp.client.handler.message;
 
 import com.xiaoniucode.etp.client.manager.ConnectionPool;
 import com.xiaoniucode.etp.client.manager.ServerSessionManager;
-import com.xiaoniucode.etp.core.AbstractTunnelMessageHandler;
+import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.xiaoniucode.etp.core.msg.Message.*;
+import com.xiaoniucode.etp.core.message.Message.*;
 
 /**
  *

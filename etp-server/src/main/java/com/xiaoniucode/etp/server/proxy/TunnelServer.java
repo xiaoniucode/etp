@@ -1,10 +1,10 @@
 package com.xiaoniucode.etp.server.proxy;
 
-import com.xiaoniucode.etp.core.NettyEventLoopFactory;
-import com.xiaoniucode.etp.core.Lifecycle;
-import com.xiaoniucode.etp.core.IdleCheckHandler;
+import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
+import com.xiaoniucode.etp.core.server.Lifecycle;
+import com.xiaoniucode.etp.core.handler.IdleCheckHandler;
 
-import com.xiaoniucode.etp.core.msg.Message;
+import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.config.AppConfig;

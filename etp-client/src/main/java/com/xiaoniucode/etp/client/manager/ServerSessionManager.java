@@ -2,9 +2,9 @@ package com.xiaoniucode.etp.client.manager;
 
 import com.xiaoniucode.etp.client.manager.domain.AgentSession;
 import com.xiaoniucode.etp.client.manager.domain.ServerSession;
-import com.xiaoniucode.etp.client.utils.StringUtils;
-import com.xiaoniucode.etp.core.EtpConstants;
-import com.xiaoniucode.etp.core.LanInfo;
+import com.xiaoniucode.etp.common.utils.StringUtils;
+import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.domain.LanInfo;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class ServerSessionManager {
         if (optional.isPresent()) {
             AgentSession agentSession = optional.get();
             ServerSession serverSession = new ServerSession(sessionId, tunnel, server, lanInfo, agentSession);
-            server.attr(EtpConstants.SESSION_ID).set(sessionId);
+            server.attr(ChannelConstants.SESSION_ID).set(sessionId);
             sessionIdToAgentSession.put(serverSession.getSessionId(), serverSession);
             logger.debug("隧道会话创建成功：[会话标识={}]", serverSession.getSessionId());
             return Optional.of(serverSession);
@@ -36,8 +36,8 @@ public class ServerSessionManager {
     }
 
     public static Optional<ServerSession> removeServerSession(Channel server) {
-        String sessionId = server.attr(EtpConstants.SESSION_ID).get();
-        server.attr(EtpConstants.SESSION_ID).setIfAbsent(null);
+        String sessionId = server.attr(ChannelConstants.SESSION_ID).get();
+        server.attr(ChannelConstants.SESSION_ID).setIfAbsent(null);
         ServerSession remove = sessionIdToAgentSession.remove(sessionId);
         ChannelUtils.closeOnFlush(server);
         return Optional.ofNullable(remove);
@@ -52,7 +52,7 @@ public class ServerSessionManager {
     }
 
     public static Optional<ServerSession> getServerSession(Channel server) {
-        String sessionId = server.attr(EtpConstants.SESSION_ID).get();
+        String sessionId = server.attr(ChannelConstants.SESSION_ID).get();
         return getServerSession(sessionId);
     }
 
