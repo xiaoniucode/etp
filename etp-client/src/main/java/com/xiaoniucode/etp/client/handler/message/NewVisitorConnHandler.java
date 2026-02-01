@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.client.handler.message;
 
 import com.xiaoniucode.etp.client.manager.ConnectionPool;
 import com.xiaoniucode.etp.client.handler.utils.MessageWrapper;
-import com.xiaoniucode.etp.client.manager.ChannelManager;
+import com.xiaoniucode.etp.client.manager.BootstrapManager;
 import com.xiaoniucode.etp.client.manager.ServerSessionManager;
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.handler.ChannelSwitcher;
@@ -29,7 +29,7 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
         String localIP = msg.getLocalIp();
         int localPort = msg.getLocalPort();
 
-        Bootstrap serverBootstrap = ChannelManager.getRealServerBootstrap();
+        Bootstrap serverBootstrap = BootstrapManager.getRealServerBootstrap();
         serverBootstrap.connect(localIP, localPort).addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 logger.debug("连接到目标服务 - [地址={}，端口={}]", localIP, localPort);

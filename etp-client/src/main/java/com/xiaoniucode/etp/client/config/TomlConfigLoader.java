@@ -107,6 +107,7 @@ public class TomlConfigLoader implements ConfigSource {
                 String protocol = proxyTable.getString("protocol");
                 String localIp = proxyTable.getString("localIp");
                 Long localPortValue = proxyTable.getLong("localPort");
+                Long remotePortValue = proxyTable.getLong("remotePort");
                 Boolean autoDomain = proxyTable.getBoolean("autoDomain", true);
                 List<String> customDomains = proxyTable.getList("customDomains");
                 Long statusValue = proxyTable.getLong("status", ProxyStatus.OPEN.getStatus().longValue());
@@ -118,7 +119,7 @@ public class TomlConfigLoader implements ConfigSource {
                 }
                 if (StringUtils.hasText(protocol)) {
                     try {
-                        proxyConfig.setProtocol(ProtocolType.getType(protocol.trim()));
+                        proxyConfig.setProtocol(ProtocolType.getByName(protocol.trim()));
                     } catch (IllegalArgumentException e) {
                         throw new IllegalArgumentException("无效的协议类型: " + protocol.trim(), e);
                     }
@@ -129,6 +130,10 @@ public class TomlConfigLoader implements ConfigSource {
                 if (localPortValue != null) {
                     validatePort(localPortValue.intValue());
                     proxyConfig.setLocalPort(localPortValue.intValue());
+                }
+                if (remotePortValue != null) {
+                    validatePort(remotePortValue.intValue());
+                    proxyConfig.setRemotePort(remotePortValue.intValue());
                 }
                 if (autoDomain != null) {
                     proxyConfig.setAutoDomain(autoDomain);

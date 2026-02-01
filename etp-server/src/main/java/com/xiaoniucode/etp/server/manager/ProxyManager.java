@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.manager;
 
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import org.slf4j.Logger;
@@ -43,6 +44,9 @@ public class ProxyManager {
     }
 
     public synchronized ProxyConfig createProxy(String clientId, ProxyConfig proxyConfig, Consumer<ProxyConfig> callback) {
+        if (!StringUtils.hasText(clientId)||proxyConfig==null){
+            return null;
+        }
         ProtocolType protocol = proxyConfig.getProtocol();
         if (ProtocolType.isTcp(protocol)) {
             Integer remotePort = proxyConfig.getRemotePort();
@@ -133,6 +137,6 @@ public class ProxyManager {
     }
 
     public Set<ProxyConfig> getByClientId(String clientId) {
-        return clientIdToProxyConfigs.get(clientId);
+        return clientIdToProxyConfigs.getOrDefault(clientId,new HashSet<>());
     }
 }

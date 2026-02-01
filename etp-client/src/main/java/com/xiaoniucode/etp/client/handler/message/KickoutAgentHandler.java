@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.xiaoniucode.etp.core.message.Message.*;
 
-public class KickoutClientHandler implements MessageHandler {
-    private final Logger logger = LoggerFactory.getLogger(KickoutClientHandler.class);
+public class KickoutAgentHandler implements MessageHandler {
+    private final Logger logger = LoggerFactory.getLogger(KickoutAgentHandler.class);
 
     @Override
     public void handle(ChannelHandlerContext ctx, ControlMessage msg) {

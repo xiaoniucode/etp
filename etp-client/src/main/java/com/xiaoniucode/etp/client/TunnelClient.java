@@ -3,12 +3,13 @@ package com.xiaoniucode.etp.client;
 import com.xiaoniucode.etp.client.common.utils.DeviceUtils;
 import com.xiaoniucode.etp.client.common.utils.MavenArchiverUtil;
 import com.xiaoniucode.etp.client.config.AppConfig;
-import com.xiaoniucode.etp.client.config.ConfigHelper;
+import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
 import com.xiaoniucode.etp.client.handler.tunnel.RealServerHandler;
 import com.xiaoniucode.etp.client.handler.tunnel.ControlTunnelHandler;
-import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
-import com.xiaoniucode.etp.client.manager.ChannelManager;
+import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
+import com.xiaoniucode.etp.client.manager.BootstrapManager;
 import com.xiaoniucode.etp.client.common.utils.OSUtils;
+import com.xiaoniucode.etp.client.manager.EventBusManager;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.message.Message;
@@ -74,8 +75,9 @@ public final class TunnelClient implements Lifecycle {
             if (start) {
                 return;
             }
-            ConfigHelper.set(config);
-            TunnelClientHelper.setTunnelClient(this);
+            logger.debug("代理客户端应用初始化");
+            EventBusManager.register(new ApplicationInitListener());
+            EventBusManager.publishAsync(new ApplicationInitEvent(config));
             controlBootstrap = new Bootstrap();
             Bootstrap realBootstrap = new Bootstrap();
 
@@ -129,7 +131,7 @@ public final class TunnelClient implements Lifecycle {
                         }
                     });
 
-            ChannelManager.initBootstraps(controlBootstrap, realBootstrap);
+            BootstrapManager.initBootstraps(controlBootstrap, realBootstrap);
             if (!stop) {
                 //连接到服务器
                 connectTunnelServer();
@@ -147,7 +149,6 @@ public final class TunnelClient implements Lifecycle {
                 Channel control = channelFuture.channel();
                 control.attr(ChannelConstants.SERVER_DDR).set(config.getServerAddr());
                 control.attr(ChannelConstants.SERVER_PORT).set(config.getServerPort());
-                ChannelManager.setControlChannel(control);
                 //获取客户端版本
                 String version = MavenArchiverUtil.getVersion();
                 //设备指纹作为客户端 ID

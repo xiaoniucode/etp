@@ -2,33 +2,30 @@ syntax = "proto3";
 
 package com.xiaoniucode.etp.core.message;
 
-// 消息类型枚举
 enum MessageType {
-  UNKNOWN = 0;              // 未知类型
-  LOGIN = 101;          // 登录请求
-  LOGIN_RESP = 104;          //登录响应
-  NEW_PROXY = 102;       // 创建代理请求
-  CLOSE_PROXY = 103;     // 关闭代理请求
-  PING = 105;            // 心跳请求
-  NEW_PROXY_RESP = 202;  // 创建代理响应
-  ERROR = 205;           // 错误响应
-  PONG = 206;            // 心跳响应
-  KICKOUT = 301;       // 踢出客户端通知
-  NEW_VISITOR = 302;    // 新访问者连接请求
-  NEW_VISITOR_RESP = 303;   // 访问者连接响应
+  UNKNOWN = 0;
+  LOGIN = 101;
+  LOGIN_RESP = 104;
+  NEW_PROXY = 102;
+  CLOSE_PROXY = 103;
+  PING = 105;
+  NEW_PROXY_RESP = 202;
+  ERROR = 205;
+  PONG = 206;
+  KICKOUT = 301;
+  NEW_VISITOR = 302;
+  NEW_VISITOR_RESP = 303;
 }
 
-// 协议类型枚举
 enum ProtocolType {
   TCP = 0;
   HTTP = 1;
 }
 
 message MessageHeader {
-  MessageType type = 1;// 消息类型
+  MessageType type = 1;
 }
 
-// 登录请求
 message Login {
   optional string os = 1;
   optional  string arch = 2;
@@ -40,57 +37,50 @@ message LoginResp {
   string sessionId = 1;
 }
 
-// 创建代理
 message NewProxy {
   string name = 1;
-  string localIp = 2;
+  optional string localIp = 2;
   int32 localPort = 3;
-  int32 status = 4;
-  ProtocolType protocol = 5;
-  int32 remotePort = 6;
-  bool autoDomain = 7;
-  repeated string customDomains = 8;
-  repeated string subDomains = 9;
+  optional int32 status = 4;
+  optional bool encrypt = 5;
+  optional bool compress = 6;
+  ProtocolType protocol = 7;
+  optional int32 remotePort = 8;
+  optional  bool autoDomain = 9;
+  repeated string customDomains = 10;
+  repeated string subDomains = 11;
+  map<string, string> metadata = 12;
 }
 
-// 创建代理响应
 message NewProxyResp {
   string proxyName = 1;
   string remoteAddr = 2;
 }
 
-// 关闭代理
 message CloseProxy {
   string sessionId = 1;
 }
 
-// 新访问者连接
 message NewVisitorConn {
   string sessionId = 1;
   string localIp = 2;
   int32 localPort = 3;
-  int32 proxyId = 4;
 }
 
-// 访问者连接响应
 message NewVisitorConnResp {
   string sessionId = 2;
 }
 
-// 错误响应
 message Error {
   int32 code = 1;
   string message = 2;
 }
 
-// 心跳消息
 message Ping {}
 message Pong {}
 
-// 踢出客户端
 message Kickout {}
 
-// 统一消息容器
 message ControlMessage {
   MessageHeader header = 1;
   oneof payload {

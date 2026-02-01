@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TlsConfig {
-    private Boolean enable=false;
+    private Boolean enable = false;
     private String certPath;
     private String storePassPath;
 }

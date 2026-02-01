@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.handler.tunnel;
 
 import com.xiaoniucode.etp.core.handler.MessageHandler;
 import com.xiaoniucode.etp.server.handler.factory.TunnelMessageHandlerFactory;
+import com.xiaoniucode.etp.server.manager.session.AgentSessionContext;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import io.netty.channel.*;
 import org.slf4j.Logger;
@@ -26,10 +27,20 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<ControlMes
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ControlMessage msg) throws Exception {
-        MessageType messageType = msg.getHeader().getType();
-        MessageHandler handler = factory.getHandler(messageType);
-        if (handler != null) {
-            handler.handle(ctx, msg);
+        try {
+            agentSessionManager.getAgentSession(ctx.channel()).ifPresent(agentSession -> {
+                AgentSessionContext.set(agentSession);
+                logger.debug("初始化代理客户端会话上下文");
+            });
+            MessageType messageType = msg.getHeader().getType();
+            MessageHandler handler = factory.getHandler(messageType);
+            if (handler != null) {
+                handler.handle(ctx, msg);
+            }
+            ctx.fireChannelRead(msg);
+        } finally {
+            AgentSessionContext.clear();
+            logger.debug("清理代理客户端会话上下文");
         }
     }
 

@@ -28,10 +28,10 @@ public class DefaultAppConfig implements AppConfig {
     public static class Builder {
         private String serverAddr = "127.0.0.1";
         private int serverPort = 9527;
-        private AuthConfig authConfig = new AuthConfig();
+        private AuthConfig authConfig;
         private TlsConfig tlsConfig = new TlsConfig();
         private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
-        private LogConfig logConfig = new LogConfig();
+        private LogConfig logConfig;
 
         public Builder serverAddr(String serverAddr) {
             this.serverAddr = serverAddr;

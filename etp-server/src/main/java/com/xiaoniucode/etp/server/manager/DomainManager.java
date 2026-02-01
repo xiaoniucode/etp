@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.manager;
 
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class DomainManager {
 
     public DomainInfo getDomainInfo(String domain) {
         ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.setStatus(ProxyStatus.OPEN);
+        proxyConfig.setProxyStatus(ProxyStatus.OPEN);
         return new DomainInfo("a.domain1.com", proxyConfig);
         //todo return domainMap.get(domain);
     }
@@ -151,7 +151,7 @@ public class DomainManager {
         DomainInfo domainInfo = domainMap.get(domain);
         if (domainInfo != null) {
             domainInfo.setActive(false);
-            domainInfo.getProxyConfig().setStatus(ProxyStatus.OPEN);
+            domainInfo.getProxyConfig().setProxyStatus(ProxyStatus.OPEN);
             logger.debug("停用域名: {}", domain);
         }
     }
@@ -164,7 +164,7 @@ public class DomainManager {
         DomainInfo domainInfo = domainMap.get(domain);
         if (domainInfo != null) {
             domainInfo.setActive(true);
-            domainInfo.getProxyConfig().setStatus(ProxyStatus.OPEN);
+            domainInfo.getProxyConfig().setProxyStatus(ProxyStatus.OPEN);
             logger.debug("启用域名: {}", domain);
         }
     }

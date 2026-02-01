@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.manager.session;
 
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.notify.EventBus;
@@ -57,13 +58,15 @@ public class AgentSessionManager {
     @Autowired
     private EventBus eventBus;
 
+
     /**
      * 创建代理客户端会话
+     * 1.注册系统中已经存在代理配置
      */
     public Optional<AgentSession> createAgentSession(String clientId, String token, Channel control, String arch, String os, String version) {
         //为客户端生成一个唯一的 sessionId
         String sessionId = sessionIdGenerator.nextAgentSessionId();
-        AgentSession agentSession = new AgentSession(clientId, token, control, sessionId, arch, os,version);
+        AgentSession agentSession = new AgentSession(clientId, token, control, sessionId, arch, os, version);
 
         agentSession.getControl().attr(ChannelConstants.SESSION_ID).set(sessionId);
         sessionIdToAgentSession.putIfAbsent(sessionId, agentSession);
@@ -88,6 +91,12 @@ public class AgentSessionManager {
         //发布代理客户端注册成功事件
         eventBus.publishAsync(new AgentRegisteredEvent(agentSession));
         return Optional.of(agentSession);
+    }
+
+    public void addPortToAgentSession(Integer remotePort) {
+        AgentSessionContext.get().ifPresent(agentSession -> {
+            portToAgentSession.putIfAbsent(remotePort, agentSession);
+        });
     }
 
     public void disconnect(Channel control) {
@@ -163,4 +172,14 @@ public class AgentSessionManager {
     }
 
 
+    public Optional<AgentSession> getAgentSession(Channel control) {
+        if (control == null) {
+            return Optional.empty();
+        }
+        String sessionId = control.attr(ChannelConstants.SESSION_ID).get();
+        if (StringUtils.hasText(sessionId)) {
+            return Optional.ofNullable(sessionIdToAgentSession.get(sessionId));
+        }
+        return Optional.empty();
+    }
 }

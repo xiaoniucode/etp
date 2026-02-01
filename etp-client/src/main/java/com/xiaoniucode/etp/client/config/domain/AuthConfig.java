@@ -10,13 +10,13 @@ public class AuthConfig {
     /**
      * 初始重试延迟（秒）
      */
-    private Integer initialDelay =1;
+    private Integer initialDelay = 1;
     /**
      * 最大延迟时间（秒）
      */
-    private Integer maxDelay =30;
+    private Integer maxDelay = 30;
     /**
      * 最大重试次数
      */
-    private Integer maxRetries=5;
+    private Integer maxRetries = 5;
 }

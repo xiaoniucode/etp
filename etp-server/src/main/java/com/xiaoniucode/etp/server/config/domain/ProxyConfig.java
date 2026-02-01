@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.config.domain;
 
+import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.server.enums.DomainType;
-import com.xiaoniucode.etp.server.enums.ProxyStatus;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,7 +30,7 @@ public class ProxyConfig {
      * 代理的状态
      */
     @Setter
-    private ProxyStatus status;
+    private ProxyStatus proxyStatus;
     /**
      * 任意自定义域名
      */

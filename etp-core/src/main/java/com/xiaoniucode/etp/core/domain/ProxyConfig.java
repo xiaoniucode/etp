@@ -22,7 +22,7 @@ public class ProxyConfig {
     @Setter
     private ProtocolType protocol;
     @Setter
-    private String localIp;
+    private String localIp = "127.0.0.1";
     @Setter
     private Integer localPort;
     @Setter
@@ -53,12 +53,12 @@ public class ProxyConfig {
      * 是否加密
      */
     @Setter
-    private Boolean encrypt;
+    private Boolean encrypt = false;
     /**
      * 是否压缩
      */
     @Setter
-    private Boolean compress;
+    private Boolean compress = false;
     @Setter
     private Map<String, String> metadata = new ConcurrentHashMap<>();
 

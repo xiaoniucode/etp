@@ -1,6 +1,8 @@
 package com.xiaoniucode.etp.client.handler.message;
 
+import com.xiaoniucode.etp.client.event.LoginSuccessEvent;
 import com.xiaoniucode.etp.client.manager.AgentSessionManager;
+import com.xiaoniucode.etp.client.manager.EventBusManager;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.handler.MessageHandler;
 import com.xiaoniucode.etp.core.message.Message;
@@ -21,6 +23,8 @@ public class LoginRespHandler implements MessageHandler {
         String clientId = control.attr(ChannelConstants.CLIENT_ID).get();
 
         AgentSessionManager.createAgentSession(clientId, sessionId, control);
-        logger.info("登陆成功 - [客户端标识={}，会话标识={}]", clientId, sessionId);
+        logger.info("登陆成功 - [客户端标识={}]", clientId);
+
+        EventBusManager.publishAsync(new LoginSuccessEvent(clientId));
     }
 }

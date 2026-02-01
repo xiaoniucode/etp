@@ -25,7 +25,6 @@ public class TcpVisitorHandler extends ChannelInboundHandlerAdapter {
         Channel visitor = ctx.channel();
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
         visitorSessionManager.registerVisitor(visitor, this::connectToTarget);
-       // ctx.pipeline().remove(this);
         super.channelActive(ctx);
     }
 

@@ -22,6 +22,7 @@ public class TunnelClientStartup {
         try {
             System.setProperty("io.netty.leakDetection.level", "DISABLED");
             AppConfig config = buildConfig(args);
+
             initLogback(config);
             registerShutdownHook();
             tunnelClient = new TunnelClient(config);

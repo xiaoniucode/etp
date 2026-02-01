@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
- * 基于Disruptor实现的事件总线
+ * 基于Disruptor 实现的事件总线
  */
 public class EventBus {
     private final Logger logger = LoggerFactory.getLogger(EventBus.class);
@@ -67,7 +67,7 @@ public class EventBus {
     }
 
     /**
-     * 注册监听器（自动推断事件类型）
+     * 注册监听器
      */
     public <T> void register(EventListener<T> listener) {
         Class<?> eventType = getEventType(listener);

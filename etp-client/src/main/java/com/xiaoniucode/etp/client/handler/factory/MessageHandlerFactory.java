@@ -19,7 +19,7 @@ public class MessageHandlerFactory {
         HANDLERS.put(MessageType.NEW_VISITOR, new NewVisitorConnHandler());
         HANDLERS.put(MessageType.ERROR, new ErrorChannelHandler());
         HANDLERS.put(MessageType.NEW_PROXY_RESP, new NewProxyRespHandler());
-        HANDLERS.put(MessageType.KICKOUT, new KickoutClientHandler());
+        HANDLERS.put(MessageType.KICKOUT, new KickoutAgentHandler());
     }
 
     public static MessageHandler getHandler(MessageType type) {

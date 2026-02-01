@@ -12,23 +12,48 @@ import java.util.Map;
  * @author liuxin
  */
 public enum ProtocolType {
-    TCP, HTTP;
+    TCP(1, "tcp"),
+    HTTP(2, "http");
+
+    private static final Map<Integer, ProtocolType> TYPE_MAP;
     private static final Map<String, ProtocolType> NAME_MAP;
 
     static {
-        Map<String, ProtocolType> map = new HashMap<>();
+        Map<Integer, ProtocolType> typeMap = new HashMap<>();
+        Map<String, ProtocolType> nameMap = new HashMap<>();
+
         for (ProtocolType protocol : values()) {
-            map.put(protocol.name().toLowerCase(), protocol);
+            typeMap.put(protocol.type, protocol);
+            nameMap.put(protocol.name().toLowerCase(), protocol);
+            nameMap.put(protocol.desc.toLowerCase(), protocol);
         }
-        NAME_MAP = Collections.unmodifiableMap(map);
+
+        TYPE_MAP = Collections.unmodifiableMap(typeMap);
+        NAME_MAP = Collections.unmodifiableMap(nameMap);
     }
 
-    public static ProtocolType getType(String type) {
-        ProtocolType protocol = NAME_MAP.get(type.toLowerCase());
-        if (protocol == null) {
-            throw new IllegalArgumentException("无效协议类型,暂不支持： " + type);
+    private final int type;
+    private final String desc;
+
+    ProtocolType(int type, String desc) {
+        this.type = type;
+        this.desc = desc;
+    }
+
+    public static ProtocolType getType(int type) {
+        return TYPE_MAP.get(type);
+    }
+
+    public static ProtocolType getByName(String name) {
+        if (!StringUtils.hasText(name)) {
+            return null;
         }
-        return protocol;
+        return NAME_MAP.get(name.toLowerCase());
+    }
+
+    public static ProtocolType getByName(String name, ProtocolType defaultValue) {
+        ProtocolType protocol = getByName(name);
+        return protocol != null ? protocol : defaultValue;
     }
 
     public static boolean isTcp(ProtocolType protocolType) {
@@ -40,10 +65,20 @@ public enum ProtocolType {
     }
 
     public static boolean isHttp(String protocol) {
-        return StringUtils.hasText(protocol) && HTTP.name().equalsIgnoreCase(protocol);
+        ProtocolType protocolType = getByName(protocol);
+        return protocolType == HTTP;
     }
 
     public static boolean isTcp(String protocol) {
-        return StringUtils.hasText(protocol) && TCP.name().equalsIgnoreCase(protocol);
+        ProtocolType protocolType = getByName(protocol);
+        return protocolType == TCP;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public String getDesc() {
+        return desc;
     }
 }

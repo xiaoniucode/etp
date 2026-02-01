@@ -53,11 +53,11 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
 //                }
 //            });
 //        }
-        //认证通过，注册Agent连接
-        agentSessionManager.createAgentSession(clientId, token, control, login.getArch(), login.getOs(),login.getVersion()).ifPresent(agentSession -> {
+        //创建代理客户端会话上下文
+        agentSessionManager.createAgentSession(clientId, token, control, login.getArch(), login.getOs(), login.getVersion()).ifPresent(session -> {
             //返回登陆成功消息
             Message.MessageHeader heder = Message.MessageHeader.newBuilder().setType(Message.MessageType.LOGIN_RESP).build();
-            Message.LoginResp loginResp = Message.LoginResp.newBuilder().setSessionId(agentSession.getSessionId()).build();
+            Message.LoginResp loginResp = Message.LoginResp.newBuilder().setSessionId(session.getSessionId()).build();
 
             ControlMessage message = ControlMessage.newBuilder().setHeader(heder).setLoginResp(loginResp).build();
             control.writeAndFlush(message).addListener(future -> {
@@ -65,7 +65,7 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
                     logger.warn("登陆成功返回结果消息发送失败");
                 }
             });
-            logger.debug("客户端登陆成功：[客户端ID={}，令牌={}，版本号={}]", clientId, token, agentSession.getVersion());
+            logger.debug("客户端登陆成功：[客户端标识={}，令牌={}，版本号={}]", clientId, token, session.getVersion());
         });
     }
 }

@@ -31,13 +31,23 @@ customDomains = ["a.domain2.com", "b.domain2.com"]
 name = "mysql"
 protocol = "tcp"
 localPort = 3306
+remotePort=3307
+status = 1
+encrypt = true
+compress = true
+
+[[proxies]]
+name = "redis"
+protocol = "tcp"
+localPort = 6379
+remotePort=6380
 status = 1
 encrypt = true
 compress = true
 
 #日志
 [log]
-level = "info"
+level = "debug"
 path = "log"
 name = "etpc.log"
 archivePattern = "etpc.%d{yyyy-MM-dd}.log"

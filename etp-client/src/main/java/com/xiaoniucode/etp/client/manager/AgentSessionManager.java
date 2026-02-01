@@ -34,6 +34,15 @@ public class AgentSessionManager {
         return Optional.ofNullable(agentSession);
     }
 
+    public static Optional<Channel> getControl() {
+        Optional<AgentSession> agent = getAgentSession();
+        if (agent.isPresent()) {
+            AgentSession session = agent.get();
+            return Optional.ofNullable(session.getControl());
+        }
+        return Optional.empty();
+    }
+
     public static void removeAgentSession() {
         removeAgentSession(null);
     }

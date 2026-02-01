@@ -2,26 +2,12 @@ package com.xiaoniucode.etp.server.listener;
 
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
-import com.xiaoniucode.etp.server.config.domain.ClientInfo;
-import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.event.TcpServerInitializedEvent;
-import com.xiaoniucode.etp.server.helper.BeanHelper;
-import com.xiaoniucode.etp.server.manager.ClientManager;
-import com.xiaoniucode.etp.server.manager.PortManager;
-import com.xiaoniucode.etp.server.enums.ProxyStatus;
-import com.xiaoniucode.etp.server.manager.TcpServerManager;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 系统首次启动时候执行，当TCP代理服务初始化成功后，将所有代理端口（remotePort）进行绑定
