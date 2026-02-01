@@ -3,9 +3,12 @@ serverPort = 9527
 #认证
 [auth]
 token = "token"
+initialDelay = 1
+maxDelay = 4
+maxRetries = 3
 
 [tls]
-eable = false
+enable = false
 certPath = "cert/client.p12"
 storePassPath = "jesjH9JNLKY3"
 mutual = true #开启双向认证
@@ -18,7 +21,7 @@ localIp = "localhost"
 localPort = 1024
 autoDomain = true
 customDomains = ["a.domain1.com"]
-status=0
+status = 0
 
 [[proxies]]
 name = "web2"
@@ -31,7 +34,7 @@ customDomains = ["a.domain2.com", "b.domain2.com"]
 name = "mysql"
 protocol = "tcp"
 localPort = 3306
-remotePort=3307
+remotePort = 3307
 status = 1
 encrypt = true
 compress = true
@@ -40,7 +43,7 @@ compress = true
 name = "redis"
 protocol = "tcp"
 localPort = 6379
-remotePort=6380
+remotePort = 6380
 status = 1
 encrypt = true
 compress = true

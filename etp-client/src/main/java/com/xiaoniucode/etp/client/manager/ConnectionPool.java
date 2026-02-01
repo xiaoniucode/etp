@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.client.manager;
 
-import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.config.ConfigUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 
@@ -20,8 +21,9 @@ public class ConnectionPool {
             return future;
         }
         AgentSessionManager.getControl().ifPresent(control -> {
-            String serverAddr = control.attr(ChannelConstants.SERVER_DDR).get();
-            Integer serverPort = control.attr(ChannelConstants.SERVER_PORT).get();
+            AppConfig config = ConfigUtils.getConfig();
+            String serverAddr = config.getServerAddr();
+            int serverPort = config.getServerPort();
             Bootstrap tunnelBootstrap = BootstrapManager.getTunnelBootstrap();
             tunnelBootstrap.connect(serverAddr, serverPort).addListener((ChannelFutureListener) f -> {
                 if (f.isSuccess()) {

@@ -1,5 +1,7 @@
 package com.xiaoniucode.etp.client.manager;
 
+import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.config.ConfigUtils;
 import com.xiaoniucode.etp.client.manager.domain.AgentSession;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import io.netty.channel.Channel;
@@ -13,15 +15,16 @@ public class AgentSessionManager {
     private AgentSessionManager() {
     }
 
-    public static Optional<AgentSession> createAgentSession(String clientId, String sessionId, Channel control) {
-        if (clientId == null || sessionId == null || control == null) {
+    public static Optional<AgentSession> createAgentSession(String sessionId, Channel control) {
+        if ( sessionId == null || control == null) {
             return Optional.empty();
         }
+        String clientId = control.attr(ChannelConstants.CLIENT_ID).get();
         AgentSession agentSession = new AgentSession(clientId, sessionId, control);
         String token = control.attr(ChannelConstants.TOKEN).get();
-        String serverAddr = control.attr(ChannelConstants.SERVER_DDR).get();
-        Integer serverPort = control.attr(ChannelConstants.SERVER_PORT).get();
-
+        AppConfig config = ConfigUtils.getConfig();
+        String serverAddr = config.getServerAddr();
+        int serverPort = config.getServerPort();
         agentSession.setToken(token);
         agentSession.setServerAddr(serverAddr);
         agentSession.setServerPort(serverPort);

@@ -24,6 +24,5 @@ public class ApplicationInitListener implements EventListener<ApplicationInitEve
         EventBusManager.register(new ProxyConfigSender());
 
 
-        //
     }
 }

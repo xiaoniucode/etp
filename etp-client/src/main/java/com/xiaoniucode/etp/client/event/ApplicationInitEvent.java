@@ -15,4 +15,5 @@ public class ApplicationInitEvent {
     public AppConfig getAppConfig() {
         return appConfig;
     }
+
 }

@@ -55,8 +55,8 @@ public class TomlConfigLoader implements ConfigSource {
                 authConfig.setToken(token.trim());
 
                 // 读取新增的认证相关字段
-                Long initialDelaySecValue = authTable.getLong("initialDelaySec");
-                Long maxDelaySecValue = authTable.getLong("maxDelaySec");
+                Long initialDelaySecValue = authTable.getLong("initialDelay");
+                Long maxDelaySecValue = authTable.getLong("maxDelay");
                 Long maxRetriesValue = authTable.getLong("maxRetries");
 
                 if (initialDelaySecValue != null && initialDelaySecValue > 0) {
@@ -71,7 +71,7 @@ public class TomlConfigLoader implements ConfigSource {
 
                 builder.authConfig(authConfig);
             } else {
-                throw new IllegalArgumentException("必须配置认证token");
+                throw new IllegalArgumentException("必须配置 token");
             }
         } else {
             throw new IllegalArgumentException("必须配置认证信息");

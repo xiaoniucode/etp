@@ -1,7 +1,6 @@
 package com.xiaoniucode.etp.client.handler.tunnel;
 
 import com.xiaoniucode.etp.client.handler.factory.MessageHandlerFactory;
-import com.xiaoniucode.etp.client.manager.domain.AgentSession;
 import com.xiaoniucode.etp.client.manager.AgentSessionManager;
 import com.xiaoniucode.etp.client.manager.ServerSessionManager;
 import com.xiaoniucode.etp.core.handler.MessageHandler;
@@ -45,14 +44,11 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<ControlMes
         //清理和关闭隧道会话和连接
         ServerSessionManager.removeAllServerSession();
         //清理代理客户端资源
-        AgentSessionManager.removeAgentSession(new Consumer<AgentSession>() {
-            @Override
-            public void accept(AgentSession agent) {
-                if (agent == null) {
-                    return;
-                }
-                logger.debug("代理客户端断开连接 - [客户端标识={}，会话标识={}]", agent.getClientId(), agent.getSessionId());
+        AgentSessionManager.removeAgentSession(agent -> {
+            if (agent == null) {
+                return;
             }
+            logger.debug("代理客户端断开连接 - [客户端标识={}，会话标识={}]", agent.getClientId(), agent.getSessionId());
         });
         channelStatusCallback.accept(ctx);
         super.channelInactive(ctx);

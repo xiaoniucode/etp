@@ -6,9 +6,10 @@ import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
 import com.xiaoniucode.etp.client.handler.tunnel.RealServerHandler;
 import com.xiaoniucode.etp.client.handler.tunnel.ControlTunnelHandler;
+import com.xiaoniucode.etp.client.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
 import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
 import com.xiaoniucode.etp.client.manager.BootstrapManager;
-import com.xiaoniucode.etp.client.common.utils.OSUtils;
 import com.xiaoniucode.etp.client.manager.EventBusManager;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
@@ -28,7 +29,6 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,10 +59,6 @@ public final class TunnelClient implements Lifecycle {
      * SSL加密上下文
      */
     private SslContext tlsContext;
-    /**
-     * 连接到服务端后通知调用者
-     */
-    private Consumer<Void> connectSuccessListener;
 
     public TunnelClient(AppConfig config) {
         this.config = config;
@@ -78,6 +74,7 @@ public final class TunnelClient implements Lifecycle {
             logger.debug("代理客户端应用初始化");
             EventBusManager.register(new ApplicationInitListener());
             EventBusManager.publishAsync(new ApplicationInitEvent(config));
+            TunnelClientHelper.setTunnelClient(this);
             controlBootstrap = new Bootstrap();
             Bootstrap realBootstrap = new Bootstrap();
 
@@ -147,22 +144,13 @@ public final class TunnelClient implements Lifecycle {
         channelFuture.addListener((ChannelFutureListener) f -> {
             if (f.isSuccess()) {
                 Channel control = channelFuture.channel();
-                control.attr(ChannelConstants.SERVER_DDR).set(config.getServerAddr());
-                control.attr(ChannelConstants.SERVER_PORT).set(config.getServerPort());
                 //获取客户端版本
                 String version = MavenArchiverUtil.getVersion();
                 //设备指纹作为客户端 ID
                 String clientId = DeviceUtils.generate16Id();
-                Message.MessageHeader header = Message.MessageHeader.newBuilder().setType(Message.MessageType.LOGIN).build();
-
-                Message.Login login = Message.Login.newBuilder()
-                        .setClientId(clientId)
-                        .setVersion(version)
-                        .setToken(config.getAuthConfig().getToken())
-                        .setArch(OSUtils.getOSArch())
-                        .setOs(OSUtils.getOS()).build();
-                Message.ControlMessage loginMessage = Message.ControlMessage.newBuilder().setHeader(header).setLogin(login).build();
-                control.writeAndFlush(loginMessage).addListener(future -> {
+                String token = config.getAuthConfig().getToken();
+                Message.ControlMessage message = MessageWrapper.buildLogin(clientId, token, version);
+                control.writeAndFlush(message).addListener(future -> {
                     if (future.isSuccess()) {
                         control.attr(ChannelConstants.CLIENT_ID).set(clientId);
                     }
@@ -170,9 +158,6 @@ public final class TunnelClient implements Lifecycle {
                 retryCount.set(0);
                 logger.debug("连接到ETP服务端: {}:{}", config.getServerAddr(), config.getServerPort());
                 start = true;
-                if (connectSuccessListener != null) {
-                    connectSuccessListener.accept(null);
-                }
             } else {
                 //连接失败，执行重连
                 scheduleReconnect();
@@ -214,5 +199,6 @@ public final class TunnelClient implements Lifecycle {
             stop = true;
             controlWorkerGroup.shutdownGracefully();
         }
+        EventBusManager.shutdown();
     }
 }
