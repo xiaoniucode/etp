@@ -3,6 +3,9 @@ package com.xiaoniucode.etp.client.manager;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 
+/**
+ * Disruptor 事件总线管理器
+ */
 public class EventBusManager {
     private static volatile EventBus eventBus;
     private static final Object lock = new Object();

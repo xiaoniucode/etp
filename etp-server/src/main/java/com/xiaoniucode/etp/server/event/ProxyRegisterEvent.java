@@ -10,5 +10,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ProxyRegisterEvent extends Event {
-   private ProxyConfig proxyConfig;
+   private final ProxyConfig proxyConfig;
 }

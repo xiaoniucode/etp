@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.client.event;
 
 public class LoginSuccessEvent {
-    private String clientId;
+    private final String clientId;
     public LoginSuccessEvent(String clientId) {
         this.clientId=clientId;
     }

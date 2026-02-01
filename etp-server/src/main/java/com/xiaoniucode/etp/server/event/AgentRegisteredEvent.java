@@ -11,5 +11,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class AgentRegisteredEvent extends Event {
-    private AgentSession agentSession;
+    private final AgentSession agentSession;
 }
