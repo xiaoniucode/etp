@@ -1,12 +1,12 @@
 package com.xiaoniucode.etp.server.manager;
 
-import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +17,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class TcpServerManager {
-    private final Logger logger = LoggerFactory.getLogger(TcpServerManager.class);
+public class PortListenerManager {
+    private final Logger logger = LoggerFactory.getLogger(PortListenerManager.class);
     private final Map<Integer, Channel> portToChannel = new ConcurrentHashMap<>();
     @Autowired
     private PortManager portManager;
     @Autowired
     private VisitorSessionManager visitorSessionManager;
+    @Autowired
+    private TcpProxyServer tcpProxyServer;
 
     /**
      * 监听指定端口，用于访问者连接
@@ -32,8 +34,7 @@ public class TcpServerManager {
      */
     public void bindPort(Integer port) {
         try {
-            TcpProxyServer tcpProxy = BeanHelper.getBean(TcpProxyServer.class);
-            ServerBootstrap serverBootstrap = tcpProxy.getServerBootstrap();
+            ServerBootstrap serverBootstrap = tcpProxyServer.getServerBootstrap();
             if (!portToChannel.containsKey(port)) {
                 ChannelFuture future = serverBootstrap.bind(port).sync();
                 portToChannel.put(port, future.channel());
@@ -77,7 +78,9 @@ public class TcpServerManager {
         }
     }
 
+    @PreDestroy
     public void clearAll() {
+        logger.debug("清理代理端口资源占用");
         for (Channel channel : portToChannel.values()) {
             try {
                 channel.close().sync();

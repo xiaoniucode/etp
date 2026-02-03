@@ -1,18 +1,18 @@
 package com.xiaoniucode.etp.server.metrics;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * 用于统计通道流量和消息指标
  *
  * @author liuxin
  */
+@ChannelHandler.Sharable
+@Component
 public class TrafficMetricsHandler extends ChannelDuplexHandler {
     private final Logger logger = LoggerFactory.getLogger(TrafficMetricsHandler.class);
 

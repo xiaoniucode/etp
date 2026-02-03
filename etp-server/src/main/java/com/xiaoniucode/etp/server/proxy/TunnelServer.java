@@ -8,11 +8,8 @@ import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.ConfigUtils;
 import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.handler.tunnel.ControlTunnelHandler;
-import com.xiaoniucode.etp.server.manager.DomainManager;
-import com.xiaoniucode.etp.server.manager.PortManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -29,7 +26,6 @@ import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,9 +39,13 @@ public class TunnelServer implements Lifecycle {
     private EventLoopGroup tunnelBossGroup;
     private EventLoopGroup tunnelWorkerGroup;
     private SslContext tlsContext;
+    private final EventBus eventBus;
+    private final ControlTunnelHandler controlTunnelHandler;
 
-    public TunnelServer(AppConfig config) {
+    public TunnelServer(AppConfig config, EventBus eventBus, ControlTunnelHandler controlTunnelHandler) {
         this.config = config;
+        this.eventBus = eventBus;
+        this.controlTunnelHandler = controlTunnelHandler;
     }
 
     @SuppressWarnings("all")
@@ -79,29 +79,24 @@ public class TunnelServer implements Lifecycle {
                                     .addLast("protoBufDecoder", new ProtobufDecoder(Message.ControlMessage.getDefaultInstance()))
                                     .addLast("protoBufVarint32LengthFieldPrepender", new ProtobufVarint32LengthFieldPrepender())
                                     .addLast("protoBufEncoder", new ProtobufEncoder())
-                                    .addLast("idleCheckHandler",new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
-                                    .addLast("controlTunnelHandler",BeanHelper.getBean(ControlTunnelHandler.class));
+                                    .addLast("idleCheckHandler", new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
+                                    .addLast("controlTunnelHandler", controlTunnelHandler);
                         }
                     });
             serverBootstrap.bind(config.getServerAddr(), config.getServerPort()).sync();
-            //异步处理
-            CompletableFuture.runAsync(() -> {
-                BeanHelper.getBean(TcpProxyServer.class).start();
-                BeanHelper.getBean(HttpProxyServer.class).start();
-            });
             logger.info("ETP隧道已开启:{}:{}", config.getServerAddr(), config.getServerPort());
-            BeanHelper.getBean(EventBus.class).publishAsync(new TunnelBindEvent());
+            eventBus.publishAsync(new TunnelBindEvent());
         } catch (Throwable e) {
             logger.error("ETP隧道开启失败", e);
         }
     }
+
     @Override
     @PreDestroy
     public void stop() {
         try {
             tunnelBossGroup.shutdownGracefully().sync();
             tunnelWorkerGroup.shutdownGracefully().sync();
-            BeanHelper.getBean(TcpProxyServer.class).stop();
         } catch (InterruptedException e) {
             logger.error(e.getMessage());
         }

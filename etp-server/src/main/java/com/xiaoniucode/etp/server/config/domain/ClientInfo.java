@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.config.domain;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

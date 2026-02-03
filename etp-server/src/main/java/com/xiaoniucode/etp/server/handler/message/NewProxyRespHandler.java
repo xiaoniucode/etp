@@ -5,14 +5,15 @@ import com.xiaoniucode.etp.core.handler.MessageHandler;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
-import com.xiaoniucode.etp.server.config.ConfigUtils;
+import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.event.ProxyRegisterEvent;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.manager.TcpServerManager;
+import com.xiaoniucode.etp.server.manager.PortListenerManager;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,9 @@ public class NewProxyRespHandler implements MessageHandler {
     @Autowired
     private AgentSessionManager agentSessionManager;
     @Autowired
-    private TcpServerManager tcpServerManager;
+    private PortListenerManager portListenerManager;
+    @Resource
+    private AppConfig appConfig;
 
     @Override
     public void handle(ChannelHandlerContext ctx, ControlMessage msg) {
@@ -52,7 +55,7 @@ public class NewProxyRespHandler implements MessageHandler {
                 //todo test
                 if (ProtocolType.isTcp(proxyConfig.getProtocol())) {
                     Integer remotePort = proxyConfig.getRemotePort();
-                    tcpServerManager.bindPort(remotePort);
+                    portListenerManager.bindPort(remotePort);
                     agentSessionManager.addPortToAgentSession(remotePort);
                 }
                 if (ProtocolType.isHttp(proxyConfig.getProtocol())){
@@ -89,10 +92,10 @@ public class NewProxyRespHandler implements MessageHandler {
         if (domains == null || domains.isEmpty()) {
             return builder.build();
         }
-        String host = ConfigUtils.get().getServerAddr();
+        String host =appConfig.getServerAddr();
         StringBuilder remoteAddr = new StringBuilder();
         if (ProtocolType.isHttp(protocol)) {
-            int httpProxyPort = ConfigUtils.get().getHttpProxyPort();
+            int httpProxyPort = appConfig.getHttpProxyPort();
             for (String domain : domains) {
                 remoteAddr.append("http://").append(domain);
                 if (httpProxyPort != 80) {

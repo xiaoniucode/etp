@@ -1,0 +1,1 @@
+org.springframework.boot.SpringApplicationRunListener=com.xiaoniucode.etp.server.config.spring.ConfigLoadListener

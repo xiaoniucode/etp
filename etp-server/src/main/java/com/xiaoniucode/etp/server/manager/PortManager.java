@@ -5,7 +5,6 @@ import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.PortRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -20,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author liuxin
  */
 public class PortManager {
-    private final Logger LOGGER = LoggerFactory.getLogger(PortManager.class);
+    private final Logger logger = LoggerFactory.getLogger(PortManager.class);
     private final Set<Integer> allocatedPorts = new HashSet<>(32);
     private int startPort = 1;
     private int endPort = 65535;
@@ -46,7 +45,7 @@ public class PortManager {
             throw new IllegalArgumentException("无效的端口范围: " + startPort + "-" + endPort);
         }
 
-        LOGGER.debug("端口分配器初始化，范围: {}-{}", startPort, endPort);
+        logger.debug("端口分配器初始化，范围: {}-{}", startPort, endPort);
     }
     public int acquire() {
         // 检查端口是否足够
@@ -65,13 +64,13 @@ public class PortManager {
             }
             if (tryBindPort(port)) {
                 allocatedPorts.add(port);
-                LOGGER.info("成功分配端口: {}", port);
+                logger.info("成功分配端口: {}", port);
                 return port;
             }
         }
 
         // 随机分配失败，尝试顺序查找
-        LOGGER.warn("随机分配失败，尝试顺序查找");
+        logger.warn("随机分配失败，尝试顺序查找");
         for (int port = startPort; port <= endPort; port++) {
             if (allocatedPorts.contains(port)) {
                 continue;
@@ -83,7 +82,7 @@ public class PortManager {
             }
         }
 
-        LOGGER.error("范围内所有端口都不可用");
+        logger.error("范围内所有端口都不可用");
         return -1;
     }
 
@@ -97,17 +96,17 @@ public class PortManager {
 
     public boolean release(int port) {
         if (allocatedPorts.remove(port)) {
-            LOGGER.info("成功释放端口: {}", port);
+            logger.info("成功释放端口: {}", port);
             return true;
         } else {
-            LOGGER.warn("尝试释放未分配的端口: {}", port);
+            logger.warn("尝试释放未分配的端口: {}", port);
             return false;
         }
     }
 
     public boolean isAvailable(int port) {
         if (port < startPort || port > endPort) {
-            LOGGER.warn("端口 {} 不在允许范围 {}-{} 内", port, startPort, endPort);
+            logger.warn("端口 {} 不在允许范围 {}-{} 内", port, startPort, endPort);
             return false;
         }
         if (allocatedPorts.contains(port)) {

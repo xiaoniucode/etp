@@ -1,5 +1,10 @@
 package com.xiaoniucode.etp.server.config.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Dashboard {
     private Boolean enable;
     private String username;
@@ -18,54 +23,6 @@ public class Dashboard {
         this.password = password;
         this.addr = addr;
         this.port = port;
-        this.reset = reset;
-    }
-
-    public Boolean getEnable() {
-        return enable;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getAddr() {
-        return addr;
-    }
-
-    public Integer getPort() {
-        return port;
-    }
-
-    public Boolean getReset() {
-        return reset;
-    }
-
-    public void setEnable(Boolean enable) {
-        this.enable = enable;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setAddr(String addr) {
-        this.addr = addr;
-    }
-
-    public void setPort(Integer port) {
-        this.port = port;
-    }
-
-    public void setReset(Boolean reset) {
         this.reset = reset;
     }
 }

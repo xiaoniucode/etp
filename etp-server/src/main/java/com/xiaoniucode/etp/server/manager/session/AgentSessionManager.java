@@ -2,21 +2,17 @@ package com.xiaoniucode.etp.server.manager.session;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
-import com.xiaoniucode.etp.core.utils.ChannelUtils;
-import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.event.AgentRegisteredEvent;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
-import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.*;

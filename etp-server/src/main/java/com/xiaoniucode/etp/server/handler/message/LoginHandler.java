@@ -34,29 +34,29 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
         String clientId = login.getClientId();
         String token = login.getToken();
         boolean hasToken = accessTokenManager.hasToken(token);
-        if (!hasToken) {
-            logger.error("客户端 - {} 认证失败，无效Token：{}", clientId, token);
-            ControlMessage message = MessageWrapper.buildErrorMessage(401, "认证失败，无效Token");
-            control.writeAndFlush(message).addListener(future -> {
-                if (future.isSuccess()) {
-                    control.close();
-                }
-            });
-            return;
-        }
-        // 已经连接的代理客户端数量
-        Integer agents = agentSessionManager.getOnlineAgents(token);
-        AccessToken accessToken = accessTokenManager.getAccessToken(token);
-        Integer maxClient = accessToken.getMaxClients();
-        //macClient=-1表示不限制Token连接数
-        if (maxClient != -1 && agents > maxClient) {
-            ControlMessage message = MessageWrapper.buildErrorMessage(401, "Token 连接数达到限制");
-            control.writeAndFlush(message).addListener(future -> {
-                if (future.isSuccess()) {
-                    control.close();
-                }
-            });
-        }
+//        if (!hasToken) {
+//            logger.error("客户端 - {} 认证失败，无效Token：{}", clientId, token);
+//            ControlMessage message = MessageWrapper.buildErrorMessage(401, "认证失败，无效Token");
+//            control.writeAndFlush(message).addListener(future -> {
+//                if (future.isSuccess()) {
+//                    control.close();
+//                }
+//            });
+//            return;
+//        }
+//        // 已经连接的代理客户端数量
+//        Integer agents = agentSessionManager.getOnlineAgents(token);
+//        AccessToken accessToken = accessTokenManager.getAccessToken(token);
+//        Integer maxClient = accessToken.getMaxClients();
+//        //macClient=-1表示不限制Token连接数
+//        if (maxClient != -1 && agents > maxClient) {
+//            ControlMessage message = MessageWrapper.buildErrorMessage(401, "Token 连接数达到限制");
+//            control.writeAndFlush(message).addListener(future -> {
+//                if (future.isSuccess()) {
+//                    control.close();
+//                }
+//            });
+//        }
         //创建代理客户端会话上下文
         agentSessionManager.createAgentSession(clientId, token, control, login.getArch(), login.getOs(), login.getVersion())
                 .ifPresent(session -> {

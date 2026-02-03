@@ -5,7 +5,6 @@ import com.xiaoniucode.etp.core.domain.LanInfo;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
-import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.ProtocolDetection;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
@@ -37,6 +36,10 @@ public class VisitorSessionManager {
     private final Map<String, Set<Channel>> domainToVisitorChannels = new ConcurrentHashMap<>();
     @Autowired
     private SessionIdGenerator sessionIdGenerator;
+    @Autowired
+    private ProxyManager proxyManager;
+    @Autowired
+    private AgentSessionManager agentSessionManager;
 
     /**
      * 注册访问者连接信息
@@ -46,8 +49,6 @@ public class VisitorSessionManager {
      * @param callback 回调 visitor session info
      */
     public void registerVisitor(Channel visitor, Consumer<VisitorSession> callback) {
-        ProxyManager proxyManager = BeanHelper.getBean(ProxyManager.class);
-        AgentSessionManager agentSessionManager = BeanHelper.getBean(AgentSessionManager.class);
         AgentSession agentSession = null;
         ProxyConfig proxyConfig = null;
         if (ProtocolDetection.isTcp(visitor)) {

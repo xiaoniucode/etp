@@ -3,15 +3,15 @@ package com.xiaoniucode.etp.server.proxy;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.notify.EventBus;
-import com.xiaoniucode.etp.server.event.TcpServerInitializedEvent;
+import com.xiaoniucode.etp.server.event.TcpProxyInitializedEvent;
 import com.xiaoniucode.etp.server.handler.tunnel.TcpVisitorHandler;
-import com.xiaoniucode.etp.server.helper.BeanHelper;
-import com.xiaoniucode.etp.server.manager.TcpServerManager;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.flush.FlushConsolidationHandler;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,14 +24,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author liuxin
  */
 public final class TcpProxyServer implements Lifecycle {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TcpProxyServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(TcpProxyServer.class);
     @Getter
     private ServerBootstrap serverBootstrap;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private final AtomicBoolean init = new AtomicBoolean(false);
+    private final TcpVisitorHandler tcpVisitorHandler;
+    private final EventBus eventBus;
+
+    public TcpProxyServer(TcpVisitorHandler tcpVisitorHandler, EventBus eventBus) {
+        this.tcpVisitorHandler = tcpVisitorHandler;
+        this.eventBus = eventBus;
+    }
 
     @Override
+    @PostConstruct
     public void start() {
         if (init.get()) {
             return;
@@ -50,22 +58,23 @@ public final class TcpProxyServer implements Lifecycle {
                     protected void initChannel(SocketChannel sc) {
                         sc.pipeline().addLast(new TrafficMetricsHandler());
                         sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
-                        sc.pipeline().addLast(BeanHelper.getBean(TcpVisitorHandler.class));
+                        sc.pipeline().addLast(tcpVisitorHandler);
                     }
                 });
         init.set(true);
-        BeanHelper.getBean(EventBus.class).publishAsync(new TcpServerInitializedEvent(serverBootstrap));
-        LOGGER.debug("TCP 代理服务初始化成功");
+        eventBus.publishAsync(new TcpProxyInitializedEvent(serverBootstrap));
+        logger.debug("TCP 代理服务初始化成功");
     }
 
 
     @Override
+    @PreDestroy
     public void stop() {
         if (!init.get()) {
-            LOGGER.warn("尚未初始化TCP 服务");
+            logger.warn("尚未初始化TCP 服务");
             return;
         }
-        BeanHelper.getBean(TcpServerManager.class).clearAll();
+        logger.debug("清理 TCP 代理线程资源");
         if (bossGroup != null) {
             bossGroup.shutdownGracefully();
         }

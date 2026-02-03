@@ -139,20 +139,9 @@ public class TomlConfigSource implements ConfigSource {
             String name = tokenTable.getString("name");
             String token = tokenTable.getString("token");
             Long maxClients = tokenTable.getLong("maxClients");
-
-            if (!StringUtils.hasText(name)) {
-                throw new IllegalArgumentException("必须指定AccessToken的描述！");
-            }
-            if (!StringUtils.hasText(token)) {
-                throw new IllegalArgumentException("必须指定AccessToken的令牌！");
-            }
-            if (maxClients == null || maxClients <= 0) {
-                throw new IllegalArgumentException("AccessToken的最大客户端数必须大于0！");
-            }
             if (tokenTemp.contains(token)) {
                 throw new IllegalArgumentException("AccessToken令牌冲突，不能存在重复的令牌！ " + token);
             }
-
             AccessToken accessToken = new AccessToken(name, token, maxClients.intValue());
             accessTokens.add(accessToken);
             tokenTemp.add(token);

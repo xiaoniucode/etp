@@ -31,11 +31,11 @@ public class SessionCleanupTask {
     private AgentSessionManager agentSessionManager;
 
     /**
-     * 自动清理客户端心跳超时的会话
+     * 自动清理客户端心跳超时会话定时任务
      */
     @Scheduled(fixedDelay = CLEANUP_INTERVAL)
     public void cleanupExpiredAgentSessions() {
-        logger.debug("自动清理心跳超时客户端会话信息定时任务");
+        logger.debug("自动清理心跳超时客户端会话定时任务");
         Collection<AgentSession> agentSessions = agentSessionManager.getAllAgentSessions();
         if (agentSessions != null) {
             long now = System.currentTimeMillis();

@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.manager;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 客户端管理器
  * 负责客户端的注册、更新、移除和查询
  */
+@Component
 public class ClientManager {
     private static final Logger logger = LoggerFactory.getLogger(ClientManager.class);
 
@@ -24,7 +26,7 @@ public class ClientManager {
      * 注册客户端
      * secretKey不能为空，否则无法注册
      */
-    public static void addClient(ClientInfo client) {
+    public void addClient(ClientInfo client) {
         if (hasClient(client.getSecretKey())) {
             throw new RuntimeException("该客户端已经被注册:" + client.getName() + "-" + client.getSecretKey());
         }
@@ -32,7 +34,7 @@ public class ClientManager {
         logger.debug("客户端: {}-{} 注册成功", client.getName(), client.getSecretKey());
     }
 
-    public static void updateClientName(String secretKey, String name) {
+    public void updateClientName(String secretKey, String name) {
         ClientInfo client = clients.get(secretKey);
         if (client != null) {
             client.setName(name);
@@ -45,32 +47,32 @@ public class ClientManager {
      * @param secretKey 认证密钥
      * @return 是否存在
      */
-    public static boolean hasClient(String secretKey) {
+    public boolean hasClient(String secretKey) {
         return clients.containsKey(secretKey);
     }
 
     /**
      * 下线客户端
      */
-    public static void removeClient(String secretKey) {
+    public void removeClient(String secretKey) {
         clients.remove(secretKey);
     }
 
     /**
      * 通过客户端密钥获取客户端信息
      */
-    public static ClientInfo getClient(String secretKey) {
+    public ClientInfo getClient(String secretKey) {
         return clients.get(secretKey);
     }
 
     /**
      * 获取所有客户端信息
      */
-    public static Collection<ClientInfo> allClients() {
+    public Collection<ClientInfo> allClients() {
         return clients.values();
     }
 
-    public static int getClientCount() {
+    public int getClientCount() {
         return clients.size();
     }
 }

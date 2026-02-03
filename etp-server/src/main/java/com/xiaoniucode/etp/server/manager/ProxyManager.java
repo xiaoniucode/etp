@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.manager;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

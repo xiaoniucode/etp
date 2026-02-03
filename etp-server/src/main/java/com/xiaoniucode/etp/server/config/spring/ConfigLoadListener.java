@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server;
+package com.xiaoniucode.etp.server.config.spring;
 
 import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.common.CommandLineArgs;
@@ -6,7 +6,6 @@ import com.xiaoniucode.etp.common.PortChecker;
 import com.xiaoniucode.etp.common.log.LogConfig;
 import com.xiaoniucode.etp.common.log.LogbackConfigurator;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.ConfigUtils;
 import com.xiaoniucode.etp.server.config.TomlConfigSource;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -42,8 +41,6 @@ public class ConfigLoadListener implements SpringApplicationRunListener {
                 logger.error("{} 端口已经被占用", bindPort);
                 System.exit(0);
             }
-            ConfigUtils.set(appConfig);
-
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage(), e);
             System.err.println("错误: " + e.getMessage());
