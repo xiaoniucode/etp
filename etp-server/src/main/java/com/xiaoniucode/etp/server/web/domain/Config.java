@@ -16,10 +16,10 @@ public class Config {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    @Column(name = "key", nullable = false, unique = true)
-    private String key;
+    @Column(name = "config_key", nullable = false, unique = true)
+    private String configKey;
     
-    @Column(name = "value", nullable = false)
-    private String value;
+    @Column(name = "config_value", nullable = false)
+    private String configValue;
 
 }

@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.web.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -30,5 +31,6 @@ public class Client {
     @Column(name = "status", nullable = false)
     private Integer status;
     @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 }

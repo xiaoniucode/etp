@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface ConfigsRepository extends JpaRepository<Config, Integer> {
     
     /**
-     * 根据 key 查询配置
+     * 根据 configKey 查询配置
      */
-    Config findByKey(String key);
+    Config findByConfigKey(String configKey);
 }

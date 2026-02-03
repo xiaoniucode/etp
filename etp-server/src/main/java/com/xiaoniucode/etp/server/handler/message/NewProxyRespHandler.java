@@ -1,12 +1,12 @@
 package com.xiaoniucode.etp.server.handler.message;
 
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.core.handler.MessageHandler;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.event.ProxyRegisterEvent;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.PortListenerManager;
@@ -78,7 +78,7 @@ public class NewProxyRespHandler implements MessageHandler {
         config.setLocalPort(proxy.getLocalPort());
         config.setRemotePort(proxy.getRemotePort());
         config.setProtocol(ProtocolType.getByName(proxy.getProtocol().name()));
-        config.setProxyStatus(ProxyStatus.fromStatus(proxy.getStatus()));
+        config.setStatus(ProxyStatus.fromStatus(proxy.getStatus()));
         config.setAutoDomain(proxy.getAutoDomain());
         config.getCustomDomains().addAll(proxy.getCustomDomainsList());
         config.getSubDomains().addAll(proxy.getSubDomainsList());

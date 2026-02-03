@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.manager.domain;
 
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
-import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 
 public class DomainInfo {
     private final String domain;
@@ -11,7 +11,7 @@ public class DomainInfo {
     public DomainInfo(String domain, ProxyConfig proxyConfig) {
         this.domain = domain;
         this.proxyConfig = proxyConfig;
-        this.active = proxyConfig.getProxyStatus() == ProxyStatus.OPEN;
+        this.active = proxyConfig.getStatus() == ProxyStatus.OPEN;
     }
 
     public String getDomain() {

@@ -35,7 +35,7 @@ totalSizeCap = "3GB"
 enable = true
 #addr = "localhost"
 port = 8030
-reset = true
+reset = false
 username = "admin"
 password = "123456"
 #公网端口分配范围

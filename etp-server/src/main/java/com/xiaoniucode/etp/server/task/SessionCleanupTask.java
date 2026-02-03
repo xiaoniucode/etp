@@ -35,7 +35,7 @@ public class SessionCleanupTask {
      */
     @Scheduled(fixedDelay = CLEANUP_INTERVAL)
     public void cleanupExpiredAgentSessions() {
-        logger.debug("自动清理心跳超时客户端会话定时任务");
+        logger.debug("清理心跳超时客户端会话定时任务");
         Collection<AgentSession> agentSessions = agentSessionManager.getAllAgentSessions();
         if (agentSessions != null) {
             long now = System.currentTimeMillis();

@@ -26,6 +26,6 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public Config getByKey(String key) {
-        return configsRepository.findByKey(key);
+        return configsRepository.findByConfigKey(key);
     }
 }

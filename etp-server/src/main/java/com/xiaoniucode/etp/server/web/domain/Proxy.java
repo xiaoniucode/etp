@@ -3,6 +3,9 @@ package com.xiaoniucode.etp.server.web.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
 
 /**
@@ -26,7 +29,7 @@ public class Proxy {
     @Column(name = "type", nullable = false)
     private String type;
     
-    @Column(name = "source", nullable = false, columnDefinition = "DEFAULT 0")
+    @Column(name = "source", nullable = false)
     private Integer source;
     
     @Column(name = "local_ip", nullable = false)
@@ -38,16 +41,18 @@ public class Proxy {
     @Column(name = "remote_port")
     private Integer remotePort;
     
-    @Column(name = "status", nullable = false, columnDefinition = "DEFAULT 1")
+    @Column(name = "status", nullable = false)
     private Integer status;
     
     @Column(name = "domain_type")
     private Integer domainType;
     
     @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
     
     @Column(name = "updated_at", nullable = false)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
 }
