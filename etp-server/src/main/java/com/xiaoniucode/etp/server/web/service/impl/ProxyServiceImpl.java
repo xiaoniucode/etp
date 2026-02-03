@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.web.service.impl;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.web.domain.Proxy;
 import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
-import com.xiaoniucode.etp.server.web.repository.ProxyDomainsRepository;
+import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class ProxyServiceImpl implements ProxyService {
     private ProxyRepository proxiesRepository;
 
     @Autowired
-    private ProxyDomainsRepository proxyDomainsRepository;
+    private ProxyDomainRepository proxyDomainRepository;
     @Autowired
     private ProxyManager proxyManager;
     @Override

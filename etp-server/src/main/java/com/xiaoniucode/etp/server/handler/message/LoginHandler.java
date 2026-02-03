@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.handler.message;
 
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
-import com.xiaoniucode.etp.server.config.domain.AccessToken;
+import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
 import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import com.xiaoniucode.etp.server.manager.AccessTokenManager;
@@ -34,29 +34,31 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
         String clientId = login.getClientId();
         String token = login.getToken();
         boolean hasToken = accessTokenManager.hasToken(token);
-//        if (!hasToken) {
-//            logger.error("客户端 - {} 认证失败，无效Token：{}", clientId, token);
-//            ControlMessage message = MessageWrapper.buildErrorMessage(401, "认证失败，无效Token");
-//            control.writeAndFlush(message).addListener(future -> {
-//                if (future.isSuccess()) {
-//                    control.close();
-//                }
-//            });
-//            return;
-//        }
-//        // 已经连接的代理客户端数量
-//        Integer agents = agentSessionManager.getOnlineAgents(token);
-//        AccessToken accessToken = accessTokenManager.getAccessToken(token);
-//        Integer maxClient = accessToken.getMaxClients();
-//        //macClient=-1表示不限制Token连接数
-//        if (maxClient != -1 && agents > maxClient) {
-//            ControlMessage message = MessageWrapper.buildErrorMessage(401, "Token 连接数达到限制");
-//            control.writeAndFlush(message).addListener(future -> {
-//                if (future.isSuccess()) {
-//                    control.close();
-//                }
-//            });
-//        }
+        if (!hasToken) {
+            logger.error("客户端 - {} 认证失败，无效令牌：{}", clientId, token);
+            ControlMessage message = MessageWrapper.buildErrorMessage(401, "认证失败，无效令牌: "+token);
+            control.writeAndFlush(message).addListener(future -> {
+                if (future.isSuccess()) {
+                    control.close();
+                }
+            });
+            return;
+        }
+        // 已经连接的代理客户端数量
+        Integer agents = agentSessionManager.getOnlineAgents(token);
+        AccessTokenInfo accessToken = accessTokenManager.getAccessToken(token);
+        Integer maxClient = accessToken.getMaxClients();
+        //macClient=-1表示不限制Token连接数
+        if (maxClient != -1 && agents >= maxClient) {
+            logger.warn("访问令牌连接数已达上限: {}", maxClient);
+            ControlMessage message = MessageWrapper.buildErrorMessage(401, "访问令牌连接数已达上限: " + maxClient);
+            control.writeAndFlush(message).addListener(future -> {
+                if (future.isSuccess()) {
+                    control.close();
+                }
+            });
+            return;
+        }
         //创建代理客户端会话上下文
         agentSessionManager.createAgentSession(clientId, token, control, login.getArch(), login.getOs(), login.getVersion())
                 .ifPresent(session -> {

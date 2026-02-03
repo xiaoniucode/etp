@@ -40,12 +40,9 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackOn = Exception.class)
     public void updatePassword(Integer userId, UpdatePasswordRequest req) {
         int id = userId;
-        // 注意：这里简化了密码更新逻辑，实际实现可能需要调整
         User user = usersRepository.findById(id).orElse(null);
         if (user == null) {
             throw new BizException(401, "用户不存在");
         }
-        // 假设 req 中包含了旧密码和新密码
-        // 实际实现可能需要调整，因为 Users 实体可能没有这些临时字段
     }
 }

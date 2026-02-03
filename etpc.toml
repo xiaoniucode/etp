@@ -50,7 +50,7 @@ compress = true
 
 #日志
 [log]
-level = "debug"
+level = "info"
 path = "log"
 name = "etpc.log"
 archivePattern = "etpc.%d{yyyy-MM-dd}.log"

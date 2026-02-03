@@ -36,7 +36,6 @@ public class AuthServiceImpl implements AuthService {
     public LoginToken createToken(int userId, String username) {
         LoginToken token = new LoginToken();
         token.setUid(userId);
-        // 注意：username 字段可能不存在于 AuthTokens 实体中，需要根据实际情况调整
         return token;
     }
 

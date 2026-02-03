@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
  * 系统配置 Repository
  */
 @Repository
-public interface ConfigsRepository extends JpaRepository<Config, Integer> {
+public interface ConfigRepository extends JpaRepository<Config, Integer> {
     
     /**
      * 根据 configKey 查询配置

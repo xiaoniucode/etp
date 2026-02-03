@@ -49,8 +49,6 @@ public class HttpProxyServer implements Lifecycle {
 
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
-                    .option(ChannelOption.TCP_NODELAY, true)
-                    .option(ChannelOption.SO_BACKLOG, 1024)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.SO_RCVBUF, 64 * 1024)
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())

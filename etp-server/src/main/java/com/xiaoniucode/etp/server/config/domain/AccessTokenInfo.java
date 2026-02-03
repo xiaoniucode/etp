@@ -6,13 +6,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AccessToken {
+public class AccessTokenInfo {
     public static final int UNLIMITED_CLIENTS = -1;
     private String name;
     private String token;
     private Integer maxClients;
 
-    public AccessToken(String name, String token, Integer maxClients) {
+    public AccessTokenInfo(String name, String token, Integer maxClients) {
         check(name, token, maxClients);
         this.name = name;
         this.token = token;

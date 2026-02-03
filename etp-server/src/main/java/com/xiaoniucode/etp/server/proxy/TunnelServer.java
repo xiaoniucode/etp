@@ -6,9 +6,9 @@ import com.xiaoniucode.etp.core.handler.IdleCheckHandler;
 
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
-import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.event.TunnelBindEvent;
+import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
+import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
 import com.xiaoniucode.etp.server.handler.tunnel.ControlTunnelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -54,6 +54,7 @@ public class TunnelServer implements Lifecycle {
     public void start() {
         try {
             logger.debug("正在启动ETP服务");
+            eventBus.publishSync(new TunnelServerStartingEvent());
 //            if (config.isTls()) {
 //                tlsContext = new ServerTlsContextFactory().createContext();
 //            }
@@ -61,8 +62,6 @@ public class TunnelServer implements Lifecycle {
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(tunnelBossGroup, tunnelWorkerGroup)
-                    .option(ChannelOption.TCP_NODELAY, true)
-                    .option(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.TCP_NODELAY, true)
                     .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
@@ -85,7 +84,7 @@ public class TunnelServer implements Lifecycle {
                     });
             serverBootstrap.bind(config.getServerAddr(), config.getServerPort()).sync();
             logger.info("ETP隧道已开启:{}:{}", config.getServerAddr(), config.getServerPort());
-            eventBus.publishAsync(new TunnelBindEvent());
+            eventBus.publishAsync(new TunnelServerBindEvent());
         } catch (Throwable e) {
             logger.error("ETP隧道开启失败", e);
         }

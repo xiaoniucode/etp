@@ -48,8 +48,6 @@ public final class TcpProxyServer implements Lifecycle {
         workerGroup = NettyEventLoopFactory.eventLoopGroup();
         serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.SO_KEEPALIVE, true)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .channel(NettyEventLoopFactory.serverSocketChannelClass())

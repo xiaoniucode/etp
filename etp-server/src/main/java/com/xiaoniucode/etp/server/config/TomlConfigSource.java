@@ -132,7 +132,7 @@ public class TomlConfigSource implements ConfigSource {
             return;
         }
 
-        List<AccessToken> accessTokens = new CopyOnWriteArrayList<>();
+        List<AccessTokenInfo> accessTokens = new CopyOnWriteArrayList<>();
         Set<String> tokenTemp = new HashSet<>();
 
         for (Toml tokenTable : accessTokenTables) {
@@ -142,7 +142,7 @@ public class TomlConfigSource implements ConfigSource {
             if (tokenTemp.contains(token)) {
                 throw new IllegalArgumentException("AccessToken令牌冲突，不能存在重复的令牌！ " + token);
             }
-            AccessToken accessToken = new AccessToken(name, token, maxClients.intValue());
+            AccessTokenInfo accessToken = new AccessTokenInfo(name, token, maxClients.intValue());
             accessTokens.add(accessToken);
             tokenTemp.add(token);
         }

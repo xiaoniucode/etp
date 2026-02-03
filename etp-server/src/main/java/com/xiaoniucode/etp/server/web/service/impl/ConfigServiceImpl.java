@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.web.service.ConfigService;
 import com.xiaoniucode.etp.server.web.domain.Config;
-import com.xiaoniucode.etp.server.web.repository.ConfigsRepository;
+import com.xiaoniucode.etp.server.web.repository.ConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,22 +10,22 @@ import org.springframework.stereotype.Service;
 public class ConfigServiceImpl implements ConfigService {
 
     @Autowired
-    private ConfigsRepository configsRepository;
+    private ConfigRepository configRepository;
 
     @Override
     public int update(Config save) {
-        configsRepository.save(save);
+        configRepository.save(save);
         return 1;
     }
 
     @Override
     public int insert(Config save) {
-        configsRepository.save(save);
+        configRepository.save(save);
         return 1;
     }
 
     @Override
     public Config getByKey(String key) {
-        return configsRepository.findByConfigKey(key);
+        return configRepository.findByConfigKey(key);
     }
 }

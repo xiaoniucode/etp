@@ -13,7 +13,7 @@ storePassPath = "3FbV8R8VW49O"
 [[access_tokens]]
 name = "macos"
 token = "5E793FAD27AA713D"
-maxClients = 2
+maxClients = 1
 
 [[access_tokens]]
 name = "mac"

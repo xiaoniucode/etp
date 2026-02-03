@@ -26,12 +26,12 @@ public class ClientManager {
      * 注册客户端
      * secretKey不能为空，否则无法注册
      */
-    public void addClient(ClientInfo client) {
-        if (hasClient(client.getSecretKey())) {
-            throw new RuntimeException("该客户端已经被注册:" + client.getName() + "-" + client.getSecretKey());
+    public void addClient(ClientInfo clientInfo) {
+        if (hasClient(clientInfo.getSecretKey())) {
+            throw new RuntimeException("该客户端已经被注册:" + clientInfo.getName() + "-" + clientInfo.getSecretKey());
         }
-        clients.putIfAbsent(client.getSecretKey(), client);
-        logger.debug("客户端: {}-{} 注册成功", client.getName(), client.getSecretKey());
+        clients.putIfAbsent(clientInfo.getSecretKey(), clientInfo);
+        logger.debug("客户端: {}-{} 注册成功", clientInfo.getName(), clientInfo.getSecretKey());
     }
 
     public void updateClientName(String secretKey, String name) {

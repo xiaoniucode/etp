@@ -159,10 +159,10 @@ public final class TunnelClient implements Lifecycle {
             if (f.isSuccess()) {
                 Channel control = channelFuture.channel();
                 //获取客户端版本
-                String version ="0.5.1"; //todo MavenArchiverUtil.getVersion();
+                String version = MavenArchiverUtil.getVersion();
                 // todo test
                 String clientId = "EWGSSGREGGWEWE";
-                String token ="EWGSSGREGGWEWE"; //todo config.getAuthConfig().getToken();
+                String token = config.getAuthConfig().getToken();
                 Message.ControlMessage message = MessageWrapper.buildLogin(clientId, token, version);
                 control.writeAndFlush(message).addListener(future -> {
                     if (future.isSuccess()) {

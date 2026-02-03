@@ -10,7 +10,7 @@ import java.util.List;
  * 代理域名 Repository
  */
 @Repository
-public interface ProxyDomainsRepository extends JpaRepository<ProxyDomain, Integer> {
+public interface ProxyDomainRepository extends JpaRepository<ProxyDomain, Integer> {
     
     /**
      * 根据代理ID查询域名

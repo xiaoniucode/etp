@@ -24,7 +24,7 @@ public class RealServerHandler extends ChannelInboundHandlerAdapter {
             LanInfo lanInfo = serverSession.getLanInfo();
             ChannelUtils.closeOnFlush(server);
             control.writeAndFlush(MessageWrapper.buildCloseProxy(sessionId));
-            logger.debug("隧道关闭 - [会话标识={}，目标地址={}，目标端口={}]", sessionId, lanInfo.getLocalIP(), lanInfo.getLocalPort());
+            logger.debug("隧道关闭 - [目标地址={}，目标端口={}]", lanInfo.getLocalIP(), lanInfo.getLocalPort());
         });
         super.channelInactive(ctx);
     }

@@ -25,7 +25,6 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client getBySecretKey(String secretKey) {
-        // 注意：ClientsRepository 可能没有 findBySecretKey 方法，需要根据实际情况调整
         return null;
     }
 

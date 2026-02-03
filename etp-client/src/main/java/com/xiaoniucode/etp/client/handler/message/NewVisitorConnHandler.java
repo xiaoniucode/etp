@@ -14,6 +14,7 @@ import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.xiaoniucode.etp.core.message.Message.*;
+
 /**
  *
  * @author liuxin
@@ -45,7 +46,7 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                         ServerSessionManager.createServerSession(sessionId, tunnel, server, new LanInfo(localIP, localPort)).ifPresent(serverSession -> {
                             //设置通道可读
                             server.config().setOption(ChannelOption.AUTO_READ, true);
-                            logger.debug("隧道创建成功 - [会话标识={}，目标地址={}，目标端口={}]", sessionId, localIP, localPort);
+                            logger.debug("隧道创建成功 - [目标地址={}，目标端口={}]", localIP, localPort);
                         });
                     }
                 })).exceptionally(cause -> {
