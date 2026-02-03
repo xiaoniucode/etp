@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.proxy;
 
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
-import com.xiaoniucode.etp.server.config.ConfigHelper;
+import com.xiaoniucode.etp.server.config.ConfigUtils;
 import com.xiaoniucode.etp.server.handler.message.HostSnifferHandler;
 import com.xiaoniucode.etp.server.handler.tunnel.HttpVisitorHandler;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
@@ -23,17 +23,22 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpProxyServer implements Lifecycle {
     private final Logger logger = LoggerFactory.getLogger(HttpProxyServer.class);
-    private ServerBootstrap serverBootstrap;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
+    private final HttpVisitorHandler httpVisitorHandler;
+
+    public HttpProxyServer(HttpVisitorHandler httpVisitorHandler) {
+        this.httpVisitorHandler = httpVisitorHandler;
+    }
 
     @Override
     public void start() {
         try {
-            int httpProxyPort = ConfigHelper.get().getHttpProxyPort();
+            int httpProxyPort = ConfigUtils.get().getHttpProxyPort();
             bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             workerGroup = NettyEventLoopFactory.eventLoopGroup();
-            serverBootstrap = new ServerBootstrap();
+
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .option(ChannelOption.TCP_NODELAY, true)
                     .option(ChannelOption.SO_BACKLOG, 1024)
@@ -46,7 +51,7 @@ public class HttpProxyServer implements Lifecycle {
                             sc.pipeline().addLast(new TrafficMetricsHandler());
                             sc.pipeline().addLast(new HostSnifferHandler());
                             sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
-                            sc.pipeline().addLast(BeanHelper.getBean(HttpVisitorHandler.class));
+                            sc.pipeline().addLast(httpVisitorHandler);
                         }
                     });
             serverBootstrap.bind(httpProxyPort).syncUninterruptibly().get();

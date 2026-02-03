@@ -1,128 +1,18 @@
 package com.xiaoniucode.etp.server;
 
-import ch.qos.logback.classic.Level;
-import com.xiaoniucode.etp.common.*;
-import com.xiaoniucode.etp.common.log.LogConfig;
-import com.xiaoniucode.etp.common.log.LogbackConfigurator;
-import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.TomlConfigSource;
-import com.xiaoniucode.etp.server.proxy.TunnelServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 服务启动入口
  *
  * @author liuxin
  */
+@EnableScheduling
 @SpringBootApplication
 public class TunnelServerStartup {
-    private static final Logger logger = LoggerFactory.getLogger(TunnelServerStartup.class);
-
-    static {
-        System.setProperty("io.netty.leakDetection.level", "DISABLED");
-    }
-
     public static void main(String[] args) {
-        try {
-            SpringApplication.run(TunnelServerStartup.class, args);
-
-            AppConfig config = buildConfig(args);
-            initLogback(config);
-            int bindPort = config.getBindPort();
-            if (PortChecker.isPortOccupied(bindPort)) {
-                logger.error("{} 端口已经被占用", bindPort);
-                return;
-            }
-            TunnelServer tunnelServer = new TunnelServer(config);
-            registerShutdownHook(tunnelServer);
-            tunnelServer.start();
-        } catch (IllegalArgumentException e) {
-            logger.error(e.getMessage(), e);
-            System.err.println("错误: " + e.getMessage());
-            printHelp();
-            System.exit(1);
-        } catch (Exception e) {
-            logger.error("启动失败", e);
-            System.err.println("启动失败: " + e.getMessage());
-            System.exit(1);
-        }
-    }
-
-    private static AppConfig buildConfig(String[] args) {
-        CommandLineArgs cmdArgs = new CommandLineArgs();
-
-        cmdArgs.registerOption("config", "c", "配置文件路径", false, true);
-        cmdArgs.registerOption("help", "h", "显示帮助信息", false, false);
-
-        try {
-            cmdArgs.parse(args);
-
-            if (cmdArgs.has("help")) {
-                printHelp();
-                System.exit(0);
-            }
-
-            if (cmdArgs.has("config")) {
-                return loadConfigFromFile(cmdArgs.get("config"));
-            }
-            return AppConfig.builder().build();
-
-        } catch (IllegalArgumentException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("配置加载失败: " + e.getMessage(), e);
-        }
-    }
-
-    private static AppConfig loadConfigFromFile(String configPath) {
-        if (!Files.exists(Paths.get(configPath))) {
-            throw new IllegalArgumentException("配置文件不存在: " + configPath);
-        }
-        TomlConfigSource configSource = new TomlConfigSource(configPath);
-        return configSource.load();
-    }
-
-    private static void printHelp() {
-        System.out.println("用法: etps [选项]");
-        System.out.println();
-        System.out.println("选项:");
-        System.out.println("  -c, --config <path>         配置文件路径");
-        System.out.println("  --help                      显示帮助信息");
-        System.out.println();
-        System.out.println("示例:");
-        System.out.println("  etps -c etps.toml");
-        System.out.println("  etps");
-    }
-
-    private static void initLogback(AppConfig config) {
-        LogConfig log = config.getLogConfig();
-        if (log == null) {
-            return;
-        }
-        new LogbackConfigurator.Builder()
-                .setPath(log.getPath())
-                .setLogPattern(log.getLogPattern())
-                .setArchivePattern(log.getArchivePattern())
-                .setLogLevel(log.getLevel())
-                .setLogName(log.getName())
-                .setMaxHistory(log.getMaxHistory())
-                .setTotalSizeCap(log.getTotalSizeCap())
-                .addLogger("io.netty.channel.ChannelHandlerMask", Level.INFO)
-                .build()
-                .configure();
-    }
-
-    private static void registerShutdownHook(TunnelServer tunnelServer) {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (tunnelServer != null) {
-                tunnelServer.stop();
-            }
-        }));
+        SpringApplication.run(TunnelServerStartup.class, args);
     }
 }

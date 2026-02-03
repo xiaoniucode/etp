@@ -10,6 +10,9 @@
     <packaging>jar</packaging>
     <name>etpc</name>
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <native-maven-plugin.version>0.11.4</native-maven-plugin.version>
         <shade.mainClass>com.xiaoniucode.etp.client.TunnelClientStartup</shade.mainClass>
     </properties>
     <dependencies>
@@ -36,22 +39,13 @@
                         <version>${native-maven-plugin.version}</version>
                         <configuration>
                             <mainClass>com.xiaoniucode.etp.client.TunnelClientStartup</mainClass>
-                            <imageName>etp-client</imageName>
+                            <imageName>etpc</imageName>
+                            <buildArgs>
+                                <buildArg>--enable-native-access=ALL-UNNAMED</buildArg>
+                                <buildArg>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</buildArg>
+                                <buildArg>--add-opens=java.base/java.nio=ALL-UNNAMED</buildArg>
+                            </buildArgs>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>add-reachability-metadata</id>
-                                <goals>
-                                    <goal>add-reachability-metadata</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>native-compile</id>
-                                <goals>
-                                    <goal>compile</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>

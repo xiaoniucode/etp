@@ -17,6 +17,10 @@ public class ErrorChannelHandler implements MessageHandler {
     @Override
     public void handle(ChannelHandlerContext ctx, ControlMessage msg) {
         Message.Error error = msg.getError();
-        logger.error("错误: {}", error.getMessage());
+        int code = error.getCode();
+        logger.error("{}", error.getMessage());
+        if (code==401){
+            System.exit(0);
+        }
     }
 }

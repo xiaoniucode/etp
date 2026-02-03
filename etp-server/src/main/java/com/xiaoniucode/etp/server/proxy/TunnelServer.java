@@ -8,7 +8,7 @@ import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.ConfigHelper;
+import com.xiaoniucode.etp.server.config.ConfigUtils;
 import com.xiaoniucode.etp.server.event.TunnelBindEvent;
 import com.xiaoniucode.etp.server.handler.tunnel.ControlTunnelHandler;
 import com.xiaoniucode.etp.server.manager.DomainManager;
@@ -24,6 +24,8 @@ import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.ssl.SslContext;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,11 +50,9 @@ public class TunnelServer implements Lifecycle {
 
     @SuppressWarnings("all")
     @Override
+    @PostConstruct
     public void start() {
         try {
-            ConfigHelper.set(config);
-            BeanHelper.getBean(PortManager.class).init(config);
-            BeanHelper.getBean(DomainManager.class).init(config);
             logger.debug("正在启动ETP服务");
 //            if (config.isTls()) {
 //                tlsContext = new ServerTlsContextFactory().createContext();
@@ -83,19 +83,20 @@ public class TunnelServer implements Lifecycle {
                                     .addLast("controlTunnelHandler",BeanHelper.getBean(ControlTunnelHandler.class));
                         }
                     });
-            serverBootstrap.bind(config.getHost(), config.getBindPort()).sync();
+            serverBootstrap.bind(config.getServerAddr(), config.getServerPort()).sync();
             //异步处理
             CompletableFuture.runAsync(() -> {
                 BeanHelper.getBean(TcpProxyServer.class).start();
                 BeanHelper.getBean(HttpProxyServer.class).start();
             });
-            logger.info("ETP隧道已开启:{}:{}", config.getHost(), config.getBindPort());
+            logger.info("ETP隧道已开启:{}:{}", config.getServerAddr(), config.getServerPort());
             BeanHelper.getBean(EventBus.class).publishAsync(new TunnelBindEvent());
         } catch (Throwable e) {
             logger.error("ETP隧道开启失败", e);
         }
     }
     @Override
+    @PreDestroy
     public void stop() {
         try {
             tunnelBossGroup.shutdownGracefully().sync();

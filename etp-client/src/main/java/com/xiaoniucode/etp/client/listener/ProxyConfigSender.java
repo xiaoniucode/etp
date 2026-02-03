@@ -21,13 +21,14 @@ public class ProxyConfigSender implements EventListener<LoginSuccessEvent> {
 
     @Override
     public void onEvent(LoginSuccessEvent event) {
-        if (isSend.get()) {
-            return;
-        }
+        //todo
+//        if (isSend.get()) {
+//            return;
+//        }
         logger.debug("发送代理配置规则信息");
         AppConfig config = ConfigUtils.getConfig();
         List<ProxyConfig> proxies = config.getProxies();
         ProxyRegistrar.registerBatch(proxies);
-        isSend.set(true);
+//        isSend.set(true);
     }
 }

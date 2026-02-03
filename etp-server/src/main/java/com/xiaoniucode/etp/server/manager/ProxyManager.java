@@ -44,7 +44,7 @@ public class ProxyManager {
     }
 
     public synchronized ProxyConfig createProxy(String clientId, ProxyConfig proxyConfig, Consumer<ProxyConfig> callback) {
-        if (!StringUtils.hasText(clientId)||proxyConfig==null){
+        if (!StringUtils.hasText(clientId) || proxyConfig == null) {
             return null;
         }
         ProtocolType protocol = proxyConfig.getProtocol();
@@ -53,10 +53,12 @@ public class ProxyManager {
             if (portToProxyConfig.containsKey(remotePort)) {
                 logger.warn("端口冲突 [端口={}] 代理创建失败 [客户端ID={}，代理名称={}]",
                         remotePort, clientId, proxyConfig.getName());
-                return null;
+                ProxyConfig config = portToProxyConfig.get(remotePort);
+                callback.accept(config);
+                return config;
             }
             portToProxyConfig.put(proxyConfig.getRemotePort(), proxyConfig);
-            logger.debug("代理创建成功: [客户端ID={}，代理名称={}，远程端口={}，内网端口={}]", clientId, proxyConfig.getName(),remotePort,proxyConfig.getLocalPort());
+            logger.debug("代理创建成功: [客户端ID={}，代理名称={}，远程端口={}，内网端口={}]", clientId, proxyConfig.getName(), remotePort, proxyConfig.getLocalPort());
         }
         if (ProtocolType.isHttp(protocol)) {
             Set<String> domains = proxyConfig.getFullDomains();
@@ -137,6 +139,6 @@ public class ProxyManager {
     }
 
     public Set<ProxyConfig> getByClientId(String clientId) {
-        return clientIdToProxyConfigs.getOrDefault(clientId,new HashSet<>());
+        return clientIdToProxyConfigs.getOrDefault(clientId, new HashSet<>());
     }
 }

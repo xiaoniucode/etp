@@ -3,70 +3,68 @@ package com.xiaoniucode.etp.server.config;
 import com.xiaoniucode.etp.common.config.Config;
 import com.xiaoniucode.etp.common.log.LogConfig;
 import com.xiaoniucode.etp.server.config.domain.Dashboard;
-import com.xiaoniucode.etp.server.config.domain.KeystoreConfig;
 import com.xiaoniucode.etp.server.config.domain.PortRange;
-import com.xiaoniucode.etp.server.config.domain.ClientInfo;
+import com.xiaoniucode.etp.server.config.domain.AccessToken;
+import com.xiaoniucode.etp.server.config.domain.TLSConfig;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 @Setter
 public class AppConfig implements Config {
-    private String host;
-    private int bindPort;
+    private String serverAddr;
+    private int serverPort;
     private int httpProxyPort;
     private int httpsProxyPort;
     private LogConfig logConfig;
     private Dashboard dashboard;
     private PortRange portRange;
     private Set<String> baseDomains;
+    private TLSConfig tls;
+    private List<AccessToken> accessTokens;
 
     private AppConfig(Builder builder) {
-        this.host = builder.host;
-        this.bindPort = builder.bindPort;
+        this.serverAddr = builder.serverAddr;
+        this.serverPort = builder.serverPort;
         this.httpProxyPort = builder.httpProxyPort;
         this.httpsProxyPort = builder.httpsProxyPort;
         this.logConfig = builder.logConfig;
         this.dashboard = builder.dashboard;
         this.portRange = builder.portRange;
         this.baseDomains = builder.baseDomains;
+        this.tls = builder.tls;
+        this.accessTokens = builder.accessTokens;
     }
 
-
     public static class Builder {
-        private String host = "0.0.0.0";
-        private int bindPort = 9527;
+        private String serverAddr = "0.0.0.0";
+        private int serverPort = 9527;
         private int httpProxyPort = 80;
         private int httpsProxyPort = 443;
-        private boolean tls = false;
+        private TLSConfig tls;
         private Set<String> baseDomains;
-        private KeystoreConfig keystoreConfig;
         private LogConfig logConfig;
         private Dashboard dashboard = new Dashboard(false);
-        private PortRange portRange = new PortRange(1024, 49151);
-        private List<ClientInfo> clients = new CopyOnWriteArrayList<>();
+        private PortRange portRange = new PortRange(1, 65535);
+        private List<AccessToken> accessTokens = new CopyOnWriteArrayList<>();
 
-        public Builder host(String host) {
-            this.host = host;
+        public Builder serverAddr(String serverAddr) {
+            this.serverAddr = serverAddr;
             return this;
         }
 
-        public Builder bindPort(int bindPort) {
-            this.bindPort = bindPort;
+        public Builder serverPort(int serverPort) {
+            this.serverPort = serverPort;
             return this;
         }
 
-        public Builder tls(boolean tls) {
+        public Builder tls(TLSConfig tls) {
             this.tls = tls;
-            return this;
-        }
-
-        public Builder keystoreConfig(KeystoreConfig keystoreConfig) {
-            this.keystoreConfig = keystoreConfig;
             return this;
         }
 
@@ -85,8 +83,8 @@ public class AppConfig implements Config {
             return this;
         }
 
-        public Builder clients(List<ClientInfo> clients) {
-            this.clients = clients;
+        public Builder accessTokens(List<AccessToken> accessTokens) {
+            this.accessTokens = accessTokens;
             return this;
         }
 

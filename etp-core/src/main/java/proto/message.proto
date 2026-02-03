@@ -15,6 +15,7 @@ enum MessageType {
   KICKOUT = 301;
   NEW_VISITOR = 302;
   NEW_VISITOR_RESP = 303;
+  HEARTBEAT_TIMEOUT = 304;
 }
 
 enum ProtocolType {
@@ -75,7 +76,7 @@ message Error {
   int32 code = 1;
   string message = 2;
 }
-
+message HeartbeatTimeout{}
 message Ping {}
 message Pong {}
 
@@ -95,5 +96,6 @@ message ControlMessage {
     NewVisitorConn newVisitorConn = 31;
     NewVisitorConnResp newVisitorConnResp = 32;
     LoginResp loginResp = 33;
+    HeartbeatTimeout heartbeatTimeout = 34;
   }
 }

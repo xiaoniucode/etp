@@ -1,5 +1,5 @@
-host = "0.0.0.0"
-bindPort = 9527
+serverAddr = "0.0.0.0"
+serverPort = 9527
 httpProxyPort = 80
 httpsProxyPort = 8443
 baseDomains = ["domain1.com", "domain2.com"]
@@ -11,12 +11,12 @@ keyPath = "3FbV8R8VW49O"
 storePassPath = "3FbV8R8VW49O"
 
 [access_tokens]
-desc = "windows"
-token = "token"
+name = "macos"
+token = "5E793FAD27AA713D"
 maxClients = 2
 
 [access_tokens]
-desc = "mac"
+name = "mac"
 token = "token2"
 maxClients = 2
 

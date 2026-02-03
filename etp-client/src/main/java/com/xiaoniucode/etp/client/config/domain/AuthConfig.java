@@ -14,7 +14,7 @@ public class AuthConfig {
     /**
      * 最大延迟时间（秒）
      */
-    private Integer maxDelay = 30;
+    private Integer maxDelay = 20;
     /**
      * 最大重试次数
      */

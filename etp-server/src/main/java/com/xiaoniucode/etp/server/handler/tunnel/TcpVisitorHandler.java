@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.handler.tunnel;
 
 import com.xiaoniucode.etp.core.domain.LanInfo;
 import com.xiaoniucode.etp.core.message.Message;
+import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
 import io.netty.channel.*;
@@ -31,18 +32,8 @@ public class TcpVisitorHandler extends ChannelInboundHandlerAdapter {
     private void connectToTarget(VisitorSession session) {
         Channel control = session.getControl();
         LanInfo lanInfo = session.getLanInfo();
-        Message.MessageHeader header = Message.MessageHeader.newBuilder()
-                .setType(Message.MessageType.NEW_VISITOR).build();
-        Message.NewVisitorConn newVisitorConn = Message.NewVisitorConn
-                .newBuilder()
-                .setSessionId(session.getSessionId())
-                .setLocalIp(lanInfo.getLocalIP())
-                .setLocalPort(lanInfo.getLocalPort())
-                .build();
-        Message.ControlMessage message = Message.ControlMessage.newBuilder()
-                .setHeader(header)
-                .setNewVisitorConn(newVisitorConn)
-                .build();
+        Message.ControlMessage message = MessageWrapper
+                .buildNewVisitorConn(session.getSessionId(), lanInfo.getLocalIP(), lanInfo.getLocalPort());
         control.writeAndFlush(message);
     }
 
@@ -52,13 +43,8 @@ public class TcpVisitorHandler extends ChannelInboundHandlerAdapter {
         Channel visitor = ctx.channel();
         visitorSessionManager.disconnect(visitor, session -> {
             Channel tunnel = session.getTunnel();
-            Message.MessageHeader header = Message.MessageHeader.newBuilder().setType(Message.MessageType.CLOSE_PROXY).build();
-
-            Message.CloseProxy closeProxy = Message.CloseProxy
-                    .newBuilder()
-                    .setSessionId(session.getSessionId()).build();
-
-            Message.ControlMessage message = Message.ControlMessage.newBuilder().setHeader(header).setCloseProxy(closeProxy).build();
+            Message.ControlMessage message = MessageWrapper
+                    .buildCloseProxy(session.getSessionId());
             tunnel.writeAndFlush(message);
         });
         super.channelInactive(ctx);
@@ -68,18 +54,25 @@ public class TcpVisitorHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error(cause.getMessage(), cause);
+        Channel visitor = ctx.channel();
+        visitorSessionManager.disconnect(visitor, session -> {
+            Channel tunnel = session.getTunnel();
+            Message.ControlMessage message = MessageWrapper
+                    .buildCloseProxy(session.getSessionId());
+            tunnel.writeAndFlush(message);
+        });
         ctx.close();
     }
 
     //todo 需要迁移改造通过桥接器实现
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        super.channelWritabilityChanged(ctx);
         Channel visitor = ctx.channel();
         VisitorSession visitorSession = visitorSessionManager.getVisitorSession(visitor);
         Channel tunnel = visitorSession.getTunnel();
         if (tunnel != null) {
             tunnel.config().setOption(ChannelOption.AUTO_READ, visitor.isWritable());
         }
-        super.channelWritabilityChanged(ctx);
     }
 }

@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.client;
 
-import com.xiaoniucode.etp.client.common.utils.DeviceUtils;
 import com.xiaoniucode.etp.client.common.utils.MavenArchiverUtil;
 import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
 import com.xiaoniucode.etp.client.handler.tunnel.RealServerHandler;
 import com.xiaoniucode.etp.client.handler.tunnel.ControlTunnelHandler;
@@ -11,6 +11,7 @@ import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
 import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
 import com.xiaoniucode.etp.client.manager.BootstrapManager;
 import com.xiaoniucode.etp.client.manager.EventBusManager;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.message.Message;
@@ -69,6 +70,10 @@ public final class TunnelClient implements Lifecycle {
     public void start() {
         try {
             if (start) {
+                return;
+            }
+            if (!checkConfig(config)) {
+                System.exit(0);
                 return;
             }
             logger.debug("代理客户端应用初始化");
@@ -139,16 +144,25 @@ public final class TunnelClient implements Lifecycle {
         }
     }
 
+    private boolean checkConfig(AppConfig config) {
+        AuthConfig auth = config.getAuthConfig();
+        if (!StringUtils.hasText(auth.getToken())) {
+            logger.error("请配置登陆密钥");
+            return false;
+        }
+        return true;
+    }
+
     private void connectTunnelServer() {
         ChannelFuture channelFuture = controlBootstrap.connect(config.getServerAddr(), config.getServerPort());
         channelFuture.addListener((ChannelFutureListener) f -> {
             if (f.isSuccess()) {
                 Channel control = channelFuture.channel();
                 //获取客户端版本
-                String version = MavenArchiverUtil.getVersion();
-                //设备指纹作为客户端 ID
-                String clientId = DeviceUtils.generate16Id();
-                String token = config.getAuthConfig().getToken();
+                String version ="0.5.1"; //todo MavenArchiverUtil.getVersion();
+                // todo test
+                String clientId = "EWGSSGREGGWEWE";
+                String token ="EWGSSGREGGWEWE"; //todo config.getAuthConfig().getToken();
                 Message.ControlMessage message = MessageWrapper.buildLogin(clientId, token, version);
                 control.writeAndFlush(message).addListener(future -> {
                     if (future.isSuccess()) {

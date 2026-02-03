@@ -19,32 +19,28 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author liuxin
  */
-@Component
 public class PortManager {
     private final Logger LOGGER = LoggerFactory.getLogger(PortManager.class);
     private final Set<Integer> allocatedPorts = new HashSet<>(32);
-    private int startPort = 1024;
-    private int endPort = 49151;
+    private int startPort = 1;
+    private int endPort = 65535;
     private final AtomicBoolean init = new AtomicBoolean(false);
 
-    /**
-     * 初始化端口范围,默认范围：1024-49151
-     */
-    public void init(AppConfig appConfig) {
+    public PortManager(AppConfig config) {
         if (init.get()) {
             init.set(true);
             return;
         }
-        PortRange portRange = appConfig.getPortRange();
+        PortRange portRange = config.getPortRange();
         startPort = portRange.getStart();
         endPort = portRange.getEnd();
 
 
         if (startPort == -1) {
-            startPort = 1024;
+            startPort = 1;
         }
         if (endPort == -1) {
-            endPort = 49151;
+            endPort = 65535;
         }
         if (startPort < 1 || endPort < 1 || endPort > 65535 || startPort > endPort) {
             throw new IllegalArgumentException("无效的端口范围: " + startPort + "-" + endPort);
@@ -52,7 +48,6 @@ public class PortManager {
 
         LOGGER.debug("端口分配器初始化，范围: {}-{}", startPort, endPort);
     }
-
     public int acquire() {
         // 检查端口是否足够
         int totalPorts = endPort - startPort + 1;

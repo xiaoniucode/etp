@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.metrics;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
-import com.xiaoniucode.etp.server.config.ConfigHelper;
+import com.xiaoniucode.etp.server.config.ConfigUtils;
 import com.xiaoniucode.etp.server.metrics.domain.Metrics;
 import com.xiaoniucode.etp.server.metrics.domain.Count;
 import io.netty.channel.Channel;
@@ -66,7 +66,7 @@ public class MetricsCollector {
         if (StringUtils.hasText(domain)) {
             key = domain;
         } else {
-            if (ConfigHelper.get().getHttpProxyPort() == remotePort||ConfigHelper.get().getHttpsProxyPort()==remotePort) {
+            if (ConfigUtils.get().getHttpProxyPort() == remotePort|| ConfigUtils.get().getHttpsProxyPort()==remotePort) {
                 return;
             }
             key = remotePort + "";

@@ -5,7 +5,7 @@ import com.xiaoniucode.etp.core.handler.MessageHandler;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
-import com.xiaoniucode.etp.server.config.ConfigHelper;
+import com.xiaoniucode.etp.server.config.ConfigUtils;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.event.ProxyRegisterEvent;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
@@ -50,10 +50,14 @@ public class NewProxyRespHandler implements MessageHandler {
             proxyManager.createProxy(clientId, config, proxyConfig -> {
                 //发布事件，可订阅事件对其进行持久化或其他操作
                 //todo test
-                if (proxyConfig.getProtocol() == ProtocolType.TCP) {
+                if (ProtocolType.isTcp(proxyConfig.getProtocol())) {
                     Integer remotePort = proxyConfig.getRemotePort();
                     tcpServerManager.bindPort(remotePort);
                     agentSessionManager.addPortToAgentSession(remotePort);
+                }
+                if (ProtocolType.isHttp(proxyConfig.getProtocol())){
+                    Set<String> domains = proxyConfig.getFullDomains();
+                    agentSessionManager.addDomainsToAgentSession(domains);
                 }
                 //注册代理配置
                 eventBus.publishAsync(new ProxyRegisterEvent(proxyConfig));
@@ -85,10 +89,10 @@ public class NewProxyRespHandler implements MessageHandler {
         if (domains == null || domains.isEmpty()) {
             return builder.build();
         }
-        String host = ConfigHelper.get().getHost();
+        String host = ConfigUtils.get().getServerAddr();
         StringBuilder remoteAddr = new StringBuilder();
         if (ProtocolType.isHttp(protocol)) {
-            int httpProxyPort = ConfigHelper.get().getHttpProxyPort();
+            int httpProxyPort = ConfigUtils.get().getHttpProxyPort();
             for (String domain : domains) {
                 remoteAddr.append("http://").append(domain);
                 if (httpProxyPort != 80) {

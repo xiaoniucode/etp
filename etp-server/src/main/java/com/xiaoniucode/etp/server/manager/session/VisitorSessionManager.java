@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.manager.session;
 
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.LanInfo;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
@@ -91,30 +92,29 @@ public class VisitorSessionManager {
 
     public synchronized void disconnect(Channel visitor, Consumer<VisitorSession> callback) {
         VisitorSession visitorSession = getVisitorSession(visitor);
-
         if (ProtocolDetection.isTcp(visitor)) {
             int remotePort = getListenerPort(visitor);
-            Set<Channel> visitorChannels = remotePortToVisitorChannels.get(remotePort);
-            visitorChannels.remove(visitor);
+            Set<Channel> visitors = remotePortToVisitorChannels.get(remotePort);
+            visitors.remove(visitor);
             visitor.close();
-            if (visitorChannels.isEmpty()) {
+            if (visitors.isEmpty()) {
                 remotePortToVisitorChannels.remove(remotePort);
             }
         }
         if (ProtocolDetection.isHttp(visitor)) {
             String domain = getDomain(visitor);
-            Set<Channel> visitorChannels = domainToVisitorChannels.get(domain);
-            visitorChannels.remove(visitor);
+            Set<Channel> visitors = domainToVisitorChannels.get(domain);
+            visitors.remove(visitor);
             visitor.close();
-            if (visitorChannels.isEmpty()) {
+            if (visitors.isEmpty()) {
                 domainToVisitorChannels.remove(domain);
             }
 
             ByteBuf cachedPacket = visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).get();
             if (cachedPacket != null) {
                 cachedPacket.release();
-                visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).set(null);
             }
+            clearVisitorAttributeKey(visitor);
         }
 
         String sessionId = visitorSession.getSessionId();
@@ -124,6 +124,39 @@ public class VisitorSessionManager {
         }
     }
 
+    private void clearVisitorAttributeKey(Channel visitor) {
+        visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).set(null);
+        visitor.attr(ChannelConstants.VISIT_DOMAIN).set(null);
+        visitor.attr(ChannelConstants.SESSION_ID).set(null);
+    }
+
+    /**
+     * 断开某一个Agent 所有访问者会话信息
+     */
+    public void disconnectAllSessionsForAgent(Channel control, Set<Integer> remotePorts, Set<String> domains) {
+        //删除与某一个代理客户端有关的所有访问者会话
+        sessionIdToVisitorSession.values().removeIf(session -> session.getTunnel() == control);
+        //删除访问者所有端口映射
+        for (Integer remotePort : remotePorts) {
+            Set<Channel> visitors = remotePortToVisitorChannels.get(remotePort);
+            if (visitors != null) {
+                for (Channel visitor : visitors) {
+                    clearVisitorAttributeKey(visitor);
+                    ChannelUtils.closeOnFlush(visitor);
+                }
+            }
+        }
+        //删除访问者所有域名映射
+        for (String domain : domains) {
+            Set<Channel> visitors = domainToVisitorChannels.get(domain);
+            if (visitors != null) {
+                for (Channel visitor : visitors) {
+                    clearVisitorAttributeKey(visitor);
+                    ChannelUtils.closeOnFlush(visitor);
+                }
+            }
+        }
+    }
 
     public void disconnect(String sessionId, Consumer<VisitorSession> callback) {
         VisitorSession session = sessionIdToVisitorSession.get(sessionId);
@@ -196,4 +229,5 @@ public class VisitorSessionManager {
     private String getDomain(Channel visitor) {
         return visitor.attr(ChannelConstants.VISIT_DOMAIN).get();
     }
+
 }

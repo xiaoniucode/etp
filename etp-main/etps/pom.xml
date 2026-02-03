@@ -10,9 +10,7 @@
     <packaging>jar</packaging>
     <name>etps</name>
     <properties>
-        <java.version>25</java.version>
         <shade.mainClass>com.xiaoniucode.etp.server.TunnelServerStartup</shade.mainClass>
-        <native-maven-plugin.version>0.10.6</native-maven-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -73,7 +71,7 @@
                         <buildArg>--initialize-at-build-time=org.sqlite.util.ProcessRunner</buildArg>
                     </buildArgs>
                     <mainClass>com.xiaoniucode.etp.server.TunnelServerStartup</mainClass>
-                    <imageName>etp-server</imageName>
+                    <imageName>etps</imageName>
                 </configuration>
             </plugin>
             <plugin>

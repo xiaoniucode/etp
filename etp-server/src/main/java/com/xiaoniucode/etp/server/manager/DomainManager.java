@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
 public class DomainManager {
     private final Logger logger = LoggerFactory.getLogger(DomainManager.class);
     /**
@@ -20,10 +19,9 @@ public class DomainManager {
     private final Map<String, DomainInfo> domainMap = new ConcurrentHashMap<>();
     private final Set<String> baseDomains = new HashSet<>();
 
-
-    public void init(AppConfig appConfig) {
-        if (appConfig.getBaseDomains() != null) {
-            baseDomains.addAll(appConfig.getBaseDomains());
+    public DomainManager(AppConfig config) {
+        if (config.getBaseDomains() != null) {
+            baseDomains.addAll(config.getBaseDomains());
             logger.info("DomainManager初始化完成，基础域名: {}", baseDomains);
         }
     }

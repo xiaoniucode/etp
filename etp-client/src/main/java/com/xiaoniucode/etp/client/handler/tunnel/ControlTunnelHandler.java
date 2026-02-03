@@ -41,6 +41,7 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<ControlMes
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
         //清理和关闭隧道会话和连接
         ServerSessionManager.removeAllServerSession();
         //清理代理客户端资源
@@ -51,6 +52,11 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<ControlMes
             logger.debug("代理客户端断开连接 - [客户端标识={}，会话标识={}]", agent.getClientId(), agent.getSessionId());
         });
         channelStatusCallback.accept(ctx);
-        super.channelInactive(ctx);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        logger.error("控制通道异常: ", cause);
+        ctx.close();
     }
 }

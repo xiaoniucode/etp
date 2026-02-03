@@ -1,9 +1,9 @@
 package com.xiaoniucode.etp.server.config;
 
-public class ConfigHelper {
+public class ConfigUtils {
     private static volatile AppConfig instance;
 
-    private ConfigHelper() {
+    private ConfigUtils() {
     }
 
     public static void set(AppConfig config) {

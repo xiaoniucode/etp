@@ -2,10 +2,10 @@ serverAddr = "127.0.0.1"
 serverPort = 9527
 #认证
 [auth]
-token = "token"
+token = "5E793FAD27AA713D"
 initialDelay = 1
-maxDelay = 4
-maxRetries = 3
+maxDelay = 10
+maxRetries = 5
 
 [tls]
 enable = false

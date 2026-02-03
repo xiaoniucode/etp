@@ -6,10 +6,8 @@ import com.xiaoniucode.etp.common.log.LogConfig;
 import com.xiaoniucode.etp.common.utils.LogUtils;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.common.utils.TomlUtils;
-import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.moandjiezana.toml.Toml;
 import com.xiaoniucode.etp.server.config.domain.*;
-import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -38,20 +36,20 @@ public class TomlConfigSource implements ConfigSource {
         parseDashboard(builder, root);
         parseTls(builder, root);
         parsePortRange(builder, root);
-        parseClients(builder, root);
+        parseAccessTokens(builder, root);
 
         return builder.build();
     }
 
     private void parseRoot(AppConfig.Builder builder, Toml root) {
-        String hostValue = root.getString("host", DEFAULT_HOST);
-        if (StringUtils.hasText(hostValue)) {
-            builder.host(hostValue.trim());
+        String serverAddrValue = root.getString("serverAddr", DEFAULT_HOST);
+        if (StringUtils.hasText(serverAddrValue)) {
+            builder.serverAddr(serverAddrValue.trim());
         }
 
-        Long bindPortValue = root.getLong("bindPort", (long) DEFAULT_BIND_PORT);
-        validatePort(bindPortValue.intValue());
-        builder.bindPort(bindPortValue.intValue());
+        Long serverPortValue = root.getLong("serverPort", (long) DEFAULT_BIND_PORT);
+        validatePort(serverPortValue.intValue());
+        builder.serverPort(serverPortValue.intValue());
 
         List<String> baseDomains = root.getList("baseDomains", new ArrayList<>());
         builder.baseDomains(new HashSet<>(baseDomains));
@@ -65,9 +63,6 @@ public class TomlConfigSource implements ConfigSource {
         int httpsPort = httpsProxyPort.intValue();
         validatePort(httpsPort);
         builder.httpsProxyPort(httpsPort);
-
-        Boolean tlsValue = root.getBoolean("tls", false);
-        builder.tls(tlsValue);
     }
 
     private void parseLogConfig(AppConfig.Builder builder, Toml root) {
@@ -104,16 +99,15 @@ public class TomlConfigSource implements ConfigSource {
     }
 
     private void parseTls(AppConfig.Builder builder, Toml root) {
-        Toml keystoreTable = root.getTable("keystore");
-        if (keystoreTable != null) {
-            String keyPath = keystoreTable.getString("path");
-            String keyPass = keystoreTable.getString("keyPass");
-            String storePass = keystoreTable.getString("storePass");
-
-            if (StringUtils.hasText(keyPath) && StringUtils.hasText(keyPass) && StringUtils.hasText(storePass)) {
-                KeystoreConfig keystoreConfig = new KeystoreConfig(keyPath, keyPass, storePass);
-                builder.keystoreConfig(keystoreConfig);
-            }
+        Toml tlsTable = root.getTable("tls");
+        if (tlsTable != null) {
+            Boolean enable = tlsTable.getBoolean("enable", false);
+            String certPath = tlsTable.getString("certPath");
+            String keyPath = tlsTable.getString("keyPath");
+            String storePassPath = tlsTable.getString("storePassPath");
+            
+            TLSConfig tlsConfig = new TLSConfig(enable, certPath, keyPath, storePassPath);
+            builder.tls(tlsConfig);
         }
     }
 
@@ -127,92 +121,44 @@ public class TomlConfigSource implements ConfigSource {
             );
             builder.portRange(portRange);
         } else {
-            PortRange portRange = new PortRange(1024, 49151);
+            PortRange portRange = new PortRange(1, 65535);
             builder.portRange(portRange);
         }
     }
 
-    private void parseClients(AppConfig.Builder builder, Toml root) {
-        List<Toml> readClients = root.getTables("clients");
-        if (readClients == null) {
+    private void parseAccessTokens(AppConfig.Builder builder, Toml root) {
+        List<Toml> accessTokenTables = root.getTables("access_tokens");
+        if (accessTokenTables == null) {
             return;
         }
 
-        List<ClientInfo> clients = new CopyOnWriteArrayList<>();
+        List<AccessToken> accessTokens = new CopyOnWriteArrayList<>();
         Set<String> tokenTemp = new HashSet<>();
-        Set<String> nameTemp = new HashSet<>();
 
-        for (Toml client : readClients) {
-            String name = client.getString("name");
-            String secretKey = client.getString("secretKey");
+        for (Toml tokenTable : accessTokenTables) {
+            String name = tokenTable.getString("name");
+            String token = tokenTable.getString("token");
+            Long maxClients = tokenTable.getLong("maxClients");
 
             if (!StringUtils.hasText(name)) {
-                throw new IllegalArgumentException("必须指定客户端的名称！");
+                throw new IllegalArgumentException("必须指定AccessToken的描述！");
+            }
+            if (!StringUtils.hasText(token)) {
+                throw new IllegalArgumentException("必须指定AccessToken的令牌！");
+            }
+            if (maxClients == null || maxClients <= 0) {
+                throw new IllegalArgumentException("AccessToken的最大客户端数必须大于0！");
+            }
+            if (tokenTemp.contains(token)) {
+                throw new IllegalArgumentException("AccessToken令牌冲突，不能存在重复的令牌！ " + token);
             }
 
-            if (tokenTemp.contains(secretKey)) {
-                throw new IllegalArgumentException("客户端[密钥]冲突，不能存在重复的密钥！ " + secretKey);
-            }
-
-            if (nameTemp.contains(name)) {
-                throw new IllegalArgumentException("客户端[名称]冲突，不能存在重复的名称！ " + name);
-            }
-
-            List<ProxyConfig> proxies = parseProxies(client);
-            int clientId = GlobalIdGenerator.nextId();
-            ClientInfo clientInfo = new ClientInfo(name, secretKey, clientId, proxies);
-            clients.add(clientInfo);
-
-            tokenTemp.add(secretKey);
-            nameTemp.add(name);
+            AccessToken accessToken = new AccessToken(name, token, maxClients.intValue());
+            accessTokens.add(accessToken);
+            tokenTemp.add(token);
         }
 
-        builder.clients(clients);
-    }
-
-    private List<ProxyConfig> parseProxies(Toml client) {
-        List<Toml> proxies = client.getTables("proxies");
-        if (proxies == null) {
-            return new ArrayList<>();
-        }
-
-        List<ProxyConfig> proxyConfigs = new CopyOnWriteArrayList<>();
-        Set<Integer> portTemp = new HashSet<>();
-
-        for (Toml proxy : proxies) {
-            String type = proxy.getString("type");
-            String proxyName = proxy.getString("name");
-            String localIP = proxy.getString("localIP", "127.0.0.1");
-            Long localPort = proxy.getLong("localPort");
-            Long remotePort = proxy.getLong("remotePort");
-            Long status = proxy.getLong("status", 1L);
-            List<String> customDomains = proxy.getList("customDomains", new ArrayList<>());
-            //todo 需要检查域名是否重复
-            if (ProtocolType.TCP.name().equalsIgnoreCase(type) && remotePort != null) {
-                if (portTemp.contains(remotePort.intValue())) {
-                    throw new IllegalArgumentException("公网端口不能重复！" + remotePort.intValue());
-                }
-                portTemp.add(remotePort.intValue());
-            }
-
-            if (localPort == null) {
-                throw new IllegalArgumentException("必须指定内网端口");
-            }
-
-            ProxyConfig proxyConfig = new ProxyConfig();
-            proxyConfig.setName(proxyName);
-            proxyConfig.setLocalPort(localPort.intValue());
-
-            if (ProtocolType.TCP.name().equalsIgnoreCase(type)) {
-                proxyConfig.setRemotePort(remotePort == null ? null : remotePort.intValue());
-            } else {
-                //http or https
-                proxyConfig.getCustomDomains().addAll(new HashSet<>(customDomains));
-            }
-            proxyConfigs.add(proxyConfig);
-        }
-
-        return proxyConfigs;
+        builder.accessTokens(accessTokens);
     }
 
     @Override

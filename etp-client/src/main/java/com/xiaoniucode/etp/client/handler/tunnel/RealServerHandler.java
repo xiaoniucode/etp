@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.client.handler.tunnel;
 import com.xiaoniucode.etp.client.handler.utils.MessageWrapper;
 import com.xiaoniucode.etp.client.manager.ServerSessionManager;
 import com.xiaoniucode.etp.core.domain.LanInfo;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ public class RealServerHandler extends ChannelInboundHandlerAdapter {
             Channel control = serverSession.getAgentSession().getControl();
             String sessionId = serverSession.getSessionId();
             LanInfo lanInfo = serverSession.getLanInfo();
+            ChannelUtils.closeOnFlush(server);
             control.writeAndFlush(MessageWrapper.buildCloseProxy(sessionId));
             logger.debug("隧道关闭 - [会话标识={}，目标地址={}，目标端口={}]", sessionId, lanInfo.getLocalIP(), lanInfo.getLocalPort());
         });

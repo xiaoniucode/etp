@@ -24,11 +24,15 @@ public class CommandLineArgs {
             String arg = args[i];
 
             if (arg.startsWith("--")) {
-                i = parseLongArg(arg, args, i);
+                String name = arg.substring(2);
+                if (options.containsKey(name)) {
+                    i = parseLongArg(arg, args, i);
+                }
             } else if (arg.startsWith("-")) {
-                i = parseShortArg(arg, args, i);
-            } else {
-                throw new IllegalArgumentException("未知参数: " + arg);
+                String shortName = arg.substring(1);
+                if (shortToLong.containsKey(shortName)) {
+                    i = parseShortArg(arg, args, i);
+                }
             }
         }
 

@@ -39,7 +39,6 @@ public class ServerSessionManager {
         String sessionId = server.attr(ChannelConstants.SESSION_ID).get();
         server.attr(ChannelConstants.SESSION_ID).setIfAbsent(null);
         ServerSession remove = sessionIdToAgentSession.remove(sessionId);
-        ChannelUtils.closeOnFlush(server);
         return Optional.ofNullable(remove);
     }
 

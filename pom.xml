@@ -11,6 +11,16 @@
     <artifactId>etp</artifactId>
     <version>0.5.1</version>
     <name>etp</name>
+    <dependencies>
+        <dependency>
+            <groupId>com.moandjiezana.toml</groupId>
+            <artifactId>toml4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
     <packaging>pom</packaging>
     <url>https://github.com/xiaoniucode/etp</url>
     <description>etp(Easy Tunnel Proxy)</description>
@@ -58,6 +68,7 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <!--核心依赖-->
         <netty.version>4.1.80.Final</netty.version>
+<!--        <netty.version>4.2.9.Final</netty.version>-->
         <protobuf.version>4.32.1</protobuf.version>
         <maven.compiler>3.8.1</maven.compiler>
         <toml4j.version>0.7.2</toml4j.version>
@@ -82,7 +93,6 @@
         <module>etp-common</module>
         <module>etp-server</module>
         <module>etp-client</module>
-        <module>etp-main</module>
     </modules>
 
     <dependencyManagement>

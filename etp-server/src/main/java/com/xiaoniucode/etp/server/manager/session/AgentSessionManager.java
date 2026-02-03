@@ -3,11 +3,13 @@ package com.xiaoniucode.etp.server.manager.session;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.config.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.event.AgentRegisteredEvent;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
+import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
 import io.netty.channel.Channel;
@@ -17,24 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
 public class AgentSessionManager {
     private final Logger logger = LoggerFactory.getLogger(AgentSessionManager.class);
-    /**
-     * 连接超时时间 5分钟
-     */
-    private static final long HEARTBEAT_TIMEOUT = 300000L;
-    /**
-     * 定时任务运行间隔时间1分钟
-     */
-    private static final long CLEANUP_INTERVAL = 60000L;
-
     /**
      * Token -> AgentSessions
      */
@@ -51,6 +42,14 @@ public class AgentSessionManager {
      * domain -> Agent连接信息
      */
     private static final Map<String, AgentSession> domainToAgentSession = new ConcurrentHashMap<>();
+    /**
+     * control channel -> remotePorts
+     */
+    private static final Map<Channel, Set<Integer>> controlToPorts = new ConcurrentHashMap<>();
+    /**
+     * control channel -> domains
+     */
+    private static final Map<Channel, Set<String>> controlToDomains = new ConcurrentHashMap<>();
     @Autowired
     private SessionIdGenerator sessionIdGenerator;
     @Autowired
@@ -78,13 +77,23 @@ public class AgentSessionManager {
         for (ProxyConfig proxy : proxyConfigs) {
             ProtocolType protocol = proxy.getProtocol();
             if (ProtocolType.isTcp(protocol)) {
-                portToAgentSession.putIfAbsent(proxy.getRemotePort(), agentSession);
+                Integer remotePort = proxy.getRemotePort();
+                portToAgentSession.putIfAbsent(remotePort, agentSession);
+                Set<Integer> ports = controlToPorts.computeIfAbsent(control,
+                        k -> ConcurrentHashMap.newKeySet()
+                );
+                ports.add(remotePort);
                 continue;
             }
+            Set<String> domainMapping = controlToDomains.computeIfAbsent(control,
+                    k -> ConcurrentHashMap.newKeySet()
+            );
+
             if (ProtocolType.isHttp(protocol)) {
                 Set<String> domains = proxy.getFullDomains();
                 for (String domain : domains) {
                     domainToAgentSession.putIfAbsent(domain, agentSession);
+                    domainMapping.add(domain.trim());
                 }
             }
         }
@@ -96,37 +105,58 @@ public class AgentSessionManager {
     public void addPortToAgentSession(Integer remotePort) {
         AgentSessionContext.get().ifPresent(agentSession -> {
             portToAgentSession.putIfAbsent(remotePort, agentSession);
+            controlToPorts.computeIfAbsent(agentSession.getControl(),
+                    k -> ConcurrentHashMap.newKeySet()
+            ).add(remotePort);
         });
     }
 
-    public void disconnect(Channel control) {
-        String sessionId = control.attr(ChannelConstants.SESSION_ID).get();
-        disconnect(sessionId);
+    public void addDomainsToAgentSession(Set<String> domains) {
+        AgentSessionContext.get().ifPresent(agentSession -> {
+            for (String domain : domains) {
+                domainToAgentSession.putIfAbsent(domain, agentSession);
+            }
+            controlToDomains.computeIfAbsent(agentSession.getControl(),
+                    k -> ConcurrentHashMap.newKeySet()
+            ).addAll(domains);
+        });
     }
 
     /**
      * 与代理客户端断开连接
+     * 1.清理掉所有远程端口到代理客户端会话信息
      *
-     * @param sessionId sessionId
      */
-    public void disconnect(String sessionId) {
-        AgentSession agentSession = sessionIdToAgentSession.remove(sessionId);
-        if (agentSession == null) {
-            return;
-        }
-        Channel control = agentSession.getControl();
-        control.attr(ChannelConstants.SESSION_ID).set(null);
+    public void disconnect(Channel control) {
+        getAgentSession(control).ifPresent(agentSession -> {
+            String sessionId = agentSession.getSessionId();
+            sessionIdToAgentSession.remove(sessionId);
+            control.attr(ChannelConstants.SESSION_ID).set(null);
 
-        String token = agentSession.getToken();
-        Set<AgentSession> agentSessions = tokenToAgentSessions.get(token);
-        agentSessions.remove(agentSession);
-        if (agentSessions.isEmpty()) {
-            tokenToAgentSessions.remove(token);
-        }
-        ChannelUtils.closeOnFlush(control);
-        //清理自动注册的客户端以及数据记录
-        //todo 还需要清理visitor相关资源、启动的服务资源
-        //需要清空与该agent有关的所有session连接
+            String token = agentSession.getToken();
+            //清理登陆令牌代理客户端映射
+            Set<AgentSession> agentSessions = tokenToAgentSessions.get(token);
+            if (agentSessions != null) {
+                agentSessions.remove(agentSession);
+                if (agentSessions.isEmpty()) {
+                    tokenToAgentSessions.remove(token);
+                }
+            }
+            Set<Integer> ports = controlToPorts.remove(control);
+            if (ports != null) {
+                //清理掉代理客户端所有端口映射信息
+                for (Integer remotePort : ports) {
+                    portToAgentSession.remove(remotePort);
+                }
+            }
+            Set<String> domains = controlToDomains.remove(control);
+            if (domains != null) {
+                //清理掉代理客户端所有域名映射关系
+                for (String domain : domains) {
+                    domainToAgentSession.remove(domain);
+                }
+            }
+        });
     }
 
     /**
@@ -141,26 +171,17 @@ public class AgentSessionManager {
         if (agentSession != null) {
             agentSession.setLastHeartbeat(System.currentTimeMillis());
             if (logger.isDebugEnabled()) {
-                logger.debug("Heartbeat updated for session: {}", sessionId);
+                logger.debug("更新代理客户端最后心跳时间 - 会话标识={}", sessionId);
             }
         }
     }
 
     /**
-     * 自动清理超时 session 会话
-     *
+     * 获取所有客户端会话信息
+     * @return 客户端会话列表
      */
-    @Scheduled(fixedDelay = CLEANUP_INTERVAL)
-    public void cleanupExpiredSessions() {
-        long now = System.currentTimeMillis();
-        sessionIdToAgentSession.values().stream()
-                .filter(conn -> (now - conn.getLastHeartbeat()) > HEARTBEAT_TIMEOUT)
-                .forEach(conn -> {
-                    if (logger.isWarnEnabled()) {
-                        logger.warn("Cleaning up expired agent session connection: {}", conn.getSessionId());
-                    }
-                    disconnect(conn.getSessionId());
-                });
+    public Collection<AgentSession> getAllAgentSessions() {
+        return sessionIdToAgentSession.values();
     }
 
     public AgentSession getAgentSessionByPort(Integer remotePort) {
@@ -181,5 +202,35 @@ public class AgentSessionManager {
             return Optional.ofNullable(sessionIdToAgentSession.get(sessionId));
         }
         return Optional.empty();
+    }
+
+    public Set<Integer> getAgentRemotePorts(Channel control) {
+        Set<Integer> remotePorts = controlToPorts.get(control);
+        if (remotePorts == null) {
+            return new HashSet<>();
+        }
+        return remotePorts;
+    }
+
+    public Set<String> getAgentDomains(Channel control) {
+        Set<String> domains = controlToDomains.get(control);
+        if (domains == null) {
+            return new HashSet<>();
+        }
+        return domains;
+    }
+
+    /**
+     * 获取令牌的会话数量
+     *
+     * @param token 登陆认证令牌
+     * @return 会话数量
+     */
+    public Integer getOnlineAgents(String token) {
+        Set<AgentSession> agentSessions = tokenToAgentSessions.get(token);
+        if (agentSessions != null) {
+            return agentSessions.size();
+        }
+        return 0;
     }
 }
