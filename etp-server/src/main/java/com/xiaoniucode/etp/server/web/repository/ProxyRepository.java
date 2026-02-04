@@ -25,7 +25,7 @@ public interface ProxyRepository extends JpaRepository<Proxy, Integer> {
     /**
      * 根据类型查询代理
      */
-    List<Proxy> findByType(String type);
+    List<Proxy> findByProtocol(String protocol);
     
     /**
      * 根据状态查询代理

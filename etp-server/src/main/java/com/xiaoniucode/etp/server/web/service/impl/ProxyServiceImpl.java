@@ -28,7 +28,7 @@ public class ProxyServiceImpl implements ProxyService {
 
     @Override
     public List<Proxy> proxies(String type) {
-        return proxiesRepository.findByType(type);
+        return proxiesRepository.findByProtocol(type);
     }
 
     @Override

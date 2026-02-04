@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ProxyRegisterEvent extends Event {
+public class ProxyCreatedEvent extends Event {
+   private final String clientId;
    private final ProxyConfig proxyConfig;
 }

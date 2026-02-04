@@ -36,43 +36,4 @@ public class TcpVisitorHandler extends ChannelInboundHandlerAdapter {
                 .buildNewVisitorConn(session.getSessionId(), lanInfo.getLocalIP(), lanInfo.getLocalPort());
         control.writeAndFlush(message);
     }
-
-    //todo 需要迁移改造通过桥接器实现
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Channel visitor = ctx.channel();
-        visitorSessionManager.disconnect(visitor, session -> {
-            Channel tunnel = session.getTunnel();
-            Message.ControlMessage message = MessageWrapper
-                    .buildCloseProxy(session.getSessionId());
-            tunnel.writeAndFlush(message);
-        });
-        super.channelInactive(ctx);
-    }
-
-    //todo 需要迁移改造通过桥接器实现
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error(cause.getMessage(), cause);
-        Channel visitor = ctx.channel();
-        visitorSessionManager.disconnect(visitor, session -> {
-            Channel tunnel = session.getTunnel();
-            Message.ControlMessage message = MessageWrapper
-                    .buildCloseProxy(session.getSessionId());
-            tunnel.writeAndFlush(message);
-        });
-        ctx.close();
-    }
-
-    //todo 需要迁移改造通过桥接器实现
-    @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        super.channelWritabilityChanged(ctx);
-        Channel visitor = ctx.channel();
-        VisitorSession visitorSession = visitorSessionManager.getVisitorSession(visitor);
-        Channel tunnel = visitorSession.getTunnel();
-        if (tunnel != null) {
-            tunnel.config().setOption(ChannelOption.AUTO_READ, visitor.isWritable());
-        }
-    }
 }

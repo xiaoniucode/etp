@@ -11,6 +11,8 @@ import com.xiaoniucode.etp.server.manager.domain.AgentSession;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +24,7 @@ import java.util.function.Consumer;
 
 @Component
 public class VisitorSessionManager {
+    private final Logger logger = LoggerFactory.getLogger(VisitorSessionManager.class);
     /**
      * sessionId -> Visitor session info
      */
@@ -93,6 +96,9 @@ public class VisitorSessionManager {
 
     public synchronized void disconnect(Channel visitor, Consumer<VisitorSession> callback) {
         VisitorSession visitorSession = getVisitorSession(visitor);
+        if (visitorSession==null){
+            return;
+        }
         if (ProtocolDetection.isTcp(visitor)) {
             int remotePort = getListenerPort(visitor);
             Set<Channel> visitors = remotePortToVisitorChannels.get(remotePort);
@@ -161,6 +167,9 @@ public class VisitorSessionManager {
 
     public void disconnect(String sessionId, Consumer<VisitorSession> callback) {
         VisitorSession session = sessionIdToVisitorSession.get(sessionId);
+        if (session==null){
+            return;
+        }
         disconnect(session.getVisitor(), callback);
     }
 

@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.manager;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,24 +27,17 @@ public class ProxyManager {
      */
     private final Map<String, ProxyConfig> domainToProxyConfig = new ConcurrentHashMap<>();
     /**
-     * proxyName --> proxyConfig
-     * 代理名称与代理配置映射
-     */
-    private final Map<String, ProxyConfig> proxyNameToProxyConfig = new ConcurrentHashMap<>();
-    /**
      * clientId --> ProxyConfigs
      * 每个客户端的配置列表
      */
     private final Map<String, Set<ProxyConfig>> clientIdToProxyConfigs = new ConcurrentHashMap<>();
-
     @Autowired
-    private DomainManager domainManager;
+    private ClientManager clientManager;
 
-    public synchronized ProxyConfig createProxy(String clientId, ProxyConfig proxyConfig) {
-        return createProxy(clientId, proxyConfig, null);
+    public synchronized ProxyConfig addProxy(String clientId, ProxyConfig proxyConfig) {
+        return addProxy(clientId, proxyConfig, null);
     }
-
-    public synchronized ProxyConfig createProxy(String clientId, ProxyConfig proxyConfig, Consumer<ProxyConfig> callback) {
+    public synchronized ProxyConfig addProxy(String clientId, ProxyConfig proxyConfig, Consumer<ProxyConfig> callback) {
         if (!StringUtils.hasText(clientId) || proxyConfig == null) {
             return null;
         }
@@ -72,8 +66,13 @@ public class ProxyManager {
             }
             logger.debug("代理创建成功: [客户端ID={},代理名称={},域名={}]", clientId, proxyConfig.getName(), domains);
         }
-
-        proxyNameToProxyConfig.put(proxyConfig.getName(), proxyConfig);
+        ClientInfo clientInfo = clientManager.getClient(clientId);
+        if (clientInfo!=null){
+            //clientInfo: proxyName -> ProxyConfig
+            clientInfo.getProxyNameToProxyConfig().put(proxyConfig.getName(), proxyConfig);
+        }else {
+            //todo
+        }
         clientIdToProxyConfigs.computeIfAbsent(clientId, k ->
                 ConcurrentHashMap.newKeySet()).add(proxyConfig);
         if (callback != null) {
@@ -87,7 +86,11 @@ public class ProxyManager {
     }
 
     public synchronized ProxyConfig removeProxy(String clientId, String proxyName, Consumer<ProxyConfig> callback) {
-        ProxyConfig proxyConfig = proxyNameToProxyConfig.remove(proxyName);
+        ClientInfo clientInfo = clientManager.getClient(clientId);
+        if (clientInfo == null) {
+            return null;
+        }
+        ProxyConfig proxyConfig = clientInfo.getProxyNameToProxyConfig().get(proxyName);
         if (proxyConfig == null) {
             logger.warn("删除代理失败，代理配置不存在");
             return null;

@@ -7,7 +7,7 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.event.ProxyRegisterEvent;
+import com.xiaoniucode.etp.server.event.ProxyCreatedEvent;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.PortListenerManager;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
@@ -50,7 +50,7 @@ public class NewProxyRespHandler implements MessageHandler {
             Message.NewProxy newProxy = msg.getNewProxy();
             ProxyConfig config = buildProxyConfig(newProxy);
             //保存到代理到配置管理器
-            proxyManager.createProxy(clientId, config, proxyConfig -> {
+            proxyManager.addProxy(clientId, config, proxyConfig -> {
                 //发布事件，可订阅事件对其进行持久化或其他操作
                 //todo test
                 if (ProtocolType.isTcp(proxyConfig.getProtocol())) {
@@ -63,7 +63,7 @@ public class NewProxyRespHandler implements MessageHandler {
                     agentSessionManager.addDomainsToAgentSession(domains);
                 }
                 //注册代理配置
-                eventBus.publishAsync(new ProxyRegisterEvent(proxyConfig));
+                eventBus.publishAsync(new ProxyCreatedEvent(clientId,proxyConfig));
                 control.writeAndFlush(buildResponse(proxyConfig));
                 logger.debug("代理注册成功: [代理名称={}]", proxyConfig.getName());
             });

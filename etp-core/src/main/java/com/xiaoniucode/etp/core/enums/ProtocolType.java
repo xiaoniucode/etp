@@ -40,7 +40,7 @@ public enum ProtocolType {
         this.desc = desc;
     }
 
-    public static ProtocolType getType(int type) {
+    public static ProtocolType getProtocol(int type) {
         return TYPE_MAP.get(type);
     }
 
@@ -74,7 +74,7 @@ public enum ProtocolType {
         return protocolType == TCP;
     }
 
-    public int getType() {
+    public int getProtocol() {
         return type;
     }
 

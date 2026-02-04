@@ -520,4 +520,8 @@ public class DomainManager {
     public Set<String> getInvalidDomains(Set<String> domains) {
         return domains;
     }
+
+    public Set<String> addDomains(List<String> domains) {
+        return null;
+    }
 }

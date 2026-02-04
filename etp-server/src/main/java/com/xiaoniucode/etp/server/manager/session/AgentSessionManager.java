@@ -167,7 +167,7 @@ public class AgentSessionManager {
         if (agentSession != null) {
             agentSession.setLastHeartbeat(System.currentTimeMillis());
             if (logger.isDebugEnabled()) {
-                logger.debug("更新代理客户端最后心跳时间 - 会话标识={}", sessionId);
+                logger.debug("更新代理客户端最后心跳时间 - 客户端ID={} - 会话标识={}", agentSession.getClientId(),sessionId);
             }
         }
     }
