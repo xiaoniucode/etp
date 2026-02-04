@@ -66,6 +66,8 @@ message NewVisitorConn {
   string sessionId = 1;
   string localIp = 2;
   int32 localPort = 3;
+  optional bool encrypt = 4;
+  optional bool compress = 5;
 }
 
 message NewVisitorConnResp {

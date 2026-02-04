@@ -38,8 +38,10 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                 server.config().setOption(ChannelOption.AUTO_READ, false);
                 ConnectionPool.acquire().thenAccept(tunnel -> tunnel.writeAndFlush(MessageWrapper.buildVisitorConn(sessionId)).addListener(f -> {
                     if (f.isSuccess()) {
+                        boolean compress = msg.getCompress();
+                        boolean encrypt = msg.getEncrypt();
                         //控制通道转换为数据通道
-                        ChannelSwitcher.switchToDataTunnel(tunnel.pipeline());
+                        ChannelSwitcher.switchToDataTunnel(tunnel.pipeline(), compress, encrypt);
                         //桥接，双向透明转发
                         ChannelBridge.bridge(server, tunnel);
                         //创建连接会话

@@ -70,6 +70,8 @@ public class ProxyRegistrar {
                 .setLocalIp(config.getLocalIp())
                 .setLocalPort(config.getLocalPort())
                 .setStatus(config.getStatus().getStatus())
+                .setCompress(config.getCompress())
+                .setEncrypt(config.getEncrypt())
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
         switch (protocol) {
             case TCP:

@@ -80,6 +80,8 @@ public class NewProxyRespHandler implements MessageHandler {
         config.setProtocol(ProtocolType.getByName(proxy.getProtocol().name()));
         config.setStatus(ProxyStatus.fromStatus(proxy.getStatus()));
         config.setAutoDomain(proxy.getAutoDomain());
+        config.setCompress(proxy.getCompress());
+        config.setEncrypt(proxy.getEncrypt());
         config.getCustomDomains().addAll(proxy.getCustomDomainsList());
         config.getSubDomains().addAll(proxy.getSubDomainsList());
         return config;

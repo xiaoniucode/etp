@@ -5819,6 +5819,28 @@ java.lang.String defaultValue) {
      * @return The localPort.
      */
     int getLocalPort();
+
+    /**
+     * <code>optional bool encrypt = 4;</code>
+     * @return Whether the encrypt field is set.
+     */
+    boolean hasEncrypt();
+    /**
+     * <code>optional bool encrypt = 4;</code>
+     * @return The encrypt.
+     */
+    boolean getEncrypt();
+
+    /**
+     * <code>optional bool compress = 5;</code>
+     * @return Whether the compress field is set.
+     */
+    boolean hasCompress();
+    /**
+     * <code>optional bool compress = 5;</code>
+     * @return The compress.
+     */
+    boolean getCompress();
   }
   /**
    * Protobuf type {@code com.xiaoniucode.etp.core.message.NewVisitorConn}
@@ -5859,6 +5881,7 @@ java.lang.String defaultValue) {
               com.xiaoniucode.etp.core.message.Message.NewVisitorConn.class, com.xiaoniucode.etp.core.message.Message.NewVisitorConn.Builder.class);
     }
 
+    private int bitField0_;
     public static final int SESSIONID_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
     private volatile java.lang.Object sessionId_ = "";
@@ -5948,6 +5971,44 @@ java.lang.String defaultValue) {
       return localPort_;
     }
 
+    public static final int ENCRYPT_FIELD_NUMBER = 4;
+    private boolean encrypt_ = false;
+    /**
+     * <code>optional bool encrypt = 4;</code>
+     * @return Whether the encrypt field is set.
+     */
+    @java.lang.Override
+    public boolean hasEncrypt() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>optional bool encrypt = 4;</code>
+     * @return The encrypt.
+     */
+    @java.lang.Override
+    public boolean getEncrypt() {
+      return encrypt_;
+    }
+
+    public static final int COMPRESS_FIELD_NUMBER = 5;
+    private boolean compress_ = false;
+    /**
+     * <code>optional bool compress = 5;</code>
+     * @return Whether the compress field is set.
+     */
+    @java.lang.Override
+    public boolean hasCompress() {
+      return ((bitField0_ & 0x00000002) != 0);
+    }
+    /**
+     * <code>optional bool compress = 5;</code>
+     * @return The compress.
+     */
+    @java.lang.Override
+    public boolean getCompress() {
+      return compress_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5971,6 +6032,12 @@ java.lang.String defaultValue) {
       if (localPort_ != 0) {
         output.writeInt32(3, localPort_);
       }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeBool(4, encrypt_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        output.writeBool(5, compress_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -5989,6 +6056,14 @@ java.lang.String defaultValue) {
       if (localPort_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, localPort_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, encrypt_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(5, compress_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -6011,6 +6086,16 @@ java.lang.String defaultValue) {
           .equals(other.getLocalIp())) return false;
       if (getLocalPort()
           != other.getLocalPort()) return false;
+      if (hasEncrypt() != other.hasEncrypt()) return false;
+      if (hasEncrypt()) {
+        if (getEncrypt()
+            != other.getEncrypt()) return false;
+      }
+      if (hasCompress() != other.hasCompress()) return false;
+      if (hasCompress()) {
+        if (getCompress()
+            != other.getCompress()) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -6028,6 +6113,16 @@ java.lang.String defaultValue) {
       hash = (53 * hash) + getLocalIp().hashCode();
       hash = (37 * hash) + LOCALPORT_FIELD_NUMBER;
       hash = (53 * hash) + getLocalPort();
+      if (hasEncrypt()) {
+        hash = (37 * hash) + ENCRYPT_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getEncrypt());
+      }
+      if (hasCompress()) {
+        hash = (37 * hash) + COMPRESS_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getCompress());
+      }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -6162,6 +6257,8 @@ java.lang.String defaultValue) {
         sessionId_ = "";
         localIp_ = "";
         localPort_ = 0;
+        encrypt_ = false;
+        compress_ = false;
         return this;
       }
 
@@ -6204,6 +6301,16 @@ java.lang.String defaultValue) {
         if (((from_bitField0_ & 0x00000004) != 0)) {
           result.localPort_ = localPort_;
         }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.encrypt_ = encrypt_;
+          to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.compress_ = compress_;
+          to_bitField0_ |= 0x00000002;
+        }
+        result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
@@ -6230,6 +6337,12 @@ java.lang.String defaultValue) {
         }
         if (other.getLocalPort() != 0) {
           setLocalPort(other.getLocalPort());
+        }
+        if (other.hasEncrypt()) {
+          setEncrypt(other.getEncrypt());
+        }
+        if (other.hasCompress()) {
+          setCompress(other.getCompress());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -6272,6 +6385,16 @@ java.lang.String defaultValue) {
                 bitField0_ |= 0x00000004;
                 break;
               } // case 24
+              case 32: {
+                encrypt_ = input.readBool();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
+              case 40: {
+                compress_ = input.readBool();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 40
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -6461,6 +6584,86 @@ java.lang.String defaultValue) {
       public Builder clearLocalPort() {
         bitField0_ = (bitField0_ & ~0x00000004);
         localPort_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private boolean encrypt_ ;
+      /**
+       * <code>optional bool encrypt = 4;</code>
+       * @return Whether the encrypt field is set.
+       */
+      @java.lang.Override
+      public boolean hasEncrypt() {
+        return ((bitField0_ & 0x00000008) != 0);
+      }
+      /**
+       * <code>optional bool encrypt = 4;</code>
+       * @return The encrypt.
+       */
+      @java.lang.Override
+      public boolean getEncrypt() {
+        return encrypt_;
+      }
+      /**
+       * <code>optional bool encrypt = 4;</code>
+       * @param value The encrypt to set.
+       * @return This builder for chaining.
+       */
+      public Builder setEncrypt(boolean value) {
+
+        encrypt_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool encrypt = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearEncrypt() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        encrypt_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean compress_ ;
+      /**
+       * <code>optional bool compress = 5;</code>
+       * @return Whether the compress field is set.
+       */
+      @java.lang.Override
+      public boolean hasCompress() {
+        return ((bitField0_ & 0x00000010) != 0);
+      }
+      /**
+       * <code>optional bool compress = 5;</code>
+       * @return The compress.
+       */
+      @java.lang.Override
+      public boolean getCompress() {
+        return compress_;
+      }
+      /**
+       * <code>optional bool compress = 5;</code>
+       * @param value The compress to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCompress(boolean value) {
+
+        compress_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool compress = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCompress() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        compress_ = false;
         onChanged();
         return this;
       }
@@ -12456,41 +12659,43 @@ java.lang.String defaultValue) {
       "\007_statusB\n\n\010_encryptB\013\n\t_compressB\r\n\013_re" +
       "motePortB\r\n\013_autoDomain\"5\n\014NewProxyResp\022" +
       "\021\n\tproxyName\030\001 \001(\t\022\022\n\nremoteAddr\030\002 \001(\t\"\037" +
-      "\n\nCloseProxy\022\021\n\tsessionId\030\001 \001(\t\"G\n\016NewVi" +
-      "sitorConn\022\021\n\tsessionId\030\001 \001(\t\022\017\n\007localIp\030" +
-      "\002 \001(\t\022\021\n\tlocalPort\030\003 \001(\005\"\'\n\022NewVisitorCo" +
-      "nnResp\022\021\n\tsessionId\030\002 \001(\t\"&\n\005Error\022\014\n\004co" +
-      "de\030\001 \001(\005\022\017\n\007message\030\002 \001(\t\"\022\n\020HeartbeatTi" +
-      "meout\"\006\n\004Ping\"\006\n\004Pong\"\t\n\007Kickout\"\374\006\n\016Con" +
-      "trolMessage\022?\n\006header\030\001 \001(\0132/.com.xiaoni" +
-      "ucode.etp.core.message.MessageHeader\0228\n\005" +
-      "login\030\n \001(\0132\'.com.xiaoniucode.etp.core.m" +
-      "essage.LoginH\000\022>\n\010newProxy\030\013 \001(\0132*.com.x" +
-      "iaoniucode.etp.core.message.NewProxyH\000\022B" +
-      "\n\ncloseProxy\030\014 \001(\0132,.com.xiaoniucode.etp" +
-      ".core.message.CloseProxyH\000\0226\n\004ping\030\r \001(\013" +
-      "2&.com.xiaoniucode.etp.core.message.Ping" +
-      "H\000\022F\n\014newProxyResp\030\024 \001(\0132..com.xiaoniuco" +
-      "de.etp.core.message.NewProxyRespH\000\0228\n\005er" +
-      "ror\030\025 \001(\0132\'.com.xiaoniucode.etp.core.mes" +
-      "sage.ErrorH\000\0226\n\004pong\030\026 \001(\0132&.com.xiaoniu" +
-      "code.etp.core.message.PongH\000\022<\n\007kickout\030" +
-      "\036 \001(\0132).com.xiaoniucode.etp.core.message" +
-      ".KickoutH\000\022J\n\016newVisitorConn\030\037 \001(\01320.com" +
-      ".xiaoniucode.etp.core.message.NewVisitor" +
-      "ConnH\000\022R\n\022newVisitorConnResp\030  \001(\01324.com" +
-      ".xiaoniucode.etp.core.message.NewVisitor" +
-      "ConnRespH\000\022@\n\tloginResp\030! \001(\0132+.com.xiao" +
-      "niucode.etp.core.message.LoginRespH\000\022N\n\020" +
-      "heartbeatTimeout\030\" \001(\01322.com.xiaoniucode" +
-      ".etp.core.message.HeartbeatTimeoutH\000B\t\n\007" +
-      "payload*\332\001\n\013MessageType\022\013\n\007UNKNOWN\020\000\022\t\n\005" +
-      "LOGIN\020e\022\016\n\nLOGIN_RESP\020h\022\r\n\tNEW_PROXY\020f\022\017" +
-      "\n\013CLOSE_PROXY\020g\022\010\n\004PING\020i\022\023\n\016NEW_PROXY_R" +
-      "ESP\020\312\001\022\n\n\005ERROR\020\315\001\022\t\n\004PONG\020\316\001\022\014\n\007KICKOUT" +
-      "\020\255\002\022\020\n\013NEW_VISITOR\020\256\002\022\025\n\020NEW_VISITOR_RES" +
-      "P\020\257\002\022\026\n\021HEARTBEAT_TIMEOUT\020\260\002*!\n\014Protocol" +
-      "Type\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001b\006proto3"
+      "\n\nCloseProxy\022\021\n\tsessionId\030\001 \001(\t\"\215\001\n\016NewV" +
+      "isitorConn\022\021\n\tsessionId\030\001 \001(\t\022\017\n\007localIp" +
+      "\030\002 \001(\t\022\021\n\tlocalPort\030\003 \001(\005\022\024\n\007encrypt\030\004 \001" +
+      "(\010H\000\210\001\001\022\025\n\010compress\030\005 \001(\010H\001\210\001\001B\n\n\010_encry" +
+      "ptB\013\n\t_compress\"\'\n\022NewVisitorConnResp\022\021\n" +
+      "\tsessionId\030\002 \001(\t\"&\n\005Error\022\014\n\004code\030\001 \001(\005\022" +
+      "\017\n\007message\030\002 \001(\t\"\022\n\020HeartbeatTimeout\"\006\n\004" +
+      "Ping\"\006\n\004Pong\"\t\n\007Kickout\"\374\006\n\016ControlMessa" +
+      "ge\022?\n\006header\030\001 \001(\0132/.com.xiaoniucode.etp" +
+      ".core.message.MessageHeader\0228\n\005login\030\n \001" +
+      "(\0132\'.com.xiaoniucode.etp.core.message.Lo" +
+      "ginH\000\022>\n\010newProxy\030\013 \001(\0132*.com.xiaoniucod" +
+      "e.etp.core.message.NewProxyH\000\022B\n\nclosePr" +
+      "oxy\030\014 \001(\0132,.com.xiaoniucode.etp.core.mes" +
+      "sage.CloseProxyH\000\0226\n\004ping\030\r \001(\0132&.com.xi" +
+      "aoniucode.etp.core.message.PingH\000\022F\n\014new" +
+      "ProxyResp\030\024 \001(\0132..com.xiaoniucode.etp.co" +
+      "re.message.NewProxyRespH\000\0228\n\005error\030\025 \001(\013" +
+      "2\'.com.xiaoniucode.etp.core.message.Erro" +
+      "rH\000\0226\n\004pong\030\026 \001(\0132&.com.xiaoniucode.etp." +
+      "core.message.PongH\000\022<\n\007kickout\030\036 \001(\0132).c" +
+      "om.xiaoniucode.etp.core.message.KickoutH" +
+      "\000\022J\n\016newVisitorConn\030\037 \001(\01320.com.xiaoniuc" +
+      "ode.etp.core.message.NewVisitorConnH\000\022R\n" +
+      "\022newVisitorConnResp\030  \001(\01324.com.xiaoniuc" +
+      "ode.etp.core.message.NewVisitorConnRespH" +
+      "\000\022@\n\tloginResp\030! \001(\0132+.com.xiaoniucode.e" +
+      "tp.core.message.LoginRespH\000\022N\n\020heartbeat" +
+      "Timeout\030\" \001(\01322.com.xiaoniucode.etp.core" +
+      ".message.HeartbeatTimeoutH\000B\t\n\007payload*\332" +
+      "\001\n\013MessageType\022\013\n\007UNKNOWN\020\000\022\t\n\005LOGIN\020e\022\016" +
+      "\n\nLOGIN_RESP\020h\022\r\n\tNEW_PROXY\020f\022\017\n\013CLOSE_P" +
+      "ROXY\020g\022\010\n\004PING\020i\022\023\n\016NEW_PROXY_RESP\020\312\001\022\n\n" +
+      "\005ERROR\020\315\001\022\t\n\004PONG\020\316\001\022\014\n\007KICKOUT\020\255\002\022\020\n\013NE" +
+      "W_VISITOR\020\256\002\022\025\n\020NEW_VISITOR_RESP\020\257\002\022\026\n\021H" +
+      "EARTBEAT_TIMEOUT\020\260\002*!\n\014ProtocolType\022\007\n\003T" +
+      "CP\020\000\022\010\n\004HTTP\020\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -12543,7 +12748,7 @@ java.lang.String defaultValue) {
     internal_static_com_xiaoniucode_etp_core_message_NewVisitorConn_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_NewVisitorConn_descriptor,
-        new java.lang.String[] { "SessionId", "LocalIp", "LocalPort", });
+        new java.lang.String[] { "SessionId", "LocalIp", "LocalPort", "Encrypt", "Compress", });
     internal_static_com_xiaoniucode_etp_core_message_NewVisitorConnResp_descriptor =
       getDescriptor().getMessageType(7);
     internal_static_com_xiaoniucode_etp_core_message_NewVisitorConnResp_fieldAccessorTable = new

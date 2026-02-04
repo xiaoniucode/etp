@@ -8,17 +8,24 @@ public class ChannelSwitcher {
     /**
      * 从控制通道切换为数据通道
      *
-     * @param pipeline pipeline
+     * @param pipeline       pipeline
+     * @param enableCompress 是否启用压缩
+     * @param enableEncrypt  是否启用加密
      */
-    public static void switchToDataTunnel(ChannelPipeline pipeline) {
+    public static void switchToDataTunnel(ChannelPipeline pipeline, boolean enableCompress, boolean enableEncrypt) {
         pipeline.remove("protoBufVarint32FrameDecoder");
         pipeline.remove("protoBufDecoder");
         pipeline.remove("protoBufVarint32LengthFieldPrepender");
         pipeline.remove("protoBufEncoder");
         pipeline.remove("controlTunnelHandler");
         pipeline.remove("idleCheckHandler");
-        //添加字节压缩编解码器
-        pipeline.addLast("snappyDecoder", new SnappyDecoder());
-        pipeline.addLast("snappyEncoder", new SnappyEncoder());
+
+        if (enableCompress) {
+            pipeline.addLast("snappyDecoder", new SnappyDecoder());
+            pipeline.addLast("snappyEncoder", new SnappyEncoder());
+        }
+
+        if (enableEncrypt) {
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.manager.domain;
 
-import com.xiaoniucode.etp.core.domain.LanInfo;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,8 +22,8 @@ public class VisitorSession {
      */
     private Channel tunnel;
     /**
-     * 目标连接服务信息
+     * 代理配置信息
      */
-    private LanInfo lanInfo;
+    private ProxyConfig proxyConfig;
 
 }

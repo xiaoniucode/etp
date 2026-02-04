@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +38,9 @@ public class ServerSessionManager {
 
     public static Optional<ServerSession> removeServerSession(Channel server) {
         String sessionId = server.attr(ChannelConstants.SESSION_ID).get();
+        if (sessionId == null) {
+            return Optional.empty();
+        }
         server.attr(ChannelConstants.SESSION_ID).setIfAbsent(null);
         ServerSession remove = sessionIdToAgentSession.remove(sessionId);
         return Optional.ofNullable(remove);

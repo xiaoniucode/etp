@@ -42,7 +42,10 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<ControlMes
                 handler.handle(ctx, msg);
             }
             ctx.fireChannelRead(msg);
-        } finally {
+        } catch (Exception e) {
+            logger.error("消息处理器分发异常",e);
+        }
+        finally {
             AgentSessionContext.clear();
         }
     }

@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.handler.message;
 
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.handler.ChannelSwitcher;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.handler.bridge.ChannelBridge;
@@ -46,12 +47,13 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
             logger.warn("visitor visitorSession is not exist.");
             return;
         }
+        ProxyConfig config = visitorSession.getProxyConfig();
         Channel visitor = visitorSession.getVisitor();
         Channel tunnel = ctx.channel();
         //将数据连接保存到visitor session会话中
         visitorSession.setTunnel(tunnel);
         //将控制隧道切换为数据隧道
-        ChannelSwitcher.switchToDataTunnel(ctx.pipeline());
+        ChannelSwitcher.switchToDataTunnel(ctx.pipeline(), config.getCompress(), config.getEncrypt());
         ChannelBridgeCallback callback = new ChannelBridgeCallback() {
             /**
              * 由于是双向通道，所以会出现两次调用回调接口，需要做防重处理

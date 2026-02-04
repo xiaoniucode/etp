@@ -59,14 +59,17 @@ public class MessageWrapper {
                 .build();
     }
 
-    public static Message.ControlMessage buildNewVisitorConn(String sessionId, String localIP, Integer localPort) {
+    public static Message.ControlMessage buildNewVisitorConn(String sessionId, String localIp, Integer localPort, Boolean compress, Boolean encrypt) {
+
         Message.MessageHeader header = Message.MessageHeader.newBuilder()
                 .setType(Message.MessageType.NEW_VISITOR)
                 .build();
         Message.NewVisitorConn newVisitorConn = Message.NewVisitorConn.newBuilder()
                 .setSessionId(sessionId)
-                .setLocalIp(localIP)
+                .setLocalIp(localIp)
                 .setLocalPort(localPort)
+                .setCompress(compress)
+                .setEncrypt(encrypt)
                 .build();
         return Message.ControlMessage.newBuilder()
                 .setHeader(header)
@@ -95,4 +98,6 @@ public class MessageWrapper {
                 .setHeartbeatTimeout(heartbeatTimeout)
                 .build();
     }
+
+
 }

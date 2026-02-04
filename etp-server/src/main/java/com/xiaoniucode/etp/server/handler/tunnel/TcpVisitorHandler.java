@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.handler.tunnel;
 
-import com.xiaoniucode.etp.core.domain.LanInfo;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
@@ -31,9 +31,13 @@ public class TcpVisitorHandler extends ChannelInboundHandlerAdapter {
 
     private void connectToTarget(VisitorSession session) {
         Channel control = session.getControl();
-        LanInfo lanInfo = session.getLanInfo();
+        ProxyConfig config = session.getProxyConfig();
         Message.ControlMessage message = MessageWrapper
-                .buildNewVisitorConn(session.getSessionId(), lanInfo.getLocalIP(), lanInfo.getLocalPort());
+                .buildNewVisitorConn(session.getSessionId(),
+                        config.getLocalIp(),
+                        config.getLocalPort(),
+                        config.getCompress(),
+                        config.getEncrypt());
         control.writeAndFlush(message);
     }
 }

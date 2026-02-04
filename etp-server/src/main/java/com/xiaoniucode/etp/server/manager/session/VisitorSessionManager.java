@@ -1,7 +1,6 @@
 package com.xiaoniucode.etp.server.manager.session;
 
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
-import com.xiaoniucode.etp.core.domain.LanInfo;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
@@ -86,7 +85,7 @@ public class VisitorSessionManager {
         visitorSession.setVisitor(visitor);
         visitorSession.setControl(agentSession.getControl());
         visitorSession.setSessionId(sessionId);
-        visitorSession.setLanInfo(new LanInfo(proxyConfig.getLocalIp(), proxyConfig.getLocalPort()));
+        visitorSession.setProxyConfig(proxyConfig);
 
         sessionIdToVisitorSession.put(sessionId, visitorSession);
         if (callback != null) {
