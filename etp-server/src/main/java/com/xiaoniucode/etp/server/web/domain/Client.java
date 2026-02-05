@@ -23,8 +23,6 @@ public class Client {
     private String clientId;
     @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "token", nullable = false)
-    private String token;
     @Column(name = "os", nullable = false)
     private String os;
     @Column(name = "arch", nullable = false)

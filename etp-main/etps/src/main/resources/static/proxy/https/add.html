@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>新增映射</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/assets/layui/css/layui.css" rel="stylesheet">
+    <link href="/static/assets/css/app.css" rel="stylesheet">
+</head>
+<body>
+<div class="layui-container" style="padding-top: 15px">
+    <form class="layui-form layui-form-pane" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">客户端</label>
+            <div class="layui-input-inline">
+                <select name="client" lay-filter="clientSelect">
+                    <option value="">请选择客户端</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">隧道名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" autocomplete="off" placeholder="请输入隧道名称" lay-verify="required"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">内网IP</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="localIP" value="127.0.0.1" autocomplete="off" placeholder="默认: 127.0.0.1"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">内网端口</label>
+                <div class="layui-input-inline">
+                    <input type="number" lay-verify="required" placeholder="请输入目标服务端口" name="localPort" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">域名类型</label>
+            <div class="layui-input-block">
+                <input type="radio" name="domainType" value="auto" title="自动生成" checked lay-filter="domainType">
+                <input type="radio" name="domainType" value="sub" title="子域名" lay-filter="domainType">
+                <input type="radio" name="domainType" value="custom" title="自定义域名" lay-filter="domainType">
+            </div>
+        </div>
+        <input type="hidden" name="autoDomain" value="true">
+        
+        <div class="layui-form-item" id="customDomainsGroup" style="display: none;">
+            <div class="layui-input-block">
+                <textarea name="customDomains" placeholder="域名，一行一个" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        
+        <div class="layui-form-item" id="subDomainsGroup" style="display: none;">
+            <div class="layui-input-block">
+                <textarea name="subDomains" placeholder="子域名，一行一个" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" name="status" lay-verify="required" value="1" lay-value="1"
+                       lay-skin="switch" lay-text="开启|关闭" checked>
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="text-align: left;">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="proxyForm">立即创建</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="/static/assets/layui/layui.js"></script>
+<script src="/static/assets/js/ajax.js"></script>
+<script>
+    layui.use(['form', 'jquery', 'Rest'], function () {
+        const form = layui.form;
+        const Rest = layui.Rest;
+        const $ = layui.$;
+        //渲染客户端下拉框
+        Rest.get('/api/client/list').then(data => {
+            const $select = $('select[name="client"]');
+            const $submitBtn = $('button[lay-filter="proxyForm"]');
+            // 清空旧选项
+            $select.find('option:gt(0)').remove();
+            if (data.length > 0) {
+                // 动态添加新选项
+                data.forEach(function (item) {
+                    $select.append(
+                        '<option value="' + item.id + '|' + item.secretKey + '">' + item.name + '</option>'
+                    );
+                });
+                $select.val(data[0].id + '|' + data[0].secretKey);
+                $select.prop('disabled', false);
+                $submitBtn.removeClass('layui-btn-disabled').prop('disabled', false);
+            } else {
+                $select.prop('disabled', true);
+                $submitBtn.addClass('layui-btn-disabled').prop('disabled', true);
+                layer.msg('暂无可用客户端，请先创建客户端', {icon: 2, time: 5000});
+            }
+            form.render('select');
+        })
+        
+        // 域名类型切换逻辑
+        form.on('radio(domainType)', function(data) {
+            const domainType = data.value;
+            // 隐藏所有域名输入组
+            $('#customDomainsGroup').hide();
+            $('#subDomainsGroup').hide();
+            // 根据选择的类型显示对应输入组并设置autoDomain值
+            if (domainType === 'auto') {
+                $('input[name="autoDomain"]').val('true');
+            } else if (domainType === 'custom') {
+                $('input[name="autoDomain"]').val('false');
+                $('#customDomainsGroup').show();
+            } else if (domainType === 'sub') {
+                $('input[name="autoDomain"]').val('false');
+                $('#subDomainsGroup').show();
+            }
+        });
+        
+        form.on('submit(proxyForm)', function (data) {
+            const field = data.field;
+            const remotePort = field.remotePort
+            if (remotePort === undefined || remotePort === '' || remotePort === 0) {
+                field.remotePort = -1
+            }
+            if (field.client) {
+                const [clientId, secretKey] = field.client.split('|', 2);
+                field.clientId = Number(clientId) || 0;
+                field.secretKey = secretKey || '';
+                delete field.client;
+            }
+            field.status = field.status ? 1 : 0;
+            // 将domainType映射为数字值
+            if (field.domainType === 'auto') {
+                field.domainType = 0;
+            } else if (field.domainType === 'sub') {
+                field.domainType = 1;
+            } else if (field.domainType === 'custom') {
+                field.domainType = 2;
+            }
+            Rest.post('/api/proxy/add-https', field).then(data => {
+                layer.msg('创建成功', {icon: 1, time: 400,}, () => {
+                    const parentTable = parent.layui.table;
+                    parentTable.reload('proxy');
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            })
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

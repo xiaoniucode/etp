@@ -1,0 +1,15 @@
+spring:
+  mvc:
+    static-path-pattern: /**
+  web:
+    resources:
+      static-locations: classpath:/static/
+  profiles:
+    active: mysql
+logging:
+  level:
+    com.xiaoniucode.etp: debug
+server:
+  servlet:
+    context-path: /
+  port: 8081

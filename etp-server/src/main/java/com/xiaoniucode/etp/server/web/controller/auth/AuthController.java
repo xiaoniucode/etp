@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
  * @author liuxin
  */
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -22,12 +22,12 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping("/login")
+    @PostMapping("login")
     public Ajax login(@Valid @RequestBody LoginRequest param) {
         return Ajax.success(authService.login(param));
     }
 
-    @PostMapping("/logout")
+    @PostMapping("logout")
     public Ajax logout(@RequestHeader("Authorization") String auth) {
         if (StringUtils.hasText(auth) && auth.startsWith("Bearer ")) {
             authService.invalidateToken(auth.substring(7));

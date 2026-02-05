@@ -1,57 +1,48 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
-import com.xiaoniucode.etp.server.web.service.ClientService;
+import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.domain.Client;
 import com.xiaoniucode.etp.server.web.repository.ClientRepository;
+import com.xiaoniucode.etp.server.web.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class ClientServiceImpl implements ClientService {
 
     @Autowired
-    private ClientRepository clientsRepository;
+    private ClientRepository clientRepository;
 
     @Override
-    public Client getById(long id) {
-        return clientsRepository.findById((int) id).orElse(null);
+    public List<Client> findAll() {
+        return clientRepository.findAll();
     }
 
     @Override
-    public Client getByName(String name) {
-        return clientsRepository.findByName(name);
+    public Client findById(Integer id) {
+        return clientRepository.findById(id)
+                .orElseThrow(() -> new BizException("客户端不存在"));
     }
 
     @Override
-    public Client getBySecretKey(String secretKey) {
-        return null;
+    public void delete(Integer id) {
+        clientRepository.deleteById(id);
     }
 
     @Override
-    public List<Client> list() {
-        return clientsRepository.findAll();
+    public void deleteBatch(List<Integer> ids) {
+        clientRepository.deleteAllById(ids);
     }
 
     @Override
-    public boolean update(long id, String name) {
-        Client client = clientsRepository.findById((int) id).orElse(null);
-        if (client != null) {
-            client.setName(name);
-            clientsRepository.save(client);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean deleteById(long id) {
-        clientsRepository.deleteById((int) id);
-        return true;
-    }
-
-    @Override
-    public int count() {
-        return (int) clientsRepository.count();
+    public Client kickout(Integer id) {
+        Client client = findById(id);
+        client.setStatus(0); // 0 表示离线
+        return clientRepository.save(client);
     }
 }
+
+
+

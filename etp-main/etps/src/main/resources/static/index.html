@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>etp - 内网穿透</title>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="./assets/layui/css/layui.css" rel="stylesheet">
+    <link href="./assets/css/index.css" rel="stylesheet">
+    <link rel="icon" href="./assets/image/favicon.ico">
+    <link href="./assets/css/app.css" rel="stylesheet">
+</head>
+<body class="layui-layout-body">
+
+<div class="layui-layout layui-layout-admin">
+    <!-- 顶部 -->
+    <div class="layui-header">
+        <div class="layui-logo layui-bg-black">
+            <img src="./assets/image/logo.png" alt="ETP" style="width: 80px; height: 40px; border-radius: 4px;"
+                 onerror="this.style.display='none'">
+        </div>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a id="fullscreenBtn" href="javascript:;">
+                    <i class="layui-icon layui-icon-screen-full"></i> 全屏
+                </a>
+            </li>
+            <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
+                <a href="javascript:;">
+                    <img src="./assets/image/logo_white.png" class="layui-nav-img">
+                    <span id="username">加载中...</span>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd>
+                        <a id="openAccountSetting" href="javascript:;">
+                            <i class="layui-icon layui-icon-password"></i> 修改密码
+                        </a>
+                    </dd>
+                    <dd>
+                        <a id="logout" href="javascript:;">
+                            <i class="layui-icon layui-icon-logout"></i> 退出登录
+                        </a>
+                    </dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 左侧菜单 -->
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree" lay-filter="leftMenu">
+                <li class="layui-nav-item layui-this">
+                    <a href="javascript:;" data-url="/monitor/index.html"><i class="layui-icon layui-icon-console"></i>
+                        监控</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;" data-url="/proxy/tcp/index.html"><i class="layui-icon layui-icon-link"></i>
+                        TCP</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;" data-url="/proxy/http/index.html"><i class="layui-icon layui-icon-link"></i>
+                        HTTP</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;" data-url="/proxy/https/index.html"><i class="layui-icon layui-icon-link"></i>
+                        HTTPS</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;" data-url="/client/index.html"><i class="layui-icon layui-icon-app"></i> 客户端</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;" data-url="/access-token/index.html"><i class="layui-icon layui-icon-app"></i> 访问令牌</a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;" data-url="/stats/index.html"><i class="layui-icon layui-icon-chart"></i> 流量统计</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- 主体内容 -->
+    <div class="layui-body">
+        <iframe id="mainFrame" src="/monitor/index.html" frameborder="0"></iframe>
+    </div>
+</div>
+
+<script src="./assets/layui/layui.js"></script>
+<script src="./assets/js/ajax.js"></script>
+<script>
+    layui.use(['element', 'layer', 'jquery', 'Rest'], function () {
+        const Rest = layui.Rest;
+        const $ = layui.$;
+        
+        setLoginInfo();
+        initRoute();
+        
+        // 左侧菜单切换页面
+        $('.layui-nav-tree .layui-nav-item a').on('click', function () {
+            const url = $(this).data('url');
+            if (url && url !== '') {
+                $('#mainFrame').attr('src', url);
+                // 将当前页面URL存储到URL哈希中
+                window.location.hash = url;
+                // 高亮当前菜单
+                $('.layui-nav-item').removeClass('layui-this');
+                $(this).parent().addClass('layui-this');
+            }
+        });
+        
+        $('#openAccountSetting').on('click', function () {
+            $('#mainFrame').attr('src', '/account.html');
+            window.location.hash = '/account.html';
+        });
+
+        $('#logout').on('click', function () {
+            Rest.delete('/api/user/logout').then(data => {
+                localStorage.removeItem("user")
+                localStorage.removeItem("auth_token")
+                layer.msg('退出成功', {icon: 1, time: 1000}, function () {
+                    window.location.href = '/login.html';
+                });
+            })
+
+        });
+
+        // 全屏功能
+        $('#fullscreenBtn').on('click', function () {
+            toggleFullscreen();
+        });
+
+        // 监听全屏状态变化
+        document.addEventListener('fullscreenchange', function () {
+            updateFullscreenButton();
+        });
+        document.addEventListener('webkitfullscreenchange', function () {
+            updateFullscreenButton();
+        });
+        document.addEventListener('mozfullscreenchange', function () {
+            updateFullscreenButton();
+        });
+        document.addEventListener('MSFullscreenChange', function () {
+            updateFullscreenButton();
+        });
+
+        // 切换全屏
+        function toggleFullscreen() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+                // 进入全屏
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.mozRequestFullScreen) {
+                    document.documentElement.mozRequestFullScreen();
+                } else if (document.documentElement.msRequestFullscreen) {
+                    document.documentElement.msRequestFullscreen();
+                }
+            } else {
+                // 退出全屏
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // 更新全屏按钮状态
+        function updateFullscreenButton() {
+            const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+            const fullscreenBtn = $('#fullscreenBtn');
+            if (isFullscreen) {
+                fullscreenBtn.html('<i class="layui-icon layui-icon-screen-restore"></i> 退出全屏');
+            } else {
+                fullscreenBtn.html('<i class="layui-icon layui-icon-screen-full"></i> 全屏');
+            }
+        }
+
+        function setLoginInfo() {
+            try {
+                const userStr = localStorage.getItem("user");
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    if (user && user.username) {
+                        $("#username").text(user.username);
+                    }
+                }
+            } catch (e) {
+                console.warn("解析用户信息失败", e);
+            }
+        }
+        
+        // 初始化路由，从URL哈希恢复当前页面
+        function initRoute() {
+            const hash = window.location.hash;
+            if (hash && hash.length > 1) {
+                // 从哈希中获取页面URL
+                const targetUrl = hash.substring(1);
+                $('#mainFrame').attr('src', targetUrl);
+                // 高亮对应的菜单
+                highlightMenuByUrl(targetUrl);
+            }
+        }
+        
+        // 根据URL高亮对应的菜单
+        function highlightMenuByUrl(url) {
+            $('.layui-nav-item').removeClass('layui-this');
+            $('.layui-nav-item a').each(function() {
+                const itemUrl = $(this).data('url');
+                if (itemUrl === url) {
+                    $(this).parent().addClass('layui-this');
+                    return false;
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

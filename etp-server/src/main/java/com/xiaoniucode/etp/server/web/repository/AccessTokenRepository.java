@@ -14,9 +14,6 @@ import java.util.Set;
 @Repository
 public interface AccessTokenRepository extends JpaRepository<AccessToken, Integer> {
     
-    /**
-     * 根据token查询访问令牌
-     */
     AccessToken findByToken(String token);
 
     List<AccessToken> findByTokenIn(List<String> tokens);

@@ -1,5 +1,9 @@
 package com.xiaoniucode.etp.server.web.manager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,29 +16,18 @@ import java.util.concurrent.TimeUnit;
  *
  * @author liuxin
  */
+@Component
 public class CaptchaManager {
-    private static final Map<String, CaptchaEntry> cache = new ConcurrentHashMap<>();
-    private static final ScheduledExecutorService CLEANER = Executors.newSingleThreadScheduledExecutor();
+    private final Logger logger = LoggerFactory.getLogger(CaptchaManager.class);
+    private final Map<String, CaptchaEntry> cache = new ConcurrentHashMap<>();
 
-    static {
-        // 每分钟清理一次过期验证码
-        CLEANER.scheduleAtFixedRate(() -> {
-            long now = System.currentTimeMillis();
-            cache.entrySet().removeIf(entry -> entry.getValue().expireAt <= now);
-        }, 1, 1, TimeUnit.MINUTES);
+    public Map<String, CaptchaEntry> getCaches() {
+        return cache;
     }
-
-    /**
-     * @param code     验证码文字
-     * @param expireAt 过期时间戳
-     */
-    private record CaptchaEntry(String code, long expireAt) {
-    }
-
     /**
      * 存放验证码，返回一个唯一的 captchaId
      */
-    public static String put(String code, int expireSeconds) {
+    public String add(String code, int expireSeconds) {
         String captchaId = UUID.randomUUID().toString().replaceAll("-", "");
         cache.put(captchaId, new CaptchaEntry(code.toUpperCase(), System.currentTimeMillis() + expireSeconds * 1000L));
         return captchaId;
@@ -43,7 +36,7 @@ public class CaptchaManager {
     /**
      * 校验并删除（一次性）
      */
-    public static boolean verifyAndRemove(String captchaId, String userInput) {
+    public boolean verifyAndRemove(String captchaId, String userInput) {
         if (captchaId == null || userInput == null) {
             return false;
         }
@@ -51,17 +44,17 @@ public class CaptchaManager {
         if (entry == null) {
             return false;
         }
-        return entry.code.equalsIgnoreCase(userInput.trim());
+        return entry.code().equalsIgnoreCase(userInput.trim());
     }
 
     /**
      * 只校验（不删除），允许重复校验
      */
-    public static boolean verify(String captchaId, String userInput) {
+    public boolean verify(String captchaId, String userInput) {
         CaptchaEntry entry = cache.get(captchaId);
         if (entry == null) {
             return false;
         }
-        return entry.code.equalsIgnoreCase(userInput.trim());
+        return entry.code().equalsIgnoreCase(userInput.trim());
     }
 }

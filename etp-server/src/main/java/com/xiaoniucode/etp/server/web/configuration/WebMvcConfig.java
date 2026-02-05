@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.web.configuration;
 import com.xiaoniucode.etp.server.web.security.AuthInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -18,10 +19,21 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 配置静态资源映射
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("classpath:/static/");
+        
+        // 配置根路径直接访问静态资源
+        registry.addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/")
+                .resourceChain(true);
+    }
+
+    @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // 注册认证拦截器，拦截所有路径
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/user/login", "/login.html", "/captcha", "/layui/**");
+                .excludePathPatterns("/api/auth/login", "/login.html", "/api/captcha", "/layui/**", "/assets/**", "/static/**");
     }
 }

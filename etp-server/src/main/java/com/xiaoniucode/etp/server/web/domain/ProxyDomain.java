@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.web.domain;
 
+import com.xiaoniucode.etp.core.enums.DomainType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,9 @@ public class ProxyDomain {
     
     @Column(name = "domain", nullable = false)
     private String domain;
+    @Convert(converter = DomainTypeConverter.class)
+    @Column(name = "domain_type", nullable = false)
+    private DomainType domainType;
     
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp

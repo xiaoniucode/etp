@@ -36,8 +36,8 @@ protocol = "tcp"
 localPort = 3306
 remotePort = 3307
 status = 1
-encrypt = true
-compress = true
+encrypt = false
+compress = false
 
 [[proxies]]
 name = "redis"

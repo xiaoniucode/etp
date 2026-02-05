@@ -15,14 +15,10 @@ import org.springframework.web.bind.annotation.*;
  * @author liuxin
  */
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
     @Autowired
     private UserService userService;
-
-
-
-
     @GetMapping("/profile")
     public Ajax getProfile() {
         return Ajax.success();

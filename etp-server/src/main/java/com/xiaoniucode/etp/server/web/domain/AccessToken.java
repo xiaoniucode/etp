@@ -18,15 +18,15 @@ public class AccessToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
-    @Column(name = "name")
+
+    @Column(name = "name", nullable = false)
     private String name;
-    
+
     @Column(name = "token", nullable = false)
     private String token;
-    
-    @Column(name = "max_client")
-    private Integer maxClient;
+
+    @Column(name = "max_client", nullable = false)
+    private Integer maxClient = 0;
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>客户端管理</title>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/assets/layui/css/layui.css" rel="stylesheet">
+    <link href="/static/assets/css/app.css" rel="stylesheet">
+</head>
+<body>
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <div class="layui-row">
+                        <div class="layui-col-md6">
+                            <h3>客户端管理</h3>
+                        </div>
+                        <div class="layui-col-md6 text-right">
+                            <button class="layui-btn layui-btn-sm layui-btn-danger" id="deleteBatchBtn" disabled>
+                                <i class="layui-icon layui-icon-delete"></i> 批量删除
+                            </button>
+                            <button class="layui-btn layui-btn-sm" id="refreshBtn">
+                                <i class="layui-icon layui-icon-refresh-3"></i> 刷新
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="clientTable" lay-filter="clientTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="barTools">
+    <a class="layui-btn layui-btn-xs" lay-event="detail">详情</a>
+    <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="kickout" {{d.status !== 1 ? 'style="opacity: 0.5; pointer-events: none;"' : ''}}>剔除</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>
+</script>
+
+<script src="/static/assets/layui/layui.js"></script>
+<script src="/static/assets/js/ajax.js"></script>
+<script>
+    layui.use(['table', 'layer', 'jquery', 'Rest'], function () {
+        const table = layui.table;
+        const layer = layui.layer;
+        const $ = layui.$;
+        const Rest = layui.Rest;
+
+        // 渲染表格
+        const clientTable = table.render({
+            elem: '#clientTable',
+            url: '/api/client',
+            method: 'GET',
+            request: {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+                }
+            },
+            cols: [[
+                {type: 'checkbox', fixed: 'left'},
+                {field: 'name', title: '名称'},
+                {field: 'clientId', title: '客户端ID'},
+                {field: 'os', title: '操作系统'},
+                {field: 'arch', title: '架构'},
+                {field: 'version', title: '版本'},
+                {field: 'status', title: '状态' ,templet: function(d) {
+                    return d.status === 1 ? '<span style="color: #52c41a;">在线</span>' : '<span style="color: #999;">离线</span>';
+                }},
+                {title: '操作', width: 250, toolbar: '#barTools', fixed: 'right'}
+            ]],
+            page: false,
+            loading: true,
+            text: {
+                none: '暂无客户端数据'
+            }
+        });
+
+        // 复选框事件
+        table.on('checkbox(clientTable)', function (obj) {
+            const checkStatus = table.checkStatus('clientTable');
+            const checkedCount = checkStatus.data.length;
+            $('#deleteBatchBtn').prop('disabled', checkedCount === 0);
+        });
+
+        // 工具栏事件
+        table.on('tool(clientTable)', function (obj) {
+            const data = obj.data;
+            if (obj.event === 'detail') {
+                // 详情事件
+                const detailHtml = `
+                    <div style="padding: 20px;">
+                        <table class="layui-table">
+                            <tr>
+                                <th width="120">ID</th>
+                                <td>${data.id}</td>
+                            </tr>
+                            <tr>
+                                <th>名称</th>
+                                <td>${data.name}</td>
+                            </tr>
+                            <tr>
+                                <th>客户端ID</th>
+                                <td>${data.clientId}</td>
+                            </tr>
+                            <tr>
+                                <th>操作系统</th>
+                                <td>${data.os}</td>
+                            </tr>
+                            <tr>
+                                <th>架构</th>
+                                <td>${data.arch}</td>
+                            </tr>
+                            <tr>
+                                <th>版本</th>
+                                <td>${data.version}</td>
+                            </tr>
+                            <tr>
+                                <th>状态</th>
+                                <td>${data.status === 1 ? '在线' : '离线'}</td>
+                            </tr>
+                            <tr>
+                                <th>创建时间</th>
+                                <td>${data.createdAt}</td>
+                            </tr>
+                            <tr>
+                                <th>更新时间</th>
+                                <td>${data.updatedAt}</td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+                layer.open({
+                    title: '客户端详情',
+                    type: 1,
+                    offset: '30px',
+                    shade: false,
+                    area: ['500px', 'auto'],
+                    content: detailHtml
+                });
+            } else if (obj.event === 'kickout') {
+                // 剔除事件
+                layer.confirm('确定剔除「' + data.name + '」客户端吗？', {
+                    icon: 2,
+                    title: '危险操作确认',
+                    skin: 'layui-layer-molv',
+                    btn: ['确认', '再想想'],
+                }, function (index) {
+                    Rest.put('/api/client/' + data.id + '/kickout').then(res => {
+                        clientTable.reload();
+                        layer.msg("剔除成功", {time: 2000});
+                    });
+                    layer.close(index);
+                });
+            } else if (obj.event === 'delete') {
+                // 删除事件
+                layer.confirm('确定删除「' + data.name + '」客户端吗？', {
+                    icon: 2,
+                    title: '危险操作确认',
+                    skin: 'layui-layer-molv',
+                    btn: ['确认删除', '我再想想'],
+                }, function (index) {
+                    Rest.delete('/api/client/' + data.id).then(res => {
+                        clientTable.reload();
+                        layer.msg("删除成功", {time: 2000});
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+
+        // 批量删除按钮事件
+        $('#deleteBatchBtn').on('click', function () {
+            const checkStatus = table.checkStatus('clientTable');
+            const checkedData = checkStatus.data;
+            if (checkedData.length === 0) {
+                layer.msg('请选择要删除的客户端', {icon: 2});
+                return;
+            }
+
+            const ids = checkedData.map(item => item.id);
+            const names = checkedData.map(item => item.name).join('、');
+
+            layer.confirm('确定删除选中的客户端：「' + names + '」吗？', {
+                icon: 2,
+                title: '危险操作确认',
+                skin: 'layui-layer-molv',
+                btn: ['确认删除', '我再想想'],
+            }, function (index) {
+                Rest.delete('/api/client', ids).then(res => {
+                    clientTable.reload();
+                    $('#deleteBatchBtn').prop('disabled', true);
+                    layer.msg("删除成功", {time: 2000});
+                });
+                layer.close(index);
+            });
+        });
+
+        // 刷新按钮事件
+        $('#refreshBtn').on('click', function () {
+            clientTable.reload();
+            $('#deleteBatchBtn').prop('disabled', true);
+            layer.msg('刷新成功', {time: 1000});
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>编辑映射</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/assets/layui/css/layui.css" rel="stylesheet">
+    <link href="/static/assets/css/app.css" rel="stylesheet">
+</head>
+<body>
+<div class="layui-container" style="padding-top: 15px">
+    <form class="layui-form layui-form-pane" action="" lay-filter="editForm">
+        <div class="layui-form-item">
+            <label class="layui-form-label">客户端</label>
+            <div class="layui-input-inline">
+                <select name="client" lay-filter="clientSelect" disabled>
+                    <option value="">请选择客户端</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">隧道名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" autocomplete="off" placeholder="请输入隧道名称" lay-verify="required"
+                       class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">内网IP</label>
+                <div class="layui-input-block">
+                    <input type="text" name="localIP" value="127.0.0.1" autocomplete="off" placeholder="默认: 127.0.0.1"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">内网端口</label>
+                <div class="layui-input-inline">
+                    <input type="number" lay-verify="required" placeholder="请输入" name="localPort" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">公网端口</label>
+            <div class="layui-input-inline">
+                <input type="number" lay-verify="number" placeholder="不填自动分配" name="remotePort"
+                       id="remotePort" autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" name="status" value="1" lay-value="1"
+                       lay-skin="switch" lay-text="开启|关闭" checked>
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="text-align: left;">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="proxyForm">保存更新</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="/static/assets/layui/layui.js"></script>
+<script src="/static/assets/js/ajax.js"></script>
+<script>
+    function getQueryParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return decodeURIComponent(r[2]);
+        return null;
+    }
+
+    layui.use(['form', 'jquery', 'Rest'], function () {
+        const form = layui.form;
+        const Rest = layui.Rest;
+        const $ = layui.$;
+        const proxyId = getQueryParam("id")
+        var clientList = [];
+        //渲染下拉框
+        Rest.get('/api/client/list').then(data => {
+            clientList = data || [];
+            const $select = $('select[name="client"]');
+            $select.find('option:gt(0)').remove();
+            clientList.forEach(function (item) {
+                $select.append(
+                    '<option value="' + item.id + '|' + item.secretKey + '">' +
+                    item.name + '</option>'
+                );
+            });
+            form.render('select');
+        })
+        //渲染表单详情
+        Rest.get('/api/proxy/get?id=' + proxyId).then(data => {
+            form.val('editForm', data);
+            const targetClient = clientList.find(function (item) {
+                return item.id === data.clientId;
+            });
+            if (targetClient) {
+                const fullValue = targetClient.id + '|' + targetClient.secretKey;
+                $('select[name="client"]').val(fullValue);
+                form.render('select');
+            }
+        })
+        //保存数据
+        form.on('submit(proxyForm)', function (data) {
+            const field = data.field;
+            if (field.client) {
+                const [clientId, secretKey] = field.client.split('|', 2);
+                field.clientId = Number(clientId) || 0;
+                field.secretKey = secretKey || '';
+                delete field.client;
+            }
+            field.id = proxyId
+            field.status = field.status ? 1 : 0;
+            Rest.put('/api/proxy/update-tcp', field).then(data => {
+                layer.msg('更新成功', {icon: 1, time: 400,}, () => {
+                    const parentTable = parent.layui.table;
+                    parentTable.reload('proxy');
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            })
+            return false;
+        });
+    });
+</script>
+
+</body>
+</html>

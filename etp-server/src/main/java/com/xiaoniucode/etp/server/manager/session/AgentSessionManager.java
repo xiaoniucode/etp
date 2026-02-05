@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.manager.session;
 
+import com.xiaoniucode.etp.common.utils.DateUtils;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
@@ -165,15 +166,20 @@ public class AgentSessionManager {
         }
         AgentSession agentSession = sessionIdToAgentSession.get(sessionId);
         if (agentSession != null) {
-            agentSession.setLastHeartbeat(System.currentTimeMillis());
+            long before = agentSession.getLastHeartbeat();
+            long current = System.currentTimeMillis();
+            agentSession.setLastHeartbeat(current);
             if (logger.isDebugEnabled()) {
-                logger.debug("更新代理客户端最后心跳时间 - 客户端ID={} - 会话标识={}", agentSession.getClientId(),sessionId);
+                String beforeStr = DateUtils.formatTimestamp(before);
+                String currentStr = DateUtils.formatTimestamp(current);
+                logger.debug("更新客户端连接最后心跳时间 - [客户端ID={}，上次={}，本次={}]", agentSession.getClientId(), beforeStr, currentStr);
             }
         }
     }
 
     /**
      * 获取所有客户端会话信息
+     *
      * @return 客户端会话列表
      */
     public Collection<AgentSession> getAllAgentSessions() {

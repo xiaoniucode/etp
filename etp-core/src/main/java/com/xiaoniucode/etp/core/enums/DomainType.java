@@ -10,14 +10,24 @@ public enum DomainType {
         this.description = description;
     }
 
-    private final int type;
+    private final Integer type;
     private final String description;
+    public static DomainType fromType(Integer type) {
+        for (DomainType domainType : values()) {
+            if (domainType.getType().equals(type)) {
+                return domainType;
+            }
+        }
+        throw new IllegalArgumentException("Unknown domain type: " + type);
+    }
 
-    public int getType() {
+    public Integer getType() {
         return type;
     }
 
     public String getDescription() {
         return description;
     }
+
+
 }

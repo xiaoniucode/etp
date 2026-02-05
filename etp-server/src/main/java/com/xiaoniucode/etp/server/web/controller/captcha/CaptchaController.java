@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.server.web.common.CaptchaGenerator;
 import com.xiaoniucode.etp.server.web.controller.captcha.resp.Captcha;
 import com.xiaoniucode.etp.server.web.manager.CaptchaManager;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -13,14 +14,16 @@ import org.springframework.web.bind.annotation.*;
  * @author liuxin
  */
 @RestController
-@RequestMapping("/captcha")
+@RequestMapping("/api/captcha")
 public class CaptchaController {
+    @Autowired
+    private CaptchaManager captchaManager;
     @GetMapping
     public Ajax generateCaptcha(HttpSession session) {
         try {
             CaptchaGenerator generator = new CaptchaGenerator();
             String code = generator.generateCaptcha();
-            String captchaId = CaptchaManager.put(code, 120);
+            String captchaId = captchaManager.add(code, 120);
             session.setAttribute("captchaId", captchaId);
             return Ajax.success(new Captcha(captchaId,code));
         } catch (Exception e) {

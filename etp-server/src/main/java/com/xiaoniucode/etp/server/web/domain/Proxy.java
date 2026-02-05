@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.web.domain;
 
+import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import jakarta.persistence.*;
@@ -37,6 +38,11 @@ public class Proxy {
 
     @Column(name = "local_ip", nullable = false)
     private String localIp;
+    /**
+     * 仅SUB和AUTO 类型域名需要
+     */
+    @Column(name = "base_domain")
+    private String baseDomain;
 
     @Column(name = "local_port", nullable = false)
     private Integer localPort;
@@ -48,8 +54,9 @@ public class Proxy {
     @Convert(converter = ProxyStatusConverter.class)
     private ProxyStatus status;
 
-    @Column(name = "domain_type")
-    private Integer domainType;
+    @Convert(converter = DomainTypeConverter.class)
+    @Column(name = "domain_type", nullable = false)
+    private DomainType domainType;
     /**
      * 是否加密
      */
@@ -60,7 +67,6 @@ public class Proxy {
      */
     @Column(name = "compress", nullable = false)
     private Boolean compress;
-
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;

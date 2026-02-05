@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>ETP 内网穿透管理平台 - 登录</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/assets/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/assets/css/login.css">
+    <link rel="icon" href="/static/assets/image/favicon.ico">
+    <link href="/static/assets/css/app.css" rel="stylesheet">
+</head>
+<body>
+<div class="bg-animation"></div>
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="login-header">
+            <h2>ETP 内网穿透</h2>
+            <p>Easy Tunnel Proxy</p>
+        </div>
+
+        <div class="login-body">
+            <form class="layui-form">
+
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <i class="layui-icon layui-icon-username"></i>
+                        </div>
+                        <input type="text" name="username" lay-verify="required" placeholder="用户名"
+                               autocomplete="off"
+                               class="layui-input" lay-affix="clear">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <i class="layui-icon layui-icon-password"></i>
+                        </div>
+                        <input type="password" name="password" lay-verify="required" placeholder="密码"
+                               autocomplete="off" class="layui-input" lay-affix="eye">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-row">
+                        <div class="layui-col-xs7">
+                            <div class="layui-input-wrap">
+                                <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-vercode"></i>
+                                </div>
+                                <input type="text" name="captcha" lay-verify="required" placeholder="验证码"
+                                       autocomplete="off" class="layui-input" lay-affix="clear">
+                            </div>
+                        </div>
+                        <div class="layui-col-xs5">
+                            <div style="margin-left: 10px;">
+                                <canvas id="captchaCanvas" width="120" height="40"
+                                        class="captcha-img"
+                                        style="border:1px solid #e6e6e6;border-radius:6px;cursor:pointer;"
+                                        title="点击刷新"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="demo-login">
+                        立即登录
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/static/assets/layui/layui.js"></script>
+<script src="/static/assets/js/ajax.js"></script>
+<script>
+    layui.use(['form', 'layer', 'jquery', 'Rest'], function () {
+        var form = layui.form;
+        var Rest = layui.Rest;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+        let captchaId = '';
+
+        function setToken(token) {
+            if (token) localStorage.setItem('auth_token', token);
+        }
+
+        function setUser(userId, username) {
+            localStorage.setItem('user', JSON.stringify({userId, username}));
+        }
+
+        // 绘制验证码
+        function drawCaptcha(code) {
+            const canvas = document.getElementById('captchaCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            for (let i = 0; i < 6; i++) {
+                ctx.strokeStyle = `rgb(${100 + Math.random() * 100 | 0}, ${100 + Math.random() * 100 | 0}, ${100 + Math.random() * 100 | 0})`;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(Math.random() * w, Math.random() * h);
+                ctx.lineTo(Math.random() * w, Math.random() * h);
+                ctx.stroke();
+            }
+
+            ctx.font = 'bold 26px Arial';
+            ctx.textBaseline = 'middle';
+            for (let i = 0; i < code.length; i++) {
+                const x = 15 + i * 26;
+                const y = h / 2;
+                const angle = (Math.random() - 0.5) * 0.6;
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle);
+                ctx.fillStyle = `hsl(${i * 60}, 70%, 40%)`;
+                ctx.fillText(code[i].toUpperCase(), 0, 0);
+                ctx.restore();
+            }
+
+            for (let i = 0; i < 40; i++) {
+                ctx.fillStyle = `rgb(${Math.random() * 255 | 0}, ${Math.random() * 255 | 0}, ${Math.random() * 255 | 0})`;
+                ctx.fillRect(Math.random() * w, Math.random() * h, 2, 2);
+            }
+        }
+
+        // 刷新验证码
+        function refreshCaptcha() {
+            Rest.get('/api/captcha').then(data => {
+                captchaId = data.captchaId;
+                drawCaptcha(data.code);
+            })
+        }
+
+        // 页面加载、点击刷新
+        $(function () {
+            refreshCaptcha();
+            $('#captchaCanvas').on('click', refreshCaptcha);
+        });
+
+        //登录提交
+        form.on('submit(demo-login)', function (data) {
+            var field = data.field;
+            const loginBody = {
+                username: field.username,
+                password: field.password,
+                captchaId: captchaId,
+                code: field.captcha
+            }
+            Rest.post('/api/auth/login', loginBody).then(data => {
+                setToken(data.auth_token);
+                setUser(data.userId, data.username);
+                layer.msg('登录成功', {icon: 1, time: 1000}, function () {
+                    location.href = '/index.html';
+                });
+            }).catch(err => {
+                refreshCaptcha();
+            })
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

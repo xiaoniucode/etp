@@ -18,7 +18,6 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
     @Override
     public LoginToken login(LoginRequest req) {
-
         String username = req.getUsername();
         String password = req.getPassword();
         User user = userRepository.findByUsername(username);

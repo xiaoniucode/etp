@@ -63,7 +63,7 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
             @Override
             public void onChannelInactive(Channel channel, Channel peer) {
                 if (executed.compareAndSet(false, true)) {
-                    logger.debug("会话连接断开，释放资源");
+                    logger.debug("访问者连接断开，释放资源");
                     visitorSessionManager.disconnect(visitor, session -> {
                         Channel tunnel = session.getTunnel();
                         Message.ControlMessage message = MessageWrapper

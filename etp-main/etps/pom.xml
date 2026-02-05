@@ -18,6 +18,7 @@
             <artifactId>etp-server</artifactId>
             <version>0.5.1</version>
         </dependency>
+
     </dependencies>
     <build>
         <plugins>
