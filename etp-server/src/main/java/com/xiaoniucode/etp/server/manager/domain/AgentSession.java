@@ -29,13 +29,14 @@ public class AgentSession {
     private long lastHeartbeat;
 
 
-    public AgentSession(String clientId, String token, Channel control, String sessionId, String arch, String os,String version) {
+    public AgentSession(String clientId, ClientType clientType, String token, Channel control, String sessionId, String arch, String os, String version) {
         this.clientId = clientId;
+        this.clientType = clientType;
         this.token = token;
         this.control = control;
         this.sessionId = sessionId;
         this.arch = arch;
         this.os = os;
-        this.version=version;
+        this.version = version;
     }
 }

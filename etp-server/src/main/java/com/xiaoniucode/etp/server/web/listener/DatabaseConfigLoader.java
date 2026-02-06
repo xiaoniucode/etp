@@ -1,7 +1,6 @@
 package com.xiaoniucode.etp.server.web.listener;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.config.AppConfig;
@@ -118,9 +117,9 @@ public class DatabaseConfigLoader implements EventListener<TunnelServerStartingE
         int skipCount = 0;
         logger.debug("从数据库查询到 {} 个客户端配置", clients.size());
         for (Client client : clients) {
-            if (clientManager.hasClient(client.getClientId())) {
+            if (clientManager.hasClient(client.getId())) {
                 skipCount++;
-                logger.warn("客户端缓存失败，已存在相同客户端 - 客户端ID：{}", client.getClientId());
+                logger.warn("客户端缓存失败，已存在相同客户端 - 客户端ID：{}", client.getId());
                 continue;
             }
             ClientInfo clientInfo = new ClientInfo();
@@ -131,7 +130,7 @@ public class DatabaseConfigLoader implements EventListener<TunnelServerStartingE
             clientInfo.setVersion(clientInfo.getVersion());
             clientManager.addClient(clientInfo);
             successCount++;
-            logger.debug("加载客户端配置到缓存：[客户端ID={}，客户端名字={}]", client.getClientId(), client.getName());
+            logger.debug("加载客户端配置到缓存：[客户端ID={}，客户端名字={}]", client.getId(), client.getName());
         }
         logger.debug("客户端配置加载完成。成功: {}, 跳过: {}, 总计: {}",
                 successCount, skipCount, total);

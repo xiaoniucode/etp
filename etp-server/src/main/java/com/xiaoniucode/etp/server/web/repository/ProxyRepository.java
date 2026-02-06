@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.web.repository;
 
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.web.domain.Proxy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -25,7 +26,7 @@ public interface ProxyRepository extends JpaRepository<Proxy, Integer> {
     /**
      * 根据类型查询代理
      */
-    List<Proxy> findByProtocol(String protocol);
+    List<Proxy> findByProtocol(ProtocolType protocol);
     
     /**
      * 根据状态查询代理

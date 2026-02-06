@@ -65,12 +65,27 @@
             </div>
         </div>
         <div class="layui-form-item" pane>
+            <label class="layui-form-label">压缩传输</label>
+            <div class="layui-input-block">
+                <input type="radio" name="AAA" value="1" title="是">
+                <input type="radio" name="AAA" value="2" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">隧道加密</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="AAA" value="1" title="是">
+                <input type="radio" name="AAA" value="2" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
             <label class="layui-form-label">状态</label>
             <div class="layui-input-inline">
                 <input type="checkbox" name="status" lay-verify="required" value="1" lay-value="1"
                        lay-skin="switch" lay-text="开启|关闭" checked>
             </div>
         </div>
+
 
         <div class="layui-form-item" style="text-align: left;">
             <div class="layui-input-block">
@@ -130,31 +145,65 @@
         
         form.on('submit(proxyForm)', function (data) {
             const field = data.field;
-            const remotePort = field.remotePort
-            if (remotePort === undefined || remotePort === '' || remotePort === 0) {
-                field.remotePort = -1
-            }
             if (field.client) {
                 const [clientId, secretKey] = field.client.split('|', 2);
                 field.clientId = Number(clientId) || 0;
-                field.secretKey = secretKey || '';
                 delete field.client;
             }
-            field.status = field.status ? 1 : 0;
-            // 将domainType映射为数字值
-            if (field.domainType === 'auto') {
-                field.domainType = 0;
-            } else if (field.domainType === 'sub') {
-                field.domainType = 1;
-            } else if (field.domainType === 'custom') {
-                field.domainType = 2;
-            }
-            Rest.post('/api/proxy/add-http', field).then(data => {
-                layer.msg('创建成功', {icon: 1, time: 400,}, () => {
-                    const parentTable = parent.layui.table;
-                    parentTable.reload('proxy');
-                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+            
+            // 构建代理对象
+            const proxy = {
+                clientId: field.clientId,
+                name: field.name,
+                protocol: 'HTTP',
+                source: 0, // 手动添加
+                localIp: field.localIP || '127.0.0.1',
+                localPort: Number(field.localPort),
+                remotePort: null,
+                status: field.status ? 'ACTIVE' : 'INACTIVE',
+                domainType: field.domainType.toUpperCase(),
+                encrypt: false,
+                compress: false
+            };
+            
+            // 构建域名列表
+            const domains = [];
+            if (field.domainType === 'sub' && field.subDomains) {
+                const subDomainList = field.subDomains.split('\n').filter(domain => domain.trim());
+                subDomainList.forEach(domain => {
+                    domains.push({
+                        domain: domain.trim(),
+                        domainType: 'SUB'
+                    });
                 });
+            } else if (field.domainType === 'custom' && field.customDomains) {
+                const customDomainList = field.customDomains.split('\n').filter(domain => domain.trim());
+                customDomainList.forEach(domain => {
+                    domains.push({
+                        domain: domain.trim(),
+                        domainType: 'CUSTOM'
+                    });
+                });
+            }
+            
+            // 发送请求
+            fetch('/proxies/http', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+                },
+                body: JSON.stringify({proxy: proxy, domains: domains})
+            }).then(response => response.json()).then(data => {
+                if (data.code === 0) {
+                    layer.msg('创建成功', {icon: 1, time: 400,}, () => {
+                        const parentTable = parent.layui.table;
+                        parentTable.reload('proxy');
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    });
+                } else {
+                    layer.msg(data.msg || '创建失败', {icon: 2});
+                }
             })
             return false;
         });

@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.handler.message;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
+import com.xiaoniucode.etp.server.enums.ClientType;
 import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import com.xiaoniucode.etp.server.manager.AccessTokenManager;
@@ -33,10 +34,11 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
         Message.Login login = msg.getLogin();
         String clientId = login.getClientId();
         String token = login.getToken();
+
         boolean hasToken = accessTokenManager.hasToken(token);
         if (!hasToken) {
             logger.error("客户端 - {} 认证失败，无效令牌：{}", clientId, token);
-            ControlMessage message = MessageWrapper.buildErrorMessage(401, "认证失败，无效令牌: "+token);
+            ControlMessage message = MessageWrapper.buildErrorMessage(401, "认证失败，无效令牌: " + token);
             control.writeAndFlush(message).addListener(future -> {
                 if (future.isSuccess()) {
                     control.close();
@@ -59,8 +61,14 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
             });
             return;
         }
+        ClientType type = null;
+        Message.ClientType clientType = login.getClientType();
+        switch (clientType) {
+            case WEB_SESSION -> type = ClientType.WEB_SESSION;
+            case BINARY_DEVICE -> type = ClientType.BINARY_DEVICE;
+        }
         //创建代理客户端会话上下文
-        agentSessionManager.createAgentSession(clientId, token, control, login.getArch(), login.getOs(), login.getVersion())
+        agentSessionManager.createAgentSession(clientId, type, token, control, login.getArch(), login.getOs(), login.getVersion())
                 .ifPresent(session -> {
                     //返回登陆成功消息
                     ControlMessage message = MessageWrapper.buildLoginResp(session.getSessionId());

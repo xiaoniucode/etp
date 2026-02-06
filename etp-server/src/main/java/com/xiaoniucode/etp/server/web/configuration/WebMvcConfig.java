@@ -24,10 +24,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");
         
-        // 配置根路径直接访问静态资源
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/")
-                .resourceChain(true);
+                .resourceChain(false);
     }
 
     @Override

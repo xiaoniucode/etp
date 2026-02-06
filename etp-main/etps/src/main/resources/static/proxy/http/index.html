@@ -44,7 +44,7 @@
             elem: '#proxy',
             text: "空空如也",
             skin: "line",
-            url: '/api/proxy/list?type=http',
+            url: '/api/proxies/http',
             toolbar: '#headerToobar',
             cellMinWidth: 80,
             headers: {
@@ -82,11 +82,11 @@
                     }
                 },
                 {
-                    field: 'source', title: '映射来源', sort: true, templet: function (d) {
-                        if (d.source === 1) {
-                            return ' <span class="layui-badge layui-bg-orange">自动注册</span>';
-                        } else if (d.source === 0) {
-                            return '<span class="layui-badge layui-bg-green">手动添加</span>';
+                    field: 'source', title: '隧道类型', sort: true, templet: function (d) {
+                        if (d.source === 0) {
+                            return ' <span class="layui-badge layui-bg-orange">web_session</span>';
+                        } else if (d.source === 1) {
+                            return '<span class="layui-badge layui-bg-green">binary_device</span>';
                         }
                     }
                 },
@@ -105,7 +105,7 @@
                     type: 2,
                     offset: '30px',
                     shade: false,
-                    area: ['60%', '70%'],
+                    area: ['60%', '80%'],
                     content: '/proxy/http/edit.html?id=' + data.id
                 });
             } else if (obj.event === 'delete') {
@@ -116,20 +116,46 @@
                         skin: 'layui-layer-molv',
                         btn: ['确认删除', '我再想想'],
                     }, function (index) {
-                        Rest.delete('/api/proxy/del', {id: data.id, secretKey: data.secretKey}).then(data => {
-                            table.reload('proxy')
-                            layer.msg("删除成功", {time: 2000});
+                        fetch(`/proxies/${data.id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+                            }
+                        }).then(response => {
+                            if (response.ok) {
+                                table.reload('proxy');
+                                layer.msg("删除成功", {time: 2000});
+                            } else {
+                                layer.msg("删除失败", {icon: 2});
+                            }
                         })
                     })
 
             } else if (obj.event === 'statusSwitch') {
                 const loading = layer.msg('正在切换...', {icon: 16, shade: 0.3, time: 0});
-                Rest.put('/api/proxy/switch-proxy-status', {id: data.id, secretKey: data.secretKey}).then(data => {
+                fetch(`/proxies/${data.id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+                    }
+                }).then(response => response.json()).then(proxy => {
+                    proxy.status = proxy.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+                    return fetch(`/proxies/${data.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+                        },
+                        body: JSON.stringify({proxy: proxy, domains: []})
+                    });
+                }).then(response => {
                     layer.close(loading);
-                    layer.msg('切换成功', {icon: 1});
-                }).catch(err => {
-                    layer.msg("切换失败", {icon: 2});
-                    obj.update({status: data.status});//回滚状态
+                    if (response.ok) {
+                        table.reload('proxy');
+                        layer.msg('切换成功', {icon: 1});
+                    } else {
+                        layer.msg("切换失败", {icon: 2});
+                        obj.update({status: data.status});//回滚状态
+                    }
                 })
             } else if (obj.event === 'copyPort') {
                 const port = obj.data.remotePort + '';
@@ -146,7 +172,7 @@
                     type: 2,
                     offset: '30px',
                     shade: false,
-                    area: ['60%', '70%'],
+                    area: ['60%', '80%'],
                     content: '/proxy/http/add.html'
                 });
             } else if (obj.event === 'flush') {

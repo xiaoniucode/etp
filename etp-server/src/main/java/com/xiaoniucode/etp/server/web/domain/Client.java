@@ -16,11 +16,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Client {
+    /**
+     * 设备ID
+     */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    @Column(name = "clientId", nullable = false)
-    private String clientId;
+    @Column(name = "id", nullable = false)
+    private String id;
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "os", nullable = false)

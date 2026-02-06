@@ -359,6 +359,123 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     // @@protoc_insertion_point(enum_scope:com.xiaoniucode.etp.core.message.ProtocolType)
   }
 
+  /**
+   * Protobuf enum {@code com.xiaoniucode.etp.core.message.ClientType}
+   */
+  public enum ClientType
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>WEB_SESSION = 0;</code>
+     */
+    WEB_SESSION(0),
+    /**
+     * <code>BINARY_DEVICE = 1;</code>
+     */
+    BINARY_DEVICE(1),
+    UNRECOGNIZED(-1),
+    ;
+
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "ClientType");
+    }
+    /**
+     * <code>WEB_SESSION = 0;</code>
+     */
+    public static final int WEB_SESSION_VALUE = 0;
+    /**
+     * <code>BINARY_DEVICE = 1;</code>
+     */
+    public static final int BINARY_DEVICE_VALUE = 1;
+
+
+    public final int getNumber() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalArgumentException(
+            "Can't get the number of an unknown enum value.");
+      }
+      return value;
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static ClientType valueOf(int value) {
+      return forNumber(value);
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     */
+    public static ClientType forNumber(int value) {
+      switch (value) {
+        case 0: return WEB_SESSION;
+        case 1: return BINARY_DEVICE;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<ClientType>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        ClientType> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<ClientType>() {
+            public ClientType findValueByNumber(int number) {
+              return ClientType.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalStateException(
+            "Can't get the descriptor of an unrecognized enum value.");
+      }
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return com.xiaoniucode.etp.core.message.Message.getDescriptor().getEnumTypes().get(2);
+    }
+
+    private static final ClientType[] VALUES = values();
+
+    public static ClientType valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      if (desc.getIndex() == -1) {
+        return UNRECOGNIZED;
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private ClientType(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:com.xiaoniucode.etp.core.message.ClientType)
+  }
+
   public interface MessageHeaderOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.MessageHeader)
       com.google.protobuf.MessageOrBuilder {
@@ -902,6 +1019,22 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      */
     com.google.protobuf.ByteString
         getVersionBytes();
+
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+     * @return Whether the clientType field is set.
+     */
+    boolean hasClientType();
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+     * @return The enum numeric value on the wire for clientType.
+     */
+    int getClientTypeValue();
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+     * @return The clientType.
+     */
+    com.xiaoniucode.etp.core.message.Message.ClientType getClientType();
   }
   /**
    * Protobuf type {@code com.xiaoniucode.etp.core.message.Login}
@@ -930,6 +1063,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       token_ = "";
       clientId_ = "";
       version_ = "";
+      clientType_ = 0;
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -1165,6 +1299,31 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
 
+    public static final int CLIENTTYPE_FIELD_NUMBER = 6;
+    private int clientType_ = 0;
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+     * @return Whether the clientType field is set.
+     */
+    @java.lang.Override public boolean hasClientType() {
+      return ((bitField0_ & 0x00000008) != 0);
+    }
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+     * @return The enum numeric value on the wire for clientType.
+     */
+    @java.lang.Override public int getClientTypeValue() {
+      return clientType_;
+    }
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+     * @return The clientType.
+     */
+    @java.lang.Override public com.xiaoniucode.etp.core.message.Message.ClientType getClientType() {
+      com.xiaoniucode.etp.core.message.Message.ClientType result = com.xiaoniucode.etp.core.message.Message.ClientType.forNumber(clientType_);
+      return result == null ? com.xiaoniucode.etp.core.message.Message.ClientType.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1194,6 +1353,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (((bitField0_ & 0x00000004) != 0)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 5, version_);
       }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        output.writeEnum(6, clientType_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -1217,6 +1379,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       if (((bitField0_ & 0x00000004) != 0)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(5, version_);
+      }
+      if (((bitField0_ & 0x00000008) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(6, clientType_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -1252,6 +1418,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (!getVersion()
             .equals(other.getVersion())) return false;
       }
+      if (hasClientType() != other.hasClientType()) return false;
+      if (hasClientType()) {
+        if (clientType_ != other.clientType_) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -1278,6 +1448,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (hasVersion()) {
         hash = (37 * hash) + VERSION_FIELD_NUMBER;
         hash = (53 * hash) + getVersion().hashCode();
+      }
+      if (hasClientType()) {
+        hash = (37 * hash) + CLIENTTYPE_FIELD_NUMBER;
+        hash = (53 * hash) + clientType_;
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -1415,6 +1589,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         token_ = "";
         clientId_ = "";
         version_ = "";
+        clientType_ = 0;
         return this;
       }
 
@@ -1467,6 +1642,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           result.version_ = version_;
           to_bitField0_ |= 0x00000004;
         }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.clientType_ = clientType_;
+          to_bitField0_ |= 0x00000008;
+        }
         result.bitField0_ |= to_bitField0_;
       }
 
@@ -1506,6 +1685,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           version_ = other.version_;
           bitField0_ |= 0x00000010;
           onChanged();
+        }
+        if (other.hasClientType()) {
+          setClientTypeValue(other.getClientTypeValue());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -1558,6 +1740,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 bitField0_ |= 0x00000010;
                 break;
               } // case 42
+              case 48: {
+                clientType_ = input.readEnum();
+                bitField0_ |= 0x00000020;
+                break;
+              } // case 48
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -1952,6 +2139,64 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         checkByteStringIsUtf8(value);
         version_ = value;
         bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+
+      private int clientType_ = 0;
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+       * @return Whether the clientType field is set.
+       */
+      @java.lang.Override public boolean hasClientType() {
+        return ((bitField0_ & 0x00000020) != 0);
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+       * @return The enum numeric value on the wire for clientType.
+       */
+      @java.lang.Override public int getClientTypeValue() {
+        return clientType_;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+       * @param value The enum numeric value on the wire for clientType to set.
+       * @return This builder for chaining.
+       */
+      public Builder setClientTypeValue(int value) {
+        clientType_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+       * @return The clientType.
+       */
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.ClientType getClientType() {
+        com.xiaoniucode.etp.core.message.Message.ClientType result = com.xiaoniucode.etp.core.message.Message.ClientType.forNumber(clientType_);
+        return result == null ? com.xiaoniucode.etp.core.message.Message.ClientType.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+       * @param value The clientType to set.
+       * @return This builder for chaining.
+       */
+      public Builder setClientType(com.xiaoniucode.etp.core.message.Message.ClientType value) {
+        if (value == null) { throw new NullPointerException(); }
+        bitField0_ |= 0x00000020;
+        clientType_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearClientType() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        clientType_ = 0;
         onChanged();
         return this;
       }
@@ -12641,61 +12886,64 @@ java.lang.String defaultValue) {
       "\n\rmessage.proto\022 com.xiaoniucode.etp.cor" +
       "e.message\"L\n\rMessageHeader\022;\n\004type\030\001 \001(\016" +
       "2-.com.xiaoniucode.etp.core.message.Mess" +
-      "ageType\"~\n\005Login\022\017\n\002os\030\001 \001(\tH\000\210\001\001\022\021\n\004arc" +
-      "h\030\002 \001(\tH\001\210\001\001\022\r\n\005token\030\003 \001(\t\022\020\n\010clientId\030" +
-      "\004 \001(\t\022\024\n\007version\030\005 \001(\tH\002\210\001\001B\005\n\003_osB\007\n\005_a" +
-      "rchB\n\n\010_version\"\036\n\tLoginResp\022\021\n\tsessionI" +
-      "d\030\001 \001(\t\"\355\003\n\010NewProxy\022\014\n\004name\030\001 \001(\t\022\024\n\007lo" +
-      "calIp\030\002 \001(\tH\000\210\001\001\022\021\n\tlocalPort\030\003 \001(\005\022\023\n\006s" +
-      "tatus\030\004 \001(\005H\001\210\001\001\022\024\n\007encrypt\030\005 \001(\010H\002\210\001\001\022\025" +
-      "\n\010compress\030\006 \001(\010H\003\210\001\001\022@\n\010protocol\030\007 \001(\0162" +
-      "..com.xiaoniucode.etp.core.message.Proto" +
-      "colType\022\027\n\nremotePort\030\010 \001(\005H\004\210\001\001\022\027\n\nauto" +
-      "Domain\030\t \001(\010H\005\210\001\001\022\025\n\rcustomDomains\030\n \003(\t" +
-      "\022\022\n\nsubDomains\030\013 \003(\t\022J\n\010metadata\030\014 \003(\01328" +
-      ".com.xiaoniucode.etp.core.message.NewPro" +
-      "xy.MetadataEntry\032/\n\rMetadataEntry\022\013\n\003key" +
-      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\n\n\010_localIpB\t\n" +
-      "\007_statusB\n\n\010_encryptB\013\n\t_compressB\r\n\013_re" +
-      "motePortB\r\n\013_autoDomain\"5\n\014NewProxyResp\022" +
-      "\021\n\tproxyName\030\001 \001(\t\022\022\n\nremoteAddr\030\002 \001(\t\"\037" +
-      "\n\nCloseProxy\022\021\n\tsessionId\030\001 \001(\t\"\215\001\n\016NewV" +
-      "isitorConn\022\021\n\tsessionId\030\001 \001(\t\022\017\n\007localIp" +
-      "\030\002 \001(\t\022\021\n\tlocalPort\030\003 \001(\005\022\024\n\007encrypt\030\004 \001" +
-      "(\010H\000\210\001\001\022\025\n\010compress\030\005 \001(\010H\001\210\001\001B\n\n\010_encry" +
-      "ptB\013\n\t_compress\"\'\n\022NewVisitorConnResp\022\021\n" +
-      "\tsessionId\030\002 \001(\t\"&\n\005Error\022\014\n\004code\030\001 \001(\005\022" +
-      "\017\n\007message\030\002 \001(\t\"\022\n\020HeartbeatTimeout\"\006\n\004" +
-      "Ping\"\006\n\004Pong\"\t\n\007Kickout\"\374\006\n\016ControlMessa" +
-      "ge\022?\n\006header\030\001 \001(\0132/.com.xiaoniucode.etp" +
-      ".core.message.MessageHeader\0228\n\005login\030\n \001" +
-      "(\0132\'.com.xiaoniucode.etp.core.message.Lo" +
-      "ginH\000\022>\n\010newProxy\030\013 \001(\0132*.com.xiaoniucod" +
-      "e.etp.core.message.NewProxyH\000\022B\n\nclosePr" +
-      "oxy\030\014 \001(\0132,.com.xiaoniucode.etp.core.mes" +
-      "sage.CloseProxyH\000\0226\n\004ping\030\r \001(\0132&.com.xi" +
-      "aoniucode.etp.core.message.PingH\000\022F\n\014new" +
-      "ProxyResp\030\024 \001(\0132..com.xiaoniucode.etp.co" +
-      "re.message.NewProxyRespH\000\0228\n\005error\030\025 \001(\013" +
-      "2\'.com.xiaoniucode.etp.core.message.Erro" +
-      "rH\000\0226\n\004pong\030\026 \001(\0132&.com.xiaoniucode.etp." +
-      "core.message.PongH\000\022<\n\007kickout\030\036 \001(\0132).c" +
-      "om.xiaoniucode.etp.core.message.KickoutH" +
-      "\000\022J\n\016newVisitorConn\030\037 \001(\01320.com.xiaoniuc" +
-      "ode.etp.core.message.NewVisitorConnH\000\022R\n" +
-      "\022newVisitorConnResp\030  \001(\01324.com.xiaoniuc" +
-      "ode.etp.core.message.NewVisitorConnRespH" +
-      "\000\022@\n\tloginResp\030! \001(\0132+.com.xiaoniucode.e" +
-      "tp.core.message.LoginRespH\000\022N\n\020heartbeat" +
-      "Timeout\030\" \001(\01322.com.xiaoniucode.etp.core" +
-      ".message.HeartbeatTimeoutH\000B\t\n\007payload*\332" +
-      "\001\n\013MessageType\022\013\n\007UNKNOWN\020\000\022\t\n\005LOGIN\020e\022\016" +
-      "\n\nLOGIN_RESP\020h\022\r\n\tNEW_PROXY\020f\022\017\n\013CLOSE_P" +
-      "ROXY\020g\022\010\n\004PING\020i\022\023\n\016NEW_PROXY_RESP\020\312\001\022\n\n" +
-      "\005ERROR\020\315\001\022\t\n\004PONG\020\316\001\022\014\n\007KICKOUT\020\255\002\022\020\n\013NE" +
-      "W_VISITOR\020\256\002\022\025\n\020NEW_VISITOR_RESP\020\257\002\022\026\n\021H" +
-      "EARTBEAT_TIMEOUT\020\260\002*!\n\014ProtocolType\022\007\n\003T" +
-      "CP\020\000\022\010\n\004HTTP\020\001b\006proto3"
+      "ageType\"\324\001\n\005Login\022\017\n\002os\030\001 \001(\tH\000\210\001\001\022\021\n\004ar" +
+      "ch\030\002 \001(\tH\001\210\001\001\022\r\n\005token\030\003 \001(\t\022\020\n\010clientId" +
+      "\030\004 \001(\t\022\024\n\007version\030\005 \001(\tH\002\210\001\001\022E\n\nclientTy" +
+      "pe\030\006 \001(\0162,.com.xiaoniucode.etp.core.mess" +
+      "age.ClientTypeH\003\210\001\001B\005\n\003_osB\007\n\005_archB\n\n\010_" +
+      "versionB\r\n\013_clientType\"\036\n\tLoginResp\022\021\n\ts" +
+      "essionId\030\001 \001(\t\"\355\003\n\010NewProxy\022\014\n\004name\030\001 \001(" +
+      "\t\022\024\n\007localIp\030\002 \001(\tH\000\210\001\001\022\021\n\tlocalPort\030\003 \001" +
+      "(\005\022\023\n\006status\030\004 \001(\005H\001\210\001\001\022\024\n\007encrypt\030\005 \001(\010" +
+      "H\002\210\001\001\022\025\n\010compress\030\006 \001(\010H\003\210\001\001\022@\n\010protocol" +
+      "\030\007 \001(\0162..com.xiaoniucode.etp.core.messag" +
+      "e.ProtocolType\022\027\n\nremotePort\030\010 \001(\005H\004\210\001\001\022" +
+      "\027\n\nautoDomain\030\t \001(\010H\005\210\001\001\022\025\n\rcustomDomain" +
+      "s\030\n \003(\t\022\022\n\nsubDomains\030\013 \003(\t\022J\n\010metadata\030" +
+      "\014 \003(\01328.com.xiaoniucode.etp.core.message" +
+      ".NewProxy.MetadataEntry\032/\n\rMetadataEntry" +
+      "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\n\n\010_loc" +
+      "alIpB\t\n\007_statusB\n\n\010_encryptB\013\n\t_compress" +
+      "B\r\n\013_remotePortB\r\n\013_autoDomain\"5\n\014NewPro" +
+      "xyResp\022\021\n\tproxyName\030\001 \001(\t\022\022\n\nremoteAddr\030" +
+      "\002 \001(\t\"\037\n\nCloseProxy\022\021\n\tsessionId\030\001 \001(\t\"\215" +
+      "\001\n\016NewVisitorConn\022\021\n\tsessionId\030\001 \001(\t\022\017\n\007" +
+      "localIp\030\002 \001(\t\022\021\n\tlocalPort\030\003 \001(\005\022\024\n\007encr" +
+      "ypt\030\004 \001(\010H\000\210\001\001\022\025\n\010compress\030\005 \001(\010H\001\210\001\001B\n\n" +
+      "\010_encryptB\013\n\t_compress\"\'\n\022NewVisitorConn" +
+      "Resp\022\021\n\tsessionId\030\002 \001(\t\"&\n\005Error\022\014\n\004code" +
+      "\030\001 \001(\005\022\017\n\007message\030\002 \001(\t\"\022\n\020HeartbeatTime" +
+      "out\"\006\n\004Ping\"\006\n\004Pong\"\t\n\007Kickout\"\374\006\n\016Contr" +
+      "olMessage\022?\n\006header\030\001 \001(\0132/.com.xiaoniuc" +
+      "ode.etp.core.message.MessageHeader\0228\n\005lo" +
+      "gin\030\n \001(\0132\'.com.xiaoniucode.etp.core.mes" +
+      "sage.LoginH\000\022>\n\010newProxy\030\013 \001(\0132*.com.xia" +
+      "oniucode.etp.core.message.NewProxyH\000\022B\n\n" +
+      "closeProxy\030\014 \001(\0132,.com.xiaoniucode.etp.c" +
+      "ore.message.CloseProxyH\000\0226\n\004ping\030\r \001(\0132&" +
+      ".com.xiaoniucode.etp.core.message.PingH\000" +
+      "\022F\n\014newProxyResp\030\024 \001(\0132..com.xiaoniucode" +
+      ".etp.core.message.NewProxyRespH\000\0228\n\005erro" +
+      "r\030\025 \001(\0132\'.com.xiaoniucode.etp.core.messa" +
+      "ge.ErrorH\000\0226\n\004pong\030\026 \001(\0132&.com.xiaoniuco" +
+      "de.etp.core.message.PongH\000\022<\n\007kickout\030\036 " +
+      "\001(\0132).com.xiaoniucode.etp.core.message.K" +
+      "ickoutH\000\022J\n\016newVisitorConn\030\037 \001(\01320.com.x" +
+      "iaoniucode.etp.core.message.NewVisitorCo" +
+      "nnH\000\022R\n\022newVisitorConnResp\030  \001(\01324.com.x" +
+      "iaoniucode.etp.core.message.NewVisitorCo" +
+      "nnRespH\000\022@\n\tloginResp\030! \001(\0132+.com.xiaoni" +
+      "ucode.etp.core.message.LoginRespH\000\022N\n\020he" +
+      "artbeatTimeout\030\" \001(\01322.com.xiaoniucode.e" +
+      "tp.core.message.HeartbeatTimeoutH\000B\t\n\007pa" +
+      "yload*\332\001\n\013MessageType\022\013\n\007UNKNOWN\020\000\022\t\n\005LO" +
+      "GIN\020e\022\016\n\nLOGIN_RESP\020h\022\r\n\tNEW_PROXY\020f\022\017\n\013" +
+      "CLOSE_PROXY\020g\022\010\n\004PING\020i\022\023\n\016NEW_PROXY_RES" +
+      "P\020\312\001\022\n\n\005ERROR\020\315\001\022\t\n\004PONG\020\316\001\022\014\n\007KICKOUT\020\255" +
+      "\002\022\020\n\013NEW_VISITOR\020\256\002\022\025\n\020NEW_VISITOR_RESP\020" +
+      "\257\002\022\026\n\021HEARTBEAT_TIMEOUT\020\260\002*!\n\014ProtocolTy" +
+      "pe\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001*0\n\nClientType\022\017\n\013W" +
+      "EB_SESSION\020\000\022\021\n\rBINARY_DEVICE\020\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -12712,7 +12960,7 @@ java.lang.String defaultValue) {
     internal_static_com_xiaoniucode_etp_core_message_Login_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Login_descriptor,
-        new java.lang.String[] { "Os", "Arch", "Token", "ClientId", "Version", });
+        new java.lang.String[] { "Os", "Arch", "Token", "ClientId", "Version", "ClientType", });
     internal_static_com_xiaoniucode_etp_core_message_LoginResp_descriptor =
       getDescriptor().getMessageType(2);
     internal_static_com_xiaoniucode_etp_core_message_LoginResp_fieldAccessorTable = new

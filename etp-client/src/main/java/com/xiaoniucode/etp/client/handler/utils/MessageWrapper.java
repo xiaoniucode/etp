@@ -25,11 +25,14 @@ public class MessageWrapper {
     }
 
     public static Message.ControlMessage buildLogin(String clientId, String token, String version) {
-        Message.MessageHeader header = Message.MessageHeader.newBuilder().setType(Message.MessageType.LOGIN).build();
+        Message.MessageHeader header = Message.MessageHeader.newBuilder()
+                .setType(Message.MessageType.LOGIN)
+                .build();
         Message.Login login = Message.Login.newBuilder()
                 .setClientId(clientId)
                 .setVersion(version)
                 .setToken(token)
+                .setClientType(Message.ClientType.BINARY_DEVICE)
                 .setArch(OSUtils.getOSArch())
                 .setOs(OSUtils.getOS()).build();
         return Message.ControlMessage.newBuilder().setHeader(header).setLogin(login).build();

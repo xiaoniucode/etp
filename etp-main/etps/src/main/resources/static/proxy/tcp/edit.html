@@ -52,6 +52,20 @@
             </div>
         </div>
         <div class="layui-form-item" pane>
+            <label class="layui-form-label">压缩传输</label>
+            <div class="layui-input-block">
+                <input type="radio" name="AAA" value="1" title="是">
+                <input type="radio" name="AAA" value="2" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">隧道加密</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="AAA" value="1" title="是">
+                <input type="radio" name="AAA" value="2" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
             <label class="layui-form-label">状态</label>
             <div class="layui-input-inline">
                 <input type="checkbox" name="status" value="1" lay-value="1"
@@ -83,7 +97,7 @@
         const proxyId = getQueryParam("id")
         var clientList = [];
         //渲染下拉框
-        Rest.get('/api/client/list').then(data => {
+        Rest.get('/api/clients').then(data => {
             clientList = data || [];
             const $select = $('select[name="client"]');
             $select.find('option:gt(0)').remove();
@@ -96,8 +110,21 @@
             form.render('select');
         })
         //渲染表单详情
-        Rest.get('/api/proxy/get?id=' + proxyId).then(data => {
-            form.val('editForm', data);
+        fetch(`/proxies/${proxyId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+            }
+        }).then(response => response.json()).then(data => {
+            // 转换数据格式
+            const formData = {
+                name: data.name,
+                localIP: data.localIp,
+                localPort: data.localPort,
+                remotePort: data.remotePort,
+                status: data.status === 'ACTIVE' ? '1' : '0'
+            };
+            form.val('editForm', formData);
+            
             const targetClient = clientList.find(function (item) {
                 return item.id === data.clientId;
             });
@@ -113,17 +140,42 @@
             if (field.client) {
                 const [clientId, secretKey] = field.client.split('|', 2);
                 field.clientId = Number(clientId) || 0;
-                field.secretKey = secretKey || '';
                 delete field.client;
             }
-            field.id = proxyId
-            field.status = field.status ? 1 : 0;
-            Rest.put('/api/proxy/update-tcp', field).then(data => {
-                layer.msg('更新成功', {icon: 1, time: 400,}, () => {
-                    const parentTable = parent.layui.table;
-                    parentTable.reload('proxy');
-                    parent.layer.close(parent.layer.getFrameIndex(window.name));
-                });
+            
+            // 构建代理对象
+            const proxy = {
+                clientId: field.clientId,
+                name: field.name,
+                protocol: 'TCP',
+                source: 0, // 手动添加
+                localIp: field.localIP || '127.0.0.1',
+                localPort: Number(field.localPort),
+                remotePort: field.remotePort ? Number(field.remotePort) : null,
+                status: field.status ? 'ACTIVE' : 'INACTIVE',
+                domainType: 'NONE',
+                encrypt: false,
+                compress: false
+            };
+            
+            // 发送请求
+            fetch(`/proxies/tcp/${proxyId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+                },
+                body: JSON.stringify({proxy: proxy})
+            }).then(response => response.json()).then(data => {
+                if (data.code === 0) {
+                    layer.msg('更新成功', {icon: 1, time: 400,}, () => {
+                        const parentTable = parent.layui.table;
+                        parentTable.reload('proxy');
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    });
+                } else {
+                    layer.msg(data.msg || '更新失败', {icon: 2});
+                }
             })
             return false;
         });

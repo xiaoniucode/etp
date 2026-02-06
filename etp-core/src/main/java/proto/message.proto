@@ -22,6 +22,10 @@ enum ProtocolType {
   TCP = 0;
   HTTP = 1;
 }
+enum ClientType{
+  WEB_SESSION = 0;
+  BINARY_DEVICE = 1;
+}
 
 message MessageHeader {
   MessageType type = 1;
@@ -33,6 +37,7 @@ message Login {
   string token = 3;
   string clientId = 4;
   optional  string version = 5;
+  optional ClientType clientType=6;
 }
 message LoginResp {
   string sessionId = 1;

@@ -55,7 +55,7 @@
         // 渲染表格
         const clientTable = table.render({
             elem: '#clientTable',
-            url: '/api/client',
+            url: '/api/clients',
             method: 'GET',
             request: {
                 headers: {
@@ -67,8 +67,8 @@
                 {field: 'name', title: '名称'},
                 {field: 'clientId', title: '客户端ID'},
                 {field: 'os', title: '操作系统'},
-                {field: 'arch', title: '架构'},
-                {field: 'version', title: '版本'},
+                {field: 'arch', title: '系统架构'},
+                {field: 'version', title: '客户端版本'},
                 {field: 'status', title: '状态' ,templet: function(d) {
                     return d.status === 1 ? '<span style="color: #52c41a;">在线</span>' : '<span style="color: #999;">离线</span>';
                 }},

@@ -51,6 +51,20 @@
             </div>
         </div>
         <div class="layui-form-item" pane>
+            <label class="layui-form-label">压缩传输</label>
+            <div class="layui-input-block">
+                <input type="radio" name="AAA" value="1" title="是">
+                <input type="radio" name="AAA" value="2" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">隧道加密</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="AAA" value="1" title="是">
+                <input type="radio" name="AAA" value="2" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
             <label class="layui-form-label">状态</label>
             <div class="layui-input-inline">
                 <input type="checkbox" name="status" lay-verify="required" value="1" lay-value="1"
@@ -73,7 +87,7 @@
         const Rest = layui.Rest;
         const $ = layui.$;
         //渲染客户端下拉框
-        Rest.get('/api/client/list').then(data => {
+        Rest.get('/api/clients').then(data => {
             const $select = $('select[name="client"]');
             const $submitBtn = $('button[lay-filter="proxyForm"]');
             // 清空旧选项
@@ -97,23 +111,45 @@
         })
         form.on('submit(proxyForm)', function (data) {
             const field = data.field;
-            const remotePort = field.remotePort
-            if (remotePort === undefined || remotePort === '' || remotePort === 0) {
-                field.remotePort = -1
-            }
             if (field.client) {
                 const [clientId, secretKey] = field.client.split('|', 2);
                 field.clientId = Number(clientId) || 0;
-                field.secretKey = secretKey || '';
                 delete field.client;
             }
-            field.status = field.status ? 1 : 0;
-            Rest.post('/api/proxy/add-tcp', field).then(data => {
-                layer.msg('创建成功', {icon: 1, time: 400,}, () => {
-                    const parentTable = parent.layui.table;
-                    parentTable.reload('proxy');
-                    parent.layer.close(parent.layer.getFrameIndex(window.name));
-                });
+
+            // 构建代理对象
+            const proxy = {
+                clientId: field.clientId,
+                name: field.name,
+                protocol: 'TCP',
+                source: 0, // 手动添加
+                localIp: field.localIP || '127.0.0.1',
+                localPort: Number(field.localPort),
+                remotePort: field.remotePort ? Number(field.remotePort) : null,
+                status: field.status ? 'ACTIVE' : 'INACTIVE',
+                domainType: 'NONE',
+                encrypt: false,
+                compress: false
+            };
+
+            // 发送请求
+            fetch('/proxies/tcp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
+                },
+                body: JSON.stringify({proxy: proxy})
+            }).then(response => response.json()).then(data => {
+                if (data.code === 0) {
+                    layer.msg('创建成功', {icon: 1, time: 400,}, () => {
+                        const parentTable = parent.layui.table;
+                        parentTable.reload('proxy');
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    });
+                } else {
+                    layer.msg(data.msg || '创建失败', {icon: 2});
+                }
             })
             return false;
         });

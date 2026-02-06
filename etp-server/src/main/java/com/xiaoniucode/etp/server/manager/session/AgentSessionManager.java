@@ -6,6 +6,7 @@ import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.notify.EventBus;
+import com.xiaoniucode.etp.server.enums.ClientType;
 import com.xiaoniucode.etp.server.event.AgentRegisteredEvent;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
@@ -59,10 +60,10 @@ public class AgentSessionManager {
      * 创建代理客户端会话
      * 1.注册系统中已经存在代理配置
      */
-    public Optional<AgentSession> createAgentSession(String clientId, String token, Channel control, String arch, String os, String version) {
+    public Optional<AgentSession> createAgentSession(String clientId, ClientType clientType, String token, Channel control, String arch, String os, String version) {
         //为客户端生成一个唯一的 sessionId
         String sessionId = sessionIdGenerator.nextAgentSessionId();
-        AgentSession agentSession = new AgentSession(clientId, token, control, sessionId, arch, os, version);
+        AgentSession agentSession = new AgentSession(clientId,clientType, token, control, sessionId, arch, os, version);
 
         agentSession.getControl().attr(ChannelConstants.SESSION_ID).set(sessionId);
         sessionIdToAgentSession.putIfAbsent(sessionId, agentSession);

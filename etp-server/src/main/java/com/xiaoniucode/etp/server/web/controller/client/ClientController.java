@@ -14,7 +14,7 @@ import java.util.List;
  * @author liuxin
  */
 @RestController
-@RequestMapping("/api/client")
+@RequestMapping("/api/clients")
 public class ClientController {
 
     @Autowired

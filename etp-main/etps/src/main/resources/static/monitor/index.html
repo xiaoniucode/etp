@@ -127,7 +127,7 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">隧道地址</label>
                                     <div class="layui-input-block">
-                                        <input type="text" class="layui-input config-display" readonly name="host">
+                                        <input type="text" class="layui-input config-display" readonly name="serverAddr">
                                     </div>
                                 </div>
                             </div>
@@ -135,7 +135,7 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">控制端口</label>
                                     <div class="layui-input-block">
-                                        <input type="text" class="layui-input config-display" readonly name="bind_port">
+                                        <input type="text" class="layui-input config-display" readonly name="serverPort">
                                     </div>
                                 </div>
                             </div>
@@ -151,7 +151,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="layui-col-md6">
+                            <!--<div class="layui-col-md6">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">HTTPS代理</label>
                                     <div class="layui-input-block">
@@ -159,7 +159,7 @@
                                                name="httpsProxyPort">
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
                         </div>
 
 
@@ -272,8 +272,7 @@
                     name: '隧道数量',
                     data: [
                         {value: 0, name: 'TCP'},
-                        {value: 0, name: 'HTTP'},
-                        {value: 0, name: 'HTTPS'}
+                        {value: 0, name: 'HTTP'}
                     ]
                 },
                 {
@@ -347,8 +346,8 @@
                 const baseDomains = Array.isArray(sysConfig.baseDomains) ? sysConfig.baseDomains.join(', ') : (sysConfig.baseDomains || '未设置');
                 form.val('sysConfigForm', {
                     tls_enabled: sysConfig.tls_enabled,
-                    host: sysConfig.host,
-                    bind_port: sysConfig.bind_port,
+                    serverAddr: sysConfig.serverAddr,
+                    serverPort: sysConfig.serverPort,
                     port_range: portRange,
                     httpProxyPort:sysConfig.httpProxyPort,
                     httpsProxyPort:sysConfig.httpsProxyPort,
@@ -364,8 +363,7 @@
                             {
                                 data: [
                                     {value: stats.proxy.tcpCount, name: 'TCP'},
-                                    {value: stats.proxy.httpCount, name: 'HTTP'},
-                                    {value: stats.proxy.httpsCount, name: 'HTTPS'}
+                                    {value: stats.proxy.httpCount, name: 'HTTP'}
                                 ]
                             }
                         ]
@@ -392,7 +390,7 @@
 
         // 加载流量数据
         function loadTrafficData() {
-            Rest.get('/api/metrics/summery', {}, {loading: false}).then(data => {
+            Rest.get('/api/monitor/metrics/summery', {}, {loading: false}).then(data => {
                 // 查找流量图表
                 const trafficChartItem = charts.find(item => item.config.id === 'traffic-chart');
                 if (trafficChartItem) {
