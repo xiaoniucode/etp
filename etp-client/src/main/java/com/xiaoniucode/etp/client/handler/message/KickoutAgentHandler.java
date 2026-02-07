@@ -15,8 +15,7 @@ public class KickoutAgentHandler implements MessageHandler {
     @Override
     public void handle(ChannelHandlerContext ctx, ControlMessage msg) {
         AgentSessionManager.getAgentSession().ifPresent(agent -> {
-            String clientId = agent.getClientId();
-            logger.info("代理客户端被强制下线 - [客户端标识={}]", clientId);
+            logger.info("客户端被强制下线]");
         });
         TunnelClient tunnelClient = TunnelClientHelper.getTunnelClient();
         if (tunnelClient != null) {

@@ -69,6 +69,9 @@ public class ProxyConfig {
      * @return 域名类型
      */
     public DomainType getDomainType() {
+        if (ProtocolType.isTcp(protocol)) {
+            return null;
+        }
         if (!customDomains.isEmpty()) {
             return DomainType.CUSTOM_DOMAIN;
         }

@@ -10,28 +10,26 @@
     <link href="/static/assets/css/app.css" rel="stylesheet">
 </head>
 <body>
-<div class="layui-container">
-    <div class="layui-row">
-        <div class="layui-col-md12">
-            <div class="layui-card">
-                <div class="layui-card-header">
-                    <div class="layui-row">
-                        <div class="layui-col-md6">
-                            <h3>客户端管理</h3>
-                        </div>
-                        <div class="layui-col-md6 text-right">
-                            <button class="layui-btn layui-btn-sm layui-btn-danger" id="deleteBatchBtn" disabled>
-                                <i class="layui-icon layui-icon-delete"></i> 批量删除
-                            </button>
-                            <button class="layui-btn layui-btn-sm" id="refreshBtn">
-                                <i class="layui-icon layui-icon-refresh-3"></i> 刷新
-                            </button>
-                        </div>
+<div class="layui-row">
+    <div class="layui-col-md12">
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <div class="layui-row">
+                    <div class="layui-col-md6">
+                        <h3>客户端管理</h3>
+                    </div>
+                    <div class="layui-col-md6 text-right">
+                        <button class="layui-btn layui-btn-sm layui-btn-danger" id="deleteBatchBtn" disabled>
+                            <i class="layui-icon layui-icon-delete"></i> 批量删除
+                        </button>
+                        <button class="layui-btn layui-btn-sm" id="refreshBtn">
+                            <i class="layui-icon layui-icon-refresh-3"></i> 刷新
+                        </button>
                     </div>
                 </div>
-                <div class="layui-card-body">
-                    <table class="layui-hide" id="clientTable" lay-filter="clientTable"></table>
-                </div>
+            </div>
+            <div class="layui-card-body">
+                <table class="layui-hide" id="clientTable" lay-filter="clientTable"></table>
             </div>
         </div>
     </div>
@@ -39,7 +37,8 @@
 
 <script type="text/html" id="barTools">
     <a class="layui-btn layui-btn-xs" lay-event="detail">详情</a>
-    <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="kickout" {{d.status !== 1 ? 'style="opacity: 0.5; pointer-events: none;"' : ''}}>剔除</a>
+    <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="kickout" {{!d.isOnline
+       ? 'style="opacity: 0.5; pointer-events: none;"' : ''}}>剔除</a>
     <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>
 </script>
 
@@ -65,13 +64,15 @@
             cols: [[
                 {type: 'checkbox', fixed: 'left'},
                 {field: 'name', title: '名称'},
-                {field: 'clientId', title: '客户端ID'},
+                {field: 'id', title: '客户端标识'},
                 {field: 'os', title: '操作系统'},
                 {field: 'arch', title: '系统架构'},
                 {field: 'version', title: '客户端版本'},
-                {field: 'status', title: '状态' ,templet: function(d) {
-                    return d.status === 1 ? '<span style="color: #52c41a;">在线</span>' : '<span style="color: #999;">离线</span>';
-                }},
+                {
+                    field: 'isOnline', title: '在线状态', templet: function (d) {
+                        return d.isOnline ? '<span style="color: #52c41a;">在线</span>' : '<span style="color: #999;">离线</span>';
+                    }
+                },
                 {title: '操作', width: 250, toolbar: '#barTools', fixed: 'right'}
             ]],
             page: false,
@@ -105,8 +106,8 @@
                                 <td>${data.name}</td>
                             </tr>
                             <tr>
-                                <th>客户端ID</th>
-                                <td>${data.clientId}</td>
+                                <th>客户端标识</th>
+                                <td>${data.id}</td>
                             </tr>
                             <tr>
                                 <th>操作系统</th>
@@ -121,9 +122,10 @@
                                 <td>${data.version}</td>
                             </tr>
                             <tr>
-                                <th>状态</th>
-                                <td>${data.status === 1 ? '在线' : '离线'}</td>
+                                <th>在线状态</th>
+                                <td>${data.isOnline ? '在线' : '离线'}</td>
                             </tr>
+
                             <tr>
                                 <th>创建时间</th>
                                 <td>${data.createdAt}</td>
@@ -151,7 +153,7 @@
                     skin: 'layui-layer-molv',
                     btn: ['确认', '再想想'],
                 }, function (index) {
-                    Rest.put('/api/client/' + data.id + '/kickout').then(res => {
+                    Rest.put('/api/clients/' + data.id + '/kickout').then(res => {
                         clientTable.reload();
                         layer.msg("剔除成功", {time: 2000});
                     });
@@ -200,6 +202,7 @@
                 layer.close(index);
             });
         });
+
 
         // 刷新按钮事件
         $('#refreshBtn').on('click', function () {

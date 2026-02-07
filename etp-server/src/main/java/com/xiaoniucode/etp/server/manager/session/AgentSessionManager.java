@@ -5,10 +5,13 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.enums.ClientType;
 import com.xiaoniucode.etp.server.event.AgentRegisteredEvent;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
+import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
 import io.netty.channel.Channel;
@@ -28,6 +31,10 @@ public class AgentSessionManager {
      * Token -> AgentSessions
      */
     private final Map<String, Set<AgentSession>> tokenToAgentSessions = new ConcurrentHashMap<>();
+    /**
+     * clientId --> AgentSession
+     */
+    private final Map<String, AgentSession> clientIdToAgentSession = new ConcurrentHashMap<>();
     /**
      * sessionId ->AgentSession
      */
@@ -63,14 +70,15 @@ public class AgentSessionManager {
     public Optional<AgentSession> createAgentSession(String clientId, ClientType clientType, String token, Channel control, String arch, String os, String version) {
         //为客户端生成一个唯一的 sessionId
         String sessionId = sessionIdGenerator.nextAgentSessionId();
-        AgentSession agentSession = new AgentSession(clientId,clientType, token, control, sessionId, arch, os, version);
+        AgentSession agentSession = new AgentSession(clientId, clientType, token, control, sessionId, arch, os, version);
 
         agentSession.getControl().attr(ChannelConstants.SESSION_ID).set(sessionId);
         sessionIdToAgentSession.putIfAbsent(sessionId, agentSession);
 
         tokenToAgentSessions.computeIfAbsent(token,
                 k -> new CopyOnWriteArraySet<>()).add(agentSession);
-
+        //clientId --> AgentSession
+        clientIdToAgentSession.put(clientId, agentSession);
         Set<ProxyConfig> proxyConfigs = proxyManager.getByClientId(clientId);
         for (ProxyConfig proxy : proxyConfigs) {
             ProtocolType protocol = proxy.getProtocol();
@@ -121,9 +129,8 @@ public class AgentSessionManager {
     }
 
     /**
-     * 与代理客户端断开连接
-     * 1.清理掉所有远程端口到代理客户端会话信息
-     *
+     * 服务端与客户端断开连接
+     * 清理掉所有远程端口到代理客户端会话信息
      */
     public void disconnect(Channel control) {
         getAgentSession(control).ifPresent(agentSession -> {
@@ -140,6 +147,9 @@ public class AgentSessionManager {
                     tokenToAgentSessions.remove(token);
                 }
             }
+            //清理客户端ID 连接会话
+            clientIdToAgentSession.remove(agentSession.getClientId());
+
             Set<Integer> ports = controlToPorts.remove(control);
             if (ports != null) {
                 //清理掉代理客户端所有端口映射信息
@@ -235,5 +245,39 @@ public class AgentSessionManager {
             return agentSessions.size();
         }
         return 0;
+    }
+
+    /**
+     * 给客户端发送断开消息，如果断开会自动清理资源
+     *
+     * @param clientId 客户端唯一标识
+     * @return 会话
+     */
+    public AgentSession kickoutAgent(String clientId) {
+        AgentSession agentSession = clientIdToAgentSession.get(clientId);
+        if (agentSession == null) {
+            logger.warn("没有找到客户端会话: {}", clientId);
+            return null;
+        }
+        Channel control = agentSession.getControl();
+        if (control == null) {
+            logger.warn("客户端 - {} 控制隧道不存在", clientId);
+            return null;
+        }
+        Message.ControlMessage controlMessage = MessageWrapper.buildKickout();
+        control.writeAndFlush(controlMessage).addListener(future -> {
+            ChannelUtils.closeOnFlush(control);
+        });
+        return agentSession;
+    }
+
+    /**
+     * 如果存在说明客户端是在线状态
+     *
+     * @param clientId 客户端唯一标识
+     * @return 是否在线
+     */
+    public boolean isOnline(String clientId) {
+        return clientIdToAgentSession.get(clientId) != null;
     }
 }

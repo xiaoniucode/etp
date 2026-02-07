@@ -34,11 +34,11 @@ public class Metrics {
     /**
      * 接收消息数
      */
-    private long readMsgs;
+    private long readMessages;
     /**
      * 发送消息数
      */
-    private long writeMsgs;
+    private long writeMessages;
     /**
      * 时间
      */

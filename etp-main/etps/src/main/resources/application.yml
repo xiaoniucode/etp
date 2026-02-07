@@ -12,4 +12,4 @@ logging:
 server:
   servlet:
     context-path: /
-  port: 8081
+  port: 8082

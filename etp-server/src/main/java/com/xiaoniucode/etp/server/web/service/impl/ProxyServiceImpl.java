@@ -1,15 +1,21 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.web.controller.proxy.convert.HttpProxyConvert;
+import com.xiaoniucode.etp.server.web.controller.proxy.convert.TcpProxyConvert;
 import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyCreateRequest;
 import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyUpdateRequest;
 import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyCreateRequest;
 import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyUpdateRequest;
+import com.xiaoniucode.etp.server.web.controller.proxy.response.HttpProxyDTO;
+import com.xiaoniucode.etp.server.web.controller.proxy.response.TcpProxyDTO;
 import com.xiaoniucode.etp.server.web.domain.Proxy;
 import com.xiaoniucode.etp.server.web.domain.ProxyDomain;
 import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,35 +31,36 @@ public class ProxyServiceImpl implements ProxyService {
 
     private final ProxyRepository proxyRepository;
     private final ProxyDomainRepository proxyDomainRepository;
+    @Resource
+    private AppConfig appConfig;
 
     /**
      * 创建 TCP 代理
      */
     @Transactional
-    public Proxy createTcpProxy(TcpProxyCreateRequest proxy) {
-        return null;
+    public void createTcpProxy(TcpProxyCreateRequest proxy) {
     }
 
     /**
      * 创建 HTTP 代理
      */
     @Transactional
-    public Proxy createHttpProxy(HttpProxyCreateRequest proxy) {
+    public void createHttpProxy(HttpProxyCreateRequest proxy) {
         //保存基本信息
         //批量持久化域名
-        return null;
+
     }
 
     @Override
     @Transactional
-    public Proxy updateTcpProxy(TcpProxyUpdateRequest request) {
-        return null;
+    public void updateTcpProxy(TcpProxyUpdateRequest request) {
+        //释放域名资源占用
     }
 
     @Override
     @Transactional
-    public Proxy updateHttpProxy(HttpProxyUpdateRequest request) {
-        return null;
+    public void updateHttpProxy(HttpProxyUpdateRequest request) {
+        //释放域名资源占用
     }
 
     /**
@@ -65,43 +72,59 @@ public class ProxyServiceImpl implements ProxyService {
         proxyDomainRepository.deleteAll(proxyDomainRepository.findByProxyId(id));
         // 删除代理
         proxyRepository.deleteById(id);
+        //释放域名资源占用
     }
 
-    /**
-     * 根据 ID 查询代理
-     */
-    public Proxy getProxyById(Integer id) {
-        return proxyRepository.findById(id).orElse(null);
+    @Override
+    public TcpProxyDTO getTcpProxyById(Integer id) {
+        Proxy proxy = proxyRepository.findById(id).orElse(null);
+        return proxy != null ? TcpProxyConvert.INSTANCE.toDTO(proxy) : null;
     }
 
-    /**
-     * 根据客户端 ID 查询代理
-     */
-    public List<Proxy> getProxiesByClientId(String clientId) {
-        return proxyRepository.findByClientId(Integer.valueOf(clientId));
-    }
-
-    /**
-     * 获取所有 TCP 代理
-     */
-    public List<Proxy> getTcpProxies() {
-        return proxyRepository.findByProtocol(ProtocolType.TCP);
-    }
-
-    /**
-     * 获取所有 HTTP 代理
-     */
-    public List<Proxy> getHttpProxies() {
-        return proxyRepository.findByProtocol(ProtocolType.HTTP);
-    }
-
-    /**
-     * 根据代理 ID 获取域名列表
-     */
-    public List<String> getDomainsByProxyId(Integer proxyId) {
-        return proxyDomainRepository.findByProxyId(proxyId).stream()
+    @Override
+    public HttpProxyDTO getHttpProxyById(Integer id) {
+        Proxy proxy = proxyRepository.findById(id).orElse(null);
+        if (proxy == null) {
+            return null;
+        }
+        // 查询关联的域名列表
+        List<ProxyDomain> proxyDomains = proxyDomainRepository.findByProxyId(id);
+        List<String> domains = proxyDomains.stream()
                 .map(ProxyDomain::getDomain)
                 .collect(java.util.stream.Collectors.toList());
+        int httpProxyPort = appConfig.getHttpProxyPort();
+        return HttpProxyConvert.INSTANCE.toDTO(proxy, domains, httpProxyPort);
+    }
+
+    @Override
+    public List<TcpProxyDTO> getTcpProxies() {
+        List<Proxy> proxies = proxyRepository.findByProtocol(ProtocolType.TCP);
+        return TcpProxyConvert.INSTANCE.toDTOList(proxies);
+    }
+
+    @Override
+    public List<HttpProxyDTO> getHttpProxies() {
+        List<Proxy> proxies = proxyRepository.findByProtocol(ProtocolType.HTTP);
+        return proxies.stream()
+                .map(proxy -> {
+                    List<ProxyDomain> proxyDomains = proxyDomainRepository.findByProxyId(proxy.getId());
+                    List<String> domains = proxyDomains.stream()
+                            .map(ProxyDomain::getDomain)
+                            .collect(java.util.stream.Collectors.toList());
+                    int httpProxyPort = appConfig.getHttpProxyPort();
+                    return HttpProxyConvert.INSTANCE.toDTO(proxy, domains, httpProxyPort);
+                })
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public void batchDeleteProxies(List<Integer> ids) {
+
+    }
+
+    @Override
+    public void switchProxyStatus(Integer id) {
+
     }
 
 }

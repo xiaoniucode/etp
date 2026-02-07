@@ -102,7 +102,7 @@
         const Rest = layui.Rest;
         const $ = layui.$;
         //渲染客户端下拉框
-        Rest.get('/api/client/list').then(data => {
+        Rest.get('/api/clients').then(data => {
             const $select = $('select[name="client"]');
             const $submitBtn = $('button[lay-filter="proxyForm"]');
             // 清空旧选项

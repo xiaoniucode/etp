@@ -53,8 +53,8 @@
                     field: 'writeBytes', title: '<strong>下行流量</strong>', sort: true,
                     templet: d => '<strong style="color:#16baaa;">' + formatBytes(d.writeBytes) + '</strong>'
                 },
-                {field: 'readMsgs', title: '接收消息数', sort: true},
-                {field: 'writeMsgs', title: '发送消息数', sort: true},
+                {field: 'readMessages', title: '接收消息数', sort: true},
+                {field: 'writeMessages', title: '发送消息数', sort: true},
                 {
                     field: 'time', title: '统计时间', sort: true, width: 180,
                     templet: d => layui.util.toDateString(d.time, 'yyyy-MM-dd HH:mm')

@@ -1,6 +1,9 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
+import com.xiaoniucode.etp.server.web.controller.client.convert.ClientConvert;
+import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 import com.xiaoniucode.etp.server.web.domain.Client;
 import com.xiaoniucode.etp.server.web.repository.ClientRepository;
 import com.xiaoniucode.etp.server.web.service.ClientService;
@@ -14,33 +17,42 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
+    @Autowired
+    private AgentSessionManager agentSessionManager;
 
     @Override
-    public List<Client> findAll() {
-        return clientRepository.findAll();
+    public List<ClientDTO> findAll() {
+        List<Client> clients = clientRepository.findAll();
+        List<ClientDTO> clientDTOs = ClientConvert.INSTANCE.toDTOList(clients);
+        for (ClientDTO clientDTO : clientDTOs) {
+            boolean isOnline = agentSessionManager.isOnline(clientDTO.getId());
+            clientDTO.setIsOnline(isOnline);
+        }
+        return clientDTOs;
     }
 
     @Override
-    public Client findById(Integer id) {
-        return clientRepository.findById(id)
-                .orElseThrow(() -> new BizException("客户端不存在"));
+    public ClientDTO findById(String id) {
+        Client client = clientRepository.findById(id).orElseThrow(() -> new BizException("客户端不存在"));
+        ClientDTO clientDTO = ClientConvert.INSTANCE.toDTO(client);
+        boolean isOnline = agentSessionManager.isOnline(id);
+        clientDTO.setIsOnline(isOnline);
+        return clientDTO;
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(String id) {
         clientRepository.deleteById(id);
     }
 
     @Override
-    public void deleteBatch(List<Integer> ids) {
+    public void deleteBatch(List<String> ids) {
         clientRepository.deleteAllById(ids);
     }
 
     @Override
-    public Client kickout(Integer id) {
-        Client client = findById(id);
-        client.setStatus(0); // 0 表示离线
-        return clientRepository.save(client);
+    public void kickout(String clientId) {
+        agentSessionManager.kickoutAgent(clientId);
     }
 }
 

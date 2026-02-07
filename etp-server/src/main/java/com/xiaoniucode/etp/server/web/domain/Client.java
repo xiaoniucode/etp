@@ -16,9 +16,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Client {
-    /**
-     * 设备ID
-     */
     @Id
     @Column(name = "id", nullable = false)
     private String id;
@@ -30,8 +27,6 @@ public class Client {
     private String arch;
     @Column(name = "version", nullable = false)
     private String version;
-    @Column(name = "status", nullable = false)
-    private Integer status;
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;

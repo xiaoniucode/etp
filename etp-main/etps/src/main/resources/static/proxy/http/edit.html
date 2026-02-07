@@ -110,7 +110,7 @@
         const proxyId = getQueryParam("id")
         var clientList = [];
         //渲染下拉框
-        Rest.get('/api/client/list').then(data => {
+        Rest.get('/api/clients').then(data => {
             clientList = data || [];
             const $select = $('select[name="client"]');
             $select.find('option:gt(0)').remove();
@@ -123,38 +123,27 @@
             form.render('select');
         })
         //渲染表单详情
-        Promise.all([
-            fetch(`/proxies/${proxyId}`, {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
-                }
-            }).then(response => response.json()),
-            fetch(`/proxies/${proxyId}/domains`, {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
-                }
-            }).then(response => response.json())
-        ]).then(([proxy, domains]) => {
+        Rest.get(`/api/proxies/${proxyId}/http`).then(data => {
             // 将domainType转换为字符串值，用于表单渲染
             let domainTypeStr = 'auto';
-            if (proxy.domainType === 'SUB') {
+            if (data.domainType === 1) {
                 domainTypeStr = 'sub';
-            } else if (proxy.domainType === 'CUSTOM') {
+            } else if (data.domainType === 2) {
                 domainTypeStr = 'custom';
             }
             
             // 构建表单数据
             const formData = {
-                name: proxy.name,
-                localIP: proxy.localIp,
-                localPort: proxy.localPort,
-                status: proxy.status === 'ACTIVE' ? '1' : '0',
+                name: data.name,
+                localIP: data.localIp,
+                localPort: data.localPort,
+                status: data.status === 1 ? '1' : '0',
                 domainType: domainTypeStr
             };
             
             form.val('editForm', formData);
             const targetClient = clientList.find(function (item) {
-                return item.id === proxy.clientId;
+                return item.id === data.clientId;
             });
             if (targetClient) {
                 const fullValue = targetClient.id + '|' + targetClient.secretKey;
@@ -163,27 +152,29 @@
             }
             
             // 设置域名类型和显示状态
-            if (proxy.domainType === 'AUTO') {
+            if (data.domainType === 0) {
                 $('input[name="domainType"][value="auto"]').prop('checked', true);
                 $('input[name="autoDomain"]').val('true');
                 $('#customDomainsGroup').hide();
                 $('#subDomainsGroup').hide();
-            } else if (proxy.domainType === 'SUB') {
+            } else if (data.domainType === 1) {
                 $('input[name="domainType"][value="sub"]').prop('checked', true);
                 $('input[name="autoDomain"]').val('false');
                 $('#customDomainsGroup').hide();
                 $('#subDomainsGroup').show();
                 // 填充子域名
-                const subDomains = domains.filter(d => d.domainType === 'SUB').map(d => d.domain).join('\n');
-                $('textarea[name="subDomains"]').val(subDomains);
-            } else if (proxy.domainType === 'CUSTOM') {
+                if (data.domains) {
+                    $('textarea[name="subDomains"]').val(data.domains.join('\n'));
+                }
+            } else if (data.domainType === 2) {
                 $('input[name="domainType"][value="custom"]').prop('checked', true);
                 $('input[name="autoDomain"]').val('false');
                 $('#customDomainsGroup').show();
                 $('#subDomainsGroup').hide();
                 // 填充自定义域名
-                const customDomains = domains.filter(d => d.domainType === 'CUSTOM').map(d => d.domain).join('\n');
-                $('textarea[name="customDomains"]').val(customDomains);
+                if (data.domains) {
+                    $('textarea[name="customDomains"]').val(data.domains.join('\n'));
+                }
             }
             form.render('radio');
         })
@@ -216,6 +207,13 @@
             }
             
             // 构建代理对象
+            let domainTypeCode = 0;
+            if (field.domainType === 'sub') {
+                domainTypeCode = 1;
+            } else if (field.domainType === 'custom') {
+                domainTypeCode = 2;
+            }
+            
             const proxy = {
                 clientId: field.clientId,
                 name: field.name,
@@ -225,7 +223,7 @@
                 localPort: Number(field.localPort),
                 remotePort: null,
                 status: field.status ? 'ACTIVE' : 'INACTIVE',
-                domainType: field.domainType.toUpperCase(),
+                domainType: domainTypeCode,
                 encrypt: false,
                 compress: false
             };
@@ -251,23 +249,14 @@
             }
             
             // 发送请求
-            fetch(`/proxies/http/${proxyId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
-                },
-                body: JSON.stringify({proxy: proxy, domains: domains})
-            }).then(response => response.json()).then(data => {
-                if (data.code === 0) {
-                    layer.msg('更新成功', {icon: 1, time: 400,}, () => {
-                        const parentTable = parent.layui.table;
-                        parentTable.reload('proxy');
-                        parent.layer.close(parent.layer.getFrameIndex(window.name));
-                    });
-                } else {
-                    layer.msg(data.msg || '更新失败', {icon: 2});
-                }
+            Rest.put(`/api/proxies/http/${proxyId}`, {proxy: proxy, domains: domains}).then(data => {
+                layer.msg('更新成功', {icon: 1, time: 400,}, () => {
+                    const parentTable = parent.layui.table;
+                    parentTable.reload('proxy');
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).catch(err => {
+                layer.msg(err.message || '更新失败', {icon: 2});
             })
             return false;
         });

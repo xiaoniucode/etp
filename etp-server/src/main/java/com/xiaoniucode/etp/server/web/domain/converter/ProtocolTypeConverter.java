@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.web.domain;
+package com.xiaoniucode.etp.server.web.domain.converter;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import jakarta.persistence.AttributeConverter;
@@ -11,7 +11,7 @@ public class ProtocolTypeConverter implements AttributeConverter<ProtocolType, I
         if (protocolType == null) {
             return null;
         }
-        return protocolType.getProtocol();
+        return protocolType.getCode();
     }
 
     @Override
@@ -19,6 +19,6 @@ public class ProtocolTypeConverter implements AttributeConverter<ProtocolType, I
         if (code == null) {
             return null;
         }
-        return ProtocolType.getProtocol(code);
+        return ProtocolType.getCode(code);
     }
 }

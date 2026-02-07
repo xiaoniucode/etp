@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.service;
 
-import com.xiaoniucode.etp.server.web.domain.Client;
+import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 
 import java.util.List;
 
@@ -8,27 +8,27 @@ public interface ClientService {
     /**
      * 查询所有客户端
      */
-    List<Client> findAll();
+    List<ClientDTO> findAll();
 
     /**
      * 根据 ID 查询客户端
      */
-    Client findById(Integer id);
+    ClientDTO findById(String clientId);
 
     /**
      * 删除单个客户端
      */
-    void delete(Integer id);
+    void delete(String clientId);
 
     /**
      * 批量删除客户端
      */
-    void deleteBatch(List<Integer> ids);
+    void deleteBatch(List<String> ids);
 
     /**
-     * 剔除客户端（切换状态为离线）
+     * 剔除在线客户端
      */
-    Client kickout(Integer id);
+    void kickout(String clientId);
 }
 
 

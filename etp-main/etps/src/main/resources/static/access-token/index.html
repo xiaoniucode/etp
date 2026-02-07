@@ -10,28 +10,26 @@
     <link href="/static/assets/css/app.css" rel="stylesheet">
 </head>
 <body>
-<div class="layui-container" style="padding: 15px;">
-    <div class="layui-row">
-        <div class="layui-col-md12">
-            <div class="layui-card">
-                <div class="layui-card-header">
-                    <div class="layui-row">
-                        <div class="layui-col-md6">
-                            <h3>访问令牌管理</h3>
-                        </div>
-                        <div class="layui-col-md6 text-right">
-                            <button class="layui-btn layui-btn-sm layui-btn-normal" id="addTokenBtn">
-                                <i class="layui-icon layui-icon-add-1"></i> 新增
-                            </button>
-                            <button class="layui-btn layui-btn-sm" id="refreshBtn">
-                                <i class="layui-icon layui-icon-refresh-3"></i> 刷新
-                            </button>
-                        </div>
+<div class="layui-row">
+    <div class="layui-col-md12">
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <div class="layui-row">
+                    <div class="layui-col-md6">
+                        <h3>访问令牌管理</h3>
+                    </div>
+                    <div class="layui-col-md6 text-right">
+                        <button class="layui-btn layui-btn-sm layui-btn-normal" id="addTokenBtn">
+                            <i class="layui-icon layui-icon-add-1"></i> 新增
+                        </button>
+                        <button class="layui-btn layui-btn-sm" id="refreshBtn">
+                            <i class="layui-icon layui-icon-refresh-3"></i> 刷新
+                        </button>
                     </div>
                 </div>
-                <div class="layui-card-body">
-                    <table class="layui-hide" id="tokenTable" lay-filter="tokenTable"></table>
-                </div>
+            </div>
+            <div class="layui-card-body">
+                <table class="layui-hide" id="tokenTable" lay-filter="tokenTable"></table>
             </div>
         </div>
     </div>
@@ -77,7 +75,7 @@
             cols: [[
                 {field: 'id', title: 'ID', width: 80, sort: true},
                 {field: 'name', title: '名称', width: 180},
-                {field: 'token', title: 'Token', minWidth: 300},
+                {field: 'token', title: '访问令牌', minWidth: 300},
                 {field: 'maxClient', title: '最大客户端数', width: 120},
                 {title: '操作', width: 200, toolbar: '#barTools', fixed: 'right'}
             ]],

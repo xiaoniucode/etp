@@ -7,28 +7,28 @@ public enum ProxyStatus {
     CLOSED(0, "关闭"),
     OPEN(1, "开启");
 
-    private final Integer status;
+    private final Integer code;
     private final String description;
 
-    ProxyStatus(Integer status, String description) {
-        this.status = status;
+    ProxyStatus(Integer code, String description) {
+        this.code = code;
         this.description = description;
     }
 
-    public Integer getStatus() {
-        return status;
+    public Integer getCode() {
+        return code;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public static ProxyStatus fromStatus(Integer status) {
+    public static ProxyStatus fromStatus(Integer code) {
         for (ProxyStatus proxyStatus : values()) {
-            if (proxyStatus.getStatus().equals(status)) {
+            if (proxyStatus.getCode().equals(code)) {
                 return proxyStatus;
             }
         }
-        throw new IllegalArgumentException("Unknown proxy status: " + status);
+        throw new IllegalArgumentException("Unknown proxy code: " + code);
     }
 }

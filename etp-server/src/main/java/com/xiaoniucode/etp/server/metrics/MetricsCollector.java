@@ -8,6 +8,7 @@ import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.metrics.domain.Metrics;
 import com.xiaoniucode.etp.server.metrics.domain.Count;
 import io.netty.channel.Channel;
+import lombok.Getter;
 
 import java.net.InetSocketAddress;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ import java.util.function.Consumer;
  *
  * @author liuxin
  */
+@Getter
 public class MetricsCollector {
     /**
      * 唯一标识
@@ -40,11 +42,11 @@ public class MetricsCollector {
     /**
      * 接收消息数
      */
-    private final LongAdder readMsgs = new LongAdder();
+    private final LongAdder readMessages = new LongAdder();
     /**
      * 发送消息数
      */
-    private final LongAdder writeMsgs = new LongAdder();
+    private final LongAdder writeMessages = new LongAdder();
     /**
      * 接收总字节数
      */
@@ -105,8 +107,8 @@ public class MetricsCollector {
         metrics.setChannels(channels.get());
         metrics.setReadBytes(readBytes.sum());
         metrics.setWriteBytes(writeBytes.sum());
-        metrics.setReadMsgs(readMsgs.sum());
-        metrics.setWriteMsgs(writeMsgs.sum());
+        metrics.setReadMessages(readMessages.sum());
+        metrics.setWriteMessages(writeMessages.sum());
         metrics.setTime(LocalDateTime.now());
         return metrics;
     }
@@ -131,15 +133,15 @@ public class MetricsCollector {
         }
     }
 
-    public void incReadMsgs(long msgs) {
-        if (msgs > 0) {
-            readMsgs.add(msgs);
+    public void incReadMessages(long messages) {
+        if (messages > 0) {
+            readMessages.add(messages);
         }
     }
 
-    public void incWriteMsgs(long msgs) {
-        if (msgs > 0) {
-            writeMsgs.add(msgs);
+    public void incWriteMessages(long messages) {
+        if (messages > 0) {
+            writeMessages.add(messages);
         }
     }
 
@@ -151,27 +153,4 @@ public class MetricsCollector {
         channels.decrementAndGet();
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public AtomicInteger getChannels() {
-        return channels;
-    }
-
-    public LongAdder getReadMsgs() {
-        return readMsgs;
-    }
-
-    public LongAdder getWriteMsgs() {
-        return writeMsgs;
-    }
-
-    public LongAdder getReadBytes() {
-        return readBytes;
-    }
-
-    public LongAdder getWriteBytes() {
-        return writeBytes;
-    }
 }

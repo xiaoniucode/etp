@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.web.domain;
+package com.xiaoniucode.etp.server.web.domain.converter;
 
 import com.xiaoniucode.etp.core.enums.DomainType;
 import jakarta.persistence.AttributeConverter;
@@ -11,7 +11,7 @@ public class DomainTypeConverter implements AttributeConverter<DomainType, Integ
         if (domainType==null){
             return null;
         }
-        return domainType.getType();
+        return domainType.getCode();
     }
 
     @Override

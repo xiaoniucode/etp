@@ -49,7 +49,7 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<ControlMes
             if (agent == null) {
                 return;
             }
-            logger.debug("代理客户端断开连接 - [客户端标识={}，会话标识={}]", agent.getClientId(), agent.getSessionId());
+            logger.debug("客户端与服务端断开连接");
         });
         channelStatusCallback.accept(ctx);
     }

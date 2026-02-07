@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.web.controller.client;
 
 import com.xiaoniucode.etp.server.web.common.Ajax;
-import com.xiaoniucode.etp.server.web.domain.Client;
+import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 import com.xiaoniucode.etp.server.web.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +25,7 @@ public class ClientController {
      */
     @GetMapping
     public Ajax getAll() {
-        List<Client> clients = clientService.findAll();
+        List<ClientDTO> clients = clientService.findAll();
         return Ajax.success(clients);
     }
 
@@ -33,8 +33,8 @@ public class ClientController {
      * 根据 ID 获取客户端
      */
     @GetMapping("/{id}")
-    public Ajax getById(@PathVariable Integer id) {
-        Client client = clientService.findById(id);
+    public Ajax getById(@PathVariable String id) {
+        ClientDTO client = clientService.findById(id);
         return Ajax.success(client);
     }
 
@@ -42,7 +42,7 @@ public class ClientController {
      * 删除单个客户端
      */
     @DeleteMapping("/{id}")
-    public Ajax delete(@PathVariable Integer id) {
+    public Ajax delete(@PathVariable String id) {
         clientService.delete(id);
         return Ajax.success();
     }
@@ -51,18 +51,18 @@ public class ClientController {
      * 批量删除客户端
      */
     @DeleteMapping
-    public Ajax deleteBatch(@RequestBody List<Integer> ids) {
+    public Ajax deleteBatch(@RequestBody List<String> ids) {
         clientService.deleteBatch(ids);
         return Ajax.success();
     }
 
     /**
-     * 剔除客户端（切换状态为离线）
+     * 剔除在线客户端
      */
     @PutMapping("/{id}/kickout")
-    public Ajax kickout(@PathVariable Integer id) {
-        Client client = clientService.kickout(id);
-        return Ajax.success(client);
+    public Ajax kickout(@PathVariable String id) {
+        clientService.kickout(id);
+        return Ajax.success();
     }
 
 }

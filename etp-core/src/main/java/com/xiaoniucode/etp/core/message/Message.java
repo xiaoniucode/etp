@@ -365,13 +365,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
   public enum ClientType
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
-     * <code>WEB_SESSION = 0;</code>
+     * <code>BINARY_DEVICE = 0;</code>
      */
-    WEB_SESSION(0),
+    BINARY_DEVICE(0),
     /**
-     * <code>BINARY_DEVICE = 1;</code>
+     * <code>WEB_SESSION = 1;</code>
      */
-    BINARY_DEVICE(1),
+    WEB_SESSION(1),
     UNRECOGNIZED(-1),
     ;
 
@@ -385,13 +385,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         "ClientType");
     }
     /**
-     * <code>WEB_SESSION = 0;</code>
+     * <code>BINARY_DEVICE = 0;</code>
      */
-    public static final int WEB_SESSION_VALUE = 0;
+    public static final int BINARY_DEVICE_VALUE = 0;
     /**
-     * <code>BINARY_DEVICE = 1;</code>
+     * <code>WEB_SESSION = 1;</code>
      */
-    public static final int BINARY_DEVICE_VALUE = 1;
+    public static final int WEB_SESSION_VALUE = 1;
 
 
     public final int getNumber() {
@@ -418,8 +418,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      */
     public static ClientType forNumber(int value) {
       switch (value) {
-        case 0: return WEB_SESSION;
-        case 1: return BINARY_DEVICE;
+        case 0: return BINARY_DEVICE;
+        case 1: return WEB_SESSION;
         default: return null;
       }
     }
@@ -12942,8 +12942,8 @@ java.lang.String defaultValue) {
       "P\020\312\001\022\n\n\005ERROR\020\315\001\022\t\n\004PONG\020\316\001\022\014\n\007KICKOUT\020\255" +
       "\002\022\020\n\013NEW_VISITOR\020\256\002\022\025\n\020NEW_VISITOR_RESP\020" +
       "\257\002\022\026\n\021HEARTBEAT_TIMEOUT\020\260\002*!\n\014ProtocolTy" +
-      "pe\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001*0\n\nClientType\022\017\n\013W" +
-      "EB_SESSION\020\000\022\021\n\rBINARY_DEVICE\020\001b\006proto3"
+      "pe\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001*0\n\nClientType\022\021\n\rB" +
+      "INARY_DEVICE\020\000\022\017\n\013WEB_SESSION\020\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

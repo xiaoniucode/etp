@@ -23,8 +23,8 @@ enum ProtocolType {
   HTTP = 1;
 }
 enum ClientType{
-  WEB_SESSION = 0;
-  BINARY_DEVICE = 1;
+  BINARY_DEVICE = 0;
+  WEB_SESSION = 1;
 }
 
 message MessageHeader {

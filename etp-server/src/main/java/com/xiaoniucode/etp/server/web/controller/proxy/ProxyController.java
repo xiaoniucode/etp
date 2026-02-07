@@ -5,15 +5,13 @@ import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyCreateRe
 import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyUpdateRequest;
 import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyCreateRequest;
 import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyUpdateRequest;
-import com.xiaoniucode.etp.server.web.controller.proxy.response.HttpProxyVo;
-import com.xiaoniucode.etp.server.web.controller.proxy.response.TcpProxyVo;
+import com.xiaoniucode.etp.server.web.controller.proxy.response.HttpProxyDTO;
+import com.xiaoniucode.etp.server.web.controller.proxy.response.TcpProxyDTO;
 import com.xiaoniucode.etp.server.web.domain.Proxy;
-import com.xiaoniucode.etp.server.web.domain.ProxyDomain;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 代理配置接口控制器
@@ -77,20 +75,21 @@ public class ProxyController {
     /**
      * 根据 ID 查询代理
      */
-    @GetMapping("{id}")
-    public Ajax getProxyById(@PathVariable Integer id) {
-        Proxy proxy = proxyService.getProxyById(id);
+    @GetMapping("{id}/tcp")
+    public Ajax getTcpProxyById(@PathVariable Integer id) {
+        TcpProxyDTO proxy = proxyService.getTcpProxyById(id);
         return Ajax.success(proxy);
 
     }
 
     /**
-     * 根据客户端 ID 查询代理
+     * 根据 ID 查询代理
      */
-    @GetMapping("client/{clientId}")
-    public Ajax getProxiesByClientId(@PathVariable String clientId) {
-        List<Proxy> proxies = proxyService.getProxiesByClientId(clientId);
-        return Ajax.success(proxies);
+    @GetMapping("{id}/http")
+    public Ajax getHttpProxyById(@PathVariable Integer id) {
+        HttpProxyDTO proxy = proxyService.getHttpProxyById(id);
+        return Ajax.success(proxy);
+
     }
 
     /**
@@ -98,7 +97,7 @@ public class ProxyController {
      */
     @GetMapping("tcp")
     public Ajax getTcpProxies() {
-        List<Proxy> proxies = proxyService.getTcpProxies();
+        List<TcpProxyDTO> proxies = proxyService.getTcpProxies();
         return Ajax.success(proxies);
     }
 
@@ -107,8 +106,26 @@ public class ProxyController {
      */
     @GetMapping("http")
     public Ajax getHttpProxies() {
-        List<Proxy> proxies = proxyService.getHttpProxies();
+        List<HttpProxyDTO> proxies = proxyService.getHttpProxies();
         return Ajax.success(proxies);
+    }
+
+    /**
+     * 批量删除代理
+     */
+    @DeleteMapping
+    public Ajax batchDeleteProxies(List<Integer> ids) {
+        proxyService.batchDeleteProxies(ids);
+        return Ajax.success();
+    }
+
+    /**
+     * 切换代理状态
+     */
+    @PutMapping("{id}/status")
+    public Ajax switchProxyStatus(@PathVariable Integer id) {
+        proxyService.switchProxyStatus(id);
+        return Ajax.success();
     }
 
 }

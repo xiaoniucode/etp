@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.web.domain;
+package com.xiaoniucode.etp.server.web.domain.converter;
 
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import jakarta.persistence.AttributeConverter;
@@ -8,7 +8,7 @@ import jakarta.persistence.Converter;
 public class ProxyStatusConverter implements AttributeConverter<ProxyStatus, Integer> {
     @Override
     public Integer convertToDatabaseColumn(ProxyStatus proxyStatus) {
-        return proxyStatus.getStatus();
+        return proxyStatus.getCode();
     }
 
     @Override

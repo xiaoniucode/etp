@@ -110,18 +110,14 @@
             form.render('select');
         })
         //渲染表单详情
-        fetch(`/proxies/${proxyId}`, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
-            }
-        }).then(response => response.json()).then(data => {
+        Rest.get(`/api/proxies/${proxyId}/tcp`).then(data => {
             // 转换数据格式
             const formData = {
                 name: data.name,
                 localIP: data.localIp,
                 localPort: data.localPort,
                 remotePort: data.remotePort,
-                status: data.status === 'ACTIVE' ? '1' : '0'
+                status: data.status === 1 ? '1' : '0'
             };
             form.val('editForm', formData);
             
@@ -159,23 +155,14 @@
             };
             
             // 发送请求
-            fetch(`/proxies/tcp/${proxyId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
-                },
-                body: JSON.stringify({proxy: proxy})
-            }).then(response => response.json()).then(data => {
-                if (data.code === 0) {
-                    layer.msg('更新成功', {icon: 1, time: 400,}, () => {
-                        const parentTable = parent.layui.table;
-                        parentTable.reload('proxy');
-                        parent.layer.close(parent.layer.getFrameIndex(window.name));
-                    });
-                } else {
-                    layer.msg(data.msg || '更新失败', {icon: 2});
-                }
+            Rest.put(`/api/proxies/tcp/${proxyId}`, proxy).then(data => {
+                layer.msg('更新成功', {icon: 1, time: 400,}, () => {
+                    const parentTable = parent.layui.table;
+                    parentTable.reload('proxy');
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).catch(err => {
+                layer.msg(err.message || '更新失败', {icon: 2});
             })
             return false;
         });

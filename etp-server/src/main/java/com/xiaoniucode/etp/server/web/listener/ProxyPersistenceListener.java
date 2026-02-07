@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.web.listener;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.ProxyCreatedEvent;
@@ -70,6 +71,7 @@ public class ProxyPersistenceListener implements EventListener<ProxyCreatedEvent
         proxy.setCompress(config.getCompress());
         proxy.setEncrypt(config.getEncrypt());
         proxy.setSource(1);//todo
+        proxy.setDomainType(config.getDomainType());
         return proxy;
     }
 

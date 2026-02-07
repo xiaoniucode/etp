@@ -52,12 +52,14 @@ public class ControlTunnelHandler extends SimpleChannelInboundHandler<ControlMes
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        logger.debug("客户端连接断开，开始释放资源");
         Channel control = ctx.channel();
         agentSessionManager.disconnect(control);
         Set<Integer> remotePorts = agentSessionManager.getAgentRemotePorts(control);
         Set<String> domains = agentSessionManager.getAgentDomains(control);
         visitorSessionManager.disconnectAllSessionsForAgent(control,remotePorts,domains);
         ChannelUtils.closeOnFlush(control);
+        logger.debug("客户端连接资源释放完成");
         super.channelInactive(ctx);
     }
 

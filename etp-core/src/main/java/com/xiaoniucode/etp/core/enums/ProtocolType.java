@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.core.enums;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
+import lombok.Getter;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public enum ProtocolType {
         Map<String, ProtocolType> nameMap = new HashMap<>();
 
         for (ProtocolType protocol : values()) {
-            typeMap.put(protocol.type, protocol);
+            typeMap.put(protocol.code, protocol);
             nameMap.put(protocol.name().toLowerCase(), protocol);
             nameMap.put(protocol.desc.toLowerCase(), protocol);
         }
@@ -32,15 +33,16 @@ public enum ProtocolType {
         NAME_MAP = Collections.unmodifiableMap(nameMap);
     }
 
-    private final int type;
+    private final int code;
+    @Getter
     private final String desc;
 
-    ProtocolType(int type, String desc) {
-        this.type = type;
+    ProtocolType(int code, String desc) {
+        this.code = code;
         this.desc = desc;
     }
 
-    public static ProtocolType getProtocol(int type) {
+    public static ProtocolType getCode(int type) {
         return TYPE_MAP.get(type);
     }
 
@@ -74,11 +76,8 @@ public enum ProtocolType {
         return protocolType == TCP;
     }
 
-    public int getProtocol() {
-        return type;
+    public int getCode() {
+        return code;
     }
 
-    public String getDesc() {
-        return desc;
-    }
 }

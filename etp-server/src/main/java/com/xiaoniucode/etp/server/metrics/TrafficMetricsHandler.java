@@ -23,7 +23,7 @@ public class TrafficMetricsHandler extends ChannelDuplexHandler {
             return;
         }
         MetricsCollector.doCollector(visitor, collector -> {
-            collector.incReadMsgs(1);
+            collector.incReadMessages(1);
             if (msg instanceof ByteBuf byteBuf) {
                 collector.incReadBytes((byteBuf).readableBytes());
             }
@@ -40,7 +40,7 @@ public class TrafficMetricsHandler extends ChannelDuplexHandler {
             return;
         }
         MetricsCollector.doCollector(visitor, collector -> {
-            collector.incWriteMsgs(1);
+            collector.incWriteMessages(1);
             if (msg instanceof ByteBuf byteBuf) {
                 collector.incWriteBytes((byteBuf).readableBytes());
             }

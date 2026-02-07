@@ -110,7 +110,7 @@ public class TomlConfigLoader implements ConfigSource {
                 Long remotePortValue = proxyTable.getLong("remotePort");
                 Boolean autoDomain = proxyTable.getBoolean("autoDomain", true);
                 List<String> customDomains = proxyTable.getList("customDomains");
-                Long statusValue = proxyTable.getLong("status", ProxyStatus.OPEN.getStatus().longValue());
+                Long statusValue = proxyTable.getLong("status", ProxyStatus.OPEN.getCode().longValue());
                 Boolean encrypt = proxyTable.getBoolean("encrypt");
                 Boolean compress = proxyTable.getBoolean("compress");
 

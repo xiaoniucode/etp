@@ -69,7 +69,7 @@ public class ProxyRegistrar {
         builder.setName(config.getName())
                 .setLocalIp(config.getLocalIp())
                 .setLocalPort(config.getLocalPort())
-                .setStatus(config.getStatus().getStatus())
+                .setStatus(config.getStatus().getCode())
                 .setCompress(config.getCompress())
                 .setEncrypt(config.getEncrypt())
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
