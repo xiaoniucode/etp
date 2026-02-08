@@ -1,8 +1,10 @@
 package com.xiaoniucode.etp.server.web.domain;
 
+import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
+import com.xiaoniucode.etp.server.web.domain.converter.ClientTypeConverter;
 import com.xiaoniucode.etp.server.web.domain.converter.DomainTypeConverter;
 import com.xiaoniucode.etp.server.web.domain.converter.ProtocolTypeConverter;
 import com.xiaoniucode.etp.server.web.domain.converter.ProxyStatusConverter;
@@ -36,16 +38,12 @@ public class Proxy {
     @Column(name = "protocol", nullable = false)
     private ProtocolType protocol;
 
-    @Column(name = "source", nullable = false)
-    private Integer source;
+    @Column(name = "clientType", nullable = false)
+    @Convert(converter = ClientTypeConverter.class)
+    private ClientType clientType;
 
     @Column(name = "local_ip", nullable = false)
     private String localIp;
-    /**
-     * 仅SUB和AUTO 类型域名需要
-     */
-    @Column(name = "base_domain")
-    private String baseDomain;
 
     @Column(name = "local_port", nullable = false)
     private Integer localPort;
@@ -58,7 +56,7 @@ public class Proxy {
     private ProxyStatus status;
 
     @Convert(converter = DomainTypeConverter.class)
-    @Column(name = "domain_type", nullable = false)
+    @Column(name = "domain_type")
     private DomainType domainType;
     /**
      * 是否加密

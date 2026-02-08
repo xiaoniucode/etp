@@ -946,62 +946,51 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional string os = 1;</code>
-     * @return Whether the os field is set.
+     * <code>string clientId = 1;</code>
+     * @return The clientId.
      */
-    boolean hasOs();
+    java.lang.String getClientId();
     /**
-     * <code>optional string os = 1;</code>
-     * @return The os.
-     */
-    java.lang.String getOs();
-    /**
-     * <code>optional string os = 1;</code>
-     * @return The bytes for os.
+     * <code>string clientId = 1;</code>
+     * @return The bytes for clientId.
      */
     com.google.protobuf.ByteString
-        getOsBytes();
+        getClientIdBytes();
 
     /**
-     * <code>optional string arch = 2;</code>
-     * @return Whether the arch field is set.
-     */
-    boolean hasArch();
-    /**
-     * <code>optional string arch = 2;</code>
-     * @return The arch.
-     */
-    java.lang.String getArch();
-    /**
-     * <code>optional string arch = 2;</code>
-     * @return The bytes for arch.
-     */
-    com.google.protobuf.ByteString
-        getArchBytes();
-
-    /**
-     * <code>string token = 3;</code>
+     * <code>string token = 2;</code>
      * @return The token.
      */
     java.lang.String getToken();
     /**
-     * <code>string token = 3;</code>
+     * <code>string token = 2;</code>
      * @return The bytes for token.
      */
     com.google.protobuf.ByteString
         getTokenBytes();
 
     /**
-     * <code>string clientId = 4;</code>
-     * @return The clientId.
+     * <code>string name = 3;</code>
+     * @return The name.
      */
-    java.lang.String getClientId();
+    java.lang.String getName();
     /**
-     * <code>string clientId = 4;</code>
-     * @return The bytes for clientId.
+     * <code>string name = 3;</code>
+     * @return The bytes for name.
      */
     com.google.protobuf.ByteString
-        getClientIdBytes();
+        getNameBytes();
+
+    /**
+     * <code>.com.xiaoniucode.etp.core.message.ClientType clientType = 4;</code>
+     * @return The enum numeric value on the wire for clientType.
+     */
+    int getClientTypeValue();
+    /**
+     * <code>.com.xiaoniucode.etp.core.message.ClientType clientType = 4;</code>
+     * @return The clientType.
+     */
+    com.xiaoniucode.etp.core.message.Message.ClientType getClientType();
 
     /**
      * <code>optional string version = 5;</code>
@@ -1021,20 +1010,38 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         getVersionBytes();
 
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
-     * @return Whether the clientType field is set.
+     * <code>optional string os = 6;</code>
+     * @return Whether the os field is set.
      */
-    boolean hasClientType();
+    boolean hasOs();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
-     * @return The enum numeric value on the wire for clientType.
+     * <code>optional string os = 6;</code>
+     * @return The os.
      */
-    int getClientTypeValue();
+    java.lang.String getOs();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
-     * @return The clientType.
+     * <code>optional string os = 6;</code>
+     * @return The bytes for os.
      */
-    com.xiaoniucode.etp.core.message.Message.ClientType getClientType();
+    com.google.protobuf.ByteString
+        getOsBytes();
+
+    /**
+     * <code>optional string arch = 7;</code>
+     * @return Whether the arch field is set.
+     */
+    boolean hasArch();
+    /**
+     * <code>optional string arch = 7;</code>
+     * @return The arch.
+     */
+    java.lang.String getArch();
+    /**
+     * <code>optional string arch = 7;</code>
+     * @return The bytes for arch.
+     */
+    com.google.protobuf.ByteString
+        getArchBytes();
   }
   /**
    * Protobuf type {@code com.xiaoniucode.etp.core.message.Login}
@@ -1058,12 +1065,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       super(builder);
     }
     private Login() {
+      clientId_ = "";
+      token_ = "";
+      name_ = "";
+      clientType_ = 0;
+      version_ = "";
       os_ = "";
       arch_ = "";
-      token_ = "";
-      clientId_ = "";
-      version_ = "";
-      clientType_ = 0;
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -1080,144 +1088,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     }
 
     private int bitField0_;
-    public static final int OS_FIELD_NUMBER = 1;
-    @SuppressWarnings("serial")
-    private volatile java.lang.Object os_ = "";
-    /**
-     * <code>optional string os = 1;</code>
-     * @return Whether the os field is set.
-     */
-    @java.lang.Override
-    public boolean hasOs() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>optional string os = 1;</code>
-     * @return The os.
-     */
-    @java.lang.Override
-    public java.lang.String getOs() {
-      java.lang.Object ref = os_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        os_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>optional string os = 1;</code>
-     * @return The bytes for os.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getOsBytes() {
-      java.lang.Object ref = os_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        os_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int ARCH_FIELD_NUMBER = 2;
-    @SuppressWarnings("serial")
-    private volatile java.lang.Object arch_ = "";
-    /**
-     * <code>optional string arch = 2;</code>
-     * @return Whether the arch field is set.
-     */
-    @java.lang.Override
-    public boolean hasArch() {
-      return ((bitField0_ & 0x00000002) != 0);
-    }
-    /**
-     * <code>optional string arch = 2;</code>
-     * @return The arch.
-     */
-    @java.lang.Override
-    public java.lang.String getArch() {
-      java.lang.Object ref = arch_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        arch_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>optional string arch = 2;</code>
-     * @return The bytes for arch.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getArchBytes() {
-      java.lang.Object ref = arch_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        arch_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int TOKEN_FIELD_NUMBER = 3;
-    @SuppressWarnings("serial")
-    private volatile java.lang.Object token_ = "";
-    /**
-     * <code>string token = 3;</code>
-     * @return The token.
-     */
-    @java.lang.Override
-    public java.lang.String getToken() {
-      java.lang.Object ref = token_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        token_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string token = 3;</code>
-     * @return The bytes for token.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getTokenBytes() {
-      java.lang.Object ref = token_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        token_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int CLIENTID_FIELD_NUMBER = 4;
+    public static final int CLIENTID_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
     private volatile java.lang.Object clientId_ = "";
     /**
-     * <code>string clientId = 4;</code>
+     * <code>string clientId = 1;</code>
      * @return The clientId.
      */
     @java.lang.Override
@@ -1234,7 +1109,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
     /**
-     * <code>string clientId = 4;</code>
+     * <code>string clientId = 1;</code>
      * @return The bytes for clientId.
      */
     @java.lang.Override
@@ -1252,6 +1127,102 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
 
+    public static final int TOKEN_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object token_ = "";
+    /**
+     * <code>string token = 2;</code>
+     * @return The token.
+     */
+    @java.lang.Override
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string token = 2;</code>
+     * @return The bytes for token.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int NAME_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object name_ = "";
+    /**
+     * <code>string name = 3;</code>
+     * @return The name.
+     */
+    @java.lang.Override
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        name_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string name = 3;</code>
+     * @return The bytes for name.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int CLIENTTYPE_FIELD_NUMBER = 4;
+    private int clientType_ = 0;
+    /**
+     * <code>.com.xiaoniucode.etp.core.message.ClientType clientType = 4;</code>
+     * @return The enum numeric value on the wire for clientType.
+     */
+    @java.lang.Override public int getClientTypeValue() {
+      return clientType_;
+    }
+    /**
+     * <code>.com.xiaoniucode.etp.core.message.ClientType clientType = 4;</code>
+     * @return The clientType.
+     */
+    @java.lang.Override public com.xiaoniucode.etp.core.message.Message.ClientType getClientType() {
+      com.xiaoniucode.etp.core.message.Message.ClientType result = com.xiaoniucode.etp.core.message.Message.ClientType.forNumber(clientType_);
+      return result == null ? com.xiaoniucode.etp.core.message.Message.ClientType.UNRECOGNIZED : result;
+    }
+
     public static final int VERSION_FIELD_NUMBER = 5;
     @SuppressWarnings("serial")
     private volatile java.lang.Object version_ = "";
@@ -1261,7 +1232,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      */
     @java.lang.Override
     public boolean hasVersion() {
-      return ((bitField0_ & 0x00000004) != 0);
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>optional string version = 5;</code>
@@ -1299,29 +1270,98 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
 
-    public static final int CLIENTTYPE_FIELD_NUMBER = 6;
-    private int clientType_ = 0;
+    public static final int OS_FIELD_NUMBER = 6;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object os_ = "";
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
-     * @return Whether the clientType field is set.
+     * <code>optional string os = 6;</code>
+     * @return Whether the os field is set.
      */
-    @java.lang.Override public boolean hasClientType() {
-      return ((bitField0_ & 0x00000008) != 0);
+    @java.lang.Override
+    public boolean hasOs() {
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
-     * @return The enum numeric value on the wire for clientType.
+     * <code>optional string os = 6;</code>
+     * @return The os.
      */
-    @java.lang.Override public int getClientTypeValue() {
-      return clientType_;
+    @java.lang.Override
+    public java.lang.String getOs() {
+      java.lang.Object ref = os_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        os_ = s;
+        return s;
+      }
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
-     * @return The clientType.
+     * <code>optional string os = 6;</code>
+     * @return The bytes for os.
      */
-    @java.lang.Override public com.xiaoniucode.etp.core.message.Message.ClientType getClientType() {
-      com.xiaoniucode.etp.core.message.Message.ClientType result = com.xiaoniucode.etp.core.message.Message.ClientType.forNumber(clientType_);
-      return result == null ? com.xiaoniucode.etp.core.message.Message.ClientType.UNRECOGNIZED : result;
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getOsBytes() {
+      java.lang.Object ref = os_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        os_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int ARCH_FIELD_NUMBER = 7;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object arch_ = "";
+    /**
+     * <code>optional string arch = 7;</code>
+     * @return Whether the arch field is set.
+     */
+    @java.lang.Override
+    public boolean hasArch() {
+      return ((bitField0_ & 0x00000004) != 0);
+    }
+    /**
+     * <code>optional string arch = 7;</code>
+     * @return The arch.
+     */
+    @java.lang.Override
+    public java.lang.String getArch() {
+      java.lang.Object ref = arch_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        arch_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>optional string arch = 7;</code>
+     * @return The bytes for arch.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getArchBytes() {
+      java.lang.Object ref = arch_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        arch_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -1338,23 +1378,26 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (((bitField0_ & 0x00000001) != 0)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 1, os_);
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 2, arch_);
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(clientId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, clientId_);
       }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(token_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 3, token_);
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, token_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(clientId_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 4, clientId_);
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 3, name_);
       }
-      if (((bitField0_ & 0x00000004) != 0)) {
+      if (clientType_ != com.xiaoniucode.etp.core.message.Message.ClientType.BINARY_DEVICE.getNumber()) {
+        output.writeEnum(4, clientType_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 5, version_);
       }
-      if (((bitField0_ & 0x00000008) != 0)) {
-        output.writeEnum(6, clientType_);
+      if (((bitField0_ & 0x00000002) != 0)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 6, os_);
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 7, arch_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1365,24 +1408,27 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (size != -1) return size;
 
       size = 0;
-      if (((bitField0_ & 0x00000001) != 0)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, os_);
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, arch_);
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(clientId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, clientId_);
       }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(token_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, token_);
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, token_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(clientId_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, clientId_);
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, name_);
       }
-      if (((bitField0_ & 0x00000004) != 0)) {
+      if (clientType_ != com.xiaoniucode.etp.core.message.Message.ClientType.BINARY_DEVICE.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(4, clientType_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(5, version_);
       }
-      if (((bitField0_ & 0x00000008) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(6, clientType_);
+      if (((bitField0_ & 0x00000002) != 0)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(6, os_);
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(7, arch_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -1399,6 +1445,18 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       com.xiaoniucode.etp.core.message.Message.Login other = (com.xiaoniucode.etp.core.message.Message.Login) obj;
 
+      if (!getClientId()
+          .equals(other.getClientId())) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
+      if (!getName()
+          .equals(other.getName())) return false;
+      if (clientType_ != other.clientType_) return false;
+      if (hasVersion() != other.hasVersion()) return false;
+      if (hasVersion()) {
+        if (!getVersion()
+            .equals(other.getVersion())) return false;
+      }
       if (hasOs() != other.hasOs()) return false;
       if (hasOs()) {
         if (!getOs()
@@ -1408,19 +1466,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (hasArch()) {
         if (!getArch()
             .equals(other.getArch())) return false;
-      }
-      if (!getToken()
-          .equals(other.getToken())) return false;
-      if (!getClientId()
-          .equals(other.getClientId())) return false;
-      if (hasVersion() != other.hasVersion()) return false;
-      if (hasVersion()) {
-        if (!getVersion()
-            .equals(other.getVersion())) return false;
-      }
-      if (hasClientType() != other.hasClientType()) return false;
-      if (hasClientType()) {
-        if (clientType_ != other.clientType_) return false;
       }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
@@ -1433,6 +1478,18 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CLIENTID_FIELD_NUMBER;
+      hash = (53 * hash) + getClientId().hashCode();
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
+      hash = (37 * hash) + NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getName().hashCode();
+      hash = (37 * hash) + CLIENTTYPE_FIELD_NUMBER;
+      hash = (53 * hash) + clientType_;
+      if (hasVersion()) {
+        hash = (37 * hash) + VERSION_FIELD_NUMBER;
+        hash = (53 * hash) + getVersion().hashCode();
+      }
       if (hasOs()) {
         hash = (37 * hash) + OS_FIELD_NUMBER;
         hash = (53 * hash) + getOs().hashCode();
@@ -1440,18 +1497,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (hasArch()) {
         hash = (37 * hash) + ARCH_FIELD_NUMBER;
         hash = (53 * hash) + getArch().hashCode();
-      }
-      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
-      hash = (53 * hash) + getToken().hashCode();
-      hash = (37 * hash) + CLIENTID_FIELD_NUMBER;
-      hash = (53 * hash) + getClientId().hashCode();
-      if (hasVersion()) {
-        hash = (37 * hash) + VERSION_FIELD_NUMBER;
-        hash = (53 * hash) + getVersion().hashCode();
-      }
-      if (hasClientType()) {
-        hash = (37 * hash) + CLIENTTYPE_FIELD_NUMBER;
-        hash = (53 * hash) + clientType_;
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -1584,12 +1629,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
+        clientId_ = "";
+        token_ = "";
+        name_ = "";
+        clientType_ = 0;
+        version_ = "";
         os_ = "";
         arch_ = "";
-        token_ = "";
-        clientId_ = "";
-        version_ = "";
-        clientType_ = 0;
         return this;
       }
 
@@ -1623,28 +1669,30 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private void buildPartial0(com.xiaoniucode.etp.core.message.Message.Login result) {
         int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.os_ = os_;
-          to_bitField0_ |= 0x00000001;
-        }
-        if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.arch_ = arch_;
-          to_bitField0_ |= 0x00000002;
-        }
-        if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.token_ = token_;
-        }
-        if (((from_bitField0_ & 0x00000008) != 0)) {
           result.clientId_ = clientId_;
         }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.token_ = token_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.name_ = name_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.clientType_ = clientType_;
+        }
+        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000010) != 0)) {
           result.version_ = version_;
-          to_bitField0_ |= 0x00000004;
+          to_bitField0_ |= 0x00000001;
         }
         if (((from_bitField0_ & 0x00000020) != 0)) {
-          result.clientType_ = clientType_;
-          to_bitField0_ |= 0x00000008;
+          result.os_ = os_;
+          to_bitField0_ |= 0x00000002;
+        }
+        if (((from_bitField0_ & 0x00000040) != 0)) {
+          result.arch_ = arch_;
+          to_bitField0_ |= 0x00000004;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -1661,33 +1709,38 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.Login other) {
         if (other == com.xiaoniucode.etp.core.message.Message.Login.getDefaultInstance()) return this;
-        if (other.hasOs()) {
-          os_ = other.os_;
+        if (!other.getClientId().isEmpty()) {
+          clientId_ = other.clientId_;
           bitField0_ |= 0x00000001;
-          onChanged();
-        }
-        if (other.hasArch()) {
-          arch_ = other.arch_;
-          bitField0_ |= 0x00000002;
           onChanged();
         }
         if (!other.getToken().isEmpty()) {
           token_ = other.token_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (!other.getName().isEmpty()) {
+          name_ = other.name_;
           bitField0_ |= 0x00000004;
           onChanged();
         }
-        if (!other.getClientId().isEmpty()) {
-          clientId_ = other.clientId_;
-          bitField0_ |= 0x00000008;
-          onChanged();
+        if (other.clientType_ != 0) {
+          setClientTypeValue(other.getClientTypeValue());
         }
         if (other.hasVersion()) {
           version_ = other.version_;
           bitField0_ |= 0x00000010;
           onChanged();
         }
-        if (other.hasClientType()) {
-          setClientTypeValue(other.getClientTypeValue());
+        if (other.hasOs()) {
+          os_ = other.os_;
+          bitField0_ |= 0x00000020;
+          onChanged();
+        }
+        if (other.hasArch()) {
+          arch_ = other.arch_;
+          bitField0_ |= 0x00000040;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -1716,35 +1769,40 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 done = true;
                 break;
               case 10: {
-                os_ = input.readStringRequireUtf8();
+                clientId_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000001;
                 break;
               } // case 10
               case 18: {
-                arch_ = input.readStringRequireUtf8();
+                token_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000002;
                 break;
               } // case 18
               case 26: {
-                token_ = input.readStringRequireUtf8();
+                name_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000004;
                 break;
               } // case 26
-              case 34: {
-                clientId_ = input.readStringRequireUtf8();
+              case 32: {
+                clientType_ = input.readEnum();
                 bitField0_ |= 0x00000008;
                 break;
-              } // case 34
+              } // case 32
               case 42: {
                 version_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000010;
                 break;
               } // case 42
-              case 48: {
-                clientType_ = input.readEnum();
+              case 50: {
+                os_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000020;
                 break;
-              } // case 48
+              } // case 50
+              case 58: {
+                arch_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000040;
+                break;
+              } // case 58
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -1762,239 +1820,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       private int bitField0_;
 
-      private java.lang.Object os_ = "";
-      /**
-       * <code>optional string os = 1;</code>
-       * @return Whether the os field is set.
-       */
-      public boolean hasOs() {
-        return ((bitField0_ & 0x00000001) != 0);
-      }
-      /**
-       * <code>optional string os = 1;</code>
-       * @return The os.
-       */
-      public java.lang.String getOs() {
-        java.lang.Object ref = os_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          os_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>optional string os = 1;</code>
-       * @return The bytes for os.
-       */
-      public com.google.protobuf.ByteString
-          getOsBytes() {
-        java.lang.Object ref = os_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          os_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string os = 1;</code>
-       * @param value The os to set.
-       * @return This builder for chaining.
-       */
-      public Builder setOs(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        os_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string os = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearOs() {
-        os_ = getDefaultInstance().getOs();
-        bitField0_ = (bitField0_ & ~0x00000001);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string os = 1;</code>
-       * @param value The bytes for os to set.
-       * @return This builder for chaining.
-       */
-      public Builder setOsBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        os_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object arch_ = "";
-      /**
-       * <code>optional string arch = 2;</code>
-       * @return Whether the arch field is set.
-       */
-      public boolean hasArch() {
-        return ((bitField0_ & 0x00000002) != 0);
-      }
-      /**
-       * <code>optional string arch = 2;</code>
-       * @return The arch.
-       */
-      public java.lang.String getArch() {
-        java.lang.Object ref = arch_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          arch_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>optional string arch = 2;</code>
-       * @return The bytes for arch.
-       */
-      public com.google.protobuf.ByteString
-          getArchBytes() {
-        java.lang.Object ref = arch_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          arch_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string arch = 2;</code>
-       * @param value The arch to set.
-       * @return This builder for chaining.
-       */
-      public Builder setArch(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        arch_ = value;
-        bitField0_ |= 0x00000002;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string arch = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearArch() {
-        arch_ = getDefaultInstance().getArch();
-        bitField0_ = (bitField0_ & ~0x00000002);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string arch = 2;</code>
-       * @param value The bytes for arch to set.
-       * @return This builder for chaining.
-       */
-      public Builder setArchBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        arch_ = value;
-        bitField0_ |= 0x00000002;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object token_ = "";
-      /**
-       * <code>string token = 3;</code>
-       * @return The token.
-       */
-      public java.lang.String getToken() {
-        java.lang.Object ref = token_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          token_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string token = 3;</code>
-       * @return The bytes for token.
-       */
-      public com.google.protobuf.ByteString
-          getTokenBytes() {
-        java.lang.Object ref = token_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          token_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string token = 3;</code>
-       * @param value The token to set.
-       * @return This builder for chaining.
-       */
-      public Builder setToken(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        token_ = value;
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string token = 3;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearToken() {
-        token_ = getDefaultInstance().getToken();
-        bitField0_ = (bitField0_ & ~0x00000004);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string token = 3;</code>
-       * @param value The bytes for token to set.
-       * @return This builder for chaining.
-       */
-      public Builder setTokenBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        token_ = value;
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-
       private java.lang.Object clientId_ = "";
       /**
-       * <code>string clientId = 4;</code>
+       * <code>string clientId = 1;</code>
        * @return The clientId.
        */
       public java.lang.String getClientId() {
@@ -2010,7 +1838,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>string clientId = 4;</code>
+       * <code>string clientId = 1;</code>
        * @return The bytes for clientId.
        */
       public com.google.protobuf.ByteString
@@ -2027,7 +1855,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>string clientId = 4;</code>
+       * <code>string clientId = 1;</code>
        * @param value The clientId to set.
        * @return This builder for chaining.
        */
@@ -2035,22 +1863,22 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           java.lang.String value) {
         if (value == null) { throw new NullPointerException(); }
         clientId_ = value;
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <code>string clientId = 4;</code>
+       * <code>string clientId = 1;</code>
        * @return This builder for chaining.
        */
       public Builder clearClientId() {
         clientId_ = getDefaultInstance().getClientId();
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
       /**
-       * <code>string clientId = 4;</code>
+       * <code>string clientId = 1;</code>
        * @param value The bytes for clientId to set.
        * @return This builder for chaining.
        */
@@ -2059,7 +1887,202 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (value == null) { throw new NullPointerException(); }
         checkByteStringIsUtf8(value);
         clientId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object token_ = "";
+      /**
+       * <code>string token = 2;</code>
+       * @return The token.
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string token = 2;</code>
+       * @return The bytes for token.
+       */
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string token = 2;</code>
+       * @param value The token to set.
+       * @return This builder for chaining.
+       */
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        token_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string token = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearToken() {
+        token_ = getDefaultInstance().getToken();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string token = 2;</code>
+       * @param value The bytes for token to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        token_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object name_ = "";
+      /**
+       * <code>string name = 3;</code>
+       * @return The name.
+       */
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          name_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string name = 3;</code>
+       * @return The bytes for name.
+       */
+      public com.google.protobuf.ByteString
+          getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string name = 3;</code>
+       * @param value The name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setName(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        name_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string name = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearName() {
+        name_ = getDefaultInstance().getName();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string name = 3;</code>
+       * @param value The bytes for name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        name_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      private int clientType_ = 0;
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.ClientType clientType = 4;</code>
+       * @return The enum numeric value on the wire for clientType.
+       */
+      @java.lang.Override public int getClientTypeValue() {
+        return clientType_;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.ClientType clientType = 4;</code>
+       * @param value The enum numeric value on the wire for clientType to set.
+       * @return This builder for chaining.
+       */
+      public Builder setClientTypeValue(int value) {
+        clientType_ = value;
         bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.ClientType clientType = 4;</code>
+       * @return The clientType.
+       */
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.ClientType getClientType() {
+        com.xiaoniucode.etp.core.message.Message.ClientType result = com.xiaoniucode.etp.core.message.Message.ClientType.forNumber(clientType_);
+        return result == null ? com.xiaoniucode.etp.core.message.Message.ClientType.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.ClientType clientType = 4;</code>
+       * @param value The clientType to set.
+       * @return This builder for chaining.
+       */
+      public Builder setClientType(com.xiaoniucode.etp.core.message.Message.ClientType value) {
+        if (value == null) { throw new NullPointerException(); }
+        bitField0_ |= 0x00000008;
+        clientType_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.ClientType clientType = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearClientType() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        clientType_ = 0;
         onChanged();
         return this;
       }
@@ -2143,60 +2166,160 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
 
-      private int clientType_ = 0;
+      private java.lang.Object os_ = "";
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
-       * @return Whether the clientType field is set.
+       * <code>optional string os = 6;</code>
+       * @return Whether the os field is set.
        */
-      @java.lang.Override public boolean hasClientType() {
+      public boolean hasOs() {
         return ((bitField0_ & 0x00000020) != 0);
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
-       * @return The enum numeric value on the wire for clientType.
+       * <code>optional string os = 6;</code>
+       * @return The os.
        */
-      @java.lang.Override public int getClientTypeValue() {
-        return clientType_;
+      public java.lang.String getOs() {
+        java.lang.Object ref = os_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          os_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
-       * @param value The enum numeric value on the wire for clientType to set.
+       * <code>optional string os = 6;</code>
+       * @return The bytes for os.
+       */
+      public com.google.protobuf.ByteString
+          getOsBytes() {
+        java.lang.Object ref = os_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          os_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string os = 6;</code>
+       * @param value The os to set.
        * @return This builder for chaining.
        */
-      public Builder setClientTypeValue(int value) {
-        clientType_ = value;
-        bitField0_ |= 0x00000020;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
-       * @return The clientType.
-       */
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.ClientType getClientType() {
-        com.xiaoniucode.etp.core.message.Message.ClientType result = com.xiaoniucode.etp.core.message.Message.ClientType.forNumber(clientType_);
-        return result == null ? com.xiaoniucode.etp.core.message.Message.ClientType.UNRECOGNIZED : result;
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
-       * @param value The clientType to set.
-       * @return This builder for chaining.
-       */
-      public Builder setClientType(com.xiaoniucode.etp.core.message.Message.ClientType value) {
+      public Builder setOs(
+          java.lang.String value) {
         if (value == null) { throw new NullPointerException(); }
+        os_ = value;
         bitField0_ |= 0x00000020;
-        clientType_ = value.getNumber();
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.ClientType clientType = 6;</code>
+       * <code>optional string os = 6;</code>
        * @return This builder for chaining.
        */
-      public Builder clearClientType() {
+      public Builder clearOs() {
+        os_ = getDefaultInstance().getOs();
         bitField0_ = (bitField0_ & ~0x00000020);
-        clientType_ = 0;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string os = 6;</code>
+       * @param value The bytes for os to set.
+       * @return This builder for chaining.
+       */
+      public Builder setOsBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        os_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object arch_ = "";
+      /**
+       * <code>optional string arch = 7;</code>
+       * @return Whether the arch field is set.
+       */
+      public boolean hasArch() {
+        return ((bitField0_ & 0x00000040) != 0);
+      }
+      /**
+       * <code>optional string arch = 7;</code>
+       * @return The arch.
+       */
+      public java.lang.String getArch() {
+        java.lang.Object ref = arch_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          arch_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string arch = 7;</code>
+       * @return The bytes for arch.
+       */
+      public com.google.protobuf.ByteString
+          getArchBytes() {
+        java.lang.Object ref = arch_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          arch_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string arch = 7;</code>
+       * @param value The arch to set.
+       * @return This builder for chaining.
+       */
+      public Builder setArch(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        arch_ = value;
+        bitField0_ |= 0x00000040;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string arch = 7;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearArch() {
+        arch_ = getDefaultInstance().getArch();
+        bitField0_ = (bitField0_ & ~0x00000040);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string arch = 7;</code>
+       * @param value The bytes for arch to set.
+       * @return This builder for chaining.
+       */
+      public Builder setArchBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        arch_ = value;
+        bitField0_ |= 0x00000040;
         onChanged();
         return this;
       }
@@ -2893,63 +3016,45 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         getCustomDomainsBytes(int index);
 
     /**
+     * <pre>
+     * map&lt;string, string&gt; metadata = 12;
+     * </pre>
+     *
      * <code>repeated string subDomains = 11;</code>
      * @return A list containing the subDomains.
      */
     java.util.List<java.lang.String>
         getSubDomainsList();
     /**
+     * <pre>
+     * map&lt;string, string&gt; metadata = 12;
+     * </pre>
+     *
      * <code>repeated string subDomains = 11;</code>
      * @return The count of subDomains.
      */
     int getSubDomainsCount();
     /**
+     * <pre>
+     * map&lt;string, string&gt; metadata = 12;
+     * </pre>
+     *
      * <code>repeated string subDomains = 11;</code>
      * @param index The index of the element to return.
      * @return The subDomains at the given index.
      */
     java.lang.String getSubDomains(int index);
     /**
+     * <pre>
+     * map&lt;string, string&gt; metadata = 12;
+     * </pre>
+     *
      * <code>repeated string subDomains = 11;</code>
      * @param index The index of the value to return.
      * @return The bytes of the subDomains at the given index.
      */
     com.google.protobuf.ByteString
         getSubDomainsBytes(int index);
-
-    /**
-     * <code>map&lt;string, string&gt; metadata = 12;</code>
-     */
-    int getMetadataCount();
-    /**
-     * <code>map&lt;string, string&gt; metadata = 12;</code>
-     */
-    boolean containsMetadata(
-        java.lang.String key);
-    /**
-     * Use {@link #getMetadataMap()} instead.
-     */
-    @java.lang.Deprecated
-    java.util.Map<java.lang.String, java.lang.String>
-    getMetadata();
-    /**
-     * <code>map&lt;string, string&gt; metadata = 12;</code>
-     */
-    java.util.Map<java.lang.String, java.lang.String>
-    getMetadataMap();
-    /**
-     * <code>map&lt;string, string&gt; metadata = 12;</code>
-     */
-    /* nullable */
-java.lang.String getMetadataOrDefault(
-        java.lang.String key,
-        /* nullable */
-java.lang.String defaultValue);
-    /**
-     * <code>map&lt;string, string&gt; metadata = 12;</code>
-     */
-    java.lang.String getMetadataOrThrow(
-        java.lang.String key);
   }
   /**
    * Protobuf type {@code com.xiaoniucode.etp.core.message.NewProxy}
@@ -2987,18 +3092,6 @@ java.lang.String defaultValue);
       return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor;
     }
 
-    @SuppressWarnings({"rawtypes"})
-    @java.lang.Override
-    protected com.google.protobuf.MapFieldReflectionAccessor internalGetMapFieldReflection(
-        int number) {
-      switch (number) {
-        case 12:
-          return internalGetMetadata();
-        default:
-          throw new RuntimeException(
-              "Invalid map field number: " + number);
-      }
-    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -3260,6 +3353,10 @@ java.lang.String defaultValue);
     private com.google.protobuf.LazyStringArrayList subDomains_ =
         com.google.protobuf.LazyStringArrayList.emptyList();
     /**
+     * <pre>
+     * map&lt;string, string&gt; metadata = 12;
+     * </pre>
+     *
      * <code>repeated string subDomains = 11;</code>
      * @return A list containing the subDomains.
      */
@@ -3268,6 +3365,10 @@ java.lang.String defaultValue);
       return subDomains_;
     }
     /**
+     * <pre>
+     * map&lt;string, string&gt; metadata = 12;
+     * </pre>
+     *
      * <code>repeated string subDomains = 11;</code>
      * @return The count of subDomains.
      */
@@ -3275,6 +3376,10 @@ java.lang.String defaultValue);
       return subDomains_.size();
     }
     /**
+     * <pre>
+     * map&lt;string, string&gt; metadata = 12;
+     * </pre>
+     *
      * <code>repeated string subDomains = 11;</code>
      * @param index The index of the element to return.
      * @return The subDomains at the given index.
@@ -3283,6 +3388,10 @@ java.lang.String defaultValue);
       return subDomains_.get(index);
     }
     /**
+     * <pre>
+     * map&lt;string, string&gt; metadata = 12;
+     * </pre>
+     *
      * <code>repeated string subDomains = 11;</code>
      * @param index The index of the value to return.
      * @return The bytes of the subDomains at the given index.
@@ -3290,85 +3399,6 @@ java.lang.String defaultValue);
     public com.google.protobuf.ByteString
         getSubDomainsBytes(int index) {
       return subDomains_.getByteString(index);
-    }
-
-    public static final int METADATA_FIELD_NUMBER = 12;
-    private static final class MetadataDefaultEntryHolder {
-      static final com.google.protobuf.MapEntry<
-          java.lang.String, java.lang.String> defaultEntry =
-              com.google.protobuf.MapEntry
-              .<java.lang.String, java.lang.String>newDefaultInstance(
-                  com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_NewProxy_MetadataEntry_descriptor, 
-                  com.google.protobuf.WireFormat.FieldType.STRING,
-                  "",
-                  com.google.protobuf.WireFormat.FieldType.STRING,
-                  "");
-    }
-    @SuppressWarnings("serial")
-    private com.google.protobuf.MapField<
-        java.lang.String, java.lang.String> metadata_;
-    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-    internalGetMetadata() {
-      if (metadata_ == null) {
-        return com.google.protobuf.MapField.emptyMapField(
-            MetadataDefaultEntryHolder.defaultEntry);
-      }
-      return metadata_;
-    }
-    public int getMetadataCount() {
-      return internalGetMetadata().getMap().size();
-    }
-    /**
-     * <code>map&lt;string, string&gt; metadata = 12;</code>
-     */
-    @java.lang.Override
-    public boolean containsMetadata(
-        java.lang.String key) {
-      if (key == null) { throw new NullPointerException("map key"); }
-      return internalGetMetadata().getMap().containsKey(key);
-    }
-    /**
-     * Use {@link #getMetadataMap()} instead.
-     */
-    @java.lang.Override
-    @java.lang.Deprecated
-    public java.util.Map<java.lang.String, java.lang.String> getMetadata() {
-      return getMetadataMap();
-    }
-    /**
-     * <code>map&lt;string, string&gt; metadata = 12;</code>
-     */
-    @java.lang.Override
-    public java.util.Map<java.lang.String, java.lang.String> getMetadataMap() {
-      return internalGetMetadata().getMap();
-    }
-    /**
-     * <code>map&lt;string, string&gt; metadata = 12;</code>
-     */
-    @java.lang.Override
-    public /* nullable */
-java.lang.String getMetadataOrDefault(
-        java.lang.String key,
-        /* nullable */
-java.lang.String defaultValue) {
-      if (key == null) { throw new NullPointerException("map key"); }
-      java.util.Map<java.lang.String, java.lang.String> map =
-          internalGetMetadata().getMap();
-      return map.containsKey(key) ? map.get(key) : defaultValue;
-    }
-    /**
-     * <code>map&lt;string, string&gt; metadata = 12;</code>
-     */
-    @java.lang.Override
-    public java.lang.String getMetadataOrThrow(
-        java.lang.String key) {
-      if (key == null) { throw new NullPointerException("map key"); }
-      java.util.Map<java.lang.String, java.lang.String> map =
-          internalGetMetadata().getMap();
-      if (!map.containsKey(key)) {
-        throw new java.lang.IllegalArgumentException();
-      }
-      return map.get(key);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -3418,12 +3448,6 @@ java.lang.String defaultValue) {
       for (int i = 0; i < subDomains_.size(); i++) {
         com.google.protobuf.GeneratedMessage.writeString(output, 11, subDomains_.getRaw(i));
       }
-      com.google.protobuf.GeneratedMessage
-        .serializeStringMapTo(
-          output,
-          internalGetMetadata(),
-          MetadataDefaultEntryHolder.defaultEntry,
-          12);
       getUnknownFields().writeTo(output);
     }
 
@@ -3483,16 +3507,6 @@ java.lang.String defaultValue) {
         size += dataSize;
         size += 1 * getSubDomainsList().size();
       }
-      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
-           : internalGetMetadata().getMap().entrySet()) {
-        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-        metadata__ = MetadataDefaultEntryHolder.defaultEntry.newBuilderForType()
-            .setKey(entry.getKey())
-            .setValue(entry.getValue())
-            .build();
-        size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(12, metadata__);
-      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -3547,8 +3561,6 @@ java.lang.String defaultValue) {
           .equals(other.getCustomDomainsList())) return false;
       if (!getSubDomainsList()
           .equals(other.getSubDomainsList())) return false;
-      if (!internalGetMetadata().equals(
-          other.internalGetMetadata())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -3600,10 +3612,6 @@ java.lang.String defaultValue) {
       if (getSubDomainsCount() > 0) {
         hash = (37 * hash) + SUBDOMAINS_FIELD_NUMBER;
         hash = (53 * hash) + getSubDomainsList().hashCode();
-      }
-      if (!internalGetMetadata().getMap().isEmpty()) {
-        hash = (37 * hash) + METADATA_FIELD_NUMBER;
-        hash = (53 * hash) + internalGetMetadata().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -3714,28 +3722,6 @@ java.lang.String defaultValue) {
         return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor;
       }
 
-      @SuppressWarnings({"rawtypes"})
-      protected com.google.protobuf.MapFieldReflectionAccessor internalGetMapFieldReflection(
-          int number) {
-        switch (number) {
-          case 12:
-            return internalGetMetadata();
-          default:
-            throw new RuntimeException(
-                "Invalid map field number: " + number);
-        }
-      }
-      @SuppressWarnings({"rawtypes"})
-      protected com.google.protobuf.MapFieldReflectionAccessor internalGetMutableMapFieldReflection(
-          int number) {
-        switch (number) {
-          case 12:
-            return internalGetMutableMetadata();
-          default:
-            throw new RuntimeException(
-                "Invalid map field number: " + number);
-        }
-      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -3771,7 +3757,6 @@ java.lang.String defaultValue) {
             com.google.protobuf.LazyStringArrayList.emptyList();
         subDomains_ =
             com.google.protobuf.LazyStringArrayList.emptyList();
-        internalGetMutableMetadata().clear();
         return this;
       }
 
@@ -3847,10 +3832,6 @@ java.lang.String defaultValue) {
           subDomains_.makeImmutable();
           result.subDomains_ = subDomains_;
         }
-        if (((from_bitField0_ & 0x00000800) != 0)) {
-          result.metadata_ = internalGetMetadata();
-          result.metadata_.makeImmutable();
-        }
         result.bitField0_ |= to_bitField0_;
       }
 
@@ -3917,9 +3898,6 @@ java.lang.String defaultValue) {
           }
           onChanged();
         }
-        internalGetMutableMetadata().mergeFrom(
-            other.internalGetMetadata());
-        bitField0_ |= 0x00000800;
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -4003,15 +3981,6 @@ java.lang.String defaultValue) {
                 subDomains_.add(s);
                 break;
               } // case 90
-              case 98: {
-                com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-                metadata__ = input.readMessage(
-                    MetadataDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-                internalGetMutableMetadata().getMutableMap().put(
-                    metadata__.getKey(), metadata__.getValue());
-                bitField0_ |= 0x00000800;
-                break;
-              } // case 98
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -4583,6 +4552,10 @@ java.lang.String defaultValue) {
         bitField0_ |= 0x00000400;
       }
       /**
+       * <pre>
+       * map&lt;string, string&gt; metadata = 12;
+       * </pre>
+       *
        * <code>repeated string subDomains = 11;</code>
        * @return A list containing the subDomains.
        */
@@ -4592,6 +4565,10 @@ java.lang.String defaultValue) {
         return subDomains_;
       }
       /**
+       * <pre>
+       * map&lt;string, string&gt; metadata = 12;
+       * </pre>
+       *
        * <code>repeated string subDomains = 11;</code>
        * @return The count of subDomains.
        */
@@ -4599,6 +4576,10 @@ java.lang.String defaultValue) {
         return subDomains_.size();
       }
       /**
+       * <pre>
+       * map&lt;string, string&gt; metadata = 12;
+       * </pre>
+       *
        * <code>repeated string subDomains = 11;</code>
        * @param index The index of the element to return.
        * @return The subDomains at the given index.
@@ -4607,6 +4588,10 @@ java.lang.String defaultValue) {
         return subDomains_.get(index);
       }
       /**
+       * <pre>
+       * map&lt;string, string&gt; metadata = 12;
+       * </pre>
+       *
        * <code>repeated string subDomains = 11;</code>
        * @param index The index of the value to return.
        * @return The bytes of the subDomains at the given index.
@@ -4616,6 +4601,10 @@ java.lang.String defaultValue) {
         return subDomains_.getByteString(index);
       }
       /**
+       * <pre>
+       * map&lt;string, string&gt; metadata = 12;
+       * </pre>
+       *
        * <code>repeated string subDomains = 11;</code>
        * @param index The index to set the value at.
        * @param value The subDomains to set.
@@ -4631,6 +4620,10 @@ java.lang.String defaultValue) {
         return this;
       }
       /**
+       * <pre>
+       * map&lt;string, string&gt; metadata = 12;
+       * </pre>
+       *
        * <code>repeated string subDomains = 11;</code>
        * @param value The subDomains to add.
        * @return This builder for chaining.
@@ -4645,6 +4638,10 @@ java.lang.String defaultValue) {
         return this;
       }
       /**
+       * <pre>
+       * map&lt;string, string&gt; metadata = 12;
+       * </pre>
+       *
        * <code>repeated string subDomains = 11;</code>
        * @param values The subDomains to add.
        * @return This builder for chaining.
@@ -4659,6 +4656,10 @@ java.lang.String defaultValue) {
         return this;
       }
       /**
+       * <pre>
+       * map&lt;string, string&gt; metadata = 12;
+       * </pre>
+       *
        * <code>repeated string subDomains = 11;</code>
        * @return This builder for chaining.
        */
@@ -4670,6 +4671,10 @@ java.lang.String defaultValue) {
         return this;
       }
       /**
+       * <pre>
+       * map&lt;string, string&gt; metadata = 12;
+       * </pre>
+       *
        * <code>repeated string subDomains = 11;</code>
        * @param value The bytes of the subDomains to add.
        * @return This builder for chaining.
@@ -4682,133 +4687,6 @@ java.lang.String defaultValue) {
         subDomains_.add(value);
         bitField0_ |= 0x00000400;
         onChanged();
-        return this;
-      }
-
-      private com.google.protobuf.MapField<
-          java.lang.String, java.lang.String> metadata_;
-      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-          internalGetMetadata() {
-        if (metadata_ == null) {
-          return com.google.protobuf.MapField.emptyMapField(
-              MetadataDefaultEntryHolder.defaultEntry);
-        }
-        return metadata_;
-      }
-      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-          internalGetMutableMetadata() {
-        if (metadata_ == null) {
-          metadata_ = com.google.protobuf.MapField.newMapField(
-              MetadataDefaultEntryHolder.defaultEntry);
-        }
-        if (!metadata_.isMutable()) {
-          metadata_ = metadata_.copy();
-        }
-        bitField0_ |= 0x00000800;
-        onChanged();
-        return metadata_;
-      }
-      public int getMetadataCount() {
-        return internalGetMetadata().getMap().size();
-      }
-      /**
-       * <code>map&lt;string, string&gt; metadata = 12;</code>
-       */
-      @java.lang.Override
-      public boolean containsMetadata(
-          java.lang.String key) {
-        if (key == null) { throw new NullPointerException("map key"); }
-        return internalGetMetadata().getMap().containsKey(key);
-      }
-      /**
-       * Use {@link #getMetadataMap()} instead.
-       */
-      @java.lang.Override
-      @java.lang.Deprecated
-      public java.util.Map<java.lang.String, java.lang.String> getMetadata() {
-        return getMetadataMap();
-      }
-      /**
-       * <code>map&lt;string, string&gt; metadata = 12;</code>
-       */
-      @java.lang.Override
-      public java.util.Map<java.lang.String, java.lang.String> getMetadataMap() {
-        return internalGetMetadata().getMap();
-      }
-      /**
-       * <code>map&lt;string, string&gt; metadata = 12;</code>
-       */
-      @java.lang.Override
-      public /* nullable */
-java.lang.String getMetadataOrDefault(
-          java.lang.String key,
-          /* nullable */
-java.lang.String defaultValue) {
-        if (key == null) { throw new NullPointerException("map key"); }
-        java.util.Map<java.lang.String, java.lang.String> map =
-            internalGetMetadata().getMap();
-        return map.containsKey(key) ? map.get(key) : defaultValue;
-      }
-      /**
-       * <code>map&lt;string, string&gt; metadata = 12;</code>
-       */
-      @java.lang.Override
-      public java.lang.String getMetadataOrThrow(
-          java.lang.String key) {
-        if (key == null) { throw new NullPointerException("map key"); }
-        java.util.Map<java.lang.String, java.lang.String> map =
-            internalGetMetadata().getMap();
-        if (!map.containsKey(key)) {
-          throw new java.lang.IllegalArgumentException();
-        }
-        return map.get(key);
-      }
-      public Builder clearMetadata() {
-        bitField0_ = (bitField0_ & ~0x00000800);
-        internalGetMutableMetadata().getMutableMap()
-            .clear();
-        return this;
-      }
-      /**
-       * <code>map&lt;string, string&gt; metadata = 12;</code>
-       */
-      public Builder removeMetadata(
-          java.lang.String key) {
-        if (key == null) { throw new NullPointerException("map key"); }
-        internalGetMutableMetadata().getMutableMap()
-            .remove(key);
-        return this;
-      }
-      /**
-       * Use alternate mutation accessors instead.
-       */
-      @java.lang.Deprecated
-      public java.util.Map<java.lang.String, java.lang.String>
-          getMutableMetadata() {
-        bitField0_ |= 0x00000800;
-        return internalGetMutableMetadata().getMutableMap();
-      }
-      /**
-       * <code>map&lt;string, string&gt; metadata = 12;</code>
-       */
-      public Builder putMetadata(
-          java.lang.String key,
-          java.lang.String value) {
-        if (key == null) { throw new NullPointerException("map key"); }
-        if (value == null) { throw new NullPointerException("map value"); }
-        internalGetMutableMetadata().getMutableMap()
-            .put(key, value);
-        bitField0_ |= 0x00000800;
-        return this;
-      }
-      /**
-       * <code>map&lt;string, string&gt; metadata = 12;</code>
-       */
-      public Builder putAllMetadata(
-          java.util.Map<java.lang.String, java.lang.String> values) {
-        internalGetMutableMetadata().getMutableMap()
-            .putAll(values);
-        bitField0_ |= 0x00000800;
         return this;
       }
 
@@ -12820,11 +12698,6 @@ java.lang.String defaultValue) {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_xiaoniucode_etp_core_message_NewProxy_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_com_xiaoniucode_etp_core_message_NewProxy_MetadataEntry_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_com_xiaoniucode_etp_core_message_NewProxy_MetadataEntry_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -12886,64 +12759,61 @@ java.lang.String defaultValue) {
       "\n\rmessage.proto\022 com.xiaoniucode.etp.cor" +
       "e.message\"L\n\rMessageHeader\022;\n\004type\030\001 \001(\016" +
       "2-.com.xiaoniucode.etp.core.message.Mess" +
-      "ageType\"\324\001\n\005Login\022\017\n\002os\030\001 \001(\tH\000\210\001\001\022\021\n\004ar" +
-      "ch\030\002 \001(\tH\001\210\001\001\022\r\n\005token\030\003 \001(\t\022\020\n\010clientId" +
-      "\030\004 \001(\t\022\024\n\007version\030\005 \001(\tH\002\210\001\001\022E\n\nclientTy" +
-      "pe\030\006 \001(\0162,.com.xiaoniucode.etp.core.mess" +
-      "age.ClientTypeH\003\210\001\001B\005\n\003_osB\007\n\005_archB\n\n\010_" +
-      "versionB\r\n\013_clientType\"\036\n\tLoginResp\022\021\n\ts" +
-      "essionId\030\001 \001(\t\"\355\003\n\010NewProxy\022\014\n\004name\030\001 \001(" +
-      "\t\022\024\n\007localIp\030\002 \001(\tH\000\210\001\001\022\021\n\tlocalPort\030\003 \001" +
-      "(\005\022\023\n\006status\030\004 \001(\005H\001\210\001\001\022\024\n\007encrypt\030\005 \001(\010" +
-      "H\002\210\001\001\022\025\n\010compress\030\006 \001(\010H\003\210\001\001\022@\n\010protocol" +
-      "\030\007 \001(\0162..com.xiaoniucode.etp.core.messag" +
-      "e.ProtocolType\022\027\n\nremotePort\030\010 \001(\005H\004\210\001\001\022" +
-      "\027\n\nautoDomain\030\t \001(\010H\005\210\001\001\022\025\n\rcustomDomain" +
-      "s\030\n \003(\t\022\022\n\nsubDomains\030\013 \003(\t\022J\n\010metadata\030" +
-      "\014 \003(\01328.com.xiaoniucode.etp.core.message" +
-      ".NewProxy.MetadataEntry\032/\n\rMetadataEntry" +
-      "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\n\n\010_loc" +
-      "alIpB\t\n\007_statusB\n\n\010_encryptB\013\n\t_compress" +
-      "B\r\n\013_remotePortB\r\n\013_autoDomain\"5\n\014NewPro" +
-      "xyResp\022\021\n\tproxyName\030\001 \001(\t\022\022\n\nremoteAddr\030" +
-      "\002 \001(\t\"\037\n\nCloseProxy\022\021\n\tsessionId\030\001 \001(\t\"\215" +
-      "\001\n\016NewVisitorConn\022\021\n\tsessionId\030\001 \001(\t\022\017\n\007" +
-      "localIp\030\002 \001(\t\022\021\n\tlocalPort\030\003 \001(\005\022\024\n\007encr" +
-      "ypt\030\004 \001(\010H\000\210\001\001\022\025\n\010compress\030\005 \001(\010H\001\210\001\001B\n\n" +
-      "\010_encryptB\013\n\t_compress\"\'\n\022NewVisitorConn" +
-      "Resp\022\021\n\tsessionId\030\002 \001(\t\"&\n\005Error\022\014\n\004code" +
-      "\030\001 \001(\005\022\017\n\007message\030\002 \001(\t\"\022\n\020HeartbeatTime" +
-      "out\"\006\n\004Ping\"\006\n\004Pong\"\t\n\007Kickout\"\374\006\n\016Contr" +
-      "olMessage\022?\n\006header\030\001 \001(\0132/.com.xiaoniuc" +
-      "ode.etp.core.message.MessageHeader\0228\n\005lo" +
-      "gin\030\n \001(\0132\'.com.xiaoniucode.etp.core.mes" +
-      "sage.LoginH\000\022>\n\010newProxy\030\013 \001(\0132*.com.xia" +
-      "oniucode.etp.core.message.NewProxyH\000\022B\n\n" +
-      "closeProxy\030\014 \001(\0132,.com.xiaoniucode.etp.c" +
-      "ore.message.CloseProxyH\000\0226\n\004ping\030\r \001(\0132&" +
-      ".com.xiaoniucode.etp.core.message.PingH\000" +
-      "\022F\n\014newProxyResp\030\024 \001(\0132..com.xiaoniucode" +
-      ".etp.core.message.NewProxyRespH\000\0228\n\005erro" +
-      "r\030\025 \001(\0132\'.com.xiaoniucode.etp.core.messa" +
-      "ge.ErrorH\000\0226\n\004pong\030\026 \001(\0132&.com.xiaoniuco" +
-      "de.etp.core.message.PongH\000\022<\n\007kickout\030\036 " +
-      "\001(\0132).com.xiaoniucode.etp.core.message.K" +
-      "ickoutH\000\022J\n\016newVisitorConn\030\037 \001(\01320.com.x" +
-      "iaoniucode.etp.core.message.NewVisitorCo" +
-      "nnH\000\022R\n\022newVisitorConnResp\030  \001(\01324.com.x" +
-      "iaoniucode.etp.core.message.NewVisitorCo" +
-      "nnRespH\000\022@\n\tloginResp\030! \001(\0132+.com.xiaoni" +
-      "ucode.etp.core.message.LoginRespH\000\022N\n\020he" +
-      "artbeatTimeout\030\" \001(\01322.com.xiaoniucode.e" +
-      "tp.core.message.HeartbeatTimeoutH\000B\t\n\007pa" +
-      "yload*\332\001\n\013MessageType\022\013\n\007UNKNOWN\020\000\022\t\n\005LO" +
-      "GIN\020e\022\016\n\nLOGIN_RESP\020h\022\r\n\tNEW_PROXY\020f\022\017\n\013" +
-      "CLOSE_PROXY\020g\022\010\n\004PING\020i\022\023\n\016NEW_PROXY_RES" +
-      "P\020\312\001\022\n\n\005ERROR\020\315\001\022\t\n\004PONG\020\316\001\022\014\n\007KICKOUT\020\255" +
-      "\002\022\020\n\013NEW_VISITOR\020\256\002\022\025\n\020NEW_VISITOR_RESP\020" +
-      "\257\002\022\026\n\021HEARTBEAT_TIMEOUT\020\260\002*!\n\014ProtocolTy" +
-      "pe\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001*0\n\nClientType\022\021\n\rB" +
-      "INARY_DEVICE\020\000\022\017\n\013WEB_SESSION\020\001b\006proto3"
+      "ageType\"\316\001\n\005Login\022\020\n\010clientId\030\001 \001(\t\022\r\n\005t" +
+      "oken\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\022@\n\nclientType\030\004" +
+      " \001(\0162,.com.xiaoniucode.etp.core.message." +
+      "ClientType\022\024\n\007version\030\005 \001(\tH\000\210\001\001\022\017\n\002os\030\006" +
+      " \001(\tH\001\210\001\001\022\021\n\004arch\030\007 \001(\tH\002\210\001\001B\n\n\010_version" +
+      "B\005\n\003_osB\007\n\005_arch\"\036\n\tLoginResp\022\021\n\tsession" +
+      "Id\030\001 \001(\t\"\360\002\n\010NewProxy\022\014\n\004name\030\001 \001(\t\022\024\n\007l" +
+      "ocalIp\030\002 \001(\tH\000\210\001\001\022\021\n\tlocalPort\030\003 \001(\005\022\023\n\006" +
+      "status\030\004 \001(\005H\001\210\001\001\022\024\n\007encrypt\030\005 \001(\010H\002\210\001\001\022" +
+      "\025\n\010compress\030\006 \001(\010H\003\210\001\001\022@\n\010protocol\030\007 \001(\016" +
+      "2..com.xiaoniucode.etp.core.message.Prot" +
+      "ocolType\022\027\n\nremotePort\030\010 \001(\005H\004\210\001\001\022\027\n\naut" +
+      "oDomain\030\t \001(\010H\005\210\001\001\022\025\n\rcustomDomains\030\n \003(" +
+      "\t\022\022\n\nsubDomains\030\013 \003(\tB\n\n\010_localIpB\t\n\007_st" +
+      "atusB\n\n\010_encryptB\013\n\t_compressB\r\n\013_remote" +
+      "PortB\r\n\013_autoDomain\"5\n\014NewProxyResp\022\021\n\tp" +
+      "roxyName\030\001 \001(\t\022\022\n\nremoteAddr\030\002 \001(\t\"\037\n\nCl" +
+      "oseProxy\022\021\n\tsessionId\030\001 \001(\t\"\215\001\n\016NewVisit" +
+      "orConn\022\021\n\tsessionId\030\001 \001(\t\022\017\n\007localIp\030\002 \001" +
+      "(\t\022\021\n\tlocalPort\030\003 \001(\005\022\024\n\007encrypt\030\004 \001(\010H\000" +
+      "\210\001\001\022\025\n\010compress\030\005 \001(\010H\001\210\001\001B\n\n\010_encryptB\013" +
+      "\n\t_compress\"\'\n\022NewVisitorConnResp\022\021\n\tses" +
+      "sionId\030\002 \001(\t\"&\n\005Error\022\014\n\004code\030\001 \001(\005\022\017\n\007m" +
+      "essage\030\002 \001(\t\"\022\n\020HeartbeatTimeout\"\006\n\004Ping" +
+      "\"\006\n\004Pong\"\t\n\007Kickout\"\374\006\n\016ControlMessage\022?" +
+      "\n\006header\030\001 \001(\0132/.com.xiaoniucode.etp.cor" +
+      "e.message.MessageHeader\0228\n\005login\030\n \001(\0132\'" +
+      ".com.xiaoniucode.etp.core.message.LoginH" +
+      "\000\022>\n\010newProxy\030\013 \001(\0132*.com.xiaoniucode.et" +
+      "p.core.message.NewProxyH\000\022B\n\ncloseProxy\030" +
+      "\014 \001(\0132,.com.xiaoniucode.etp.core.message" +
+      ".CloseProxyH\000\0226\n\004ping\030\r \001(\0132&.com.xiaoni" +
+      "ucode.etp.core.message.PingH\000\022F\n\014newProx" +
+      "yResp\030\024 \001(\0132..com.xiaoniucode.etp.core.m" +
+      "essage.NewProxyRespH\000\0228\n\005error\030\025 \001(\0132\'.c" +
+      "om.xiaoniucode.etp.core.message.ErrorH\000\022" +
+      "6\n\004pong\030\026 \001(\0132&.com.xiaoniucode.etp.core" +
+      ".message.PongH\000\022<\n\007kickout\030\036 \001(\0132).com.x" +
+      "iaoniucode.etp.core.message.KickoutH\000\022J\n" +
+      "\016newVisitorConn\030\037 \001(\01320.com.xiaoniucode." +
+      "etp.core.message.NewVisitorConnH\000\022R\n\022new" +
+      "VisitorConnResp\030  \001(\01324.com.xiaoniucode." +
+      "etp.core.message.NewVisitorConnRespH\000\022@\n" +
+      "\tloginResp\030! \001(\0132+.com.xiaoniucode.etp.c" +
+      "ore.message.LoginRespH\000\022N\n\020heartbeatTime" +
+      "out\030\" \001(\01322.com.xiaoniucode.etp.core.mes" +
+      "sage.HeartbeatTimeoutH\000B\t\n\007payload*\332\001\n\013M" +
+      "essageType\022\013\n\007UNKNOWN\020\000\022\t\n\005LOGIN\020e\022\016\n\nLO" +
+      "GIN_RESP\020h\022\r\n\tNEW_PROXY\020f\022\017\n\013CLOSE_PROXY" +
+      "\020g\022\010\n\004PING\020i\022\023\n\016NEW_PROXY_RESP\020\312\001\022\n\n\005ERR" +
+      "OR\020\315\001\022\t\n\004PONG\020\316\001\022\014\n\007KICKOUT\020\255\002\022\020\n\013NEW_VI" +
+      "SITOR\020\256\002\022\025\n\020NEW_VISITOR_RESP\020\257\002\022\026\n\021HEART" +
+      "BEAT_TIMEOUT\020\260\002*!\n\014ProtocolType\022\007\n\003TCP\020\000" +
+      "\022\010\n\004HTTP\020\001*0\n\nClientType\022\021\n\rBINARY_DEVIC" +
+      "E\020\000\022\017\n\013WEB_SESSION\020\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -12960,7 +12830,7 @@ java.lang.String defaultValue) {
     internal_static_com_xiaoniucode_etp_core_message_Login_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Login_descriptor,
-        new java.lang.String[] { "Os", "Arch", "Token", "ClientId", "Version", "ClientType", });
+        new java.lang.String[] { "ClientId", "Token", "Name", "ClientType", "Version", "Os", "Arch", });
     internal_static_com_xiaoniucode_etp_core_message_LoginResp_descriptor =
       getDescriptor().getMessageType(2);
     internal_static_com_xiaoniucode_etp_core_message_LoginResp_fieldAccessorTable = new
@@ -12972,13 +12842,7 @@ java.lang.String defaultValue) {
     internal_static_com_xiaoniucode_etp_core_message_NewProxy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor,
-        new java.lang.String[] { "Name", "LocalIp", "LocalPort", "Status", "Encrypt", "Compress", "Protocol", "RemotePort", "AutoDomain", "CustomDomains", "SubDomains", "Metadata", });
-    internal_static_com_xiaoniucode_etp_core_message_NewProxy_MetadataEntry_descriptor =
-      internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor.getNestedType(0);
-    internal_static_com_xiaoniucode_etp_core_message_NewProxy_MetadataEntry_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_com_xiaoniucode_etp_core_message_NewProxy_MetadataEntry_descriptor,
-        new java.lang.String[] { "Key", "Value", });
+        new java.lang.String[] { "Name", "LocalIp", "LocalPort", "Status", "Encrypt", "Compress", "Protocol", "RemotePort", "AutoDomain", "CustomDomains", "SubDomains", });
     internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_descriptor =
       getDescriptor().getMessageType(4);
     internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_fieldAccessorTable = new

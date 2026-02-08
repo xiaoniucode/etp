@@ -30,6 +30,7 @@ public class MessageWrapper {
                 .build();
         Message.Login login = Message.Login.newBuilder()
                 .setClientId(clientId)
+                .setName(OSUtils.getUsername())
                 .setVersion(version)
                 .setToken(token)
                 .setClientType(Message.ClientType.BINARY_DEVICE)

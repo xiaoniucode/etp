@@ -3,12 +3,14 @@ package com.xiaoniucode.etp.server.web.service.impl;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.client.convert.ClientConvert;
+import com.xiaoniucode.etp.server.web.controller.client.request.ClientSaveRequest;
 import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 import com.xiaoniucode.etp.server.web.domain.Client;
 import com.xiaoniucode.etp.server.web.repository.ClientRepository;
 import com.xiaoniucode.etp.server.web.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -53,6 +55,13 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void kickout(String clientId) {
         agentSessionManager.kickoutAgent(clientId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveClient(ClientSaveRequest request) {
+        Client client = ClientConvert.INSTANCE.toEntity(request);
+        clientRepository.saveAndFlush(client);
     }
 }
 

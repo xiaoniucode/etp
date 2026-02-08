@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.handler.message;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.core.handler.MessageHandler;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
@@ -48,7 +49,13 @@ public class NewProxyRespHandler implements MessageHandler {
         agentSessionManager.getAgentSession(control).ifPresent(agent -> {
             String clientId = agent.getClientId();
             Message.NewProxy newProxy = msg.getNewProxy();
+            ClientType clientType = agent.getClientType();
             ProxyConfig config = buildProxyConfig(newProxy);
+            //判断代理是否已经存在了
+            if (proxyManager.hasProxy(clientId, config)) {
+                logger.warn("代理配置已经存在，跳过注册：[客户端标识={}，代理名称={}]", clientId, config.getName());
+                return;
+            }
             //保存到代理到配置管理器
             proxyManager.addProxy(clientId, config, proxyConfig -> {
                 //发布事件，可订阅事件对其进行持久化或其他操作
@@ -58,12 +65,12 @@ public class NewProxyRespHandler implements MessageHandler {
                     portListenerManager.bindPort(remotePort);
                     agentSessionManager.addPortToAgentSession(remotePort);
                 }
-                if (ProtocolType.isHttp(proxyConfig.getProtocol())){
+                if (ProtocolType.isHttp(proxyConfig.getProtocol())) {
                     Set<String> domains = proxyConfig.getFullDomains();
                     agentSessionManager.addDomainsToAgentSession(domains);
                 }
                 //注册代理配置
-                eventBus.publishAsync(new ProxyCreatedEvent(clientId,proxyConfig));
+                eventBus.publishAsync(new ProxyCreatedEvent(clientId, clientType, proxyConfig));
                 control.writeAndFlush(buildResponse(proxyConfig));
                 logger.debug("代理注册成功: [代理名称={}]", proxyConfig.getName());
             });
@@ -94,7 +101,7 @@ public class NewProxyRespHandler implements MessageHandler {
         if (domains == null || domains.isEmpty()) {
             return builder.build();
         }
-        String host =appConfig.getServerAddr();
+        String host = appConfig.getServerAddr();
         StringBuilder remoteAddr = new StringBuilder();
         if (ProtocolType.isHttp(protocol)) {
             int httpProxyPort = appConfig.getHttpProxyPort();

@@ -63,8 +63,8 @@
             },
             cols: [[
                 {type: 'checkbox', fixed: 'left'},
-                {field: 'name', title: '名称'},
                 {field: 'id', title: '客户端标识'},
+                {field: 'name', title: '名称'},
                 {field: 'os', title: '操作系统'},
                 {field: 'arch', title: '系统架构'},
                 {field: 'version', title: '客户端版本'},
@@ -98,16 +98,12 @@
                     <div style="padding: 20px;">
                         <table class="layui-table">
                             <tr>
-                                <th width="120">ID</th>
+                                <th width="120">客户端标识</th>
                                 <td>${data.id}</td>
                             </tr>
                             <tr>
                                 <th>名称</th>
                                 <td>${data.name}</td>
-                            </tr>
-                            <tr>
-                                <th>客户端标识</th>
-                                <td>${data.id}</td>
                             </tr>
                             <tr>
                                 <th>操作系统</th>

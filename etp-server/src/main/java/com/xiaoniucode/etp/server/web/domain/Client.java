@@ -1,5 +1,7 @@
 package com.xiaoniucode.etp.server.web.domain;
 
+import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.server.web.domain.converter.ClientTypeConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +23,9 @@ public class Client {
     private String id;
     @Column(name = "name", nullable = false)
     private String name;
+    @Column(name = "clientType", nullable = false)
+    @Convert(converter = ClientTypeConverter.class)
+    private ClientType clientType;
     @Column(name = "os", nullable = false)
     private String os;
     @Column(name = "arch", nullable = false)

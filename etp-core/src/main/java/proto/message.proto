@@ -32,12 +32,13 @@ message MessageHeader {
 }
 
 message Login {
-  optional string os = 1;
-  optional  string arch = 2;
-  string token = 3;
-  string clientId = 4;
-  optional  string version = 5;
-  optional ClientType clientType=6;
+  string clientId = 1;
+  string token = 2;
+  string name = 3;
+  ClientType clientType = 4;
+  optional string version = 5;
+  optional string os = 6;
+  optional string arch = 7;
 }
 message LoginResp {
   string sessionId = 1;
@@ -55,7 +56,7 @@ message NewProxy {
   optional  bool autoDomain = 9;
   repeated string customDomains = 10;
   repeated string subDomains = 11;
-  map<string, string> metadata = 12;
+  //  map<string, string> metadata = 12;
 }
 
 message NewProxyResp {

@@ -37,6 +37,7 @@ public class ProxyManager {
     public synchronized ProxyConfig addProxy(String clientId, ProxyConfig proxyConfig) {
         return addProxy(clientId, proxyConfig, null);
     }
+
     public synchronized ProxyConfig addProxy(String clientId, ProxyConfig proxyConfig, Consumer<ProxyConfig> callback) {
         if (!StringUtils.hasText(clientId) || proxyConfig == null) {
             return null;
@@ -67,10 +68,10 @@ public class ProxyManager {
             logger.debug("代理创建成功: [客户端ID={},代理名称={},域名={}]", clientId, proxyConfig.getName(), domains);
         }
         ClientInfo clientInfo = clientManager.getClient(clientId);
-        if (clientInfo!=null){
+        if (clientInfo != null) {
             //clientInfo: proxyName -> ProxyConfig
             clientInfo.getProxyNameToProxyConfig().put(proxyConfig.getName(), proxyConfig);
-        }else {
+        } else {
             //todo
         }
         clientIdToProxyConfigs.computeIfAbsent(clientId, k ->
@@ -137,11 +138,31 @@ public class ProxyManager {
         return portToProxyConfig.get(port);
     }
 
+    public Collection<ProxyConfig> getTcpProxyConfigs() {
+        return portToProxyConfig.values();
+    }
+
     public ProxyConfig getByDomain(String domain) {
         return domainToProxyConfig.get(domain);
     }
 
     public Set<ProxyConfig> getByClientId(String clientId) {
         return clientIdToProxyConfigs.getOrDefault(clientId, new HashSet<>());
+    }
+
+    /**
+     * 判断代理是否已经存在
+     *
+     * @param clientId 客户端标识
+     * @param config   配置信息
+     * @return 是否存在
+     */
+    public Boolean hasProxy(String clientId, ProxyConfig config) {
+        ClientInfo client = clientManager.getClient(clientId);
+        if (client == null) {
+            logger.error("客户端不存在: {}", clientId);
+            return null;
+        }
+        return client.hasName(config.getName());
     }
 }

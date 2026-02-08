@@ -31,4 +31,7 @@ public class OSUtils {
     public static String getOSArch() {
         return System.getProperty("os.arch");
     }
+    public static String getUsername() {
+        return System.getProperty("user.name");
+    }
 }

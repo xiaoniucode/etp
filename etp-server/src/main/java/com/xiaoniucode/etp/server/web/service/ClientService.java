@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.web.service;
 
+import com.xiaoniucode.etp.server.web.controller.client.request.ClientSaveRequest;
 import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 
 import java.util.List;
@@ -29,6 +30,12 @@ public interface ClientService {
      * 剔除在线客户端
      */
     void kickout(String clientId);
+
+    /**
+     * 保存客户端
+     *
+     */
+    void saveClient(ClientSaveRequest request);
 }
 
 

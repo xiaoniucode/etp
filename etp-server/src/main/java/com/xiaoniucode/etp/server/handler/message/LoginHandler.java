@@ -1,10 +1,13 @@
 package com.xiaoniucode.etp.server.handler.message;
 
+import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
+import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
-import com.xiaoniucode.etp.server.enums.ClientType;
+import com.xiaoniucode.etp.server.event.AgentLoginEvent;
 import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.server.manager.domain.AgentSession;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import com.xiaoniucode.etp.server.manager.AccessTokenManager;
 import io.netty.channel.Channel;
@@ -27,6 +30,8 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
     private AgentSessionManager agentSessionManager;
     @Autowired
     private AccessTokenManager accessTokenManager;
+    @Autowired
+    private EventBus eventBus;
 
     @Override
     protected void doHandle(ChannelHandlerContext ctx, ControlMessage msg) {
@@ -68,8 +73,19 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
             case BINARY_DEVICE -> type = ClientType.BINARY_DEVICE;
         }
         //创建代理客户端会话上下文
-        agentSessionManager.createAgentSession(clientId, type, token, control, login.getArch(), login.getOs(), login.getVersion())
+        AgentSession.AgentSessionBuilder builder = AgentSession.builder()
+                .clientId(clientId)
+                .name(login.getName())
+                .clientType(type)
+                .token(token)
+                .control(control)
+                .arch(login.getArch())
+                .os(login.getOs())
+                .version(login.getVersion());
+
+        agentSessionManager.createAgentSession(builder)
                 .ifPresent(session -> {
+                    eventBus.publishAsync(new AgentLoginEvent(session.isNew(), session));
                     //返回登陆成功消息
                     ControlMessage message = MessageWrapper.buildLoginResp(session.getSessionId());
                     control.writeAndFlush(message).addListener(future -> {

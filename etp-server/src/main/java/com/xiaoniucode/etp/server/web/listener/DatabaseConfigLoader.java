@@ -78,7 +78,7 @@ public class DatabaseConfigLoader implements EventListener<TunnelServerStartingE
         // 加载客户端配置
         loadClientConfigs();
         // 加载代理配置
-       // loadProxyConfigs();
+        // loadProxyConfigs();
     }
 
     private void loadProxyConfigs() {
@@ -122,12 +122,10 @@ public class DatabaseConfigLoader implements EventListener<TunnelServerStartingE
                 logger.warn("客户端缓存失败，已存在相同客户端 - 客户端ID：{}", client.getId());
                 continue;
             }
-            ClientInfo clientInfo = new ClientInfo();
-            clientInfo.setClientId(clientInfo.getClientId());
-            clientInfo.setName(client.getName());
-            clientInfo.setOs(client.getOs());
-            clientInfo.setArch(client.getArch());
-            clientInfo.setVersion(clientInfo.getVersion());
+            ClientInfo clientInfo = ClientInfo.builder()
+                    .clientId(client.getId())
+                    .name(client.getName())
+                    .build();
             clientManager.addClient(clientInfo);
             successCount++;
             logger.debug("加载客户端配置到缓存：[客户端ID={}，客户端名字={}]", client.getId(), client.getName());

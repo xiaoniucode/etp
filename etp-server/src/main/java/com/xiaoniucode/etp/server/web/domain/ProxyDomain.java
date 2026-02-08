@@ -20,16 +20,17 @@ public class ProxyDomain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @Column(name = "proxy_id", nullable = false)
     private Integer proxyId;
-    
+    @Column(name = "baseDomain")
+    private String baseDomain;
     @Column(name = "domain", nullable = false)
     private String domain;
     @Convert(converter = DomainTypeConverter.class)
     @Column(name = "domain_type", nullable = false)
     private DomainType domainType;
-    
+
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;

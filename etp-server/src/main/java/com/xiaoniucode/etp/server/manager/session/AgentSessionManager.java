@@ -6,12 +6,11 @@ import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
-import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
-import com.xiaoniucode.etp.server.enums.ClientType;
-import com.xiaoniucode.etp.server.event.AgentRegisteredEvent;
+import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
 import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.server.manager.ClientManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
 import io.netty.channel.Channel;
@@ -60,19 +59,32 @@ public class AgentSessionManager {
     @Autowired
     private ProxyManager proxyManager;
     @Autowired
-    private EventBus eventBus;
-
+    private ClientManager clientManager;
 
     /**
      * 创建代理客户端会话
      * 1.注册系统中已经存在代理配置
      */
-    public Optional<AgentSession> createAgentSession(String clientId, ClientType clientType, String token, Channel control, String arch, String os, String version) {
+    public Optional<AgentSession> createAgentSession(AgentSession.AgentSessionBuilder builder) {
         //为客户端生成一个唯一的 sessionId
         String sessionId = sessionIdGenerator.nextAgentSessionId();
-        AgentSession agentSession = new AgentSession(clientId, clientType, token, control, sessionId, arch, os, version);
-
+        AgentSession tempSession = builder
+                .sessionId(sessionId)
+                .build();
+        String clientId = tempSession.getClientId();
+        boolean hasClient = clientManager.hasClient(clientId);
+        //如果不存在客户端则将其加入到管理器
+        if (!hasClient) {
+            ClientInfo clientInfo = ClientInfo.builder()
+                    .clientId(clientId)
+                    .name(tempSession.getName())
+                    .build();
+            clientManager.addClient(clientInfo);
+        }
+        AgentSession agentSession = builder.isNew(!hasClient).build();
         agentSession.getControl().attr(ChannelConstants.SESSION_ID).set(sessionId);
+        String token = agentSession.getToken();
+        Channel control = agentSession.getControl();
         sessionIdToAgentSession.putIfAbsent(sessionId, agentSession);
 
         tokenToAgentSessions.computeIfAbsent(token,
@@ -103,8 +115,6 @@ public class AgentSessionManager {
                 }
             }
         }
-        //发布代理客户端注册成功事件
-        eventBus.publishAsync(new AgentRegisteredEvent(agentSession));
         return Optional.of(agentSession);
     }
 

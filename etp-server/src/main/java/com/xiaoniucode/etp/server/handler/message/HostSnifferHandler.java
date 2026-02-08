@@ -14,6 +14,7 @@ import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 
 /**
@@ -96,5 +97,18 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             }
         }
         return null;
+    }
+
+    /**
+     * 获取访问用户的IP 地址
+     * @param visitor 访问者
+     * @return IP地址
+     */
+    private String getVisitorIp(Channel visitor) {
+        if (visitor.remoteAddress() instanceof InetSocketAddress) {
+            return ((InetSocketAddress) visitor.remoteAddress())
+                    .getAddress().getHostAddress();
+        }
+        return visitor.remoteAddress().toString();
     }
 }
