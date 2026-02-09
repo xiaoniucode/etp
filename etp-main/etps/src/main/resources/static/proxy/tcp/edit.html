@@ -31,7 +31,7 @@
             <div class="layui-inline">
                 <label class="layui-form-label">内网IP</label>
                 <div class="layui-input-block">
-                    <input type="text" name="localIP" value="127.0.0.1" autocomplete="off" placeholder="默认: 127.0.0.1"
+                    <input type="text" name="localIp" value="127.0.0.1" autocomplete="off" placeholder="默认: 127.0.0.1"
                            class="layui-input">
                 </div>
             </div>
@@ -54,15 +54,15 @@
         <div class="layui-form-item" pane>
             <label class="layui-form-label">压缩传输</label>
             <div class="layui-input-block">
-                <input type="radio" name="AAA" value="1" title="是">
-                <input type="radio" name="AAA" value="2" title="否" checked>
+                <input type="radio" name="compress" value="true" title="是">
+                <input type="radio" name="compress" value="false" title="否" checked>
             </div>
         </div>
         <div class="layui-form-item" pane>
             <label class="layui-form-label">隧道加密</label>
             <div class="layui-input-inline">
-                <input type="radio" name="AAA" value="1" title="是">
-                <input type="radio" name="AAA" value="2" title="否" checked>
+                <input type="radio" name="encrypt" value="true" title="是">
+                <input type="radio" name="encrypt" value="false" title="否" >
             </div>
         </div>
         <div class="layui-form-item" pane>
@@ -117,9 +117,11 @@
                 localIP: data.localIp,
                 localPort: data.localPort,
                 remotePort: data.remotePort,
-                status: data.status === 1 ? '1' : '0'
+                status: data.status === 1 ? '1' : '0',
+                compress: data.compress ? 'true' : 'false',
+                encrypt: data.encrypt ? 'true' : 'false'
             };
-            form.val('editForm', formData);
+            form.val('editForm', data);
             
             const targetClient = clientList.find(function (item) {
                 return item.id === data.clientId;
@@ -134,7 +136,7 @@
         form.on('submit(proxyForm)', function (data) {
             const field = data.field;
             if (field.client) {
-                const [clientId, secretKey] = field.client.split('|', 2);
+                const [clientId] = field.client.split('|', 2);
                 field.clientId = Number(clientId) || 0;
                 delete field.client;
             }
@@ -143,19 +145,18 @@
             const proxy = {
                 clientId: field.clientId,
                 name: field.name,
-                protocol: 'TCP',
-                source: 0, // 手动添加
+                protocol: 1, // TCP
                 localIp: field.localIP || '127.0.0.1',
                 localPort: Number(field.localPort),
                 remotePort: field.remotePort ? Number(field.remotePort) : null,
-                status: field.status ? 'ACTIVE' : 'INACTIVE',
-                domainType: 'NONE',
-                encrypt: false,
-                compress: false
+                status: field.status ? 1 : 0, // 1: ACTIVE, 0: INACTIVE
+                domainType: 0, // NONE
+                encrypt: field.encrypt === 'true',
+                compress: field.compress === 'true'
             };
             
             // 发送请求
-            Rest.put(`/api/proxies/tcp/${proxyId}`, proxy).then(data => {
+            Rest.put(`/api/proxies/tcp`, field).then(data => {
                 layer.msg('更新成功', {icon: 1, time: 400,}, () => {
                     const parentTable = parent.layui.table;
                     parentTable.reload('proxy');

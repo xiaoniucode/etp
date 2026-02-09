@@ -48,7 +48,7 @@ public class ProxyController {
     /**
      * 更新 TCP 代理
      */
-    @PutMapping("tcp/{id}")
+    @PutMapping("tcp")
     public Ajax updateTcpProxy(@RequestBody TcpProxyUpdateRequest request) {
         proxyService.updateTcpProxy(request);
         return Ajax.success();
@@ -57,7 +57,7 @@ public class ProxyController {
     /**
      * 更新 HTTP 代理
      */
-    @PutMapping("http/{id}")
+    @PutMapping("http")
     public Ajax updateHttpProxy(@RequestBody HttpProxyUpdateRequest request) {
         proxyService.updateHttpProxy(request);
         return Ajax.success();

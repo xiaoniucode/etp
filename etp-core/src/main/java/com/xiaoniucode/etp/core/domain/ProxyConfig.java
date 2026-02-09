@@ -14,9 +14,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 @Getter
 public class ProxyConfig {
-    /**
-     * 代理的名称，不能重复
-     */
+    @Setter
+    private String proxyId;
     @Setter
     private String name;
     @Setter

@@ -11,7 +11,6 @@ import lombok.Setter;
 public class TcpProxyCreateRequest {
     private String clientId;
     private String name;
-    private Integer protocol;
     private String localIp;
     private Integer localPort;
     private Integer remotePort;

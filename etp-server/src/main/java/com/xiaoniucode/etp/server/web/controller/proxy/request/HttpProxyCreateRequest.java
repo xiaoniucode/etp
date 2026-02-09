@@ -13,7 +13,6 @@ import java.util.List;
 public class HttpProxyCreateRequest {
     private String clientId;
     private String name;
-    private Integer protocol;
     private String localIp;
     private Integer localPort;
     private Integer status;

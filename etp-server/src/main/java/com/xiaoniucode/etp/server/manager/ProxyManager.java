@@ -4,6 +4,8 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
+import com.xiaoniucode.etp.server.manager.temp.DomainGenerator;
+import com.xiaoniucode.etp.server.manager.temp.DomainManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,10 @@ public class ProxyManager {
     private final Map<String, Set<ProxyConfig>> clientIdToProxyConfigs = new ConcurrentHashMap<>();
     @Autowired
     private ClientManager clientManager;
+    @Autowired
+    private DomainManager domainManager;
+    @Autowired
+    private DomainGenerator domainGenerator;
 
     public synchronized ProxyConfig addProxy(String clientId, ProxyConfig proxyConfig) {
         return addProxy(clientId, proxyConfig, null);

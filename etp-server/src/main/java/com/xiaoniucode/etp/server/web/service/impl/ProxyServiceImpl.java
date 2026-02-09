@@ -1,7 +1,9 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.web.controller.proxy.convert.HttpProxyConvert;
 import com.xiaoniucode.etp.server.web.controller.proxy.convert.TcpProxyConvert;
 import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyCreateRequest;
@@ -17,6 +19,7 @@ import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,12 +36,16 @@ public class ProxyServiceImpl implements ProxyService {
     private final ProxyDomainRepository proxyDomainRepository;
     @Resource
     private AppConfig appConfig;
+    @Autowired
+    private ProxyManager proxyManager;
 
     /**
      * 创建 TCP 代理
      */
     @Transactional
     public void createTcpProxy(TcpProxyCreateRequest proxy) {
+        //判断客户端是否存在
+
     }
 
     /**
@@ -123,8 +130,19 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void switchProxyStatus(Integer id) {
+        proxyRepository.findById(id).ifPresent(proxy -> {
+            ProxyStatus status = proxy.getStatus();
+            if (ProxyStatus.OPEN==status){
+                proxy.setStatus(ProxyStatus.CLOSED);
+            }else {
+                proxy.setStatus(ProxyStatus.OPEN);
+            }
+            //todo 更新内存状态
 
+            proxyRepository.saveAndFlush(proxy);
+        });
     }
 
 }

@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.generator;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 生成系统唯一ID
@@ -9,12 +10,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class GlobalIdGenerator {
 
-    private static final AtomicInteger ID = new AtomicInteger(0);
 
     private GlobalIdGenerator() {
     }
 
-    public static Integer nextId() {
-        return ID.incrementAndGet();
+    public static String uuid32() {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        return new UUID(random.nextLong(), random.nextLong()).toString();
     }
 }

@@ -67,15 +67,15 @@
         <div class="layui-form-item" pane>
             <label class="layui-form-label">压缩传输</label>
             <div class="layui-input-block">
-                <input type="radio" name="AAA" value="1" title="是">
-                <input type="radio" name="AAA" value="2" title="否" checked>
+                <input type="radio" name="compress" value="true" title="是">
+                <input type="radio" name="compress" value="false" title="否" checked>
             </div>
         </div>
         <div class="layui-form-item" pane>
             <label class="layui-form-label">隧道加密</label>
             <div class="layui-input-inline">
-                <input type="radio" name="AAA" value="1" title="是">
-                <input type="radio" name="AAA" value="2" title="否" checked>
+                <input type="radio" name="encrypt" value="true" title="是">
+                <input type="radio" name="encrypt" value="false" title="否" checked>
             </div>
         </div>
         <div class="layui-form-item" pane>
@@ -138,7 +138,9 @@
                 localIP: data.localIp,
                 localPort: data.localPort,
                 status: data.status === 1 ? '1' : '0',
-                domainType: domainTypeStr
+                domainType: domainTypeStr,
+                compress: data.compress ? 'true' : 'false',
+                encrypt: data.encrypt ? 'true' : 'false'
             };
             
             form.val('editForm', formData);
@@ -217,15 +219,14 @@
             const proxy = {
                 clientId: field.clientId,
                 name: field.name,
-                protocol: 'HTTP',
-                source: 0, // 手动添加
+                protocol: 2, // HTTP
                 localIp: field.localIP || '127.0.0.1',
                 localPort: Number(field.localPort),
                 remotePort: null,
-                status: field.status ? 'ACTIVE' : 'INACTIVE',
+                status: field.status ? 1 : 0, // 1: ACTIVE, 0: INACTIVE
                 domainType: domainTypeCode,
-                encrypt: false,
-                compress: false
+                encrypt: field.encrypt === 'true',
+                compress: field.compress === 'true'
             };
             
             // 构建域名列表
@@ -249,7 +250,7 @@
             }
             
             // 发送请求
-            Rest.put(`/api/proxies/http/${proxyId}`, {proxy: proxy, domains: domains}).then(data => {
+            Rest.put(`/api/proxies/http`, {proxy: proxy, domains: domains}).then(data => {
                 layer.msg('更新成功', {icon: 1, time: 400,}, () => {
                     const parentTable = parent.layui.table;
                     parentTable.reload('proxy');

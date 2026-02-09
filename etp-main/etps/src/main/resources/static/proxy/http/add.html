@@ -67,15 +67,15 @@
         <div class="layui-form-item" pane>
             <label class="layui-form-label">压缩传输</label>
             <div class="layui-input-block">
-                <input type="radio" name="AAA" value="1" title="是">
-                <input type="radio" name="AAA" value="2" title="否" checked>
+                <input type="radio" name="compress" value="true" title="是">
+                <input type="radio" name="compress" value="false" title="否" checked>
             </div>
         </div>
         <div class="layui-form-item" pane>
             <label class="layui-form-label">隧道加密</label>
             <div class="layui-input-inline">
-                <input type="radio" name="AAA" value="1" title="是">
-                <input type="radio" name="AAA" value="2" title="否" checked>
+                <input type="radio" name="encrypt" value="true" title="是">
+                <input type="radio" name="encrypt" value="false" title="否" checked>
             </div>
         </div>
         <div class="layui-form-item" pane>
@@ -152,18 +152,24 @@
             }
             
             // 构建代理对象
+            let domainTypeCode = 0;
+            if (field.domainType === 'sub') {
+                domainTypeCode = 1;
+            } else if (field.domainType === 'custom') {
+                domainTypeCode = 2;
+            }
+            
             const proxy = {
                 clientId: field.clientId,
                 name: field.name,
-                protocol: 'HTTP',
-                source: 0, // 手动添加
+                protocol: 2, // HTTP
                 localIp: field.localIP || '127.0.0.1',
                 localPort: Number(field.localPort),
                 remotePort: null,
-                status: field.status ? 'ACTIVE' : 'INACTIVE',
-                domainType: field.domainType.toUpperCase(),
-                encrypt: false,
-                compress: false
+                status: field.status ? 1 : 0, // 1: ACTIVE, 0: INACTIVE
+                domainType: domainTypeCode,
+                encrypt: field.encrypt === 'true',
+                compress: field.compress === 'true'
             };
             
             // 构建域名列表

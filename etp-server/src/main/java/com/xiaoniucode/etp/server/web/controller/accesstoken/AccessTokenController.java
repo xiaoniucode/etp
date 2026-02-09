@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.web.controller.accesstoken;
 import com.xiaoniucode.etp.server.web.common.Ajax;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.CreateAccessTokenRequest;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.UpdateAccessTokenRequest;
+import com.xiaoniucode.etp.server.web.controller.accesstoken.response.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.domain.AccessToken;
 import com.xiaoniucode.etp.server.web.service.AccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class AccessTokenController {
      */
     @GetMapping
     public Ajax getAll() {
-        List<AccessToken> accessTokens = accessTokenService.findAll();
+        List<AccessTokenDTO> accessTokens = accessTokenService.findAll();
         return Ajax.success(accessTokens);
     }
     
@@ -30,7 +31,7 @@ public class AccessTokenController {
      */
     @GetMapping("/{id}")
     public Ajax getById(@PathVariable Integer id) {
-        AccessToken accessToken = accessTokenService.findById(id);
+        AccessTokenDTO accessToken = accessTokenService.findById(id);
         return Ajax.success(accessToken);
     }
     

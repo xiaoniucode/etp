@@ -8,7 +8,6 @@ public record TcpProxyDTO(
         String clientId,
         String name,
         Integer protocol,
-        Integer source,
         String localIp,
         Integer localPort,
         Integer remotePort,

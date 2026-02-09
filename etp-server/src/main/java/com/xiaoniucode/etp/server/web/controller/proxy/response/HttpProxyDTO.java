@@ -9,7 +9,6 @@ public record HttpProxyDTO(
         String clientId,
         String name,
         Integer protocol,
-        Integer source,
         String localIp,
         String baseDomain,
         Integer localPort,

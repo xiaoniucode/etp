@@ -23,6 +23,17 @@ autoDomain = true
 customDomains = ["a.domain1.com"]
 status = 0
 
+
+[[proxies]]
+name = "web11"
+protocol = "http"
+localIp = "localhost"
+localPort = 1025
+autoDomain = true
+subDomains = ["a","b"]
+status = 0
+
+
 [[proxies]]
 name = "web2"
 protocol = "http"

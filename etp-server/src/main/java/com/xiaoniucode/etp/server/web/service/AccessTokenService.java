@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.web.service;
 
+import com.xiaoniucode.etp.server.web.controller.accesstoken.response.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.domain.AccessToken;
 
 import java.util.List;
@@ -13,12 +14,12 @@ public interface AccessTokenService {
     /**
      * 查询所有访问令牌
      */
-    List<AccessToken> findAll();
+    List<AccessTokenDTO> findAll();
 
     /**
      * 根据 ID 查询访问令牌
      */
-    AccessToken findById(Integer id);
+    AccessTokenDTO findById(Integer id);
 
     /**
      * 更新访问令牌
