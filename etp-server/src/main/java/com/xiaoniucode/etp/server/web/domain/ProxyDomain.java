@@ -22,7 +22,7 @@ public class ProxyDomain {
     private Integer id;
 
     @Column(name = "proxy_id", nullable = false)
-    private Integer proxyId;
+    private String proxyId;
     @Column(name = "baseDomain")
     private String baseDomain;
     @Column(name = "domain", nullable = false)

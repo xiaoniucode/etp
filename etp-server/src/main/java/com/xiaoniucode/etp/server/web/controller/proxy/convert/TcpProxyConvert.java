@@ -15,6 +15,7 @@ public interface TcpProxyConvert {
 
     @Mapping(target = "protocol", expression = "java(proxy.getProtocol().getCode())")
     @Mapping(target = "status", expression = "java(proxy.getStatus().getCode())")
+    @Mapping(target = "clientType", expression = "java(proxy.getClientType().getCode())")
     TcpProxyDTO toDTO(Proxy proxy);
 
     List<TcpProxyDTO> toDTOList(List<Proxy> proxies);

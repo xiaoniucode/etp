@@ -11,6 +11,7 @@ public record TcpProxyDTO(
         String localIp,
         Integer localPort,
         Integer remotePort,
+        Integer clientType,
         Integer status,
         Boolean encrypt,
         Boolean compress,

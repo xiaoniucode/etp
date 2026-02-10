@@ -84,10 +84,10 @@
                     }
                 },
                 {
-                    field: 'source', title: '隧道类型', sort: true, templet: function (d) {
-                        if (d.source === 0) {
+                    field: 'clientType', title: '隧道类型', sort: true, templet: function (d) {
+                        if (d.clientType === 0) {
                             return ' <span class="layui-badge layui-bg-orange">web_session</span>';
-                        } else if (d.source === 1) {
+                        } else if (d.clientType === 1) {
                             return '<span class="layui-badge layui-bg-green">binary_device</span>';
                         }
                     }

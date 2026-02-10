@@ -14,6 +14,7 @@ public record HttpProxyDTO(
         Integer localPort,
         Integer status,
         Integer domainType,
+        Integer clientType,
         Boolean encrypt,
         Boolean compress,
         LocalDateTime createdAt,

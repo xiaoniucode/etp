@@ -15,6 +15,7 @@ public interface HttpProxyConvert {
 
     @Mapping(target = "protocol", expression = "java(proxy.getProtocol().getCode())")
     @Mapping(target = "domainType", expression = "java(proxy.getDomainType().getCode())")
+    @Mapping(target = "clientType", expression = "java(proxy.getClientType().getCode())")
     @Mapping(target = "status", expression = "java(proxy.getStatus().getCode())")
     HttpProxyDTO toDTO(Proxy proxy, List<String> domains, int httpProxyPort);
 
