@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.ProxyCreatedEvent;
+import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.PortListenerManager;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
@@ -71,7 +72,10 @@ public class NewProxyRespHandler implements MessageHandler {
                 }
                 //注册代理配置
                 eventBus.publishAsync(new ProxyCreatedEvent(clientId, clientType, proxyConfig));
-                control.writeAndFlush(buildResponse(proxyConfig));
+                Message.NewProxyResp newProxyResp = buildResponse(proxyConfig);
+                Message.MessageHeader header = Message.MessageHeader.newBuilder().setType(Message.MessageType.NEW_PROXY_RESP).build();
+                ControlMessage message = ControlMessage.newBuilder().setHeader(header).setNewProxyResp(newProxyResp).build();
+                control.writeAndFlush(message);
                 logger.debug("代理注册成功: [代理名称={}]", proxyConfig.getName());
             });
         });
@@ -80,6 +84,7 @@ public class NewProxyRespHandler implements MessageHandler {
 
     private ProxyConfig buildProxyConfig(Message.NewProxy proxy) {
         ProxyConfig config = new ProxyConfig();
+        config.setProxyId(GlobalIdGenerator.uuid32());
         config.setName(proxy.getName());
         config.setLocalIp(proxy.getLocalIp());
         config.setLocalPort(proxy.getLocalPort());
@@ -94,9 +99,9 @@ public class NewProxyRespHandler implements MessageHandler {
         return config;
     }
 
-    private Message.NewProxyResp buildResponse(ProxyConfig ext) {
-        ProtocolType protocol = ext.getProtocol();
-        Set<String> domains = ext.getFullDomains();
+    private Message.NewProxyResp buildResponse(ProxyConfig config) {
+        ProtocolType protocol = config.getProtocol();
+        Set<String> domains = config.getFullDomains();
         Message.NewProxyResp.Builder builder = Message.NewProxyResp.newBuilder();
         if (domains == null || domains.isEmpty()) {
             return builder.build();
@@ -114,10 +119,10 @@ public class NewProxyRespHandler implements MessageHandler {
             }
 
         } else if (ProtocolType.isTcp(protocol)) {
-            Integer remotePort = ext.getRemotePort();
+            Integer remotePort = config.getRemotePort();
             remoteAddr.append(host).append(":").append(remotePort);
         }
-        builder.setProxyName(ext.getName());
+        builder.setProxyName(config.getName());
         builder.setRemoteAddr(remoteAddr.toString());
         return builder.build();
     }

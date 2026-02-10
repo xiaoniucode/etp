@@ -15,7 +15,7 @@ public interface ProxyDomainRepository extends JpaRepository<ProxyDomain, Intege
     /**
      * 根据代理ID查询域名
      */
-    List<ProxyDomain> findByProxyId(Integer proxyId);
+    List<ProxyDomain> findByProxyId(String proxyId);
     
     /**
      * 根据域名查询

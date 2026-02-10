@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TcpProxyUpdateRequest {
-    private Integer id;
+    private String id;
     private String clientId;
     private String name;
     private String localIp;

@@ -1,11 +1,11 @@
 package com.xiaoniucode.etp.server.handler.message;
 
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
-import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
-import com.xiaoniucode.etp.server.manager.DomainManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.manager.DomainManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -23,6 +23,7 @@ import java.util.List;
 public class HostSnifferHandler extends ByteToMessageDecoder {
     private final Logger logger = LoggerFactory.getLogger(HostSnifferHandler.class);
     private boolean sniffing = true;
+
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         Channel visitor = ctx.channel();
@@ -51,13 +52,15 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                     } else {
                         domain = host;
                     }
-                    DomainInfo domainInfo = BeanHelper.getBean(DomainManager.class).getDomainInfo(domain);
-                    if (!domainInfo.isActive()) {
+
+                    String proxyId = BeanHelper.getBean(DomainManager.class).getProxyId(domain);
+                    ProxyConfig config = BeanHelper.getBean(ProxyManager.class).getById(proxyId);
+                    if (!config.isOpen()) {
                         visitor.close();
-                        logger.debug("隧道状态为关闭状态");
+                        logger.debug("隧道为关闭状态");
                         return;
                     }
-                    if (!BeanHelper.getBean(ProxyManager.class).hasDomain(domain)) {
+                    if (!BeanHelper.getBean(DomainManager.class).exist(domain)) {
                         logger.warn("没有该域名的代理服务");
                         visitor.close();
                         return;
@@ -101,6 +104,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
 
     /**
      * 获取访问用户的IP 地址
+     *
      * @param visitor 访问者
      * @return IP地址
      */

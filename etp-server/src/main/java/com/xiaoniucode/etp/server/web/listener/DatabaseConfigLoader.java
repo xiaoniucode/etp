@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 如果开启管理面板，则将数据库中的配置全部加载到内存
@@ -86,9 +87,9 @@ public class DatabaseConfigLoader implements EventListener<TunnelServerStartingE
         for (Proxy proxy : proxies) {
             String clientId = proxy.getClientId();
             List<ProxyDomain> proxyDomain = proxyDomainRepository.findByProxyId(proxy.getId());
-            List<String> domains = proxyDomain.stream().map(ProxyDomain::getDomain).toList();
+            Set<String> domains = proxyDomain.stream().map(ProxyDomain::getDomain).collect(Collectors.toSet());
 
-            Set<String> d = domainManager.addDomains(domains);
+            Set<String> d = domainManager.addDomains(proxy.getId(),domains);
             ProxyConfig proxyConfig = toProxyConfig(proxy);
 
             proxyConfig.getFullDomains().addAll(d);
@@ -98,6 +99,7 @@ public class DatabaseConfigLoader implements EventListener<TunnelServerStartingE
 
     private ProxyConfig toProxyConfig(Proxy proxy) {
         ProxyConfig config = new ProxyConfig();
+        config.setProxyId(proxy.getId());
         config.setName(proxy.getName());
         config.setLocalIp(proxy.getLocalIp());
         config.setLocalPort(proxy.getLocalPort());

@@ -67,7 +67,7 @@ public class ProxyController {
      * 删除代理
      */
     @DeleteMapping("{id}")
-    public Ajax deleteProxy(@PathVariable Integer id) {
+    public Ajax deleteProxy(@PathVariable String id) {
         proxyService.deleteProxy(id);
         return Ajax.success();
     }
@@ -76,7 +76,7 @@ public class ProxyController {
      * 根据 ID 查询代理
      */
     @GetMapping("{id}/tcp")
-    public Ajax getTcpProxyById(@PathVariable Integer id) {
+    public Ajax getTcpProxyById(@PathVariable String id) {
         TcpProxyDTO proxy = proxyService.getTcpProxyById(id);
         return Ajax.success(proxy);
 
@@ -86,7 +86,7 @@ public class ProxyController {
      * 根据 ID 查询代理
      */
     @GetMapping("{id}/http")
-    public Ajax getHttpProxyById(@PathVariable Integer id) {
+    public Ajax getHttpProxyById(@PathVariable String id) {
         HttpProxyDTO proxy = proxyService.getHttpProxyById(id);
         return Ajax.success(proxy);
 
@@ -114,7 +114,7 @@ public class ProxyController {
      * 批量删除代理
      */
     @DeleteMapping
-    public Ajax batchDeleteProxies(List<Integer> ids) {
+    public Ajax batchDeleteProxies(List<String> ids) {
         proxyService.batchDeleteProxies(ids);
         return Ajax.success();
     }
@@ -123,7 +123,7 @@ public class ProxyController {
      * 切换代理状态
      */
     @PutMapping("{id}/status")
-    public Ajax switchProxyStatus(@PathVariable Integer id) {
+    public Ajax switchProxyStatus(@PathVariable String id) {
         proxyService.switchProxyStatus(id);
         return Ajax.success();
     }

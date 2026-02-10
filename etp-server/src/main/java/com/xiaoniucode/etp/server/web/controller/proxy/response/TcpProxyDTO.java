@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public record TcpProxyDTO(
-        Integer id,
+        String id,
         String clientId,
         String name,
         Integer protocol,

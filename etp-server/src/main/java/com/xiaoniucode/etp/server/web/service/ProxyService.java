@@ -34,14 +34,14 @@ public interface ProxyService {
     /**
      * 删除代理
      */
-    void deleteProxy(Integer id);
+    void deleteProxy(String id);
 
     /**
      * 根据 ID 查询tcp代理
      */
-    TcpProxyDTO getTcpProxyById(Integer id);
+    TcpProxyDTO getTcpProxyById(String id);
 
-    HttpProxyDTO getHttpProxyById(Integer id);
+    HttpProxyDTO getHttpProxyById(String id);
 
     /**
      * 根据 ID 查询http代理
@@ -50,8 +50,8 @@ public interface ProxyService {
 
     List<HttpProxyDTO> getHttpProxies();
 
-    void batchDeleteProxies(List<Integer> ids);
+    void batchDeleteProxies(List<String> ids);
 
-    void switchProxyStatus(Integer id);
+    void switchProxyStatus(String id);
 
 }

@@ -62,6 +62,7 @@ public class ProxyPersistenceListener implements EventListener<ProxyCreatedEvent
 
     private Proxy toProxy(String clientId, ClientType clientType, ProxyConfig config) {
         Proxy proxy = new Proxy();
+        proxy.setId(config.getProxyId());
         proxy.setClientId(clientId);
         proxy.setName(config.getName());
         proxy.setProtocol(config.getProtocol());

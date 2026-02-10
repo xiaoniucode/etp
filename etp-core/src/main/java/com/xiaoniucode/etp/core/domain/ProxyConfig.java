@@ -82,4 +82,7 @@ public class ProxyConfig {
         }
         return null;
     }
+    public boolean isOpen(){
+        return this.status==ProxyStatus.OPEN;
+    }
 }

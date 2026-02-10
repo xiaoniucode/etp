@@ -16,6 +16,7 @@ public final class GlobalIdGenerator {
 
     public static String uuid32() {
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        return new UUID(random.nextLong(), random.nextLong()).toString();
+        return new UUID(random.nextLong(), random.nextLong()).toString().replace("-", "");
     }
+
 }

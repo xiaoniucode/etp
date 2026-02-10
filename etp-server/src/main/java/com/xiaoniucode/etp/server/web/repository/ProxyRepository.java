@@ -11,12 +11,12 @@ import java.util.List;
  * 代理 Repository
  */
 @Repository
-public interface ProxyRepository extends JpaRepository<Proxy, Integer> {
+public interface ProxyRepository extends JpaRepository<Proxy, String> {
     
     /**
      * 根据客户端ID查询代理
      */
-    List<Proxy> findByClientId(Integer clientId);
+    List<Proxy> findByClientId(String clientId);
     
     /**
      * 根据名称查询代理

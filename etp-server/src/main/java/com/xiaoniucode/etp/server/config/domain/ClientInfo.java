@@ -14,13 +14,14 @@ public class ClientInfo {
     private String clientId;
     private String name;
     /**
-     * proxyName --> proxyConfig
-     * 代理名称与代理配置映射
+     * proxyId --> proxyConfig
      */
-    private final Map<String, ProxyConfig> proxyNameToProxyConfig = new ConcurrentHashMap<>();
+    private final Map<String, ProxyConfig> proxyToProxyConfig = new ConcurrentHashMap<>();
 
-
-    public boolean hasName(String name){
-        return proxyNameToProxyConfig.containsKey(name);
+  public void addProxy(ProxyConfig config){
+      proxyToProxyConfig.put(config.getProxyId(),config);
+  }
+    public boolean exist(String proxyId){
+        return proxyToProxyConfig.containsKey(proxyId);
     }
 }

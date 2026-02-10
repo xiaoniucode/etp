@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 public class HttpProxyUpdateRequest {
-    private Integer id;
+    private String id;
     private String clientId;
     private String name;
     private String localIp;

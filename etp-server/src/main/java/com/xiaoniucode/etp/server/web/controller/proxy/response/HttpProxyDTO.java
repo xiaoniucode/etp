@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record HttpProxyDTO(
-        Integer id,
+        String id,
         String clientId,
         String name,
         Integer protocol,

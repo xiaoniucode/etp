@@ -4,8 +4,6 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
-import com.xiaoniucode.etp.server.manager.temp.DomainGenerator;
-import com.xiaoniucode.etp.server.manager.temp.DomainManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +22,10 @@ public class ProxyManager {
      */
     private final Map<Integer, ProxyConfig> portToProxyConfig = new ConcurrentHashMap<>();
     /**
-     * domain --> ProxyConfig
-     * 域名与代理配置映射
+     * proxyId --> ProxyConfig
+     *
      */
-    private final Map<String, ProxyConfig> domainToProxyConfig = new ConcurrentHashMap<>();
+    private final Map<String, ProxyConfig> proxyIdToProxyConfig = new ConcurrentHashMap<>();
     /**
      * clientId --> ProxyConfigs
      * 每个客户端的配置列表
@@ -40,11 +38,11 @@ public class ProxyManager {
     @Autowired
     private DomainGenerator domainGenerator;
 
-    public synchronized ProxyConfig addProxy(String clientId, ProxyConfig proxyConfig) {
+    public ProxyConfig addProxy(String clientId, ProxyConfig proxyConfig) {
         return addProxy(clientId, proxyConfig, null);
     }
 
-    public synchronized ProxyConfig addProxy(String clientId, ProxyConfig proxyConfig, Consumer<ProxyConfig> callback) {
+    public ProxyConfig addProxy(String clientId, ProxyConfig proxyConfig, Consumer<ProxyConfig> callback) {
         if (!StringUtils.hasText(clientId) || proxyConfig == null) {
             return null;
         }
@@ -62,24 +60,17 @@ public class ProxyManager {
             logger.debug("代理创建成功: [客户端ID={}，代理名称={}，远程端口={}，内网端口={}]", clientId, proxyConfig.getName(), remotePort, proxyConfig.getLocalPort());
         }
         if (ProtocolType.isHttp(protocol)) {
-            Set<String> domains = proxyConfig.getFullDomains();
-            for (String domain : domains) {
-                if (domainToProxyConfig.containsKey(domain)) {
-                    logger.warn("域名冲突[域名={}] 该域名添加失败 [客户端ID={}，代理名称={}]",
-                            domain, clientId, proxyConfig.getName());
-                    continue;
-                }
-                domainToProxyConfig.put(domain, proxyConfig);
-            }
+            Set<String> domains = domainGenerator.generate(proxyConfig);
+            proxyConfig.getFullDomains().clear();
+            proxyConfig.getFullDomains().addAll(domains);
+            domainManager.addDomains(proxyConfig.getProxyId(), domains);
             logger.debug("代理创建成功: [客户端ID={},代理名称={},域名={}]", clientId, proxyConfig.getName(), domains);
         }
         ClientInfo clientInfo = clientManager.getClient(clientId);
         if (clientInfo != null) {
-            //clientInfo: proxyName -> ProxyConfig
-            clientInfo.getProxyNameToProxyConfig().put(proxyConfig.getName(), proxyConfig);
-        } else {
-            //todo
+            clientInfo.addProxy(proxyConfig);
         }
+        proxyIdToProxyConfig.put(proxyConfig.getProxyId(),proxyConfig);
         clientIdToProxyConfigs.computeIfAbsent(clientId, k ->
                 ConcurrentHashMap.newKeySet()).add(proxyConfig);
         if (callback != null) {
@@ -92,12 +83,12 @@ public class ProxyManager {
         return removeProxy(clientId, proxyName, null);
     }
 
-    public synchronized ProxyConfig removeProxy(String clientId, String proxyName, Consumer<ProxyConfig> callback) {
+    public  ProxyConfig removeProxy(String clientId, String proxyId, Consumer<ProxyConfig> callback) {
         ClientInfo clientInfo = clientManager.getClient(clientId);
         if (clientInfo == null) {
             return null;
         }
-        ProxyConfig proxyConfig = clientInfo.getProxyNameToProxyConfig().get(proxyName);
+        ProxyConfig proxyConfig = proxyIdToProxyConfig.get(proxyId);
         if (proxyConfig == null) {
             logger.warn("删除代理失败，代理配置不存在");
             return null;
@@ -107,20 +98,15 @@ public class ProxyManager {
             portToProxyConfig.remove(proxyConfig.getRemotePort());
         }
         if (ProtocolType.isHttp(protocol)) {
-            Set<String> domains = proxyConfig.getFullDomains();
-            if (domains != null && !domains.isEmpty()) {
-                for (String domain : domains) {
-                    domainToProxyConfig.remove(domain);
-                }
-                domains.clear();
-            }
+            //清空该代理的所有域名
+            domainManager.clearDomain(proxyConfig.getProxyId());
         }
         Set<ProxyConfig> proxyConfigs = clientIdToProxyConfigs.get(clientId);
         if (proxyConfigs != null && !proxyConfigs.isEmpty()) {
             Iterator<ProxyConfig> iterator = proxyConfigs.iterator();
             while (iterator.hasNext()) {
                 ProxyConfig config = iterator.next();
-                if (proxyName.equals(config.getName())) {
+                if (proxyId.equals(config.getName())) {
                     iterator.remove();
                     break;
                 }
@@ -129,15 +115,12 @@ public class ProxyManager {
                 clientIdToProxyConfigs.remove(clientId);
             }
         }
+        proxyIdToProxyConfig.remove(proxyConfig.getProxyId());
         logger.debug("代理删除成功: [客户端ID={},代理名称={}]", clientId, proxyConfig.getName());
         if (callback != null) {
             callback.accept(proxyConfig);
         }
         return proxyConfig;
-    }
-
-    public boolean hasDomain(String domain) {
-        return domainToProxyConfig.containsKey(domain);
     }
 
     public ProxyConfig getByRemotePort(Integer port) {
@@ -146,10 +129,6 @@ public class ProxyManager {
 
     public Collection<ProxyConfig> getTcpProxyConfigs() {
         return portToProxyConfig.values();
-    }
-
-    public ProxyConfig getByDomain(String domain) {
-        return domainToProxyConfig.get(domain);
     }
 
     public Set<ProxyConfig> getByClientId(String clientId) {
@@ -169,6 +148,21 @@ public class ProxyManager {
             logger.error("客户端不存在: {}", clientId);
             return null;
         }
-        return client.hasName(config.getName());
+        return client.exist(config.getProxyId());
+    }
+
+    /**
+     * 通过代理配置ID获取配置信息
+     *
+     * @param proxyId 唯一ID
+     * @return 配置信息
+     */
+    public ProxyConfig getById(String proxyId) {
+        return proxyIdToProxyConfig.get(proxyId);
+    }
+
+    public ProxyConfig getByDomain(String domain) {
+        String proxyId = domainManager.getProxyId(domain);
+        return getById(proxyId);
     }
 }

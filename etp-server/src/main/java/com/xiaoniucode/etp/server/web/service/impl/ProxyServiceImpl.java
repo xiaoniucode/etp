@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.web.service.impl;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.web.controller.proxy.convert.HttpProxyConvert;
 import com.xiaoniucode.etp.server.web.controller.proxy.convert.TcpProxyConvert;
@@ -45,6 +46,7 @@ public class ProxyServiceImpl implements ProxyService {
     @Transactional
     public void createTcpProxy(TcpProxyCreateRequest proxy) {
         //判断客户端是否存在
+        String id = GlobalIdGenerator.uuid32();
 
     }
 
@@ -55,13 +57,14 @@ public class ProxyServiceImpl implements ProxyService {
     public void createHttpProxy(HttpProxyCreateRequest proxy) {
         //保存基本信息
         //批量持久化域名
-
+        String id = GlobalIdGenerator.uuid32();
     }
 
     @Override
     @Transactional
     public void updateTcpProxy(TcpProxyUpdateRequest request) {
         //释放域名资源占用
+
     }
 
     @Override
@@ -74,7 +77,7 @@ public class ProxyServiceImpl implements ProxyService {
      * 删除代理
      */
     @Transactional
-    public void deleteProxy(Integer id) {
+    public void deleteProxy(String id) {
         // 删除关联的域名
         proxyDomainRepository.deleteAll(proxyDomainRepository.findByProxyId(id));
         // 删除代理
@@ -83,13 +86,13 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     @Override
-    public TcpProxyDTO getTcpProxyById(Integer id) {
+    public TcpProxyDTO getTcpProxyById(String id) {
         Proxy proxy = proxyRepository.findById(id).orElse(null);
         return proxy != null ? TcpProxyConvert.INSTANCE.toDTO(proxy) : null;
     }
 
     @Override
-    public HttpProxyDTO getHttpProxyById(Integer id) {
+    public HttpProxyDTO getHttpProxyById(String id) {
         Proxy proxy = proxyRepository.findById(id).orElse(null);
         if (proxy == null) {
             return null;
@@ -125,13 +128,13 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     @Override
-    public void batchDeleteProxies(List<Integer> ids) {
+    public void batchDeleteProxies(List<String> ids) {
 
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void switchProxyStatus(Integer id) {
+    public void switchProxyStatus(String id) {
         proxyRepository.findById(id).ifPresent(proxy -> {
             ProxyStatus status = proxy.getStatus();
             if (ProxyStatus.OPEN==status){

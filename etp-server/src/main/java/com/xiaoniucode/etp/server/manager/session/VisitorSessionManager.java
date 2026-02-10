@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
+import com.xiaoniucode.etp.server.manager.DomainManager;
 import com.xiaoniucode.etp.server.manager.ProtocolDetection;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
@@ -42,6 +43,7 @@ public class VisitorSessionManager {
     private ProxyManager proxyManager;
     @Autowired
     private AgentSessionManager agentSessionManager;
+
 
     /**
      * 注册访问者连接信息

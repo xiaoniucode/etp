@@ -6,8 +6,9 @@ import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
 import com.xiaoniucode.etp.server.handler.tunnel.ControlTunnelHandler;
 import com.xiaoniucode.etp.server.handler.tunnel.HttpVisitorHandler;
 import com.xiaoniucode.etp.server.handler.tunnel.TcpVisitorHandler;
-import com.xiaoniucode.etp.server.manager.DomainManager;
 import com.xiaoniucode.etp.server.manager.PortManager;
+import com.xiaoniucode.etp.server.manager.DomainGenerator;
+import com.xiaoniucode.etp.server.manager.DomainManager;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import com.xiaoniucode.etp.server.proxy.HttpProxyServer;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
@@ -37,10 +38,9 @@ public class ServerConfiguration {
     }
 
     @Bean
-    public DomainManager domainManager() {
-        return new DomainManager(config);
+    public DomainGenerator domainGenerator(DomainManager domainManager) {
+        return new DomainGenerator(config.getBaseDomains(),domainManager);
     }
-
     @Bean
     public TcpProxyServer tcpProxyServer(TcpVisitorHandler tcpVisitorHandler, EventBus eventBus) {
         return new TcpProxyServer(tcpVisitorHandler, eventBus);

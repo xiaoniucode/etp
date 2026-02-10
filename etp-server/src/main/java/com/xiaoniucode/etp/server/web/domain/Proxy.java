@@ -25,8 +25,7 @@ import java.time.LocalDateTime;
 @Setter
 public class Proxy {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private String id;
 
     @Column(name = "client_id", nullable = false)
     private String clientId;
