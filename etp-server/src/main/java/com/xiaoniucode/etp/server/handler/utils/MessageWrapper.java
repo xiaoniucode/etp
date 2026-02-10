@@ -100,4 +100,12 @@ public class MessageWrapper {
     }
 
 
+    public static Message.ControlMessage buildNewProxyResp(String name, String remoteAddr) {
+        Message.MessageHeader header = Message.MessageHeader.newBuilder().setType(Message.MessageType.NEW_PROXY_RESP).build();
+        Message.NewProxyResp body = Message.NewProxyResp.newBuilder().setProxyName(name).setRemoteAddr(remoteAddr).build();
+        return Message.ControlMessage.newBuilder()
+                .setHeader(header)
+                .setNewProxyResp(body)
+                .build();
+    }
 }

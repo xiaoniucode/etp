@@ -43,6 +43,7 @@ public class DomainGenerator {
                 }
                 res.add(domain);
             }
+            return res;
         }
 
         //2.处理子域名
@@ -66,6 +67,7 @@ public class DomainGenerator {
                 res.add(candidate);
                 logger.debug("生成子域名成功：{}", candidate);
             }
+            return res;
         }
         //3.根据基础域名自动生成域名
         Boolean autoGenerate = config.getAutoDomain();
@@ -82,6 +84,7 @@ public class DomainGenerator {
             } else {
                 logger.warn("自动生成的域名已被占用：{}", autoDomain);
             }
+            return res;
         }
         return res;
     }

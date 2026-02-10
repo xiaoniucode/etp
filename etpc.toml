@@ -21,7 +21,7 @@ localIp = "localhost"
 localPort = 1024
 autoDomain = true
 customDomains = ["a.domain1.com"]
-status = 0
+status = 1
 
 
 [[proxies]]
@@ -31,7 +31,7 @@ localIp = "localhost"
 localPort = 1025
 autoDomain = true
 subDomains = ["a","b"]
-status = 0
+status = 1
 
 
 [[proxies]]

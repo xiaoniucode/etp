@@ -53,7 +53,13 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                         domain = host;
                     }
 
+
                     String proxyId = BeanHelper.getBean(DomainManager.class).getProxyId(domain);
+                    if (proxyId==null){
+                        visitor.close();
+                        logger.debug("隧道不存在");
+                        return;
+                    }
                     ProxyConfig config = BeanHelper.getBean(ProxyManager.class).getById(proxyId);
                     if (!config.isOpen()) {
                         visitor.close();

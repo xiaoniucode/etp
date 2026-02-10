@@ -10,6 +10,7 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.ProxyCreatedEvent;
 import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
+import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.PortListenerManager;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
@@ -72,10 +73,8 @@ public class NewProxyRespHandler implements MessageHandler {
                 }
                 //注册代理配置
                 eventBus.publishAsync(new ProxyCreatedEvent(clientId, clientType, proxyConfig));
-                Message.NewProxyResp newProxyResp = buildResponse(proxyConfig);
-                Message.MessageHeader header = Message.MessageHeader.newBuilder().setType(Message.MessageType.NEW_PROXY_RESP).build();
-                ControlMessage message = ControlMessage.newBuilder().setHeader(header).setNewProxyResp(newProxyResp).build();
-                control.writeAndFlush(message);
+                Message.ControlMessage controlMessage = buildResponse(proxyConfig);
+                control.writeAndFlush(controlMessage);
                 logger.debug("代理注册成功: [代理名称={}]", proxyConfig.getName());
             });
         });
@@ -83,8 +82,9 @@ public class NewProxyRespHandler implements MessageHandler {
     }
 
     private ProxyConfig buildProxyConfig(Message.NewProxy proxy) {
+        String proxyId = GlobalIdGenerator.uuid32();
         ProxyConfig config = new ProxyConfig();
-        config.setProxyId(GlobalIdGenerator.uuid32());
+        config.setProxyId(proxyId);
         config.setName(proxy.getName());
         config.setLocalIp(proxy.getLocalIp());
         config.setLocalPort(proxy.getLocalPort());
@@ -99,12 +99,13 @@ public class NewProxyRespHandler implements MessageHandler {
         return config;
     }
 
-    private Message.NewProxyResp buildResponse(ProxyConfig config) {
+    private Message.ControlMessage buildResponse(ProxyConfig config) {
         ProtocolType protocol = config.getProtocol();
         Set<String> domains = config.getFullDomains();
-        Message.NewProxyResp.Builder builder = Message.NewProxyResp.newBuilder();
+
         if (domains == null || domains.isEmpty()) {
-            return builder.build();
+            //todo return error
+            return null;
         }
         String host = appConfig.getServerAddr();
         StringBuilder remoteAddr = new StringBuilder();
@@ -122,8 +123,6 @@ public class NewProxyRespHandler implements MessageHandler {
             Integer remotePort = config.getRemotePort();
             remoteAddr.append(host).append(":").append(remotePort);
         }
-        builder.setProxyName(config.getName());
-        builder.setRemoteAddr(remoteAddr.toString());
-        return builder.build();
+        return MessageWrapper.buildNewProxyResp(config.getName(), remoteAddr.toString());
     }
 }

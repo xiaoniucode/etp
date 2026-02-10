@@ -110,6 +110,7 @@ public class TomlConfigLoader implements ConfigSource {
                 Long remotePortValue = proxyTable.getLong("remotePort");
                 Boolean autoDomain = proxyTable.getBoolean("autoDomain", true);
                 List<String> customDomains = proxyTable.getList("customDomains");
+                List<String> subDomains = proxyTable.getList("subDomains");
                 Long statusValue = proxyTable.getLong("status", ProxyStatus.OPEN.getCode().longValue());
                 Boolean encrypt = proxyTable.getBoolean("encrypt");
                 Boolean compress = proxyTable.getBoolean("compress");
@@ -142,6 +143,13 @@ public class TomlConfigLoader implements ConfigSource {
                     for (String domain : customDomains) {
                         if (StringUtils.hasText(domain)) {
                             proxyConfig.getCustomDomains().add(domain.trim());
+                        }
+                    }
+                }
+                if (subDomains != null && !subDomains.isEmpty()) {
+                    for (String domain : subDomains) {
+                        if (StringUtils.hasText(domain)) {
+                            proxyConfig.getSubDomains().add(domain.trim());
                         }
                     }
                 }
