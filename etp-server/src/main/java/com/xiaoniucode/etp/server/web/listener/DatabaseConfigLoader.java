@@ -82,20 +82,20 @@ public class DatabaseConfigLoader implements EventListener<TunnelServerStartingE
         // loadProxyConfigs();
     }
 
-    private void loadProxyConfigs() {
-        List<Proxy> proxies = proxyRepository.findAll();
-        for (Proxy proxy : proxies) {
-            String clientId = proxy.getClientId();
-            List<ProxyDomain> proxyDomain = proxyDomainRepository.findByProxyId(proxy.getId());
-            Set<String> domains = proxyDomain.stream().map(ProxyDomain::getDomain).collect(Collectors.toSet());
-
-            Set<String> d = domainManager.addDomains(proxy.getId(),domains);
-            ProxyConfig proxyConfig = toProxyConfig(proxy);
-
-            proxyConfig.getFullDomains().addAll(d);
-            proxyManager.addProxy(clientId, proxyConfig);
-        }
-    }
+//    private void loadProxyConfigs() {
+//        List<Proxy> proxies = proxyRepository.findAll();
+//        for (Proxy proxy : proxies) {
+//            String clientId = proxy.getClientId();
+//            List<ProxyDomain> proxyDomain = proxyDomainRepository.findByProxyId(proxy.getId());
+//            Set<String> domains = proxyDomain.stream().map(ProxyDomain::getDomain).collect(Collectors.toSet());
+//
+//            Set<String> d = domainManager.addDomains(proxy.getId(),domains);
+//            ProxyConfig proxyConfig = toProxyConfig(proxy);
+//
+//            proxyConfig.getFullDomains().addAll(d);
+//            proxyManager.addProxy(clientId, proxyConfig);
+//        }
+//    }
 
     private ProxyConfig toProxyConfig(Proxy proxy) {
         ProxyConfig config = new ProxyConfig();

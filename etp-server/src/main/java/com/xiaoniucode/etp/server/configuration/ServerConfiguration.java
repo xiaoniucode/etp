@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.server.handler.tunnel.TcpVisitorHandler;
 import com.xiaoniucode.etp.server.manager.PortManager;
 import com.xiaoniucode.etp.server.manager.DomainGenerator;
 import com.xiaoniucode.etp.server.manager.DomainManager;
+import com.xiaoniucode.etp.server.manager.domain.strategy.DomainGenerationStrategy;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import com.xiaoniucode.etp.server.proxy.HttpProxyServer;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
@@ -16,6 +17,8 @@ import com.xiaoniucode.etp.server.proxy.TunnelServer;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class ServerConfiguration {
@@ -38,9 +41,10 @@ public class ServerConfiguration {
     }
 
     @Bean
-    public DomainGenerator domainGenerator(DomainManager domainManager) {
-        return new DomainGenerator(config.getBaseDomains(),domainManager);
+    public DomainGenerator domainGenerator(DomainManager domainManager, List<DomainGenerationStrategy> strategies) {
+        return new DomainGenerator(config.getBaseDomains(), domainManager, strategies);
     }
+
     @Bean
     public TcpProxyServer tcpProxyServer(TcpVisitorHandler tcpVisitorHandler, EventBus eventBus) {
         return new TcpProxyServer(tcpVisitorHandler, eventBus);

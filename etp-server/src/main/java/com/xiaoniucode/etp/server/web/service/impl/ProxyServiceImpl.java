@@ -11,6 +11,7 @@ import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyCreateRe
 import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyUpdateRequest;
 import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyCreateRequest;
 import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyUpdateRequest;
+import com.xiaoniucode.etp.server.web.controller.proxy.response.DomainWithBaseDomain;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.HttpProxyDTO;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.TcpProxyDTO;
 import com.xiaoniucode.etp.server.web.domain.Proxy;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 代理服务实现类
@@ -97,11 +99,10 @@ public class ProxyServiceImpl implements ProxyService {
         if (proxy == null) {
             return null;
         }
-        // 查询关联的域名列表
         List<ProxyDomain> proxyDomains = proxyDomainRepository.findByProxyId(id);
-        List<String> domains = proxyDomains.stream()
-                .map(ProxyDomain::getDomain)
-                .collect(java.util.stream.Collectors.toList());
+        List<DomainWithBaseDomain> domains = proxyDomains.stream()
+                .map(proxyDomain -> new DomainWithBaseDomain(proxyDomain.getDomain(), proxyDomain.getBaseDomain()))
+                .collect(Collectors.toList());
         int httpProxyPort = appConfig.getHttpProxyPort();
         return HttpProxyConvert.INSTANCE.toDTO(proxy, domains, httpProxyPort);
     }
@@ -118,13 +119,13 @@ public class ProxyServiceImpl implements ProxyService {
         return proxies.stream()
                 .map(proxy -> {
                     List<ProxyDomain> proxyDomains = proxyDomainRepository.findByProxyId(proxy.getId());
-                    List<String> domains = proxyDomains.stream()
-                            .map(ProxyDomain::getDomain)
-                            .collect(java.util.stream.Collectors.toList());
+                    List<DomainWithBaseDomain> domains = proxyDomains.stream()
+                            .map(proxyDomain -> new DomainWithBaseDomain(proxyDomain.getDomain(), proxyDomain.getBaseDomain()))
+                            .collect(Collectors.toList());
                     int httpProxyPort = appConfig.getHttpProxyPort();
                     return HttpProxyConvert.INSTANCE.toDTO(proxy, domains, httpProxyPort);
                 })
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override

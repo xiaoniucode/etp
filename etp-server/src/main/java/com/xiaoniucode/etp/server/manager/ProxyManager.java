@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
+import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Component
 public class ProxyManager {
@@ -60,17 +62,18 @@ public class ProxyManager {
             logger.debug("代理创建成功: [客户端ID={}，代理名称={}，远程端口={}，内网端口={}]", clientId, proxyConfig.getName(), remotePort, proxyConfig.getLocalPort());
         }
         if (ProtocolType.isHttp(protocol)) {
-            Set<String> domains = domainGenerator.generate(proxyConfig);
+            Set<DomainInfo> domainInfos = domainGenerator.generate(proxyConfig);
+            Set<String> domains = domainInfos.stream().map(DomainInfo::getFullDomain).collect(Collectors.toSet());
             proxyConfig.getFullDomains().clear();
             proxyConfig.getFullDomains().addAll(domains);
-            domainManager.addDomains(proxyConfig.getProxyId(), domains);
+            domainManager.addDomains(proxyConfig.getProxyId(), domainInfos);
             logger.debug("代理创建成功: [客户端ID={},代理名称={},域名={}]", clientId, proxyConfig.getName(), domains);
         }
         ClientInfo clientInfo = clientManager.getClient(clientId);
         if (clientInfo != null) {
             clientInfo.addProxy(proxyConfig);
         }
-        proxyIdToProxyConfig.put(proxyConfig.getProxyId(),proxyConfig);
+        proxyIdToProxyConfig.put(proxyConfig.getProxyId(), proxyConfig);
         clientIdToProxyConfigs.computeIfAbsent(clientId, k ->
                 ConcurrentHashMap.newKeySet()).add(proxyConfig);
         if (callback != null) {
@@ -83,7 +86,7 @@ public class ProxyManager {
         return removeProxy(clientId, proxyName, null);
     }
 
-    public  ProxyConfig removeProxy(String clientId, String proxyId, Consumer<ProxyConfig> callback) {
+    public ProxyConfig removeProxy(String clientId, String proxyId, Consumer<ProxyConfig> callback) {
         ClientInfo clientInfo = clientManager.getClient(clientId);
         if (clientInfo == null) {
             return null;

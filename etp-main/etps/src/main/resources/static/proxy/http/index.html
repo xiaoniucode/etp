@@ -58,9 +58,14 @@
                         if (d.domains && d.domains.length > 0) {
                             let domainStr = '';
                             for (let i = 0; i < d.domains.length; i++) {
-                                let domain = d.domains[i];
-                                if (domain) {
-                                    let fullUrl = 'http' + '://' + domain;
+                                let domainObj = d.domains[i];
+                                if (domainObj && domainObj.domain) {
+                                    // 将基础域名和子域名进行拼接
+                                    let fullDomain = domainObj.domain;
+                                    if (domainObj.baseDomain) {
+                                        fullDomain = domainObj.domain + '.' + domainObj.baseDomain;
+                                    }
+                                    let fullUrl = 'http' + '://' + fullDomain;
                                     if (d.httpProxyPort && d.httpProxyPort !== 80) {
                                         fullUrl = fullUrl + ":" + d.httpProxyPort;
                                     }

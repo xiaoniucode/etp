@@ -66,7 +66,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                         logger.debug("隧道为关闭状态");
                         return;
                     }
-                    if (!BeanHelper.getBean(DomainManager.class).exist(domain)) {
+                    if (!BeanHelper.getBean(DomainManager.class).exists(domain)) {
                         logger.warn("没有该域名的代理服务");
                         visitor.close();
                         return;

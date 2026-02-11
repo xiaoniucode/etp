@@ -6,19 +6,25 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.ProxyCreatedEvent;
+import com.xiaoniucode.etp.server.manager.DomainManager;
+import com.xiaoniucode.etp.server.manager.domain.AutoDomainInfo;
+import com.xiaoniucode.etp.server.manager.domain.CustomDomainInfo;
+import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
+import com.xiaoniucode.etp.server.manager.domain.SubDomainInfo;
 import com.xiaoniucode.etp.server.web.domain.Proxy;
+import com.xiaoniucode.etp.server.web.domain.ProxyDomain;
 import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -26,14 +32,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Component
 public class ProxyPersistenceListener implements EventListener<ProxyCreatedEvent> {
     private final Logger logger = LoggerFactory.getLogger(ProxyPersistenceListener.class);
-    /**
-     * 缓存累计到一定量再一次新保存到数据库
-     */
-    private static final int BATCH_SIZE = 100;
-    private final Queue<Proxy> queue = new ConcurrentLinkedQueue<>();
-    private final Object flushLock = new Object();
     @Autowired
     private EventBus eventBus;
+    @Autowired
+    private DomainManager domainManager;
     @Autowired
     private ProxyRepository proxyRepository;
     @Autowired
@@ -45,7 +47,7 @@ public class ProxyPersistenceListener implements EventListener<ProxyCreatedEvent
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void onEvent(ProxyCreatedEvent event) {
         String clientId = event.getClientId();
         ClientType clientType = event.getClientType();
@@ -55,8 +57,28 @@ public class ProxyPersistenceListener implements EventListener<ProxyCreatedEvent
         if (ProtocolType.isTcp(protocol)) {
             proxyRepository.saveAndFlush(proxy);
         } else if (ProtocolType.isHttp(protocol)) {
-            proxyRepository.saveAndFlush(proxy);
-
+            //保存代理基础配置信息
+            Proxy p = proxyRepository.saveAndFlush(proxy);
+            List<ProxyDomain> batch = new ArrayList<>();
+            Set<String> fullDomains = config.getFullDomains();
+            for (String domain : fullDomains) {
+                ProxyDomain proxyDomain = new ProxyDomain();
+                proxyDomain.setProxyId(p.getId());
+                DomainInfo domainInfo = domainManager.getDomainInfo(domain);
+                if (domainInfo instanceof CustomDomainInfo customDomain){
+                    String fullDomain = customDomain.getFullDomain();
+                    proxyDomain.setDomain(fullDomain);
+                }else if (domainInfo instanceof SubDomainInfo subDomain){
+                    proxyDomain.setBaseDomain(subDomain.getBaseDomain());
+                    proxyDomain.setDomain(subDomain.getSubDomain());
+                }else if (domainInfo instanceof AutoDomainInfo autoDomain){
+                    proxyDomain.setBaseDomain(autoDomain.getBaseDomain());
+                    proxyDomain.setDomain(autoDomain.getPrefix());
+                }
+                batch.add(proxyDomain);
+            }
+            //批量保存所有域名信息
+            proxyDomainRepository.saveAllAndFlush(batch);
         }
     }
 
@@ -80,14 +102,5 @@ public class ProxyPersistenceListener implements EventListener<ProxyCreatedEvent
             proxy.setDomainType(config.getDomainType());
         }
         return proxy;
-    }
-
-
-    /**
-     * 应用关闭之前，将缓存中的全部保存到数据库
-     */
-    @PreDestroy
-    public void destroy() {
-
     }
 }

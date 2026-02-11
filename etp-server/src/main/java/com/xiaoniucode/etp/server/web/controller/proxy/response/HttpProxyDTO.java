@@ -10,7 +10,6 @@ public record HttpProxyDTO(
         String name,
         Integer protocol,
         String localIp,
-        String baseDomain,
         Integer localPort,
         Integer status,
         Integer domainType,
@@ -19,7 +18,7 @@ public record HttpProxyDTO(
         Boolean compress,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        List<String> domains,
+        List<DomainWithBaseDomain> domains,
         Integer httpProxyPort
 ) implements Serializable {
 }

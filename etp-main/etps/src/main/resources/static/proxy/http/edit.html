@@ -166,7 +166,8 @@
                 $('#subDomainsGroup').show();
                 // 填充子域名
                 if (data.domains) {
-                    $('textarea[name="subDomains"]').val(data.domains.join('\n'));
+                    const domainList = data.domains.map(domainObj => domainObj.domain).filter(Boolean);
+                    $('textarea[name="subDomains"]').val(domainList.join('\n'));
                 }
             } else if (data.domainType === 2) {
                 $('input[name="domainType"][value="custom"]').prop('checked', true);
@@ -175,7 +176,8 @@
                 $('#subDomainsGroup').hide();
                 // 填充自定义域名
                 if (data.domains) {
-                    $('textarea[name="customDomains"]').val(data.domains.join('\n'));
+                    const domainList = data.domains.map(domainObj => domainObj.domain).filter(Boolean);
+                    $('textarea[name="customDomains"]').val(domainList.join('\n'));
                 }
             }
             form.render('radio');

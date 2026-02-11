@@ -57,16 +57,13 @@ public class Proxy {
     @Convert(converter = DomainTypeConverter.class)
     @Column(name = "domain_type")
     private DomainType domainType;
-    /**
-     * 是否加密
-     */
+
     @Column(name = "encrypt", nullable = false)
     private Boolean encrypt;
-    /**
-     * 是否压缩
-     */
+
     @Column(name = "compress", nullable = false)
     private Boolean compress;
+
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
