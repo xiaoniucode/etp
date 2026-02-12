@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 代理域名 Repository
@@ -21,4 +22,9 @@ public interface ProxyDomainRepository extends JpaRepository<ProxyDomain, Intege
      * 根据域名查询
      */
     ProxyDomain findByDomain(String domain);
+    
+    /**
+     * 根据代理ID列表删除域名
+     */
+    void deleteByProxyIdIn(Set<String> proxyIds);
 }

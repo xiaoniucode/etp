@@ -14,13 +14,11 @@ import com.xiaoniucode.etp.server.manager.domain.AutoDomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.CustomDomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.SubDomainInfo;
+import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 import com.xiaoniucode.etp.server.web.controller.proxy.convert.HttpProxyConvert;
 import com.xiaoniucode.etp.server.web.controller.proxy.convert.TcpProxyConvert;
-import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyCreateRequest;
-import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyUpdateRequest;
-import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyCreateRequest;
-import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyUpdateRequest;
+import com.xiaoniucode.etp.server.web.controller.proxy.request.*;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.DomainWithBaseDomain;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.HttpProxyDTO;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.TcpProxyDTO;
@@ -91,10 +89,14 @@ public class ProxyServiceImpl implements ProxyService {
     @Transactional(rollbackFor = Exception.class)
     public void createHttpProxy(HttpProxyCreateRequest proxy) {
         String proxyId = GlobalIdGenerator.uuid32();
-
+        if (proxyRepository.findByName(proxy.getName()) != null) {
+            throw new BizException("名称已经存在了，请更换一个");
+        }
         String clientId = proxy.getClientId();
         ClientDTO client = clientService.findById(clientId);
-
+        if (client == null) {
+            throw new BizException("客户端不存在");
+        }
         Proxy newProxy = new Proxy();
         newProxy.setId(proxyId);
         newProxy.setClientId(proxy.getClientId());
@@ -263,8 +265,13 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     @Override
-    public void batchDeleteProxies(List<String> ids) {
-
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDeleteProxies(BatchDeleteRequest request) {
+        Set<String> ids = request.getIds();
+        //删除基础信息
+        proxyRepository.deleteAllById(ids);
+        //删除域名信息
+        proxyDomainRepository.deleteByProxyIdIn(ids);
     }
 
     @Override

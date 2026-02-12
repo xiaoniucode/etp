@@ -1,9 +1,6 @@
 package com.xiaoniucode.etp.server.web.service;
 
-import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyCreateRequest;
-import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyUpdateRequest;
-import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyCreateRequest;
-import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyUpdateRequest;
+import com.xiaoniucode.etp.server.web.controller.proxy.request.*;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.HttpProxyDTO;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.TcpProxyDTO;
 
@@ -50,7 +47,7 @@ public interface ProxyService {
 
     List<HttpProxyDTO> getHttpProxies();
 
-    void batchDeleteProxies(List<String> ids);
+    void batchDeleteProxies(BatchDeleteRequest request);
 
     void switchProxyStatus(String id);
 

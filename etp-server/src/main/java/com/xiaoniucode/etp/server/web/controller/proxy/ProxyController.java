@@ -1,14 +1,12 @@
 package com.xiaoniucode.etp.server.web.controller.proxy;
 
 import com.xiaoniucode.etp.server.web.common.Ajax;
-import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyCreateRequest;
-import com.xiaoniucode.etp.server.web.controller.proxy.request.HttpProxyUpdateRequest;
-import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyCreateRequest;
-import com.xiaoniucode.etp.server.web.controller.proxy.request.TcpProxyUpdateRequest;
+import com.xiaoniucode.etp.server.web.controller.proxy.request.*;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.HttpProxyDTO;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.TcpProxyDTO;
 import com.xiaoniucode.etp.server.web.domain.Proxy;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,11 +19,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/proxies")
 public class ProxyController {
-    private final ProxyService proxyService;
-
-    public ProxyController(ProxyService proxyService) {
-        this.proxyService = proxyService;
-    }
+    @Autowired
+    private ProxyService proxyService;
 
     /**
      * 创建 TCP 代理
@@ -114,8 +109,8 @@ public class ProxyController {
      * 批量删除代理
      */
     @DeleteMapping
-    public Ajax batchDeleteProxies(List<String> ids) {
-        proxyService.batchDeleteProxies(ids);
+    public Ajax batchDeleteProxies(@RequestBody BatchDeleteRequest request) {
+        proxyService.batchDeleteProxies(request);
         return Ajax.success();
     }
 

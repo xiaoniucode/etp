@@ -177,8 +177,7 @@
                         btn: ['确认删除', '我再想想'],
                     }, function (index) {
                         const ids = data.map(item => item.id);
-                        const secretKeys = data.map(item => item.secretKey);
-                        Rest.post('/api/proxy/batch-del', {ids: ids, secretKeys: secretKeys}).then(data => {
+                        Rest.delete('/api/proxies', {ids:ids}).then(data => {
                             table.reload('proxy')
                             layer.msg('删除成功', {time: 2000});
                         }).catch(err => {

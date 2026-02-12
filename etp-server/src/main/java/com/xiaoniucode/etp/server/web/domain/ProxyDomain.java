@@ -1,7 +1,5 @@
 package com.xiaoniucode.etp.server.web.domain;
 
-import com.xiaoniucode.etp.core.enums.DomainType;
-import com.xiaoniucode.etp.server.web.domain.converter.DomainTypeConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
