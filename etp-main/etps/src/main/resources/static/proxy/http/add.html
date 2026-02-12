@@ -13,7 +13,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">客户端</label>
             <div class="layui-input-inline">
-                <select name="client" lay-filter="clientSelect">
+                <select name="clientId" lay-filter="clientSelect">
                     <option value="">请选择客户端</option>
                 </select>
             </div>
@@ -30,7 +30,7 @@
             <div class="layui-inline">
                 <label class="layui-form-label">内网IP</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="localIP" value="127.0.0.1" autocomplete="off" placeholder="默认: 127.0.0.1"
+                    <input type="text" name="localIp" value="127.0.0.1" autocomplete="off" placeholder="默认: 127.0.0.1"
                            class="layui-input">
                 </div>
             </div>
@@ -103,7 +103,7 @@
         const $ = layui.$;
         //渲染客户端下拉框
         Rest.get('/api/clients').then(data => {
-            const $select = $('select[name="client"]');
+            const $select = $('select[name="clientId"]');
             const $submitBtn = $('button[lay-filter="proxyForm"]');
             // 清空旧选项
             $select.find('option:gt(0)').remove();
@@ -111,10 +111,10 @@
                 // 动态添加新选项
                 data.forEach(function (item) {
                     $select.append(
-                        '<option value="' + item.id + '|' + item.secretKey + '">' + item.name + '</option>'
+                        '<option value="' + item.id + '">' + item.name + '</option>'
                     );
                 });
-                $select.val(data[0].id + '|' + data[0].secretKey);
+                $select.val(data[0].id);
                 $select.prop('disabled', false);
                 $submitBtn.removeClass('layui-btn-disabled').prop('disabled', false);
             } else {
@@ -128,10 +128,8 @@
         // 域名类型切换逻辑
         form.on('radio(domainType)', function(data) {
             const domainType = data.value;
-            // 隐藏所有域名输入组
             $('#customDomainsGroup').hide();
             $('#subDomainsGroup').hide();
-            // 根据选择的类型显示对应输入组并设置autoDomain值
             if (domainType === 'auto') {
                 $('input[name="autoDomain"]').val('true');
             } else if (domainType === 'custom') {
@@ -145,62 +143,38 @@
         
         form.on('submit(proxyForm)', function (data) {
             const field = data.field;
-            if (field.client) {
-                const [clientId, secretKey] = field.client.split('|', 2);
-                field.clientId = Number(clientId) || 0;
-                delete field.client;
-            }
             
-            // 构建代理对象
+            // 构建域名类型代码
             let domainTypeCode = 0;
             if (field.domainType === 'sub') {
                 domainTypeCode = 1;
             } else if (field.domainType === 'custom') {
                 domainTypeCode = 2;
             }
-            
-            const proxy = {
-                clientId: field.clientId,
-                name: field.name,
-                protocol: 2, // HTTP
-                localIp: field.localIP || '127.0.0.1',
-                localPort: Number(field.localPort),
-                remotePort: null,
-                status: field.status ? 1 : 0, // 1: ACTIVE, 0: INACTIVE
-                domainType: domainTypeCode,
-                encrypt: field.encrypt === 'true',
-                compress: field.compress === 'true'
-            };
+            field.domainType = domainTypeCode;
             
             // 构建域名列表
             const domains = [];
-            if (field.domainType === 'sub' && field.subDomains) {
+            if (field.domainType === 1 && field.subDomains) {
                 const subDomainList = field.subDomains.split('\n').filter(domain => domain.trim());
                 subDomainList.forEach(domain => {
-                    domains.push({
-                        domain: domain.trim(),
-                        domainType: 'SUB'
-                    });
+                    domains.push(domain.trim());
                 });
-            } else if (field.domainType === 'custom' && field.customDomains) {
+            } else if (field.domainType === 2 && field.customDomains) {
                 const customDomainList = field.customDomains.split('\n').filter(domain => domain.trim());
                 customDomainList.forEach(domain => {
-                    domains.push({
-                        domain: domain.trim(),
-                        domainType: 'CUSTOM'
-                    });
+                    domains.push(domain.trim());
                 });
             }
+            field.domains = domains;
+            
+            // 移除不需要的字段
+            delete field.subDomains;
+            delete field.customDomains;
+            delete field.autoDomain;
             
             // 发送请求
-            fetch('/proxies/http', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
-                },
-                body: JSON.stringify({proxy: proxy, domains: domains})
-            }).then(response => response.json()).then(data => {
+            Rest.post('/api/proxies/http', field).then(data => {
                 if (data.code === 0) {
                     layer.msg('创建成功', {icon: 1, time: 400,}, () => {
                         const parentTable = parent.layui.table;

@@ -58,9 +58,6 @@ public class ProxyConfig {
      */
     @Setter
     private Boolean compress = false;
-    @Setter
-    private Map<String, String> metadata = new ConcurrentHashMap<>();
-
     /**
      * 计算域名的类型
      * 优先级：自定义域名 --> 子域名 --> 自动生成

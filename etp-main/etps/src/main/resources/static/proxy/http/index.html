@@ -54,15 +54,15 @@
                 {type: 'checkbox', fixed: 'left'},
                 {field: 'clientId', fixed: 'left', width: 180, title: '客户端', sort: true},
                 {field: 'name', title: '隧道名称'},
-                {                    field: 'domains', sort: true, title: '访问地址', templet: function (d) {
+                {
+                    field: 'domains', sort: true, title: '访问地址', templet: function (d) {
                         if (d.domains && d.domains.length > 0) {
                             let domainStr = '';
                             for (let i = 0; i < d.domains.length; i++) {
                                 let domainObj = d.domains[i];
                                 if (domainObj && domainObj.domain) {
-                                    // 将基础域名和子域名进行拼接
                                     let fullDomain = domainObj.domain;
-                                    if (domainObj.baseDomain) {
+                                    if ((d.domainType === 0 || d.domainType === 1) && domainObj.baseDomain) {
                                         fullDomain = domainObj.domain + '.' + domainObj.baseDomain;
                                     }
                                     let fullUrl = 'http' + '://' + fullDomain;
@@ -81,7 +81,7 @@
                         return '';
                     }
                 },
-                {field: 'localPort', sort: true,width:110, title: '内网端口'},
+                {field: 'localPort', sort: true, width: 110, title: '内网端口'},
                 {
                     field: 'status', width: 90, title: '状态', sort: true, templet: function (d) {
                         const isChecked = d.status === 1 ? 'checked' : '';

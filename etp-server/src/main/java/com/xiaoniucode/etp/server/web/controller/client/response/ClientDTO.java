@@ -16,6 +16,7 @@ public class ClientDTO implements Serializable {
     private String os;
     private String arch;
     private String version;
+    private Integer clientType;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

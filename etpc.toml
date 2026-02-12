@@ -33,6 +33,13 @@ autoDomain = true
 subDomains = ["a","b"]
 status = 1
 
+[[proxies]]
+name = "fullstack2"
+protocol = "http"
+localIp = "localhost"
+localPort = 8090
+autoDomain = true
+status = 1
 
 [[proxies]]
 name = "web2"

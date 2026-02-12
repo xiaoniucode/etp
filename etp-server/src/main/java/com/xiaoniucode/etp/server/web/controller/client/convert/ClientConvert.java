@@ -24,6 +24,7 @@ public interface ClientConvert {
      * @param client 客户端实体
      * @return 客户端DTO
      */
+    @Mapping(target = "clientType", expression = "java(client.getClientType().getCode())")
     @Mappings({@Mapping(target = "isOnline", ignore = true)})
     ClientDTO toDTO(Client client);
 
@@ -33,6 +34,7 @@ public interface ClientConvert {
      * @param clients 客户端实体列表
      * @return 客户端DTO列表
      */
+    @Mapping(target = "clientType", expression = "java(client.getClientType().getCode())")
     List<ClientDTO> toDTOList(List<Client> clients);
 
     /**

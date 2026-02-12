@@ -13,7 +13,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">客户端</label>
             <div class="layui-input-inline">
-                <select name="client" lay-filter="clientSelect" disabled>
+                <select name="clientId" lay-filter="clientSelect" disabled>
                     <option value="">请选择客户端</option>
                 </select>
             </div>
@@ -96,66 +96,32 @@
         const $ = layui.$;
         const proxyId = getQueryParam("id")
         var clientList = [];
-        //渲染下拉框
         Rest.get('/api/clients').then(data => {
             clientList = data || [];
-            const $select = $('select[name="client"]');
+            const $select = $('select[name="clientId"]');
             $select.find('option:gt(0)').remove();
             clientList.forEach(function (item) {
                 $select.append(
-                    '<option value="' + item.id + '|' + item.secretKey + '">' +
-                    item.name + '</option>'
+                    '<option value="' + item.id + '">' + item.name + '</option>'
                 );
             });
             form.render('select');
+
+            Rest.get(`/api/proxies/${proxyId}/tcp`).then(data => {
+                form.val('editForm', data);
+                const targetClient = clientList.find(function (item) {
+                    return item.id === data.clientId;
+                });
+                if (targetClient) {
+                    $('select[name="clientId"]').val(targetClient.id);
+                    form.render('select');
+                }
+            })
         })
-        //渲染表单详情
-        Rest.get(`/api/proxies/${proxyId}/tcp`).then(data => {
-            // 转换数据格式
-            const formData = {
-                name: data.name,
-                localIP: data.localIp,
-                localPort: data.localPort,
-                remotePort: data.remotePort,
-                status: data.status === 1 ? '1' : '0',
-                compress: data.compress ? 'true' : 'false',
-                encrypt: data.encrypt ? 'true' : 'false'
-            };
-            form.val('editForm', data);
-            
-            const targetClient = clientList.find(function (item) {
-                return item.id === data.clientId;
-            });
-            if (targetClient) {
-                const fullValue = targetClient.id + '|' + targetClient.secretKey;
-                $('select[name="client"]').val(fullValue);
-                form.render('select');
-            }
-        })
-        //保存数据
+
         form.on('submit(proxyForm)', function (data) {
             const field = data.field;
-            if (field.client) {
-                const [clientId] = field.client.split('|', 2);
-                field.clientId = Number(clientId) || 0;
-                delete field.client;
-            }
-            
-            // 构建代理对象
-            const proxy = {
-                clientId: field.clientId,
-                name: field.name,
-                protocol: 1, // TCP
-                localIp: field.localIP || '127.0.0.1',
-                localPort: Number(field.localPort),
-                remotePort: field.remotePort ? Number(field.remotePort) : null,
-                status: field.status ? 1 : 0, // 1: ACTIVE, 0: INACTIVE
-                domainType: 0, // NONE
-                encrypt: field.encrypt === 'true',
-                compress: field.compress === 'true'
-            };
-            
-            // 发送请求
+            field.id=proxyId
             Rest.put(`/api/proxies/tcp`, field).then(data => {
                 layer.msg('更新成功', {icon: 1, time: 400,}, () => {
                     const parentTable = parent.layui.table;

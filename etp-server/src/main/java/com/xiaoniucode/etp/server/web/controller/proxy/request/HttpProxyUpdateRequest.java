@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * HTTP 代理请求参数类
@@ -18,7 +19,7 @@ public class HttpProxyUpdateRequest {
     private Integer localPort;
     private Integer status;
     private Integer domainType;
-    private List<String> domains;
+    private Set<String> domains;
     private Boolean encrypt;
     private Boolean compress;
 }
