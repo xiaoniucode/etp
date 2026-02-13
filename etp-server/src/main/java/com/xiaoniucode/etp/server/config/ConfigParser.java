@@ -1,46 +1,31 @@
-package com.xiaoniucode.etp.server.config.spring;
+package com.xiaoniucode.etp.server.config;
 
 import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.common.CommandLineArgs;
 import com.xiaoniucode.etp.common.PortChecker;
 import com.xiaoniucode.etp.common.log.LogConfig;
 import com.xiaoniucode.etp.common.log.LogbackConfigurator;
-import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.TomlConfigSource;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringApplicationRunListener;
-import org.springframework.boot.bootstrap.ConfigurableBootstrapContext;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-/**
- * 解析启动参数加载配置文件或解析命令
- */
-public class ConfigLoadListener implements SpringApplicationRunListener {
-    private final Logger logger = LoggerFactory.getLogger(ConfigLoadListener.class);
-    private final String[] args;
-    private AppConfig appConfig;
+public class ConfigParser implements SpringApplicationRunListener {
+    private static final Logger logger = LoggerFactory.getLogger(ConfigParser.class);
 
-    public ConfigLoadListener(SpringApplication application, String[] args) {
-        this.args = args;
-    }
-
-    @Override
-    public void starting(@NonNull ConfigurableBootstrapContext bootstrapContext) {
+    public static AppConfig parse(String[] args) {
         try {
             System.setProperty("io.netty.leakDetection.level", "DISABLED");
-            appConfig = buildConfig(args);
+            AppConfig appConfig = buildConfig(args);
             initLogback(appConfig);
             int bindPort = appConfig.getServerPort();
             if (PortChecker.isPortOccupied(bindPort)) {
                 logger.error("{} 端口已经被占用", bindPort);
                 System.exit(0);
             }
+            return appConfig;
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage(), e);
             System.err.println("错误: " + e.getMessage());
@@ -51,17 +36,9 @@ public class ConfigLoadListener implements SpringApplicationRunListener {
             System.err.println("启动失败: " + e.getMessage());
             System.exit(1);
         }
+        return null;
     }
 
-    @Override
-    public void contextPrepared(ConfigurableApplicationContext context) {
-        if (appConfig!=null){
-            logger.debug("注册配置类到IOC 容器");
-            context.getBeanFactory().registerSingleton("appConfig", appConfig);
-        }else {
-            logger.warn("配置为 null");
-        }
-    }
 
     private static AppConfig buildConfig(String[] args) {
         CommandLineArgs cmdArgs = new CommandLineArgs();

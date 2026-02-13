@@ -18,8 +18,8 @@ mutual = true #开启双向认证
 name = "web1"
 protocol = "http"
 localIp = "localhost"
-localPort = 1024
-autoDomain = true
+localPort = 8081
+autoDomain = false
 customDomains = ["a.domain1.com"]
 status = 1
 
