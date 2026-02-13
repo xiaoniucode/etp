@@ -10,41 +10,22 @@
     <link href="/static/assets/css/app.css" rel="stylesheet">
 </head>
 <body>
-<div class="layui-row">
-    <div class="layui-col-md12">
-        <div class="layui-card">
-            <div class="layui-card-header">
-                <div class="layui-row">
-                    <div class="layui-col-md6">
-                        <h3>访问令牌管理</h3>
-                    </div>
-                    <div class="layui-col-md6 text-right">
-                        <button class="layui-btn layui-btn-sm layui-btn-normal" id="addTokenBtn">
-                            <i class="layui-icon layui-icon-add-1"></i> 新增
-                        </button>
-                        <button class="layui-btn layui-btn-sm" id="refreshBtn">
-                            <i class="layui-icon layui-icon-refresh-3"></i> 刷新
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="layui-card-body">
-                <table class="layui-hide" id="tokenTable" lay-filter="tokenTable"></table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script type="text/html" id="toolbar">
+<table class="layui-hide" id="tokenTable" lay-filter="tokenTable"></table>
+<script type="text/html" id="headerToobar">
     <div class="layui-btn-container">
-        <button class="layui-btn layui-btn-sm layui-btn-normal" id="addTokenBtn">
+        <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add">
             <i class="layui-icon layui-icon-add-1"></i> 新增
         </button>
-        <button class="layui-btn layui-btn-sm" id="refreshBtn">
-            <i class="layui-icon layui-icon-refresh-3"></i> 刷新
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="batchDelete">
+            <i class="layui-icon layui-icon-delete"></i> 批量删除
+        </button>
+        <button class="layui-btn layui-btn-sm" lay-event="flush">
+            <i class="layui-icon layui-icon-refresh"></i> 刷新
         </button>
     </div>
 </script>
+
+
 
 <script type="text/html" id="barTools">
     <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
@@ -65,14 +46,16 @@
         // 渲染表格
         const tokenTable = table.render({
             elem: '#tokenTable',
+            text: "空空如也",
+            skin: "line",
             url: '/api/access-token',
-            method: 'GET',
-            request: {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
-                }
+            toolbar: '#headerToobar',
+            cellMinWidth: 80,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem("auth_token")
             },
             cols: [[
+                {type: 'checkbox', fixed: 'left'},
                 {field: 'id', title: 'ID', width: 80, sort: true},
                 {field: 'name', title: '名称', width: 180},
                 {field: 'token', title: '访问令牌', minWidth: 400},
@@ -80,12 +63,12 @@
                 {field: 'maxClient', title: '连接限制', minWidth: 100},
                 {title: '操作', width: 200, toolbar: '#barTools', fixed: 'right'}
             ]],
-            page: false,
-            loading: true,
-            text: {
-                none: '暂无访问令牌数据'
+            error: function (res, msg) {
+                console.log(res, msg)
             }
         });
+
+
 
         // 工具栏事件
         table.on('tool(tokenTable)', function (obj) {
@@ -124,27 +107,48 @@
             }
         });
 
-        // 新增按钮事件
-        $('#addTokenBtn').on('click', function () {
-            layer.open({
-                title: '新增访问令牌',
-                type: 2,
-                offset: '30px',
-                shade: false,
-                area: ['40%', '40%'],
-                content: '/access-token/add.html',
-                end: function () {
-                    // 关闭弹窗后刷新表格
-                    tokenTable.reload();
+        // 操作工具栏
+        table.on('toolbar(tokenTable)', function (obj) {
+            if (obj.event === 'add') {
+                layer.open({
+                    title: '新增访问令牌',
+                    type: 2,
+                    offset: '30px',
+                    shade: false,
+                    area: ['40%', '40%'],
+                    content: '/access-token/add.html',
+                    end: function () {
+                        // 关闭弹窗后刷新表格
+                        tokenTable.reload();
+                    }
+                });
+            } else if (obj.event === 'flush') {
+                tokenTable.reload()
+            } else if (obj.event === 'batchDelete') {
+                const checkStatus = table.checkStatus('tokenTable');
+                const data = checkStatus.data;
+                if (data.length === 0) {
+                    layer.msg('请选择要删除的访问令牌', {icon: 2});
+                    return;
                 }
-            });
-        });
-
-        // 刷新按钮事件
-        $('#refreshBtn').on('click', function () {
-            tokenTable.reload();
-            layer.msg('刷新成功', {time: 1000});
-        });
+                const ids = data.map(item => item.id);
+                const names = data.map(item => item.name).join('、');
+                layer.confirm('确定删除选中的访问令牌：「' + names + '」吗？',
+                    {
+                        icon: 2,
+                        title: '危险操作确认',
+                        skin: 'layui-layer-molv',
+                        btn: ['确认删除', '我再想想'],
+                    }, function (index) {
+                        Rest.delete('/api/access-token', {ids: ids}).then(res => {
+                            tokenTable.reload()
+                            layer.msg('删除成功', {time: 2000});
+                        }).catch(err => {
+                            layer.msg('删除失败', {icon: 2});
+                        })
+                    })
+            }
+        })
     });
 </script>
 </body>

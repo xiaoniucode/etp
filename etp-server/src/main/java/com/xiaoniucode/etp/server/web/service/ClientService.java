@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.web.service;
 
+import com.xiaoniucode.etp.server.web.controller.client.request.BatchDeleteClientRequest;
 import com.xiaoniucode.etp.server.web.controller.client.request.ClientSaveRequest;
 import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 
@@ -24,7 +25,7 @@ public interface ClientService {
     /**
      * 批量删除客户端
      */
-    void deleteBatch(List<String> ids);
+    void deleteBatch( BatchDeleteClientRequest request);
 
     /**
      * 剔除在线客户端

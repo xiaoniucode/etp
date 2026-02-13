@@ -5,10 +5,12 @@ import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.convert.AccessTokenConvert;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.response.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.domain.AccessToken;
+import com.xiaoniucode.etp.server.web.controller.accesstoken.request.BatchDeleteAccessTokenRequest;
 import com.xiaoniucode.etp.server.web.repository.AccessTokenRepository;
 import com.xiaoniucode.etp.server.web.service.AccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -68,5 +70,12 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     @Override
     public void delete(Integer id) {
         accessTokenRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBatch(BatchDeleteAccessTokenRequest request) {
+        List<Integer> ids = request.getIds();
+        accessTokenRepository.deleteAllById(ids);
     }
 }

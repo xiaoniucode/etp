@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.web.controller.accesstoken;
 
 import com.xiaoniucode.etp.server.web.common.Ajax;
+import com.xiaoniucode.etp.server.web.controller.accesstoken.request.BatchDeleteAccessTokenRequest;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.CreateAccessTokenRequest;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.UpdateAccessTokenRequest;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.response.AccessTokenDTO;
@@ -66,6 +67,15 @@ public class AccessTokenController {
     @DeleteMapping("/{id}")
     public Ajax delete(@PathVariable Integer id) {
         accessTokenService.delete(id);
+        return Ajax.success();
+    }
+    
+    /**
+     * 批量删除访问令牌
+     */
+    @DeleteMapping
+    public Ajax batchDelete(@RequestBody BatchDeleteAccessTokenRequest request) {
+        accessTokenService.deleteBatch(request);
         return Ajax.success();
     }
 }

@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.web.service;
 
+import com.xiaoniucode.etp.server.web.controller.accesstoken.request.BatchDeleteAccessTokenRequest;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.response.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.domain.AccessToken;
 
@@ -27,7 +28,12 @@ public interface AccessTokenService {
     AccessToken update(AccessToken accessToken);
 
     /**
-     * 删除访问令牌
-     */
-    void delete(Integer id);
+        * 删除访问令牌
+        */
+       void delete(Integer id);
+       
+       /**
+        * 批量删除访问令牌
+        */
+       void deleteBatch(BatchDeleteAccessTokenRequest request);
 }

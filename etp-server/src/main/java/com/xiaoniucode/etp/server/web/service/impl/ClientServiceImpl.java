@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.web.service.impl;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.client.convert.ClientConvert;
+import com.xiaoniucode.etp.server.web.controller.client.request.BatchDeleteClientRequest;
 import com.xiaoniucode.etp.server.web.controller.client.request.ClientSaveRequest;
 import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 import com.xiaoniucode.etp.server.web.domain.Client;
@@ -48,8 +49,8 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void deleteBatch(List<String> ids) {
-        clientRepository.deleteAllById(ids);
+    public void deleteBatch(BatchDeleteClientRequest request) {
+        clientRepository.deleteAllById(request.getIds());
     }
 
     @Override

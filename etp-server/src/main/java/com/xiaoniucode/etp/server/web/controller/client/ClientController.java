@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.web.controller.client;
 
 import com.xiaoniucode.etp.server.web.common.Ajax;
+import com.xiaoniucode.etp.server.web.controller.client.request.BatchDeleteClientRequest;
 import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 import com.xiaoniucode.etp.server.web.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +52,8 @@ public class ClientController {
      * 批量删除客户端
      */
     @DeleteMapping
-    public Ajax deleteBatch(@RequestBody List<String> ids) {
-        clientService.deleteBatch(ids);
+    public Ajax deleteBatch(@RequestBody BatchDeleteClientRequest request) {
+        clientService.deleteBatch(request);
         return Ajax.success();
     }
 
