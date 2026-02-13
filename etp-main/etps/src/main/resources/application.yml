@@ -12,3 +12,18 @@ logging:
 server:
   servlet:
     context-path: /
+
+
+jwt:
+  secret: test
+  expiration: 3600000
+
+security:
+  permit-all:
+    paths:
+      - /api/auth/login
+      - /api/captcha
+      - /login.html
+      - /layui/**
+      - /assets/**
+      - /static/**

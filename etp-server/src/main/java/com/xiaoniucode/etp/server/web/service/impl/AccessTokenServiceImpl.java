@@ -28,7 +28,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 
     @Override
     public AccessToken create(AccessToken accessToken) {
-        // 自动生成 UUID 格式的 token，去掉下划线
         String token = UUID.randomUUID().toString().replaceAll("-", "");
         accessToken.setToken(token);
         return accessTokenRepository.save(accessToken);

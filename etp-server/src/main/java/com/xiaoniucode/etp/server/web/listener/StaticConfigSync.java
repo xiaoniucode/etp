@@ -8,7 +8,7 @@ import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
 import com.xiaoniucode.etp.server.web.common.DigestUtil;
 import com.xiaoniucode.etp.server.web.domain.AccessToken;
 import com.xiaoniucode.etp.server.web.domain.Config;
-import com.xiaoniucode.etp.server.web.domain.User;
+import com.xiaoniucode.etp.server.web.domain.SysUser;
 import com.xiaoniucode.etp.server.web.repository.AccessTokenRepository;
 import com.xiaoniucode.etp.server.web.repository.ConfigRepository;
 import com.xiaoniucode.etp.server.web.repository.UserRepository;
@@ -88,13 +88,13 @@ public class StaticConfigSync implements EventListener<TunnelServerBindEvent> {
         String password = dashboard.getPassword();
         //没有直接添加用户
         if (userRepository.findByUsername(username) == null) {
-            userRepository.saveAndFlush(new User(username, DigestUtil.encode(password, username)));
+            userRepository.saveAndFlush(new SysUser(username, DigestUtil.encode(password, username)));
             logger.debug("同步用户: {} 配置到数据库", username);
         } else if (reset) {
             //删除所有用户
             userRepository.deleteAll();
             //重新注册
-            userRepository.saveAndFlush(new User(username, DigestUtil.encode(password, username)));
+            userRepository.saveAndFlush(new SysUser(username, DigestUtil.encode(password, username)));
             logger.debug("重置管理面板认证信息");
         } else {
             logger.debug("管理面板登录：使用配置文件中的用户凭证");

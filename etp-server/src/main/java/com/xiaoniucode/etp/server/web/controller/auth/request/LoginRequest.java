@@ -17,5 +17,7 @@ public class LoginRequest {
 
     @NotEmpty(message = "验证码不能为空")
     private String code;
+    @NotEmpty(message = "验证码ID不能为空")
+    private String captchaId;
 
 }

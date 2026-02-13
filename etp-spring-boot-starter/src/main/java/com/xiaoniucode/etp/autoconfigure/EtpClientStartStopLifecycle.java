@@ -2,10 +2,9 @@ package com.xiaoniucode.etp.autoconfigure;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.DefaultAppConfig;
-import com.xiaoniucode.etp.client.ProxyClient;
 import com.xiaoniucode.etp.client.TunnelClient;
+import com.xiaoniucode.etp.client.config.ProxyRegistrar;
 import com.xiaoniucode.etp.common.utils.StringUtils;
-import com.xiaoniucode.etp.core.message.NewProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
@@ -26,13 +25,14 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
     private TunnelClient tunnelClient;
     private final Environment environment;
     private final WebServerPortListener webServerPortListener;
-    private final ProxyClient proxyClient;
+    private final ProxyRegistrar proxyRegistrar;
+
 
     public EtpClientStartStopLifecycle(Environment environment, WebServerPortListener webServerPortListener,
-                                       ProxyClient proxyClient, EtpClientProperties properties) {
+                                       ProxyRegistrar proxyRegistrar, EtpClientProperties properties) {
         this.environment = environment;
         this.properties = properties;
-        this.proxyClient = proxyClient;
+        this.proxyRegistrar = proxyRegistrar;
         this.webServerPortListener = webServerPortListener;
     }
 

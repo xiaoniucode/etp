@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 @Getter
 @Setter
-public class User {
+public class SysUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -34,10 +34,10 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public User() {
+    public SysUser() {
     }
 
-    public User(String username, String password) {
+    public SysUser(String username, String password) {
         this.username = username;
         this.password = password;
     }

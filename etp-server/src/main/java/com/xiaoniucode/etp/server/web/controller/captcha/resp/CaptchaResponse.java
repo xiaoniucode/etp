@@ -9,7 +9,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @AllArgsConstructor
-public class Captcha {
+public class CaptchaResponse {
     private String captchaId;
     private String code;
 }
