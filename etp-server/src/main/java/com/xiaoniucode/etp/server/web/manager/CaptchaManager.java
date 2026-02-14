@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.web.manager;
 
+import com.xiaoniucode.etp.server.web.common.BizException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -7,9 +8,6 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 验证码管理
@@ -24,6 +22,7 @@ public class CaptchaManager {
     public Map<String, CaptchaEntry> getCaches() {
         return cache;
     }
+
     /**
      * 存放验证码，返回一个唯一的 captchaId
      */
@@ -34,27 +33,44 @@ public class CaptchaManager {
     }
 
     /**
-     * 校验并删除（一次性）
+     * 校验并删除
      */
-    public boolean verifyAndRemove(String captchaId, String userInput) {
-        if (captchaId == null || userInput == null) {
-            return false;
+    public void verifyAndRemove(String captchaId, String code) {
+        if (captchaId == null || code == null) {
+            throw new BizException("输入验证码为空");
         }
         CaptchaEntry entry = cache.remove(captchaId);
-        if (entry == null) {
-            return false;
-        }
-        return entry.code().equalsIgnoreCase(userInput.trim());
+        verifyEntry(entry, captchaId, code);
     }
 
     /**
-     * 只校验（不删除），允许重复校验
+     * 只校验不删除，允许重复校验
      */
-    public boolean verify(String captchaId, String userInput) {
-        CaptchaEntry entry = cache.get(captchaId);
-        if (entry == null) {
-            return false;
+    public void verify(String captchaId, String code) {
+        if (captchaId == null || code == null) {
+            throw new BizException("输入验证码为空");
         }
-        return entry.code().equalsIgnoreCase(userInput.trim());
+        CaptchaEntry entry = cache.get(captchaId);
+        verifyEntry(entry, captchaId, code);
+    }
+
+    /**
+     * 验证验证码条目
+     */
+    private void verifyEntry(CaptchaEntry entry, String captchaId, String code) {
+        if (entry == null) {
+            throw new BizException("验证码不存在");
+        }
+        // 检查是否过期
+        if (entry.expireAt() < System.currentTimeMillis()) {
+            logger.debug("验证码已过期: {}", captchaId);
+            throw new BizException("验证码已过期");
+        }
+        //检查是否正确
+        boolean result = entry.code().equalsIgnoreCase(code.trim());
+        logger.debug("验证码校验结果: {}, 验证码ID: {}", result, captchaId);
+        if (!result) {
+            throw new BizException("验证码不正确");
+        }
     }
 }

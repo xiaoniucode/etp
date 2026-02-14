@@ -12,10 +12,8 @@ logging:
 server:
   servlet:
     context-path: /
-
-
 jwt:
-  secret: xiaoniucode_spring_security_jwt_secret_key
+ # secret: xiaoniucode_spring_security_jwt_secret_key
   expiration: 3600000
 
 security:

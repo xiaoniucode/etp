@@ -24,14 +24,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        boolean verify = captchaManager.verify(request.getCaptchaId(), request.getCode());
-        if (!verify) {
-            throw new BizException("验证码不正确");
-        }
+        captchaManager.verifyAndRemove(request.getCaptchaId(), request.getCode());
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        //生成 Token
         String token = tokenUtil.generateToken(request.getUsername());
         return new LoginResponse(token);
     }
