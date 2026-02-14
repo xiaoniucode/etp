@@ -19,7 +19,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @PostMapping("/login")
+    @PostMapping("login")
     public Ajax login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
         return Ajax.success(response);

@@ -4,7 +4,6 @@ import com.xiaoniucode.etp.server.web.common.Ajax;
 import com.xiaoniucode.etp.server.web.controller.proxy.request.*;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.HttpProxyDTO;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.TcpProxyDTO;
-import com.xiaoniucode.etp.server.web.domain.Proxy;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

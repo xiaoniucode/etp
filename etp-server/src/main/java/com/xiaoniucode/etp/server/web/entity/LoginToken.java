@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.web.domain;
+package com.xiaoniucode.etp.server.web.entity;
 
 
 import jakarta.persistence.Column;

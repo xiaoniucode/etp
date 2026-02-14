@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.service;
 
-import com.xiaoniucode.etp.server.web.domain.Config;
+import com.xiaoniucode.etp.server.web.entity.Config;
 
 public interface ConfigService {
     int update(Config save);

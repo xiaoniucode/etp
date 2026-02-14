@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.server.web.controller.client.convert.ClientConvert;
 import com.xiaoniucode.etp.server.web.controller.client.request.BatchDeleteClientRequest;
 import com.xiaoniucode.etp.server.web.controller.client.request.ClientSaveRequest;
 import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
-import com.xiaoniucode.etp.server.web.domain.Client;
+import com.xiaoniucode.etp.server.web.entity.Client;
 import com.xiaoniucode.etp.server.web.repository.ClientRepository;
 import com.xiaoniucode.etp.server.web.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;

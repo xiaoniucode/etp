@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.web.service;
 
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.BatchDeleteAccessTokenRequest;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.response.AccessTokenDTO;
-import com.xiaoniucode.etp.server.web.domain.AccessToken;
+import com.xiaoniucode.etp.server.web.entity.AccessToken;
 
 import java.util.List;
 

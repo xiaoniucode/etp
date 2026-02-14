@@ -1,13 +1,13 @@
-package com.xiaoniucode.etp.server.web.domain;
+package com.xiaoniucode.etp.server.web.entity;
 
 import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
-import com.xiaoniucode.etp.server.web.domain.converter.ClientTypeConverter;
-import com.xiaoniucode.etp.server.web.domain.converter.DomainTypeConverter;
-import com.xiaoniucode.etp.server.web.domain.converter.ProtocolTypeConverter;
-import com.xiaoniucode.etp.server.web.domain.converter.ProxyStatusConverter;
+import com.xiaoniucode.etp.server.web.entity.converter.ClientTypeConverter;
+import com.xiaoniucode.etp.server.web.entity.converter.DomainTypeConverter;
+import com.xiaoniucode.etp.server.web.entity.converter.ProtocolTypeConverter;
+import com.xiaoniucode.etp.server.web.entity.converter.ProxyStatusConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

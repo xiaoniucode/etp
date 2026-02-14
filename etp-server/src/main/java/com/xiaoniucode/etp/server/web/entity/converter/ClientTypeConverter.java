@@ -1,7 +1,6 @@
-package com.xiaoniucode.etp.server.web.domain.converter;
+package com.xiaoniucode.etp.server.web.entity.converter;
 
 import com.xiaoniucode.etp.core.enums.ClientType;
-import com.xiaoniucode.etp.core.enums.DomainType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

@@ -8,10 +8,9 @@ import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
 import com.xiaoniucode.etp.server.manager.*;
-import com.xiaoniucode.etp.server.web.domain.AccessToken;
-import com.xiaoniucode.etp.server.web.domain.Client;
-import com.xiaoniucode.etp.server.web.domain.Proxy;
-import com.xiaoniucode.etp.server.web.domain.ProxyDomain;
+import com.xiaoniucode.etp.server.web.entity.AccessToken;
+import com.xiaoniucode.etp.server.web.entity.Client;
+import com.xiaoniucode.etp.server.web.entity.Proxy;
 import com.xiaoniucode.etp.server.web.repository.AccessTokenRepository;
 import com.xiaoniucode.etp.server.web.repository.ClientRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
@@ -24,8 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 如果开启管理面板，则将数据库中的配置全部加载到内存

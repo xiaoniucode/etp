@@ -5,7 +5,7 @@ import com.xiaoniucode.etp.server.web.controller.accesstoken.request.BatchDelete
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.CreateAccessTokenRequest;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.UpdateAccessTokenRequest;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.response.AccessTokenDTO;
-import com.xiaoniucode.etp.server.web.domain.AccessToken;
+import com.xiaoniucode.etp.server.web.entity.AccessToken;
 import com.xiaoniucode.etp.server.web.service.AccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

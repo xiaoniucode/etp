@@ -5,10 +5,9 @@ import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.config.domain.*;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
-import com.xiaoniucode.etp.server.web.common.DigestUtil;
-import com.xiaoniucode.etp.server.web.domain.AccessToken;
-import com.xiaoniucode.etp.server.web.domain.Config;
-import com.xiaoniucode.etp.server.web.domain.SysUser;
+import com.xiaoniucode.etp.server.web.entity.AccessToken;
+import com.xiaoniucode.etp.server.web.entity.Config;
+import com.xiaoniucode.etp.server.web.entity.SysUser;
 import com.xiaoniucode.etp.server.web.repository.AccessTokenRepository;
 import com.xiaoniucode.etp.server.web.repository.ConfigRepository;
 import com.xiaoniucode.etp.server.web.repository.UserRepository;
@@ -17,6 +16,7 @@ import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -39,6 +39,8 @@ public class StaticConfigSync implements EventListener<TunnelServerBindEvent> {
     private AccessTokenRepository accessTokenRepository;
     @Resource
     private AppConfig config;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void init() {
@@ -88,13 +90,14 @@ public class StaticConfigSync implements EventListener<TunnelServerBindEvent> {
         String password = dashboard.getPassword();
         //没有直接添加用户
         if (userRepository.findByUsername(username) == null) {
-            userRepository.saveAndFlush(new SysUser(username, DigestUtil.encode(password, username)));
+
+            userRepository.saveAndFlush(new SysUser(username, passwordEncoder.encode(password)));
             logger.debug("同步用户: {} 配置到数据库", username);
         } else if (reset) {
             //删除所有用户
             userRepository.deleteAll();
             //重新注册
-            userRepository.saveAndFlush(new SysUser(username, DigestUtil.encode(password, username)));
+            userRepository.saveAndFlush(new SysUser(username, passwordEncoder.encode(password)));
             logger.debug("重置管理面板认证信息");
         } else {
             logger.debug("管理面板登录：使用配置文件中的用户凭证");

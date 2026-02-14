@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.convert.AccessTokenConvert;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.response.AccessTokenDTO;
-import com.xiaoniucode.etp.server.web.domain.AccessToken;
+import com.xiaoniucode.etp.server.web.entity.AccessToken;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.BatchDeleteAccessTokenRequest;
 import com.xiaoniucode.etp.server.web.repository.AccessTokenRepository;
 import com.xiaoniucode.etp.server.web.service.AccessTokenService;

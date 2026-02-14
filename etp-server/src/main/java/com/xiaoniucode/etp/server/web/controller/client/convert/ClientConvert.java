@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.web.controller.client.convert;
 
 import com.xiaoniucode.etp.server.web.controller.client.request.ClientSaveRequest;
 import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
-import com.xiaoniucode.etp.server.web.domain.Client;
+import com.xiaoniucode.etp.server.web.entity.Client;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

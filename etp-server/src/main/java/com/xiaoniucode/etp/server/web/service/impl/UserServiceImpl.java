@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.user.request.UpdatePasswordRequest;
-import com.xiaoniucode.etp.server.web.domain.SysUser;
+import com.xiaoniucode.etp.server.web.entity.SysUser;
 import com.xiaoniucode.etp.server.web.repository.UserRepository;
 import com.xiaoniucode.etp.server.web.service.UserService;
 import jakarta.transaction.Transactional;

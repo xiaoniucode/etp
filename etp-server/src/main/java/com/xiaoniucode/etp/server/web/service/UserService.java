@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.web.service;
 
 import com.xiaoniucode.etp.server.web.controller.user.request.UpdatePasswordRequest;
-import com.xiaoniucode.etp.server.web.domain.SysUser;
+import com.xiaoniucode.etp.server.web.entity.SysUser;
 
 public interface UserService {
     SysUser getByUsername(String username);

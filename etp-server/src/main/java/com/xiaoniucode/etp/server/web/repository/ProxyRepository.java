@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.web.repository;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.server.web.domain.Proxy;
+import com.xiaoniucode.etp.server.web.entity.Proxy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

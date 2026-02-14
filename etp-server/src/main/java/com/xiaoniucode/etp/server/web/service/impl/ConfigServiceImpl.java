@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.web.service.ConfigService;
-import com.xiaoniucode.etp.server.web.domain.Config;
+import com.xiaoniucode.etp.server.web.entity.Config;
 import com.xiaoniucode.etp.server.web.repository.ConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

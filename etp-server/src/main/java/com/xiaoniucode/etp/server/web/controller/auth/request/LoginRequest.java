@@ -5,9 +5,11 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
-public class LoginRequest {
+public class LoginRequest implements Serializable {
 
     @NotBlank(message = "用户名不能为空")
     private String username;
