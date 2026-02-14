@@ -27,30 +27,56 @@ layui.define(['layer', 'jquery'], function (exports) {
                     timeout: options.timeout || 30000,
 
                     success: (res) => {
-                        if (res && res.code === 401) {
+                        if (!res) {
+                            const msg = '请求失败，返回数据为空';
+                            if (options.silent !== true) {
+                                layer.msg(msg, {icon: 2, time: 1500});
+                            }
+                            reject(new Error(msg));
+                            return;
+                        }
+                        
+                        if (res.code === 401) {
                             localStorage.clear();
                             layer.msg('登录已过期，请重新登录', {icon: 2});
                             setTimeout(() => {
                                 window.parent.parent.location.href = '/login.html';
                             }, 800);
-                            reject(new Error('未授权'));
-                        } else if (res && res.code === 0) {
-                            resolve(res.data);
-                        } else {
-                            const msg = res?.message || '操作失败';
+                            reject(new Error(res.message || '未授权访问'));
+                        } else if (res.code === 404) {
+                            window.parent.parent.location.href = '/error/404.html';
+                            reject(new Error('找不到访问资源'));
+                        } else if (res.code === 403) {
+                            window.parent.parent.location.href = '/error/403.html';
+                            reject(new Error(res.message || '没有资源访问权限'));
+                        } else if (res.code === 500) {
+                            const msg = res.message || '操作失败';
                             if (options.silent !== true) {
                                 layer.msg(msg, {icon: 2, time: 1500});
                             }
                             const err = new Error(msg);
                             err.response = res;
-                            err.data = res?.data;
-                            err.code = res?.code;
+                            err.data = res.data;
+                            err.code = res.code;
+                            reject(err);
+                        } else if (res.code === 0) {
+                            resolve(res.data);
+                        } else {
+                            // 处理其他未知状态码
+                            const msg = res.message || '请求失败';
+                            if (options.silent !== true) {
+                                layer.msg(msg, {icon: 2, time: 1500});
+                            }
+                            const err = new Error(msg);
+                            err.response = res;
+                            err.data = res.data;
+                            err.code = res.code;
                             reject(err);
                         }
                     },
 
                     error: (xhr) => {
-                        // 如果是401错误，直接退出登录
+                        // 处理HTTP状态码错误
                         if (xhr.status === 401) {
                             localStorage.clear();
                             layer.msg('登录已过期，请重新登录', {icon: 2});
@@ -59,19 +85,41 @@ layui.define(['layer', 'jquery'], function (exports) {
                             }, 800);
                             reject(new Error('未授权'));
                             return;
+                        } else if (xhr.status === 404) {
+                            window.parent.parent.location.href = '/error/404.html';
+                            reject(new Error('找不到访问资源'));
+                            return;
+                        } else if (xhr.status === 403) {
+                            window.parent.parent.location.href = '/error/403.html';
+                            reject(new Error('没有资源访问权限'));
+                            return;
+                        } else if (xhr.status >= 500) {
+                            window.parent.parent.location.href = '/error/500.html';
+                            reject(new Error('服务器内部错误'));
+                            return;
                         }
+                        
+                        // 处理网络错误
                         let msg = '网络异常';
                         if (xhr.responseJSON?.message) {
                             msg = xhr.responseJSON.message;
                         } else if (xhr.status === 0) {
                             msg = '无法连接服务器';
-                        } else if (xhr.status >= 500) {
-                            msg = '服务器开小差了';
+                        } else if (xhr.status === 400) {
+                            msg = '请求参数错误';
+                        } else if (xhr.status === 408) {
+                            msg = '请求超时';
                         }
+                        
                         if (options.silent !== true) {
-                            layer.msg(msg, {icon: 2});
+                            layer.msg(msg, {icon: 2, time: 1500});
                         }
-                        reject(new Error(msg));
+                        
+                        const err = new Error(msg);
+                        err.status = xhr.status;
+                        err.response = xhr.responseJSON || xhr.responseText;
+                        err.headers = xhr.getAllResponseHeaders();
+                        reject(err);
                     },
 
                     complete: () => {

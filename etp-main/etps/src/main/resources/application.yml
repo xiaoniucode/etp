@@ -13,18 +13,11 @@ server:
   servlet:
     context-path: /
 jwt:
- # secret: xiaoniucode_spring_security_jwt_secret_key
-  expiration: 3600000
+  secret:
+  expiration: 3600
 
 security:
   permit-all:
     paths:
       - /api/auth/login
       - /api/captcha
-      - /**/*.html
-      - /**.html
-      - /**/favicon.ico
-      - /favicon.ico
-      - /layui/**
-      - /assets/**
-      - /static/**
