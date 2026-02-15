@@ -9,11 +9,10 @@ maxRetries = 5
 
 [tls]
 enable = false
-certPath = "cert/client.p12"
-storePassPath = "jesjH9JNLKY3"
-mutual = true #开启双向认证
+cert = "/to/cert/path/client.crt"
+key = "/to/key/path/client.key"
+ca = "/to/ca/path/ca.crt"
 
-# 三个字段互斥，优先级：customDomains > subDomains > autoDomain 后面两个必须配置基础域名
 [[proxies]]
 name = "web1"
 protocol = "http"
@@ -23,14 +22,13 @@ autoDomain = false
 customDomains = ["a.domain1.com"]
 status = 1
 
-
 [[proxies]]
 name = "web11"
 protocol = "http"
 localIp = "localhost"
 localPort = 1025
 autoDomain = true
-subDomains = ["a","b"]
+subDomains = ["a", "b"]
 status = 1
 
 [[proxies]]

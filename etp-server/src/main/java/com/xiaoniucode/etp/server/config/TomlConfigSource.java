@@ -102,11 +102,10 @@ public class TomlConfigSource implements ConfigSource {
         Toml tlsTable = root.getTable("tls");
         if (tlsTable != null) {
             Boolean enable = tlsTable.getBoolean("enable", false);
-            String certPath = tlsTable.getString("certPath");
-            String keyPath = tlsTable.getString("keyPath");
-            String storePassPath = tlsTable.getString("storePassPath");
-            
-            TLSConfig tlsConfig = new TLSConfig(enable, certPath, keyPath, storePassPath);
+            String certFile = tlsTable.getString("cert");
+            String keyFile = tlsTable.getString("key");
+            String caFile = tlsTable.getString("ca");
+            TLSConfig tlsConfig = new TLSConfig(enable, certFile, keyFile, caFile);
             builder.tls(tlsConfig);
         }
     }

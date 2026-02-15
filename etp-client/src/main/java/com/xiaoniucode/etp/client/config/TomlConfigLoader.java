@@ -80,20 +80,12 @@ public class TomlConfigLoader implements ConfigSource {
         // 读取TLS配置
         Toml tlsTable = root.getTable("tls");
         if (tlsTable != null) {
-            TlsConfig tlsConfig = new TlsConfig();
-            Boolean enable = tlsTable.getBoolean("enable");
-            String certPath = tlsTable.getString("certPath");
-            String storePassPath = tlsTable.getString("storePassPath");
 
-            tlsConfig.setEnable(enable != null ? enable : false);
-            if (StringUtils.hasText(certPath)) {
-                tlsConfig.setCertPath(certPath.trim());
-            }
-            if (StringUtils.hasText(storePassPath)) {
-                tlsConfig.setStorePassPath(storePassPath.trim());
-            }
-
-            builder.tlsConfig(tlsConfig);
+            Boolean enable = tlsTable.getBoolean("enable",false);
+            String certFile = tlsTable.getString("cert");
+            String keyFile = tlsTable.getString("key");
+            String caFile = tlsTable.getString("ca");
+            builder.tlsConfig(new TlsConfig(enable,certFile,keyFile,caFile));
         }
 
         // 读取代理配置
