@@ -1,7 +1,6 @@
 package com.xiaoniucode.etp.client.config;
 
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
-import com.xiaoniucode.etp.client.config.domain.TlsConfig;
 import com.xiaoniucode.etp.client.config.domain.LogConfig;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.common.utils.TomlUtils;
@@ -9,6 +8,7 @@ import com.moandjiezana.toml.Toml;
 import com.xiaoniucode.etp.common.config.ConfigSource;
 import com.xiaoniucode.etp.common.config.ConfigSourceType;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.Getter;
@@ -80,11 +80,10 @@ public class TomlConfigLoader implements ConfigSource {
         // 读取TLS配置
         Toml tlsTable = root.getTable("tls");
         if (tlsTable != null) {
-
             Boolean enable = tlsTable.getBoolean("enable",false);
-            String certFile = tlsTable.getString("cert");
-            String keyFile = tlsTable.getString("key");
-            String caFile = tlsTable.getString("ca");
+            String certFile = tlsTable.getString("certFile");
+            String keyFile = tlsTable.getString("keyFile");
+            String caFile = tlsTable.getString("caFile");
             builder.tlsConfig(new TlsConfig(enable,certFile,keyFile,caFile));
         }
 

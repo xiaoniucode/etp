@@ -8,10 +8,10 @@ maxDelay = 10
 maxRetries = 5
 
 [tls]
-enable = false
-cert = "/to/cert/path/client.crt"
-key = "/to/key/path/client.key"
-ca = "/to/ca/path/ca.crt"
+enable = true
+certFile = "cert/openssl/chain.pem"
+keyFile = "cert/openssl/privkey.pem"
+caFile = "cert/openssl/chain.pem"
 
 [[proxies]]
 name = "web1"
@@ -43,9 +43,10 @@ status = 1
 name = "web2"
 protocol = "http"
 localIp = "localhost"
-localPort = 8082
+localPort = 8030
 customDomains = ["a.domain2.com", "b.domain2.com"]
-
+encrypt = false
+compress = false
 [[proxies]]
 name = "mysql"
 protocol = "tcp"
@@ -53,7 +54,7 @@ localPort = 3306
 remotePort = 3307
 status = 1
 encrypt = false
-compress = false
+compress = true
 
 [[proxies]]
 name = "redis"

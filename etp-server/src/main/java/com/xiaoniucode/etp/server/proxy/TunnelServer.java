@@ -6,6 +6,7 @@ import com.xiaoniucode.etp.core.handler.IdleCheckHandler;
 
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
+import com.xiaoniucode.etp.core.tls.SslContextFactory;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
 import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
@@ -55,9 +56,9 @@ public class TunnelServer implements Lifecycle {
         try {
             logger.debug("正在启动ETP服务");
             eventBus.publishSync(new TunnelServerStartingEvent());
-//            if (config.isTls()) {
-//                tlsContext = new ServerTlsContextFactory().createContext();
-//            }
+            if (config.getTlsConfig().getEnable()) {
+                tlsContext = SslContextFactory.createServerSslContext(config.getTlsConfig());
+            }
             tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -69,10 +70,10 @@ public class TunnelServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-//                            if (config.isTls()) {
-//                                sc.pipeline().addLast("tls", tlsContext.newHandler(sc.alloc()));
-//                                logger.debug("TLS加密处理器添加成功");
-//                            }
+                            if (config.getTlsConfig().getEnable()) {
+                                sc.pipeline().addLast("tls", tlsContext.newHandler(sc.alloc()));
+                                logger.debug("TLS加密处理器添加成功");
+                            }
                             sc.pipeline()
                                     .addLast("protoBufVarint32FrameDecoder", new ProtobufVarint32FrameDecoder())
                                     .addLast("protoBufDecoder", new ProtobufDecoder(Message.ControlMessage.getDefaultInstance()))

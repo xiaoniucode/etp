@@ -2,10 +2,10 @@ package com.xiaoniucode.etp.server.config;
 
 import com.xiaoniucode.etp.common.config.Config;
 import com.xiaoniucode.etp.common.log.LogConfig;
+import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.server.config.domain.Dashboard;
 import com.xiaoniucode.etp.server.config.domain.PortRange;
 import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
-import com.xiaoniucode.etp.server.config.domain.TLSConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +24,7 @@ public class AppConfig implements Config {
     private Dashboard dashboard;
     private PortRange portRange;
     private Set<String> baseDomains;
-    private TLSConfig tls;
+    private TlsConfig tlsConfig;
     private List<AccessTokenInfo> accessTokens;
 
     private AppConfig(Builder builder) {
@@ -36,7 +36,7 @@ public class AppConfig implements Config {
         this.dashboard = builder.dashboard;
         this.portRange = builder.portRange;
         this.baseDomains = builder.baseDomains;
-        this.tls = builder.tls;
+        this.tlsConfig = builder.tls;
         this.accessTokens = builder.accessTokens;
     }
 
@@ -45,7 +45,7 @@ public class AppConfig implements Config {
         private int serverPort = 9527;
         private int httpProxyPort = 80;
         private int httpsProxyPort = 443;
-        private TLSConfig tls=new TLSConfig(false);
+        private TlsConfig tls=new TlsConfig(false);
         private Set<String> baseDomains;
         private LogConfig logConfig;
         private Dashboard dashboard = new Dashboard(false);
@@ -62,7 +62,7 @@ public class AppConfig implements Config {
             return this;
         }
 
-        public Builder tls(TLSConfig tls) {
+        public Builder tls(TlsConfig tls) {
             this.tls = tls;
             return this;
         }

@@ -17,6 +17,7 @@ import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.handler.IdleCheckHandler;
+import com.xiaoniucode.etp.core.tls.SslContextFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -95,9 +96,9 @@ public final class TunnelClient implements Lifecycle {
                         }
                     });
 
-//            if (config.getTlsConfig().getEnable()) {
-//                tlsContext = new ClientTlsContextFactory().createContext();
-//            }
+            if (config.getTlsConfig().getEnable()) {
+                tlsContext = tlsContext = SslContextFactory.createClientSslContext(config.getTlsConfig());
+            }
             /**
              * 控制消息处理，单例
              */
@@ -119,9 +120,8 @@ public final class TunnelClient implements Lifecycle {
                         @Override
                         protected void initChannel(SocketChannel sc) {
                             if (config.getTlsConfig().getEnable()) {
-                                SSLEngine engine = tlsContext.newEngine(sc.alloc(), config.getServerAddr(), config.getServerPort());
-                                engine.setUseClientMode(true);
-                                sc.pipeline().addLast("tls", new SslHandler(engine));
+                                SslHandler sslHandler = tlsContext.newHandler(sc.alloc());
+                                sc.pipeline().addLast("tls", sslHandler);
                             }
                             sc.pipeline()
                                     .addLast("protoBufVarint32FrameDecoder", new ProtobufVarint32FrameDecoder())

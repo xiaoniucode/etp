@@ -7,6 +7,8 @@ import io.netty.channel.ChannelPipeline;
 public class ChannelSwitcher {
     /**
      * 从控制通道切换为数据通道
+     * 发送时：原始数据 → 压缩 → 加密 → 发送
+     * 接收时：接收 → 解密 → 解压 → 原始数据
      *
      * @param pipeline       pipeline
      * @param enableCompress 是否启用压缩
@@ -25,7 +27,8 @@ public class ChannelSwitcher {
             pipeline.addLast("snappyEncoder", new SnappyEncoder());
         }
 
-        if (enableEncrypt) {
+        if (!enableEncrypt) {
+            pipeline.remove("tls");
         }
     }
 }

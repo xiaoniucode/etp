@@ -7,6 +7,7 @@ import com.xiaoniucode.etp.common.utils.LogUtils;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
+import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.server.config.domain.*;
 
 import java.util.*;
@@ -102,10 +103,10 @@ public class TomlConfigSource implements ConfigSource {
         Toml tlsTable = root.getTable("tls");
         if (tlsTable != null) {
             Boolean enable = tlsTable.getBoolean("enable", false);
-            String certFile = tlsTable.getString("cert");
-            String keyFile = tlsTable.getString("key");
-            String caFile = tlsTable.getString("ca");
-            TLSConfig tlsConfig = new TLSConfig(enable, certFile, keyFile, caFile);
+            String certFile = tlsTable.getString("certFile");
+            String keyFile = tlsTable.getString("keyFile");
+            String caFile = tlsTable.getString("caFile");
+            TlsConfig tlsConfig = new TlsConfig(enable, certFile, keyFile, caFile);
             builder.tls(tlsConfig);
         }
     }
