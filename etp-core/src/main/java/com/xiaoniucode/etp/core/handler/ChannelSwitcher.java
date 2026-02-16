@@ -27,7 +27,7 @@ public class ChannelSwitcher {
             pipeline.addLast("snappyEncoder", new SnappyEncoder());
         }
 
-        if (!enableEncrypt) {
+        if (!enableEncrypt && pipeline.get("tls") != null) {
             pipeline.remove("tls");
         }
     }

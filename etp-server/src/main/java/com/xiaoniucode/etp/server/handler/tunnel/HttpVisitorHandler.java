@@ -63,7 +63,6 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         }
     }
 
-    //todo 需要迁移到桥接器
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel visitor = ctx.channel();
@@ -75,14 +74,12 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         super.channelInactive(ctx);
     }
 
-    //todo 需要迁移到桥接器
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error(cause.getMessage(), cause);
         ctx.close();
     }
 
-    //todo 需要迁移到桥接器
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel visitor = ctx.channel();
