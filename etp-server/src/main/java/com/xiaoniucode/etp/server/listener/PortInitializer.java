@@ -4,9 +4,7 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
-import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.event.TcpProxyInitializedEvent;
-import com.xiaoniucode.etp.server.manager.ClientManager;
 import com.xiaoniucode.etp.server.manager.PortManager;
 import com.xiaoniucode.etp.server.manager.PortListenerManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
@@ -17,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * 系统首次启动时候执行，当TCP代理服务初始化成功后，将所有代理端口（remotePort）进行监听
@@ -43,7 +40,7 @@ public class PortInitializer implements EventListener<TcpProxyInitializedEvent> 
     @Override
     public void onEvent(TcpProxyInitializedEvent event) {
         try {
-            Collection<ProxyConfig> configs = proxyManager.getTcpProxyConfigs();
+            Collection<ProxyConfig> configs = proxyManager.getTcpProxies();
             for (ProxyConfig proxy : configs) {
                 if (proxy.getStatus() == ProxyStatus.CLOSED) {
                     continue;

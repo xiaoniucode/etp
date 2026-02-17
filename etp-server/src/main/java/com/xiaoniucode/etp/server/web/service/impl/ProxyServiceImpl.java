@@ -13,6 +13,7 @@ import com.xiaoniucode.etp.server.manager.domain.AutoDomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.CustomDomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.SubDomainInfo;
+import com.xiaoniucode.etp.server.proxy.processor.ProxyConfigProcessorExecutor;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 import com.xiaoniucode.etp.server.web.controller.proxy.convert.HttpProxyConvert;
@@ -54,11 +55,13 @@ public class ProxyServiceImpl implements ProxyService {
     private ClientService clientService;
     @Autowired
     private DomainManager domainManager;
+    @Autowired
+    private ProxyConfigProcessorExecutor processorExecutor;
 
     /**
      * 创建 TCP 代理
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void createTcpProxy(TcpProxyCreateRequest proxy) {
         String id = GlobalIdGenerator.uuid32();
         String clientId = proxy.getClientId();
@@ -270,6 +273,8 @@ public class ProxyServiceImpl implements ProxyService {
         proxyRepository.deleteAllById(ids);
         //删除域名信息
         proxyDomainRepository.deleteByProxyIdIn(ids);
+        //删除内存状态
+        proxyManager.removeProxies(ids);
     }
 
     @Override
@@ -282,9 +287,9 @@ public class ProxyServiceImpl implements ProxyService {
             } else {
                 proxy.setStatus(ProxyStatus.OPEN);
             }
-            //todo 更新内存状态
+            //更新内存状态
+            proxyManager.changeStatus(proxy.getId(), proxy.getStatus());
             proxyRepository.saveAndFlush(proxy);
         });
     }
-
 }

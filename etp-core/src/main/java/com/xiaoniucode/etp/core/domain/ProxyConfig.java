@@ -58,6 +58,7 @@ public class ProxyConfig {
      */
     @Setter
     private Boolean compress = false;
+
     /**
      * 计算域名的类型
      * 优先级：自定义域名 --> 子域名 --> 自动生成
@@ -79,7 +80,8 @@ public class ProxyConfig {
         }
         return null;
     }
-    public boolean isOpen(){
-        return this.status==ProxyStatus.OPEN;
+
+    public boolean isOpen() {
+        return this.status == ProxyStatus.OPEN;
     }
 }

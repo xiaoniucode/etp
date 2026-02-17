@@ -26,7 +26,7 @@ status = 1
 name = "web11"
 protocol = "http"
 localIp = "localhost"
-localPort = 1025
+localPort = 3006
 autoDomain = true
 subDomains = ["a", "b"]
 status = 1
@@ -38,7 +38,8 @@ localIp = "localhost"
 localPort = 8090
 autoDomain = true
 status = 1
-
+encrypt = false
+compress = false
 [[proxies]]
 name = "web2"
 protocol = "http"

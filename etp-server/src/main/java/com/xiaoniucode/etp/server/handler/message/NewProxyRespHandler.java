@@ -13,7 +13,9 @@ import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.PortListenerManager;
+import com.xiaoniucode.etp.server.manager.domain.valid.ValidInfo;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
+import com.xiaoniucode.etp.server.proxy.processor.ProxyConfigProcessorExecutor;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import jakarta.annotation.Resource;
@@ -40,41 +42,30 @@ public class NewProxyRespHandler implements MessageHandler {
     private ProxyManager proxyManager;
     @Autowired
     private AgentSessionManager agentSessionManager;
-    @Autowired
-    private PortListenerManager portListenerManager;
     @Resource
     private AppConfig appConfig;
+    @Autowired
+    private ProxyConfigProcessorExecutor processorExecutor;
 
     @Override
     public void handle(ChannelHandlerContext ctx, ControlMessage msg) {
         Channel control = ctx.channel();
         agentSessionManager.getAgentSession(control).ifPresent(agent -> {
             String clientId = agent.getClientId();
-            Message.NewProxy newProxy = msg.getNewProxy();
-            ClientType clientType = agent.getClientType();
-            ProxyConfig config = buildProxyConfig(newProxy);
-            //判断代理是否已经存在了
-            if (proxyManager.hasProxy(clientId, config)) {
-                logger.warn("代理配置已经存在，跳过注册：[客户端标识={}，代理名称={}]", clientId, config.getName());
+            ProxyConfig config = buildProxyConfig(msg.getNewProxy());
+            ValidInfo validInfo = proxyManager.validProxy(clientId, config);
+            if (validInfo.isInValid()) {
+                logger.warn("无效配置：[客户端标识={}，代理名称={}]", clientId, config.getName());
+                control.writeAndFlush(MessageUtils.buildErrorMessage(400, validInfo.getMessage()));
                 return;
             }
-            //保存到代理到配置管理器
+            if (validInfo.isUpdate()) {
+                proxyManager.removeProxyByName(clientId, config.getName());
+            }
             proxyManager.addProxy(clientId, config, proxyConfig -> {
-                //发布事件，可订阅事件对其进行持久化或其他操作
-                //todo test
-                if (ProtocolType.isTcp(proxyConfig.getProtocol())) {
-                    Integer remotePort = proxyConfig.getRemotePort();
-                    portListenerManager.bindPort(remotePort);
-                    agentSessionManager.addPortToAgentSession(remotePort);
-                }
-                if (ProtocolType.isHttp(proxyConfig.getProtocol())) {
-                    Set<String> domains = proxyConfig.getFullDomains();
-                    agentSessionManager.addDomainsToAgentSession(domains);
-                }
-                //注册代理配置
-                eventBus.publishAsync(new ProxyCreatedEvent(clientId, clientType, proxyConfig));
-                Message.ControlMessage controlMessage = buildResponse(proxyConfig);
-                control.writeAndFlush(controlMessage);
+                processorExecutor.execute(proxyConfig);
+                eventBus.publishAsync(new ProxyCreatedEvent(clientId, agent.getClientType(), proxyConfig));
+                control.writeAndFlush(buildResponse(proxyConfig));
                 logger.debug("代理注册成功: [代理名称={}]", proxyConfig.getName());
             });
         });
@@ -102,11 +93,6 @@ public class NewProxyRespHandler implements MessageHandler {
     private Message.ControlMessage buildResponse(ProxyConfig config) {
         ProtocolType protocol = config.getProtocol();
         Set<String> domains = config.getFullDomains();
-
-        if (domains == null || domains.isEmpty()) {
-            //todo return error
-            return null;
-        }
         String host = appConfig.getServerAddr();
         StringBuilder remoteAddr = new StringBuilder();
         if (ProtocolType.isHttp(protocol)) {

@@ -9,5 +9,5 @@ import java.util.Set;
 @Getter
 @Setter
 public class BatchDeleteRequest implements Serializable {
-    private Set<String>ids;
+    private Set<String> ids;
 }

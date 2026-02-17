@@ -3,8 +3,10 @@ package com.xiaoniucode.etp.server.manager;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
+import com.xiaoniucode.etp.server.manager.domain.valid.ValidInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,8 +84,18 @@ public class ProxyManager {
         return proxyConfig;
     }
 
-    public ProxyConfig removeProxy(String clientId, String proxyName) {
-        return removeProxy(clientId, proxyName, null);
+    public void removeProxies(Set<String> proxyIds) {
+
+    }
+
+    public ProxyConfig removeProxyById(String clientId, String proxyId) {
+        return removeProxy(clientId, proxyId, null);
+    }
+
+    public ProxyConfig removeProxyByName(String clientId, String name) {
+        ClientInfo client = clientManager.getClient(clientId);
+        ProxyConfig config = client.getProxyConfig(name);
+        return removeProxy(clientId, config.getProxyId(), null);
     }
 
     public ProxyConfig removeProxy(String clientId, String proxyId, Consumer<ProxyConfig> callback) {
@@ -96,6 +108,7 @@ public class ProxyManager {
             logger.warn("删除代理失败，代理配置不存在");
             return null;
         }
+        clientInfo.removeProxyByName(proxyConfig.getName());
         ProtocolType protocol = proxyConfig.getProtocol();
         if (ProtocolType.isTcp(protocol)) {
             portToProxyConfig.remove(proxyConfig.getRemotePort());
@@ -130,8 +143,12 @@ public class ProxyManager {
         return portToProxyConfig.get(port);
     }
 
-    public Collection<ProxyConfig> getTcpProxyConfigs() {
+    public Collection<ProxyConfig> getTcpProxies() {
         return portToProxyConfig.values();
+    }
+
+    public Collection<ProxyConfig> getHttpProxies() {
+        return proxyIdToProxyConfig.values().stream().filter(config -> ProtocolType.isHttp(config.getProtocol())).toList();
     }
 
     public Set<ProxyConfig> getByClientId(String clientId) {
@@ -145,13 +162,45 @@ public class ProxyManager {
      * @param config   配置信息
      * @return 是否存在
      */
-    public Boolean hasProxy(String clientId, ProxyConfig config) {
+    public ValidInfo validProxy(String clientId, ProxyConfig config) {
+        if (clientId == null || config == null) {
+            return ValidInfo.fail("客户端ID或代理配置不能为空");
+        }
         ClientInfo client = clientManager.getClient(clientId);
         if (client == null) {
             logger.error("客户端不存在: {}", clientId);
-            return null;
+            return ValidInfo.fail("客户端ID不存在: " + clientId);
         }
-        return client.exist(config.getProxyId());
+        //名字相同则更新
+        ProxyConfig existConfig = client.getProxyConfig(config.getName());
+        if (existConfig != null) {
+            return ValidInfo.update(existConfig);
+        } else {
+            ProtocolType protocol = config.getProtocol();
+            //如果是TCP协议 检查端口
+            if (ProtocolType.isTcp(protocol)) {
+                Integer remotePort = config.getRemotePort();
+                if (remotePort != null && portToProxyConfig.containsKey(remotePort)) {
+                    return ValidInfo.fail("端口占用：" + remotePort);
+                }
+            }
+            //如果是HTTP协议 检查域名
+            if (ProtocolType.isHttp(protocol) && !config.getAutoDomain()) {
+
+                Set<String> customDomains = config.getCustomDomains();
+                if (customDomains != null) {
+                    for (String domain : customDomains) {
+                        if (domainManager.exists(domain)) {
+                            return ValidInfo.fail("自定义域名冲突：" + domain);
+                        }
+                    }
+                }
+                //todo 检查子域名
+                Set<String> subDomains = config.getSubDomains();
+            }
+            //新增
+            return ValidInfo.ok();
+        }
     }
 
     /**
@@ -168,4 +217,21 @@ public class ProxyManager {
         String proxyId = domainManager.getProxyId(domain);
         return getById(proxyId);
     }
+
+    /**
+     * 改变代理配置的状态
+     *
+     * @param proxyId     代理配置 ID
+     * @param proxyStatus 需要改变的状态
+     */
+    public void changeStatus(String proxyId, ProxyStatus proxyStatus) {
+        ProxyConfig proxyConfig = getById(proxyId);
+        if (proxyConfig == null) {
+            logger.warn("代理配置不存在：{}", proxyId);
+            return;
+        }
+        proxyConfig.setStatus(proxyStatus);
+    }
+
+
 }
