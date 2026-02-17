@@ -173,7 +173,9 @@ public class VisitorSessionManager {
         }
         disconnect(session.getVisitor(), callback);
     }
-
+    public synchronized void closeVisitorsByRemotePorts(Set<Integer> remotePorts) {
+        remotePorts.forEach(this::closeVisitorsByRemotePort);
+    }
     /**
      * 关闭指定端口上的所有visitor 连接
      * TCP代理
@@ -219,7 +221,9 @@ public class VisitorSessionManager {
             domainToVisitorChannels.remove(domain);
         }
     }
-
+    public synchronized void closeVisitorsByDomains(Set<String> domains) {
+        domains.forEach(this::closeVisitorsByDomain);
+    }
     public VisitorSession getVisitorSession(String sessionId) {
         return sessionIdToVisitorSession.get(sessionId);
     }

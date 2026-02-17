@@ -155,6 +155,8 @@ public class ProxyServiceImpl implements ProxyService {
                 return proxyDomain;
             }).toList();
             proxyDomainRepository.saveAllAndFlush(batch);
+
+            processorExecutor.execute(config);
         });
 
     }

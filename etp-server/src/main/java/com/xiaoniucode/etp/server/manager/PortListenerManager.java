@@ -1,7 +1,5 @@
 package com.xiaoniucode.etp.server.manager;
 
-import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
-import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -11,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,8 +19,6 @@ public class PortListenerManager {
     private final Map<Integer, Channel> portToChannel = new ConcurrentHashMap<>();
     @Autowired
     private PortManager portManager;
-    @Autowired
-    private VisitorSessionManager visitorSessionManager;
     @Autowired
     private TcpProxyServer tcpProxyServer;
 
@@ -54,8 +49,6 @@ public class PortListenerManager {
 
     public void stopPortListen(Integer remotePort, boolean releasePort) {
         try {
-            //关闭所有已建立的访问者连接
-            visitorSessionManager.closeVisitorsByRemotePort(remotePort);
             Channel serverChannel = portToChannel.get(remotePort);
             if (serverChannel != null) {
                 serverChannel.close().sync();

@@ -150,6 +150,15 @@ public class AgentSessionManager {
         });
     }
 
+    public void removeDomainsToAgentSession(String clientId, Set<String> domains) {
+        getById(clientId).ifPresent(agentSession -> {
+            for (String domain : domains) {
+                domainToAgentSession.remove(domain);
+            }
+            controlToDomains.get(agentSession.getControl()).removeAll(domains);
+        });
+    }
+
     /**
      * 服务端与客户端断开连接
      * 清理掉所有远程端口到代理客户端会话信息
