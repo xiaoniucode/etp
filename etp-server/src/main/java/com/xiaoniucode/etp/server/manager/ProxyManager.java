@@ -89,11 +89,6 @@ public class ProxyManager {
         }
         return proxyConfig;
     }
-
-    public void removeProxies(Set<String> proxyIds) {
-
-    }
-
     public String getClientId(String proxyId) {
         return proxyIdToClientId.get(proxyId);
     }

@@ -38,8 +38,8 @@ localIp = "localhost"
 localPort = 8090
 autoDomain = true
 status = 1
-encrypt = false
-compress = false
+encrypt = true
+compress = true
 [[proxies]]
 name = "web2"
 protocol = "http"

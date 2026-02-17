@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Accessors(chain = true)
 public class User  {
     /**

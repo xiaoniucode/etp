@@ -313,13 +313,18 @@ public class ProxyServiceImpl implements ProxyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchDeleteProxies(BatchDeleteRequest request) {
-        Set<String> ids = request.getIds();
+        Set<String> proxyIds = request.getIds();
         //删除基础信息
-        proxyRepository.deleteAllById(ids);
+        proxyRepository.deleteAllById(proxyIds);
         //删除域名信息
-        proxyDomainRepository.deleteByProxyIdIn(ids);
+        proxyDomainRepository.deleteByProxyIdIn(proxyIds);
         //删除内存状态
-        proxyManager.removeProxies(ids);
+        for (String proxyId : proxyIds) {
+            proxyManager.removeProxyById(proxyId).ifPresent(c -> {
+                c.setStatus(ProxyStatus.DELETED);
+                processorExecutor.execute(c);
+            });
+        }
     }
 
     @Override
