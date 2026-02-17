@@ -15,6 +15,7 @@ public class ChannelBridge extends ChannelDuplexHandler {
     private static final Logger log = LoggerFactory.getLogger(ChannelBridge.class);
     private final Channel peer;
     private final ChannelBridgeCallback callback;
+
     public ChannelBridge(Channel peer) {
         this(peer, null);
     }
@@ -32,10 +33,16 @@ public class ChannelBridge extends ChannelDuplexHandler {
         }
         ReferenceCountUtil.retain(msg);
         peer.writeAndFlush(msg).addListener((ChannelFutureListener) f -> {
-            if (!f.isSuccess()) {
-                log.debug("bridge write failed: {}", f.cause().getMessage());
-                closeOnFlush(ctx.channel());
-                closeOnFlush(peer);
+            try {
+                if (!f.isSuccess()) {
+                    log.error("消息转发失败: {}", f.cause().getMessage());
+                    closeOnFlush(ctx.channel());
+                    closeOnFlush(peer);
+                }
+            } finally {
+                if (ReferenceCountUtil.refCnt(msg) > 0) {
+                    ReferenceCountUtil.release(msg);
+                }
             }
         });
     }

@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.handler.tunnel;
 
-import com.xiaoniucode.etp.client.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.client.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.client.manager.ServerSessionManager;
 import com.xiaoniucode.etp.core.domain.LanInfo;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
@@ -23,7 +23,7 @@ public class RealServerHandler extends ChannelInboundHandlerAdapter {
             String sessionId = serverSession.getSessionId();
             LanInfo lanInfo = serverSession.getLanInfo();
             ChannelUtils.closeOnFlush(server);
-            control.writeAndFlush(MessageWrapper.buildCloseProxy(sessionId));
+            control.writeAndFlush(MessageUtils.buildCloseProxy(sessionId));
             logger.debug("隧道关闭 - [目标地址={}，目标端口={}]", lanInfo.getLocalIP(), lanInfo.getLocalPort());
         });
         super.channelInactive(ctx);

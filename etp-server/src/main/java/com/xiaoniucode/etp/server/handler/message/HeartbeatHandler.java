@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.handler.message;
 
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
-import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -27,7 +27,7 @@ public class HeartbeatHandler extends AbstractTunnelMessageHandler {
         Channel control = ctx.channel();
         //更新代理客户端最后心跳时间
         agentSessionManager.updateHeartbeat(control);
-        ControlMessage message = MessageWrapper.buildPong();
+        ControlMessage message = MessageUtils.buildPong();
         control.writeAndFlush(message);
     }
 }

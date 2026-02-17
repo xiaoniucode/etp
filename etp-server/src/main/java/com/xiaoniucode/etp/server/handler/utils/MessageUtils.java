@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.handler.utils;
 
 import com.xiaoniucode.etp.core.message.Message;
 
-public class MessageWrapper {
+public class MessageUtils {
 
     public static Message.ControlMessage buildErrorMessage(int code, String msg) {
         Message.MessageHeader header = Message.MessageHeader.newBuilder()

@@ -9,7 +9,7 @@ import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.handler.tunnel.HttpVisitorHandler;
-import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ProtocolDetection;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
@@ -53,7 +53,7 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
         //将数据连接保存到visitor session会话中
         visitorSession.setTunnel(tunnel);
         //将控制隧道切换为数据隧道
-        ChannelSwitcher.switchToDataTunnel(ctx.pipeline(), config.getCompress(), config.getEncrypt());
+        ChannelSwitcher.switchToDataTunnel(tunnel.pipeline(), config.getCompress(), config.getEncrypt());
         ChannelBridgeCallback callback = new ChannelBridgeCallback() {
             /**
              * 由于是双向通道，所以会出现两次调用回调接口，需要做防重处理
@@ -66,7 +66,7 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
                     logger.debug("访问者连接断开，释放资源");
                     visitorSessionManager.disconnect(visitor, session -> {
                         Channel tunnel = session.getTunnel();
-                        Message.ControlMessage message = MessageWrapper
+                        Message.ControlMessage message = MessageUtils
                                 .buildCloseProxy(session.getSessionId());
                         tunnel.writeAndFlush(message);
                     });
@@ -81,13 +81,12 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
                     logger.error(cause.getMessage(), cause);
                     visitorSessionManager.disconnect(visitor, session -> {
                         Channel tunnel = session.getTunnel();
-                        Message.ControlMessage message = MessageWrapper.buildCloseProxy(session.getSessionId());
+                        Message.ControlMessage message = MessageUtils.buildCloseProxy(session.getSessionId());
                         tunnel.writeAndFlush(message);
 
                     });
                     ChannelUtils.closeOnFlush(visitor);
                 }
-
             }
 
             @Override
@@ -101,11 +100,11 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
         };
         //[visitor <-> tunnel]桥接，双向透明转发，无需序列化和拷贝
         ChannelBridge.bridge(visitor, tunnel, callback);
-        visitor.config().setOption(ChannelOption.AUTO_READ, true);
         if (ProtocolDetection.isHttp(visitor)) {
             visitor.attr(ChannelConstants.CONNECTED).set(true);
             httpVisitorHandler.sendFirstPackage(visitorSession);
         }
+        visitor.config().setOption(ChannelOption.AUTO_READ, true);
         logger.debug("已连接到目标服务");
     }
 }

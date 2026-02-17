@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.task;
 
 import com.xiaoniucode.etp.core.message.Message;
-import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import io.netty.channel.Channel;
@@ -45,7 +45,7 @@ public class SessionCleanupTask {
                 }
                 //尝试向客户端发送心跳超时消息
                 Channel control = conn.getControl();
-                Message.ControlMessage message = MessageWrapper.heartbeatTimeout();
+                Message.ControlMessage message = MessageUtils.heartbeatTimeout();
                 control.writeAndFlush(message);
                 agentSessionManager.disconnect(conn.getControl());
             });

@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
 import com.xiaoniucode.etp.server.event.AgentLoginEvent;
-import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import com.xiaoniucode.etp.server.manager.AccessTokenManager;
@@ -43,7 +43,7 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
         boolean hasToken = accessTokenManager.hasToken(token);
         if (!hasToken) {
             logger.error("客户端 - {} 认证失败，无效令牌：{}", clientId, token);
-            ControlMessage message = MessageWrapper.buildErrorMessage(401, "认证失败，无效令牌: " + token);
+            ControlMessage message = MessageUtils.buildErrorMessage(401, "认证失败，无效令牌: " + token);
             control.writeAndFlush(message).addListener(future -> {
                 if (future.isSuccess()) {
                     control.close();
@@ -58,7 +58,7 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
         //macClient=-1表示不限制Token连接数
         if (maxClient != -1 && agents >= maxClient) {
             logger.warn("访问令牌连接数已达上限: {}", maxClient);
-            ControlMessage message = MessageWrapper.buildErrorMessage(401, "访问令牌连接数已达上限: " + maxClient);
+            ControlMessage message = MessageUtils.buildErrorMessage(401, "访问令牌连接数已达上限: " + maxClient);
             control.writeAndFlush(message).addListener(future -> {
                 if (future.isSuccess()) {
                     control.close();
@@ -87,7 +87,7 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
                 .ifPresent(session -> {
                     eventBus.publishAsync(new AgentLoginEvent(session.isNew(), session));
                     //返回登陆成功消息
-                    ControlMessage message = MessageWrapper.buildLoginResp(session.getSessionId());
+                    ControlMessage message = MessageUtils.buildLoginResp(session.getSessionId());
                     control.writeAndFlush(message).addListener(future -> {
                         if (!future.isSuccess()) {
                             logger.warn("登陆成功返回结果消息发送失败");

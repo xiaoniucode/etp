@@ -9,7 +9,7 @@ import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
-import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ClientManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
@@ -274,7 +274,7 @@ public class AgentSessionManager {
             logger.warn("客户端 - {} 控制隧道不存在", clientId);
             return null;
         }
-        Message.ControlMessage controlMessage = MessageWrapper.buildKickout();
+        Message.ControlMessage controlMessage = MessageUtils.buildKickout();
         control.writeAndFlush(controlMessage).addListener(future -> {
             ChannelUtils.closeOnFlush(control);
         });

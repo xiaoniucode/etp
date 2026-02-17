@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
 import com.xiaoniucode.etp.client.handler.tunnel.RealServerHandler;
 import com.xiaoniucode.etp.client.handler.tunnel.ControlTunnelHandler;
-import com.xiaoniucode.etp.client.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.client.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
 import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
 import com.xiaoniucode.etp.client.manager.BootstrapManager;
@@ -35,7 +35,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLEngine;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -163,7 +162,7 @@ public final class TunnelClient implements Lifecycle {
                 // todo test
                 String clientId = "EWGSSGREGGWEWE";
                 String token = config.getAuthConfig().getToken();
-                Message.ControlMessage message = MessageWrapper.buildLogin(clientId, token, version);
+                Message.ControlMessage message = MessageUtils.buildLogin(clientId, token, version);
                 control.writeAndFlush(message).addListener(future -> {
                     if (future.isSuccess()) {
                         control.attr(ChannelConstants.CLIENT_ID).set(clientId);

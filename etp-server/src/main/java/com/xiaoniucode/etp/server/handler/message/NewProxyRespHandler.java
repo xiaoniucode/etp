@@ -10,7 +10,7 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.ProxyCreatedEvent;
 import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
-import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.PortListenerManager;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
@@ -123,6 +123,6 @@ public class NewProxyRespHandler implements MessageHandler {
             Integer remotePort = config.getRemotePort();
             remoteAddr.append(host).append(":").append(remotePort);
         }
-        return MessageWrapper.buildNewProxyResp(config.getName(), remoteAddr.toString());
+        return MessageUtils.buildNewProxyResp(config.getName(), remoteAddr.toString());
     }
 }

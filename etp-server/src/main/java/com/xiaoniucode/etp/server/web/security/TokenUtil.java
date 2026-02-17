@@ -24,10 +24,10 @@ public class TokenUtil {
     private final String secret;
     private final long expiration;
 
-    public TokenUtil(@Value("${jwt.secret:}") String secret, 
-                    @Value("${jwt.expiration:3600}") long expiration) {
+    public TokenUtil(@Value("${jwt.secret:}") String secret,
+                     @Value("${jwt.expiration:3600}") long expiration) {
         this.expiration = expiration;
-        
+
         if (!StringUtils.hasText(secret)) {
             // 生成32字节的随机密钥
             byte[] randomBytes = new byte[32];
@@ -54,27 +54,22 @@ public class TokenUtil {
         claims.put("sub", username);
         claims.put("created", now);
 
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .claims(claims)
                 .subject(username)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
-
-        logger.debug("为用户 {} 生成JWT令牌，过期时间: {}", username, expiryDate);
-        return token;
     }
 
     public Claims getClaimsFromToken(String token) {
         try {
-            Claims claims = Jwts.parser()
+            return Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-            logger.debug("解析JWT令牌成功，用户: {}", claims.getSubject());
-            return claims;
         } catch (Exception e) {
             logger.warn("解析JWT令牌失败: {}", e.getMessage());
             throw e;
@@ -82,21 +77,13 @@ public class TokenUtil {
     }
 
     public String getUsernameFromToken(String token) {
-        String username = getClaimsFromToken(token).getSubject();
-        logger.debug("从JWT令牌中获取用户名: {}", username);
-        return username;
+        return getClaimsFromToken(token).getSubject();
     }
 
     public boolean validateToken(String token) {
         try {
             Claims claims = getClaimsFromToken(token);
-            boolean isValid = !claims.getExpiration().before(new Date());
-            if (isValid) {
-                logger.debug("JWT令牌验证通过，用户: {}", claims.getSubject());
-            } else {
-                logger.debug("JWT令牌已过期，用户: {}", claims.getSubject());
-            }
-            return isValid;
+            return !claims.getExpiration().before(new Date());
         } catch (Exception e) {
             logger.warn("JWT令牌验证失败: {}", e.getMessage());
             return false;

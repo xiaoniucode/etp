@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.client.handler.message;
 
 import com.xiaoniucode.etp.client.manager.ConnectionPool;
-import com.xiaoniucode.etp.client.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.client.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.client.manager.BootstrapManager;
 import com.xiaoniucode.etp.client.manager.ServerSessionManager;
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
@@ -36,7 +36,7 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                 logger.debug("连接到目标服务 - [地址={}，端口={}]", localIP, localPort);
                 Channel server = future.channel();
                 server.config().setOption(ChannelOption.AUTO_READ, false);
-                ConnectionPool.acquire().thenAccept(tunnel -> tunnel.writeAndFlush(MessageWrapper.buildVisitorConn(sessionId)).addListener(f -> {
+                ConnectionPool.acquire().thenAccept(tunnel -> tunnel.writeAndFlush(MessageUtils.buildVisitorConn(sessionId)).addListener(f -> {
                     if (f.isSuccess()) {
                         boolean compress = msg.getCompress();
                         boolean encrypt = msg.getEncrypt();
@@ -53,11 +53,11 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                     }
                 })).exceptionally(cause -> {
                     logger.error(cause.getMessage(), cause);
-                    control.writeAndFlush(MessageWrapper.buildCloseProxy(sessionId));
+                    control.writeAndFlush(MessageUtils.buildCloseProxy(sessionId));
                     return null;
                 });
             } else {
-                control.writeAndFlush(MessageWrapper.buildCloseProxy(sessionId));
+                control.writeAndFlush(MessageUtils.buildCloseProxy(sessionId));
                 logger.error("隧道创建失败 - [服务地址={}:服务端口={}] 不可用!", localIP, localPort);
             }
         });

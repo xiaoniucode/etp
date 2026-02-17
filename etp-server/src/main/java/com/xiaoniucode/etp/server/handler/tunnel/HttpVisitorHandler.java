@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.handler.tunnel;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.message.Message;
-import com.xiaoniucode.etp.server.handler.utils.MessageWrapper;
+import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
 import io.netty.buffer.ByteBuf;
@@ -40,7 +40,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private void connectToTarget(VisitorSession session) {
         Channel control = session.getControl();
         ProxyConfig config = session.getProxyConfig();
-        Message.ControlMessage message = MessageWrapper
+        Message.ControlMessage message = MessageUtils
                 .buildNewVisitorConn(session.getSessionId(),
                         config.getLocalIp(),
                         config.getLocalPort(),
@@ -68,7 +68,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Channel visitor = ctx.channel();
         visitorSessionManager.disconnect(visitor, session -> {
             Channel tunnel = session.getTunnel();
-            Message.ControlMessage message = MessageWrapper.buildCloseProxy(session.getSessionId());
+            Message.ControlMessage message = MessageUtils.buildCloseProxy(session.getSessionId());
             tunnel.writeAndFlush(message);
         });
         super.channelInactive(ctx);
