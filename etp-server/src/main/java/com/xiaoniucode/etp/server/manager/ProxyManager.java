@@ -35,6 +35,10 @@ public class ProxyManager {
      * 每个客户端的配置列表
      */
     private final Map<String, Set<ProxyConfig>> clientIdToProxyConfigs = new ConcurrentHashMap<>();
+    /**
+     * proxyId -->clientId
+     */
+    private final Map<String, String> proxyIdToClientId = new ConcurrentHashMap<>();
     @Autowired
     private ClientManager clientManager;
     @Autowired
@@ -51,6 +55,7 @@ public class ProxyManager {
             return null;
         }
         ProtocolType protocol = proxyConfig.getProtocol();
+        String proxyId = proxyConfig.getProxyId();
         if (ProtocolType.isTcp(protocol)) {
             Integer remotePort = proxyConfig.getRemotePort();
             if (portToProxyConfig.containsKey(remotePort)) {
@@ -75,7 +80,8 @@ public class ProxyManager {
         if (clientInfo != null) {
             clientInfo.addProxy(proxyConfig);
         }
-        proxyIdToProxyConfig.put(proxyConfig.getProxyId(), proxyConfig);
+        proxyIdToClientId.put(proxyId, clientId);
+        proxyIdToProxyConfig.put(proxyId, proxyConfig);
         clientIdToProxyConfigs.computeIfAbsent(clientId, k ->
                 ConcurrentHashMap.newKeySet()).add(proxyConfig);
         if (callback != null) {
@@ -88,17 +94,22 @@ public class ProxyManager {
 
     }
 
-    public ProxyConfig removeProxyById(String clientId, String proxyId) {
-        return removeProxy(clientId, proxyId, null);
+    public String getClientId(String proxyId) {
+        return proxyIdToClientId.get(proxyId);
+    }
+
+    public Optional<ProxyConfig> removeProxyById(String proxyId) {
+        return Optional.ofNullable(removeProxy(proxyId, null));
     }
 
     public ProxyConfig removeProxyByName(String clientId, String name) {
         ClientInfo client = clientManager.getClient(clientId);
         ProxyConfig config = client.getProxyConfig(name);
-        return removeProxy(clientId, config.getProxyId(), null);
+        return removeProxy(config.getProxyId(), null);
     }
 
-    public ProxyConfig removeProxy(String clientId, String proxyId, Consumer<ProxyConfig> callback) {
+    public ProxyConfig removeProxy(String proxyId, Consumer<ProxyConfig> callback) {
+        String clientId = proxyIdToClientId.get(proxyId);
         ClientInfo clientInfo = clientManager.getClient(clientId);
         if (clientInfo == null) {
             return null;
@@ -224,13 +235,14 @@ public class ProxyManager {
      * @param proxyId     代理配置 ID
      * @param proxyStatus 需要改变的状态
      */
-    public void changeStatus(String proxyId, ProxyStatus proxyStatus) {
+    public ProxyConfig changeStatus(String proxyId, ProxyStatus proxyStatus) {
         ProxyConfig proxyConfig = getById(proxyId);
         if (proxyConfig == null) {
             logger.warn("代理配置不存在：{}", proxyId);
-            return;
+            return null;
         }
         proxyConfig.setStatus(proxyStatus);
+        return proxyConfig;
     }
 
 

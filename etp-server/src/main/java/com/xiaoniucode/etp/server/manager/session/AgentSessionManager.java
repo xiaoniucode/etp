@@ -118,8 +118,12 @@ public class AgentSessionManager {
         return Optional.of(agentSession);
     }
 
-    public void addPortToAgentSession(Integer remotePort) {
-        AgentSessionContext.get().ifPresent(agentSession -> {
+    public Optional<AgentSession> getById(String clientId) {
+        return Optional.ofNullable(clientIdToAgentSession.get(clientId));
+    }
+
+    public void addPortToAgentSession(String clientId, Integer remotePort) {
+        getById(clientId).ifPresent(agentSession -> {
             portToAgentSession.putIfAbsent(remotePort, agentSession);
             controlToPorts.computeIfAbsent(agentSession.getControl(),
                     k -> ConcurrentHashMap.newKeySet()
@@ -127,8 +131,16 @@ public class AgentSessionManager {
         });
     }
 
-    public void addDomainsToAgentSession(Set<String> domains) {
-        AgentSessionContext.get().ifPresent(agentSession -> {
+    public void removePortToAgentSession(String clientId, Integer remotePort) {
+        getById(clientId).ifPresent(agentSession -> {
+            portToAgentSession.remove(remotePort);
+            Set<Integer> ports = controlToPorts.get(agentSession.getControl());
+            ports.remove(remotePort);
+        });
+    }
+
+    public void addDomainsToAgentSession(String clientId, Set<String> domains) {
+        getById(clientId).ifPresent(agentSession -> {
             for (String domain : domains) {
                 domainToAgentSession.putIfAbsent(domain, agentSession);
             }

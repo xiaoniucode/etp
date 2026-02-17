@@ -19,9 +19,9 @@ public interface ProxyRepository extends JpaRepository<Proxy, String> {
     List<Proxy> findByClientId(String clientId);
     
     /**
-     * 根据名称查询代理
+     * 根据客户端ID和名称查询代理
      */
-    Proxy findByName(String name);
+    Proxy findByClientIdAndName(String clientId, String name);
     
     /**
      * 根据类型查询代理

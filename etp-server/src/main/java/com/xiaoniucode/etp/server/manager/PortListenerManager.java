@@ -39,7 +39,6 @@ public class PortListenerManager {
                 ChannelFuture future = serverBootstrap.bind(port).sync();
                 portToChannel.put(port, future.channel());
                 portManager.addPort(port);
-                logger.info("{} 服务启动成功", port);
             }
         } catch (InterruptedException e) {
             logger.error(e.getMessage(), e);
@@ -55,26 +54,18 @@ public class PortListenerManager {
 
     public void stopPortListen(Integer remotePort, boolean releasePort) {
         try {
-            //关闭所有已建立的连接
+            //关闭所有已建立的访问者连接
             visitorSessionManager.closeVisitorsByRemotePort(remotePort);
-            //关闭监听通道
             Channel serverChannel = portToChannel.get(remotePort);
             if (serverChannel != null) {
                 serverChannel.close().sync();
                 portToChannel.remove(remotePort);
             }
-            //释放端口
             if (releasePort) {
                 portManager.release(remotePort);
-                logger.info("成功停止并释放公网端口: {}", remotePort);
-                //如果释放了端口，说明映射被删掉了，需要清空流量指标收集器
-                MetricsCollector.removeCollector(remotePort + "");
-                logger.debug("删除公网端口: {}", remotePort);
-            } else {
-                logger.info("{} 端口映射服务已停止（保留端口）", remotePort);
             }
         } catch (Exception e) {
-            logger.error("停止端口 {} 失败", remotePort, e);
+            logger.error("停止服务失败：端口-{}", remotePort, e);
         }
     }
 

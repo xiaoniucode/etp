@@ -23,35 +23,25 @@ public class PortManager {
     private final Set<Integer> allocatedPorts = new HashSet<>(32);
     private int startPort = 1;
     private int endPort = 65535;
-    private final AtomicBoolean init = new AtomicBoolean(false);
 
     public PortManager(AppConfig config) {
-        if (init.get()) {
-            init.set(true);
-            return;
-        }
         PortRange portRange = config.getPortRange();
-        startPort = portRange.getStart();
-        endPort = portRange.getEnd();
-
-
-        if (startPort == -1) {
-            startPort = 1;
-        }
-        if (endPort == -1) {
-            endPort = 65535;
-        }
-        if (startPort < 1 || endPort < 1 || endPort > 65535 || startPort > endPort) {
+        int start = portRange.getStart();
+        int end = portRange.getEnd();
+        startPort = start < 1 ? startPort : start;
+        endPort = Math.min(end, endPort);
+        if (endPort < 1 || startPort > endPort) {
             throw new IllegalArgumentException("无效的端口范围: " + startPort + "-" + endPort);
         }
 
         logger.debug("端口分配器初始化，范围: {}-{}", startPort, endPort);
     }
+
     public int acquire() {
         // 检查端口是否足够
         int totalPorts = endPort - startPort + 1;
         if (allocatedPorts.size() >= totalPorts) {
-            throw new IllegalArgumentException("可用端口已用完！");
+            throw new IllegalArgumentException("无可用端口");
         }
         Random random = new Random();
         int rangeSize = endPort - startPort + 1;
@@ -64,7 +54,7 @@ public class PortManager {
             }
             if (tryBindPort(port)) {
                 allocatedPorts.add(port);
-                logger.info("成功分配端口: {}", port);
+                logger.debug("端口分配成功: {}", port);
                 return port;
             }
         }
@@ -96,7 +86,7 @@ public class PortManager {
 
     public boolean release(int port) {
         if (allocatedPorts.remove(port)) {
-            logger.info("成功释放端口: {}", port);
+            logger.debug("释放端口占用: {}", port);
             return true;
         } else {
             logger.warn("尝试释放未分配的端口: {}", port);

@@ -42,15 +42,15 @@ layui.define(['layer', 'jquery'], function (exports) {
                             setTimeout(() => {
                                 window.parent.parent.location.href = '/login.html';
                             }, 800);
-                            reject(new Error(res.message || '未授权访问'));
+                            reject(new Error(res.msg || '未授权访问'));
                         } else if (res.code === 404) {
                             window.parent.parent.location.href = '/error/404.html';
                             reject(new Error('找不到访问资源'));
                         } else if (res.code === 403) {
                             window.parent.parent.location.href = '/error/403.html';
-                            reject(new Error(res.message || '没有资源访问权限'));
+                            reject(new Error(res.msg || '没有资源访问权限'));
                         } else if (res.code === 500) {
-                            const msg = res.message || '操作失败';
+                            const msg = res.msg || '操作失败';
                             if (options.silent !== true) {
                                 layer.msg(msg, {icon: 2, time: 1500});
                             }
@@ -63,7 +63,7 @@ layui.define(['layer', 'jquery'], function (exports) {
                             resolve(res.data);
                         } else {
                             // 处理其他未知状态码
-                            const msg = res.message || '请求失败';
+                            const msg = res.msg || '请求失败';
                             if (options.silent !== true) {
                                 layer.msg(msg, {icon: 2, time: 1500});
                             }

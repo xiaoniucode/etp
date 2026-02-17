@@ -120,7 +120,7 @@
 
             } else if (obj.event === 'statusSwitch') {
                 const loading = layer.msg('正在切换...', {icon: 16, shade: 0.3, time: 0});
-                Rest.put(`/api/proxies/${data.id}/status`, {status: data.status === 1 ? 0 : 1}).then(() => {
+                Rest.put(`/api/proxies/${data.id}/status`).then(() => {
                     layer.close(loading);
                     table.reload('proxy');
                     layer.msg('切换成功', {icon: 1});
