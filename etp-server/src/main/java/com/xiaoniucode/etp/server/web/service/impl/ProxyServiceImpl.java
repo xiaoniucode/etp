@@ -66,6 +66,10 @@ public class ProxyServiceImpl implements ProxyService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void createTcpProxy(TcpProxyCreateRequest request) {
+        //检查是否开启了 TLS
+        if (request.getEncrypt() && !appConfig.getTlsConfig().getEnable()) {
+            throw new BizException("不支持隧道加密，未配置加密证书");
+        }
         String clientId = request.getClientId();
         ClientDTO client = clientService.findById(clientId);
         if (client == null) {
@@ -83,6 +87,7 @@ public class ProxyServiceImpl implements ProxyService {
         if (proxyRepository.findByClientIdAndName(clientId, request.getName()) != null) {
             throw new BizException("名称重复");
         }
+
         String proxyId = GlobalIdGenerator.uuid32();
         Proxy newProxy = new Proxy();
         newProxy.setId(proxyId);
@@ -111,6 +116,10 @@ public class ProxyServiceImpl implements ProxyService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void createHttpProxy(HttpProxyCreateRequest request) {
+        //检查是否开启了 TLS
+        if (request.getEncrypt() && !appConfig.getTlsConfig().getEnable()) {
+            throw new BizException("不支持隧道加密，未配置加密证书");
+        }
         String clientId = request.getClientId();
         ClientDTO client = clientService.findById(clientId);
         if (client == null) {

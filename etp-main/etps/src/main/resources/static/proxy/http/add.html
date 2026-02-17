@@ -144,6 +144,8 @@
         form.on('submit(proxyForm)', function (data) {
             const field = data.field;
             
+            field.status = field.status ? '1' : '0';
+            
             // 构建域名类型代码
             let domainTypeCode = 0;
             if (field.domainType === 'sub') {

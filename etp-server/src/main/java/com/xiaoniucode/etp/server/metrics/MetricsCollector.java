@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
@@ -70,7 +71,7 @@ public class MetricsCollector {
             key = domain;
         } else {
             AppConfig config = BeanHelper.getBean(AppConfig.class);
-            if (config.getHttpProxyPort() == remotePort|| config.getHttpsProxyPort()==remotePort) {
+            if (config.getHttpProxyPort() == remotePort || config.getHttpsProxyPort() == remotePort) {
                 return;
             }
             key = remotePort + "";
@@ -79,7 +80,8 @@ public class MetricsCollector {
         callback.accept(metricsCollector);
 
     }
-    public static Count count(){
+
+    public static Count count() {
         Count res = new Count();
         long totalInBytes = 0;
         long totalOutBytes = 0;
@@ -90,6 +92,11 @@ public class MetricsCollector {
         res.setIn(totalInBytes);
         res.setOut(totalOutBytes);
         return res;
+    }
+
+    public static void removeCollectors(Set<String> keys) {
+        keys.forEach(MetricsCollector::removeCollector);
+
     }
 
     public static void removeCollector(String key) {

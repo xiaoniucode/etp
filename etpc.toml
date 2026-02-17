@@ -8,7 +8,7 @@ maxDelay = 10
 maxRetries = 5
 
 [tls]
-enable = true
+enable = false
 certFile = "cert/openssl/chain.pem"
 keyFile = "cert/openssl/privkey.pem"
 caFile = "cert/openssl/chain.pem"

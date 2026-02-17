@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Ajax handleException(Exception e) {
         logger.error(e.getMessage());
-        return Ajax.error("系统内部错误");
+        return Ajax.error(e.getMessage());
     }
 
 }

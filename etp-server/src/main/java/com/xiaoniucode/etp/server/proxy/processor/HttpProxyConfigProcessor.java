@@ -6,6 +6,7 @@ import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
+import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +37,13 @@ public class HttpProxyConfigProcessor implements ProxyConfigProcessor {
         Set<String> domains = proxyConfig.getFullDomains();
         if (status.isOpen()) {
             agentSessionManager.addDomainsToAgentSession(clientId, domains);
-        } else if (status.isClosed() || status.isDeleted()) {
+        } else if (status.isClosed()) {
             agentSessionManager.removeDomainsToAgentSession(clientId, domains);
             visitorSessionManager.closeVisitorsByDomains(domains);
+        } else if (status.isDeleted()) {
+            agentSessionManager.removeDomainsToAgentSession(clientId, domains);
+            visitorSessionManager.closeVisitorsByDomains(domains);
+            MetricsCollector.removeCollectors(domains);
         }
     }
 }

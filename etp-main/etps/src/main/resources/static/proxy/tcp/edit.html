@@ -121,6 +121,7 @@
 
         form.on('submit(proxyForm)', function (data) {
             const field = data.field;
+            field.status = field.status ? '1' : '0';
             field.id=proxyId
             Rest.put(`/api/proxies/tcp`, field).then(data => {
                 layer.msg('更新成功', {icon: 1, time: 400,}, () => {

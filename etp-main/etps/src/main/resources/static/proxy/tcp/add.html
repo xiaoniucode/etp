@@ -111,6 +111,7 @@
         })
         form.on('submit(proxyForm)', function (data) {
             const field = data.field;
+            field.status = field.status ? '1' : '0';
             Rest.post('/api/proxies/tcp', field).then(data => {
                 if (data.code === 0) {
                     layer.msg('创建成功', {icon: 1, time: 400,}, () => {
