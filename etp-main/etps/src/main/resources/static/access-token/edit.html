@@ -50,19 +50,17 @@
         const layer = layui.layer;
         const id = getQueryParam("id");
         
-        // 加载现有数据
         Rest.get('/api/access-token/' + id).then(data => {
             form.val('editForm', data);
         }).catch(err => {
             layer.msg('加载数据失败: ' + err.message, {icon: 2});
         });
         
-        // 提交表单
         form.on('submit(demo1)', function (data) {
             const field = data.field;
-            Rest.put('/api/access-token/' + id, field).then(res => {
+            field.id=id
+            Rest.put('/api/access-token', field).then(res => {
                 layer.msg('更新成功', {icon: 1, time: 400}, () => {
-                    // 关闭当前弹窗
                     parent.layer.close(parent.layer.getFrameIndex(window.name));
                 });
             }).catch(err => {

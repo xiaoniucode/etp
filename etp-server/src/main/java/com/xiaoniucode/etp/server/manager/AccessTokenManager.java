@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -42,5 +43,9 @@ public class AccessTokenManager {
 
     public boolean hasToken(String token) {
         return cache.containsKey(token);
+    }
+
+    public Optional<AccessTokenInfo> removeAccessToken(String token) {
+        return Optional.ofNullable(cache.remove(token));
     }
 }

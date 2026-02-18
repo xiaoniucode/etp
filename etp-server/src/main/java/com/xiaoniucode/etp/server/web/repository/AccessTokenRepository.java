@@ -15,4 +15,6 @@ public interface AccessTokenRepository extends JpaRepository<AccessToken, Intege
     AccessToken findByToken(String token);
 
     List<AccessToken> findByTokenIn(List<String> tokens);
+
+    List<AccessToken> findByIdIn(List<Integer> ids);
 }

@@ -46,7 +46,6 @@
             const field = data.field;
             Rest.post('/api/access-token', field).then(res => {
                 layer.msg('创建成功', {icon: 1, time: 400}, () => {
-                    // 关闭当前弹窗
                     parent.layer.close(parent.layer.getFrameIndex(window.name));
                 });
             }).catch(err => {

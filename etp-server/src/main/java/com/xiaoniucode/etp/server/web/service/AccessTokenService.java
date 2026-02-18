@@ -1,6 +1,8 @@
 package com.xiaoniucode.etp.server.web.service;
 
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.BatchDeleteAccessTokenRequest;
+import com.xiaoniucode.etp.server.web.controller.accesstoken.request.CreateAccessTokenRequest;
+import com.xiaoniucode.etp.server.web.controller.accesstoken.request.UpdateAccessTokenRequest;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.response.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.entity.AccessToken;
 
@@ -10,7 +12,7 @@ public interface AccessTokenService {
     /**
      * 创建访问令牌
      */
-    AccessToken create(AccessToken accessToken);
+    AccessToken create(CreateAccessTokenRequest request);
 
     /**
      * 查询所有访问令牌
@@ -25,7 +27,7 @@ public interface AccessTokenService {
     /**
      * 更新访问令牌
      */
-    AccessToken update(AccessToken accessToken);
+    void update(UpdateAccessTokenRequest accessToken);
 
     /**
         * 删除访问令牌
