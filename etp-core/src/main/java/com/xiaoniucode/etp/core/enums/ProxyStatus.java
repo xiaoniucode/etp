@@ -30,7 +30,7 @@ public enum ProxyStatus {
                 return proxyStatus;
             }
         }
-        throw new IllegalArgumentException("Unknown proxy code: " + code);
+        throw new IllegalArgumentException("未知代理状态: " + code);
     }
 
     /**

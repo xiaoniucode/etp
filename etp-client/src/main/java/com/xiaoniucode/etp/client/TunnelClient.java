@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.client;
 import com.xiaoniucode.etp.client.common.utils.MavenArchiverUtil;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
+import com.xiaoniucode.etp.client.config.domain.RetryConfig;
 import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
 import com.xiaoniucode.etp.client.handler.tunnel.RealServerHandler;
 import com.xiaoniucode.etp.client.handler.tunnel.ControlTunnelHandler;
@@ -13,6 +14,7 @@ import com.xiaoniucode.etp.client.manager.BootstrapManager;
 import com.xiaoniucode.etp.client.manager.EventBusManager;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.server.Lifecycle;
@@ -162,7 +164,8 @@ public final class TunnelClient implements Lifecycle {
                 // todo test
                 String clientId = "EWGSSGREGGWEWE";
                 String token = config.getAuthConfig().getToken();
-                Message.ControlMessage message = MessageUtils.buildLogin(clientId, token, version);
+                ClientType clientType = config.getClientType();
+                Message.ControlMessage message = MessageUtils.buildLogin(clientId, clientType, token, version);
                 control.writeAndFlush(message).addListener(future -> {
                     if (future.isSuccess()) {
                         control.attr(ChannelConstants.CLIENT_ID).set(clientId);
@@ -179,7 +182,7 @@ public final class TunnelClient implements Lifecycle {
     }
 
     private void scheduleReconnect() {
-        if (retryCount.get() >= config.getAuthConfig().getMaxRetries()) {
+        if (retryCount.get() >= config.getAuthConfig().getRetry().getMaxRetries()) {
             logger.error("达到最大重试次数，停止重连");
             this.stop();
             return;
@@ -196,14 +199,15 @@ public final class TunnelClient implements Lifecycle {
      * @return 时间（秒）
      */
     private long calculateDelay() {
+        RetryConfig retry = config.getAuthConfig().getRetry();
         int retries = retryCount.get();
         if (retries == 0) {
-            return config.getAuthConfig().getInitialDelay();
+            return retry.getInitialDelay();
         }
         // 指数退避 + 随机抖动(±30%)
-        long delay = Math.min((1L << retries), config.getAuthConfig().getMaxDelay());
+        long delay = Math.min((1L << retries), retry.getMaxDelay());
         long jitter = (long) (delay * 0.3 * (Math.random() * 2 - 1));
-        return Math.min(delay + jitter, config.getAuthConfig().getMaxDelay());
+        return Math.min(delay + jitter, retry.getMaxDelay());
     }
 
     @Override

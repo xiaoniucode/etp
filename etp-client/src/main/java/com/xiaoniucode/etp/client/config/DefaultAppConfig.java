@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.config.domain.LogConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
+import com.xiaoniucode.etp.core.enums.ClientType;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,6 +16,7 @@ public class DefaultAppConfig implements AppConfig {
     private final TlsConfig tlsConfig;
     private final List<ProxyConfig> proxies;
     private final LogConfig logConfig;
+    private final ClientType clientType;
 
     private DefaultAppConfig(Builder builder) {
         this.serverAddr = builder.serverAddr;
@@ -23,15 +25,17 @@ public class DefaultAppConfig implements AppConfig {
         this.tlsConfig = builder.tlsConfig;
         this.proxies = builder.proxies;
         this.logConfig = builder.logConfig;
+        this.clientType = builder.clientType;
     }
 
     public static class Builder {
         private String serverAddr = "127.0.0.1";
         private int serverPort = 9527;
         private AuthConfig authConfig = new AuthConfig();
-        private TlsConfig tlsConfig = new TlsConfig(false);
+        private TlsConfig tlsConfig = new TlsConfig();
         private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
         private LogConfig logConfig;
+        private ClientType clientType = ClientType.BINARY_DEVICE;
 
         public Builder serverAddr(String serverAddr) {
             this.serverAddr = serverAddr;
@@ -60,6 +64,11 @@ public class DefaultAppConfig implements AppConfig {
 
         public Builder logConfig(LogConfig logConfig) {
             this.logConfig = logConfig;
+            return this;
+        }
+
+        public Builder clientType(ClientType clientType) {
+            this.clientType = clientType;
             return this;
         }
 
@@ -96,6 +105,11 @@ public class DefaultAppConfig implements AppConfig {
     @Override
     public LogConfig getLogConfig() {
         return logConfig;
+    }
+
+    @Override
+    public ClientType getClientType() {
+        return clientType;
     }
 
     public static Builder builder() {

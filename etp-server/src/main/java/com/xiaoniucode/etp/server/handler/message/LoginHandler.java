@@ -39,7 +39,7 @@ public class LoginHandler extends AbstractTunnelMessageHandler {
         Message.Login login = msg.getLogin();
         String clientId = login.getClientId();
         String token = login.getToken();
-
+        //todo 检查是否已经登陆了，避免重复登陆
         boolean hasToken = accessTokenManager.hasToken(token);
         if (!hasToken) {
             logger.error("客户端 - {} 认证失败，无效令牌：{}", clientId, token);

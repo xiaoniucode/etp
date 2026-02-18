@@ -26,4 +26,12 @@ public enum ClientType {
         }
         return null;
     }
+
+    public boolean isWebSession() {
+        return this == WEB_SESSION;
+    }
+
+    public boolean isBinaryDevice() {
+        return this == BINARY_DEVICE;
+    }
 }

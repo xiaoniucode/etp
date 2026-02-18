@@ -3,18 +3,20 @@ package com.xiaoniucode.etp.autoconfigure;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.DefaultAppConfig;
 import com.xiaoniucode.etp.client.TunnelClient;
-import com.xiaoniucode.etp.client.config.ProxyRegistrar;
-import com.xiaoniucode.etp.common.utils.StringUtils;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.TlsConfig;
+import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.core.env.Environment;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * etp启动停止生命周期
+ * etp客户端启动、停止生命周期
  *
  * @author liuxin
  */
@@ -25,68 +27,44 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
     private TunnelClient tunnelClient;
     private final Environment environment;
     private final WebServerPortListener webServerPortListener;
-    private final ProxyRegistrar proxyRegistrar;
 
 
-    public EtpClientStartStopLifecycle(Environment environment, WebServerPortListener webServerPortListener,
-                                       ProxyRegistrar proxyRegistrar, EtpClientProperties properties) {
+    public EtpClientStartStopLifecycle(Environment environment, WebServerPortListener webServerPortListener, EtpClientProperties properties) {
         this.environment = environment;
         this.properties = properties;
-        this.proxyRegistrar = proxyRegistrar;
         this.webServerPortListener = webServerPortListener;
     }
 
     @Override
     public void start() {
-        if (properties.getTls()) {
-            System.setProperty("client.truststore.path", properties.getTruststore().getPath());
-            System.setProperty("client.truststore.storePass", properties.getTruststore().getStorePass());
-        }
-        String secretKey = properties.getSecretKey();
-        if (!StringUtils.hasText(secretKey)) {
-            logger.error("必须指定secretKey");
-            return;
-        }
+        ProxyConfig proxyConfig = new ProxyConfig();
+        proxyConfig.setName(environment.getProperty("spring.application.name"));
+        proxyConfig.setLocalIp(properties.getLocalIp());
+        proxyConfig.setProtocol(properties.getProtocol());
+        proxyConfig.setRemotePort(properties.getRemotePort());
+        proxyConfig.setLocalPort(webServerPortListener.getActualPort());
+        proxyConfig.setStatus(ProxyStatus.OPEN);
+        List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
+        proxies.add(proxyConfig);
         AppConfig config = new DefaultAppConfig
                 .Builder()
                 .serverAddr(properties.getServerAddr())
                 .serverPort(properties.getServerPort())
-                .secretKey(properties.getSecretKey())
-                .tls(properties.getTls())
-                .maxDelaySec(properties.getMaxDelaySec())
-                .initialDelaySec(properties.getInitialDelaySec())
-                .maxRetries(properties.getMaxRetries())
+                .clientType(ClientType.WEB_SESSION)
+                .tlsConfig(properties.getTls())
+                .authConfig(properties.getAuthConfig())
+                .proxies(proxies)
                 .build();
         tunnelClient = new TunnelClient(config);
         tunnelClient.start();
-        //等代理客户端成功连接到服务端的时候再注册端口映射
-        tunnelClient.onConnectSuccessListener((callback) -> {
-            int localPort = webServerPortListener.getActualPort();
-            String appName = environment.getProperty("spring.application.name", "Spring-Boot");
-            Set<String> customDomains = properties.getCustomDomains() != null ? new HashSet<>(properties.getCustomDomains()) : null;
-            Set<String> subDomains = properties.getSubDomain() != null ? new HashSet<>(properties.getSubDomain()) : null;
-            NewProxy newProxy = ProxyClient.NewProxyBuilder.builder()
-                    .localIP(properties.getLocalIP())
-                    .localPort(localPort)
-                    .status(properties.getAutoStart() ? 1 : 0)
-                    .remotePort(properties.getRemotePort())
-                    .protocol(properties.getProtocol())
-                    .name(appName)
-                    .customDomains(customDomains)
-                    .subDomains(subDomains)
-                    .autoDomain(properties.getAutoDomain())
-                    .build();
-            proxyClient.registerProxy(newProxy);
-        });
         running = true;
     }
 
     @Override
     public void stop() {
-        proxyClient.unregisterProxy();
         if (isRunning() && tunnelClient != null) {
             tunnelClient.stop();
-            logger.info("etp client stopped");
+            logger.info("etp 代理服务停止");
         }
         running = false;
     }

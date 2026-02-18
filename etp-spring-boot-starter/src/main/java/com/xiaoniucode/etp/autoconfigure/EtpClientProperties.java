@@ -1,7 +1,12 @@
 package com.xiaoniucode.etp.autoconfigure;
 
+import com.xiaoniucode.etp.client.config.domain.AuthConfig;
+import com.xiaoniucode.etp.client.config.domain.RetryConfig;
+import com.xiaoniucode.etp.common.utils.StringUtils;
+import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +21,7 @@ public class EtpClientProperties {
     /**
      * 是否启用ETP代理
      */
-    private boolean enabled = false;
+    private boolean enable = false;
 
     /**
      * 代理服务地址
@@ -27,6 +32,14 @@ public class EtpClientProperties {
      * 代理服务端口
      */
     private Integer serverPort = 9527;
+
+    @NestedConfigurationProperty
+    private Auth auth = new Auth();
+    /**
+     * TLS 加密
+     */
+    @NestedConfigurationProperty
+    private TlsConfig tls = new TlsConfig();
     /**
      * 公网端口
      */
@@ -34,20 +47,11 @@ public class EtpClientProperties {
     /**
      * 内网IP
      */
-    private String localIP = "127.0.0.1";
+    private String localIp = "127.0.0.1";
     /**
      * 协议
      */
-    private ProtocolType protocol = ProtocolType.TCP;
-    /**
-     * 密钥
-     */
-    private String secretKey;
-    /**
-     * 是否自动启动代理服务
-     */
-    private Boolean autoStart = true;
-
+    private ProtocolType protocol = ProtocolType.HTTP;
     /**
      * 自定义域名列表
      */
@@ -63,56 +67,12 @@ public class EtpClientProperties {
      */
     private List<String> subDomain = new ArrayList<>();
 
-    /**
-     * 是否启用 TLS 加密
-     */
-    private Boolean tls = false;
-
-    /**
-     * 初始化重连延迟时间 单位：秒
-     */
-    private Integer initialDelaySec = 2;
-    /**
-     * 最大重试次数 超过以后关闭workerGroup
-     */
-    private Integer maxRetries = 5;
-    /**
-     * 最大延迟时间,如果超过了最大值则取maxDelaySec为最大延迟时间 单位：秒
-     */
-    private Integer maxDelaySec = 8;
-
-    /**
-     * TLS 加密配置
-     */
-    private Truststore truststore = new Truststore();
-
-    public static class Truststore {
-        private String path;
-        private String storePass;
-
-        public String getPath() {
-            return path;
-        }
-
-        public void setPath(String path) {
-            this.path = path;
-        }
-
-        public String getStorePass() {
-            return storePass;
-        }
-
-        public void setStorePass(String storePass) {
-            this.storePass = storePass;
-        }
+    public boolean isEnable() {
+        return enable;
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 
     public String getServerAddr() {
@@ -131,6 +91,44 @@ public class EtpClientProperties {
         this.serverPort = serverPort;
     }
 
+    public TlsConfig getTls() {
+        return tls;
+    }
+
+    public void setTls(TlsConfig tls) {
+        this.tls = tls;
+    }
+   public AuthConfig getAuthConfig(){
+       AuthConfig authConfig = new AuthConfig();
+       if (auth != null && StringUtils.hasText(auth.getToken())) {
+           authConfig.setToken(auth.getToken());
+       }
+
+       if (auth != null && auth.getRetry() != null) {
+           RetryConfig retryConfig = new RetryConfig();
+           Retry retry = auth.getRetry();
+           if (retry.getMaxRetries() != null) {
+               retryConfig.setMaxRetries(retry.getMaxRetries());
+           }
+           if (retry.getMaxDelay() != null) {
+               retryConfig.setMaxDelay(retry.getMaxDelay());
+           }
+           if (retry.getInitialDelay() != null) {
+               retryConfig.setInitialDelay(retry.getInitialDelay());
+           }
+
+           authConfig.setRetry(retryConfig);
+       }
+       return authConfig;
+   }
+    public Auth getAuth() {
+        return auth;
+    }
+
+    public void setAuth(Auth auth) {
+        this.auth = auth;
+    }
+
     public Integer getRemotePort() {
         return remotePort;
     }
@@ -139,12 +137,12 @@ public class EtpClientProperties {
         this.remotePort = remotePort;
     }
 
-    public String getLocalIP() {
-        return localIP;
+    public String getLocalIp() {
+        return localIp;
     }
 
-    public void setLocalIP(String localIP) {
-        this.localIP = localIP;
+    public void setLocalIp(String localIp) {
+        this.localIp = localIp;
     }
 
     public ProtocolType getProtocol() {
@@ -153,22 +151,6 @@ public class EtpClientProperties {
 
     public void setProtocol(ProtocolType protocol) {
         this.protocol = protocol;
-    }
-
-    public String getSecretKey() {
-        return secretKey;
-    }
-
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }
-
-    public Boolean getAutoStart() {
-        return autoStart;
-    }
-
-    public void setAutoStart(Boolean autoStart) {
-        this.autoStart = autoStart;
     }
 
     public List<String> getCustomDomains() {
@@ -193,45 +175,5 @@ public class EtpClientProperties {
 
     public void setSubDomain(List<String> subDomain) {
         this.subDomain = subDomain;
-    }
-
-    public Boolean getTls() {
-        return tls;
-    }
-
-    public void setTls(Boolean tls) {
-        this.tls = tls;
-    }
-
-    public Integer getInitialDelaySec() {
-        return initialDelaySec;
-    }
-
-    public void setInitialDelaySec(Integer initialDelaySec) {
-        this.initialDelaySec = initialDelaySec;
-    }
-
-    public Integer getMaxRetries() {
-        return maxRetries;
-    }
-
-    public void setMaxRetries(Integer maxRetries) {
-        this.maxRetries = maxRetries;
-    }
-
-    public Integer getMaxDelaySec() {
-        return maxDelaySec;
-    }
-
-    public void setMaxDelaySec(Integer maxDelaySec) {
-        this.maxDelaySec = maxDelaySec;
-    }
-
-    public Truststore getTruststore() {
-        return truststore;
-    }
-
-    public void setTruststore(Truststore truststore) {
-        this.truststore = truststore;
     }
 }

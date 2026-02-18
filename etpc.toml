@@ -3,6 +3,7 @@ serverPort = 9527
 #认证
 [auth]
 token = "5E793FAD27AA713D"
+[auth.retry]
 initialDelay = 1
 maxDelay = 10
 maxRetries = 5
@@ -40,6 +41,7 @@ autoDomain = true
 status = 1
 encrypt = true
 compress = true
+
 [[proxies]]
 name = "web2"
 protocol = "http"

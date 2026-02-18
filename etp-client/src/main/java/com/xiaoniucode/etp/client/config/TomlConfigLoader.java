@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.client.config;
 
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.config.domain.LogConfig;
+import com.xiaoniucode.etp.client.config.domain.RetryConfig;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
@@ -49,42 +50,31 @@ public class TomlConfigLoader implements ConfigSource {
         // 读取认证配置
         Toml authTable = root.getTable("auth");
         if (authTable != null) {
-            String token = authTable.getString("token");
-            if (StringUtils.hasText(token)) {
-                AuthConfig authConfig = new AuthConfig();
-                authConfig.setToken(token.trim());
-
-                // 读取新增的认证相关字段
-                Long initialDelaySecValue = authTable.getLong("initialDelay");
-                Long maxDelaySecValue = authTable.getLong("maxDelay");
-                Long maxRetriesValue = authTable.getLong("maxRetries");
-
-                if (initialDelaySecValue != null && initialDelaySecValue > 0) {
-                    authConfig.setInitialDelay(initialDelaySecValue.intValue());
-                }
-                if (maxDelaySecValue != null && maxDelaySecValue > 0) {
-                    authConfig.setMaxDelay(maxDelaySecValue.intValue());
-                }
-                if (maxRetriesValue != null && maxRetriesValue >= 0) {
-                    authConfig.setMaxRetries(maxRetriesValue.intValue());
-                }
-
-                builder.authConfig(authConfig);
-            } else {
-                throw new IllegalArgumentException("必须配置 token");
+            String token = authTable.getString("token", "");
+            AuthConfig authConfig = new AuthConfig();
+            authConfig.setToken(token.trim());
+            Toml retry = authTable.getTable("retry");
+            if (retry != null) {
+                Long initialDelaySecValue = retry.getLong("initialDelay", 0L);
+                Long maxDelaySecValue = retry.getLong("maxDelay", 0L);
+                Long maxRetriesValue = retry.getLong("maxRetries", 0L);
+                RetryConfig retryConfig = new RetryConfig();
+                retryConfig.setInitialDelay(initialDelaySecValue.intValue());
+                retryConfig.setMaxDelay(maxDelaySecValue.intValue());
+                retryConfig.setMaxRetries(maxRetriesValue.intValue());
+                authConfig.setRetry(retryConfig);
             }
-        } else {
-            throw new IllegalArgumentException("必须配置认证信息");
+            builder.authConfig(authConfig);
         }
 
-        // 读取TLS配置
+        // 读取 TLS 配置
         Toml tlsTable = root.getTable("tls");
         if (tlsTable != null) {
-            Boolean enable = tlsTable.getBoolean("enable",false);
+            Boolean enable = tlsTable.getBoolean("enable", false);
             String certFile = tlsTable.getString("certFile");
             String keyFile = tlsTable.getString("keyFile");
             String caFile = tlsTable.getString("caFile");
-            builder.tlsConfig(new TlsConfig(enable,certFile,keyFile,caFile));
+            builder.tlsConfig(new TlsConfig(enable, certFile, keyFile, caFile));
         }
 
         // 读取代理配置
@@ -96,7 +86,7 @@ public class TomlConfigLoader implements ConfigSource {
 
                 String name = proxyTable.getString("name");
                 String protocol = proxyTable.getString("protocol");
-                String localIp = proxyTable.getString("localIp");
+                String localIp = proxyTable.getString("localIp", "127.0.0.1");
                 Long localPortValue = proxyTable.getLong("localPort");
                 Long remotePortValue = proxyTable.getLong("remotePort");
                 Boolean autoDomain = proxyTable.getBoolean("autoDomain", true);
@@ -110,11 +100,11 @@ public class TomlConfigLoader implements ConfigSource {
                     proxyConfig.setName(name.trim());
                 }
                 if (StringUtils.hasText(protocol)) {
-                    try {
-                        proxyConfig.setProtocol(ProtocolType.getByName(protocol.trim()));
-                    } catch (IllegalArgumentException e) {
-                        throw new IllegalArgumentException("无效的协议类型: " + protocol.trim(), e);
+                    ProtocolType protocolType = ProtocolType.getByName(protocol.trim());
+                    if (protocolType == null) {
+                        throw new IllegalArgumentException("无效的协议类型: " + protocol);
                     }
+                    proxyConfig.setProtocol(protocolType);
                 }
                 if (StringUtils.hasText(localIp)) {
                     proxyConfig.setLocalIp(localIp.trim());
@@ -145,11 +135,7 @@ public class TomlConfigLoader implements ConfigSource {
                     }
                 }
                 if (statusValue != null) {
-                    try {
-                        proxyConfig.setStatus(ProxyStatus.fromStatus(statusValue.intValue()));
-                    } catch (IllegalArgumentException e) {
-                        throw new IllegalArgumentException("无效的代理状态: " + statusValue, e);
-                    }
+                    proxyConfig.setStatus(ProxyStatus.fromStatus(statusValue.intValue()));
                 }
                 if (encrypt != null) {
                     proxyConfig.setEncrypt(encrypt);

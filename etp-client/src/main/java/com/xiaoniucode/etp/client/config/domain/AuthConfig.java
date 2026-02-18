@@ -8,15 +8,7 @@ import lombok.Setter;
 public class AuthConfig {
     private String token;
     /**
-     * 初始重试延迟（秒）
+     * 重试配置
      */
-    private Integer initialDelay = 1;
-    /**
-     * 最大延迟时间（秒）
-     */
-    private Integer maxDelay = 20;
-    /**
-     * 最大重试次数
-     */
-    private Integer maxRetries = 5;
+    private RetryConfig retry = new RetryConfig();
 }

@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.client.handler.utils;
 
 import com.xiaoniucode.etp.client.common.utils.OSUtils;
+import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.core.message.Message;
 
 public class MessageUtils {
@@ -24,7 +25,7 @@ public class MessageUtils {
                 .build();
     }
 
-    public static Message.ControlMessage buildLogin(String clientId, String token, String version) {
+    public static Message.ControlMessage buildLogin(String clientId, ClientType clientType, String token, String version) {
         Message.MessageHeader header = Message.MessageHeader.newBuilder()
                 .setType(Message.MessageType.LOGIN)
                 .build();
@@ -33,7 +34,7 @@ public class MessageUtils {
                 .setName(OSUtils.getUsername())
                 .setVersion(version)
                 .setToken(token)
-                .setClientType(Message.ClientType.BINARY_DEVICE)
+                .setClientType(clientType.isBinaryDevice() ? Message.ClientType.BINARY_DEVICE : Message.ClientType.WEB_SESSION)
                 .setArch(OSUtils.getOSArch())
                 .setOs(OSUtils.getOS()).build();
         return Message.ControlMessage.newBuilder().setHeader(header).setLogin(login).build();

@@ -15,24 +15,18 @@ import org.springframework.core.env.Environment;
  */
 @Configuration
 @ConditionalOnClass(SmartLifecycle.class)
-@ConditionalOnProperty(prefix = "etp.client", name = "enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "etp.client", name = "enable", havingValue = "true", matchIfMissing = false)
 @EnableConfigurationProperties(EtpClientProperties.class)
 public class EtpClientAutoConfiguration {
     @Bean
     public SmartLifecycle etpClientLifecycle(Environment environment,
                                              WebServerPortListener webServerPortListener,
-                                             ProxyClient proxyClient,
                                              EtpClientProperties properties) {
-        return new EtpClientStartStopLifecycle(environment, webServerPortListener, proxyClient, properties);
+        return new EtpClientStartStopLifecycle(environment, webServerPortListener,properties);
     }
 
     @Bean
     public WebServerPortListener webServerPortListener() {
         return new WebServerPortListener();
-    }
-
-    @Bean
-    public ProxyClient proxyRegisterClient() {
-        return new ProxyClient();
     }
 }

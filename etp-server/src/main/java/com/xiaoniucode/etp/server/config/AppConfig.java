@@ -45,7 +45,7 @@ public class AppConfig implements Config {
         private int serverPort = 9527;
         private int httpProxyPort = 80;
         private int httpsProxyPort = 443;
-        private TlsConfig tls=new TlsConfig(false);
+        private TlsConfig tls=new TlsConfig();
         private Set<String> baseDomains;
         private LogConfig logConfig;
         private Dashboard dashboard = new Dashboard(false);
