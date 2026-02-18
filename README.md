@@ -33,6 +33,13 @@
 
 etp(Easy Tunnel Proxy) is a cross-platform intranet penetration tool that supports the TCP protocol and TCP-based upper-layer protocols. It supports the TLS 1.3 high-efficiency and secure encryption protocol, supports pure Toml static configuration or dynamic configuration via a management interface, and can be easily integrated with the Spring Boot ecosystem.
 
+```xml
+<dependency>
+    <groupId>io.github.xiaoniucode</groupId>
+    <artifactId>etp-spring-boot-starter</artifactId>
+    <version>latest</version>
+</dependency>
+```
 ## Features
 
 - Supports TCP protocol and TCP-based upper-layer protocols  

@@ -33,6 +33,13 @@
 
 etp（Easy Tunnel Proxy）是一个跨平台的内网穿透工具，支持TCP协议以及TCP上层协议，支持TLS1.3高效安全加密协议，支持纯Toml静态配置或管理界面动态配置使用，可以很方便和SpringBoot生态集成。
 
+```xml
+<dependency>
+    <groupId>io.github.xiaoniucode</groupId>
+    <artifactId>etp-spring-boot-starter</artifactId>
+    <version>latest</version>
+</dependency>
+```
 ## 功能特性
 
 - 支持TCP协议以及TCP上层协议
@@ -96,7 +103,7 @@ etp 除了支持纯`Toml`静态配置使用以外，还支持图形界面管理�
 编辑配置文件 `etps.toml` 添加如下内容
 
 ```toml 
-host="127.0.0.1"
+host = "127.0.0.1"
 bindPort = 9527
 [[clients]]
 name = "client"
