@@ -24,5 +24,4 @@ public class AuthController {
         LoginResponse response = authService.login(request);
         return Ajax.success(response);
     }
-
 }

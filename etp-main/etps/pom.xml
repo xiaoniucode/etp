@@ -11,12 +11,13 @@
     <name>etps</name>
     <properties>
         <shade.mainClass>com.xiaoniucode.etp.server.TunnelServerStartup</shade.mainClass>
+        <etp.version>0.10.0</etp.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>io.github.xiaoniucode</groupId>
-            <artifactId>etp-server</artifactId>
-            <version>0.10.0</version>
+            <artifactId>etp-server-web</artifactId>
+            <version>${etp.version}</version>
         </dependency>
 
     </dependencies>

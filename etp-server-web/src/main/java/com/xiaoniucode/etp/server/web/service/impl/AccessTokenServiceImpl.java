@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class AccessTokenServiceImpl implements AccessTokenService {
-
     @Autowired
     private AccessTokenRepository accessTokenRepository;
     @Autowired

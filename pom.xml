@@ -91,6 +91,7 @@
         <module>etp-core</module>
         <module>etp-common</module>
         <module>etp-server</module>
+        <module>etp-server-web</module>
         <module>etp-client</module>
         <module>etp-main</module>
     </modules>
