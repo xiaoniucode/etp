@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,29 @@ public class ProxyManager {
     private DomainManager domainManager;
     @Autowired
     private DomainGenerator domainGenerator;
+
+    public ProxyConfig updateProxy(ProxyConfig proxyConfig) {
+        return updateProxy(proxyConfig, null);
+    }
+
+    /**
+     * 更新代理配置
+     *
+     * @param proxyConfig 新的配置
+     * @param callback    新配置
+     * @return 旧的配置
+     */
+    public ProxyConfig updateProxy(ProxyConfig proxyConfig, BiConsumer<ProxyConfig,ProxyConfig> callback) {
+        String proxyId = proxyConfig.getProxyId();
+        ProxyConfig oldProxyConfig = getById(proxyId);
+        String clientId = getClientId(proxyId);
+        removeProxyById(proxyId);
+        ProxyConfig newProxyConfig = addProxy(clientId, proxyConfig);
+        if (callback != null) {
+            callback.accept(newProxyConfig,oldProxyConfig);
+        }
+        return oldProxyConfig;
+    }
 
     public ProxyConfig addProxy(String clientId, ProxyConfig proxyConfig) {
         return addProxy(clientId, proxyConfig, null);
@@ -89,6 +113,7 @@ public class ProxyManager {
         }
         return proxyConfig;
     }
+
     public String getClientId(String proxyId) {
         return proxyIdToClientId.get(proxyId);
     }
@@ -138,7 +163,7 @@ public class ProxyManager {
             }
         }
         proxyIdToProxyConfig.remove(proxyConfig.getProxyId());
-        logger.debug("代理删除成功: [客户端ID={},代理名称={}]", clientId, proxyConfig.getName());
+        logger.debug("代理删除成功: [客户端ID={}，代理名称={}，远程端口={}，内网端口={}]", clientId, proxyConfig.getName(), proxyConfig.getRemotePort(), proxyConfig.getLocalPort());
         if (callback != null) {
             callback.accept(proxyConfig);
         }
@@ -239,6 +264,5 @@ public class ProxyManager {
         proxyConfig.setStatus(proxyStatus);
         return proxyConfig;
     }
-
 
 }

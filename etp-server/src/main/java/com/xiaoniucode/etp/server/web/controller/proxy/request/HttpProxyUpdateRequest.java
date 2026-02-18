@@ -13,7 +13,6 @@ import java.util.Set;
 @Setter
 public class HttpProxyUpdateRequest {
     private String id;
-    private String clientId;
     private String name;
     private String localIp;
     private Integer localPort;

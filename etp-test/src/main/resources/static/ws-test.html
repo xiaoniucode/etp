@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .incoming {
+            background-color: #f0f0f0;
+        }
+        .outgoing {
+            background-color: #e3f2fd;
+            text-align: right;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebSocket测试</h1>
+        <div id="messages"></div>
+        <div style="margin: 10px 0;">
+            <label for="wsUrlInput">WebSocket URL: </label>
+            <input type="text" id="wsUrlInput" placeholder="输入WebSocket URL，例如：ws://localhost:3001/ws/test" style="width: 70%;">
+        </div>
+        <input type="text" id="messageInput" placeholder="输入消息...">
+        <button onclick="sendMessage()">发送</button>
+        <button onclick="connectWebSocket()">连接</button>
+        <button onclick="disconnectWebSocket()">断开连接</button>
+    </div>
+
+    <script>
+        let ws;
+
+        function connectWebSocket() {
+            const wsUrlInput = document.getElementById('wsUrlInput');
+            let wsUrl = wsUrlInput.value;
+            
+            // 如果用户没有输入URL，使用默认值
+            if (!wsUrl) {
+                wsUrl = `ws://${window.location.host}/ws/test`;
+                wsUrlInput.value = wsUrl;
+            }
+            
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = function() {
+                addMessage('已连接到WebSocket服务器', 'incoming');
+            };
+
+            ws.onmessage = function(event) {
+                addMessage(event.data, 'incoming');
+            };
+
+            ws.onclose = function() {
+                addMessage('已从WebSocket服务器断开连接', 'incoming');
+            };
+
+            ws.onerror = function(error) {
+                addMessage('WebSocket错误: ' + error, 'incoming');
+            };
+        }
+
+        function disconnectWebSocket() {
+            if (ws) {
+                ws.close();
+            }
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            if (ws && ws.readyState === WebSocket.OPEN && message) {
+                ws.send(message);
+                addMessage('你: ' + message, 'outgoing');
+                messageInput.value = '';
+            } else {
+                addMessage('WebSocket未连接或消息为空', 'incoming');
+            }
+        }
+
+        function addMessage(message, type) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // 页面加载时自动连接
+        window.onload = function() {
+            connectWebSocket();
+        };
+    </script>
+</body>
+</html>

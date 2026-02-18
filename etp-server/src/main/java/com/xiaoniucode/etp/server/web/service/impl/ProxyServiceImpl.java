@@ -36,7 +36,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -144,7 +147,7 @@ public class ProxyServiceImpl implements ProxyService {
 
         proxyRepository.save(newProxy);
 
-        ProxyConfig proxyConfig = buildHttpProxyConfig(proxyId, request);
+        ProxyConfig proxyConfig = buildHttpProxyConfig(newProxy, request.getDomains());
         proxyManager.addProxy(clientId, proxyConfig, config -> {
             Set<DomainInfo> domains = domainManager.getDomains(config.getProxyId());
             List<ProxyDomain> batch = domains.stream().map(domainInfo -> {
@@ -184,83 +187,100 @@ public class ProxyServiceImpl implements ProxyService {
         return proxyConfig;
     }
 
-    private ProxyConfig buildHttpProxyConfig(String proxyId, HttpProxyCreateRequest request) {
-        ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.setName(request.getName());
-        proxyConfig.setProxyId(proxyId);
-        proxyConfig.setLocalIp(request.getLocalIp());
-        proxyConfig.setLocalPort(request.getLocalPort());
-        proxyConfig.setStatus(ProxyStatus.fromStatus(request.getStatus()));
-        proxyConfig.setProtocol(ProtocolType.HTTP);
-        proxyConfig.setRemotePort(null);
-        proxyConfig.setCompress(request.getCompress());
-        proxyConfig.setEncrypt(request.getEncrypt());
-
-        DomainType domainType = DomainType.fromType(request.getDomainType());
-        if (domainType == DomainType.CUSTOM_DOMAIN) {
-            proxyConfig.getCustomDomains().addAll(request.getDomains());
-        } else if (domainType == DomainType.SUBDOMAIN) {
-            proxyConfig.getSubDomains().addAll(request.getDomains());
-        } else if (domainType == DomainType.AUTO) {
-            proxyConfig.setAutoDomain(true);
-        }
-        return proxyConfig;
-    }
-
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateTcpProxy(TcpProxyUpdateRequest request) {
-        //获取现有代理
-        Proxy existingProxy = proxyRepository.findById(request.getId()).orElseThrow(() -> new RuntimeException("代理不存在"));
+        Proxy existingProxy = proxyRepository.findById(request.getId()).orElseThrow(() ->
+                new BizException("代理配置不存在"));
 
-        //更新代理信息
         existingProxy.setName(request.getName());
         existingProxy.setLocalIp(request.getLocalIp());
         existingProxy.setLocalPort(request.getLocalPort());
         existingProxy.setRemotePort(request.getRemotePort());
-        existingProxy.setStatus(request.getStatus() == 1 ? ProxyStatus.OPEN : ProxyStatus.CLOSED);
+        existingProxy.setStatus(ProxyStatus.fromStatus(request.getStatus()));
         existingProxy.setEncrypt(request.getEncrypt());
         existingProxy.setCompress(request.getCompress());
 
-        //保存更新
         proxyRepository.save(existingProxy);
+        ProxyConfig proxyConfig = buildTcpProxyConfig(existingProxy);
+        ProxyConfig oldProxyConfig = proxyManager.updateProxy(proxyConfig);
 
+        if (!Objects.equals(proxyConfig.getRemotePort(), oldProxyConfig.getRemotePort())) {
+            //处理旧的配置
+            oldProxyConfig.setStatus(ProxyStatus.DELETED);
+            processorExecutor.execute(oldProxyConfig);
+        } else if (proxyConfig.getStatus().isOpen()) {
+            //新配置端口变化，状态为开启状态
+            processorExecutor.execute(proxyConfig);
+        }
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateHttpProxy(HttpProxyUpdateRequest request) {
-        //获取现有代理
         Proxy existingProxy = proxyRepository.findById(request.getId()).orElseThrow(() -> new RuntimeException("代理不存在"));
+        String proxyId = existingProxy.getId();
 
-        //更新代理信息
         existingProxy.setName(request.getName());
         existingProxy.setLocalIp(request.getLocalIp());
         existingProxy.setLocalPort(request.getLocalPort());
-        existingProxy.setStatus(request.getStatus() == 1 ? ProxyStatus.OPEN : ProxyStatus.CLOSED);
-        existingProxy.setDomainType(DomainType.values()[request.getDomainType()]);
+        existingProxy.setStatus(ProxyStatus.fromStatus(request.getStatus()));
+        existingProxy.setDomainType(DomainType.fromType(request.getDomainType()));
         existingProxy.setEncrypt(request.getEncrypt());
         existingProxy.setCompress(request.getCompress());
 
-        //保存更新
         proxyRepository.save(existingProxy);
 
-        //删除现有域名
         proxyDomainRepository.deleteAll(proxyDomainRepository.findByProxyId(request.getId()));
 
-        //批量持久化新域名
-        if (request.getDomains() != null && !request.getDomains().isEmpty()) {
-            List<ProxyDomain> proxyDomains = request.getDomains().stream()
-                    .map(domain -> {
-                        ProxyDomain proxyDomain = new ProxyDomain();
-                        proxyDomain.setProxyId(request.getId());
-                        proxyDomain.setDomain(domain);
-                        return proxyDomain;
-                    })
-                    .collect(Collectors.toList());
-            proxyDomainRepository.saveAll(proxyDomains);
-        }
+        ProxyConfig proxyConfig = buildHttpProxyConfig(existingProxy, request.getDomains());
+        proxyManager.updateProxy(proxyConfig, (newConfig, oldConfig) -> {
+            Set<DomainInfo> domains = domainManager.getDomains(newConfig.getProxyId());
+            List<ProxyDomain> batch = domains.stream().map(domainInfo -> {
+                ProxyDomain proxyDomain = new ProxyDomain();
+                proxyDomain.setProxyId(proxyId);
+                if (domainInfo instanceof CustomDomainInfo customDomain) {
+                    proxyDomain.setDomain(customDomain.getFullDomain());
+                }
+                if (domainInfo instanceof SubDomainInfo subDomain) {
+                    proxyDomain.setBaseDomain(subDomain.getBaseDomain());
+                    proxyDomain.setDomain(subDomain.getSubDomain());
+                }
+                if (domainInfo instanceof AutoDomainInfo autoDomain) {
+                    proxyDomain.setBaseDomain(autoDomain.getBaseDomain());
+                    proxyDomain.setDomain(autoDomain.getPrefix());
+                }
+                return proxyDomain;
+            }).toList();
 
+            proxyDomainRepository.saveAllAndFlush(batch);
+            oldConfig.setStatus(ProxyStatus.DELETED);
+            processorExecutor.execute(oldConfig);
+            processorExecutor.execute(newConfig);
+        });
+    }
+
+    private ProxyConfig buildHttpProxyConfig(Proxy proxy, Set<String> domains) {
+        ProxyConfig proxyConfig = new ProxyConfig();
+        proxyConfig.setName(proxy.getName());
+        proxyConfig.setProxyId(proxy.getId());
+        proxyConfig.setLocalIp(proxy.getLocalIp());
+        proxyConfig.setLocalPort(proxy.getLocalPort());
+        proxyConfig.setStatus(proxy.getStatus());
+        proxyConfig.setProtocol(ProtocolType.HTTP);
+        proxyConfig.setRemotePort(null);
+        proxyConfig.setCompress(proxy.getCompress());
+        proxyConfig.setEncrypt(proxy.getEncrypt());
+
+        DomainType domainType = proxy.getDomainType();
+        if (domainType == DomainType.CUSTOM_DOMAIN) {
+            proxyConfig.getCustomDomains().addAll(domains);
+        } else if (domainType == DomainType.SUBDOMAIN) {
+            proxyConfig.getSubDomains().addAll(domains);
+        } else if (domainType == DomainType.AUTO) {
+            proxyConfig.setAutoDomain(true);
+        }
+        return proxyConfig;
     }
 
 

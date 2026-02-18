@@ -38,7 +38,8 @@
             <div class="layui-inline">
                 <label class="layui-form-label">内网端口</label>
                 <div class="layui-input-inline">
-                    <input type="number" lay-verify="required" placeholder="请输入目标服务端口" name="localPort" autocomplete="off"
+                    <input type="number" lay-verify="required" placeholder="请输入目标服务端口" name="localPort"
+                           autocomplete="off"
                            class="layui-input">
                 </div>
             </div>
@@ -52,13 +53,13 @@
             </div>
         </div>
         <input type="hidden" name="autoDomain">
-        
+
         <div class="layui-form-item" id="customDomainsGroup" style="display: none;">
             <div class="layui-input-block">
                 <textarea name="customDomains" placeholder="域名，一行一个" class="layui-textarea"></textarea>
             </div>
         </div>
-        
+
         <div class="layui-form-item" id="subDomainsGroup" style="display: none;">
             <div class="layui-input-block">
                 <textarea name="subDomains" placeholder="子域名，一行一个" class="layui-textarea"></textarea>
@@ -148,7 +149,7 @@
                 $('select[name="clientId"]').val(targetClient.id);
                 form.render('select');
             }
-            
+
             if (data.domainType === 'auto') {
                 $('input[name="domainType"][value="auto"]').prop('checked', true);
                 $('input[name="autoDomain"]').val('true');
@@ -175,8 +176,8 @@
             }
             form.render('radio');
         })
-        
-        form.on('radio(domainType)', function(data) {
+
+        form.on('radio(domainType)', function (data) {
             const domainType = data.value;
             $('#customDomainsGroup').hide();
             $('#subDomainsGroup').hide();
@@ -190,11 +191,11 @@
                 $('#subDomainsGroup').show();
             }
         });
-        
+
         form.on('submit(proxyForm)', function (data) {
             const field = data.field;
             field.status = field.status ? '1' : '0';
-            field.id=proxyId
+            field.id = proxyId
             // 构建域名类型代码
             let domainTypeCode = 0;
             if (field.domainType === 'sub') {
@@ -203,26 +204,26 @@
                 domainTypeCode = 2;
             }
             field.domainType = domainTypeCode;
-            
+
             // 构建域名列表
             const domains = [];
             if (field.domainType === 1 && field.subDomains) {
                 const subDomainList = field.subDomains.split('\n').filter(domain => domain.trim());
                 subDomainList.forEach(domain => {
-                    domains.push({domain: domain.trim(), baseDomain: null});
+                    domains.push(domain.trim());
                 });
             } else if (field.domainType === 2 && field.customDomains) {
                 const customDomainList = field.customDomains.split('\n').filter(domain => domain.trim());
                 customDomainList.forEach(domain => {
-                    domains.push({domain: domain.trim(), baseDomain: null});
+                    domains.push(domain.trim());
                 });
             }
             field.domains = domains;
-            
+
             delete field.subDomains;
             delete field.customDomains;
             delete field.autoDomain;
-            
+
             Rest.put(`/api/proxies/http`, field).then(data => {
                 layer.msg('更新成功', {icon: 1, time: 400,}, () => {
                     const parentTable = parent.layui.table;

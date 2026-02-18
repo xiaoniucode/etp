@@ -31,19 +31,21 @@ public class HttpProxyConfigProcessor implements ProxyConfigProcessor {
 
     @Override
     public void process(ProxyConfig proxyConfig) {
-        logger.debug("开始处理 HTTP 协议代理配置");
         String clientId = proxyManager.getClientId(proxyConfig.getProxyId());
         ProxyStatus status = proxyConfig.getStatus();
         Set<String> domains = proxyConfig.getFullDomains();
         if (status.isOpen()) {
             agentSessionManager.addDomainsToAgentSession(clientId, domains);
+            logger.debug("HTTP隧道开启：{}", domains);
         } else if (status.isClosed()) {
             agentSessionManager.removeDomainsToAgentSession(clientId, domains);
             visitorSessionManager.closeVisitorsByDomains(domains);
+            logger.debug("HTTP隧道关闭：{}", domains);
         } else if (status.isDeleted()) {
             agentSessionManager.removeDomainsToAgentSession(clientId, domains);
             visitorSessionManager.closeVisitorsByDomains(domains);
             MetricsCollector.removeCollectors(domains);
+            logger.debug("HTTP隧道删除：{}", domains);
         }
     }
 }
