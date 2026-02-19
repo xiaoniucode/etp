@@ -1,7 +1,9 @@
 package com.xiaoniucode.etp.server.handler.message;
 
+import com.google.protobuf.ProtocolStringList;
+import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.core.handler.MessageHandler;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
@@ -12,7 +14,6 @@ import com.xiaoniucode.etp.server.event.ProxyCreatedEvent;
 import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.manager.PortListenerManager;
 import com.xiaoniucode.etp.server.manager.domain.valid.ValidInfo;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
 import com.xiaoniucode.etp.server.proxy.processor.ProxyConfigProcessorExecutor;
@@ -22,6 +23,7 @@ import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.xiaoniucode.etp.core.message.Message.ControlMessage;
@@ -69,7 +71,6 @@ public class NewProxyRespHandler implements MessageHandler {
                 logger.debug("代理注册成功: [代理名称={}]", proxyConfig.getName());
             });
         });
-
     }
 
     private ProxyConfig buildProxyConfig(Message.NewProxy proxy) {
@@ -77,16 +78,42 @@ public class NewProxyRespHandler implements MessageHandler {
         ProxyConfig config = new ProxyConfig();
         config.setProxyId(proxyId);
         config.setName(proxy.getName());
-        config.setLocalIp(proxy.getLocalIp());
+        if (proxy.hasLocalIp()){
+            config.setLocalIp(proxy.getLocalIp());
+        }
         config.setLocalPort(proxy.getLocalPort());
-        config.setRemotePort(proxy.getRemotePort());
+        if (proxy.hasRemotePort()) {
+            config.setRemotePort(proxy.getRemotePort());
+        }
         config.setProtocol(ProtocolType.getByName(proxy.getProtocol().name()));
-        config.setStatus(ProxyStatus.fromStatus(proxy.getStatus()));
-        config.setAutoDomain(proxy.getAutoDomain());
-        config.setCompress(proxy.getCompress());
-        config.setEncrypt(proxy.getEncrypt());
-        config.getCustomDomains().addAll(proxy.getCustomDomainsList());
-        config.getSubDomains().addAll(proxy.getSubDomainsList());
+        if (proxy.hasStatus()) {
+            config.setStatus(ProxyStatus.fromStatus(proxy.getStatus()));
+        }
+        if (proxy.hasAutoDomain()) {
+            config.setAutoDomain(proxy.getAutoDomain());
+        }
+        if (proxy.hasCompress()) {
+            config.setCompress(proxy.getCompress());
+        }
+        if (proxy.hasEncrypt()) {
+            config.setEncrypt(proxy.getEncrypt());
+        }
+        ProtocolStringList customDomainsList = proxy.getCustomDomainsList();
+        if (!customDomainsList.isEmpty()) {
+            config.getCustomDomains().addAll(customDomainsList);
+        }
+        ProtocolStringList subDomainsList = proxy.getSubDomainsList();
+        if (!subDomainsList.isEmpty()) {
+            config.getSubDomains().addAll(subDomainsList);
+        }
+        if (proxy.hasAccessControl()) {
+            Message.AccessControl accessControl = proxy.getAccessControl();
+            boolean enable = accessControl.getEnable();
+            AccessControlMode accessControlMode = AccessControlMode.fromValue(accessControl.getMode().name());
+            Set<String> allow = new HashSet<>(accessControl.getAllowList());
+            Set<String> deny = new HashSet<>(accessControl.getDenyList());
+            config.setAccessControl(new AccessControlConfig(enable, accessControlMode, allow, deny));
+        }
         return config;
     }
 

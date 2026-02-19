@@ -34,7 +34,7 @@ status = 1
 [proxies.access_control]
 enable = true
 mode = "allow"         # allow（白名单）、deny（黑名单）
-allow = ["127.0.0.1"]  # 白名单模式下的允许 IP 列表
+allow = ["43.135.115.160/32"]  # 白名单模式下的允许 IP 列表
 deny = []              # 黑名单模式下的拒绝 IP 列表
 
 [[proxies]]
@@ -55,7 +55,10 @@ localPort = 8030
 customDomains = ["a.domain2.com", "b.domain2.com"]
 encrypt = false
 compress = false
-
+[proxies.access_control]
+enable = true
+mode = "allow"
+deny = ["127.0.0.1"]
 [[proxies]]
 name = "mysql"
 protocol = "tcp"
@@ -64,7 +67,11 @@ remotePort = 3307
 status = 1
 encrypt = false
 compress = false
-
+[proxies.access_control]
+enable = true
+mode = "allow"
+allow = ["127.0.0.1"]
+deny = []
 [[proxies]]
 name = "redis"
 protocol = "tcp"

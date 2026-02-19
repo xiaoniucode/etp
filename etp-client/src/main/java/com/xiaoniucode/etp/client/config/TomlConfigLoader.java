@@ -11,6 +11,7 @@ import com.xiaoniucode.etp.common.config.ConfigSourceType;
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
+import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.Getter;
@@ -155,7 +156,10 @@ public class TomlConfigLoader implements ConfigSource {
                     }
                     List<String> allow = accessControl.getList("allow", new ArrayList<>());
                     List<String> deny = accessControl.getList("deny", new ArrayList<>());
-                    AccessControlConfig accessControlConfig = new AccessControlConfig(enable, mode, new HashSet<>(allow), new HashSet<>(deny));
+                    AccessControlConfig accessControlConfig = new AccessControlConfig(enable,
+                            AccessControlMode.fromValue(mode),
+                            new HashSet<>(allow),
+                            new HashSet<>(deny));
                     proxyConfig.setAccessControl(accessControlConfig);
                 }
 

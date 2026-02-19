@@ -3,11 +3,15 @@ package com.xiaoniucode.etp.server.handler.message;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.server.handler.utils.NettyHttpUtils;
 import com.xiaoniucode.etp.server.helper.BeanHelper;
+import com.xiaoniucode.etp.server.manager.AccessControlManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.DomainManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.util.CharsetUtil;
@@ -52,12 +56,18 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                     } else {
                         domain = host;
                     }
-
-
                     String proxyId = BeanHelper.getBean(DomainManager.class).getProxyId(domain);
-                    if (proxyId==null){
+
+                    if (proxyId == null) {
                         visitor.close();
                         logger.debug("隧道不存在");
+                        return;
+                    }
+                    String visitorIp = getVisitorIp(visitor);
+                    boolean checkAccess = BeanHelper.getBean(AccessControlManager.class).checkAccess(proxyId, visitorIp);
+                    if (!checkAccess) {
+                        logger.debug("访问来源 IP 没有访问权限：{}", visitorIp);
+                        NettyHttpUtils.sendHttp403(visitor).addListener((ChannelFutureListener) future -> visitor.close());
                         return;
                     }
                     ProxyConfig config = BeanHelper.getBean(ProxyManager.class).getById(proxyId);

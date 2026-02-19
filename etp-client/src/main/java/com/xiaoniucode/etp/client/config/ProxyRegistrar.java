@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.client.config;
 
 import com.xiaoniucode.etp.client.manager.AgentSessionManager;
+import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * 用于将代理配置发送到代理服务器
@@ -67,12 +69,18 @@ public class ProxyRegistrar {
         ProtocolType protocol = config.getProtocol();
         Message.NewProxy.Builder builder = Message.NewProxy.newBuilder();
         builder.setName(config.getName())
-                .setLocalIp(config.getLocalIp())
                 .setLocalPort(config.getLocalPort())
-                .setStatus(config.getStatus().getCode())
-                .setCompress(config.getCompress())
-                .setEncrypt(config.getEncrypt())
+                .setLocalIp(config.getLocalIp())
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
+        if (config.getStatus() != null) {
+            builder.setStatus(config.getStatus().getCode());
+        }
+        if (config.getCompress() != null) {
+            builder.setCompress(config.getCompress());
+        }
+        if (config.getEncrypt() != null) {
+            builder.setEncrypt(config.getEncrypt());
+        }
         switch (protocol) {
             case TCP:
                 Integer remotePort = config.getRemotePort();
@@ -81,10 +89,28 @@ public class ProxyRegistrar {
                 }
                 break;
             case HTTP:
-                builder.setAutoDomain(config.getAutoDomain());
+                if (config.getAutoDomain() != null) {
+                    builder.setAutoDomain(config.getAutoDomain());
+                }
                 builder.addAllCustomDomains(config.getCustomDomains());
                 builder.addAllSubDomains(config.getSubDomains());
                 break;
+        }
+        AccessControlConfig access = config.getAccessControl();
+        if (access != null) {
+            Message.AccessControl.Builder accessControlbuilder = Message.AccessControl
+                    .newBuilder()
+                    .setEnable(access.isEnable())
+                    .setMode(Message.AccessMode.valueOf(access.getMode().name()));
+            Set<String> allow = access.getAllow();
+            Set<String> deny = access.getDeny();
+            if (allow != null && !allow.isEmpty()) {
+                accessControlbuilder.addAllAllow(allow);
+            }
+            if (deny != null && !deny.isEmpty()) {
+                accessControlbuilder.addAllDeny(deny);
+            }
+            builder.setAccessControl(accessControlbuilder.build());
         }
         return builder.build();
     }

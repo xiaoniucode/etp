@@ -57,6 +57,8 @@ public class VisitorSessionManager {
         ProxyConfig proxyConfig = null;
         if (ProtocolDetection.isTcp(visitor)) {
             int remotePort = getListenerPort(visitor);
+            proxyConfig = proxyManager.getByRemotePort(remotePort);
+
             agentSession = agentSessionManager.getAgentSessionByPort(remotePort);
             if (agentSession == null) {
                 visitor.close();
@@ -64,8 +66,6 @@ public class VisitorSessionManager {
             }
             remotePortToVisitorChannels.computeIfAbsent(remotePort, k ->
                     ConcurrentHashMap.newKeySet()).add(visitor);
-            proxyConfig = proxyManager.getByRemotePort(remotePort);
-
         }
         if (ProtocolDetection.isHttp(visitor)) {
             String domain = visitor.attr(ChannelConstants.VISIT_DOMAIN).get();

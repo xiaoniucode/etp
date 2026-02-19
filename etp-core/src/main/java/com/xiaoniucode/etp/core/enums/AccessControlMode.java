@@ -1,11 +1,8 @@
 package com.xiaoniucode.etp.core.enums;
 
-import lombok.Getter;
-
 /**
  * IP 访问控制模式
  */
-@Getter
 public enum AccessControlMode {
     /**
      * 白名单模式：只允许指定 IP 访问
@@ -55,5 +52,20 @@ public enum AccessControlMode {
             }
         }
         throw new IllegalArgumentException("无效的访问控制模式: " + value);
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isAllowMode() {
+        return this == ALLOW;
+    }
+    public boolean isDenyMode() {
+        return this == DENY;
     }
 }

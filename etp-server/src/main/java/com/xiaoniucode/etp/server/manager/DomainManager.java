@@ -126,7 +126,11 @@ public class DomainManager {
     public String getProxyId(DomainInfo domainInfo) {
         return domainInfo != null ? domainInfoToProxyId.get(domainInfo) : null;
     }
+
     public String getProxyId(String domain) {
-        return domain != null ? domainToProxyId.get(domain) : null;
+        if (domain == null) {
+            return null;
+        }
+        return domainToProxyId.get(domain);
     }
 }

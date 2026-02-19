@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.client.config.domain.RetryConfig;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
+import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import lombok.Getter;
 import lombok.Setter;
@@ -108,7 +109,7 @@ public class EtpClientProperties {
         if (accessControl != null) {
             return new AccessControlConfig(
                     accessControl.enable,
-                    accessControl.mode.name(),
+                    AccessControlMode.fromValue(accessControl.mode.name()),
                     accessControl.allow,
                     accessControl.deny);
         }
@@ -133,20 +134,11 @@ public class EtpClientProperties {
             /**
              * 白名单模式：只允许指定 IP 访问
              */
-            ALLOW(1, "白名单"),
-
+            ALLOW,
             /**
              * 黑名单模式：拒绝指定 IP 访问，允许其他 IP 访问
              */
-            DENY(0, "黑名单");
-
-            private final Integer code;
-            private final String description;
-
-            AccessControlMode(Integer code, String description) {
-                this.code = code;
-                this.description = description;
-            }
+            DENY
         }
     }
 

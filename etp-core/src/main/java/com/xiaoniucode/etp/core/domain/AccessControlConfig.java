@@ -20,12 +20,9 @@ public class AccessControlConfig implements Serializable {
     private final Set<String> allow = new CopyOnWriteArraySet<>();
     private final Set<String> deny = new CopyOnWriteArraySet<>();
 
-    public AccessControlConfig(Boolean enable, String mode, Set<String> allow, Set<String> deny) {
+    public AccessControlConfig(Boolean enable, AccessControlMode mode, Set<String> allow, Set<String> deny) {
         this.enable = enable;
-        if (!StringUtils.hasText(mode)) {
-            throw new IllegalArgumentException("访问控制模式未指定");
-        }
-        this.mode = AccessControlMode.fromValue(mode);
+        this.mode = mode;
         if (allow != null && !allow.isEmpty()) {
             this.allow.addAll(allow);
         }
