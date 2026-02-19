@@ -26,6 +26,10 @@ enum ClientType{
   BINARY_DEVICE = 0;
   WEB_SESSION = 1;
 }
+enum AccessMode {
+  ALLOW = 0;
+  DENY = 1;
+}
 
 message MessageHeader {
   MessageType type = 1;
@@ -43,7 +47,12 @@ message Login {
 message LoginResp {
   string sessionId = 1;
 }
-
+message AccessControl {
+  bool enable = 1;
+  AccessMode mode = 2;
+  repeated string allow = 3;
+  repeated string deny = 4;
+}
 message NewProxy {
   string name = 1;
   optional string localIp = 2;
@@ -56,7 +65,7 @@ message NewProxy {
   optional  bool autoDomain = 9;
   repeated string customDomains = 10;
   repeated string subDomains = 11;
-  //  map<string, string> metadata = 12;
+  optional AccessControl access_control = 12;
 }
 
 message NewProxyResp {
