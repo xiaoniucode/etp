@@ -31,6 +31,11 @@ localPort = 3006
 autoDomain = true
 subDomains = ["a", "b"]
 status = 1
+[proxies.access_control]
+enable = true
+mode = "allow"         # allow（白名单）、deny（黑名单）
+allow = ["127.0.0.1"]  # 白名单模式下的允许 IP 列表
+deny = []              # 黑名单模式下的拒绝 IP 列表
 
 [[proxies]]
 name = "fullstack2"
@@ -50,6 +55,7 @@ localPort = 8030
 customDomains = ["a.domain2.com", "b.domain2.com"]
 encrypt = false
 compress = false
+
 [[proxies]]
 name = "mysql"
 protocol = "tcp"

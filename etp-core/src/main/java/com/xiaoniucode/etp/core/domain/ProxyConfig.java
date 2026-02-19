@@ -58,6 +58,8 @@ public class ProxyConfig {
      */
     @Setter
     private Boolean compress = false;
+    @Setter
+    private AccessControlConfig accessControl;
 
     /**
      * 计算域名的类型

@@ -8,6 +8,7 @@ import com.xiaoniucode.etp.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
 import com.xiaoniucode.etp.common.config.ConfigSource;
 import com.xiaoniucode.etp.common.config.ConfigSourceType;
+import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
@@ -15,6 +16,7 @@ import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -142,6 +144,19 @@ public class TomlConfigLoader implements ConfigSource {
                 }
                 if (compress != null) {
                     proxyConfig.setCompress(compress);
+                }
+                //访问控制
+                Toml accessControl = proxyTable.getTable("access_control");
+                if (accessControl != null) {
+                    Boolean enable = accessControl.getBoolean("enable", false);
+                    String mode = accessControl.getString("mode");
+                    if (!StringUtils.hasText(mode)) {
+                        throw new IllegalArgumentException("必须指定访问控制模式");
+                    }
+                    List<String> allow = accessControl.getList("allow", new ArrayList<>());
+                    List<String> deny = accessControl.getList("deny", new ArrayList<>());
+                    AccessControlConfig accessControlConfig = new AccessControlConfig(enable, mode, new HashSet<>(allow), new HashSet<>(deny));
+                    proxyConfig.setAccessControl(accessControlConfig);
                 }
 
                 proxies.add(proxyConfig);

@@ -24,9 +24,13 @@
 </script>
 <script type="text/html" id="post_table_tool">
     <div class="layui-clear-space">
+        <a class="layui-btn layui-btn-xs " lay-event="edit" title="IP访问控制">
+            <i class="layui-icon layui-icon-edit"></i> IP访问控制
+        </a>
         <a class="layui-btn layui-btn-xs " lay-event="edit" title="编辑">
             <i class="layui-icon layui-icon-edit"></i> 编辑
         </a>
+
         <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete" title="删除">
             <i class="layui-icon layui-icon-delete"></i> 删除
         </a>
@@ -84,7 +88,7 @@
                         }
                     }
                 },
-                {fixed: 'right', title: '操作', width: 180, templet: '#post_table_tool'}
+                {fixed: 'right', title: '操作', width: 230, templet: '#post_table_tool'}
             ]],
             error: function (res, msg) {
                 console.log(res, msg)

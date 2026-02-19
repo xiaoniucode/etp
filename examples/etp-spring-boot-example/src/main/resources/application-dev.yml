@@ -5,6 +5,15 @@ etp:
 #    server-port: 9527
 #    protocol: http
 #    local-ip: 127.0.0.1
+    access-control:
+      allow:
+        - localhost
+        - 192.168.0.1
+      enable: true
+      mode: allow
+      deny:
+        - 127.0.0.2
+        - 127.0.0.3
     auth:
       token: 5E793FAD27AA713D
 #      retry:

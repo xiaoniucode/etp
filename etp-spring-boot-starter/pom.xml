@@ -6,7 +6,7 @@
     <artifactId>etp-spring-boot-starter</artifactId>
     <version>0.2.1</version>
     <name>etp-spring-boot-starter</name>
-   <packaging>jar</packaging>
+    <packaging>jar</packaging>
     <description>etp-spring-boot-starter</description>
     <properties>
         <java.version>25</java.version>
@@ -19,7 +19,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <resource.delimiter>@</resource.delimiter>
-
+        <lombok.version>1.18.42</lombok.version>
         <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
         <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
         <maven-javadoc-plugin.version>3.8.0</maven-javadoc-plugin.version>
@@ -77,6 +77,11 @@
             <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-core</artifactId>
             <version>${etp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -153,12 +158,20 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>UTF-8</encoding>
                     <compilerArgs>
                         <arg>-Xlint:none</arg>
                         <arg>-Xlint:-options</arg>
+                        <arg>-parameters</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>

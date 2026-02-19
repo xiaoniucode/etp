@@ -44,6 +44,7 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
         proxyConfig.setRemotePort(properties.getRemotePort());
         proxyConfig.setLocalPort(webServerPortListener.getActualPort());
         proxyConfig.setStatus(ProxyStatus.OPEN);
+        proxyConfig.setAccessControl(properties.getAccessControlConfig());
         List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
         proxies.add(proxyConfig);
         AppConfig config = new DefaultAppConfig
