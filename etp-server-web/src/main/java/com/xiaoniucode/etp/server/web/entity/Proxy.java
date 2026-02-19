@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
  * 代理实体类
  */
 @Entity
-@Table(name = "proxies")
+@Table(name = "proxy")
 @Getter
 @Setter
 public class Proxy {

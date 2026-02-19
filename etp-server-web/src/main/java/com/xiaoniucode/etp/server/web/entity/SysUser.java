@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * 用户实体类
  */
 @Entity
-@Table(name = "users")
+@Table(name = "sys_user")
 @Getter
 @Setter
 public class SysUser {

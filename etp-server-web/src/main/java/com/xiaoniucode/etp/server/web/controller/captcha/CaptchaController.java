@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.web.controller.captcha;
 
 import com.xiaoniucode.etp.server.web.common.Ajax;
 import com.xiaoniucode.etp.server.web.common.CaptchaGenerator;
-import com.xiaoniucode.etp.server.web.controller.captcha.resp.CaptchaResponse;
+import com.xiaoniucode.etp.server.web.controller.captcha.response.CaptchaResponse;
 import com.xiaoniucode.etp.server.web.manager.CaptchaManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

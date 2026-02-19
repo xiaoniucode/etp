@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.web.controller.captcha.resp;
+package com.xiaoniucode.etp.server.web.controller.captcha.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

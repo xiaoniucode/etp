@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * 用于客户端连接代理服务器访问认证
  */
 @Entity
-@Table(name = "access_tokens")
+@Table(name = "access_token")
 @Getter
 @Setter
 public class AccessToken {

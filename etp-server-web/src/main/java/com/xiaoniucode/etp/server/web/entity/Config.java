@@ -8,7 +8,7 @@ import lombok.Setter;
  * 系统配置实体类
  */
 @Entity
-@Table(name = "settings")
+@Table(name = "config")
 @Getter
 @Setter
 public class Config {

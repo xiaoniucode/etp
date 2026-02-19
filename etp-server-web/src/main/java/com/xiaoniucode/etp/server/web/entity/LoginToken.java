@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * 管理界面登陆认证令牌
  */
 @Entity
-@Table(name = "login_tokens")
+@Table(name = "login_token")
 @Getter
 @Setter
 public class LoginToken {

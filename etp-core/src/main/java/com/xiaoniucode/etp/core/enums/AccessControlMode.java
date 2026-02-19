@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.core.enums;
 
 /**
  * IP 访问控制模式
+ * @author xiaoniucode
  */
 public enum AccessControlMode {
     /**
@@ -41,7 +42,7 @@ public enum AccessControlMode {
     /**
      * 根据字符串值获取对应的枚举实例
      *
-     * @param value 字符串值（如 "allow"、"deny"）
+     * @param value 字符串值
      * @return 对应的枚举实例
      * @throws IllegalArgumentException 当字符串值不存在对应的枚举实例时
      */

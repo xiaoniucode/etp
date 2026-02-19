@@ -24,6 +24,9 @@
 </script>
 <script type="text/html" id="post_table_tool">
     <div class="layui-clear-space">
+        <a class="layui-btn layui-btn-xs " lay-event="accessControl" title="访问控制">
+            <i class="layui-icon layui-icon-lock"></i> 访问控制
+        </a>
         <a class="layui-btn layui-btn-xs " lay-event="edit" title="编辑">
             <i class="layui-icon layui-icon-edit"></i> 编辑
         </a>
@@ -97,7 +100,7 @@
                         }
                     }
                 },
-                {fixed: 'right', title: '操作', width: 180, templet: '#post_table_tool'}
+                {fixed: 'right', title: '操作', width: 230, templet: '#post_table_tool'}
             ]],
             error: function (res, msg) {
                 console.log(res, msg)
@@ -106,7 +109,16 @@
         //单元格操作事件
         table.on('tool(proxy)', function (obj) {
             const data = obj.data;
-            if (obj.event === 'edit') {
+            if (obj.event === 'accessControl') {
+                layer.open({
+                    title: 'IP访问控制',
+                    type: 2,
+                    offset: '10px',
+                    shade: false,
+                    area: ['70%', '80%'],
+                    content: '/proxy/access-control.html?proxyId=' + data.id
+                });
+            } else if (obj.event === 'edit') {
                 layer.open({
                     title: '编辑隧道',
                     type: 2,

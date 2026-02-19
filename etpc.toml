@@ -59,6 +59,7 @@ compress = false
 enable = true
 mode = "allow"
 deny = ["127.0.0.1"]
+
 [[proxies]]
 name = "mysql"
 protocol = "tcp"
@@ -72,6 +73,7 @@ enable = true
 mode = "allow"
 allow = ["127.0.0.1"]
 deny = []
+
 [[proxies]]
 name = "redis"
 protocol = "tcp"

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * 代理域名实体类
  */
 @Entity
-@Table(name = "proxy_domains")
+@Table(name = "proxy_domain")
 @Getter
 @Setter
 public class ProxyDomain {

@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.web.listener;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.notify.EventBus;
@@ -11,10 +12,12 @@ import com.xiaoniucode.etp.server.manager.domain.AutoDomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.CustomDomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.SubDomainInfo;
+import com.xiaoniucode.etp.server.web.controller.accesscontrol.request.AddAccessControlRequest;
 import com.xiaoniucode.etp.server.web.entity.Proxy;
 import com.xiaoniucode.etp.server.web.entity.ProxyDomain;
 import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
+import com.xiaoniucode.etp.server.web.service.AccessControlService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,8 @@ public class ProxyPersistenceListener implements EventListener<ProxyCreatedEvent
     private ProxyRepository proxyRepository;
     @Autowired
     private ProxyDomainRepository proxyDomainRepository;
+    @Autowired
+    private AccessControlService accessControlService;
 
     @PostConstruct
     public void init() {
@@ -65,13 +70,13 @@ public class ProxyPersistenceListener implements EventListener<ProxyCreatedEvent
                 ProxyDomain proxyDomain = new ProxyDomain();
                 proxyDomain.setProxyId(p.getId());
                 DomainInfo domainInfo = domainManager.getDomainInfo(domain);
-                if (domainInfo instanceof CustomDomainInfo customDomain){
+                if (domainInfo instanceof CustomDomainInfo customDomain) {
                     String fullDomain = customDomain.getFullDomain();
                     proxyDomain.setDomain(fullDomain);
-                }else if (domainInfo instanceof SubDomainInfo subDomain){
+                } else if (domainInfo instanceof SubDomainInfo subDomain) {
                     proxyDomain.setBaseDomain(subDomain.getBaseDomain());
                     proxyDomain.setDomain(subDomain.getSubDomain());
-                }else if (domainInfo instanceof AutoDomainInfo autoDomain){
+                } else if (domainInfo instanceof AutoDomainInfo autoDomain) {
                     proxyDomain.setBaseDomain(autoDomain.getBaseDomain());
                     proxyDomain.setDomain(autoDomain.getPrefix());
                 }
@@ -80,6 +85,13 @@ public class ProxyPersistenceListener implements EventListener<ProxyCreatedEvent
             //批量保存所有域名信息
             proxyDomainRepository.saveAllAndFlush(batch);
         }
+        //初始化访问控制表
+        AddAccessControlRequest request = new AddAccessControlRequest();
+        request.setProxyId(proxy.getId());
+        request.setMode(AccessControlMode.ALLOW.getCode());
+        request.setEnable(false);
+        accessControlService.add(request);
+
     }
 
     private Proxy toProxy(String clientId, ClientType clientType, ProxyConfig config) {

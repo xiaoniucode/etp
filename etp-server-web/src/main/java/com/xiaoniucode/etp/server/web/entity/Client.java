@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * 客户端实体类
  */
 @Entity
-@Table(name = "clients")
+@Table(name = "client")
 @Getter
 @Setter
 public class Client {
