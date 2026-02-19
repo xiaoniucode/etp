@@ -9,34 +9,24 @@ import com.xiaoniucode.etp.server.web.entity.AccessControl;
 import com.xiaoniucode.etp.server.web.entity.AccessControlRule;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 /**
  * 访问控制转换类
  */
-@Mapper
+@Mapper(uses = AccessControlMode.class)
 public interface AccessControlConvert {
     AccessControlConvert INSTANCE = Mappers.getMapper(AccessControlConvert.class);
-    @Mapping(source = "mode", target = "mode", qualifiedByName = "accessControlModeToInteger")
+    
+    @Mapping(target = "mode", expression = "java(accessControl.getMode() != null ? accessControl.getMode().getCode() : null)")
     AccessControlDTO toDTO(AccessControl accessControl);
 
-    @Mapping(source = "ruleType", target = "ruleType", qualifiedByName = "accessControlModeToInteger")
+    @Mapping(target = "ruleType", expression = "java(accessControlRule.getRuleType() != null ? accessControlRule.getRuleType().getCode() : null)")
     AccessControlRuleDTO toRuleDTO(AccessControlRule accessControlRule);
 
-    @Mapping(source = "mode", target = "mode", qualifiedByName = "integerToAccessControlMode")
+    @Mapping(target = "mode", expression = "java(request.getMode() != null ? com.xiaoniucode.etp.core.enums.AccessControlMode.fromCode(request.getMode()) : null)")
     AccessControl toEntity(AddAccessControlRequest request);
 
-    @Mapping(source = "ruleType", target = "ruleType", qualifiedByName = "integerToAccessControlMode")
+    @Mapping(target = "ruleType", expression = "java(request.getRuleType() != null ? com.xiaoniucode.etp.core.enums.AccessControlMode.fromCode(request.getRuleType()) : null)")
     AccessControlRule toRuleEntity(AddAccessControlRuleRequest request);
-
-    @Named("accessControlModeToInteger")
-    default Integer accessControlModeToInteger(AccessControlMode mode) {
-        return mode != null ? mode.getCode() : null;
-    }
-
-    @Named("integerToAccessControlMode")
-    default AccessControlMode integerToAccessControlMode(Integer code) {
-        return code != null ? AccessControlMode.fromCode(code) : null;
-    }
 }
