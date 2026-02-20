@@ -8,6 +8,9 @@ import com.xiaoniucode.etp.server.handler.http.BasicAuthHandler;
 import com.xiaoniucode.etp.server.handler.http.HostSnifferHandler;
 import com.xiaoniucode.etp.server.handler.http.HttpIpCheckHandler;
 import com.xiaoniucode.etp.server.handler.http.HttpVisitorHandler;
+import com.xiaoniucode.etp.server.helper.BeanHelper;
+import com.xiaoniucode.etp.server.manager.DomainManager;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -52,7 +55,8 @@ public class HttpProxyServer implements Lifecycle {
             int httpProxyPort = appConfig.getHttpProxyPort();
             bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             workerGroup = NettyEventLoopFactory.eventLoopGroup();
-
+            DomainManager domainManager = BeanHelper.getBean(DomainManager.class);
+            ProxyManager proxyManager = BeanHelper.getBean(ProxyManager.class);
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
@@ -61,7 +65,7 @@ public class HttpProxyServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            sc.pipeline().addLast(new HostSnifferHandler());
+                            sc.pipeline().addLast(new HostSnifferHandler(domainManager, proxyManager));
                             sc.pipeline().addLast(httpIpCheckHandler);
                             sc.pipeline().addLast(basicAuthHandler);
                             sc.pipeline().addLast(trafficMetricsHandler);

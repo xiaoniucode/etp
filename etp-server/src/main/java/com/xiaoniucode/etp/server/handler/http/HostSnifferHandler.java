@@ -3,7 +3,6 @@ package com.xiaoniucode.etp.server.handler.http;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.server.helper.BeanHelper;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.DomainManager;
 import io.netty.buffer.ByteBuf;
@@ -17,11 +16,19 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * 解析出域名
+ * 用于解析请求头
+ * 不能标注@Sharable注解
  */
 public class HostSnifferHandler extends ByteToMessageDecoder {
     private final Logger logger = LoggerFactory.getLogger(HostSnifferHandler.class);
     private boolean sniffing = true;
+    private final DomainManager domainManager;
+    private final ProxyManager proxyManager;
+
+    public HostSnifferHandler(DomainManager domainManager, ProxyManager proxyManager) {
+        this.domainManager = domainManager;
+        this.proxyManager = proxyManager;
+    }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
@@ -52,20 +59,20 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                     } else {
                         domain = host;
                     }
-                    String proxyId = BeanHelper.getBean(DomainManager.class).getProxyId(domain);
+                    String proxyId = domainManager.getProxyId(domain);
                     if (proxyId == null) {
                         visitor.close();
                         logger.debug("隧道不存在");
                         return;
                     }
 
-                    ProxyConfig config = BeanHelper.getBean(ProxyManager.class).getById(proxyId);
+                    ProxyConfig config = proxyManager.getById(proxyId);
                     if (!config.isOpen()) {
                         visitor.close();
                         logger.debug("隧道为关闭状态");
                         return;
                     }
-                    if (!BeanHelper.getBean(DomainManager.class).exists(domain)) {
+                    if (!domainManager.exists(domain)) {
                         logger.warn("没有该域名的代理服务");
                         visitor.close();
                         return;
