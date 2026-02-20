@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 public class AccessControlRuleDTO {
     private Integer id;
-    private Integer acId;
+    private String proxyId;
     private String cidr;
     private Integer ruleType;
 }

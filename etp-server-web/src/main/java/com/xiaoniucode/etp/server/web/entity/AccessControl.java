@@ -15,9 +15,6 @@ import lombok.Setter;
 @Table(name = "access_control")
 public class AccessControl {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    
     @Column(name = "proxy_id", nullable = false, unique = true)
     private String proxyId;
     

@@ -153,7 +153,7 @@
 
                 if (data.id && !data.id.toString().startsWith('new_')) {
                     Rest.put('/api/access-controls/rules', {
-                        id: data.id,
+                        proxyId: proxyId,
                         ruleType: ruleType
                     }).then(() => {
                         layer.msg('规则已更新', {icon: 1, time: 1000});
@@ -190,7 +190,7 @@
                 const ruleTypeInput = obj.tr.find('input[name="ruleType' + data.id + '"]:checked');
                 const ruleType = ruleTypeInput ? parseInt(ruleTypeInput.val()) : 1;
                 Rest.post('/api/access-controls/rules', {
-                    acId: accessControlData ? accessControlData.id : null,
+                    proxyId: proxyId,
                     cidr: cidr,
                     ruleType: ruleType
                 }).then(() => {
@@ -259,7 +259,7 @@
             }
 
             Rest.put('/api/access-controls', {
-                id: accessControlData.id,
+                proxyId: proxyId,
                 enable: enable,
                 mode: accessControlData.mode
             }).then(() => {
@@ -286,7 +286,7 @@
             }
 
             Rest.put('/api/access-controls', {
-                id: accessControlData.id,
+                proxyId: proxyId,
                 enable: accessControlData.enable,
                 mode: mode
             }).then(() => {

@@ -13,20 +13,22 @@ import java.util.Set;
 @Getter
 @Setter
 public class HttpProxyCreateRequest {
-    @NotEmpty
+    @NotEmpty(message = "clientId 不能为空")
     private String clientId;
-    @NotEmpty
+    @NotEmpty(message = "name 不能为空")
     private String name;
+    @NotEmpty(message = "localIp 不能为空")
     private String localIp;
-    @NotNull
+    @NotNull(message = "localPort 不能为空")
     private Integer localPort;
-    @NotNull
+    @NotNull(message = "status 不能为空")
     private Integer status;
-    @NotNull
+    @NotNull(message = "domainType 不能为空")
     private Integer domainType;
+    @NotNull(message = "domains 不能为空")
     private Set<String> domains;
-    @NotNull
+    @NotNull(message = "encrypt 不能为空")
     private Boolean encrypt;
-    @NotNull
+    @NotNull(message = "compress 不能为空")
     private Boolean compress;
 }

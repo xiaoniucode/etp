@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.core.domain;
 
-import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

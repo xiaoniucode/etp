@@ -15,7 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 时间轮定时器，用于处理心跳超时任务
+ * 时间轮定时器，用于处理超时任务
+ * @author xiaoniucode
  */
 @Component
 public class WheelTimer {

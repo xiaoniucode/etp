@@ -74,12 +74,6 @@
                 },
                 {field: 'localPort', sort: true, title: '内网端口'},
                 {
-                    field: 'status', width: 120, title: '状态', sort: true, templet: function (d) {
-                        const isChecked = d.status === 1 ? 'checked' : '';
-                        return '<input type="checkbox" lay-skin="switch" lay-text="开启|关闭" lay-event="statusSwitch" ' + isChecked + '>';
-                    }
-                },
-                {
                     field: 'clientType', title: '隧道类型', sort: true, templet: function (d) {
                         if (d.clientType === 0) {
                             return ' <span class="layui-badge layui-bg-orange">web_session</span>';
@@ -88,13 +82,18 @@
                         }
                     }
                 },
+                {
+                    field: 'status', width: 120, title: '状态', sort: true, templet: function (d) {
+                        const isChecked = d.status === 1 ? 'checked' : '';
+                        return '<input type="checkbox" lay-skin="switch" lay-text="开启|关闭" lay-event="statusSwitch" ' + isChecked + '>';
+                    }
+                },
                 {fixed: 'right', title: '操作', width: 230, templet: '#post_table_tool'}
             ]],
             error: function (res, msg) {
                 console.log(res, msg)
             }
         });
-        //单元格操作事件
         table.on('tool(proxy)', function (obj) {
             const data = obj.data;
             if (obj.event === 'accessControl') {
@@ -138,7 +137,7 @@
                     layer.msg(tip, {icon: 1});
                 }).catch(() => {
                     layer.msg("切换失败", {icon: 2});
-                    obj.update({status: data.status});//回滚状态
+                    obj.update({status: data.status});
                 });
             } else if (obj.event === 'copyPort') {
                 const port = obj.data.remotePort + '';

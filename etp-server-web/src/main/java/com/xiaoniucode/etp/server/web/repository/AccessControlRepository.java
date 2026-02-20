@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
  * 访问控制 Repository
  */
 @Repository
-public interface AccessControlRepository extends JpaRepository<AccessControl, Integer> {
+public interface AccessControlRepository extends JpaRepository<AccessControl, String> {
     
     /**
      * 根据代理ID查询访问控制

@@ -6,6 +6,8 @@ import com.xiaoniucode.etp.server.web.controller.accesscontrol.request.AddAccess
 import com.xiaoniucode.etp.server.web.controller.accesscontrol.request.UpdateAccessControlRequest;
 import com.xiaoniucode.etp.server.web.controller.accesscontrol.request.UpdateAccessControlRuleRequest;
 
+import java.util.List;
+
 /**
  * 访问控制服务
  */
@@ -17,9 +19,11 @@ public interface AccessControlService {
 
     void deleteRuleById(Integer ruleId);
 
-    void add(AddAccessControlRequest request);
+    AccessControlDTO add(AddAccessControlRequest request);
 
     void addRule(AddAccessControlRuleRequest request);
+
+    void addRules(List<AddAccessControlRuleRequest> rules);
 
     void updateRule(UpdateAccessControlRuleRequest request);
 }

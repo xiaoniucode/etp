@@ -18,8 +18,8 @@ public class AccessControlRule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    @Column(name = "ac_id", nullable = false)
-    private Integer acId;
+    @Column(name = "proxy_id", nullable = false)
+    private String proxyId;
     
     @Column(name = "cidr", nullable = false)
     private String cidr;

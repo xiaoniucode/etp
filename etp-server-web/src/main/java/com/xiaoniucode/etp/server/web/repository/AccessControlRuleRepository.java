@@ -11,14 +11,7 @@ import java.util.List;
  */
 @Repository
 public interface AccessControlRuleRepository extends JpaRepository<AccessControlRule, Integer> {
+    List<AccessControlRule> findByProxyId(String acId);
     
-    /**
-     * 根据访问控制ID查询规则列表
-     */
-    List<AccessControlRule> findByAcId(Integer acId);
-    
-    /**
-     * 根据访问控制ID删除规则
-     */
-    void deleteByAcId(Integer acId);
+    void deleteByProxyId(String proxyId);
 }

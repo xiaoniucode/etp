@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UpdateAccessControlRuleRequest {
-    @NotNull(message = "ID不能为空")
-    private Integer id;
+    @NotNull(message = "代理 ID 不能为空")
+    private Integer proxyId;
     @NotNull(message = "规则类型不能为空")
     private Integer ruleType;
 }

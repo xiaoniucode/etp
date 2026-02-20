@@ -11,6 +11,7 @@ import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.ProxyCreatedEvent;
+import com.xiaoniucode.etp.server.event.ProxyUpdatedEvent;
 import com.xiaoniucode.etp.server.generator.GlobalIdGenerator;
 import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
@@ -66,7 +67,12 @@ public class NewProxyRespHandler implements MessageHandler {
             }
             proxyManager.addProxy(clientId, config, proxyConfig -> {
                 processorExecutor.execute(proxyConfig);
-                eventBus.publishAsync(new ProxyCreatedEvent(clientId, agent.getClientType(), proxyConfig));
+                if (validInfo.isNew()) {
+                    eventBus.publishAsync(new ProxyCreatedEvent(clientId, agent.getClientType(), proxyConfig));
+                }
+                if (validInfo.isUpdate()) {
+                    eventBus.publishAsync(new ProxyUpdatedEvent(clientId, agent.getClientType(), proxyConfig));
+                }
                 control.writeAndFlush(buildResponse(proxyConfig));
                 logger.debug("代理注册成功: [代理名称={}]", proxyConfig.getName());
             });
@@ -75,10 +81,11 @@ public class NewProxyRespHandler implements MessageHandler {
 
     private ProxyConfig buildProxyConfig(Message.NewProxy proxy) {
         String proxyId = GlobalIdGenerator.uuid32();
+
         ProxyConfig config = new ProxyConfig();
         config.setProxyId(proxyId);
         config.setName(proxy.getName());
-        if (proxy.hasLocalIp()){
+        if (proxy.hasLocalIp()) {
             config.setLocalIp(proxy.getLocalIp());
         }
         config.setLocalPort(proxy.getLocalPort());

@@ -58,13 +58,25 @@ name = "web2"
 protocol = "http"
 localIp = "localhost"
 localPort = 8030
-customDomains = ["a.domain2.com", "b.domain2.com"]
+customDomains = ["etp.domain2.com"]
 encrypt = false
 compress = false
 [proxies.access_control]
 enable = true
 mode = "allow"
-deny = ["127.0.0.1"]
+allow = ["127.0.0.1"]
+[[proxies]]
+name = "web22"
+protocol = "http"
+localIp = "localhost"
+localPort = 8030
+customDomains = ["etp2.domain2.com"]
+encrypt = false
+compress = false
+[proxies.access_control]
+enable = true
+mode = "allow"
+deny = ["127.0.0.2"]
 
 [[proxies]]
 name = "mysql"

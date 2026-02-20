@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class AccessControlServiceImpl implements AccessControlService {
-    
+
     private final AccessControlRepository accessControlRepository;
     private final AccessControlRuleRepository accessControlRuleRepository;
 
@@ -37,36 +37,34 @@ public class AccessControlServiceImpl implements AccessControlService {
     private AccessControlManager accessControlManager;
     @Autowired
     private ProxyManager proxyManager;
-    public AccessControlServiceImpl(AccessControlRepository accessControlRepository, 
-                                   AccessControlRuleRepository accessControlRuleRepository) {
+
+    public AccessControlServiceImpl(AccessControlRepository accessControlRepository,
+                                    AccessControlRuleRepository accessControlRuleRepository) {
         this.accessControlRepository = accessControlRepository;
         this.accessControlRuleRepository = accessControlRuleRepository;
     }
-    
+
     @Override
     public AccessControlDTO getByProxyId(String proxyId) {
-        AccessControl accessControl = accessControlRepository.findByProxyId(proxyId);
-        if (accessControl == null) {
-            throw new BizException("根据proxyId未找到访问控制配置: " + proxyId);
-        }
-        
+        AccessControl accessControl = accessControlRepository.getReferenceById(proxyId);
+
         AccessControlDTO dto = AccessControlConvert.INSTANCE.toDTO(accessControl);
-        List<AccessControlRule> rules = accessControlRuleRepository.findByAcId(accessControl.getId());
+        List<AccessControlRule> rules = accessControlRuleRepository.findByProxyId(accessControl.getProxyId());
         List<AccessControlRuleDTO> ruleDTOs = rules.stream()
                 .map(AccessControlConvert.INSTANCE::toRuleDTO)
                 .collect(Collectors.toList());
         dto.setRules(ruleDTOs);
-        
+
         return dto;
     }
-    
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(UpdateAccessControlRequest request) {
-        Integer id = request.getId();
-        AccessControl accessControl = accessControlRepository.findById(id)
-                .orElseThrow(() -> new BizException("根据ID未找到访问控制配置: " + id));
-        
+        String proxyId = request.getProxyId();
+        AccessControl accessControl = accessControlRepository.findById(proxyId)
+                .orElseThrow(() -> new BizException("根据ID未找到访问控制配置: " + proxyId));
+
         accessControl.setEnable(request.getEnable());
         accessControl.setMode(AccessControlMode.fromCode(request.getMode()));
         accessControlRepository.save(accessControl);
@@ -74,7 +72,7 @@ public class AccessControlServiceImpl implements AccessControlService {
         //更新代理的规则
         //删除CIDR前缀树
     }
-    
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteRuleById(Integer ruleId) {
@@ -85,25 +83,25 @@ public class AccessControlServiceImpl implements AccessControlService {
         //更新代理的规则
         //删除CIDR前缀树
     }
-    
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(AddAccessControlRequest request) {
+    public AccessControlDTO add(AddAccessControlRequest request) {
         if (accessControlRepository.findByProxyId(request.getProxyId()) != null) {
             throw new BizException("该proxyId的访问控制配置已存在: " + request.getProxyId());
         }
         AccessControl accessControl = AccessControlConvert.INSTANCE.toEntity(request);
-        accessControlRepository.save(accessControl);
-
+        AccessControl save = accessControlRepository.save(accessControl);
         //更新代理的规则
         //删除CIDR前缀树
+        return AccessControlConvert.INSTANCE.toDTO(save);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addRule(AddAccessControlRuleRequest request) {
-        if (!accessControlRepository.existsById(request.getAcId())) {
-            throw new BizException("根据ID未找到访问控制配置: " + request.getAcId());
+        if (!accessControlRepository.existsById(request.getProxyId())) {
+            throw new BizException("根据ID未找到访问控制配置: " + request.getProxyId());
         }
         AccessControlRule rule = AccessControlConvert.INSTANCE.toRuleEntity(request);
         accessControlRuleRepository.save(rule);
@@ -115,10 +113,29 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateRule(UpdateAccessControlRuleRequest request) {
-        AccessControlRule rule = accessControlRuleRepository.findById(request.getId())
-                .orElseThrow(() -> new BizException("根据ID未找到访问控制规则: " + request.getId()));
+        AccessControlRule rule = accessControlRuleRepository.findById(request.getProxyId())
+                .orElseThrow(() -> new BizException("根据ID未找到访问控制规则: " + request.getProxyId()));
         rule.setRuleType(AccessControlMode.fromCode(request.getRuleType()));
-        accessControlRuleRepository.save(rule);
+        accessControlRuleRepository.saveAndFlush(rule);
+
+        //更新代理的规则
+        //删除CIDR前缀树
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addRules(List<AddAccessControlRuleRequest> rules) {
+        if (rules == null || rules.isEmpty()) {
+            return;
+        }
+        String proxyId = rules.getFirst().getProxyId();
+        if (!accessControlRepository.existsById(proxyId)) {
+            throw new BizException("根据代理ID未找到访问控制配置: " + proxyId);
+        }
+        List<AccessControlRule> ruleEntities = rules.stream()
+                .map(AccessControlConvert.INSTANCE::toRuleEntity)
+                .collect(Collectors.toList());
+        accessControlRuleRepository.saveAllAndFlush(ruleEntities);
 
         //更新代理的规则
         //删除CIDR前缀树
