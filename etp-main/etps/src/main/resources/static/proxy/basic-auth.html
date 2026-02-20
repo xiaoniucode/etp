@@ -54,6 +54,29 @@
 
         let basicAuthData = null;
 
+        window.togglePassword = function(element, id, pass) {
+            const parent = element.parentElement;
+            if (id && pass) {
+                const passwordSpan = parent.querySelector('span');
+                if (passwordSpan) {
+                    if (passwordSpan.textContent === '******') {
+                        passwordSpan.textContent = pass;
+                    } else {
+                        passwordSpan.textContent = '******';
+                    }
+                }
+            } else {
+                const input = parent.querySelector('input');
+                if (input) {
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                    } else {
+                        input.type = 'password';
+                    }
+                }
+            }
+        }
+
         function loadBasicAuthData() {
             Rest.get('/api/basic-auth/' + proxyId).then(data => {
                     basicAuthData = data;
@@ -99,9 +122,9 @@
                     {
                         field: 'pass', title: '密码', templet: function (d) {
                             if (d.id && d.id.toString().startsWith('new_')) {
-                                return `<input type="password" class="layui-input" value="${d.pass || ''}" lay-event="editPass">`;
+                                return `<div style="position: relative;"><input type="password" class="layui-input" value="${d.pass || ''}" lay-event="editPass"><i class="layui-icon layui-icon-eye" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 16px;" onclick="togglePassword(this)"></i></div>`;
                             } else {
-                                return '******';
+                                return `<div style="position: relative;"><span>******</span><i class="layui-icon layui-icon-eye" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 16px;" onclick="togglePassword(this, '${d.id}', '${d.pass}')"></i></div>`;
                             }
                         }
                     },
