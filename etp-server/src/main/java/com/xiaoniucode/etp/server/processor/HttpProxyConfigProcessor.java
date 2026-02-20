@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.proxy.processor;
+package com.xiaoniucode.etp.server.processor;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;

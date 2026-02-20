@@ -19,7 +19,7 @@ import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.valid.ValidInfo;
 import com.xiaoniucode.etp.server.manager.session.AgentSessionManager;
-import com.xiaoniucode.etp.server.proxy.processor.ProxyConfigProcessorExecutor;
+import com.xiaoniucode.etp.server.processor.ProxyConfigProcessorExecutor;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import jakarta.annotation.Resource;

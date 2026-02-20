@@ -14,7 +14,7 @@ import com.xiaoniucode.etp.server.manager.domain.AutoDomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.CustomDomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.SubDomainInfo;
-import com.xiaoniucode.etp.server.proxy.processor.ProxyConfigProcessorExecutor;
+import com.xiaoniucode.etp.server.processor.ProxyConfigProcessorExecutor;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 import com.xiaoniucode.etp.server.web.controller.proxy.convert.HttpProxyConvert;
@@ -38,8 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
