@@ -1,6 +1,8 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.server.manager.AccessControlManager;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.accesscontrol.convert.AccessControlConvert;
 import com.xiaoniucode.etp.server.web.controller.accesscontrol.dto.AccessControlDTO;
@@ -15,6 +17,7 @@ import com.xiaoniucode.etp.server.web.repository.AccessControlRepository;
 import com.xiaoniucode.etp.server.web.repository.AccessControlRuleRepository;
 import com.xiaoniucode.etp.server.web.service.AccessControlService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +32,11 @@ public class AccessControlServiceImpl implements AccessControlService {
     
     private final AccessControlRepository accessControlRepository;
     private final AccessControlRuleRepository accessControlRuleRepository;
-    
+
+    @Autowired
+    private AccessControlManager accessControlManager;
+    @Autowired
+    private ProxyManager proxyManager;
     public AccessControlServiceImpl(AccessControlRepository accessControlRepository, 
                                    AccessControlRuleRepository accessControlRuleRepository) {
         this.accessControlRepository = accessControlRepository;
@@ -63,6 +70,9 @@ public class AccessControlServiceImpl implements AccessControlService {
         accessControl.setEnable(request.getEnable());
         accessControl.setMode(AccessControlMode.fromCode(request.getMode()));
         accessControlRepository.save(accessControl);
+
+        //更新代理的规则
+        //删除CIDR前缀树
     }
     
     @Override
@@ -72,6 +82,8 @@ public class AccessControlServiceImpl implements AccessControlService {
             throw new BizException("根据ID未找到访问控制规则: " + ruleId);
         }
         accessControlRuleRepository.deleteById(ruleId);
+        //更新代理的规则
+        //删除CIDR前缀树
     }
     
     @Override
@@ -82,6 +94,9 @@ public class AccessControlServiceImpl implements AccessControlService {
         }
         AccessControl accessControl = AccessControlConvert.INSTANCE.toEntity(request);
         accessControlRepository.save(accessControl);
+
+        //更新代理的规则
+        //删除CIDR前缀树
     }
 
     @Override
@@ -92,6 +107,9 @@ public class AccessControlServiceImpl implements AccessControlService {
         }
         AccessControlRule rule = AccessControlConvert.INSTANCE.toRuleEntity(request);
         accessControlRuleRepository.save(rule);
+
+        //更新代理的规则
+        //删除CIDR前缀树
     }
 
     @Override
@@ -101,5 +119,8 @@ public class AccessControlServiceImpl implements AccessControlService {
                 .orElseThrow(() -> new BizException("根据ID未找到访问控制规则: " + request.getId()));
         rule.setRuleType(AccessControlMode.fromCode(request.getRuleType()));
         accessControlRuleRepository.save(rule);
+
+        //更新代理的规则
+        //删除CIDR前缀树
     }
 }

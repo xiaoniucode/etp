@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>鉴权认证</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/assets/layui/css/layui.css" rel="stylesheet">
+    <link href="/static/assets/css/app.css" rel="stylesheet">
+</head>
+<body>
+<div class="layui-container" style="padding-top: 15px">
+    <form class="layui-form" lay-filter="basicAuthForm">
+        <blockquote class="layui-elem-quote">
+            基本认证：设置用户名和密码，访问代理时需要输入认证信息
+        </blockquote>
+        
+        <div style="margin-bottom: 15px; display: flex; align-items: center;">
+            <label style="width: 80px;">启用认证</label>
+            <input type="checkbox" name="enable" lay-skin="switch" lay-text="开启|关闭" lay-filter="enableSwitch">
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label>认证用户列表</label>
+        </div>
+        <table class="layui-hide" id="basicAuthTable"></table>
+
+        <script type="text/html" id="basicAuthToolbar">
+            <div class="layui-btn-container">
+                <button type="button" class="layui-btn layui-btn-sm" lay-event="add">
+                    <i class="layui-icon layui-icon-add-1"></i> 新增用户
+                </button>
+            </div>
+        </script>
+    </form>
+</div>
+
+<script src="/static/assets/layui/layui.js"></script>
+<script src="/static/assets/js/ajax.js"></script>
+<script src="/static/assets/js/common.js"></script>
+<script>
+    layui.use(['form', 'jquery', 'layer', 'Rest', 'table'], function () {
+        const form = layui.form;
+        const $ = layui.$;
+        const layer = layui.layer;
+        const Rest = layui.Rest;
+        const table = layui.table;
+
+        const proxyId = getQueryParam("proxyId");
+
+        if (!proxyId) {
+            layer.msg('缺少代理ID', {icon: 2});
+            return;
+        }
+
+        let basicAuthData = null;
+
+        function loadBasicAuthData() {
+            // 这里可以添加加载鉴权认证数据的逻辑
+            // Rest.get('/api/basic-auth/' + proxyId)
+            //     .then(data => {
+            //         basicAuthData = data;
+            //         renderBasicAuthData(data);
+            //         renderBasicAuthTable(data.users || []);
+            //     })
+            //     .catch(err => {
+            //         console.error('加载数据失败:', err);
+            //     });
+        }
+
+        function renderBasicAuthData(data) {
+            // 这里可以添加渲染鉴权认证数据的逻辑
+            if (data.enable) {
+                $('input[name="enable"]').prop('checked', true);
+            } else {
+                $('input[name="enable"]').prop('checked', false);
+            }
+            form.render('checkbox');
+        }
+
+        function renderBasicAuthTable(users) {
+            table.render({
+                elem: '#basicAuthTable',
+                data: users,
+                text: '空空如也',
+                skin: 'line',
+                cellMinWidth: 80,
+                toolbar: '#basicAuthToolbar',
+                cols: [[
+                    {field: 'LAY_INDEX', width: 80, title: '序号', type: 'numbers'},
+                    {
+                        field: 'username', title: '用户名', templet: function (d) {
+                            // 只有新增的用户（id以new_开头）可以编辑
+                            if (d.id && d.id.toString().startsWith('new_')) {
+                                return `<input type="text" class="layui-input" value="${d.username || ''}" lay-event="editUsername">`;
+                            } else {
+                                return d.username || '';
+                            }
+                        }
+                    },
+                    {
+                        field: 'password', title: '密码', templet: function (d) {
+                            // 只有新增的用户（id以new_开头）可以编辑
+                            if (d.id && d.id.toString().startsWith('new_')) {
+                                return `<input type="password" class="layui-input" value="${d.password || ''}" lay-event="editPassword">`;
+                            } else {
+                                return '******';
+                            }
+                        }
+                    },
+                    {
+                        title: '操作', width: 150, templet: function (d) {
+                            if (d.id && d.id.toString().startsWith('new_')) {
+                                return `
+                                <div class="layui-btn-container" style="display: flex; gap: 5px;">
+                                    <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="save">
+                                        <i class="layui-icon layui-icon-ok"></i>
+                                    </button>
+                                    <button type="button" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">
+                                        <i class="layui-icon layui-icon-close"></i>
+                                    </button>
+                                </div>
+                            `;
+                            } else {
+                                return `
+                                <button type="button" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">
+                                    <i class="layui-icon layui-icon-delete"></i>
+                                </button>
+                            `;
+                            }
+                        }
+                    }
+                ]]
+            });
+        }
+
+        table.on('tool(basicAuthTable)', function (obj) {
+            const data = obj.data;
+            const event = obj.event;
+
+            if (event === 'editUsername') {
+                // 处理用户名编辑
+                const target = obj.tr.find('input[lay-event="editUsername"]');
+                const username = target.val();
+            } else if (event === 'editPassword') {
+                // 处理密码编辑
+                const target = obj.tr.find('input[lay-event="editPassword"]');
+                const password = target.val();
+            } else if (event === 'save') {
+                // 保存新增用户
+                const usernameInput = obj.tr.find('input[lay-event="editUsername"]');
+                const username = usernameInput.val().trim();
+                const passwordInput = obj.tr.find('input[lay-event="editPassword"]');
+                const password = passwordInput.val().trim();
+
+                if (!username) {
+                    layer.msg('请输入用户名', {icon: 2});
+                    return;
+                }
+
+                if (!password) {
+                    layer.msg('请输入密码', {icon: 2});
+                    return;
+                }
+
+                // 这里可以添加保存用户的逻辑
+                // Rest.post('/api/basic-auth/users', {
+                //     basicAuthId: basicAuthData ? basicAuthData.id : null,
+                //     username: username,
+                //     password: password
+                // }).then(() => {
+                //     layer.msg('保存成功', {icon: 1, time: 600}, function () {
+                //         loadBasicAuthData();
+                //     });
+                // }).catch(err => {
+                //     console.error('保存失败:', err);
+                // });
+            } else if (event === 'delete') {
+                if (data.id && data.id.toString().startsWith('new_')) {
+                    const tableData = table.cache['basicAuthTable'] || [];
+                    // 过滤掉要删除的新增用户
+                    const filteredData = tableData.filter(row => row.id !== data.id);
+                    table.reload('basicAuthTable', {
+                        data: filteredData
+                    });
+                    console.log('删除新增用户:', data.username, 'ID:', data.id);
+                } else {
+                    layer.confirm('确定删除？', {
+                        icon: 2,
+                        title: '删除确认',
+                        btn: ['确认删除', '取消']
+                    }, function (index) {
+                        // 这里可以添加删除用户的逻辑
+                        // Rest.delete('/api/basic-auth/users/' + data.id).then(() => {
+                        //     layer.msg('删除成功', {icon: 1, time: 600});
+                        //     loadBasicAuthData();
+                        // }).finally(() => {
+                        //     layer.close(index);
+                        // });
+                    });
+                }
+            }
+        });
+
+        table.on('toolbar(basicAuthTable)', function (obj) {
+            const event = obj.event;
+
+            if (event === 'add') {
+                const tableData = table.cache['basicAuthTable'] || [];
+                const hasUnsavedRow = tableData.some(row => row.id && row.id.toString().startsWith('new_'));
+
+                if (hasUnsavedRow) {
+                    layer.msg('请先保存或删除当前新增的用户', {icon: 2});
+                    return;
+                }
+                const newUser = {
+                    id: 'new_' + Date.now(),
+                    username: '',
+                    password: ''
+                };
+                tableData.push(newUser);
+                table.reload('basicAuthTable', {
+                    data: tableData
+                });
+            }
+        });
+
+        form.on('switch(enableSwitch)', function (obj) {
+            const enable = obj.elem.checked;
+
+            if (!basicAuthData) {
+                layer.msg('加载数据失败，请刷新页面重试', {icon: 2});
+                // 回滚状态
+                obj.elem.checked = !enable;
+                form.render('checkbox');
+                return;
+            }
+
+            // 这里可以添加更新启用状态的逻辑
+            // Rest.put('/api/basic-auth', {
+            //     id: basicAuthData.id,
+            //     enable: enable
+            // }).then(() => {
+            //     layer.msg(enable ? '鉴权认证已开启' : '鉴权认证已关闭', {icon: 1, time: 1000});
+            //     if (basicAuthData) {
+            //         basicAuthData.enable = enable ? 1 : 0;
+            //     }
+            // }).catch(err => {
+            //     // 回滚状态
+            //     obj.elem.checked = !enable;
+            //     form.render('checkbox');
+            //     layer.msg('更新失败，请稍后重试', {icon: 2});
+            // });
+        });
+
+        loadBasicAuthData();
+    });
+</script>
+</body>
+</html>

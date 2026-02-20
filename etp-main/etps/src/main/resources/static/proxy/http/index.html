@@ -24,6 +24,9 @@
 </script>
 <script type="text/html" id="post_table_tool">
     <div class="layui-clear-space">
+        <a class="layui-btn layui-btn-xs " lay-event="basicAuth" title="鉴权认证">
+            <i class="layui-icon layui-icon-password"></i> 鉴权认证
+        </a>
         <a class="layui-btn layui-btn-xs " lay-event="accessControl" title="访问控制">
             <i class="layui-icon layui-icon-lock"></i> 访问控制
         </a>
@@ -56,7 +59,7 @@
             cols: [[
                 {type: 'checkbox', fixed: 'left'},
                 {field: 'clientId', fixed: 'left', width: 180, title: '客户端', sort: true},
-                {field: 'name', title: '隧道名称'},
+                {field: 'name', title: '隧道名称', width: 100},
                 {
                     field: 'domains', sort: true, title: '访问地址', templet: function (d) {
                         if (d.domains && d.domains.length > 0) {
@@ -86,12 +89,6 @@
                 },
                 {field: 'localPort', sort: true, width: 110, title: '内网端口'},
                 {
-                    field: 'status', width: 90, title: '状态', sort: true, templet: function (d) {
-                        const isChecked = d.status === 1 ? 'checked' : '';
-                        return '<input type="checkbox" lay-skin="switch" lay-text="开启|关闭" lay-event="statusSwitch" ' + isChecked + '>';
-                    }
-                },
-                {
                     field: 'clientType', title: '隧道类型', sort: true, templet: function (d) {
                         if (d.clientType === 0) {
                             return ' <span class="layui-badge layui-bg-orange">web_session</span>';
@@ -100,7 +97,14 @@
                         }
                     }
                 },
-                {fixed: 'right', title: '操作', width: 230, templet: '#post_table_tool'}
+                {
+                    field: 'status', width: 90, title: '状态', sort: true, templet: function (d) {
+                        const isChecked = d.status === 1 ? 'checked' : '';
+                        return '<input type="checkbox" lay-skin="switch" lay-text="开启|关闭" lay-event="statusSwitch" ' + isChecked + '>';
+                    }
+                },
+
+                {fixed: 'right', title: '操作', width: 310, templet: '#post_table_tool'}
             ]],
             error: function (res, msg) {
                 console.log(res, msg)
@@ -109,7 +113,16 @@
         //单元格操作事件
         table.on('tool(proxy)', function (obj) {
             const data = obj.data;
-            if (obj.event === 'accessControl') {
+            if (obj.event === 'basicAuth') {
+                layer.open({
+                    title: '鉴权认证',
+                    type: 2,
+                    offset: '10px',
+                    shade: false,
+                    area: ['70%', '80%'],
+                    content: '/proxy/basic-auth.html?proxyId=' + data.id
+                });
+            } else if (obj.event === 'accessControl') {
                 layer.open({
                     title: 'IP访问控制',
                     type: 2,

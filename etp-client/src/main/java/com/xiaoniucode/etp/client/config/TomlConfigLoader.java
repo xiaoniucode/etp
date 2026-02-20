@@ -8,15 +8,14 @@ import com.xiaoniucode.etp.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
 import com.xiaoniucode.etp.common.config.ConfigSource;
 import com.xiaoniucode.etp.common.config.ConfigSourceType;
-import com.xiaoniucode.etp.core.domain.AccessControlConfig;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.domain.TlsConfig;
+import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -164,6 +163,23 @@ public class TomlConfigLoader implements ConfigSource {
                 }
 
                 proxies.add(proxyConfig);
+                //HTTP BASIC AUTH 只有HTTP协议才解析
+                if (ProtocolType.isHttp(protocol)) {
+                    Toml basicAuth = proxyTable.getTable("basic_auth");
+                    if (basicAuth != null) {
+                        Boolean enable = basicAuth.getBoolean("enable", false);
+                        HashSet<HttpUser> sets = new HashSet<>();
+                        List<HashMap> users = basicAuth.getList("users");
+                        if (users != null && !users.isEmpty()) {
+                            for (HashMap map : users) {
+                                String user = (String) map.getOrDefault("user", "");
+                                String pass = (String) map.getOrDefault("pass", "");
+                                sets.add(new HttpUser(user,pass));
+                            }
+                        }
+                        proxyConfig.setBasicAuth(new BasicAuthConfig(enable, sets));
+                    }
+                }
             }
             builder.proxies(proxies);
         }

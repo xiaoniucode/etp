@@ -13,6 +13,7 @@ import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ClientManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
+import com.xiaoniucode.etp.server.timer.WheelTimer;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class AgentSessionManager {
@@ -60,6 +62,9 @@ public class AgentSessionManager {
     private ProxyManager proxyManager;
     @Autowired
     private ClientManager clientManager;
+    @Autowired
+    private WheelTimer wheelTimer;
+    private static final long HEARTBEAT_TIMEOUT = 60 * 1000L;
 
     /**
      * 创建代理客户端会话
@@ -115,6 +120,7 @@ public class AgentSessionManager {
                 }
             }
         }
+        scheduleTimeout(agentSession);
         return Optional.of(agentSession);
     }
 
@@ -198,6 +204,19 @@ public class AgentSessionManager {
         });
     }
 
+    private void scheduleTimeout(AgentSession session) {
+        Channel control = session.getControl();
+        Runnable cleanupTask = () -> {
+            //尝试向客户端发送心跳超时消息
+            control.writeAndFlush(MessageUtils.heartbeatTimeout());
+            control.eventLoop().schedule(() -> {
+                disconnect(control);
+            }, 5, TimeUnit.SECONDS);
+        };
+        WheelTimer.TimeoutHandle handle = wheelTimer.newTimeout(cleanupTask, HEARTBEAT_TIMEOUT);
+        session.setTimeoutHandle(handle);
+    }
+
     /**
      * 心跳更新，用于如果连接者长时间没有心跳，释放连接资源
      */
@@ -208,14 +227,13 @@ public class AgentSessionManager {
         }
         AgentSession agentSession = sessionIdToAgentSession.get(sessionId);
         if (agentSession != null) {
-            long before = agentSession.getLastHeartbeat();
             long current = System.currentTimeMillis();
             agentSession.setLastHeartbeat(current);
-            if (logger.isDebugEnabled()) {
-                String beforeStr = DateUtils.formatTimestamp(before);
-                String currentStr = DateUtils.formatTimestamp(current);
-                logger.debug("更新客户端连接最后心跳时间 - [客户端ID={}，上次={}，本次={}]", agentSession.getClientId(), beforeStr, currentStr);
+            WheelTimer.TimeoutHandle oldHandle = agentSession.getTimeoutHandle();
+            if (oldHandle != null && !oldHandle.isCancelled()) {
+                oldHandle.cancel();
             }
+            scheduleTimeout(agentSession);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.manager.domain;
 
 import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.server.timer.WheelTimer;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public final class AgentSession {
     private final String version;
     private final boolean isNew;
     private long lastHeartbeat;
+    private WheelTimer.TimeoutHandle timeoutHandle;
 
     private AgentSession(String sessionId, String clientId, String name,
                          ClientType clientType, Channel control, String token,

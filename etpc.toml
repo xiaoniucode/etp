@@ -31,11 +31,17 @@ localPort = 3006
 autoDomain = true
 subDomains = ["a", "b"]
 status = 1
+[proxies.basic_auth]
+enable = true
+users = [
+    { user = "user1", pass = "pass1" },
+    { user = "user2", pass = "pass2" }
+]
 [proxies.access_control]
 enable = true
-mode = "allow"         # allow（白名单）、deny（黑名单）
-allow = ["43.135.115.160/32"]  # 白名单模式下的允许 IP 列表
-deny = []              # 黑名单模式下的拒绝 IP 列表
+mode = "allow"
+allow = ["43.135.115.160/32"]
+deny = []
 
 [[proxies]]
 name = "fullstack2"

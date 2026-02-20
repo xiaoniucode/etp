@@ -79,7 +79,7 @@ public class TunnelServer implements Lifecycle {
                                     .addLast("protoBufDecoder", new ProtobufDecoder(Message.ControlMessage.getDefaultInstance()))
                                     .addLast("protoBufVarint32LengthFieldPrepender", new ProtobufVarint32LengthFieldPrepender())
                                     .addLast("protoBufEncoder", new ProtobufEncoder())
-                                    .addLast("idleCheckHandler", new IdleCheckHandler(60, 40, 0, TimeUnit.SECONDS))
+                                    .addLast("idleCheckHandler", new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
                                     .addLast("controlTunnelHandler", controlTunnelHandler);
                         }
                     });

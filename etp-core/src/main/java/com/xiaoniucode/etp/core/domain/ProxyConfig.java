@@ -60,6 +60,11 @@ public class ProxyConfig {
     private Boolean compress = false;
     @Setter
     private AccessControlConfig accessControl;
+    /**
+     * HTTP 协议有效
+     */
+    @Setter
+    private BasicAuthConfig basicAuth;
 
     /**
      * 计算域名的类型
