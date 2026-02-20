@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.handler.tunnel;
+package com.xiaoniucode.etp.server.handler.message;
 
 import com.xiaoniucode.etp.core.handler.MessageHandler;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;

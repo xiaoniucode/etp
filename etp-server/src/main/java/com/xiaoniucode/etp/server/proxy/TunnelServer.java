@@ -10,7 +10,7 @@ import com.xiaoniucode.etp.core.tls.SslContextFactory;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
 import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
-import com.xiaoniucode.etp.server.handler.tunnel.ControlTunnelHandler;
+import com.xiaoniucode.etp.server.handler.message.ControlTunnelHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;

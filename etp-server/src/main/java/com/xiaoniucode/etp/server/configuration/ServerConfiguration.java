@@ -3,9 +3,12 @@ package com.xiaoniucode.etp.server.configuration;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
-import com.xiaoniucode.etp.server.handler.tunnel.ControlTunnelHandler;
-import com.xiaoniucode.etp.server.handler.tunnel.HttpVisitorHandler;
-import com.xiaoniucode.etp.server.handler.tunnel.TcpVisitorHandler;
+import com.xiaoniucode.etp.server.handler.http.BasicAuthHandler;
+import com.xiaoniucode.etp.server.handler.http.HttpIpCheckHandler;
+import com.xiaoniucode.etp.server.handler.message.ControlTunnelHandler;
+import com.xiaoniucode.etp.server.handler.http.HttpVisitorHandler;
+import com.xiaoniucode.etp.server.handler.tcp.TcpIpCheckHandler;
+import com.xiaoniucode.etp.server.handler.tcp.TcpVisitorHandler;
 import com.xiaoniucode.etp.server.manager.PortManager;
 import com.xiaoniucode.etp.server.manager.DomainGenerator;
 import com.xiaoniucode.etp.server.manager.DomainManager;
@@ -46,16 +49,20 @@ public class ServerConfiguration {
     }
 
     @Bean
-    public TcpProxyServer tcpProxyServer(TcpVisitorHandler tcpVisitorHandler, EventBus eventBus) {
-        return new TcpProxyServer(tcpVisitorHandler, eventBus);
+    public TcpProxyServer tcpProxyServer(TcpVisitorHandler tcpVisitorHandler, TcpIpCheckHandler tcpIpCheckHandler, EventBus eventBus) {
+        return new TcpProxyServer(tcpVisitorHandler,tcpIpCheckHandler, eventBus);
     }
 
     @Bean
     public HttpProxyServer httpProxyServer(HttpVisitorHandler httpVisitorHandler,
+                                           HttpIpCheckHandler httpIpCheckHandler,
+                                           BasicAuthHandler basicAuthHandler,
                                            EventBus eventBus,
                                            TrafficMetricsHandler trafficMetricsHandler) {
         return new HttpProxyServer(config,
                 httpVisitorHandler,
+                httpIpCheckHandler,
+                basicAuthHandler,
                 eventBus,
                 trafficMetricsHandler);
     }

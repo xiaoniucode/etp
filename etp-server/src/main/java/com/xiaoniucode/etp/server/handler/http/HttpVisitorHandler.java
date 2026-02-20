@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.handler.tunnel;
+package com.xiaoniucode.etp.server.handler.http;
 
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;

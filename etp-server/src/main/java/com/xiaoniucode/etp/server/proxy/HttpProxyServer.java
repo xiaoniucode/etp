@@ -4,8 +4,10 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.handler.message.HostSnifferHandler;
-import com.xiaoniucode.etp.server.handler.tunnel.HttpVisitorHandler;
+import com.xiaoniucode.etp.server.handler.http.BasicAuthHandler;
+import com.xiaoniucode.etp.server.handler.http.HostSnifferHandler;
+import com.xiaoniucode.etp.server.handler.http.HttpIpCheckHandler;
+import com.xiaoniucode.etp.server.handler.http.HttpVisitorHandler;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -31,12 +33,16 @@ public class HttpProxyServer implements Lifecycle {
     private final AppConfig appConfig;
     private final EventBus eventBus;
     private final TrafficMetricsHandler trafficMetricsHandler;
+    private final HttpIpCheckHandler httpIpCheckHandler;
+    private final BasicAuthHandler basicAuthHandler;
 
-    public HttpProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, EventBus eventBus, TrafficMetricsHandler trafficMetricsHandler) {
+    public HttpProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, EventBus eventBus, TrafficMetricsHandler trafficMetricsHandler) {
         this.appConfig = config;
         this.httpVisitorHandler = httpVisitorHandler;
         this.eventBus = eventBus;
-        this.trafficMetricsHandler=trafficMetricsHandler;
+        this.trafficMetricsHandler = trafficMetricsHandler;
+        this.httpIpCheckHandler = httpIpCheckHandler;
+        this.basicAuthHandler = basicAuthHandler;
     }
 
     @Override
@@ -55,8 +61,10 @@ public class HttpProxyServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            sc.pipeline().addLast(trafficMetricsHandler);
                             sc.pipeline().addLast(new HostSnifferHandler());
+                            sc.pipeline().addLast(httpIpCheckHandler);
+                            sc.pipeline().addLast(basicAuthHandler);
+                            sc.pipeline().addLast(trafficMetricsHandler);
                             sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
                             sc.pipeline().addLast(httpVisitorHandler);
                         }

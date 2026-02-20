@@ -4,7 +4,8 @@ import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.event.TcpProxyInitializedEvent;
-import com.xiaoniucode.etp.server.handler.tunnel.TcpVisitorHandler;
+import com.xiaoniucode.etp.server.handler.tcp.TcpIpCheckHandler;
+import com.xiaoniucode.etp.server.handler.tcp.TcpVisitorHandler;
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -32,10 +33,12 @@ public final class TcpProxyServer implements Lifecycle {
     private final AtomicBoolean init = new AtomicBoolean(false);
     private final TcpVisitorHandler tcpVisitorHandler;
     private final EventBus eventBus;
+    private final TcpIpCheckHandler tcpIpCheckHandler;
 
-    public TcpProxyServer(TcpVisitorHandler tcpVisitorHandler, EventBus eventBus) {
+    public TcpProxyServer(TcpVisitorHandler tcpVisitorHandler, TcpIpCheckHandler tcpIpCheckHandler, EventBus eventBus) {
         this.tcpVisitorHandler = tcpVisitorHandler;
         this.eventBus = eventBus;
+        this.tcpIpCheckHandler=tcpIpCheckHandler;
     }
 
     @Override
@@ -54,6 +57,7 @@ public final class TcpProxyServer implements Lifecycle {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
+                        sc.pipeline().addLast(tcpIpCheckHandler);
                         sc.pipeline().addLast(new TrafficMetricsHandler());
                         sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
                         sc.pipeline().addLast(tcpVisitorHandler);

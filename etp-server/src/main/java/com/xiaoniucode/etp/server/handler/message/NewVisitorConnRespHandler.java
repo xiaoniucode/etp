@@ -8,7 +8,7 @@ import com.xiaoniucode.etp.core.handler.bridge.ChannelBridgeCallback;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
-import com.xiaoniucode.etp.server.handler.tunnel.HttpVisitorHandler;
+import com.xiaoniucode.etp.server.handler.http.HttpVisitorHandler;
 import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ProtocolDetection;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
