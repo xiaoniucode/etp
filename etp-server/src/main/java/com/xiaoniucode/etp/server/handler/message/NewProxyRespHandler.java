@@ -2,6 +2,8 @@ package com.xiaoniucode.etp.server.handler.message;
 
 import com.google.protobuf.ProtocolStringList;
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
+import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
+import com.xiaoniucode.etp.core.domain.HttpUser;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
@@ -25,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.xiaoniucode.etp.core.message.Message.ControlMessage;
@@ -120,6 +123,16 @@ public class NewProxyRespHandler implements MessageHandler {
             Set<String> allow = new HashSet<>(accessControl.getAllowList());
             Set<String> deny = new HashSet<>(accessControl.getDenyList());
             config.setAccessControl(new AccessControlConfig(enable, accessControlMode, allow, deny));
+        }
+        if (config.getProtocol().isHttp() && proxy.hasBasicAuth()) {
+            Message.BasicAuth basicAuth = proxy.getBasicAuth();
+            List<Message.HttpUser> httpUsersList = basicAuth.getHttpUsersList();
+            Set<HttpUser> users = new HashSet<>();
+            for (Message.HttpUser httpUser : httpUsersList) {
+                users.add(new HttpUser(httpUser.getUser(),httpUser.getPass()));
+            }
+            BasicAuthConfig basicAuthConfig = new BasicAuthConfig(basicAuth.getEnable(), users);
+            config.setBasicAuth(basicAuthConfig);
         }
         return config;
     }

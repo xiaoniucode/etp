@@ -59,7 +59,6 @@ public class ServerConfiguration {
                 eventBus,
                 trafficMetricsHandler);
     }
-
     @Bean
     public SessionIdGenerator sessionIdGenerator() {
         return new SessionIdGenerator();

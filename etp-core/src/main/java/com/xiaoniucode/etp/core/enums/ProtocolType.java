@@ -80,4 +80,10 @@ public enum ProtocolType {
         return code;
     }
 
+    public boolean isHttp() {
+        return this ==HTTP;
+    }
+    public boolean isTcp() {
+        return this ==TCP;
+    }
 }

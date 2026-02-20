@@ -27,7 +27,7 @@ status = 1
 name = "web11"
 protocol = "http"
 localIp = "localhost"
-localPort = 3006
+localPort = 8030
 autoDomain = true
 subDomains = ["a", "b"]
 status = 1
@@ -65,6 +65,12 @@ compress = false
 enable = true
 mode = "allow"
 allow = ["127.0.0.1"]
+[proxies.basic_auth]
+enable = true
+users = [
+    { user = "user1", pass = "123" },
+    { user = "user2", pass = "456" }
+]
 [[proxies]]
 name = "web22"
 protocol = "http"

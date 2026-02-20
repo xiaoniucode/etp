@@ -53,6 +53,14 @@ message AccessControl {
   repeated string allow = 3;
   repeated string deny = 4;
 }
+message HttpUser{
+  string user = 1;
+  string pass = 2;
+}
+message BasicAuth {
+  bool enable = 1;
+  repeated HttpUser httpUsers = 2;
+}
 message NewProxy {
   string name = 1;
   optional string localIp = 2;
@@ -65,7 +73,8 @@ message NewProxy {
   optional  bool autoDomain = 9;
   repeated string customDomains = 10;
   repeated string subDomains = 11;
-  optional AccessControl access_control = 12;
+  optional AccessControl accessControl = 12;
+  optional BasicAuth basicAuth = 13;
 }
 
 message NewProxyResp {

@@ -30,6 +30,21 @@ public class NettyHttpUtils {
     }
 
     /**
+     * 发送认证
+     */
+    public static ChannelFuture sendBasicAuth(Channel channel) {
+        String response = """
+                HTTP/1.1 401 Unauthorized\r
+                WWW-Authenticate: Basic realm="Authentication Required"\r
+                Content-Type: text/html; charset=UTF-8\r
+                Content-Length: 0\r
+                Connection: close\r
+                \r
+                """;
+        return channel.writeAndFlush(io.netty.buffer.Unpooled.copiedBuffer(response, CharsetUtil.UTF_8));
+    }
+
+    /**
      * 发送 HTTP 200 OK 响应
      *
      * @param channel 通道

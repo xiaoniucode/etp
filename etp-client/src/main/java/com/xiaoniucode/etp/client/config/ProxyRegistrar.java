@@ -2,6 +2,8 @@ package com.xiaoniucode.etp.client.config;
 
 import com.xiaoniucode.etp.client.manager.AgentSessionManager;
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
+import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
+import com.xiaoniucode.etp.core.domain.HttpUser;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
@@ -94,6 +96,21 @@ public class ProxyRegistrar {
                 }
                 builder.addAllCustomDomains(config.getCustomDomains());
                 builder.addAllSubDomains(config.getSubDomains());
+                BasicAuthConfig basicAuth = config.getBasicAuth();
+                if (basicAuth!=null){
+                    Message.BasicAuth.Builder basicAuthBuilder = Message.BasicAuth.newBuilder().setEnable(basicAuth.isEnable());
+                    Set<HttpUser> users = basicAuth.getUsers();
+                    if (users!=null&&!users.isEmpty()){
+                        for (HttpUser user : users) {
+                            Message.HttpUser httpUser = Message.HttpUser.newBuilder()
+                                    .setUser(user.getUser())
+                                    .setPass(user.getPass())
+                                    .build();
+                            basicAuthBuilder.addHttpUsers(httpUser);
+                        }
+                    }
+                    builder.setBasicAuth(basicAuthBuilder.build());
+                }
                 break;
         }
         AccessControlConfig access = config.getAccessControl();

@@ -97,11 +97,9 @@ public class BasicAuthServiceImpl implements BasicAuthService {
 
     @Override
     public void addUsers(List<AddHttpUserRequest> httpUsers) {
-        // 使用转换器批量转换 AddHttpUserRequest 为 HttpUser
         List<HttpUser> users = httpUsers.stream()
                 .map(BasicAuthConvert.INSTANCE::toHttpUser)
                 .toList();
-        // 批量保存用户
-        httpUserRepository.saveAll(users);
+        httpUserRepository.saveAllAndFlush(users);
     }
 }

@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.handler.message;
 
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.handler.utils.NettyHttpUtils;
@@ -10,7 +11,6 @@ import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.DomainManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -81,6 +82,38 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                         visitor.close();
                         return;
                     }
+                    //Basic Auth 认证
+                    BasicAuthConfig basicAuth = config.getBasicAuth();
+                    if (basicAuth != null && basicAuth.isEnable()) {
+                        String authHeader = parseAuthHeader(content);
+                        if (authHeader == null || !authHeader.toLowerCase().startsWith("basic ")) {
+                            NettyHttpUtils.sendBasicAuth(visitor);
+                            return;
+                        }
+
+                        try {
+                            String base64Credentials = authHeader.substring(6).trim();
+                            String credentials = new String(Base64.getDecoder().decode(base64Credentials), CharsetUtil.UTF_8);
+                            String[] parts = credentials.split(":", 2);
+
+                            if (parts.length == 2) {
+                                String username = parts[0];
+                                String password = parts[1];
+                                if (!basicAuth.check(username, password)) {
+                                    NettyHttpUtils.sendBasicAuth(visitor);
+                                    return;
+                                }
+                            } else {
+                                NettyHttpUtils.sendBasicAuth(visitor);
+                                return;
+                            }
+                        } catch (Exception e) {
+                            logger.debug("Basic Auth 解码失败: {}", e.getMessage());
+                            NettyHttpUtils.sendBasicAuth(visitor);
+                            return;
+                        }
+                    }
+
                 }
                 isHttp = true;
             }
@@ -95,6 +128,22 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             visitor.attr(ChannelConstants.VISIT_DOMAIN).set(domain);
         }
         ctx.pipeline().remove(this);
+    }
+    /**
+     * 解析 Authorization 头
+     */
+    private String parseAuthHeader(String content) {
+        String[] lines = content.split("\\r?\\n");
+        for (String line : lines) {
+            String trimmedLine = line.trim();
+            if (trimmedLine.toLowerCase().startsWith("authorization:")) {
+                int colonIndex = trimmedLine.indexOf(':');
+                if (colonIndex != -1) {
+                    return trimmedLine.substring(colonIndex + 1).trim();
+                }
+            }
+        }
+        return null;
     }
 
     private boolean isHttp(String content) {
@@ -111,8 +160,12 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
     private String parseHost(String content) {
         String[] lines = content.split("\\r?\\n");
         for (String line : lines) {
-            if (line.toLowerCase().startsWith("host:")) {
-                return line.substring(5).trim();
+            String trimmedLine = line.trim();
+            if (trimmedLine.toLowerCase().startsWith("host:")) {
+                int colonIndex = trimmedLine.indexOf(':');
+                if (colonIndex != -1) {
+                    return trimmedLine.substring(colonIndex + 1).trim();
+                }
             }
         }
         return null;
