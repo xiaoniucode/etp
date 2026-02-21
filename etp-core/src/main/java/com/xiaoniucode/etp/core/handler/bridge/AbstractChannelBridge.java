@@ -39,6 +39,7 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
         }
         // 转发数据到对端
         forwardToTarget(ctx, msg);
+        //不能调用 fireChannelRead 方法，数据会重复处理
     }
 
     @Override
@@ -51,7 +52,7 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
-        logger.debug("bridge exception: direction={}, {}", direction, cause.getMessage());
+        logger.warn("数据转发异常: 数据流方向={}, {}", direction, cause.getMessage());
         closeOnFlush(ctx.channel());
         closeOnFlush(target);
         ctx.fireExceptionCaught(cause);
@@ -69,12 +70,18 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
     }
 
     private void forwardToTarget(ChannelHandlerContext ctx, Object msg) {
+        if (!target.isActive()) {
+            ReferenceCountUtil.release(msg);
+            return;
+        }
         ReferenceCountUtil.retain(msg);
         target.writeAndFlush(msg).addListener((ChannelFutureListener) f -> {
             try {
                 if (!f.isSuccess()) {
                     logger.error("消息转发失败: {}", f.cause().getMessage());
+                    //关闭当前读数据的通道
                     closeOnFlush(ctx.channel());
+                    //关闭要写入的目标通道
                     closeOnFlush(target);
                 }
             } finally {

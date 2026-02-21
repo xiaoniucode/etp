@@ -4,14 +4,11 @@ import com.xiaoniucode.etp.core.domain.BandwidthConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.handler.ChannelSwitcher;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
-import com.xiaoniucode.etp.core.handler.bridge.ChannelBridgeCallback;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
-import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.handler.BandwidthLimiter;
 import com.xiaoniucode.etp.server.handler.factory.ServerBridgeFactory;
 import com.xiaoniucode.etp.server.handler.http.HttpVisitorHandler;
-import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ProtocolDetection;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
@@ -23,8 +20,6 @@ import org.slf4j.LoggerFactory;
 import com.xiaoniucode.etp.core.message.Message.ControlMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 处理来自代理客户端连接成功消息
@@ -56,62 +51,18 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
         visitorSession.setTunnel(tunnel);
         //将控制隧道切换为数据隧道
         ChannelSwitcher.switchToDataTunnel(tunnel.pipeline(), config.getCompress(), config.getEncrypt());
-        ChannelBridgeCallback callback = new ChannelBridgeCallback() {
-            /**
-             * 由于是双向通道，所以会出现两次调用回调接口，需要做防重处理
-             */
-            private final AtomicBoolean executed = new AtomicBoolean(false);
-
-            @Override
-            public void onChannelInactive(Channel channel, Channel peer) {
-                if (executed.compareAndSet(false, true)) {
-                    logger.debug("访问者连接断开，释放资源");
-                    visitorSessionManager.disconnect(visitor, session -> {
-                        Channel control = session.getControl();
-                        Message.ControlMessage message = MessageUtils
-                                .buildCloseProxy(session.getSessionId());
-                        control.writeAndFlush(message);
-                    });
-                    ChannelUtils.closeOnFlush(visitor);
-                }
-
-            }
-
-            @Override
-            public void onExceptionCaught(Channel channel, Channel peer, Throwable cause) {
-                if (executed.compareAndSet(false, true)) {
-                    logger.error(cause.getMessage(), cause);
-                    visitorSessionManager.disconnect(visitor, session -> {
-                        Channel control = session.getControl();
-                        Message.ControlMessage message = MessageUtils.buildCloseProxy(session.getSessionId());
-                        control.writeAndFlush(message);
-
-                    });
-                    ChannelUtils.closeOnFlush(visitor);
-                }
-            }
-
-            @Override
-            public void onChannelWritabilityChanged(Channel channel, Channel peer, boolean isWritable) {
-                VisitorSession visitorSession = visitorSessionManager.getVisitorSession(visitor);
-                Channel tunnel = visitorSession.getTunnel();
-                if (tunnel != null) {
-                    tunnel.config().setOption(ChannelOption.AUTO_READ, visitor.isWritable());
-                }
-            }
-        };
         if (config.hasBandwidthLimit()){
             BandwidthConfig bandwidth = config.getBandwidth();
             BandwidthLimiter bandwidthLimiter = new BandwidthLimiter(bandwidth);
-            ServerBridgeFactory.bridge(visitor,tunnel,bandwidthLimiter,config.getProxyId(),config.getProtocol());
+            ServerBridgeFactory.bridge(visitorSessionManager,visitor,tunnel,bandwidthLimiter,config.getProxyId(),config.getProtocol());
         }else {
-            ServerBridgeFactory.bridge(visitor,tunnel,config.getProxyId(),config.getProtocol());
+            ServerBridgeFactory.bridge(visitorSessionManager,visitor,tunnel,config.getProxyId(),config.getProtocol());
         }
         if (ProtocolDetection.isHttp(visitor)) {
             visitor.attr(ChannelConstants.CONNECTED).set(true);
             httpVisitorHandler.sendFirstPackage(visitorSession);
         }
         visitor.config().setOption(ChannelOption.AUTO_READ, true);
-        logger.debug("已连接到目标服务");
+        logger.debug("已连接到目标服务: [proxyName={},localIp={},localPort={}]",config.getName(),config.getLocalIp(),config.getLocalPort());
     }
 }

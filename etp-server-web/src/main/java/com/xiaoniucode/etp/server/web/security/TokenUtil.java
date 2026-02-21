@@ -71,7 +71,7 @@ public class TokenUtil {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (Exception e) {
-            logger.warn("解析JWT令牌失败: {}", e.getMessage());
+            logger.debug("无效登陆令牌");
             throw e;
         }
     }

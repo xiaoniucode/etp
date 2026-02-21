@@ -81,9 +81,9 @@ encrypt = false
 compress = false
 
 [proxies.bandwidth] #带宽限制
-limit = "2M" #总带宽限制(可选)
-limitIn = "1M" #入口带宽限制(可选)
-limitOut = "128k" #出口带宽限制(可选)
+limit = "20M" #总带宽限制(可选)
+limitIn = "2M" #入口带宽限制(可选)
+limitOut = "2M" #出口带宽限制(可选)
 [[proxies]]
 name = "mysql"
 protocol = "tcp"

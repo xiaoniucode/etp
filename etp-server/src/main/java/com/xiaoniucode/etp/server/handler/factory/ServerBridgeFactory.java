@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.handler.BandwidthLimiter;
 import com.xiaoniucode.etp.server.handler.BridgeRole;
 import com.xiaoniucode.etp.server.handler.ServerChannelBridge;
+import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
 import io.netty.channel.Channel;
 
 /**
@@ -15,10 +16,11 @@ public class ServerBridgeFactory {
     /**
      * 创建双向桥接（带限流）
      */
-    public static void bridge(Channel visitor, Channel tunnel,
+    public static void bridge(VisitorSessionManager visitorSessionManager,Channel visitor, Channel tunnel,
                               BandwidthLimiter limiter, String proxyId, ProtocolType protocol) {
         // 上传 受limitOut 限制
         visitor.pipeline().addLast(new ServerChannelBridge(
+                 visitorSessionManager,
                 tunnel,
                 "visitor->tunnel",
                 limiter,
@@ -29,6 +31,7 @@ public class ServerBridgeFactory {
 
         //下载 受limitIn 限制
         tunnel.pipeline().addLast(new ServerChannelBridge(
+                visitorSessionManager,
                 visitor,
                 "tunnel->visitor",
                 limiter,
@@ -41,7 +44,7 @@ public class ServerBridgeFactory {
     /**
      * 创建无限流双向桥接器
      */
-    public static void bridge(Channel visitor, Channel tunnel, String proxyId,ProtocolType protocol) {
-        bridge(visitor, tunnel, null, proxyId,protocol);
+    public static void bridge(VisitorSessionManager visitorSessionManager,Channel visitor, Channel tunnel, String proxyId,ProtocolType protocol) {
+        bridge(visitorSessionManager,visitor, tunnel, null, proxyId,protocol);
     }
 }
