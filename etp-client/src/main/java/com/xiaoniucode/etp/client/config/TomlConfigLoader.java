@@ -180,6 +180,15 @@ public class TomlConfigLoader implements ConfigSource {
                         proxyConfig.setBasicAuth(new BasicAuthConfig(enable, sets));
                     }
                 }
+                //带宽限制
+                Toml bandwidth = proxyTable.getTable("bandwidth");
+                if (bandwidth!=null){
+                    String limit = bandwidth.getString("limit");
+                    String limitIn= bandwidth.getString("limitIn");
+                    String limitOut = bandwidth.getString("limitOut");
+                    BandwidthConfig bandwidthConfig = new BandwidthConfig(limit, limitIn, limitOut);
+                    proxyConfig.setBandwidth(bandwidthConfig);
+                }
             }
             builder.proxies(proxies);
         }

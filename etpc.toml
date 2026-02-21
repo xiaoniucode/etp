@@ -92,10 +92,29 @@ remotePort = 3307
 status = 1
 encrypt = false
 compress = false
-[proxies.access_control]
+#tunnelType = "shared" #dedicated
+[proxies.bandwidth] #带宽限制
+limit = "1M" #总带宽限制(可选)
+limitIn = "512K" #入口带宽限制(可选)
+limitOut = "512K" #出口带宽限制(可选)
+[proxies.access_control] #访问控制
 enable = true
 mode = "allow"
 allow = ["127.0.0.1"]
+deny = []
+[[proxies]]
+name = "mysql2"
+protocol = "tcp"
+localPort = 3306
+remotePort = 3308
+status = 1
+encrypt = false
+compress = false
+
+[proxies.access_control]
+enable = true
+mode = "allow"
+allow = ["127.0.0.2"]
 deny = []
 
 [[proxies]]

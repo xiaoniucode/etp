@@ -1,14 +1,13 @@
 package com.xiaoniucode.etp.client.config;
 
+import lombok.Setter;
+
 public class ConfigUtils {
+    @Setter
     private static AppConfig config;
     
     private ConfigUtils() {}
-    
-    public static void setConfig(AppConfig appConfig) {
-        config = appConfig;
-    }
-    
+
     public static AppConfig getConfig() {
         if (config == null) {
             throw new IllegalStateException("Config not set");

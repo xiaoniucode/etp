@@ -1,10 +1,7 @@
 package com.xiaoniucode.etp.server.handler.message;
 
 import com.google.protobuf.ProtocolStringList;
-import com.xiaoniucode.etp.core.domain.AccessControlConfig;
-import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
-import com.xiaoniucode.etp.core.domain.HttpUser;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.core.handler.MessageHandler;
@@ -27,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.xiaoniucode.etp.core.message.Message.ControlMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,13 +123,18 @@ public class NewProxyRespHandler implements MessageHandler {
         }
         if (config.getProtocol().isHttp() && proxy.hasBasicAuth()) {
             Message.BasicAuth basicAuth = proxy.getBasicAuth();
-            List<Message.HttpUser> httpUsersList = basicAuth.getHttpUsersList();
-            Set<HttpUser> users = new HashSet<>();
-            for (Message.HttpUser httpUser : httpUsersList) {
-                users.add(new HttpUser(httpUser.getUser(),httpUser.getPass()));
-            }
+            Set<HttpUser> users = basicAuth.getHttpUsersList().stream()
+                    .map(httpUser -> new HttpUser(httpUser.getUser(), httpUser.getPass()))
+                    .collect(Collectors.toSet());
             BasicAuthConfig basicAuthConfig = new BasicAuthConfig(basicAuth.getEnable(), users);
             config.setBasicAuth(basicAuthConfig);
+        }
+        if (proxy.hasBandwidth()){
+            Message.Bandwidth bandwidth = proxy.getBandwidth();
+            BandwidthConfig bandwidthConfig = new BandwidthConfig(bandwidth.getLimit(),
+                    bandwidth.getLimitIn(),
+                    bandwidth.getLimitOut());
+            config.setBandwidth(bandwidthConfig);
         }
         return config;
     }

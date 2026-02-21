@@ -61,6 +61,12 @@ message BasicAuth {
   bool enable = 1;
   repeated HttpUser httpUsers = 2;
 }
+
+message Bandwidth{
+  optional string limit = 1;
+  optional string limitIn = 2;
+  optional string limitOut = 3;
+}
 message NewProxy {
   string name = 1;
   optional string localIp = 2;
@@ -75,6 +81,7 @@ message NewProxy {
   repeated string subDomains = 11;
   optional AccessControl accessControl = 12;
   optional BasicAuth basicAuth = 13;
+  optional Bandwidth bandwidth = 14;
 }
 
 message NewProxyResp {

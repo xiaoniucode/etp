@@ -43,7 +43,7 @@ public class EtpClientProperties {
     private Integer serverPort = 9527;
 
     @NestedConfigurationProperty
-    private Auth auth = new Auth();
+    private AuthProperties auth = new AuthProperties();
     /**
      * TLS 加密
      */
@@ -53,7 +53,7 @@ public class EtpClientProperties {
      * 访问控制
      */
     @NestedConfigurationProperty
-    private AccessControl accessControl = new AccessControl();
+    private AccessControlProperties accessControl = new AccessControlProperties();
     /**
      * 公网端口
      */
@@ -89,7 +89,7 @@ public class EtpClientProperties {
         }
         if (auth != null && auth.getRetry() != null) {
             RetryConfig retryConfig = new RetryConfig();
-            Auth.Retry retry = auth.getRetry();
+            AuthProperties.RetryProperties retry = auth.getRetry();
             if (retry.getMaxRetries() != null) {
                 retryConfig.setMaxRetries(retry.getMaxRetries());
             }
@@ -117,7 +117,7 @@ public class EtpClientProperties {
     }
 
     @Getter
-    static class AccessControl implements Serializable {
+    static class AccessControlProperties implements Serializable {
         @Setter
         private boolean enable = false;
         @Setter
@@ -144,13 +144,13 @@ public class EtpClientProperties {
 
     @Getter
     @Setter
-    static class Auth {
+    static class AuthProperties {
         private String token;
         /**
          * 重试配置
          */
         @NestedConfigurationProperty
-        private Retry retry = new Retry();
+        private RetryProperties retry = new RetryProperties();
 
         /**
          * 重试配置
@@ -159,7 +159,7 @@ public class EtpClientProperties {
          */
         @Getter
         @Setter
-        static class Retry {
+        static class RetryProperties {
             /**
              * 初始重试延迟（秒）
              */

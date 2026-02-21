@@ -29,4 +29,11 @@ public class AccessControlConfig implements Serializable {
             this.deny.addAll(deny);
         }
     }
+
+    public boolean hasAllow() {
+        return !allow.isEmpty();
+    }
+    public boolean hasDeny() {
+        return !deny.isEmpty();
+    }
 }

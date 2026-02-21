@@ -5439,6 +5439,893 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
   }
 
+  public interface BandwidthOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.Bandwidth)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>optional string limit = 1;</code>
+     * @return Whether the limit field is set.
+     */
+    boolean hasLimit();
+    /**
+     * <code>optional string limit = 1;</code>
+     * @return The limit.
+     */
+    java.lang.String getLimit();
+    /**
+     * <code>optional string limit = 1;</code>
+     * @return The bytes for limit.
+     */
+    com.google.protobuf.ByteString
+        getLimitBytes();
+
+    /**
+     * <code>optional string limitIn = 2;</code>
+     * @return Whether the limitIn field is set.
+     */
+    boolean hasLimitIn();
+    /**
+     * <code>optional string limitIn = 2;</code>
+     * @return The limitIn.
+     */
+    java.lang.String getLimitIn();
+    /**
+     * <code>optional string limitIn = 2;</code>
+     * @return The bytes for limitIn.
+     */
+    com.google.protobuf.ByteString
+        getLimitInBytes();
+
+    /**
+     * <code>optional string limitOut = 3;</code>
+     * @return Whether the limitOut field is set.
+     */
+    boolean hasLimitOut();
+    /**
+     * <code>optional string limitOut = 3;</code>
+     * @return The limitOut.
+     */
+    java.lang.String getLimitOut();
+    /**
+     * <code>optional string limitOut = 3;</code>
+     * @return The bytes for limitOut.
+     */
+    com.google.protobuf.ByteString
+        getLimitOutBytes();
+  }
+  /**
+   * Protobuf type {@code com.xiaoniucode.etp.core.message.Bandwidth}
+   */
+  public static final class Bandwidth extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.message.Bandwidth)
+      BandwidthOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "Bandwidth");
+    }
+    // Use Bandwidth.newBuilder() to construct.
+    private Bandwidth(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private Bandwidth() {
+      limit_ = "";
+      limitIn_ = "";
+      limitOut_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_Bandwidth_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_Bandwidth_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.xiaoniucode.etp.core.message.Message.Bandwidth.class, com.xiaoniucode.etp.core.message.Message.Bandwidth.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int LIMIT_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object limit_ = "";
+    /**
+     * <code>optional string limit = 1;</code>
+     * @return Whether the limit field is set.
+     */
+    @java.lang.Override
+    public boolean hasLimit() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>optional string limit = 1;</code>
+     * @return The limit.
+     */
+    @java.lang.Override
+    public java.lang.String getLimit() {
+      java.lang.Object ref = limit_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        limit_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>optional string limit = 1;</code>
+     * @return The bytes for limit.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getLimitBytes() {
+      java.lang.Object ref = limit_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        limit_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LIMITIN_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object limitIn_ = "";
+    /**
+     * <code>optional string limitIn = 2;</code>
+     * @return Whether the limitIn field is set.
+     */
+    @java.lang.Override
+    public boolean hasLimitIn() {
+      return ((bitField0_ & 0x00000002) != 0);
+    }
+    /**
+     * <code>optional string limitIn = 2;</code>
+     * @return The limitIn.
+     */
+    @java.lang.Override
+    public java.lang.String getLimitIn() {
+      java.lang.Object ref = limitIn_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        limitIn_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>optional string limitIn = 2;</code>
+     * @return The bytes for limitIn.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getLimitInBytes() {
+      java.lang.Object ref = limitIn_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        limitIn_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LIMITOUT_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object limitOut_ = "";
+    /**
+     * <code>optional string limitOut = 3;</code>
+     * @return Whether the limitOut field is set.
+     */
+    @java.lang.Override
+    public boolean hasLimitOut() {
+      return ((bitField0_ & 0x00000004) != 0);
+    }
+    /**
+     * <code>optional string limitOut = 3;</code>
+     * @return The limitOut.
+     */
+    @java.lang.Override
+    public java.lang.String getLimitOut() {
+      java.lang.Object ref = limitOut_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        limitOut_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>optional string limitOut = 3;</code>
+     * @return The bytes for limitOut.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getLimitOutBytes() {
+      java.lang.Object ref = limitOut_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        limitOut_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (((bitField0_ & 0x00000001) != 0)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, limit_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, limitIn_);
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 3, limitOut_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, limit_);
+      }
+      if (((bitField0_ & 0x00000002) != 0)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, limitIn_);
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, limitOut_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.xiaoniucode.etp.core.message.Message.Bandwidth)) {
+        return super.equals(obj);
+      }
+      com.xiaoniucode.etp.core.message.Message.Bandwidth other = (com.xiaoniucode.etp.core.message.Message.Bandwidth) obj;
+
+      if (hasLimit() != other.hasLimit()) return false;
+      if (hasLimit()) {
+        if (!getLimit()
+            .equals(other.getLimit())) return false;
+      }
+      if (hasLimitIn() != other.hasLimitIn()) return false;
+      if (hasLimitIn()) {
+        if (!getLimitIn()
+            .equals(other.getLimitIn())) return false;
+      }
+      if (hasLimitOut() != other.hasLimitOut()) return false;
+      if (hasLimitOut()) {
+        if (!getLimitOut()
+            .equals(other.getLimitOut())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasLimit()) {
+        hash = (37 * hash) + LIMIT_FIELD_NUMBER;
+        hash = (53 * hash) + getLimit().hashCode();
+      }
+      if (hasLimitIn()) {
+        hash = (37 * hash) + LIMITIN_FIELD_NUMBER;
+        hash = (53 * hash) + getLimitIn().hashCode();
+      }
+      if (hasLimitOut()) {
+        hash = (37 * hash) + LIMITOUT_FIELD_NUMBER;
+        hash = (53 * hash) + getLimitOut().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(com.xiaoniucode.etp.core.message.Message.Bandwidth prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code com.xiaoniucode.etp.core.message.Bandwidth}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.message.Bandwidth)
+        com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_Bandwidth_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_Bandwidth_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.xiaoniucode.etp.core.message.Message.Bandwidth.class, com.xiaoniucode.etp.core.message.Message.Bandwidth.Builder.class);
+      }
+
+      // Construct using com.xiaoniucode.etp.core.message.Message.Bandwidth.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        limit_ = "";
+        limitIn_ = "";
+        limitOut_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_Bandwidth_descriptor;
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.Bandwidth getDefaultInstanceForType() {
+        return com.xiaoniucode.etp.core.message.Message.Bandwidth.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.Bandwidth build() {
+        com.xiaoniucode.etp.core.message.Message.Bandwidth result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.Bandwidth buildPartial() {
+        com.xiaoniucode.etp.core.message.Message.Bandwidth result = new com.xiaoniucode.etp.core.message.Message.Bandwidth(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(com.xiaoniucode.etp.core.message.Message.Bandwidth result) {
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.limit_ = limit_;
+          to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.limitIn_ = limitIn_;
+          to_bitField0_ |= 0x00000002;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.limitOut_ = limitOut_;
+          to_bitField0_ |= 0x00000004;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.xiaoniucode.etp.core.message.Message.Bandwidth) {
+          return mergeFrom((com.xiaoniucode.etp.core.message.Message.Bandwidth)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.Bandwidth other) {
+        if (other == com.xiaoniucode.etp.core.message.Message.Bandwidth.getDefaultInstance()) return this;
+        if (other.hasLimit()) {
+          limit_ = other.limit_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (other.hasLimitIn()) {
+          limitIn_ = other.limitIn_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (other.hasLimitOut()) {
+          limitOut_ = other.limitOut_;
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                limit_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                limitIn_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                limitOut_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object limit_ = "";
+      /**
+       * <code>optional string limit = 1;</code>
+       * @return Whether the limit field is set.
+       */
+      public boolean hasLimit() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <code>optional string limit = 1;</code>
+       * @return The limit.
+       */
+      public java.lang.String getLimit() {
+        java.lang.Object ref = limit_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          limit_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string limit = 1;</code>
+       * @return The bytes for limit.
+       */
+      public com.google.protobuf.ByteString
+          getLimitBytes() {
+        java.lang.Object ref = limit_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          limit_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string limit = 1;</code>
+       * @param value The limit to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLimit(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        limit_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string limit = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLimit() {
+        limit_ = getDefaultInstance().getLimit();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string limit = 1;</code>
+       * @param value The bytes for limit to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLimitBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        limit_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object limitIn_ = "";
+      /**
+       * <code>optional string limitIn = 2;</code>
+       * @return Whether the limitIn field is set.
+       */
+      public boolean hasLimitIn() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>optional string limitIn = 2;</code>
+       * @return The limitIn.
+       */
+      public java.lang.String getLimitIn() {
+        java.lang.Object ref = limitIn_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          limitIn_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string limitIn = 2;</code>
+       * @return The bytes for limitIn.
+       */
+      public com.google.protobuf.ByteString
+          getLimitInBytes() {
+        java.lang.Object ref = limitIn_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          limitIn_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string limitIn = 2;</code>
+       * @param value The limitIn to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLimitIn(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        limitIn_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string limitIn = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLimitIn() {
+        limitIn_ = getDefaultInstance().getLimitIn();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string limitIn = 2;</code>
+       * @param value The bytes for limitIn to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLimitInBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        limitIn_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object limitOut_ = "";
+      /**
+       * <code>optional string limitOut = 3;</code>
+       * @return Whether the limitOut field is set.
+       */
+      public boolean hasLimitOut() {
+        return ((bitField0_ & 0x00000004) != 0);
+      }
+      /**
+       * <code>optional string limitOut = 3;</code>
+       * @return The limitOut.
+       */
+      public java.lang.String getLimitOut() {
+        java.lang.Object ref = limitOut_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          limitOut_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string limitOut = 3;</code>
+       * @return The bytes for limitOut.
+       */
+      public com.google.protobuf.ByteString
+          getLimitOutBytes() {
+        java.lang.Object ref = limitOut_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          limitOut_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string limitOut = 3;</code>
+       * @param value The limitOut to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLimitOut(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        limitOut_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string limitOut = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLimitOut() {
+        limitOut_ = getDefaultInstance().getLimitOut();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string limitOut = 3;</code>
+       * @param value The bytes for limitOut to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLimitOutBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        limitOut_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.Bandwidth)
+    }
+
+    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.message.Bandwidth)
+    private static final com.xiaoniucode.etp.core.message.Message.Bandwidth DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.xiaoniucode.etp.core.message.Message.Bandwidth();
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.Bandwidth getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Bandwidth>
+        PARSER = new com.google.protobuf.AbstractParser<Bandwidth>() {
+      @java.lang.Override
+      public Bandwidth parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<Bandwidth> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Bandwidth> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.Bandwidth getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface NewProxyOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.NewProxy)
       com.google.protobuf.MessageOrBuilder {
@@ -5623,6 +6510,21 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basicAuth = 13;</code>
      */
     com.xiaoniucode.etp.core.message.Message.BasicAuthOrBuilder getBasicAuthOrBuilder();
+
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+     * @return Whether the bandwidth field is set.
+     */
+    boolean hasBandwidth();
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+     * @return The bandwidth.
+     */
+    com.xiaoniucode.etp.core.message.Message.Bandwidth getBandwidth();
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+     */
+    com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder getBandwidthOrBuilder();
   }
   /**
    * Protobuf type {@code com.xiaoniucode.etp.core.message.NewProxy}
@@ -6005,6 +6907,32 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return basicAuth_ == null ? com.xiaoniucode.etp.core.message.Message.BasicAuth.getDefaultInstance() : basicAuth_;
     }
 
+    public static final int BANDWIDTH_FIELD_NUMBER = 14;
+    private com.xiaoniucode.etp.core.message.Message.Bandwidth bandwidth_;
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+     * @return Whether the bandwidth field is set.
+     */
+    @java.lang.Override
+    public boolean hasBandwidth() {
+      return ((bitField0_ & 0x00000100) != 0);
+    }
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+     * @return The bandwidth.
+     */
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.Bandwidth getBandwidth() {
+      return bandwidth_ == null ? com.xiaoniucode.etp.core.message.Message.Bandwidth.getDefaultInstance() : bandwidth_;
+    }
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+     */
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder getBandwidthOrBuilder() {
+      return bandwidth_ == null ? com.xiaoniucode.etp.core.message.Message.Bandwidth.getDefaultInstance() : bandwidth_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -6057,6 +6985,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       if (((bitField0_ & 0x00000080) != 0)) {
         output.writeMessage(13, getBasicAuth());
+      }
+      if (((bitField0_ & 0x00000100) != 0)) {
+        output.writeMessage(14, getBandwidth());
       }
       getUnknownFields().writeTo(output);
     }
@@ -6125,6 +7056,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(13, getBasicAuth());
       }
+      if (((bitField0_ & 0x00000100) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(14, getBandwidth());
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -6189,6 +7124,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (!getBasicAuth()
             .equals(other.getBasicAuth())) return false;
       }
+      if (hasBandwidth() != other.hasBandwidth()) return false;
+      if (hasBandwidth()) {
+        if (!getBandwidth()
+            .equals(other.getBandwidth())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -6248,6 +7188,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (hasBasicAuth()) {
         hash = (37 * hash) + BASICAUTH_FIELD_NUMBER;
         hash = (53 * hash) + getBasicAuth().hashCode();
+      }
+      if (hasBandwidth()) {
+        hash = (37 * hash) + BANDWIDTH_FIELD_NUMBER;
+        hash = (53 * hash) + getBandwidth().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -6381,6 +7325,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 .alwaysUseFieldBuilders) {
           internalGetAccessControlFieldBuilder();
           internalGetBasicAuthFieldBuilder();
+          internalGetBandwidthFieldBuilder();
         }
       }
       @java.lang.Override
@@ -6409,6 +7354,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (basicAuthBuilder_ != null) {
           basicAuthBuilder_.dispose();
           basicAuthBuilder_ = null;
+        }
+        bandwidth_ = null;
+        if (bandwidthBuilder_ != null) {
+          bandwidthBuilder_.dispose();
+          bandwidthBuilder_ = null;
         }
         return this;
       }
@@ -6497,6 +7447,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
               : basicAuthBuilder_.build();
           to_bitField0_ |= 0x00000080;
         }
+        if (((from_bitField0_ & 0x00002000) != 0)) {
+          result.bandwidth_ = bandwidthBuilder_ == null
+              ? bandwidth_
+              : bandwidthBuilder_.build();
+          to_bitField0_ |= 0x00000100;
+        }
         result.bitField0_ |= to_bitField0_;
       }
 
@@ -6568,6 +7524,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
         if (other.hasBasicAuth()) {
           mergeBasicAuth(other.getBasicAuth());
+        }
+        if (other.hasBandwidth()) {
+          mergeBandwidth(other.getBandwidth());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -6666,6 +7625,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 bitField0_ |= 0x00001000;
                 break;
               } // case 106
+              case 114: {
+                input.readMessage(
+                    internalGetBandwidthFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00002000;
+                break;
+              } // case 114
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -7579,6 +8545,127 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           basicAuth_ = null;
         }
         return basicAuthBuilder_;
+      }
+
+      private com.xiaoniucode.etp.core.message.Message.Bandwidth bandwidth_;
+      private com.google.protobuf.SingleFieldBuilder<
+          com.xiaoniucode.etp.core.message.Message.Bandwidth, com.xiaoniucode.etp.core.message.Message.Bandwidth.Builder, com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder> bandwidthBuilder_;
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+       * @return Whether the bandwidth field is set.
+       */
+      public boolean hasBandwidth() {
+        return ((bitField0_ & 0x00002000) != 0);
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+       * @return The bandwidth.
+       */
+      public com.xiaoniucode.etp.core.message.Message.Bandwidth getBandwidth() {
+        if (bandwidthBuilder_ == null) {
+          return bandwidth_ == null ? com.xiaoniucode.etp.core.message.Message.Bandwidth.getDefaultInstance() : bandwidth_;
+        } else {
+          return bandwidthBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+       */
+      public Builder setBandwidth(com.xiaoniucode.etp.core.message.Message.Bandwidth value) {
+        if (bandwidthBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          bandwidth_ = value;
+        } else {
+          bandwidthBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00002000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+       */
+      public Builder setBandwidth(
+          com.xiaoniucode.etp.core.message.Message.Bandwidth.Builder builderForValue) {
+        if (bandwidthBuilder_ == null) {
+          bandwidth_ = builderForValue.build();
+        } else {
+          bandwidthBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00002000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+       */
+      public Builder mergeBandwidth(com.xiaoniucode.etp.core.message.Message.Bandwidth value) {
+        if (bandwidthBuilder_ == null) {
+          if (((bitField0_ & 0x00002000) != 0) &&
+            bandwidth_ != null &&
+            bandwidth_ != com.xiaoniucode.etp.core.message.Message.Bandwidth.getDefaultInstance()) {
+            getBandwidthBuilder().mergeFrom(value);
+          } else {
+            bandwidth_ = value;
+          }
+        } else {
+          bandwidthBuilder_.mergeFrom(value);
+        }
+        if (bandwidth_ != null) {
+          bitField0_ |= 0x00002000;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+       */
+      public Builder clearBandwidth() {
+        bitField0_ = (bitField0_ & ~0x00002000);
+        bandwidth_ = null;
+        if (bandwidthBuilder_ != null) {
+          bandwidthBuilder_.dispose();
+          bandwidthBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+       */
+      public com.xiaoniucode.etp.core.message.Message.Bandwidth.Builder getBandwidthBuilder() {
+        bitField0_ |= 0x00002000;
+        onChanged();
+        return internalGetBandwidthFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+       */
+      public com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder getBandwidthOrBuilder() {
+        if (bandwidthBuilder_ != null) {
+          return bandwidthBuilder_.getMessageOrBuilder();
+        } else {
+          return bandwidth_ == null ?
+              com.xiaoniucode.etp.core.message.Message.Bandwidth.getDefaultInstance() : bandwidth_;
+        }
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 14;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          com.xiaoniucode.etp.core.message.Message.Bandwidth, com.xiaoniucode.etp.core.message.Message.Bandwidth.Builder, com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder> 
+          internalGetBandwidthFieldBuilder() {
+        if (bandwidthBuilder_ == null) {
+          bandwidthBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              com.xiaoniucode.etp.core.message.Message.Bandwidth, com.xiaoniucode.etp.core.message.Message.Bandwidth.Builder, com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder>(
+                  getBandwidth(),
+                  getParentForChildren(),
+                  isClean());
+          bandwidth_ = null;
+        }
+        return bandwidthBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.NewProxy)
@@ -15599,6 +16686,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_xiaoniucode_etp_core_message_BasicAuth_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_xiaoniucode_etp_core_message_Bandwidth_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_com_xiaoniucode_etp_core_message_Bandwidth_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -15677,61 +16769,66 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       "deny\030\004 \003(\t\"&\n\010HttpUser\022\014\n\004user\030\001 \001(\t\022\014\n\004" +
       "pass\030\002 \001(\t\"Z\n\tBasicAuth\022\016\n\006enable\030\001 \001(\010\022" +
       "=\n\thttpUsers\030\002 \003(\0132*.com.xiaoniucode.etp" +
-      ".core.message.HttpUser\"\242\004\n\010NewProxy\022\014\n\004n" +
-      "ame\030\001 \001(\t\022\024\n\007localIp\030\002 \001(\tH\000\210\001\001\022\021\n\tlocal" +
-      "Port\030\003 \001(\005\022\023\n\006status\030\004 \001(\005H\001\210\001\001\022\024\n\007encry" +
-      "pt\030\005 \001(\010H\002\210\001\001\022\025\n\010compress\030\006 \001(\010H\003\210\001\001\022@\n\010" +
-      "protocol\030\007 \001(\0162..com.xiaoniucode.etp.cor" +
-      "e.message.ProtocolType\022\027\n\nremotePort\030\010 \001" +
-      "(\005H\004\210\001\001\022\027\n\nautoDomain\030\t \001(\010H\005\210\001\001\022\025\n\rcust" +
-      "omDomains\030\n \003(\t\022\022\n\nsubDomains\030\013 \003(\t\022K\n\ra" +
-      "ccessControl\030\014 \001(\0132/.com.xiaoniucode.etp" +
-      ".core.message.AccessControlH\006\210\001\001\022C\n\tbasi" +
-      "cAuth\030\r \001(\0132+.com.xiaoniucode.etp.core.m" +
-      "essage.BasicAuthH\007\210\001\001B\n\n\010_localIpB\t\n\007_st" +
-      "atusB\n\n\010_encryptB\013\n\t_compressB\r\n\013_remote" +
-      "PortB\r\n\013_autoDomainB\020\n\016_accessControlB\014\n" +
-      "\n_basicAuth\"5\n\014NewProxyResp\022\021\n\tproxyName" +
-      "\030\001 \001(\t\022\022\n\nremoteAddr\030\002 \001(\t\"\037\n\nCloseProxy" +
-      "\022\021\n\tsessionId\030\001 \001(\t\"\215\001\n\016NewVisitorConn\022\021" +
-      "\n\tsessionId\030\001 \001(\t\022\017\n\007localIp\030\002 \001(\t\022\021\n\tlo" +
-      "calPort\030\003 \001(\005\022\024\n\007encrypt\030\004 \001(\010H\000\210\001\001\022\025\n\010c" +
-      "ompress\030\005 \001(\010H\001\210\001\001B\n\n\010_encryptB\013\n\t_compr" +
-      "ess\"\'\n\022NewVisitorConnResp\022\021\n\tsessionId\030\002" +
-      " \001(\t\"&\n\005Error\022\014\n\004code\030\001 \001(\005\022\017\n\007message\030\002" +
-      " \001(\t\"\022\n\020HeartbeatTimeout\"\006\n\004Ping\"\006\n\004Pong" +
-      "\"\t\n\007Kickout\"\374\006\n\016ControlMessage\022?\n\006header" +
-      "\030\001 \001(\0132/.com.xiaoniucode.etp.core.messag" +
-      "e.MessageHeader\0228\n\005login\030\n \001(\0132\'.com.xia" +
-      "oniucode.etp.core.message.LoginH\000\022>\n\010new" +
-      "Proxy\030\013 \001(\0132*.com.xiaoniucode.etp.core.m" +
-      "essage.NewProxyH\000\022B\n\ncloseProxy\030\014 \001(\0132,." +
-      "com.xiaoniucode.etp.core.message.ClosePr" +
-      "oxyH\000\0226\n\004ping\030\r \001(\0132&.com.xiaoniucode.et" +
-      "p.core.message.PingH\000\022F\n\014newProxyResp\030\024 " +
-      "\001(\0132..com.xiaoniucode.etp.core.message.N" +
-      "ewProxyRespH\000\0228\n\005error\030\025 \001(\0132\'.com.xiaon" +
-      "iucode.etp.core.message.ErrorH\000\0226\n\004pong\030" +
-      "\026 \001(\0132&.com.xiaoniucode.etp.core.message" +
-      ".PongH\000\022<\n\007kickout\030\036 \001(\0132).com.xiaoniuco" +
-      "de.etp.core.message.KickoutH\000\022J\n\016newVisi" +
-      "torConn\030\037 \001(\01320.com.xiaoniucode.etp.core" +
-      ".message.NewVisitorConnH\000\022R\n\022newVisitorC" +
-      "onnResp\030  \001(\01324.com.xiaoniucode.etp.core" +
-      ".message.NewVisitorConnRespH\000\022@\n\tloginRe" +
-      "sp\030! \001(\0132+.com.xiaoniucode.etp.core.mess" +
-      "age.LoginRespH\000\022N\n\020heartbeatTimeout\030\" \001(" +
-      "\01322.com.xiaoniucode.etp.core.message.Hea" +
-      "rtbeatTimeoutH\000B\t\n\007payload*\332\001\n\013MessageTy" +
-      "pe\022\013\n\007UNKNOWN\020\000\022\t\n\005LOGIN\020e\022\016\n\nLOGIN_RESP" +
-      "\020h\022\r\n\tNEW_PROXY\020f\022\017\n\013CLOSE_PROXY\020g\022\010\n\004PI" +
-      "NG\020i\022\023\n\016NEW_PROXY_RESP\020\312\001\022\n\n\005ERROR\020\315\001\022\t\n" +
-      "\004PONG\020\316\001\022\014\n\007KICKOUT\020\255\002\022\020\n\013NEW_VISITOR\020\256\002" +
-      "\022\025\n\020NEW_VISITOR_RESP\020\257\002\022\026\n\021HEARTBEAT_TIM" +
-      "EOUT\020\260\002*!\n\014ProtocolType\022\007\n\003TCP\020\000\022\010\n\004HTTP" +
-      "\020\001*0\n\nClientType\022\021\n\rBINARY_DEVICE\020\000\022\017\n\013W" +
-      "EB_SESSION\020\001*!\n\nAccessMode\022\t\n\005ALLOW\020\000\022\010\n" +
-      "\004DENY\020\001b\006proto3"
+      ".core.message.HttpUser\"o\n\tBandwidth\022\022\n\005l" +
+      "imit\030\001 \001(\tH\000\210\001\001\022\024\n\007limitIn\030\002 \001(\tH\001\210\001\001\022\025\n" +
+      "\010limitOut\030\003 \001(\tH\002\210\001\001B\010\n\006_limitB\n\n\010_limit" +
+      "InB\013\n\t_limitOut\"\365\004\n\010NewProxy\022\014\n\004name\030\001 \001" +
+      "(\t\022\024\n\007localIp\030\002 \001(\tH\000\210\001\001\022\021\n\tlocalPort\030\003 " +
+      "\001(\005\022\023\n\006status\030\004 \001(\005H\001\210\001\001\022\024\n\007encrypt\030\005 \001(" +
+      "\010H\002\210\001\001\022\025\n\010compress\030\006 \001(\010H\003\210\001\001\022@\n\010protoco" +
+      "l\030\007 \001(\0162..com.xiaoniucode.etp.core.messa" +
+      "ge.ProtocolType\022\027\n\nremotePort\030\010 \001(\005H\004\210\001\001" +
+      "\022\027\n\nautoDomain\030\t \001(\010H\005\210\001\001\022\025\n\rcustomDomai" +
+      "ns\030\n \003(\t\022\022\n\nsubDomains\030\013 \003(\t\022K\n\raccessCo" +
+      "ntrol\030\014 \001(\0132/.com.xiaoniucode.etp.core.m" +
+      "essage.AccessControlH\006\210\001\001\022C\n\tbasicAuth\030\r" +
+      " \001(\0132+.com.xiaoniucode.etp.core.message." +
+      "BasicAuthH\007\210\001\001\022C\n\tbandwidth\030\016 \001(\0132+.com." +
+      "xiaoniucode.etp.core.message.BandwidthH\010" +
+      "\210\001\001B\n\n\010_localIpB\t\n\007_statusB\n\n\010_encryptB\013" +
+      "\n\t_compressB\r\n\013_remotePortB\r\n\013_autoDomai" +
+      "nB\020\n\016_accessControlB\014\n\n_basicAuthB\014\n\n_ba" +
+      "ndwidth\"5\n\014NewProxyResp\022\021\n\tproxyName\030\001 \001" +
+      "(\t\022\022\n\nremoteAddr\030\002 \001(\t\"\037\n\nCloseProxy\022\021\n\t" +
+      "sessionId\030\001 \001(\t\"\215\001\n\016NewVisitorConn\022\021\n\tse" +
+      "ssionId\030\001 \001(\t\022\017\n\007localIp\030\002 \001(\t\022\021\n\tlocalP" +
+      "ort\030\003 \001(\005\022\024\n\007encrypt\030\004 \001(\010H\000\210\001\001\022\025\n\010compr" +
+      "ess\030\005 \001(\010H\001\210\001\001B\n\n\010_encryptB\013\n\t_compress\"" +
+      "\'\n\022NewVisitorConnResp\022\021\n\tsessionId\030\002 \001(\t" +
+      "\"&\n\005Error\022\014\n\004code\030\001 \001(\005\022\017\n\007message\030\002 \001(\t" +
+      "\"\022\n\020HeartbeatTimeout\"\006\n\004Ping\"\006\n\004Pong\"\t\n\007" +
+      "Kickout\"\374\006\n\016ControlMessage\022?\n\006header\030\001 \001" +
+      "(\0132/.com.xiaoniucode.etp.core.message.Me" +
+      "ssageHeader\0228\n\005login\030\n \001(\0132\'.com.xiaoniu" +
+      "code.etp.core.message.LoginH\000\022>\n\010newProx" +
+      "y\030\013 \001(\0132*.com.xiaoniucode.etp.core.messa" +
+      "ge.NewProxyH\000\022B\n\ncloseProxy\030\014 \001(\0132,.com." +
+      "xiaoniucode.etp.core.message.CloseProxyH" +
+      "\000\0226\n\004ping\030\r \001(\0132&.com.xiaoniucode.etp.co" +
+      "re.message.PingH\000\022F\n\014newProxyResp\030\024 \001(\0132" +
+      "..com.xiaoniucode.etp.core.message.NewPr" +
+      "oxyRespH\000\0228\n\005error\030\025 \001(\0132\'.com.xiaoniuco" +
+      "de.etp.core.message.ErrorH\000\0226\n\004pong\030\026 \001(" +
+      "\0132&.com.xiaoniucode.etp.core.message.Pon" +
+      "gH\000\022<\n\007kickout\030\036 \001(\0132).com.xiaoniucode.e" +
+      "tp.core.message.KickoutH\000\022J\n\016newVisitorC" +
+      "onn\030\037 \001(\01320.com.xiaoniucode.etp.core.mes" +
+      "sage.NewVisitorConnH\000\022R\n\022newVisitorConnR" +
+      "esp\030  \001(\01324.com.xiaoniucode.etp.core.mes" +
+      "sage.NewVisitorConnRespH\000\022@\n\tloginResp\030!" +
+      " \001(\0132+.com.xiaoniucode.etp.core.message." +
+      "LoginRespH\000\022N\n\020heartbeatTimeout\030\" \001(\01322." +
+      "com.xiaoniucode.etp.core.message.Heartbe" +
+      "atTimeoutH\000B\t\n\007payload*\332\001\n\013MessageType\022\013" +
+      "\n\007UNKNOWN\020\000\022\t\n\005LOGIN\020e\022\016\n\nLOGIN_RESP\020h\022\r" +
+      "\n\tNEW_PROXY\020f\022\017\n\013CLOSE_PROXY\020g\022\010\n\004PING\020i" +
+      "\022\023\n\016NEW_PROXY_RESP\020\312\001\022\n\n\005ERROR\020\315\001\022\t\n\004PON" +
+      "G\020\316\001\022\014\n\007KICKOUT\020\255\002\022\020\n\013NEW_VISITOR\020\256\002\022\025\n\020" +
+      "NEW_VISITOR_RESP\020\257\002\022\026\n\021HEARTBEAT_TIMEOUT" +
+      "\020\260\002*!\n\014ProtocolType\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001*0" +
+      "\n\nClientType\022\021\n\rBINARY_DEVICE\020\000\022\017\n\013WEB_S" +
+      "ESSION\020\001*!\n\nAccessMode\022\t\n\005ALLOW\020\000\022\010\n\004DEN" +
+      "Y\020\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -15773,68 +16870,74 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_BasicAuth_descriptor,
         new java.lang.String[] { "Enable", "HttpUsers", });
-    internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor =
+    internal_static_com_xiaoniucode_etp_core_message_Bandwidth_descriptor =
       getDescriptor().getMessageType(6);
+    internal_static_com_xiaoniucode_etp_core_message_Bandwidth_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_xiaoniucode_etp_core_message_Bandwidth_descriptor,
+        new java.lang.String[] { "Limit", "LimitIn", "LimitOut", });
+    internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor =
+      getDescriptor().getMessageType(7);
     internal_static_com_xiaoniucode_etp_core_message_NewProxy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor,
-        new java.lang.String[] { "Name", "LocalIp", "LocalPort", "Status", "Encrypt", "Compress", "Protocol", "RemotePort", "AutoDomain", "CustomDomains", "SubDomains", "AccessControl", "BasicAuth", });
+        new java.lang.String[] { "Name", "LocalIp", "LocalPort", "Status", "Encrypt", "Compress", "Protocol", "RemotePort", "AutoDomain", "CustomDomains", "SubDomains", "AccessControl", "BasicAuth", "Bandwidth", });
     internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_descriptor =
-      getDescriptor().getMessageType(7);
+      getDescriptor().getMessageType(8);
     internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_descriptor,
         new java.lang.String[] { "ProxyName", "RemoteAddr", });
     internal_static_com_xiaoniucode_etp_core_message_CloseProxy_descriptor =
-      getDescriptor().getMessageType(8);
+      getDescriptor().getMessageType(9);
     internal_static_com_xiaoniucode_etp_core_message_CloseProxy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_CloseProxy_descriptor,
         new java.lang.String[] { "SessionId", });
     internal_static_com_xiaoniucode_etp_core_message_NewVisitorConn_descriptor =
-      getDescriptor().getMessageType(9);
+      getDescriptor().getMessageType(10);
     internal_static_com_xiaoniucode_etp_core_message_NewVisitorConn_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_NewVisitorConn_descriptor,
         new java.lang.String[] { "SessionId", "LocalIp", "LocalPort", "Encrypt", "Compress", });
     internal_static_com_xiaoniucode_etp_core_message_NewVisitorConnResp_descriptor =
-      getDescriptor().getMessageType(10);
+      getDescriptor().getMessageType(11);
     internal_static_com_xiaoniucode_etp_core_message_NewVisitorConnResp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_NewVisitorConnResp_descriptor,
         new java.lang.String[] { "SessionId", });
     internal_static_com_xiaoniucode_etp_core_message_Error_descriptor =
-      getDescriptor().getMessageType(11);
+      getDescriptor().getMessageType(12);
     internal_static_com_xiaoniucode_etp_core_message_Error_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Error_descriptor,
         new java.lang.String[] { "Code", "Message", });
     internal_static_com_xiaoniucode_etp_core_message_HeartbeatTimeout_descriptor =
-      getDescriptor().getMessageType(12);
+      getDescriptor().getMessageType(13);
     internal_static_com_xiaoniucode_etp_core_message_HeartbeatTimeout_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_HeartbeatTimeout_descriptor,
         new java.lang.String[] { });
     internal_static_com_xiaoniucode_etp_core_message_Ping_descriptor =
-      getDescriptor().getMessageType(13);
+      getDescriptor().getMessageType(14);
     internal_static_com_xiaoniucode_etp_core_message_Ping_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Ping_descriptor,
         new java.lang.String[] { });
     internal_static_com_xiaoniucode_etp_core_message_Pong_descriptor =
-      getDescriptor().getMessageType(14);
+      getDescriptor().getMessageType(15);
     internal_static_com_xiaoniucode_etp_core_message_Pong_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Pong_descriptor,
         new java.lang.String[] { });
     internal_static_com_xiaoniucode_etp_core_message_Kickout_descriptor =
-      getDescriptor().getMessageType(15);
+      getDescriptor().getMessageType(16);
     internal_static_com_xiaoniucode_etp_core_message_Kickout_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Kickout_descriptor,
         new java.lang.String[] { });
     internal_static_com_xiaoniucode_etp_core_message_ControlMessage_descriptor =
-      getDescriptor().getMessageType(16);
+      getDescriptor().getMessageType(17);
     internal_static_com_xiaoniucode_etp_core_message_ControlMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_ControlMessage_descriptor,

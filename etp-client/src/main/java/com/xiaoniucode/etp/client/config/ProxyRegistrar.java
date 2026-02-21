@@ -1,10 +1,7 @@
 package com.xiaoniucode.etp.client.config;
 
 import com.xiaoniucode.etp.client.manager.AgentSessionManager;
-import com.xiaoniucode.etp.core.domain.AccessControlConfig;
-import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
-import com.xiaoniucode.etp.core.domain.HttpUser;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
 import io.netty.channel.Channel;
@@ -74,33 +71,33 @@ public class ProxyRegistrar {
                 .setLocalPort(config.getLocalPort())
                 .setLocalIp(config.getLocalIp())
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
-        if (config.getStatus() != null) {
+        if (config.isOpen()) {
             builder.setStatus(config.getStatus().getCode());
         }
-        if (config.getCompress() != null) {
+        if (config.isCompressEnabled()) {
             builder.setCompress(config.getCompress());
         }
-        if (config.getEncrypt() != null) {
+        if (config.isEncryptEnabled()) {
             builder.setEncrypt(config.getEncrypt());
         }
         switch (protocol) {
             case TCP:
-                Integer remotePort = config.getRemotePort();
-                if (remotePort != null) {
-                    builder.setRemotePort(remotePort);
+                if (config.hasRemotePort()) {
+                    builder.setRemotePort(config.getRemotePort());
                 }
                 break;
             case HTTP:
-                if (config.getAutoDomain() != null) {
+                if (config.isAutoDomainEnabled()) {
                     builder.setAutoDomain(config.getAutoDomain());
                 }
                 builder.addAllCustomDomains(config.getCustomDomains());
                 builder.addAllSubDomains(config.getSubDomains());
-                BasicAuthConfig basicAuth = config.getBasicAuth();
-                if (basicAuth!=null){
+                //Basic Auth 认证
+                if (config.hasBasicAuth()) {
+                    BasicAuthConfig basicAuth = config.getBasicAuth();
                     Message.BasicAuth.Builder basicAuthBuilder = Message.BasicAuth.newBuilder().setEnable(basicAuth.isEnable());
                     Set<HttpUser> users = basicAuth.getUsers();
-                    if (users!=null&&!users.isEmpty()){
+                    if (users != null && !users.isEmpty()) {
                         for (HttpUser user : users) {
                             Message.HttpUser httpUser = Message.HttpUser.newBuilder()
                                     .setUser(user.getUser())
@@ -113,22 +110,34 @@ public class ProxyRegistrar {
                 }
                 break;
         }
-        AccessControlConfig access = config.getAccessControl();
-        if (access != null) {
+        //访问控制
+        if (config.hasAccessControl()) {
+            AccessControlConfig access = config.getAccessControl();
             Message.AccessControl.Builder accessControlbuilder = Message.AccessControl
                     .newBuilder()
                     .setEnable(access.isEnable())
                     .setMode(Message.AccessMode.valueOf(access.getMode().name()));
-            Set<String> allow = access.getAllow();
-            Set<String> deny = access.getDeny();
-            if (allow != null && !allow.isEmpty()) {
+            if (access.hasAllow()) {
+                Set<String> allow = access.getAllow();
                 accessControlbuilder.addAllAllow(allow);
             }
-            if (deny != null && !deny.isEmpty()) {
+            if (access.hasDeny()) {
+                Set<String> deny = access.getDeny();
                 accessControlbuilder.addAllDeny(deny);
             }
             builder.setAccessControl(accessControlbuilder.build());
         }
+        //带宽限制
+        if (config.hasBandwidthLimit()) {
+            BandwidthConfig bandwidth = config.getBandwidth();
+            Message.Bandwidth bw = Message.Bandwidth.newBuilder()
+                    .setLimit(bandwidth.getLimit())
+                    .setLimitIn(bandwidth.getLimitIn())
+                    .setLimitOut(bandwidth.getLimitOut())
+                    .build();
+            builder.setBandwidth(bw);
+        }
+
         return builder.build();
     }
 }
