@@ -81,7 +81,6 @@ public class NewProxyRespHandler implements MessageHandler {
 
     private ProxyConfig buildProxyConfig(Message.NewProxy proxy) {
         String proxyId = GlobalIdGenerator.uuid32();
-
         ProxyConfig config = new ProxyConfig();
         config.setProxyId(proxyId);
         config.setName(proxy.getName());

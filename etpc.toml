@@ -79,11 +79,11 @@ localPort = 8030
 customDomains = ["etp2.domain2.com"]
 encrypt = false
 compress = false
-[proxies.access_control]
-enable = true
-mode = "allow"
-deny = ["127.0.0.2"]
 
+[proxies.bandwidth] #带宽限制
+limit = "2M" #总带宽限制(可选)
+limitIn = "1M" #入口带宽限制(可选)
+limitOut = "128k" #出口带宽限制(可选)
 [[proxies]]
 name = "mysql"
 protocol = "tcp"
@@ -92,11 +92,7 @@ remotePort = 3307
 status = 1
 encrypt = false
 compress = false
-#tunnelType = "shared" #dedicated
-[proxies.bandwidth] #带宽限制
-limit = "1M" #总带宽限制(可选)
-limitIn = "512K" #入口带宽限制(可选)
-limitOut = "512K" #出口带宽限制(可选)
+
 [proxies.access_control] #访问控制
 enable = true
 mode = "allow"

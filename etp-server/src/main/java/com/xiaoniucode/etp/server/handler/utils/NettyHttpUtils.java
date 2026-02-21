@@ -3,10 +3,7 @@ package com.xiaoniucode.etp.server.handler.utils;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.util.CharsetUtil;
-
-import java.util.function.Consumer;
 
 /**
  * HTTP 工具类
@@ -26,6 +23,16 @@ public class NettyHttpUtils {
                 Content-Length: 15\r
                 \r
                 Access Denied""";
+        return channel.writeAndFlush(Unpooled.copiedBuffer(response, CharsetUtil.UTF_8));
+    }
+
+    public static ChannelFuture sendHttpTooManyRequests(Channel channel) {
+        String response = """
+                HTTP/1.1 429 Too Many Requests\r
+                Content-Length: 0\r
+                Retry-After: 1\r
+                \r
+                """;
         return channel.writeAndFlush(Unpooled.copiedBuffer(response, CharsetUtil.UTF_8));
     }
 

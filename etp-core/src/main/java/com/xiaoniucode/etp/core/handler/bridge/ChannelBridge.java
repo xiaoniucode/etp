@@ -79,8 +79,8 @@ public class ChannelBridge extends ChannelDuplexHandler {
     }
 
     public static void bridge(Channel a, Channel b, ChannelBridgeCallback callback) {
-        a.pipeline().addLast(new ChannelBridge(b, callback));
-        b.pipeline().addLast(new ChannelBridge(a, callback));
+        a.pipeline().addLast(new ChannelBridge(b, callback)); //bridge1
+        b.pipeline().addLast(new ChannelBridge(a, callback)); //bridge2
     }
 
     public static void bridge(Channel a, Channel b) {

@@ -1,13 +1,15 @@
 package com.xiaoniucode.etp.server.handler.message;
 
+import com.xiaoniucode.etp.core.domain.BandwidthConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.handler.ChannelSwitcher;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
-import com.xiaoniucode.etp.core.handler.bridge.ChannelBridge;
 import com.xiaoniucode.etp.core.handler.bridge.ChannelBridgeCallback;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
+import com.xiaoniucode.etp.server.handler.BandwidthLimiter;
+import com.xiaoniucode.etp.server.handler.factory.ServerBridgeFactory;
 import com.xiaoniucode.etp.server.handler.http.HttpVisitorHandler;
 import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ProtocolDetection;
@@ -65,10 +67,10 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
                 if (executed.compareAndSet(false, true)) {
                     logger.debug("访问者连接断开，释放资源");
                     visitorSessionManager.disconnect(visitor, session -> {
-                        Channel tunnel = session.getTunnel();
+                        Channel control = session.getControl();
                         Message.ControlMessage message = MessageUtils
                                 .buildCloseProxy(session.getSessionId());
-                        tunnel.writeAndFlush(message);
+                        control.writeAndFlush(message);
                     });
                     ChannelUtils.closeOnFlush(visitor);
                 }
@@ -80,9 +82,9 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
                 if (executed.compareAndSet(false, true)) {
                     logger.error(cause.getMessage(), cause);
                     visitorSessionManager.disconnect(visitor, session -> {
-                        Channel tunnel = session.getTunnel();
+                        Channel control = session.getControl();
                         Message.ControlMessage message = MessageUtils.buildCloseProxy(session.getSessionId());
-                        tunnel.writeAndFlush(message);
+                        control.writeAndFlush(message);
 
                     });
                     ChannelUtils.closeOnFlush(visitor);
@@ -98,8 +100,13 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
                 }
             }
         };
-        //[visitor <-> tunnel]桥接，双向透明转发，无需序列化和拷贝
-        ChannelBridge.bridge(visitor, tunnel, callback);
+        if (config.hasBandwidthLimit()){
+            BandwidthConfig bandwidth = config.getBandwidth();
+            BandwidthLimiter bandwidthLimiter = new BandwidthLimiter(bandwidth);
+            ServerBridgeFactory.bridge(visitor,tunnel,bandwidthLimiter,config.getProxyId(),config.getProtocol());
+        }else {
+            ServerBridgeFactory.bridge(visitor,tunnel,config.getProxyId(),config.getProtocol());
+        }
         if (ProtocolDetection.isHttp(visitor)) {
             visitor.attr(ChannelConstants.CONNECTED).set(true);
             httpVisitorHandler.sendFirstPackage(visitorSession);

@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.client.handler.message;
 
+import com.xiaoniucode.etp.client.handler.tunnel.ClientBridgeFactory;
 import com.xiaoniucode.etp.client.manager.ConnectionPool;
 import com.xiaoniucode.etp.client.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.client.manager.BootstrapManager;
@@ -7,7 +8,6 @@ import com.xiaoniucode.etp.client.manager.ServerSessionManager;
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.handler.ChannelSwitcher;
 import com.xiaoniucode.etp.core.domain.LanInfo;
-import com.xiaoniucode.etp.core.handler.bridge.ChannelBridge;
 import com.xiaoniucode.etp.core.message.Message;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -42,8 +42,8 @@ public class NewVisitorConnHandler extends AbstractTunnelMessageHandler {
                         boolean encrypt = msg.getEncrypt();
                         //控制通道转换为数据通道
                         ChannelSwitcher.switchToDataTunnel(tunnel.pipeline(), compress, encrypt);
-                        //桥接，双向透明转发
-                        ChannelBridge.bridge(server, tunnel);
+                        //隧道双向桥接
+                        ClientBridgeFactory.bridge(tunnel,server);
                         //创建连接会话
                         ServerSessionManager.createServerSession(sessionId, tunnel, server, new LanInfo(localIP, localPort)).ifPresent(serverSession -> {
                             //设置通道可读
