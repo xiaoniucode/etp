@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.handler.message;
 
-import com.xiaoniucode.etp.client.handler.tunnel.ClientBridgeFactory;
+import com.xiaoniucode.etp.client.handler.factory.ClientBridgeFactory;
 import com.xiaoniucode.etp.client.manager.ConnectionPool;
 import com.xiaoniucode.etp.client.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.client.manager.BootstrapManager;

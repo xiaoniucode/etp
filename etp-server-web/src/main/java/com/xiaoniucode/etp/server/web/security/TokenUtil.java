@@ -29,17 +29,15 @@ public class TokenUtil {
         this.expiration = expiration;
 
         if (!StringUtils.hasText(secret)) {
-            // 生成32字节的随机密钥
             byte[] randomBytes = new byte[32];
             new SecureRandom().nextBytes(randomBytes);
-            // 转换为Base64字符串
             this.secret = Base64.getEncoder().encodeToString(randomBytes);
             logger.info("JWT密钥未配置，已自动生成32字节随机密钥");
         } else {
             this.secret = secret;
-            logger.info("使用配置的JWT密钥");
+            logger.info("使用配置的 JWT 密钥");
         }
-        logger.info("JWT令牌过期时间设置为: {}秒", expiration);
+        logger.debug("Token令牌过期时间设置为: {}秒", expiration);
     }
 
     private SecretKey getSigningKey() {
@@ -85,7 +83,7 @@ public class TokenUtil {
             Claims claims = getClaimsFromToken(token);
             return !claims.getExpiration().before(new Date());
         } catch (Exception e) {
-            logger.warn("JWT令牌验证失败: {}", e.getMessage());
+            logger.debug("Token 令牌验证失败");
             return false;
         }
     }

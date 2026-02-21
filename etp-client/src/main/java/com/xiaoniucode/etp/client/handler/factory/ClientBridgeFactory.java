@@ -1,5 +1,6 @@
-package com.xiaoniucode.etp.client.handler.tunnel;
+package com.xiaoniucode.etp.client.handler.factory;
 
+import com.xiaoniucode.etp.client.handler.tunnel.ClientChannelBridge;
 import io.netty.channel.Channel;
 
 public class ClientBridgeFactory {
