@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.manager.session;
 
-import com.xiaoniucode.etp.common.utils.DateUtils;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
@@ -13,8 +12,9 @@ import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.ClientManager;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
-import com.xiaoniucode.etp.server.timer.WheelTimer;
 import io.netty.channel.Channel;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +63,8 @@ public class AgentSessionManager {
     @Autowired
     private ClientManager clientManager;
     @Autowired
-    private WheelTimer wheelTimer;
-    private static final long HEARTBEAT_TIMEOUT = 60 * 1000L;
+    private HashedWheelTimer wheelTimer;
+    private static final long HEARTBEAT_TIMEOUT = 60;
 
     /**
      * 创建代理客户端会话
@@ -204,17 +204,29 @@ public class AgentSessionManager {
         });
     }
 
+    /**
+     * 添加心跳处理
+     *
+     * @param session 连接会话
+     */
     private void scheduleTimeout(AgentSession session) {
         Channel control = session.getControl();
-        Runnable cleanupTask = () -> {
-            //尝试向客户端发送心跳超时消息
+        Timeout timer = wheelTimer.newTimeout(timeout -> {
+            if (timeout.isCancelled()) {
+                // 任务已被取消，不执行
+                return;
+            }
+            logger.debug("心跳超时，向客户端发送探测包: {}", session.getSessionId());
             control.writeAndFlush(MessageUtils.heartbeatTimeout());
             control.eventLoop().schedule(() -> {
-                disconnect(control);
+                // 再次检查连接是否还在，以及是否被其他逻辑处理了
+                if (control.isActive() && !timeout.isCancelled()) {
+                    logger.warn("心跳无响应，断开连接: {}", session.getSessionId());
+                    disconnect(control);
+                }
             }, 5, TimeUnit.SECONDS);
-        };
-        WheelTimer.TimeoutHandle handle = wheelTimer.newTimeout(cleanupTask, HEARTBEAT_TIMEOUT);
-        session.setTimeoutHandle(handle);
+        }, HEARTBEAT_TIMEOUT, TimeUnit.SECONDS);
+        session.setWheelTimer(timer);
     }
 
     /**
@@ -229,10 +241,12 @@ public class AgentSessionManager {
         if (agentSession != null) {
             long current = System.currentTimeMillis();
             agentSession.setLastHeartbeat(current);
-            WheelTimer.TimeoutHandle oldHandle = agentSession.getTimeoutHandle();
-            if (oldHandle != null && !oldHandle.isCancelled()) {
+            Timeout oldHandle = agentSession.getWheelTimer();
+            if (agentSession.hasWheelTimer() && !oldHandle.isCancelled()) {
+                logger.debug("心跳更新，取消旧的时间轮");
                 oldHandle.cancel();
             }
+            logger.debug("心跳更新，重建时间轮");
             scheduleTimeout(agentSession);
         }
     }
