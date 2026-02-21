@@ -72,7 +72,7 @@ public class AgentSessionManager {
      */
     public Optional<AgentSession> createAgentSession(AgentSession.AgentSessionBuilder builder) {
         //为客户端生成一个唯一的 sessionId
-        String sessionId = sessionIdGenerator.nextAgentSessionId();
+        String sessionId = sessionIdGenerator.nextSessionId();
         AgentSession tempSession = builder
                 .sessionId(sessionId)
                 .build();
@@ -243,10 +243,10 @@ public class AgentSessionManager {
             agentSession.setLastHeartbeat(current);
             Timeout oldHandle = agentSession.getWheelTimer();
             if (agentSession.hasWheelTimer() && !oldHandle.isCancelled()) {
-                logger.debug("心跳更新，取消旧的时间轮");
+                logger.debug("心跳更新，取消旧的时间轮: sessionId={}", sessionId);
                 oldHandle.cancel();
             }
-            logger.debug("心跳更新，重建时间轮");
+            logger.debug("心跳更新，重建时间轮: sessionId={}", sessionId);
             scheduleTimeout(agentSession);
         }
     }

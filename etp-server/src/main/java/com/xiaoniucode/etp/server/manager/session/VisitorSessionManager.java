@@ -4,7 +4,6 @@ import com.xiaoniucode.etp.core.constant.ChannelConstants;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.generator.SessionIdGenerator;
-import com.xiaoniucode.etp.server.manager.DomainManager;
 import com.xiaoniucode.etp.server.manager.ProtocolDetection;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.manager.domain.AgentSession;
@@ -81,7 +80,7 @@ public class VisitorSessionManager {
         if (agentSession == null) {
             return;
         }
-        String sessionId = sessionIdGenerator.nextVisitorSessionId();
+        String sessionId = sessionIdGenerator.nextSessionId();
         visitor.attr(ChannelConstants.SESSION_ID).set(sessionId);
         VisitorSession visitorSession = new VisitorSession();
         visitorSession.setVisitor(visitor);
