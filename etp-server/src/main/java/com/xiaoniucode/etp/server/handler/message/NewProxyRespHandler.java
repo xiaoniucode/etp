@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,10 +85,19 @@ public class NewProxyRespHandler implements MessageHandler {
         ProxyConfig config = new ProxyConfig();
         config.setProxyId(proxyId);
         config.setName(proxy.getName());
-        if (proxy.hasLocalIp()) {
-            config.setLocalIp(proxy.getLocalIp());
-        }
-        config.setLocalPort(proxy.getLocalPort());
+        List<Target> targets = proxy.getTargetsList().stream().map(p -> {
+            Target target = new Target();
+            target.setHost(p.getHost());
+            target.setPort(p.getPort());
+            if (p.hasName()) {
+                target.setName(p.getName());
+            }
+            if (p.hasWeight()) {
+                target.setWeight(p.getWeight());
+            }
+            return target;
+        }).toList();
+        config.addTargets(targets);
         if (proxy.hasRemotePort()) {
             config.setRemotePort(proxy.getRemotePort());
         }
@@ -128,14 +138,34 @@ public class NewProxyRespHandler implements MessageHandler {
             BasicAuthConfig basicAuthConfig = new BasicAuthConfig(basicAuth.getEnable(), users);
             config.setBasicAuth(basicAuthConfig);
         }
-        if (proxy.hasBandwidth()){
+        if (proxy.hasBandwidth()) {
             Message.Bandwidth bandwidth = proxy.getBandwidth();
             BandwidthConfig bandwidthConfig = new BandwidthConfig(bandwidth.getLimit(),
                     bandwidth.getLimitIn(),
                     bandwidth.getLimitOut());
             config.setBandwidth(bandwidthConfig);
         }
+        if (proxy.hasLoadBalance()){
+            LoadBalanceConfig loadBalanceConfig = new LoadBalanceConfig();
+            Message.LoadBalance loadBalance = proxy.getLoadBalance();
+            if (loadBalance.hasStrategy()){
+                loadBalanceConfig.setStrategy(toJavaType(loadBalance.getStrategy()));
+            }
+            config.setLoadBalance(loadBalanceConfig);
+        }
         return config;
+    }
+
+    private LoadBalanceStrategy toJavaType(Message.LoadBalanceStrategy strategy) {
+        if (strategy == null) {
+            return LoadBalanceConfig.DEFAULT_STRATEGY;
+        }
+        return switch (strategy) {
+            case WEIGHT -> LoadBalanceStrategy.WEIGHT;
+            case RANDOM -> LoadBalanceStrategy.RANDOM;
+            case LEAST_CONN -> LoadBalanceStrategy.LEAST_CONN;
+            default -> LoadBalanceConfig.DEFAULT_STRATEGY;
+        };
     }
 
     private Message.ControlMessage buildResponse(ProxyConfig config) {

@@ -30,79 +30,97 @@ enum AccessMode {
   ALLOW = 0;
   DENY = 1;
 }
-
+enum LoadBalanceStrategy {
+  ROUND_ROBIN = 0;
+  WEIGHT = 1;
+  RANDOM = 2;
+  LEAST_CONN = 3;
+}
 message MessageHeader {
   MessageType type = 1;
 }
 
 message Login {
-  string clientId = 1;
+  string client_id = 1;
   string token = 2;
   string name = 3;
-  ClientType clientType = 4;
+  ClientType client_type = 4;
   optional string version = 5;
   optional string os = 6;
   optional string arch = 7;
 }
 message LoginResp {
-  string sessionId = 1;
+  string session_id = 1;
 }
+
 message AccessControl {
   bool enable = 1;
   AccessMode mode = 2;
   repeated string allow = 3;
   repeated string deny = 4;
 }
-message HttpUser{
+
+message HttpUser {
   string user = 1;
   string pass = 2;
 }
+
 message BasicAuth {
   bool enable = 1;
-  repeated HttpUser httpUsers = 2;
+  repeated HttpUser http_users = 2;
 }
 
-message Bandwidth{
+message Bandwidth {
   optional string limit = 1;
-  optional string limitIn = 2;
-  optional string limitOut = 3;
+  optional string limit_in = 2;
+  optional string limit_out = 3;
+}
+
+message Target {
+  string host = 1;
+  int32 port = 2;
+  optional string name = 4;
+  optional int32 weight = 5;
+}
+
+message LoadBalance{
+  optional LoadBalanceStrategy strategy = 1;
 }
 message NewProxy {
   string name = 1;
-  optional string localIp = 2;
-  int32 localPort = 3;
-  optional int32 status = 4;
-  optional bool encrypt = 5;
-  optional bool compress = 6;
-  ProtocolType protocol = 7;
-  optional int32 remotePort = 8;
-  optional  bool autoDomain = 9;
-  repeated string customDomains = 10;
-  repeated string subDomains = 11;
-  optional AccessControl accessControl = 12;
-  optional BasicAuth basicAuth = 13;
-  optional Bandwidth bandwidth = 14;
+  repeated Target targets = 2;
+  optional int32 status = 3;
+  optional bool encrypt = 4;
+  optional bool compress = 5;
+  ProtocolType protocol = 6;
+  optional int32 remote_port = 7;
+  optional bool auto_domain = 8;
+  repeated string custom_domains = 9;
+  repeated string sub_domains = 10;
+  optional AccessControl access_control = 11;
+  optional BasicAuth basic_auth = 12;
+  optional Bandwidth bandwidth = 13;
+  optional LoadBalance load_balance = 14;
 }
-
 message NewProxyResp {
-  string proxyName = 1;
-  string remoteAddr = 2;
+  string proxy_name = 1;
+  string remote_addr = 2;
 }
 
 message CloseProxy {
-  string sessionId = 1;
+  string session_id = 1;
 }
 
 message NewVisitorConn {
-  string sessionId = 1;
-  string localIp = 2;
-  int32 localPort = 3;
+  string session_id = 1;
+  string local_ip = 2;
+  int32 local_port = 3;
   optional bool encrypt = 4;
   optional bool compress = 5;
 }
 
 message NewVisitorConnResp {
-  string sessionId = 2;
+  string session_id = 2;
 }
 
 message Error {
@@ -119,16 +137,16 @@ message ControlMessage {
   MessageHeader header = 1;
   oneof payload {
     Login login = 10;
-    NewProxy newProxy = 11;
-    CloseProxy closeProxy = 12;
+    NewProxy new_proxy = 11;
+    CloseProxy close_proxy = 12;
     Ping ping = 13;
-    NewProxyResp newProxyResp = 20;
+    NewProxyResp new_proxy_resp = 20;
     Error error = 21;
     Pong pong = 22;
     Kickout kickout = 30;
-    NewVisitorConn newVisitorConn = 31;
-    NewVisitorConnResp newVisitorConnResp = 32;
-    LoginResp loginResp = 33;
-    HeartbeatTimeout heartbeatTimeout = 34;
+    NewVisitorConn new_visitor_conn = 31;
+    NewVisitorConnResp new_visitor_conn_resp = 32;
+    LoginResp login_resp = 33;
+    HeartbeatTimeout heartbeat_timeout = 34;
   }
 }

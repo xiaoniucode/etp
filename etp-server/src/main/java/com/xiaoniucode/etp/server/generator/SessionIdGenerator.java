@@ -8,6 +8,6 @@ public final class SessionIdGenerator {
     public String nextSessionId() {
         long seq = SESSION_SEQ.incrementAndGet();
         long timestamp = System.currentTimeMillis();
-        return timestamp + "_" + seq;
+        return timestamp + "-" + seq;
     }
 }

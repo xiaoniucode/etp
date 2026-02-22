@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.handler.http;
 
 import com.xiaoniucode.etp.core.constant.ChannelConstants;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.message.Message;
+import com.xiaoniucode.etp.server.handler.TargetConnector;
 import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
@@ -22,6 +22,8 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final Logger logger = LoggerFactory.getLogger(HttpVisitorHandler.class);
     @Autowired
     private VisitorSessionManager visitorSessionManager;
+    @Autowired
+    private TargetConnector targetConnector;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
@@ -32,21 +34,10 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             buf.retain();
             visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).set(buf);
             visitor.config().setOption(ChannelOption.AUTO_READ, false);
-            visitorSessionManager.registerVisitor(visitor, this::connectToTarget);
+            visitorSessionManager.registerVisitor(visitor, visitorSession ->
+                    targetConnector.connectToTarget(visitorSession));
             ctx.pipeline().remove(this);
         }
-    }
-
-    private void connectToTarget(VisitorSession session) {
-        Channel control = session.getControl();
-        ProxyConfig config = session.getProxyConfig();
-        Message.ControlMessage message = MessageUtils
-                .buildNewVisitorConn(session.getSessionId(),
-                        config.getLocalIp(),
-                        config.getLocalPort(),
-                        config.getCompress(),
-                        config.getEncrypt());
-        control.writeAndFlush(message);
     }
 
     /**

@@ -90,7 +90,7 @@ public class ProxyManager {
                 return config;
             }
             portToProxyConfig.put(proxyConfig.getRemotePort(), proxyConfig);
-            logger.debug("代理创建成功: [客户端ID={}，代理名称={}，远程端口={}，内网端口={}]", clientId, proxyConfig.getName(), remotePort, proxyConfig.getLocalPort());
+            logger.debug("代理创建成功: [客户端ID={}，代理名称={}]", clientId, proxyConfig.getName());
         }
         if (ProtocolType.isHttp(protocol)) {
             Set<DomainInfo> domainInfos = domainGenerator.generate(proxyConfig);
@@ -163,7 +163,7 @@ public class ProxyManager {
             }
         }
         proxyIdToProxyConfig.remove(proxyConfig.getProxyId());
-        logger.debug("代理删除成功: [客户端ID={}，代理名称={}，远程端口={}，内网端口={}]", clientId, proxyConfig.getName(), proxyConfig.getRemotePort(), proxyConfig.getLocalPort());
+        logger.debug("代理删除成功: [客户端ID={}，代理名称={}，远程端口={}]", clientId, proxyConfig.getName(), proxyConfig.getRemotePort());
         if (callback != null) {
             callback.accept(proxyConfig);
         }

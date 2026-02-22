@@ -1,6 +1,8 @@
 package com.xiaoniucode.etp.server.manager.domain;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.Target;
+import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,4 +28,24 @@ public class VisitorSession {
      */
     private ProxyConfig proxyConfig;
 
+    /**
+     * 当前选择的目标服务器
+     */
+    private Target currentTarget;
+    /**
+     * 当前使用的负载均衡器
+     */
+    private LoadBalancer currentLoadBalancer;
+
+    /**
+     * 标记连接数是否已减少，避免重复减少
+     */
+    private boolean connectionCountDecremented = false;
+
+    /**
+     * 判断是否使用了负载均衡器
+     */
+    public boolean isUsingLoadBalancer() {
+        return currentLoadBalancer != null;
+    }
 }

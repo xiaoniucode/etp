@@ -47,12 +47,17 @@ deny = []
 name = "fullstack2"
 protocol = "http"
 localIp = "localhost"
-localPort = 8090
-autoDomain = true
+localPort = 8091
+customDomains = ["etpp.domain2.com"]
 status = 1
-encrypt = true
-compress = true
-
+encrypt = false
+compress = false
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
+    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
+]
+[proxies.load_balance]
+strategy = "random" # 策略：roundrobin/weight/random/leastconn
 [[proxies]]
 name = "web2"
 protocol = "http"
@@ -106,12 +111,17 @@ remotePort = 3308
 status = 1
 encrypt = false
 compress = false
-
-[proxies.access_control]
-enable = true
-mode = "allow"
-allow = ["127.0.0.2"]
-deny = []
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
+    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
+]
+[proxies.load_balance]
+strategy = "random" # 策略：roundrobin/weight/random/leastconn
+#[proxies.access_control]
+#enable = true
+#mode = "allow"
+#allow = ["127.0.0.1"]
+#deny = []
 
 [[proxies]]
 name = "redis"
@@ -121,7 +131,12 @@ remotePort = 6380
 status = 1
 encrypt = true
 compress = true
-
+targets = [
+    { host = "10.1.1.2", port = 6379, weight = 70, name = "redis-1" },
+    { host = "10.1.1.1", port = 6379, weight = 30, name = "redis-2" }
+]
+[proxies.loadbalance]
+strategy = "weight" # 策略：roundrobin/weight/random/leastconn
 #日志
 [log]
 level = "debug"

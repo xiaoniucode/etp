@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.client.config;
 
 import com.xiaoniucode.etp.client.manager.AgentSessionManager;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
@@ -66,32 +67,46 @@ public class ProxyRegistrar {
 
     private static Message.NewProxy buildNewProxy(ProxyConfig config) {
         ProtocolType protocol = config.getProtocol();
-        Message.NewProxy.Builder builder = Message.NewProxy.newBuilder();
-        builder.setName(config.getName())
-                .setLocalPort(config.getLocalPort())
-                .setLocalIp(config.getLocalIp())
+        Message.NewProxy.Builder newProxyBuilder = Message.NewProxy.newBuilder();
+        List<Message.Target> targets = config.getTargets().stream().map(t -> {
+                    Message.Target.Builder target = Message.Target.newBuilder()
+                            .setHost(t.getHost())
+                            .setPort(t.getPort())
+                            .setWeight(t.getWeight());
+                    if (StringUtils.hasText(t.getName())) {
+                        target.setName(t.getName());
+                    }
+                    if (t.getWeight() != null) {
+                        target.setWeight(t.getWeight());
+                    }
+                    return target.build();
+                }
+        ).toList();
+        newProxyBuilder.setName(config.getName())
+                .addAllTargets(targets)
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
+
         if (config.isOpen()) {
-            builder.setStatus(config.getStatus().getCode());
+            newProxyBuilder.setStatus(config.getStatus().getCode());
         }
         if (config.isCompressEnabled()) {
-            builder.setCompress(config.getCompress());
+            newProxyBuilder.setCompress(config.getCompress());
         }
         if (config.isEncryptEnabled()) {
-            builder.setEncrypt(config.getEncrypt());
+            newProxyBuilder.setEncrypt(config.getEncrypt());
         }
         switch (protocol) {
             case TCP:
                 if (config.hasRemotePort()) {
-                    builder.setRemotePort(config.getRemotePort());
+                    newProxyBuilder.setRemotePort(config.getRemotePort());
                 }
                 break;
             case HTTP:
                 if (config.isAutoDomainEnabled()) {
-                    builder.setAutoDomain(config.getAutoDomain());
+                    newProxyBuilder.setAutoDomain(config.getAutoDomain());
                 }
-                builder.addAllCustomDomains(config.getCustomDomains());
-                builder.addAllSubDomains(config.getSubDomains());
+                newProxyBuilder.addAllCustomDomains(config.getCustomDomains());
+                newProxyBuilder.addAllSubDomains(config.getSubDomains());
                 //Basic Auth 认证
                 if (config.hasBasicAuth()) {
                     BasicAuthConfig basicAuth = config.getBasicAuth();
@@ -106,7 +121,7 @@ public class ProxyRegistrar {
                             basicAuthBuilder.addHttpUsers(httpUser);
                         }
                     }
-                    builder.setBasicAuth(basicAuthBuilder.build());
+                    newProxyBuilder.setBasicAuth(basicAuthBuilder.build());
                 }
                 break;
         }
@@ -125,7 +140,7 @@ public class ProxyRegistrar {
                 Set<String> deny = access.getDeny();
                 accessControlbuilder.addAllDeny(deny);
             }
-            builder.setAccessControl(accessControlbuilder.build());
+            newProxyBuilder.setAccessControl(accessControlbuilder.build());
         }
         //带宽限制
         if (config.hasBandwidthLimit()) {
@@ -135,9 +150,32 @@ public class ProxyRegistrar {
                     .setLimitIn(bandwidth.getLimitIn())
                     .setLimitOut(bandwidth.getLimitOut())
                     .build();
-            builder.setBandwidth(bw);
+            newProxyBuilder.setBandwidth(bw);
+        }
+        //负载均衡
+        if (config.hasLoadBalance()){
+            Message.LoadBalance.Builder loadBalanceBuilder = Message.LoadBalance.newBuilder();
+            if (config.getLoadBalance().hasStrategy()){
+                Message.LoadBalanceStrategy strategy= toProtoType(config.getLoadBalance().getStrategy());
+                loadBalanceBuilder.setStrategy(strategy);
+            }
+            newProxyBuilder.setLoadBalance(loadBalanceBuilder.build());
         }
 
-        return builder.build();
+        return newProxyBuilder.build();
+    }
+    private static Message.LoadBalanceStrategy toProtoType(LoadBalanceStrategy strategy) {
+        switch (strategy) {
+            case ROUND_ROBIN:
+                return Message.LoadBalanceStrategy.ROUND_ROBIN;
+            case WEIGHT:
+                return Message.LoadBalanceStrategy.WEIGHT;
+            case RANDOM:
+                return Message.LoadBalanceStrategy.RANDOM;
+            case LEAST_CONN:
+                return Message.LoadBalanceStrategy.LEAST_CONN;
+            default:
+                throw new IllegalArgumentException("未知负载均衡策略: " + strategy);
+        }
     }
 }

@@ -14,10 +14,8 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * TOML 客户端配置加载器
@@ -108,13 +106,21 @@ public class TomlConfigLoader implements ConfigSource {
                     }
                     proxyConfig.setProtocol(protocolType);
                 }
-                if (StringUtils.hasText(localIp)) {
-                    proxyConfig.setLocalIp(localIp.trim());
-                }
+                List<Target> targets = proxyTable.getList("targets", new ArrayList<>()).stream()
+                        .map(item -> {
+                            Map map = (Map) item;
+                            String host = (String) map.getOrDefault("host", "127.0.0.1");
+                            Long port = (Long) map.getOrDefault("port", -1);
+                            Long weight = (Long) map.getOrDefault("weight", 1);
+                            Object nameV = map.get("name");
+                            return new Target(host, port.intValue(), weight.intValue(), nameV != null ? (String) nameV : null);
+                        }).collect(Collectors.toList());
                 if (localPortValue != null) {
+                    int localPort = localPortValue.intValue();
                     validatePort(localPortValue.intValue());
-                    proxyConfig.setLocalPort(localPortValue.intValue());
+                    targets.add(new Target(localIp, localPort));
                 }
+                proxyConfig.addTargets(targets);
                 if (remotePortValue != null) {
                     validatePort(remotePortValue.intValue());
                     proxyConfig.setRemotePort(remotePortValue.intValue());
@@ -174,7 +180,7 @@ public class TomlConfigLoader implements ConfigSource {
                             for (HashMap map : users) {
                                 String user = (String) map.getOrDefault("user", "");
                                 String pass = (String) map.getOrDefault("pass", "");
-                                sets.add(new HttpUser(user,pass));
+                                sets.add(new HttpUser(user, pass));
                             }
                         }
                         proxyConfig.setBasicAuth(new BasicAuthConfig(enable, sets));
@@ -182,12 +188,23 @@ public class TomlConfigLoader implements ConfigSource {
                 }
                 //带宽限制
                 Toml bandwidth = proxyTable.getTable("bandwidth");
-                if (bandwidth!=null){
+                if (bandwidth != null) {
                     String limit = bandwidth.getString("limit");
-                    String limitIn= bandwidth.getString("limitIn");
+                    String limitIn = bandwidth.getString("limitIn");
                     String limitOut = bandwidth.getString("limitOut");
                     BandwidthConfig bandwidthConfig = new BandwidthConfig(limit, limitIn, limitOut);
                     proxyConfig.setBandwidth(bandwidthConfig);
+                }
+                //负载均衡配置
+                Toml loadBalance = proxyTable.getTable("load_balance");
+                if (loadBalance != null) {
+                    LoadBalanceConfig loadBalanceConfig = new LoadBalanceConfig();
+                    String strategy = loadBalance.getString("strategy");
+                    if (StringUtils.hasText(strategy)) {
+                        LoadBalanceStrategy strategyType = LoadBalanceStrategy.fromCode(strategy);
+                        loadBalanceConfig.setStrategy(strategyType);
+                    }
+                    proxyConfig.setLoadBalance(loadBalanceConfig);
                 }
             }
             builder.proxies(proxies);

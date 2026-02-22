@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.server.handler.BandwidthLimiter;
 import com.xiaoniucode.etp.server.handler.factory.ServerBridgeFactory;
 import com.xiaoniucode.etp.server.handler.http.HttpVisitorHandler;
+import com.xiaoniucode.etp.server.manager.LeastConnManager;
 import com.xiaoniucode.etp.server.manager.ProtocolDetection;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
@@ -51,18 +52,19 @@ public class NewVisitorConnRespHandler extends AbstractTunnelMessageHandler {
         visitorSession.setTunnel(tunnel);
         //将控制隧道切换为数据隧道
         ChannelSwitcher.switchToDataTunnel(tunnel.pipeline(), config.getCompress(), config.getEncrypt());
-        if (config.hasBandwidthLimit()){
+        if (config.hasBandwidthLimit()) {
             BandwidthConfig bandwidth = config.getBandwidth();
             BandwidthLimiter bandwidthLimiter = new BandwidthLimiter(bandwidth);
-            ServerBridgeFactory.bridge(visitorSessionManager,visitor,tunnel,bandwidthLimiter,config.getProxyId(),config.getProtocol());
-        }else {
-            ServerBridgeFactory.bridge(visitorSessionManager,visitor,tunnel,config.getProxyId(),config.getProtocol());
+            ServerBridgeFactory.bridge(visitorSessionManager, visitor, tunnel, bandwidthLimiter, config.getProxyId(), config.getProtocol());
+        } else {
+            ServerBridgeFactory.bridge(visitorSessionManager, visitor, tunnel, config.getProxyId(), config.getProtocol());
         }
+        LeastConnManager.incrementConnection(visitorSession);
         if (ProtocolDetection.isHttp(visitor)) {
             visitor.attr(ChannelConstants.CONNECTED).set(true);
             httpVisitorHandler.sendFirstPackage(visitorSession);
         }
         visitor.config().setOption(ChannelOption.AUTO_READ, true);
-        logger.debug("已连接到目标服务: [proxyName={},localIp={},localPort={}]",config.getName(),config.getLocalIp(),config.getLocalPort());
+        logger.debug("已连接到目标服务: proxyName-{}", config.getName());
     }
 }

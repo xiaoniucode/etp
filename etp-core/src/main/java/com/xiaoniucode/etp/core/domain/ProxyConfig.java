@@ -7,7 +7,9 @@ import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Getter
@@ -25,11 +27,8 @@ public class ProxyConfig {
     @Setter
     private ProtocolType protocol;
     @Setter
-    private String localIp = "127.0.0.1";
-    @Setter
-    private Integer localPort;
-    @Setter
     private Integer remotePort;
+    private final List<Target> targets = new CopyOnWriteArrayList<>();
     /**
      * 代理的状态
      */
@@ -77,6 +76,8 @@ public class ProxyConfig {
      */
     @Setter
     private BandwidthConfig bandwidth;
+    @Setter
+    private LoadBalanceConfig loadBalance;
 
     /**
      * 计算域名的类型
@@ -179,4 +180,48 @@ public class ProxyConfig {
     public boolean hasRemotePort() {
         return remotePort != null;
     }
+
+    public boolean hasLoadBalance() {
+        return loadBalance != null;
+    }
+
+    /**
+     * 是否需要负载均衡
+     * 条件:
+     * 1. 有多个target
+     * 2. 没有配置负载均衡时，默认启用轮询
+     * 3. 配置了负载均衡时，按配置的策略
+     */
+    public boolean isLoadBalanceNeeded() {
+        return targets.size() > 1;
+    }
+
+    public Target getSingleTarget() {
+        return targets.get(0);
+    }
+
+    public boolean addTarget(Target target) {
+        if (target == null) {
+            return false;
+        }
+        if (targets.contains(target)) {
+            return false;
+        }
+        targets.add(target);
+        return true;
+    }
+
+    public int addTargets(List<Target> newTargets) {
+        if (newTargets == null || newTargets.isEmpty()) {
+            return 0;
+        }
+        int addedCount = 0;
+        for (Target target : newTargets) {
+            if (addTarget(target)) {
+                addedCount++;
+            }
+        }
+        return addedCount;
+    }
 }
+

@@ -6,6 +6,7 @@ import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.handler.utils.MessageUtils;
 import com.xiaoniucode.etp.server.handler.utils.NettyHttpUtils;
+import com.xiaoniucode.etp.server.manager.LeastConnManager;
 import com.xiaoniucode.etp.server.manager.domain.VisitorSession;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
 import io.netty.buffer.ByteBuf;
@@ -100,6 +101,8 @@ public class ServerChannelBridge extends AbstractChannelBridge {
             logger.debug("访问者连接断开，释放资源");
             visitorSessionManager.disconnect(target, session -> {
                 Channel control = session.getControl();
+                //减少目标服务连接计数
+                LeastConnManager.decrementConnection(session);
                 Message.ControlMessage message = MessageUtils
                         .buildCloseProxy(session.getSessionId());
                 control.writeAndFlush(message);

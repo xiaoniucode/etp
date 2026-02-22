@@ -175,8 +175,8 @@ public class ProxyServiceImpl implements ProxyService {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setName(proxy.getName());
         proxyConfig.setProxyId(proxy.getId());
-        proxyConfig.setLocalIp(proxy.getLocalIp());
-        proxyConfig.setLocalPort(proxy.getLocalPort());
+//        proxyConfig.setLocalIp(proxy.getLocalIp());todo
+//        proxyConfig.setLocalPort(proxy.getLocalPort());
         proxyConfig.setStatus(proxy.getStatus());
         proxyConfig.setProtocol(ProtocolType.TCP);
         proxyConfig.setRemotePort(proxy.getRemotePort());
@@ -262,8 +262,8 @@ public class ProxyServiceImpl implements ProxyService {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setName(proxy.getName());
         proxyConfig.setProxyId(proxy.getId());
-        proxyConfig.setLocalIp(proxy.getLocalIp());
-        proxyConfig.setLocalPort(proxy.getLocalPort());
+//        proxyConfig.setLocalIp(proxy.getLocalIp());todo
+//        proxyConfig.setLocalPort(proxy.getLocalPort());
         proxyConfig.setStatus(proxy.getStatus());
         proxyConfig.setProtocol(ProtocolType.HTTP);
         proxyConfig.setRemotePort(null);

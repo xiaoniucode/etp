@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.handler.message;
 import com.xiaoniucode.etp.core.handler.AbstractTunnelMessageHandler;
 import com.xiaoniucode.etp.core.message.Message.*;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
+import com.xiaoniucode.etp.server.manager.LeastConnManager;
 import com.xiaoniucode.etp.server.manager.session.VisitorSessionManager;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -25,10 +26,11 @@ public class CloseProxyHandler extends AbstractTunnelMessageHandler {
     protected void doHandle(ChannelHandlerContext ctx, ControlMessage msg) {
         CloseProxy closeProxy = msg.getCloseProxy();
         visitorSessionManager.disconnect(closeProxy.getSessionId(), session -> {
+                    //减少最少连接负载均衡器连接计数
+                    LeastConnManager.decrementConnection(session);
                     ChannelUtils.closeOnFlush(session.getVisitor());
                     logger.debug("visitor: {} 断开连接", session.getSessionId());
                 }
         );
-
     }
 }

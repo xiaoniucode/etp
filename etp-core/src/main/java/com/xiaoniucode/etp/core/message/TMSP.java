@@ -4,6 +4,8 @@ package com.xiaoniucode.etp.core.message;
  * TMSP (Tunnel Multiplexed Stream Protocol)
  * 隧道多路复用流协议
  * 二进制协议
+ *
+ * @author xiaoniucode
  */
 public class TMSP {
     public static final String PROTOCOL_NAME = "TMSP";
