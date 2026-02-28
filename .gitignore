@@ -13,11 +13,11 @@ buildNumber.properties
 /bak/
 etps.toml
 etpc.toml
-etp-server/dependency-reduced-pom.xml
-etp-client/dependency-reduced-pom.xml
+server/dependency-reduced-pom.xml
+client/dependency-reduced-pom.xml
 /etp-test/dependency-reduced-pom.xml
-/etp-common/dependency-reduced-pom.xml
-/etp-core/dependency-reduced-pom.xml
+/common/dependency-reduced-pom.xml
+/core/dependency-reduced-pom.xml
 etps.log
 etpc.log
 /scripts/cert

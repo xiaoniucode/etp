@@ -1,0 +1,45 @@
+package com.xiaoniucode.etp.server.statemachine.stream.visitor.action;
+
+import com.xiaoniucode.etp.core.codec.NewVisitorCodec;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.Target;
+import com.xiaoniucode.etp.core.message.TMSP;
+import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
+import com.xiaoniucode.etp.server.statemachine.stream.visitor.ClientStreamEvent;
+import com.xiaoniucode.etp.server.statemachine.stream.visitor.ClientStreamState;
+import com.xiaoniucode.etp.server.statemachine.stream.visitor.StreamContext;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class StreamOpenAction extends StreamBaseAction {
+    @Override
+    protected void doExecute(ClientStreamState from, ClientStreamState to, ClientStreamEvent event, StreamContext context) {
+        int streamId = context.getStreamId();
+        Channel control = context.getControl();
+        ProxyConfig config = context.getProxyConfig();
+        LoadBalancer loadBalancer = context.getLoadBalancer();
+        Target target;
+        if (config.isLoadBalanceNeeded() && loadBalancer != null) {
+            target = loadBalancer.select(config.getTargets(), config.getProxyId());
+        } else {
+            target = config.getSingleTarget();
+
+        }
+        context.setCurrentTarget(target);
+        ByteBuf buffer = control.alloc().buffer();
+        NewVisitorCodec.encode(buffer, target.getHost(), target.getPort());
+        TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN, buffer);
+
+        frame.setCompressed(config.isCompressEnabled());
+        frame.setEncrypted(config.isEncryptEnabled());
+        control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
+            if (!future.isSuccess()) {
+                context.fireEvent(ClientStreamEvent.STREAM_CLOSE);
+            }
+        });
+    }
+}

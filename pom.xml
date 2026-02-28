@@ -88,12 +88,12 @@
         <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
     </properties>
     <modules>
-        <module>etp-core</module>
-        <module>etp-common</module>
-        <module>etp-server</module>
-  <!--      <module>etp-server-web</module>-->
-        <module>etp-client</module>
-        <module>etp-main</module>
+        <module>core</module>
+        <module>common</module>
+        <module>server</module>
+        <module>console</module>
+        <module>client</module>
+        <module>main</module>
     </modules>
 
     <dependencyManagement>

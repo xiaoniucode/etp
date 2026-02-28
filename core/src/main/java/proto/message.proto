@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+package com.xiaoniucode.etp.core.message;
+enum ProtocolType {
+  TCP = 0;
+  HTTP = 1;
+}
+enum ClientType{
+  BINARY_DEVICE = 0;
+  WEB_SESSION = 1;
+}
+enum AccessMode {
+  ALLOW = 0;
+  DENY = 1;
+}
+enum LoadBalanceStrategy {
+  ROUND_ROBIN = 0;
+  WEIGHT = 1;
+  RANDOM = 2;
+  LEAST_CONN = 3;
+}
+enum TransportProtocolType{
+  T_TCP = 0;
+}
+
+message AuthInfo {
+  string token = 1;
+  string version = 5;
+  ClientType client_type = 4;
+  optional string client_id = 9;
+  optional  string name = 3;
+  optional string os = 6;
+  optional string arch = 7;
+}
+
+message AuthResponse{
+  string clientId = 1;
+  uint32 connectionId = 4;
+  uint32 code = 2;
+  optional string message = 3;
+}
+
+message AccessControl {
+  bool enable = 1;
+  AccessMode mode = 2;
+  repeated string allow = 3;
+  repeated string deny = 4;
+}
+
+message HttpUser {
+  string user = 1;
+  string pass = 2;
+}
+
+message BasicAuth {
+  bool enable = 1;
+  repeated HttpUser http_users = 2;
+}
+
+message Bandwidth {
+  optional string limit = 1;
+  optional string limit_in = 2;
+  optional string limit_out = 3;
+}
+
+message Target {
+  string host = 1;
+  int32 port = 2;
+  optional string name = 4;
+  optional int32 weight = 5;
+}
+
+message LoadBalance{
+  optional LoadBalanceStrategy strategy = 1;
+}
+message DomainInfo{
+  optional bool auto_domain = 1;
+  repeated string custom_domains = 2;
+  repeated string sub_domains = 3;
+}
+message Compress{
+  optional bool enable = 1;
+}
+message Encrypt{
+  optional bool enable = 1;
+}
+message  Transport{
+  optional bool mux = 1;
+  optional TransportProtocolType protocol = 2;
+  optional Encrypt encrypt = 3;
+  optional Compress compress = 4;
+}
+message NewProxy {
+  string name = 1;
+  repeated Target targets = 2;
+  optional int32 status = 3;
+  optional Encrypt encrypt = 4;
+  optional  Compress compress = 5;
+  ProtocolType protocol = 6;
+  optional int32 remote_port = 7;
+  optional DomainInfo domain = 8;
+  optional AccessControl access_control = 11;
+  optional BasicAuth basic_auth = 12;
+  optional Bandwidth bandwidth = 13;
+  optional LoadBalance load_balance = 14;
+  optional Transport transport = 15;
+}
+message NewProxyResp {
+  string proxy_name = 1;
+  string remote_addr = 2;
+}
+
+message Error {
+  int32 code = 1;
+  string message = 2;
+}
+
+message ConfigMessage {
+  oneof payload {
+    NewProxy new_proxy = 101;
+    NewProxyResp new_proxy_resp = 102;
+    Error error = 205;
+  }
+}

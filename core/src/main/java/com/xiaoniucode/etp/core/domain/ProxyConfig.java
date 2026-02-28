@@ -1,0 +1,164 @@
+package com.xiaoniucode.etp.core.domain;
+
+import com.xiaoniucode.etp.core.enums.ProtocolType;
+
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+@Getter
+public class ProxyConfig {
+    /**
+     * 唯一标识
+     */
+    @Setter
+    private String proxyId;
+    /**
+     * 客户端内唯一
+     */
+    @Setter
+    private String name;
+    @Setter
+    private ProtocolType protocol;
+    @Setter
+    private Integer remotePort;
+    private final List<Target> targets = new CopyOnWriteArrayList<>();
+    /**
+     * 代理的状态
+     */
+    @Setter
+    private ProxyStatus status = ProxyStatus.OPEN;
+    @Setter
+    private DomainConfig domainInfo;
+    /**
+     * 访问控制
+     */
+    @Setter
+    private AccessControlConfig accessControl;
+    /**
+     * HTTP 协议有效
+     */
+    @Setter
+    private BasicAuthConfig basicAuth;
+    /**
+     * 带宽限制
+     */
+    @Setter
+    private BandwidthConfig bandwidth;
+    @Setter
+    private LoadBalanceConfig loadBalance;
+    /**
+     * 传输配置
+     */
+    @Setter
+    private TransportConfig transport;
+
+
+    public boolean hasTransport() {
+        return transport != null;
+    }
+
+    public boolean hasStatus() {
+        return status != null;
+    }
+
+
+    public boolean isOpen() {
+        return this.status == ProxyStatus.OPEN;
+    }
+
+    /**
+     * 是否启用加密
+     */
+    public boolean isEncryptEnabled() {
+        return transport != null && transport.getEncrypt() != null && transport.getEncrypt().getEnable();
+    }
+
+    /**
+     * 是否启用压缩
+     */
+    public boolean isCompressEnabled() {
+        return transport != null && transport.getCompress() != null && transport.getCompress().getEnable();
+    }
+
+    public boolean hasAccessControl() {
+        return accessControl != null;
+    }
+
+    public boolean hasBandwidthLimit() {
+        return bandwidth != null;
+    }
+
+    public boolean hasBasicAuth() {
+        return basicAuth != null;
+    }
+
+    /**
+     * 是否是 HTTP 协议
+     */
+    public boolean isHttp() {
+        return ProtocolType.isHttp(protocol);
+    }
+
+    /**
+     * 是否是 TCP 协议
+     */
+    public boolean isTcp() {
+        return ProtocolType.isTcp(protocol);
+    }
+
+    public boolean hasRemotePort() {
+        return remotePort != null;
+    }
+
+    public boolean hasLoadBalance() {
+        return loadBalance != null;
+    }
+
+    /**
+     * 是否需要负载均衡
+     * 条件:
+     * 1. 有多个target
+     * 2. 没有配置负载均衡时，默认启用轮询
+     * 3. 配置了负载均衡时，按配置的策略
+     */
+    public boolean isLoadBalanceNeeded() {
+        return targets.size() > 1;
+    }
+
+    public Target getSingleTarget() {
+        return targets.get(0);
+    }
+
+    public boolean addTarget(Target target) {
+        if (target == null) {
+            return false;
+        }
+        if (targets.contains(target)) {
+            return false;
+        }
+        targets.add(target);
+        return true;
+    }
+
+    public int addTargets(List<Target> newTargets) {
+        if (newTargets == null || newTargets.isEmpty()) {
+            return 0;
+        }
+        int addedCount = 0;
+        for (Target target : newTargets) {
+            if (addTarget(target)) {
+                addedCount++;
+            }
+        }
+        return addedCount;
+    }
+
+    public boolean isMuxTunnel() {
+        return transport != null && transport.isMux();
+    }
+}
+

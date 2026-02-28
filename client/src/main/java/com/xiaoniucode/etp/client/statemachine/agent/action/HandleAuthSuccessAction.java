@@ -1,0 +1,161 @@
+package com.xiaoniucode.etp.client.statemachine.agent.action;
+
+import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.config.ConfigUtils;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
+import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
+import com.xiaoniucode.etp.common.utils.StringUtils;
+import com.xiaoniucode.etp.core.domain.*;
+import com.xiaoniucode.etp.core.enums.LoadBalanceStrategy;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.message.Message;
+import com.xiaoniucode.etp.core.message.TMSP;
+import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.utils.ProtobufUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+
+import java.util.List;
+import java.util.Set;
+
+public class HandleAuthSuccessAction extends AgentBaseAction {
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(HandleAuthSuccessAction.class);
+
+
+    @Override
+    protected void doExecute(ClientState from, ClientState to, ClientEvent event, AgentContext context) {
+        logger.debug("认证成功");
+        AppConfig configs = ConfigUtils.getConfig();
+        List<ProxyConfig> proxies = configs.getProxies();
+        Channel control = context.getControl();
+        for (ProxyConfig config : proxies) {
+            Message.NewProxy newProxy = buildNewProxy(config);
+            Message.ConfigMessage message = Message.ConfigMessage.newBuilder().setNewProxy(newProxy).build();
+            ByteBuf payload = ProtobufUtil.toByteBuf(message, control.alloc());
+            TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE, payload);
+            //添加到缓冲区
+            control.write(frame);
+        }
+        control.flush();
+    }
+
+    private static Message.NewProxy buildNewProxy(ProxyConfig config) {
+        ProtocolType protocol = config.getProtocol();
+        Message.NewProxy.Builder newProxyBuilder = Message.NewProxy.newBuilder();
+        List<Message.Target> targets = config.getTargets().stream().map(t -> {
+                    Message.Target.Builder target = Message.Target.newBuilder()
+                            .setHost(t.getHost())
+                            .setPort(t.getPort())
+                            .setWeight(t.getWeight());
+                    if (StringUtils.hasText(t.getName())) {
+                        target.setName(t.getName());
+                    }
+                    if (t.getWeight() != null) {
+                        target.setWeight(t.getWeight());
+                    }
+                    return target.build();
+                }
+        ).toList();
+        newProxyBuilder.setName(config.getName())
+                .addAllTargets(targets)
+                .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
+
+        if (config.isOpen()) {
+            newProxyBuilder.setStatus(config.getStatus().getCode());
+        }
+        Message.Compress compress = Message.Compress.newBuilder().setEnable(config.isCompressEnabled()).build();
+        newProxyBuilder.setCompress(compress);
+        Message.Encrypt encrypt = Message.Encrypt.newBuilder().setEnable(config.isEncryptEnabled()).build();
+        newProxyBuilder.setEncrypt(encrypt);
+        switch (protocol) {
+            case TCP:
+                if (config.hasRemotePort()) {
+                    newProxyBuilder.setRemotePort(config.getRemotePort());
+                }
+                break;
+            case HTTP:
+                DomainConfig domainInfo = config.getDomainInfo();
+                if (domainInfo != null) {
+
+                    Set<String> customDomains = domainInfo.getCustomDomains();
+                    Boolean autoDomain = domainInfo.getAutoDomain();
+                    Set<String> subDomains = domainInfo.getSubDomains();
+                    Message.DomainInfo domainReq = Message.DomainInfo.newBuilder().setAutoDomain(autoDomain).addAllCustomDomains(customDomains)
+                            .addAllSubDomains(subDomains).build();
+                    newProxyBuilder.setDomain(domainReq);
+                }
+
+                //Basic Auth 认证
+                if (config.hasBasicAuth()) {
+                    BasicAuthConfig basicAuth = config.getBasicAuth();
+                    Message.BasicAuth.Builder basicAuthBuilder = Message.BasicAuth.newBuilder().setEnable(basicAuth.isEnable());
+                    Set<HttpUser> users = basicAuth.getUsers();
+                    if (users != null && !users.isEmpty()) {
+                        for (HttpUser user : users) {
+                            Message.HttpUser httpUser = Message.HttpUser.newBuilder()
+                                    .setUser(user.getUsername())
+                                    .setPass(user.getPassword())
+                                    .build();
+                            basicAuthBuilder.addHttpUsers(httpUser);
+                        }
+                    }
+                    newProxyBuilder.setBasicAuth(basicAuthBuilder.build());
+                }
+                break;
+        }
+        //访问控制
+        if (config.hasAccessControl()) {
+            AccessControlConfig access = config.getAccessControl();
+            Message.AccessControl.Builder accessControlbuilder = Message.AccessControl
+                    .newBuilder()
+                    .setEnable(access.isEnable())
+                    .setMode(Message.AccessMode.valueOf(access.getMode().name()));
+            if (access.hasAllow()) {
+                Set<String> allow = access.getAllow();
+                accessControlbuilder.addAllAllow(allow);
+            }
+            if (access.hasDeny()) {
+                Set<String> deny = access.getDeny();
+                accessControlbuilder.addAllDeny(deny);
+            }
+            newProxyBuilder.setAccessControl(accessControlbuilder.build());
+        }
+        //带宽限制
+        if (config.hasBandwidthLimit()) {
+            BandwidthConfig bandwidth = config.getBandwidth();
+            Message.Bandwidth bw = Message.Bandwidth.newBuilder()
+                    .setLimit(bandwidth.getLimit())
+                    .setLimitIn(bandwidth.getLimitIn())
+                    .setLimitOut(bandwidth.getLimitOut())
+                    .build();
+            newProxyBuilder.setBandwidth(bw);
+        }
+        //负载均衡
+        if (config.hasLoadBalance()) {
+            Message.LoadBalance.Builder loadBalanceBuilder = Message.LoadBalance.newBuilder();
+            if (config.getLoadBalance().hasStrategy()) {
+                Message.LoadBalanceStrategy strategy = toProtoType(config.getLoadBalance().getStrategy());
+                loadBalanceBuilder.setStrategy(strategy);
+            }
+            newProxyBuilder.setLoadBalance(loadBalanceBuilder.build());
+        }
+
+        return newProxyBuilder.build();
+    }
+
+    private static Message.LoadBalanceStrategy toProtoType(LoadBalanceStrategy strategy) {
+        switch (strategy) {
+            case ROUND_ROBIN:
+                return Message.LoadBalanceStrategy.ROUND_ROBIN;
+            case WEIGHT:
+                return Message.LoadBalanceStrategy.WEIGHT;
+            case RANDOM:
+                return Message.LoadBalanceStrategy.RANDOM;
+            case LEAST_CONN:
+                return Message.LoadBalanceStrategy.LEAST_CONN;
+            default:
+                throw new IllegalArgumentException("未知负载均衡策略: " + strategy);
+        }
+    }
+}

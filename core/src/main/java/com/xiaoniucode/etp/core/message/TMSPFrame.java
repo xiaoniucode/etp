@@ -1,0 +1,122 @@
+package com.xiaoniucode.etp.core.message;
+
+import io.netty.buffer.ByteBuf;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+@Getter
+@Setter
+public class TMSPFrame {
+    /**
+     * 协议魔数
+     */
+    private int magic = TMSP.MAGIC;
+
+    /**
+     * 协议版本
+     */
+    private byte version = TMSP.VERSION;
+    /**
+     * 标记位
+     */
+    private byte flags;
+    /**
+     * 流ID - 标识所属的逻辑流
+     */
+    private int streamId;
+    /**
+     * 消息类型
+     */
+    private byte msgType;
+
+    /**
+     * 数据包
+     */
+    private ByteBuf payload;
+
+    public TMSPFrame(int streamId, byte msgType) {
+        this.streamId = streamId;
+        this.msgType = msgType;
+    }
+
+    public TMSPFrame(int streamId, byte msgType, ByteBuf payload) {
+        this.streamId = streamId;
+        this.msgType = msgType;
+        this.payload = payload;
+    }
+
+    /**
+     * 判断是否压缩
+     * @return true=已压缩
+     */
+    public boolean isCompressed() {
+        return (flags & TMSP.FLAG_COMPRESSED) != 0;
+    }
+
+    /**
+     * 设置是否压缩
+     * @param compressed true=压缩，false=不压缩
+     */
+    public void setCompressed(boolean compressed) {
+        if (compressed) {
+            flags |= TMSP.FLAG_COMPRESSED;
+        } else {
+            flags &= ~TMSP.FLAG_COMPRESSED;
+        }
+    }
+
+    /**
+     * 判断是否加密
+     * @return true=已加密
+     */
+    public boolean isEncrypted() {
+        return (flags & TMSP.FLAG_ENCRYPTED) != 0;
+    }
+
+    /**
+     * 设置是否加密
+     * @param encrypted true=加密，false=不加密
+     */
+    public void setEncrypted(boolean encrypted) {
+        if (encrypted) {
+            flags |= TMSP.FLAG_ENCRYPTED;
+        } else {
+            flags &= ~TMSP.FLAG_ENCRYPTED;
+        }
+    }
+
+    /**
+     * 同时设置压缩和加密
+     * @param compress 是否压缩
+     * @param encrypt 是否加密
+     */
+    public void setFlags(boolean compress, boolean encrypt) {
+        byte newFlags = 0;
+        if (compress) newFlags |= TMSP.FLAG_COMPRESSED;
+        if (encrypt) newFlags |= TMSP.FLAG_ENCRYPTED;
+        this.flags = newFlags;
+    }
+
+    /**
+     * 判断是否既压缩又加密
+     */
+    public boolean isCompressedAndEncrypted() {
+        return (flags & (TMSP.FLAG_COMPRESSED | TMSP.FLAG_ENCRYPTED))
+                == (TMSP.FLAG_COMPRESSED | TMSP.FLAG_ENCRYPTED);
+    }
+    public boolean isMuxTunnel() {
+        return (flags & TMSP.FLAG_MUX) != 0;
+    }
+
+    /**
+     *设置为共享隧道
+     * @param isMux 是否复用隧道
+     */
+    public void setMuxTunnel(boolean isMux) {
+        if (isMux) {
+            flags |= TMSP.FLAG_MUX;
+        } else {
+            flags &= ~TMSP.FLAG_MUX;
+        }
+    }
+}
