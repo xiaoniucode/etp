@@ -15,7 +15,7 @@ import com.xiaoniucode.etp.server.manager.domain.strategy.DomainGenerationStrate
 import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import com.xiaoniucode.etp.server.proxy.HttpProxyServer;
 import com.xiaoniucode.etp.server.proxy.TcpProxyServer;
-import com.xiaoniucode.etp.server.proxy.TunnelServer;
+import com.xiaoniucode.etp.server.TunnelServer;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import jakarta.annotation.Resource;

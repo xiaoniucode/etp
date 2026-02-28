@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.proxy;
+package com.xiaoniucode.etp.server;
 
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
@@ -75,7 +75,7 @@ public class TunnelServer implements Lifecycle {
                             sc.pipeline()
                                     .addLast(new TMSPCodec.Decoder(10 * 1024 * 1024))
                                     .addLast(new TMSPCodec.Encoder())
-                                    .addLast("idleCheckHandler", new IdleCheckHandler(30, 30, 0, TimeUnit.SECONDS))
+                                    .addLast("idleCheckHandler", new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
                                     .addLast("controlFrameHandler", controlFrameHandler);
                         }
                     });

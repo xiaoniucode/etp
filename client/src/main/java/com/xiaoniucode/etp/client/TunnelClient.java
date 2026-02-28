@@ -91,7 +91,7 @@ public final class TunnelClient implements Lifecycle {
                         sc.pipeline()
                                 .addLast(new TMSPCodec.Decoder(10 * 1024 * 1024))
                                 .addLast(new TMSPCodec.Encoder())
-                                .addLast("idleCheckHandler", new IdleCheckHandler(30, 30, 0, TimeUnit.SECONDS))
+                                .addLast("idleCheckHandler", new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
                                 .addLast("controlTunnelHandler", controlTunnelHandler);
                     }
                 });
