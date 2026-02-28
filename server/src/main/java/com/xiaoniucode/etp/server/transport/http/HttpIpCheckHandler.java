@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.transport.http;
 
-import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.constant.AttributeKeys;
 import com.xiaoniucode.etp.server.transport.IpCheckHandler;
 import com.xiaoniucode.etp.server.manager.AccessControlManager;
 import com.xiaoniucode.etp.server.manager.DomainManager;
@@ -27,7 +27,7 @@ public class HttpIpCheckHandler extends IpCheckHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel visitor = ctx.channel();
-        String domain = visitor.attr(ChannelConstants.VISIT_DOMAIN).get();
+        String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
         String proxyId = domainManager.getProxyId(domain);
         doCheckAccess(visitor, proxyId);
         //继续传递给下一个处理器

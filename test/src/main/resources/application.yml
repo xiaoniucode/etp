@@ -4,5 +4,5 @@ spring:
   jpa:
     show-sql: false
 server:
-  port: 8090
+  port: 8023
 

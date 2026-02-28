@@ -7,9 +7,9 @@ import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.ClientStreamEvent;
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.StreamContext;
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.VisitorManager;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
+import com.xiaoniucode.etp.server.statemachine.stream.VisitorManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     public void channelActive(ChannelHandlerContext ctx) {
         Channel control = ctx.channel();
         AgentContext agent = agentManager.createAgent(control);
-       agent.fireEvent(AgentEvent.CONNECT );
+        agent.fireEvent(AgentEvent.CONNECT);
     }
 
     @Override
@@ -45,33 +45,33 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             case TMSP.MSG_AUTH -> {
                 ByteBuf payload = frame.getPayload();
                 Message.AuthInfo authInfo = ProtobufUtil.parseFrom(payload, Message.AuthInfo.parser());
-                agentContext.setVariable("authInfo",authInfo);
+                agentContext.setVariable("authInfo", authInfo);
                 //开始处理认证
-              agentContext.fireEvent(AgentEvent.AUTH_START);
+                agentContext.fireEvent(AgentEvent.AUTH_START);
             }
             case TMSP.MSG_STREAM_OPEN_RESP -> {
                 int streamId = frame.getStreamId();
                 Channel tunnel = ctx.channel();
-                StreamContext streamContext = visitorManager.getServerStreamContext(streamId);
-                if (streamContext==null){
+                StreamContext streamContext = visitorManager.getStreamContext(streamId);
+                if (streamContext == null) {
                     logger.warn("流上下文不存在 - [streamId={}]", streamId);
                     return;
                 }
                 streamContext.setTunnel(tunnel);
-                streamContext.fireEvent(ClientStreamEvent.STREAM_OPEN_SUCCESS);
+                streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
             }
             case TMSP.MSG_STREAM_DATA -> {
                 int streamId = frame.getStreamId();
                 ByteBuf payload = frame.getPayload().retain();
-                StreamContext streamContext = visitorManager.getServerStreamContext(streamId);
-                streamContext.fireEvent(ClientStreamEvent.STREAM_DATA);
+                StreamContext streamContext = visitorManager.getStreamContext(streamId);
+                streamContext.fireEvent(StreamEvent.STREAM_DATA);
                 streamContext.sendPayloadToVisitor(payload);
 
             }
             case TMSP.MSG_PROXY_CREATE -> {
                 Message.NewProxy newProxy = ProtobufUtil.parseFrom(frame.getPayload(), Message.NewProxy.parser());
-                agentContext.setVariable("newProxy",newProxy);
-               agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
+                agentContext.setVariable("newProxy", newProxy);
+                agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
             }
         }
     }

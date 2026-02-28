@@ -3,11 +3,13 @@ package com.xiaoniucode.etp.client.statemachine.stream;
 import com.alibaba.cola.statemachine.StateMachine;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import jdk.javadoc.doclet.Taglet;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,10 +26,13 @@ public class StreamContext extends ProcessContextImpl {
     private Channel control;
     private Channel tunnel;
     private Channel server;
+    private String localIp;
+    private int localPort;
     private boolean compress;
     private boolean encrypt;
     private boolean isMuxTunnel;
     private AgentContext agentContext;
+    private StreamManager streamManager;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;

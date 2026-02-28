@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.core.codec.NewVisitorCodec;
-import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.constant.AttributeKeys;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import io.netty.bootstrap.Bootstrap;
@@ -30,6 +30,8 @@ public class StreamOpenAction extends StreamBaseAction {
             NewVisitorCodec.NewVisitorInfo visitor = context.getVariableAs("newVisitorInfo", NewVisitorCodec.NewVisitorInfo.class);
             String localIp = visitor.getLocalIp();
             int localPort = visitor.getLocalPort();
+            context.setLocalIp(localIp);
+            context.setLocalPort(localPort);
             AgentContext agentContext = context.getAgentContext();
             AppConfig config = agentContext.getConfig();
 
@@ -40,7 +42,7 @@ public class StreamOpenAction extends StreamBaseAction {
                     logger.debug("连接到目标服务 - [地址={}，端口={}]", localIp, localPort);
                     Channel server = serverFuture.channel();
                     server.config().setOption(ChannelOption.AUTO_READ, false);
-                    server.attr(ChannelConstants.STREAM_ID).set(streamId);
+                    server.attr(AttributeKeys.STREAM_ID).set(streamId);
                     context.setServer(server);
                     Bootstrap controlBootstrap = agentContext.getControlBootstrap();
 

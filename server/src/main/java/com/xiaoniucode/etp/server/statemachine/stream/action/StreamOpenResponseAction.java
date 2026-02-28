@@ -1,8 +1,8 @@
-package com.xiaoniucode.etp.server.statemachine.stream.visitor.action;
+package com.xiaoniucode.etp.server.statemachine.stream.action;
 
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.ClientStreamEvent;
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.ClientStreamState;
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.StreamContext;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import org.slf4j.Logger;
@@ -17,12 +17,14 @@ import org.springframework.stereotype.Component;
 public class StreamOpenResponseAction extends StreamBaseAction {
     private final Logger logger= LoggerFactory.getLogger(StreamContext.class);
     @Override
-    protected void doExecute(ClientStreamState from, ClientStreamState to, ClientStreamEvent event, StreamContext context) {
+    protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         logger.debug("流打开成功");
         Channel tunnel = context.getTunnel();
         int streamId = context.getStreamId();
 
         Channel visitor = context.getVisitor();
+
+
 //
 //        visitor.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>() {
 //            @Override
@@ -32,5 +34,8 @@ public class StreamOpenResponseAction extends StreamBaseAction {
 //            }
 //        });
         visitor.config().setOption(ChannelOption.AUTO_READ, true);
+        if (context.getCurrentProtocol().isHttp()){
+            context.relayHttpFirstPackage();
+        }
     }
 }

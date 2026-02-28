@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.client.manager;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.ConfigUtils;
 import com.xiaoniucode.etp.client.manager.domain.AgentSession;
-import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.constant.AttributeKeys;
 import io.netty.channel.Channel;
 
 import java.util.Optional;
@@ -19,9 +19,9 @@ public class AgentSessionManager {
         if ( sessionId == null || control == null) {
             return Optional.empty();
         }
-        String clientId = control.attr(ChannelConstants.CLIENT_ID).get();
+        String clientId = control.attr(AttributeKeys.CLIENT_ID).get();
         AgentSession agentSession = new AgentSession(clientId, sessionId, control);
-        String token = control.attr(ChannelConstants.TOKEN).get();
+        String token = control.attr(AttributeKeys.TOKEN).get();
         AppConfig config = ConfigUtils.getConfig();
         String serverAddr = config.getServerAddr();
         int serverPort = config.getServerPort();

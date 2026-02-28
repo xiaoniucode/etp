@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.statemachine.stream.visitor.action;
+package com.xiaoniucode.etp.server.statemachine.stream.action;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.Target;
@@ -8,9 +8,9 @@ import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancerFactory;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.StreamContext;
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.ClientStreamEvent;
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.ClientStreamState;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import org.slf4j.Logger;
@@ -31,9 +31,11 @@ public class CheckTargetAction extends StreamBaseAction {
     @Autowired
     private AgentManager agentManager;
     @Override
-    protected void doExecute(ClientStreamState from, ClientStreamState to, ClientStreamEvent event, StreamContext context) {
+    protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         Channel visitor = context.getVisitor();
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
+
+        ProtocolType protocol = context.getCurrentProtocol();
         int remotePort = getListenerPort(visitor);
         ProxyConfig config = new ProxyConfig();
         Target target = new Target();
@@ -55,7 +57,14 @@ public class CheckTargetAction extends StreamBaseAction {
             target.setPort(6379);
             config.getTargets().add(target);
         }
-
+        if (protocol.isHttp()){
+            config.setProtocol(ProtocolType.HTTP);
+            config.setStatus(ProxyStatus.OPEN);
+            config.setProxyId("1001");
+            target.setHost("127.0.0.1");
+            target.setPort(8023);
+            config.getTargets().add(target);
+        }
 
        agentManager.getAgentContextByProxyId(config.getProxyId()).ifPresent(agent -> {
            context.setControl(agent.getControl());
@@ -66,10 +75,10 @@ public class CheckTargetAction extends StreamBaseAction {
             LoadBalancer loadBalancer = loadBalancerFactory.getLoadBalancer(config);
             context.setLoadBalancer(loadBalancer);
             context.setProxyConfig(config);
-            context.fireEvent(ClientStreamEvent.TARGET_VALIDATED);
+            context.fireEvent(StreamEvent.TARGET_VALIDATED);
         } else {
             logger.debug("访问目标不存在，没有可用隧道");
-            context.fireEvent(ClientStreamEvent.STREAM_CLOSE);
+            context.fireEvent(StreamEvent.STREAM_CLOSE);
         }
     }
 
@@ -78,3 +87,27 @@ public class CheckTargetAction extends StreamBaseAction {
         return sa.getPort();
     }
 }
+
+//  visitor.attr(ChannelConstants.PROTOCOL_TYPE).set(ProtocolType.HTTP);
+//            visitor.attr(ChannelConstants.VISIT_DOMAIN).set(domain);
+//            visitor.attr(ChannelConstants.BASIC_AUTH_HEADER).set(basicAuth);
+//
+//
+//String proxyId = domainManager.getProxyId(domain);
+//                    if (proxyId == null) {
+//        visitor.close();
+//                        logger.debug("隧道不存在");
+//                        return;
+//                                }
+//
+//ProxyConfig config = proxyManager.getById(proxyId);
+//                    if (!config.isOpen()) {
+//        visitor.close();
+//                        logger.debug("隧道为关闭状态");
+//                        return;
+//                                }
+//                                if (!domainManager.exists(domain)) {
+//        logger.warn("没有该域名的代理服务");
+//                        visitor.close();
+//                        return;
+//                                }

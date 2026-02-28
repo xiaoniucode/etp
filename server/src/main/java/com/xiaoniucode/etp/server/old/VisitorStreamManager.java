@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.old;
 
-import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.constant.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.generator.StreamIdGenerator;
@@ -67,7 +67,7 @@ public class VisitorStreamManager {
                     ConcurrentHashMap.newKeySet()).add(visitor);
         }
         if (ProtocolDetection.isHttp(visitor)) {
-            String domain = visitor.attr(ChannelConstants.VISIT_DOMAIN).get();
+            String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
             agentSession = agentSessionManager.getAgentSessionByDomain(domain);
             if (agentSession == null) {
                 visitor.close();
@@ -81,7 +81,7 @@ public class VisitorStreamManager {
             return;
         }
         int streamId = streamIdGenerator.nextStreamId();
-        visitor.attr(ChannelConstants.STREAM_ID).set(streamId);
+        visitor.attr(AttributeKeys.STREAM_ID).set(streamId);
         VisitorStream visitorSession = new VisitorStream();
         visitorSession.setVisitor(visitor);
         visitorSession.setControl(agentSession.getControl());
@@ -117,7 +117,7 @@ public class VisitorStreamManager {
                 domainToVisitorChannels.remove(domain);
             }
 
-            ByteBuf cachedPacket = visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).get();
+            ByteBuf cachedPacket = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).get();
             if (cachedPacket != null) {
                 cachedPacket.release();
             }
@@ -132,9 +132,9 @@ public class VisitorStreamManager {
     }
 
     private void clearVisitorAttributeKey(Channel visitor) {
-        visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).set(null);
-        visitor.attr(ChannelConstants.VISIT_DOMAIN).set(null);
-        visitor.attr(ChannelConstants.STREAM_ID).set(null);
+        visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(null);
+        visitor.attr(AttributeKeys.VISIT_DOMAIN).set(null);
+        visitor.attr(AttributeKeys.STREAM_ID).set(null);
     }
 
     /**
@@ -228,7 +228,7 @@ public class VisitorStreamManager {
     }
 
     public VisitorStream getStream(Channel visitor) {
-        Integer streamId = visitor.attr(ChannelConstants.STREAM_ID).get();
+        Integer streamId = visitor.attr(AttributeKeys.STREAM_ID).get();
         if (streamId == null) {
             return null;
         }
@@ -241,7 +241,7 @@ public class VisitorStreamManager {
     }
 
     private String getDomain(Channel visitor) {
-        return visitor.attr(ChannelConstants.VISIT_DOMAIN).get();
+        return visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
     }
 
 }

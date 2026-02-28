@@ -1,10 +1,7 @@
 package com.xiaoniucode.etp.server.transport.http;
 
-import com.xiaoniucode.etp.core.constant.ChannelConstants;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.constant.AttributeKeys;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.manager.DomainManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -22,19 +19,14 @@ import java.util.List;
 public class HostSnifferHandler extends ByteToMessageDecoder {
     private final Logger logger = LoggerFactory.getLogger(HostSnifferHandler.class);
     private boolean sniffing = true;
-    private final DomainManager domainManager;
-    private final ProxyManager proxyManager;
 
-    public HostSnifferHandler(DomainManager domainManager, ProxyManager proxyManager) {
-        this.domainManager = domainManager;
-        this.proxyManager = proxyManager;
+    public HostSnifferHandler() {
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         Channel visitor = ctx.channel();
         if (!sniffing) {
-            // 嗅探结束，直接透传
             out.add(in.retain());
             return;
         }
@@ -59,24 +51,6 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                     } else {
                         domain = host;
                     }
-                    String proxyId = domainManager.getProxyId(domain);
-                    if (proxyId == null) {
-                        visitor.close();
-                        logger.debug("隧道不存在");
-                        return;
-                    }
-
-                    ProxyConfig config = proxyManager.getById(proxyId);
-                    if (!config.isOpen()) {
-                        visitor.close();
-                        logger.debug("隧道为关闭状态");
-                        return;
-                    }
-                    if (!domainManager.exists(domain)) {
-                        logger.warn("没有该域名的代理服务");
-                        visitor.close();
-                        return;
-                    }
                     basicAuth = parseAuthHeader(content);
                 }
                 isHttp = true;
@@ -88,9 +62,9 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             sniffing = false;
         }
         if (isHttp) {
-            visitor.attr(ChannelConstants.PROTOCOL_TYPE).set(ProtocolType.HTTP);
-            visitor.attr(ChannelConstants.VISIT_DOMAIN).set(domain);
-            visitor.attr(ChannelConstants.BASIC_AUTH_HEADER).set(basicAuth);
+            visitor.attr(AttributeKeys.PROTOCOL_TYPE).set(ProtocolType.HTTP);
+            visitor.attr(AttributeKeys.VISIT_DOMAIN).set(domain);
+            visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).set(basicAuth);
         }
         ctx.pipeline().remove(this);
     }

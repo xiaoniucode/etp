@@ -1,9 +1,7 @@
-package com.xiaoniucode.etp.client.handler;
+package com.xiaoniucode.etp.client.transport;
 
-import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
@@ -18,8 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.ConnectException;
-import java.nio.channels.ClosedChannelException;
 
 /**
  *
@@ -28,12 +24,10 @@ import java.nio.channels.ClosedChannelException;
 @ChannelHandler.Sharable
 public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> {
     private final Logger logger = LoggerFactory.getLogger(ControlFrameHandler.class);
-    private final StateMachine<ClientState, ClientEvent, AgentContext> stateMachine;
     private final AgentContext clientContext;
 
     public ControlFrameHandler(AgentContext clientContext) {
         this.clientContext = clientContext;
-        this.stateMachine = clientContext.getStateMachine();
     }
 
     @Override
@@ -48,15 +42,24 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 if (code == 0) {
                     clientContext.setConnectionId(connectionId);
                     clientContext.setAuthenticated(true);
-                    stateMachine.fireEvent(clientContext.getState(), ClientEvent.AUTH_SUCCESS, clientContext);
+                    clientContext.fireEvent(ClientEvent.AUTH_SUCCESS);
                 } else {
                     clientContext.setAuthenticated(false);
-                    stateMachine.fireEvent(clientContext.getState(), ClientEvent.AUTH_FAILURE, clientContext);
+                    clientContext.fireEvent(ClientEvent.AUTH_FAILURE);
                 }
                 break;
             }
+            case TMSP.MSG_PROXY_CREATE_RESP: {
+                clientContext.fireEvent(ClientEvent.PROXY_CREATE_RESP);
+                break;
+            }
+            case TMSP.MSG_GOAWAY: {
+                clientContext.fireEvent(ClientEvent.STOP);
+                break;
+
+            }
+            //********************Stream***********************//
             case TMSP.MSG_STREAM_OPEN: {
-                logger.debug("收到流打开请求");
                 NewVisitorCodec.NewVisitorInfo visitorInfo = NewVisitorCodec.decode(frame.getPayload());
                 StreamContext streamContext = StreamManager.createStreamContext(frame.getStreamId(), clientContext);
                 streamContext.setVariable("newVisitorInfo", visitorInfo);
@@ -65,31 +68,19 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 streamContext.fireEvent(StreamEvent.STREAM_OPEN);
                 break;
             }
-
-            case TMSP.MSG_GOAWAY: {
-                stateMachine.fireEvent(clientContext.getState(), ClientEvent.STOP, clientContext);
-                break;
-            }
-
-            case TMSP.MSG_PROXY_CREATE_RESP: {
-                break;
-            }
             case TMSP.MSG_STREAM_DATA: {
                 ByteBuf payload = frame.getPayload();
                 int streamId = frame.getStreamId();
-                try {
-                    StreamContext streamContext = StreamManager.getStreamContext(streamId);
-                    if (streamContext == null) {
-                        logger.warn("收到数据的流上下文不存在 - [streamId={}]", frame.getStreamId());
-                        payload.release();
-                        return;
-                    }
+                StreamManager.getStreamContext(streamId).ifPresent(streamContext -> {
                     streamContext.fireEvent(StreamEvent.STREAM_DATA);
                     streamContext.relayToServer(payload);
-                } catch (Exception e) {
-                    logger.error("转发数据失败 - [streamId={}]", streamId, e);
-                    payload.release();
-                }
+                });
+                break;
+            }
+            case TMSP.MSG_STREAM_CLOSE: {
+                StreamManager.getStreamContext(frame.getStreamId()).ifPresent(streamContext -> {
+                    streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+                });
                 break;
             }
         }
@@ -98,30 +89,32 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         if (clientContext.getControl() == ctx.channel()) {
-            logger.error("控制隧道断开：channel-{}",ctx.channel().id());
-            ctx.close();
             clientContext.fireEvent(ClientEvent.NETWORK_ERROR);
-        }else {
-            logger.error("数据隧道断开：channel-{}",ctx.channel().id());
+        } else {
+            logger.error("数据隧道断开：channel-{}", ctx.channel().id());
             ctx.close();
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        ClientState currentState = clientContext.getState();
-        logger.info("控制通道断开，当前状态: {}", currentState);
-        if (isNetworkException(cause)) {
-            if (clientContext.getControl() == ctx.channel()) {
-                logger.error("控制隧道网络错误");
-                ctx.close();
-                clientContext.fireEvent(ClientEvent.NETWORK_ERROR);
+        //控制隧道
+        if (ctx.channel() == clientContext.getControl()) {
+            if (isNetworkException(cause)) {
+                if (clientContext.getControl() == ctx.channel()) {
+                    logger.error("控制隧道网络错误", cause);
+                    clientContext.fireEvent(ClientEvent.NETWORK_ERROR);
+                }
+            } else {
+                clientContext.fireEvent(ClientEvent.STOP);
             }
         } else {
+            logger.error("数据隧道异常",cause);
+            //数据隧道
             ctx.close();
-
         }
     }
+
     private boolean isNetworkException(Throwable cause) {
         if (cause instanceof IOException) {
             return true;

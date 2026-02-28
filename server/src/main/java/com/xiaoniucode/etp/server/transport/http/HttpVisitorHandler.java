@@ -1,14 +1,19 @@
 package com.xiaoniucode.etp.server.transport.http;
 
-import com.xiaoniucode.etp.core.constant.ChannelConstants;
-import com.xiaoniucode.etp.server.manager.domain.VisitorStream;
-import com.xiaoniucode.etp.server.old.VisitorStreamManager;
+import com.xiaoniucode.etp.core.constant.AttributeKeys;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
+import com.xiaoniucode.etp.server.statemachine.stream.VisitorManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  * 处理来自公网访问者的请求
@@ -18,69 +23,57 @@ import org.springframework.stereotype.Component;
 public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final Logger logger = LoggerFactory.getLogger(HttpVisitorHandler.class);
     @Autowired
-    private VisitorStreamManager visitorStreamManager;
-
-
+    private VisitorManager visitorManager;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
         Channel visitor = ctx.channel();
-        Boolean connected = visitor.attr(ChannelConstants.CONNECTED).get();
-//        if (connected == null || !connected) {
-//            visitor.attr(ChannelConstants.CONNECTED).set(false);
-//            buf.retain();
-//            visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).set(buf);
-//            visitor.config().setOption(ChannelOption.AUTO_READ, false);
-//            visitorStreamManager.createStream(visitor, visitorStream ->
-//                    targetConnector.connectToTarget(ctx, visitorStream));
-//
-//
-//            Channel control=null;
-//            ProxyConfig config=null;
-//            VisitorStreamContext streamContext = visitorManager.createStreamContext(visitor, control, config);
-//            targetConnector.connectToTarget(streamContext);
-//            ctx.pipeline().remove(this);
-//        }
-    }
+        Optional<StreamContext> contextOpt = visitorManager.getStreamContext(visitor);
+        if (contextOpt.isPresent()) {
+            StreamContext context = contextOpt.get();
+            if (context.getState() == StreamState.OPENED) {
+                ByteBuf payload = buf.retain();
+                context.relayToTunnel(payload);
+            } else {
+                logger.error("隧道未开启，无法传输数据");
+            }
 
-    /**
-     * 发送HTTP 协议的第一个数据包
-     */
-    public void sendFirstPackage(VisitorStream session) {
-        Channel visitor = session.getVisitor();
-        Channel tunnel = session.getTunnel();
-        ByteBuf cached = visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).get();
-        if (cached != null && tunnel.isWritable()) {
-            tunnel.writeAndFlush(cached.retain());
-            cached.release();
-            visitor.attr(ChannelConstants.HTTP_FIRST_PACKET).set(null);
+        } else {
+            logger.debug("[HTTP] 创建流上下文");
+            buf.retain();
+            visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(buf);
+            StreamContext streamContext = visitorManager.createStreamContext(visitor);
+            streamContext.setCurrentProtocol(ProtocolType.HTTP);
+            streamContext.fireEvent(StreamEvent.STREAM_OPEN);
         }
     }
 
+
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-//        Channel visitor = ctx.channel();
-//        visitorStreamManager.closeStream(visitor, session -> {
-//            Channel tunnel = session.getTunnel();
-//            tunnel.writeAndFlush(new TMSPFrame(session.getStreamId(), TMSP.MSG_CLOSE));
-//        });
-//        super.channelInactive(ctx);
+    public void channelInactive(ChannelHandlerContext ctx) {
+        Channel visitor = ctx.channel();
+        visitorManager.getStreamContext(visitor).ifPresent(streamContext -> {
+            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+        });
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error(cause.getMessage(), cause);
-        ctx.close();
+        visitorManager.getStreamContext(ctx.channel()).ifPresent(streamContext -> {
+            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+        });
     }
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel visitor = ctx.channel();
-        VisitorStream visitorSession = visitorStreamManager.getStream(visitor);
-        Channel tunnel = visitorSession.getTunnel();
-        if (tunnel != null) {
-            tunnel.config().setOption(ChannelOption.AUTO_READ, visitor.isWritable());
-        }
+        visitorManager.getStreamContext(visitor).ifPresent(streamContext -> {
+            Channel tunnel = streamContext.getTunnel();
+            if (tunnel != null) {
+                tunnel.config().setOption(ChannelOption.AUTO_READ, visitor.isWritable());
+            }
+        });
         super.channelWritabilityChanged(ctx);
     }
 }

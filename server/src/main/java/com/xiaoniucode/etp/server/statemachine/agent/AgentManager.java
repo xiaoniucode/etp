@@ -1,7 +1,8 @@
 package com.xiaoniucode.etp.server.statemachine.agent;
 
 import com.alibaba.cola.statemachine.StateMachine;
-import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.constant.AttributeKeys;
+import com.xiaoniucode.etp.server.configuration.AgentStateMachineHolder;
 import com.xiaoniucode.etp.server.generator.ConnectionIdGenerator;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -27,12 +28,10 @@ public class AgentManager {
 
     @Autowired
     private ConnectionIdGenerator connectionIdGenerator;
-    @Autowired
-    private StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine;
 
     public Optional<AgentContext> getAgentContext(Channel control) {
-        Integer connectionId = control.attr(ChannelConstants.CONNECTION_ID).get();
-        if (connectionId==null){
+        Integer connectionId = control.attr(AttributeKeys.CONNECTION_ID).get();
+        if (connectionId == null) {
             return Optional.empty();
         }
         AgentContext agentContext = channelToContext.get(connectionId);
@@ -48,16 +47,17 @@ public class AgentManager {
     }
 
     public AgentContext createAgent(Channel control) {
-        AgentContext AgentContext = new AgentContext(this,agentStateMachine);
-        //创建一个唯一 ID
         int connectionId = connectionIdGenerator.nextConnId();
+
+        StateMachine<AgentState, AgentEvent, AgentContext> stateMachine = AgentStateMachineHolder.get(connectionId);
+
+        AgentContext AgentContext = new AgentContext(this, stateMachine);
         AgentContext.setControl(control);
-        control.attr(ChannelConstants.CONNECTION_ID).set(connectionId);
+        control.attr(AttributeKeys.CONNECTION_ID).set(connectionId);
         AgentContext.setConnectionId(connectionId);
         channelToContext.put(connectionId, AgentContext);
         return AgentContext;
     }
-
 
     public int getOnlineCount() {
         return channelToContext.size();

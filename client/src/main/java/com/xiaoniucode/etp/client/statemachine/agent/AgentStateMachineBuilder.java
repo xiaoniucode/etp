@@ -5,6 +5,9 @@ import com.alibaba.cola.statemachine.StateMachineFactory;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.xiaoniucode.etp.client.statemachine.agent.action.*;
+import com.xiaoniucode.etp.client.statemachine.agent.action.auth.AuthAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.auth.HandleAuthFailureAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.auth.HandleAuthSuccessAction;
 
 public class AgentStateMachineBuilder {
 
@@ -90,7 +93,7 @@ public class AgentStateMachineBuilder {
                 .to(ClientState.CONNECTING)
                 .on(ClientEvent.RETRY)
                 .when(ctx -> true)
-                .perform(new RetryAction());
+                .perform(connectAction);
 
         // 停止
         builder.externalTransition()

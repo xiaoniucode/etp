@@ -1,6 +1,6 @@
-package com.xiaoniucode.etp.server.statemachine.stream.visitor;
+package com.xiaoniucode.etp.server.statemachine.stream;
 
-public enum ClientStreamState {
+public enum StreamState {
     INITIALIZED,  // 初始状态
     CHECKING_TARGET,//检查目标
     OPENING,      // 打开中

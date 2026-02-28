@@ -1,9 +1,10 @@
-package com.xiaoniucode.etp.client.statemachine.agent.action;
+package com.xiaoniucode.etp.client.statemachine.agent.action.auth;
 
 import com.xiaoniucode.etp.client.config.domain.RetryConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
+import com.xiaoniucode.etp.client.statemachine.agent.action.AgentBaseAction;
 
 public class HandleAuthFailureAction extends AgentBaseAction {
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(HandleAuthFailureAction.class);

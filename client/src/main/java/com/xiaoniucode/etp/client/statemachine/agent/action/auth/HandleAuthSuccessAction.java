@@ -1,10 +1,11 @@
-package com.xiaoniucode.etp.client.statemachine.agent.action;
+package com.xiaoniucode.etp.client.statemachine.agent.action.auth;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.ConfigUtils;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
+import com.xiaoniucode.etp.client.statemachine.agent.action.AgentBaseAction;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.LoadBalanceStrategy;
@@ -34,7 +35,7 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
             Message.ConfigMessage message = Message.ConfigMessage.newBuilder().setNewProxy(newProxy).build();
             ByteBuf payload = ProtobufUtil.toByteBuf(message, control.alloc());
             TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE, payload);
-            //添加到缓冲区
+
             control.write(frame);
         }
         control.flush();

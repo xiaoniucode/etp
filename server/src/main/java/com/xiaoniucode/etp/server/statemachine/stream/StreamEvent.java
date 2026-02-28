@@ -1,6 +1,6 @@
-package com.xiaoniucode.etp.server.statemachine.stream.visitor;
+package com.xiaoniucode.etp.server.statemachine.stream;
 
-public enum ClientStreamEvent {
+public enum StreamEvent {
     STREAM_OPEN,          // 发送打开流请求
     CHECK_TARGET,         //检查访问目标
     TARGET_VALIDATED,     //检查完成

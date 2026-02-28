@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.transport;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.core.handler.bridge.AbstractChannelBridge;
+import com.xiaoniucode.etp.core.netty.bridge.AbstractChannelBridge;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
 import com.xiaoniucode.etp.server.manager.domain.VisitorStream;

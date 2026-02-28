@@ -11,7 +11,6 @@ import com.xiaoniucode.etp.server.statemachine.agent.action.ProxyInitAction;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -24,10 +23,8 @@ public class AgentStateMachineConfig {
     @Autowired
     private ProxyInitAction proxyInitAction;
 
-    @Bean(name = "agentStateMachine")
-    public StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine() {
+    public StateMachine<AgentState, AgentEvent, AgentContext> createStateMachine(String machineId) {
         StateMachineBuilder<AgentState, AgentEvent, AgentContext> builder = StateMachineBuilderFactory.create();
-
         // 配置状态转换
         builder.externalTransition()
                 .from(AgentState.INITIALIZED)
@@ -62,6 +59,6 @@ public class AgentStateMachineConfig {
                 .when(ctx -> true)
                 .perform(proxyCreateAction);
 
-        return builder.build("agentStateMachine");
+        return builder.build(machineId);
     }
 }

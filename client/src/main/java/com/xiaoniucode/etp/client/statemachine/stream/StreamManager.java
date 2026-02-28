@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.client.statemachine.stream;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.constant.AttributeKeys;
 import io.netty.channel.Channel;
 
 
@@ -24,15 +24,19 @@ public class StreamManager {
         return streamContext;
     }
 
-    public static StreamContext getStreamContext(int streamId) {
-        return streams.get(streamId);
+    public static Optional<StreamContext> getStreamContext(int streamId) {
+        return Optional.ofNullable(streams.get(streamId));
     }
 
     public static Optional<StreamContext> getStreamContext(Channel visitor) {
-        Integer streamId = visitor.attr(ChannelConstants.STREAM_ID).get();
+        Integer streamId = visitor.attr(AttributeKeys.STREAM_ID).get();
         if (streamId == null) {
             return Optional.empty();
         }
         return Optional.ofNullable(streams.get(streamId));
+    }
+
+    public static boolean removeStreamContext(int streamId) {
+        return streams.remove(streamId) != null;
     }
 }

@@ -1,8 +1,9 @@
 package com.xiaoniucode.etp.server.transport.tcp;
 
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.StreamContext;
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.ClientStreamEvent;
-import com.xiaoniucode.etp.server.statemachine.stream.visitor.VisitorManager;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
+import com.xiaoniucode.etp.server.statemachine.stream.VisitorManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
@@ -25,7 +26,8 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         logger.debug("[TCP]收到访问者请求");
         Channel visitor = ctx.channel();
         StreamContext streamContext = visitorManager.createStreamContext(visitor);
-        streamContext.fireEvent(ClientStreamEvent.STREAM_OPEN);
+        streamContext.setCurrentProtocol(ProtocolType.TCP);
+        streamContext.fireEvent(StreamEvent.STREAM_OPEN);
         super.channelActive(ctx);
     }
 
@@ -36,6 +38,14 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         visitorManager.getStreamContext(visitor).ifPresent(streamContext -> {
             streamContext.relayToTunnel(payload);
         });
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        visitorManager.getStreamContext(ctx.channel()).ifPresent(streamContext -> {
+            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+        });
+        super.channelInactive(ctx);
     }
 
     @Override

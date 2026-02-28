@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.proxy;
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.server.Lifecycle;
-import com.xiaoniucode.etp.core.handler.IdleCheckHandler;
+import com.xiaoniucode.etp.core.netty.IdleCheckHandler;
 
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.tls.SslContextFactory;

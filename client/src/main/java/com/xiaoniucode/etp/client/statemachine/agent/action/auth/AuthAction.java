@@ -1,10 +1,11 @@
-package com.xiaoniucode.etp.client.statemachine.agent.action;
+package com.xiaoniucode.etp.client.statemachine.agent.action.auth;
 
 import com.xiaoniucode.etp.client.common.utils.MavenArchiverUtil;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
+import com.xiaoniucode.etp.client.statemachine.agent.action.AgentBaseAction;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;

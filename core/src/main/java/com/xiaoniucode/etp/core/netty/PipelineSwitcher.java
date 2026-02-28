@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.core.handler;
+package com.xiaoniucode.etp.core.netty;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;

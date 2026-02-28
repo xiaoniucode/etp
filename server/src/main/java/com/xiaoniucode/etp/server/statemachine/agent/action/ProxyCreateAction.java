@@ -43,7 +43,6 @@ public class ProxyCreateAction extends AgentBaseAction {
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
 
         Message.NewProxy proxy = context.getVariableAs("newProxy", Message.NewProxy.class);
-        logger.debug("新代理：{}",proxy);
         Channel control = context.getControl();
         String clientId = context.getClientId();
         ClientType clientType = context.getClientType();

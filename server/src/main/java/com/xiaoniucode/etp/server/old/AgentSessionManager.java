@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.old;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
-import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.constant.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.TMSP;
@@ -86,7 +86,7 @@ public class AgentSessionManager {
             clientManager.addClient(clientInfo);
         }
         AgentSession agentSession = builder.isNew(!hasClient).build();
-        agentSession.getControl().attr(ChannelConstants.SESSION_ID).set(sessionId);
+        agentSession.getControl().attr(AttributeKeys.SESSION_ID).set(sessionId);
         String token = agentSession.getToken();
         Channel control = agentSession.getControl();
         sessionIdToAgentSession.putIfAbsent(sessionId, agentSession);
@@ -172,7 +172,7 @@ public class AgentSessionManager {
         getAgentSession(control).ifPresent(agentSession -> {
             String sessionId = agentSession.getSessionId();
             sessionIdToAgentSession.remove(sessionId);
-            control.attr(ChannelConstants.SESSION_ID).set(null);
+            control.attr(AttributeKeys.SESSION_ID).set(null);
 
             String token = agentSession.getToken();
             //清理登陆令牌代理客户端映射
@@ -233,7 +233,7 @@ public class AgentSessionManager {
      * 心跳更新，用于如果连接者长时间没有心跳，释放连接资源
      */
     public void updateHeartbeat(Channel control) {
-        String sessionId = control.attr(ChannelConstants.SESSION_ID).get();
+        String sessionId = control.attr(AttributeKeys.SESSION_ID).get();
         if (sessionId == null) {
             return;
         }
@@ -273,7 +273,7 @@ public class AgentSessionManager {
         if (control == null) {
             return Optional.empty();
         }
-        String sessionId = control.attr(ChannelConstants.SESSION_ID).get();
+        String sessionId = control.attr(AttributeKeys.SESSION_ID).get();
         if (StringUtils.hasText(sessionId)) {
             return Optional.ofNullable(sessionIdToAgentSession.get(sessionId));
         }

@@ -1,6 +1,6 @@
-package com.xiaoniucode.etp.client.handler;
+package com.xiaoniucode.etp.client.transport;
 
-import com.xiaoniucode.etp.core.handler.bridge.AbstractChannelBridge;
+import com.xiaoniucode.etp.core.netty.bridge.AbstractChannelBridge;
 import io.netty.channel.Channel;
 
 public class ClientChannelBridge extends AbstractChannelBridge {

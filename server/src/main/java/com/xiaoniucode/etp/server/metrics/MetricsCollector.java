@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.metrics;
 
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
-import com.xiaoniucode.etp.core.constant.ChannelConstants;
+import com.xiaoniucode.etp.core.constant.AttributeKeys;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.utils.BeanHelper;
 import com.xiaoniucode.etp.server.metrics.domain.Metrics;
@@ -63,7 +63,7 @@ public class MetricsCollector {
 
 
     public static void doCollector(Channel visitor, Consumer<MetricsCollector> callback) {
-        String domain = visitor.attr(ChannelConstants.VISIT_DOMAIN).get();
+        String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
         InetSocketAddress sa = (InetSocketAddress) visitor.localAddress();
         int remotePort = sa.getPort();
         String key;

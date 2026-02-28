@@ -40,10 +40,10 @@
 - 多用户 Basic Auth 认证
 - Token令牌认证，支持多客户端
 - 带宽限流与速率限制
-- 多种负载均衡策略
+- 多种负载均衡策略、故障转移
 - 域名、子域名及自动/泛域名支持
 - 内置管理面板（Web Admin Dashboard）
-- Spring Boot 集成与 SDK 支持，便于二次开发
+- Spring Boot 集成与 SDK 支持
 - 跨平台运行：Windows、Linux、macOS
 
 ## 问题反馈

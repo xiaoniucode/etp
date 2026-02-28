@@ -4,6 +4,7 @@ import com.alibaba.cola.statemachine.StateMachine;
 import com.alibaba.cola.statemachine.StateMachineFactory;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
+import com.xiaoniucode.etp.client.statemachine.stream.action.StreamCloseAction;
 import com.xiaoniucode.etp.client.statemachine.stream.action.StreamOpenAction;
 
 public class StreamStateMachineBuilder {
@@ -31,7 +32,15 @@ public class StreamStateMachineBuilder {
                 .when(ctx -> true)
                 .perform((from, to, event, context) -> context.setState(to));
 
-        // 构建状态机
+        builder.externalTransition()
+                .from(StreamState.OPENED)
+                .to(StreamState.CLOSED)
+                .on(StreamEvent.STREAM_CLOSE)
+                .when(ctx -> true)
+                .perform(new StreamCloseAction());
+
+
+
         String machineId = "streamStateMachine:"+streamId;
         builder.build(machineId);
         return StateMachineFactory.get(machineId);

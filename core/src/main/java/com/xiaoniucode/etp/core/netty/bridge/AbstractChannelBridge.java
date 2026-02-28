@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.core.handler.bridge;
+package com.xiaoniucode.etp.core.netty.bridge;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
