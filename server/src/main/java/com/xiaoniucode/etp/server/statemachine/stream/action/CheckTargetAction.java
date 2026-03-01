@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.statemachine.stream.action;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.Target;
+import com.xiaoniucode.etp.core.domain.TransportConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
@@ -38,6 +39,7 @@ public class CheckTargetAction extends StreamBaseAction {
         ProtocolType protocol = context.getCurrentProtocol();
         int remotePort = getListenerPort(visitor);
         ProxyConfig config = new ProxyConfig();
+
         Target target = new Target();
         if (remotePort==8033){
             config.setRemotePort(8033);
@@ -46,16 +48,22 @@ public class CheckTargetAction extends StreamBaseAction {
             config.setProxyId("1001");
             target.setHost("127.0.0.1");
             target.setPort(3306);
+            TransportConfig transportConfig = new TransportConfig();
+            transportConfig.setMux(false);
+            config.setTransport(transportConfig);
             config.getTargets().add(target);
         }
         if (remotePort==3307){
-            config.setRemotePort(6379);
+            config.setRemotePort(3307);
             config.setProtocol(ProtocolType.TCP);
             config.setStatus(ProxyStatus.OPEN);
             config.setProxyId("1001");
             target.setHost("127.0.0.1");
-            target.setPort(6379);
+            target.setPort(3306);
             config.getTargets().add(target);
+            TransportConfig transportConfig = new TransportConfig();
+            transportConfig.setMux(true);
+            config.setTransport(transportConfig);
         }
         if (protocol.isHttp()){
             config.setProtocol(ProtocolType.HTTP);
@@ -63,6 +71,9 @@ public class CheckTargetAction extends StreamBaseAction {
             config.setProxyId("1001");
             target.setHost("127.0.0.1");
             target.setPort(8023);
+            TransportConfig transportConfig = new TransportConfig();
+            transportConfig.setMux(false);
+            config.setTransport(transportConfig);
             config.getTargets().add(target);
         }
 

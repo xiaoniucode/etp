@@ -3,7 +3,9 @@ package com.xiaoniucode.etp.core.codec;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -18,11 +20,14 @@ public class TMSPCodec {
      */
     public static final int LENGTH_FIELD_LENGTH = 4;
 
-    public static class Decoder extends LengthFieldBasedFrameDecoder {
-        public Decoder() {
-            this(1024 * 1024); // 默认1MB
-        }
+    public static ChannelHandler create(int maxFrameLength) {
+        return new CombinedChannelDuplexHandler<>(
+                new TMSPCodec.Decoder(maxFrameLength),
+                new TMSPCodec.Encoder()
+        );
+    }
 
+    public static class Decoder extends LengthFieldBasedFrameDecoder {
         public Decoder(int maxFrameLength) {
             super(maxFrameLength, LENGTH_FIELD_OFFSET, LENGTH_FIELD_LENGTH, 0, 0);
         }
@@ -45,7 +50,7 @@ public class TMSPCodec {
             byte msgType = byteBuf.readByte();
             int streamId = byteBuf.readInt();
             byte flags = byteBuf.readByte();
-            TMSPFrame frame = new TMSPFrame(streamId,msgType);
+            TMSPFrame frame = new TMSPFrame(streamId, msgType);
             frame.setMagic(magic);
             frame.setVersion(version);
             frame.setFlags(flags);

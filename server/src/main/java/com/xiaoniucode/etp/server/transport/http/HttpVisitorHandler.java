@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.transport.http;
 
-import com.xiaoniucode.etp.core.constant.AttributeKeys;
+import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;

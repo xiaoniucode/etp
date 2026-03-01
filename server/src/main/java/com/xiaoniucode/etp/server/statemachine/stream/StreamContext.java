@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.statemachine.stream;
 
 import com.alibaba.cola.statemachine.StateMachine;
-import com.xiaoniucode.etp.core.constant.AttributeKeys;
+import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
@@ -12,6 +12,7 @@ import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;

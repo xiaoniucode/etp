@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.proxy;
 
+import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.notify.EventBus;
@@ -58,7 +59,7 @@ public final class TcpProxyServer implements Lifecycle {
                        // sc.pipeline().addLast(tcpIpCheckHandler);
                       //  sc.pipeline().addLast(new TrafficMetricsHandler());
                        // sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
-                        sc.pipeline().addLast(tcpVisitorHandler);
+                        sc.pipeline().addLast(NettyConstants.TCP_VISITOR_HANDLER,tcpVisitorHandler);
                     }
                 });
         init.set(true);

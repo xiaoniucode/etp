@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.transport.http;
 
-import com.xiaoniucode.etp.core.constant.AttributeKeys;
+import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;

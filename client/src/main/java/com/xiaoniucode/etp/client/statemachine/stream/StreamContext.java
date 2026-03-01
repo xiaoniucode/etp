@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 @Getter
 @Setter
 public class StreamContext extends ProcessContextImpl {
-    private final Logger logger= LoggerFactory.getLogger(StreamContext.class);
+    private final Logger logger = LoggerFactory.getLogger(StreamContext.class);
     private StreamState state = StreamState.INITIALIZED;
     private int streamId;
     private Channel control;
@@ -41,6 +41,7 @@ public class StreamContext extends ProcessContextImpl {
         this.streamId = streamId;
         this.stateMachine = stateMachine;
         this.agentContext = agentContext;
+        this.control = agentContext.getControl();
     }
 
     public void fireEvent(StreamEvent event) {

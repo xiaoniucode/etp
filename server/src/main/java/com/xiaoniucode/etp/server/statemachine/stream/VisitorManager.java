@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.statemachine.stream;
 
 import com.alibaba.cola.statemachine.StateMachine;
-import com.xiaoniucode.etp.core.constant.AttributeKeys;
+import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.server.configuration.StreamStateMachineHolder;
 import com.xiaoniucode.etp.server.generator.StreamIdGenerator;
 

@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.core.constant;
+package com.xiaoniucode.etp.core.netty;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import io.netty.buffer.ByteBuf;

@@ -13,6 +13,7 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentStateMachineBuilder;
 import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
+import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.netty.IdleCheckHandler;
@@ -80,19 +81,18 @@ public final class TunnelClient implements Lifecycle {
                 .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(256 * 1024, 4 * 1024 * 1024))
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+//                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
                         if (config.getTlsConfig().getEnable() && clientContext.getTlsContext() != null) {
                             SslHandler sslHandler = clientContext.getTlsContext().newHandler(sc.alloc());
-                            sc.pipeline().addLast("tls", sslHandler);
+                            sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
                         }
                         sc.pipeline()
-                                .addLast(new TMSPCodec.Decoder(10 * 1024 * 1024))
-                                .addLast(new TMSPCodec.Encoder())
-                                .addLast("idleCheckHandler", new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
-                                .addLast("controlTunnelHandler", controlTunnelHandler);
+                                .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
+                                .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
+                                .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);
                     }
                 });
 
@@ -100,7 +100,7 @@ public final class TunnelClient implements Lifecycle {
             @Override
             protected void initChannel(SocketChannel ch) {
                 ChannelPipeline p = ch.pipeline();
-                p.addLast(new RealServerHandler(clientContext));
+                p.addLast(NettyConstants.REAL_SERVER_HANDLER, new RealServerHandler(clientContext));
             }
         });
         clientContext.setControlBootstrap(controlBootstrap);

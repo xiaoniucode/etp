@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
  * 处理来自公网访问者的请求
  */
@@ -22,22 +24,28 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private VisitorManager visitorManager;
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         logger.debug("[TCP]收到访问者请求");
         Channel visitor = ctx.channel();
         StreamContext streamContext = visitorManager.createStreamContext(visitor);
         streamContext.setCurrentProtocol(ProtocolType.TCP);
         streamContext.fireEvent(StreamEvent.STREAM_OPEN);
-        super.channelActive(ctx);
+        //super.channelActive(ctx);
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
         Channel visitor = ctx.channel();
-        ByteBuf payload = msg.retain();
-        visitorManager.getStreamContext(visitor).ifPresent(streamContext -> {
-            streamContext.relayToTunnel(payload);
-        });
+        Optional<StreamContext> contextOpt = visitorManager.getStreamContext(visitor);
+        if (contextOpt.isPresent()) {
+            StreamContext streamContext = contextOpt.get();
+            if (streamContext.getProxyConfig().isMuxTunnel()) {
+                ByteBuf payload = msg.retain();
+                streamContext.relayToTunnel(payload);
+            }
+        } else {
+            ctx.fireChannelRead(msg.retain());
+        }
     }
 
     @Override

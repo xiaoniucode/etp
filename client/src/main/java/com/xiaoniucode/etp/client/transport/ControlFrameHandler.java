@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.client.transport;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
+import com.xiaoniucode.etp.client.statemachine.stream.StreamConstants;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
@@ -62,9 +63,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             case TMSP.MSG_STREAM_OPEN: {
                 NewVisitorCodec.NewVisitorInfo visitorInfo = NewVisitorCodec.decode(frame.getPayload());
                 StreamContext streamContext = StreamManager.createStreamContext(frame.getStreamId(), clientContext);
-                streamContext.setVariable("newVisitorInfo", visitorInfo);
+                streamContext.setVariable(StreamConstants.VISIT_INFO, visitorInfo);
                 streamContext.setCompress(frame.isCompressed());
                 streamContext.setEncrypt(frame.isEncrypted());
+                streamContext.setMuxTunnel(frame.isMuxTunnel());
+
                 streamContext.fireEvent(StreamEvent.STREAM_OPEN);
                 break;
             }

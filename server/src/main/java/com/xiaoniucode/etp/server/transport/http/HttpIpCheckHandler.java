@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.transport.http;
 
-import com.xiaoniucode.etp.core.constant.AttributeKeys;
+import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.server.transport.IpCheckHandler;
 import com.xiaoniucode.etp.server.manager.AccessControlManager;
 import com.xiaoniucode.etp.server.manager.DomainManager;

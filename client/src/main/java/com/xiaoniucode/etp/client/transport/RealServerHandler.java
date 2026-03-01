@@ -1,11 +1,14 @@
 package com.xiaoniucode.etp.client.transport;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 /**
  *
@@ -20,12 +23,18 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         Channel visitor = ctx.channel();
-        StreamManager.getStreamContext(visitor).ifPresent(streamContext -> {
-            ByteBuf payload = msg.retain();
-            streamContext.relayToTunnel(payload);
-        });
+        Optional<StreamContext> streamCtx = StreamManager.getStreamContext(visitor);
+        if (streamCtx.isPresent()) {
+            StreamContext streamContext = streamCtx.get();
+            if (streamContext.isMuxTunnel()) {
+                ByteBuf payload = msg.retain();
+                streamContext.relayToTunnel(payload);
+            }
+        } else {
+            ctx.fireChannelRead(msg.retain());
+        }
     }
 
     @Override

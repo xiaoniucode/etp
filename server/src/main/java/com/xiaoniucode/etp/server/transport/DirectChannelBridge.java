@@ -1,11 +1,10 @@
 package com.xiaoniucode.etp.server.transport;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.core.netty.bridge.AbstractChannelBridge;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
+import com.xiaoniucode.etp.server.statemachine.stream.VisitorManager;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
-import com.xiaoniucode.etp.server.manager.domain.VisitorStream;
-import com.xiaoniucode.etp.server.old.VisitorStreamManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -22,9 +21,9 @@ import org.slf4j.LoggerFactory;
  * 2. 从内网来的响应（下载）→ 受 limitIn 限制
  * </p>
  */
-public class ServerChannelBridge extends AbstractChannelBridge {
-    private static final Logger logger = LoggerFactory.getLogger(ServerChannelBridge.class);
-    private final VisitorStreamManager visitorSessionManager;
+public class DirectChannelBridge extends AbstractChannelBridge {
+    private static final Logger logger = LoggerFactory.getLogger(DirectChannelBridge.class);
+    private final VisitorManager visitorManager;
     /**
      * 限流器
      */
@@ -33,21 +32,16 @@ public class ServerChannelBridge extends AbstractChannelBridge {
      * 当前 Bridge 的角色
      */
     private final BridgeRole role;
-    /**
-     * 代理 ID
-     */
-    private final String proxyId;
 
     private final ProtocolType protocol;
 
-    public ServerChannelBridge(VisitorStreamManager visitorSessionManager, Channel target, String direction,
+    public  DirectChannelBridge(VisitorManager visitorManager, Channel target, String direction,
                                BandwidthLimiter limiter, BridgeRole role,
-                               String proxyId, ProtocolType protocol) {
+                             ProtocolType protocol) {
         super(target, direction);
-        this.visitorSessionManager = visitorSessionManager;
+        this.visitorManager = visitorManager;
         this.limiter = limiter;
         this.role = role;
-        this.proxyId = proxyId;
         this.protocol = protocol;
     }
 
@@ -65,14 +59,14 @@ public class ServerChannelBridge extends AbstractChannelBridge {
             //target==visitor
             // 上传限流
             if (!limiter.tryUpload(buf)) {
-                logger.debug("上传限流，直接丢弃：proxyId-{}", proxyId);
+                logger.debug("上传限流，直接丢弃");
                 if (protocol.isHttp()) {
                     //HTTP请求返回 429告诉浏览器，短连接发送后直接关闭
                     NettyHttpUtils.sendHttpTooManyRequests(ctx.channel())
                             .addListener(f -> ChannelUtils.closeOnFlush(ctx.channel()));
                 }
                 //丢弃数据包，长连接不关闭连接
-                ReferenceCountUtil.release(msg);
+               // ReferenceCountUtil.release(msg);
                 return false;
             }
         }
@@ -80,9 +74,9 @@ public class ServerChannelBridge extends AbstractChannelBridge {
         if (role == BridgeRole.TUNNEL_TO_VISITOR) {
             // 下载限流
             if (!limiter.tryDownload(buf)) {
-                logger.debug("内网 -> 公网 下载流量限速：proxyId-{}", proxyId);
+                logger.debug("内网 -> 公网 下载流量限速");
                 // 丢弃当前数据包
-                ReferenceCountUtil.release(msg);
+               // ReferenceCountUtil.release(msg);
                 if (target.isActive()) {
                     ctx.close();
                 }
@@ -94,16 +88,11 @@ public class ServerChannelBridge extends AbstractChannelBridge {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-//        if (role == BridgeRole.TUNNEL_TO_VISITOR) {
-//            logger.debug("访问者连接断开，释放资源");
-//            visitorSessionManager.closeStream(target, session -> {
-//                Channel control = session.getControl();
-//                //减少目标服务连接计数
-//                LeastConnUtils.decrementConnection(session);
-//                TMSPFrame frame = new TMSPFrame(session.getStreamId(), TMSP.MSG_CLOSE);
-//                control.writeAndFlush(frame);
-//            });
-//        }
+        if (role == BridgeRole.TUNNEL_TO_VISITOR) {
+            visitorManager.getStreamContext(target).ifPresent(streamContext -> {
+                streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+            });
+        }
         super.channelInactive(ctx);
     }
 
@@ -116,18 +105,19 @@ public class ServerChannelBridge extends AbstractChannelBridge {
 //                control.writeAndFlush(frame);
 //            });
 //        }
-//        logger.error(cause.getMessage(), cause);
+       logger.error(cause.getMessage(), cause);
         super.exceptionCaught(ctx, cause);
     }
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         if (role == BridgeRole.TUNNEL_TO_VISITOR) {
-            VisitorStream visitorSession = visitorSessionManager.getStream(target);
-            Channel tunnel = visitorSession.getTunnel();
-            if (tunnel != null) {
-                tunnel.config().setOption(ChannelOption.AUTO_READ, target.isWritable());
-            }
+           visitorManager.getStreamContext(target).ifPresent(streamContext -> {
+               Channel tunnel = streamContext.getTunnel();
+               if (tunnel != null) {
+                   tunnel.config().setOption(ChannelOption.AUTO_READ, target.isWritable());
+               }
+           });
         }
         super.channelWritabilityChanged(ctx);
     }

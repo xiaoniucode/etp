@@ -2,11 +2,14 @@ package com.xiaoniucode.etp.client.statemachine.stream.action;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.client.statemachine.stream.StreamConstants;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamState;
+import com.xiaoniucode.etp.client.transport.DirectBridgeFactory;
 import com.xiaoniucode.etp.core.codec.NewVisitorCodec;
-import com.xiaoniucode.etp.core.constant.AttributeKeys;
+import com.xiaoniucode.etp.core.netty.AttributeKeys;
+import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import io.netty.bootstrap.Bootstrap;
@@ -23,15 +26,16 @@ public class StreamOpenAction extends StreamBaseAction {
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
-        if (context.hasVariable("newVisitorInfo")) {
+        if (context.hasVariable(StreamConstants.VISIT_INFO)) {
             Channel control = context.getControl();
             int streamId = context.getStreamId();
 
-            NewVisitorCodec.NewVisitorInfo visitor = context.getVariableAs("newVisitorInfo", NewVisitorCodec.NewVisitorInfo.class);
-            String localIp = visitor.getLocalIp();
-            int localPort = visitor.getLocalPort();
+            NewVisitorCodec.NewVisitorInfo visitorInfo = context.getVariableAs(StreamConstants.VISIT_INFO, NewVisitorCodec.NewVisitorInfo.class);
+            String localIp = visitorInfo.getLocalIp();
+            int localPort = visitorInfo.getLocalPort();
             context.setLocalIp(localIp);
             context.setLocalPort(localPort);
+
             AgentContext agentContext = context.getAgentContext();
             AppConfig config = agentContext.getConfig();
 
@@ -43,17 +47,32 @@ public class StreamOpenAction extends StreamBaseAction {
                     Channel server = serverFuture.channel();
                     server.config().setOption(ChannelOption.AUTO_READ, false);
                     server.attr(AttributeKeys.STREAM_ID).set(streamId);
-                    context.setServer(server);
+
                     Bootstrap controlBootstrap = agentContext.getControlBootstrap();
+                    Channel tunnel = createOrget(controlBootstrap, config);
 
-                    Channel tunnel = createOrget(controlBootstrap,config);
-
+                    context.setServer(server);
                     context.setTunnel(tunnel);
+
                     tunnel.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP)).addListener(f -> {
                         if (f.isSuccess()) {
-                            server.config().setOption(ChannelOption.AUTO_READ, true);
                             context.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
-                           // logger.debug("隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
+                            if (!context.isMuxTunnel()) {
+                                //删除自定义协议
+                                server.pipeline().remove(NettyConstants.REAL_SERVER_HANDLER);
+                                tunnel.pipeline().remove(NettyConstants.TMSP_CODEC);
+                                tunnel.pipeline().remove(NettyConstants.CONTROL_FRAME_HANDLER);
+                                tunnel.pipeline().remove(NettyConstants.IDLE_CHECK_HANDLER);
+                                //隧道桥接
+                                DirectBridgeFactory.bridge(tunnel, server);
+                                logger.debug("独立隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
+                            } else {
+                                logger.debug("共享隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
+                            }
+                            //开启真实目标服务可读
+                            server.config().setOption(ChannelOption.AUTO_READ, true);
+                        } else {
+
                         }
                     });
 
@@ -63,12 +82,12 @@ public class StreamOpenAction extends StreamBaseAction {
                     logger.error("隧道创建失败 - [服务地址={}:服务端口={}] 不可用!", localIp, localPort);
                 }
             });
-            context.removeVariable("newVisitorInfo");
+            context.removeVariable(StreamConstants.VISIT_INFO);
         }
     }
 
     private Channel createOrget(Bootstrap controlBootstrap, AppConfig config) {
-        if (pool.peek()==null){
+        if (pool.peek() == null) {
             logger.error("池子为空，创建新的连接");
             controlBootstrap.connect(config.getServerAddr(), config.getServerPort()).addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess()) {
@@ -77,16 +96,16 @@ public class StreamOpenAction extends StreamBaseAction {
                     logger.error("连接到隧道失败");
                 }
             });
-           return createOrget(controlBootstrap,config);
-        }else {
+            return createOrget(controlBootstrap, config);
+        } else {
             Channel poll = pool.poll();
-            if (poll.isActive()){
-               logger.debug("从池子获取：{}",poll.id());
+            if (poll.isActive()) {
+                logger.debug("从池子获取：{}", poll.id());
                 return poll;
-            }else {
+            } else {
                 pool.remove(poll);
-                logger.error("隧道无效，丢弃:"+poll.id());
-                return createOrget(controlBootstrap,config);
+                logger.error("隧道无效，丢弃:" + poll.id());
+                return createOrget(controlBootstrap, config);
             }
         }
     }

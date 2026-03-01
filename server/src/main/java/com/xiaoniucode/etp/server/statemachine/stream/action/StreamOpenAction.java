@@ -33,7 +33,8 @@ public class StreamOpenAction extends StreamBaseAction {
         ByteBuf buffer = control.alloc().buffer();
         NewVisitorCodec.encode(buffer, target.getHost(), target.getPort());
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN, buffer);
-
+        boolean muxTunnel = config.isMuxTunnel();
+        frame.setMuxTunnel(muxTunnel);
         frame.setCompressed(config.isCompressEnabled());
         frame.setEncrypted(config.isEncryptEnabled());
         control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {

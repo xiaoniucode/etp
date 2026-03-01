@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.core.netty.bridge;
+package com.xiaoniucode.etp.server.transport;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -30,16 +30,15 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (!target.isActive()) {
-            ReferenceCountUtil.release(msg);
+            if (ReferenceCountUtil.refCnt(msg) > 0) {
+                ReferenceCountUtil.release(msg);
+            }
             return;
         }
-        //用于预处理 如限流
         if (!beforeForward(ctx, msg)) {
             return;
         }
-        // 转发数据到对端
         forwardToTarget(ctx, msg);
-        //不能调用 fireChannelRead 方法，数据会重复处理
     }
 
     @Override
@@ -51,11 +50,12 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+
         logger.warn("数据转发异常: 数据流方向={}, {}", direction, cause.getMessage());
         closeOnFlush(ctx.channel());
         closeOnFlush(target);
-        ctx.fireExceptionCaught(cause);
+//        ctx.fireExceptionCaught(cause);
+        super.exceptionCaught(ctx, cause);
     }
 
     /**
@@ -71,7 +71,9 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
 
     private void forwardToTarget(ChannelHandlerContext ctx, Object msg) {
         if (!target.isActive()) {
-            ReferenceCountUtil.release(msg);
+            if (ReferenceCountUtil.refCnt(msg) > 0) {
+                ReferenceCountUtil.release(msg);
+            }
             return;
         }
         ReferenceCountUtil.retain(msg);
@@ -83,11 +85,13 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
                     closeOnFlush(ctx.channel());
                     //关闭要写入的目标通道
                     closeOnFlush(target);
+                }else {
+                    logger.debug("数据转发成功");
                 }
             } finally {
-                if (ReferenceCountUtil.refCnt(msg) > 0) {
-                    ReferenceCountUtil.release(msg);
-                }
+//                if (ReferenceCountUtil.refCnt(msg) > 0) {
+//                    ReferenceCountUtil.release(msg);
+//                }
             }
         });
     }

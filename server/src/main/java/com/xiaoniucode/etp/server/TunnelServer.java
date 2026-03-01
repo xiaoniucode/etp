@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server;
 
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
+import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.netty.IdleCheckHandler;
@@ -63,20 +64,19 @@ public class TunnelServer implements Lifecycle {
                     .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(256 * 1024, 4 * 1024 * 1024))
                     .option(ChannelOption.SO_KEEPALIVE, true)
                     .option(ChannelOption.TCP_NODELAY, true)
-                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+//                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
                             if (config.getTlsConfig().getEnable()) {
-                                sc.pipeline().addLast("tls", tlsContext.newHandler(sc.alloc()));
+                                sc.pipeline().addLast(NettyConstants.TLS_HANDLER, tlsContext.newHandler(sc.alloc()));
                                 logger.debug("TLS加密处理器添加成功");
                             }
                             sc.pipeline()
-                                    .addLast(new TMSPCodec.Decoder(10 * 1024 * 1024))
-                                    .addLast(new TMSPCodec.Encoder())
-                                    .addLast("idleCheckHandler", new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
-                                    .addLast("controlFrameHandler", controlFrameHandler);
+                                    .addLast(NettyConstants.TMSP_CODEC,TMSPCodec.create(10 * 1024 * 1024))
+                                    .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
+                                    .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
                         }
                     });
             serverBootstrap.bind(config.getServerAddr(), config.getServerPort()).sync();

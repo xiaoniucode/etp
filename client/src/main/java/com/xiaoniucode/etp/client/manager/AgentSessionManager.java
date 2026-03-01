@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.client.manager;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.ConfigUtils;
 import com.xiaoniucode.etp.client.manager.domain.AgentSession;
-import com.xiaoniucode.etp.core.constant.AttributeKeys;
+import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import io.netty.channel.Channel;
 
 import java.util.Optional;
