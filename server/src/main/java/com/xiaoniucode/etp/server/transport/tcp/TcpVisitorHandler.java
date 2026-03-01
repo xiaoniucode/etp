@@ -1,14 +1,17 @@
 package com.xiaoniucode.etp.server.transport.tcp;
 
+import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
-import com.xiaoniucode.etp.server.statemachine.stream.VisitorManager;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -21,13 +24,15 @@ import java.util.Optional;
 public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final Logger logger = LoggerFactory.getLogger(TcpVisitorHandler.class);
     @Autowired
-    private VisitorManager visitorManager;
-
+    private StreamManager visitorManager;
+    @Autowired
+    @Qualifier("streamStateMachine")
+    private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         logger.debug("[TCP]收到访问者请求");
         Channel visitor = ctx.channel();
-        StreamContext streamContext = visitorManager.createStreamContext(visitor);
+        StreamContext streamContext = visitorManager.createStreamContext(visitor,stateMachine);
         streamContext.setCurrentProtocol(ProtocolType.TCP);
         streamContext.fireEvent(StreamEvent.STREAM_OPEN);
         //super.channelActive(ctx);

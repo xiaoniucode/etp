@@ -28,11 +28,18 @@ message AuthInfo {
   string version = 5;
   ClientType client_type = 4;
   optional string client_id = 9;
-  optional  string name = 3;
+  optional string name = 3;
   optional string os = 6;
   optional string arch = 7;
 }
-
+message TunnelCreateRequest{
+  uint32 tunnel_id = 1;
+}
+message TunnelCreateResponse {
+  uint32 tunnel_id = 1;
+  uint32 code = 2;
+  optional string message = 3;
+}
 message AuthResponse{
   string clientId = 1;
   uint32 connectionId = 4;

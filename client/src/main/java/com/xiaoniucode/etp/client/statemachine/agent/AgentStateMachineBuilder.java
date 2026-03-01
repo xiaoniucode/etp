@@ -8,11 +8,12 @@ import com.xiaoniucode.etp.client.statemachine.agent.action.*;
 import com.xiaoniucode.etp.client.statemachine.agent.action.auth.AuthAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.auth.HandleAuthFailureAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.auth.HandleAuthSuccessAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.CreateTunnelPoolAction;
 
 public class AgentStateMachineBuilder {
 
-    public static StateMachine<ClientState, ClientEvent, AgentContext> buildStateMachine() {
-        StateMachineBuilder<ClientState, ClientEvent, AgentContext> builder = StateMachineBuilderFactory.create();
+    public static StateMachine<AgentState, AgentEvent, AgentContext> buildStateMachine() {
+        StateMachineBuilder<AgentState, AgentEvent, AgentContext> builder = StateMachineBuilderFactory.create();
 
         // 创建动作实例
         CheckConfigAction checkConfigAction = new CheckConfigAction();
@@ -22,92 +23,100 @@ public class AgentStateMachineBuilder {
         HandleAuthFailureAction handleAuthFailureAction = new HandleAuthFailureAction();
         HandleConnectFailureAction handleConnectFailureAction = new HandleConnectFailureAction();
         AuthAction handleConnectSuccessAction = new AuthAction();
+        CreateTunnelPoolAction createTunnelPoolAction = new CreateTunnelPoolAction();
         StopAction stopAction = new StopAction();
         // 配置检查
         builder.externalTransition()
-                .from(ClientState.INITIALIZED)
-                .to(ClientState.CONFIG_CHECKING)
-                .on(ClientEvent.START)
+                .from(AgentState.IDLE)
+                .to(AgentState.CONFIG_CHECKING)
+                .on(AgentEvent.START)
                 .when(ctx -> true)
                 .perform(checkConfigAction);
 
         // SSL初始化
         builder.externalTransition()
-                .from(ClientState.CONFIG_CHECKING)
-                .to(ClientState.SSL_INITIALIZING)
-                .on(ClientEvent.CONFIG_CHECKED)
+                .from(AgentState.CONFIG_CHECKING)
+                .to(AgentState.SSL_INITIALIZING)
+                .on(AgentEvent.CONFIG_CHECKED)
                 .when(AgentContext::isConfigValid)
                 .perform(initSslAction);
 
         // 连接尝试
         builder.externalTransition()
-                .from(ClientState.SSL_INITIALIZING)
-                .to(ClientState.CONNECTING)
-                .on(ClientEvent.SSL_INITIALIZED)
+                .from(AgentState.SSL_INITIALIZING)
+                .to(AgentState.CONNECTING)
+                .on(AgentEvent.SSL_INITIALIZED)
                 .when(context -> true)
                 .perform(connectAction);
 
         // 从CONNECTED状态发生网络错误 → FAILED
         builder.externalTransition()
-                .from(ClientState.CONNECTED)
-                .to(ClientState.FAILED)
-                .on(ClientEvent.NETWORK_ERROR)
+                .from(AgentState.CONNECTED)
+                .to(AgentState.FAILED)
+                .on(AgentEvent.NETWORK_ERROR)
                 .when(ctx -> true)
                 .perform(new NetworkErrorAction());
 
 
         // 连接成功后开始认证
         builder.externalTransition()
-                .from(ClientState.CONNECTING)
-                .to(ClientState.AUTHENTICATING)
-                .on(ClientEvent.CONNECT_SUCCESS)
+                .from(AgentState.CONNECTING)
+                .to(AgentState.AUTHENTICATING)
+                .on(AgentEvent.CONNECT_SUCCESS)
                 .when(ctx -> true)
                 .perform(handleConnectSuccessAction);
 
         // 认证成功
         builder.externalTransition()
-                .from(ClientState.AUTHENTICATING)
-                .to(ClientState.CONNECTED)
-                .on(ClientEvent.AUTH_SUCCESS)
+                .from(AgentState.AUTHENTICATING)
+                .to(AgentState.CONNECTED)
+                .on(AgentEvent.AUTH_SUCCESS)
                 .when(AgentContext::isAuthenticated)
                 .perform(handleAuthSuccessAction);
+        //创建隧道池
+        builder.externalTransition()
+                .from(AgentState.CONNECTED)
+                .to(AgentState.CONNECTED)
+                .on(AgentEvent.CREATE_TUNNEL_POOL)
+                .when(context -> true)
+                .perform(createTunnelPoolAction);
 
         // 认证失败
         builder.externalTransition()
-                .from(ClientState.AUTHENTICATING)
-                .to(ClientState.FAILED)
-                .on(ClientEvent.AUTH_FAILURE)
+                .from(AgentState.AUTHENTICATING)
+                .to(AgentState.FAILED)
+                .on(AgentEvent.AUTH_FAILURE)
                 .when(ctx -> !ctx.isAuthenticated())
                 .perform(handleAuthFailureAction);
         // 连接失败
         builder.externalTransition()
-                .from(ClientState.CONNECTING)
-                .to(ClientState.FAILED)
-                .on(ClientEvent.CONNECT_FAILURE)
+                .from(AgentState.CONNECTING)
+                .to(AgentState.FAILED)
+                .on(AgentEvent.CONNECT_FAILURE)
                 .when(ctx -> true)
                 .perform(handleConnectFailureAction);
 
         // 重试
         builder.externalTransition()
-                .from(ClientState.FAILED)
-                .to(ClientState.CONNECTING)
-                .on(ClientEvent.RETRY)
+                .from(AgentState.FAILED)
+                .to(AgentState.CONNECTING)
+                .on(AgentEvent.RETRY)
                 .when(ctx -> true)
                 .perform(connectAction);
 
         // 停止
         builder.externalTransition()
-                .from(ClientState.FAILED)
-                .to(ClientState.STOPPED)
-                .on(ClientEvent.STOP)
+                .from(AgentState.FAILED)
+                .to(AgentState.STOPPED)
+                .on(AgentEvent.STOP)
                 .when(ctx -> true)
                 .perform(stopAction);
 
 
         builder.externalTransition()
-                .from(ClientState.CONNECTED)
-                .to(ClientState.CONNECTED)
-                .on(ClientEvent.PROXY_CREATE_RESP)
+                .from(AgentState.CONNECTED)
+                .to(AgentState.CONNECTED)
+                .on(AgentEvent.PROXY_CREATE_RESP)
                 .when(ctx -> true)
                 .perform(new ProxyCreateResponseAction());
 

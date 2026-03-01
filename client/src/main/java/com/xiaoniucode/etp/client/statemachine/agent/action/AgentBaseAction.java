@@ -2,15 +2,15 @@ package com.xiaoniucode.etp.client.statemachine.agent.action;
 
 import com.alibaba.cola.statemachine.Action;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 
-public abstract class AgentBaseAction implements Action<ClientState, ClientEvent, AgentContext> {
+public abstract class AgentBaseAction implements Action<AgentState, AgentEvent, AgentContext> {
     @Override
-    public void execute(ClientState from, ClientState to, ClientEvent event, AgentContext context) {
+    public void execute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         context.setState(to);
         doExecute(from, to, event, context);
     }
 
-    protected abstract void doExecute(ClientState from, ClientState to, ClientEvent event, AgentContext context);
+    protected abstract void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context);
 }

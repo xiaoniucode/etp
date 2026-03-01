@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.statemachine.agent;
 
-public enum ClientEvent {
+public enum AgentEvent {
     START,              // 开始启动
     CONFIG_CHECKED,     // 配置检查完成
     SSL_INITIALIZED,    // SSL 初始化完成
@@ -11,9 +11,10 @@ public enum ClientEvent {
     ERROR,              // 错误
     AUTH_START,         // 开始认证
     AUTH_SUCCESS,       // 认证成功
-    AUTH_FAILURE,       // 认证失败
+    AUTH_FAILURE,        // 认证失败
     STOP,                // 停止
-    NETWORK_ERROR, //网络错误
+    NETWORK_ERROR,       //网络错误
+    CREATE_TUNNEL_POOL,  //创建隧道池
 
     PROXY_CREATE,          // 发送创建代理请求
     PROXY_CREATE_RESP,     // 接收创建代理响应

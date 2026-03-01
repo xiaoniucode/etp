@@ -2,7 +2,6 @@ package com.xiaoniucode.etp.server.statemachine.stream;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.netty.AttributeKeys;
-import com.xiaoniucode.etp.server.configuration.StreamStateMachineHolder;
 import com.xiaoniucode.etp.server.generator.StreamIdGenerator;
 
 
@@ -17,8 +16,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class VisitorManager {
-    private final Logger logger = LoggerFactory.getLogger(VisitorManager.class);
+public class StreamManager {
+    private final Logger logger = LoggerFactory.getLogger(StreamManager.class);
     /**
      * streamId -->连接上下文
      */
@@ -28,9 +27,8 @@ public class VisitorManager {
     /**
      * 创建并保存新的流上下文
      */
-    public StreamContext createStreamContext(Channel visitor) {
+    public StreamContext createStreamContext(Channel visitor,StateMachine<StreamState, StreamEvent, StreamContext> stateMachine) {
         int streamId = streamIdGenerator.nextStreamId();
-        StateMachine<StreamState, StreamEvent, StreamContext> stateMachine = StreamStateMachineHolder.get(streamId);
         StreamContext streamContext = new StreamContext(streamId, stateMachine);
         streamContext.setVisitor(visitor);
         streamContext.setVisitorManager(this);

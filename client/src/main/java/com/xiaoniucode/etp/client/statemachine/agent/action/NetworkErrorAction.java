@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.client.statemachine.agent.action;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 public class NetworkErrorAction extends AgentBaseAction {
     private final Logger logger= LoggerFactory.getLogger(NetworkErrorAction.class);
     @Override
-    protected void doExecute(ClientState from, ClientState to, ClientEvent event, AgentContext context) {
+    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.error("网络错误");
         Channel control = context.getControl();
         control.close();
 
-        context.fireEvent(ClientEvent.RETRY);
+        context.fireEvent(AgentEvent.RETRY);
     }
 }

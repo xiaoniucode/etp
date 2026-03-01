@@ -2,7 +2,6 @@ package com.xiaoniucode.etp.server.statemachine.agent;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.netty.AttributeKeys;
-import com.xiaoniucode.etp.server.configuration.AgentStateMachineHolder;
 import com.xiaoniucode.etp.server.generator.ConnectionIdGenerator;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -20,7 +19,7 @@ public class AgentManager {
     /**
      * connectionId
      */
-    private final Map<Integer, AgentContext> channelToContext = new ConcurrentHashMap<>();
+    private final Map<Integer, AgentContext> connToContext = new ConcurrentHashMap<>();
     /**
      * proxyId
      */
@@ -34,8 +33,12 @@ public class AgentManager {
         if (connectionId == null) {
             return Optional.empty();
         }
-        AgentContext agentContext = channelToContext.get(connectionId);
+        AgentContext agentContext = connToContext.get(connectionId);
         return Optional.ofNullable(agentContext);
+    }
+
+    public Optional<AgentContext> getAgentContext(int connectionId) {
+        return Optional.ofNullable(connToContext.get(connectionId));
     }
 
     public Optional<AgentContext> getAgentContextByProxyId(String proxyId) {
@@ -46,20 +49,17 @@ public class AgentManager {
         proxyIdToContext.put(proxyId, context);
     }
 
-    public AgentContext createAgent(Channel control) {
+    public AgentContext createAgent(Channel control, StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine) {
         int connectionId = connectionIdGenerator.nextConnId();
-
-        StateMachine<AgentState, AgentEvent, AgentContext> stateMachine = AgentStateMachineHolder.get(connectionId);
-
-        AgentContext AgentContext = new AgentContext(this, stateMachine);
+        AgentContext AgentContext = new AgentContext(this, agentStateMachine);
         AgentContext.setControl(control);
         control.attr(AttributeKeys.CONNECTION_ID).set(connectionId);
         AgentContext.setConnectionId(connectionId);
-        channelToContext.put(connectionId, AgentContext);
+        connToContext.put(connectionId, AgentContext);
         return AgentContext;
     }
 
     public int getOnlineCount() {
-        return channelToContext.size();
+        return connToContext.size();
     }
 }

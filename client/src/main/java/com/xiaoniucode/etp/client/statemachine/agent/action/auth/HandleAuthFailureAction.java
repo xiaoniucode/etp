@@ -2,8 +2,8 @@ package com.xiaoniucode.etp.client.statemachine.agent.action.auth;
 
 import com.xiaoniucode.etp.client.config.domain.RetryConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.client.statemachine.agent.action.AgentBaseAction;
 
 public class HandleAuthFailureAction extends AgentBaseAction {
@@ -11,7 +11,7 @@ public class HandleAuthFailureAction extends AgentBaseAction {
 
 
     @Override
-    protected void doExecute(ClientState from, ClientState to, ClientEvent event, AgentContext ctx) {
+    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {
         logger.debug("连接失败");
         int retryCount = ctx.getRetryCount() + 1;
         ctx.setRetryCount(retryCount);
@@ -20,10 +20,10 @@ public class HandleAuthFailureAction extends AgentBaseAction {
         if (retryCount <= retryConfig.getMaxRetries()) {
             logger.debug("准备重试连接，第 {} 次", retryCount);
             // 触发重试事件
-            ctx.getStateMachine().fireEvent(ClientState.FAILED, ClientEvent.RETRY, ctx);
+            ctx.getStateMachine().fireEvent(AgentState.FAILED, AgentEvent.RETRY, ctx);
         } else {
             logger.error("达到最大重试次数，停止尝试");
-            ctx.getStateMachine().fireEvent(ClientState.FAILED, ClientEvent.STOP, ctx);
+            ctx.getStateMachine().fireEvent(AgentState.FAILED, AgentEvent.STOP, ctx);
         }
     }
 }

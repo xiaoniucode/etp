@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.stream.action;
 
-import com.xiaoniucode.etp.core.codec.NewVisitorCodec;
+import com.xiaoniucode.etp.core.codec.NewStreamCodec;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.message.TMSP;
@@ -31,11 +31,11 @@ public class StreamOpenAction extends StreamBaseAction {
         }
         context.setTarget(target);
         ByteBuf buffer = control.alloc().buffer();
-        NewVisitorCodec.encode(buffer, target.getHost(), target.getPort());
+        NewStreamCodec.encode(buffer, target.getHost(), target.getPort());
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN, buffer);
         boolean muxTunnel = config.isMuxTunnel();
         frame.setMuxTunnel(muxTunnel);
-        frame.setCompressed(config.isCompressEnabled());
+        frame.setCompressed(true);
         frame.setEncrypted(config.isEncryptEnabled());
         control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {

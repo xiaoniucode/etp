@@ -1,4 +1,5 @@
 package com.xiaoniucode.etp.server.statemachine.agent;
 
-public class AgentConstants {
+public interface AgentConstants {
+    String AGENT_AUTH_INFO="AGENT_AUTH_INFO";
 }

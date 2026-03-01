@@ -11,6 +11,7 @@ import com.xiaoniucode.etp.server.statemachine.stream.action.StreamCloseAction;
 import com.xiaoniucode.etp.server.statemachine.stream.action.StreamOpenAction;
 import com.xiaoniucode.etp.server.statemachine.stream.action.StreamOpenResponseAction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,24 +25,25 @@ public class StreamStateMachineConfig {
     @Autowired
     private StreamCloseAction streamCloseAction;
 
-    public StateMachine<StreamState, StreamEvent, StreamContext> create(String machineId) {
+    @Bean("streamStateMachine")
+    public StateMachine<StreamState, StreamEvent, StreamContext> create() {
         StateMachineBuilder<StreamState, StreamEvent, StreamContext> builder = StateMachineBuilderFactory.create();
-
+        //初始化 --> 检查访问目标
         builder.externalTransition()
-                .from(StreamState.INITIALIZED)
+                .from(StreamState.IDLE)
                 .to(StreamState.CHECKING_TARGET)
                 .on(StreamEvent.STREAM_OPEN)
                 .when(ctx -> true)
                 .perform(checkTargetAction);
 
-
+        // 检查访问目标 --> 连接中 校验完成
         builder.externalTransition()
                 .from(StreamState.CHECKING_TARGET)
                 .to(StreamState.OPENING)
                 .on(StreamEvent.TARGET_VALIDATED)
                 .when(ctx -> ctx.getControl() != null && ctx.getProxyConfig() != null)
                 .perform(streamOpenAction);
-
+        //连接中 --> 已连接 连接成功
         builder.externalTransition()
                 .from(StreamState.OPENING)
                 .to(StreamState.OPENED)
@@ -63,25 +65,7 @@ public class StreamStateMachineConfig {
                 .on(StreamEvent.STREAM_CLOSE)
                 .when(ctx -> true)
                 .perform(streamCloseAction);
-//
-//        // 已打开 -> 关闭
-//        builder.externalTransition()
-//                .from(ClientStreamState.FAILED)
-//                .to(ClientStreamState.CLOSED)
-//                .on(ClientStreamEvent.STREAM_RESET)
-//                .when(ctx -> true)
-//        ;
-//
-//        // 已打开 -> 失败
-//        builder.externalTransition()
-//                .from(ClientStreamState.OPENED)
-//                .to(ClientStreamState.FAILED)
-//                .on(ClientStreamEvent.STREAM_RESET)
-//                .when(ctx -> true)
-//        ;
-//
 
-
-        return builder.build(machineId);
+        return builder.build("stream-state-machine");
     }
 }

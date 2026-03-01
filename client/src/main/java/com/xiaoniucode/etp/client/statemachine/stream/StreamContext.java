@@ -3,13 +3,11 @@ package com.xiaoniucode.etp.client.statemachine.stream;
 import com.alibaba.cola.statemachine.StateMachine;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import jdk.javadoc.doclet.Taglet;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +19,7 @@ import org.slf4j.LoggerFactory;
 @Setter
 public class StreamContext extends ProcessContextImpl {
     private final Logger logger = LoggerFactory.getLogger(StreamContext.class);
-    private StreamState state = StreamState.INITIALIZED;
+    private StreamState state = StreamState.IDLE;
     private int streamId;
     private Channel control;
     private Channel tunnel;

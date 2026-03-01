@@ -6,7 +6,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = {"host", "port"})  //host 和 port 作为唯一标识
+@EqualsAndHashCode(of = {"host", "port"})
 @ToString
 public class Target {
     /**

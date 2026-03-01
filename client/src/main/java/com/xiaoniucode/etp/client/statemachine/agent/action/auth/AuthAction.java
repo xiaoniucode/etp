@@ -3,8 +3,8 @@ package com.xiaoniucode.etp.client.statemachine.agent.action.auth;
 import com.xiaoniucode.etp.client.common.utils.MavenArchiverUtil;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.client.statemachine.agent.action.AgentBaseAction;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
@@ -18,7 +18,7 @@ public class AuthAction extends AgentBaseAction {
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AuthAction.class);
 
     @Override
-    protected void doExecute(ClientState from, ClientState to, ClientEvent event, AgentContext ctx) {
+    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {
         logger.debug("连接成功");
         ctx.setRetryCount(0);
         try {
@@ -41,12 +41,12 @@ public class AuthAction extends AgentBaseAction {
                     logger.debug("认证消息发送成功");
                 } else {
                     logger.error("认证消息发送失败", f.cause());
-                    ctx.getStateMachine().fireEvent(ClientState.AUTHENTICATING, ClientEvent.AUTH_FAILURE, ctx);
+                    ctx.getStateMachine().fireEvent(AgentState.AUTHENTICATING, AgentEvent.AUTH_FAILURE, ctx);
                 }
             });
         } catch (Exception e) {
             logger.error("认证失败", e);
-            ctx.getStateMachine().fireEvent(ClientState.AUTHENTICATING, ClientEvent.AUTH_FAILURE, ctx);
+            ctx.getStateMachine().fireEvent(AgentState.AUTHENTICATING, AgentEvent.AUTH_FAILURE, ctx);
         }
     }
 }

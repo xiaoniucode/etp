@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 @Setter
 public class AgentContext extends ProcessContextImpl {
     private final Logger logger = LoggerFactory.getLogger(AgentContext.class);
-    private AgentState state = AgentState.INITIALIZED;
+    private AgentState state = AgentState.IDLE;
     private Integer connectionId;
     private Channel control;
     private String clientId;

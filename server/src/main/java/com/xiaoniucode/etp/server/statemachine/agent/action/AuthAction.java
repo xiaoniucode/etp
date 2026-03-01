@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.manager.AccessTokenManager;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentConstants;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
@@ -35,7 +36,7 @@ public class AuthAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         Channel control = context.getControl();
-        Message.AuthInfo authInfo = context.getVariableAs("authInfo", Message.AuthInfo.class);
+        Message.AuthInfo authInfo = context.getVariableAs(AgentConstants.AGENT_AUTH_INFO, Message.AuthInfo.class);
         String token = authInfo.getToken();
         boolean hasToken = accessTokenManager.hasToken(token);
         if (!hasToken) {
@@ -89,7 +90,7 @@ public class AuthAction extends AgentBaseAction {
         context.fireEvent(AgentEvent.AUTH_SUCCESS);
 
         control.writeAndFlush(authFrame);
-        context.removeVariable("authInfo");
+        context.removeVariable(AgentConstants.AGENT_AUTH_INFO);
         logger.debug("客户端认证成功：[客户端ID={}，版本号={}]", context.getClientId(), context.getVersion());
     }
 

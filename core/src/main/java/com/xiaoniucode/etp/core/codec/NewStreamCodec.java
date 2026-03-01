@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-public class NewVisitorCodec {
+public class NewStreamCodec {
 
 
     public static void encode(ByteBuf buffer, String localIp, int localPort) {
@@ -14,12 +14,12 @@ public class NewVisitorCodec {
         buffer.writeShort(localPort);
     }
 
-    public static NewVisitorInfo decode(ByteBuf buffer) {
+    public static NewStreamInfo decode(ByteBuf buffer) {
         int ipInt = buffer.readInt();
         String localIp = intToIp(ipInt);
         int localPort = buffer.readUnsignedShort();
 
-        return new NewVisitorInfo(localIp, localPort);
+        return new NewStreamInfo(localIp, localPort);
     }
 
     private static int ipToInt(String ip) {
@@ -41,7 +41,7 @@ public class NewVisitorCodec {
     @AllArgsConstructor
     @Getter
     @Setter
-    public static class NewVisitorInfo {
+    public static class NewStreamInfo {
         private final String localIp;
         private final int localPort;
     }

@@ -12,7 +12,7 @@ public class StreamStateMachineBuilder {
     public static StateMachine<StreamState, StreamEvent, StreamContext> buildStateMachine(Integer streamId) {
         StateMachineBuilder<StreamState, StreamEvent, StreamContext> builder = StateMachineBuilderFactory.create();
         builder.externalTransition()
-                .from(StreamState.INITIALIZED)
+                .from(StreamState.IDLE)
                 .to(StreamState.OPENING)
                 .on(StreamEvent.STREAM_OPEN)
                 .when(ctx -> true)

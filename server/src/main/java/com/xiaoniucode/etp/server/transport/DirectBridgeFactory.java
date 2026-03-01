@@ -1,8 +1,7 @@
 package com.xiaoniucode.etp.server.transport;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.server.old.VisitorStreamManager;
-import com.xiaoniucode.etp.server.statemachine.stream.VisitorManager;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import io.netty.channel.Channel;
 
 /**
@@ -14,8 +13,8 @@ public class DirectBridgeFactory {
     /**
      * 创建双向桥接（带限流）
      */
-    public static void bridge(VisitorManager visitorManager, Channel visitor, Channel tunnel,
-                              BandwidthLimiter limiter,ProtocolType protocol) {
+    public static void bridge(StreamManager visitorManager, Channel visitor, Channel tunnel,
+                              BandwidthLimiter limiter, ProtocolType protocol) {
         // 上传 受limitOut 限制
         visitor.pipeline().addLast(new DirectChannelBridge(
                 visitorManager,
@@ -40,7 +39,7 @@ public class DirectBridgeFactory {
     /**
      * 创建无限流双向桥接器
      */
-    public static void bridge(VisitorManager VisitorManager, Channel visitor, Channel tunnel, ProtocolType protocol) {
+    public static void bridge(StreamManager VisitorManager, Channel visitor, Channel tunnel, ProtocolType protocol) {
         bridge(VisitorManager,visitor, tunnel, null, protocol);
     }
 }

@@ -2,8 +2,8 @@ package com.xiaoniucode.etp.client.statemachine.agent.action;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -13,7 +13,7 @@ public class ConnectAction extends AgentBaseAction {
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ConnectAction.class);
 
     @Override
-    protected void doExecute(ClientState from, ClientState to, ClientEvent event, AgentContext ctx) {
+    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {
         try {
             logger.debug("连接到隧道服务器");
             AppConfig config = ctx.getConfig();
@@ -26,16 +26,16 @@ public class ConnectAction extends AgentBaseAction {
                     ctx.setControl(control);
                     // 触发连接成功事件
                     logger.debug("成功连接到服务器");
-                    ctx.getStateMachine().fireEvent(ClientState.CONNECTING, ClientEvent.CONNECT_SUCCESS, ctx);
+                    ctx.getStateMachine().fireEvent(AgentState.CONNECTING, AgentEvent.CONNECT_SUCCESS, ctx);
                 } else {
                     logger.debug("无法连接到服务器");
                     // 触发连接失败事件
-                    ctx.getStateMachine().fireEvent(ClientState.CONNECTING, ClientEvent.CONNECT_FAILURE, ctx);
+                    ctx.getStateMachine().fireEvent(AgentState.CONNECTING, AgentEvent.CONNECT_FAILURE, ctx);
                 }
             });
         } catch (Exception e) {
             logger.error("连接失败", e);
-            ctx.getStateMachine().fireEvent(ClientState.CONNECTING, ClientEvent.CONNECT_FAILURE, ctx);
+            ctx.getStateMachine().fireEvent(AgentState.CONNECTING, AgentEvent.CONNECT_FAILURE, ctx);
         }
     }
 

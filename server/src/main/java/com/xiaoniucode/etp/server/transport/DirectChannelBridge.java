@@ -3,13 +3,12 @@ package com.xiaoniucode.etp.server.transport;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
-import com.xiaoniucode.etp.server.statemachine.stream.VisitorManager;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
-import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DirectChannelBridge extends AbstractChannelBridge {
     private static final Logger logger = LoggerFactory.getLogger(DirectChannelBridge.class);
-    private final VisitorManager visitorManager;
+    private final StreamManager visitorManager;
     /**
      * 限流器
      */
@@ -35,9 +34,9 @@ public class DirectChannelBridge extends AbstractChannelBridge {
 
     private final ProtocolType protocol;
 
-    public  DirectChannelBridge(VisitorManager visitorManager, Channel target, String direction,
-                               BandwidthLimiter limiter, BridgeRole role,
-                             ProtocolType protocol) {
+    public  DirectChannelBridge(StreamManager visitorManager, Channel target, String direction,
+                                BandwidthLimiter limiter, BridgeRole role,
+                                ProtocolType protocol) {
         super(target, direction);
         this.visitorManager = visitorManager;
         this.limiter = limiter;

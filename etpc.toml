@@ -8,6 +8,12 @@ initialDelay = 1
 maxDelay = 10
 maxRetries = 5
 
+[mux]
+enable=true #全局开启，代理可覆盖
+#main_count = 2          # 范围1-8，默认2
+#min_count = 2           # 低负载热缩容到2
+#max_count = 8
+
 [tls]
 enable = false
 certFile = "cert/openssl/chain.pem"
@@ -22,6 +28,7 @@ localPort = 8081
 autoDomain = false
 customDomains = ["a.domain1.com"]
 status = 1
+
 
 [[proxies]]
 name = "web11"
@@ -57,7 +64,7 @@ targets = [
     { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 ]
 [proxies.load_balance]
-strategy = "random" # 策略：roundrobin/weight/random/leastconn
+strategy = "random" # roundrobin/weight/random/leastconn
 [[proxies]]
 name = "web2"
 protocol = "http"
@@ -115,14 +122,6 @@ targets = [
     { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
     { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 ]
-[proxies.load_balance]
-strategy = "random" # 策略：roundrobin/weight/random/leastconn
-#[proxies.access_control]
-#enable = true
-#mode = "allow"
-#allow = ["127.0.0.1"]
-#deny = []
-
 [[proxies]]
 name = "redis"
 protocol = "tcp"

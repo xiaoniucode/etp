@@ -1,20 +1,24 @@
 package com.xiaoniucode.etp.server.transport;
 
+import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
-import com.xiaoniucode.etp.server.statemachine.stream.VisitorManager;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
+import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelContext;
+import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelEvent;
+import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelManager;
+import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelState;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,28 +31,43 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     @Autowired
     private AgentManager agentManager;
     @Autowired
-    private VisitorManager visitorManager;
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) {
-        Channel control = ctx.channel();
-        AgentContext agent = agentManager.createAgent(control);
-        agent.fireEvent(AgentEvent.CONNECT);
-    }
-
+    private StreamManager visitorManager;
+    @Autowired
+    private TunnelManager tunnelManager;
+    @Autowired
+    @Qualifier("tunnelStateMachine")
+    private StateMachine<TunnelState, TunnelEvent, TunnelContext> tunnelStateMachine;
+    @Autowired
+    @Qualifier("agentStateMachine")
+    private StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine;
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
-        AgentContext agentContext = agentManager.getAgentContext(ctx.channel())
-                .orElseThrow(() -> new IllegalStateException("连接上下文不存在"));
         byte msgType = frame.getMsgType();
         switch (msgType) {
             case TMSP.MSG_AUTH -> {
                 ByteBuf payload = frame.getPayload();
+                AgentContext agentContext = agentManager.createAgent(ctx.channel(),agentStateMachine);
                 Message.AuthInfo authInfo = ProtobufUtil.parseFrom(payload, Message.AuthInfo.parser());
-                agentContext.setVariable("authInfo", authInfo);
-                //开始处理认证
+                agentContext.setVariable(AgentConstants.AGENT_AUTH_INFO, authInfo);
+
                 agentContext.fireEvent(AgentEvent.AUTH_START);
             }
+            //创建隧道
+            case TMSP.MSG_TUNNEL_CREATE -> {
+                int connectionId = frame.getStreamId();
+                boolean isMuxTunnel = frame.isMuxTunnel();
+                agentManager.getAgentContext(connectionId).ifPresent(agentContext -> {
+                    Message.TunnelCreateRequest req = ProtobufUtil.parseFrom(frame.getPayload(), Message.TunnelCreateRequest.parser());
+                    int tunnelId = req.getTunnelId();
+                    TunnelContext tunnelContext = tunnelManager.createTunnelContext(connectionId, tunnelId, ctx.channel(), isMuxTunnel);
+                    tunnelContext.setClientId(agentContext.getClientId());
+                    tunnelContext.setControl(agentContext.getControl());
+                    tunnelContext.setStateMachine(tunnelStateMachine);
+                    tunnelContext.fireEvent(TunnelEvent.CREATE);
+                });
+            }
+
+            //----------------------------------------------------------------------------------------//
             case TMSP.MSG_STREAM_OPEN_RESP -> {
                 int streamId = frame.getStreamId();
                 Channel tunnel = ctx.channel();
@@ -58,6 +77,8 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     return;
                 }
                 streamContext.setTunnel(tunnel);
+                streamContext.setCompress(frame.isCompressed());
+                streamContext.setEncrypt(frame.isEncrypted());
                 streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
             }
             case TMSP.MSG_STREAM_DATA -> {
@@ -69,9 +90,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
 
             }
             case TMSP.MSG_PROXY_CREATE -> {
-                Message.NewProxy newProxy = ProtobufUtil.parseFrom(frame.getPayload(), Message.NewProxy.parser());
-                agentContext.setVariable("newProxy", newProxy);
-                agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
+                agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
+                    Message.NewProxy newProxy = ProtobufUtil.parseFrom(frame.getPayload(), Message.NewProxy.parser());
+                    agentContext.setVariable("newProxy", newProxy);
+                    agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
+                });
             }
         }
     }

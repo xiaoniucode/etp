@@ -1,12 +1,14 @@
 package com.xiaoniucode.etp.client.transport;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamConstants;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
-import com.xiaoniucode.etp.core.codec.NewVisitorCodec;
+import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelEvent;
+import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelManager;
+import com.xiaoniucode.etp.core.codec.NewStreamCodec;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
@@ -35,6 +37,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
         byte msgType = frame.getMsgType();
         switch (msgType) {
+            //********************Agent***********************//
             case TMSP.MSG_AUTH_RESP: {
                 ByteBuf payload = frame.getPayload();
                 Message.AuthResponse authResponse = ProtobufUtil.parseFrom(payload, Message.AuthResponse.parser());
@@ -43,25 +46,38 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 if (code == 0) {
                     clientContext.setConnectionId(connectionId);
                     clientContext.setAuthenticated(true);
-                    clientContext.fireEvent(ClientEvent.AUTH_SUCCESS);
+                    clientContext.fireEvent(AgentEvent.AUTH_SUCCESS);
                 } else {
                     clientContext.setAuthenticated(false);
-                    clientContext.fireEvent(ClientEvent.AUTH_FAILURE);
+                    clientContext.fireEvent(AgentEvent.AUTH_FAILURE);
                 }
                 break;
             }
             case TMSP.MSG_PROXY_CREATE_RESP: {
-                clientContext.fireEvent(ClientEvent.PROXY_CREATE_RESP);
+                clientContext.fireEvent(AgentEvent.PROXY_CREATE_RESP);
                 break;
             }
             case TMSP.MSG_GOAWAY: {
-                clientContext.fireEvent(ClientEvent.STOP);
+                clientContext.fireEvent(AgentEvent.STOP);
                 break;
 
             }
+            //********************Tunnel***********************//
+            case TMSP.MSG_TUNNEL_CREATE_RESP: {
+                ByteBuf payload = frame.getPayload();
+                Message.TunnelCreateResponse resp = ProtobufUtil.parseFrom(payload, Message.TunnelCreateResponse.parser());
+                if (resp.getCode() == 0) {
+                    int tunnelId = resp.getTunnelId();
+                    TunnelManager.getTunnelContext(tunnelId).ifPresent(tunnelContext -> {
+                        tunnelContext.fireEvent(TunnelEvent.CREATE_RESPONSE);
+                    });
+                }
+                break;
+            }
+
             //********************Stream***********************//
             case TMSP.MSG_STREAM_OPEN: {
-                NewVisitorCodec.NewVisitorInfo visitorInfo = NewVisitorCodec.decode(frame.getPayload());
+                NewStreamCodec.NewStreamInfo visitorInfo = NewStreamCodec.decode(frame.getPayload());
                 StreamContext streamContext = StreamManager.createStreamContext(frame.getStreamId(), clientContext);
                 streamContext.setVariable(StreamConstants.VISIT_INFO, visitorInfo);
                 streamContext.setCompress(frame.isCompressed());
@@ -92,7 +108,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         if (clientContext.getControl() == ctx.channel()) {
-            clientContext.fireEvent(ClientEvent.NETWORK_ERROR);
+            clientContext.fireEvent(AgentEvent.NETWORK_ERROR);
         } else {
             logger.error("数据隧道断开：channel-{}", ctx.channel().id());
             ctx.close();
@@ -106,13 +122,13 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             if (isNetworkException(cause)) {
                 if (clientContext.getControl() == ctx.channel()) {
                     logger.error("控制隧道网络错误", cause);
-                    clientContext.fireEvent(ClientEvent.NETWORK_ERROR);
+                    clientContext.fireEvent(AgentEvent.NETWORK_ERROR);
                 }
             } else {
-                clientContext.fireEvent(ClientEvent.STOP);
+                clientContext.fireEvent(AgentEvent.STOP);
             }
         } else {
-            logger.error("数据隧道异常",cause);
+            logger.error("数据隧道异常", cause);
             //数据隧道
             ctx.close();
         }

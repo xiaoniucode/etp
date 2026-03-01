@@ -3,6 +3,8 @@ package com.xiaoniucode.etp.client;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
+import com.xiaoniucode.etp.client.manager.MuxConnHolder;
+import com.xiaoniucode.etp.client.manager.MuxConnManager;
 import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.client.transport.RealServerHandler;
 import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
@@ -10,8 +12,8 @@ import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
 import com.xiaoniucode.etp.client.manager.EventBusManager;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentStateMachineBuilder;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.ClientState;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
 import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
@@ -39,7 +41,7 @@ public final class TunnelClient implements Lifecycle {
     private EventLoopGroup controlWorkerGroup;
     private EventLoopGroup serverWorkBootstrap;
     private AgentContext clientContext;
-    private StateMachine<ClientState, ClientEvent, AgentContext> stateMachine;
+    private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
 
     public TunnelClient(AppConfig config) {
         this.config = config;
@@ -54,7 +56,7 @@ public final class TunnelClient implements Lifecycle {
 
             initializeStateMachine();
 
-            stateMachine.fireEvent(ClientState.INITIALIZED, ClientEvent.START, clientContext);
+            stateMachine.fireEvent(AgentState.IDLE, AgentEvent.START, clientContext);
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -76,12 +78,13 @@ public final class TunnelClient implements Lifecycle {
         Bootstrap controlBootstrap = new Bootstrap();
         ControlFrameHandler controlTunnelHandler = new ControlFrameHandler(clientContext);
         controlWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
+
         controlBootstrap.group(controlWorkerGroup)
                 .channel(NettyEventLoopFactory.socketChannelClass())
                 .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(256 * 1024, 4 * 1024 * 1024))
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
-//                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
@@ -95,7 +98,8 @@ public final class TunnelClient implements Lifecycle {
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);
                     }
                 });
-
+        MuxConnManager muxManager = new MuxConnManager(controlBootstrap, config.getServerAddr(), config.getServerPort());
+        MuxConnHolder.set(muxManager);
         serverBootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) {

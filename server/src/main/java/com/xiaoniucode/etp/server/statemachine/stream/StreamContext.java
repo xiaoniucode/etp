@@ -12,7 +12,6 @@ import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -30,9 +29,11 @@ public class StreamContext extends ProcessContextImpl {
     private String sourceAddress;
     private LoadBalancer loadBalancer;
     private Target target;
-    private StreamState state = StreamState.INITIALIZED;
-    private VisitorManager visitorManager;
-    private ProtocolType currentProtocol=ProtocolType.TCP;
+    private StreamState state = StreamState.IDLE;
+    private StreamManager visitorManager;
+    private ProtocolType currentProtocol = ProtocolType.TCP;
+    private boolean compress;
+    private boolean encrypt;
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
 
 
@@ -84,7 +85,7 @@ public class StreamContext extends ProcessContextImpl {
         if (cached != null && tunnel.isWritable()) {
             TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_DATA, cached);
             tunnel.writeAndFlush(frame).addListener(future -> {
-                if (!future.isSuccess()){
+                if (!future.isSuccess()) {
                     logger.error("HTTP 首包转发失败");
                 }
             });

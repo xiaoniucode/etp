@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class AgentContext extends ProcessContextImpl {
     private Integer connectionId;
-    private ClientState state;
+    private AgentState state;
     private AppConfig config;
     private boolean configValid;
     private boolean sslInitialized;
@@ -23,7 +23,7 @@ public class AgentContext extends ProcessContextImpl {
     private Bootstrap serverBootstrap;
     private EventLoopGroup controlWorkerGroup;
     private EventLoopGroup serverWorkerGroup;
-    private StateMachine<ClientState, ClientEvent, AgentContext> stateMachine;
+    private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
     private int retryCount;
     private boolean stopped;
     private boolean authenticated;
@@ -32,7 +32,7 @@ public class AgentContext extends ProcessContextImpl {
         this.config = config;
     }
 
-    public void fireEvent(ClientEvent clientEvent) {
+    public void fireEvent(AgentEvent clientEvent) {
         stateMachine.fireEvent(state, clientEvent, this);
     }
 
