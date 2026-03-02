@@ -43,8 +43,6 @@ public class DirectTunnelPoolManager {
                 .tunnelId(tunnelId)
                 .tunnel(tunnel)
                 .tunnelType(TunnelType.DIRECT).build();
-
-
         Map<Integer, TunnelContext> clientTunnels = clientToTunnels.computeIfAbsent(clientId, k -> new ConcurrentHashMap<>());
         TunnelContext old = clientTunnels.put(tunnelId, conn);
 

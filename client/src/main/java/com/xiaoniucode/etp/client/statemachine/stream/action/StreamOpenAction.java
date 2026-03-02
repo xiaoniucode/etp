@@ -1,7 +1,5 @@
 package com.xiaoniucode.etp.client.statemachine.stream.action;
 
-import com.xiaoniucode.etp.client.manager.MuxConnHolder;
-import com.xiaoniucode.etp.client.manager.MuxConnManager;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamConstants;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
@@ -9,11 +7,14 @@ import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.client.transport.DirectBridgeFactory;
 import com.xiaoniucode.etp.core.codec.NewStreamCodec;
+import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class StreamOpenAction extends StreamBaseAction {
             context.setLocalPort(localPort);
 
             AgentContext agentContext = context.getAgentContext();
-            MuxConnManager muxManager = MuxConnHolder.get();
+
             Bootstrap serverBootstrap = agentContext.getServerBootstrap();
             serverBootstrap.connect(localIp, localPort).addListener((ChannelFutureListener) serverFuture -> {
                 if (serverFuture.isSuccess()) {
@@ -46,12 +47,18 @@ public class StreamOpenAction extends StreamBaseAction {
                     Channel server = serverFuture.channel();
                     server.config().setOption(ChannelOption.AUTO_READ, false);
                     server.attr(AttributeKeys.STREAM_ID).set(streamId);
+                    //获取一条隧道
 
-                    Channel tunnel = muxManager.getOrCreate(context.isCompress(), context.isEncrypt());
-                    if (tunnel != null && tunnel.isActive()) {
+                    Channel tunnel = null;
+                    if (control != null && control.isActive()) {
                         context.setServer(server);
-                        context.setTunnel(tunnel);
-                        tunnel.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP)).addListener(f -> {
+                        // todo context.setTunnel(tunnel);
+
+                        Message.StreamOpenResponse req = Message.StreamOpenResponse.newBuilder()
+                                .setCode(0).setTunnelId(1111).build();
+                        ByteBuf payload = ProtobufUtil.toByteBuf(req, control.alloc());
+
+                        control.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload)).addListener(f -> {
                             if (f.isSuccess()) {
                                 context.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
                                 if (!context.isMuxTunnel()) {
@@ -80,23 +87,3 @@ public class StreamOpenAction extends StreamBaseAction {
         }
     }
 }
-//独立隧道
-//                        ConnectionPool.acquire().thenAccept(tunnel ->
-//        tunnel.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_CONN)).addListener(f -> {
-//        if (f.isSuccess()) {
-//        //控制通道转换为数据通道
-//        PipelineSwitcher.switchToDirectDataTunnel(tunnel.pipeline(), compress, encrypt);
-//        //隧道双向桥接
-//        ClientBridgeFactory.bridge(tunnel, server);
-/// /创建连接会话
-//                                        ServerStreamManager.createServerSession(streamId, tunnel, server, new Target(localIP, localPort)).ifPresent(serverSession -> {
-//        //设置通道可读
-//        server.config().setOption(ChannelOption.AUTO_READ, true);
-//                                            logger.debug("隧道创建成功 - [目标地址={}，目标端口={}]", localIP, localPort);
-//                                        });
-//                                                }
-//                                                })).exceptionally(cause -> {
-//        logger.error(cause.getMessage(), cause);
-//        control.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_ERROR));
-//        return null;
-//        });

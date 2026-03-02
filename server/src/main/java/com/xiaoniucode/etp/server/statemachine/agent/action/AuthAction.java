@@ -9,10 +9,7 @@ import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.manager.AccessTokenManager;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentConstants;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.server.statemachine.agent.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -24,8 +21,8 @@ import org.springframework.util.StringUtils;
 @Component
 public class AuthAction extends AgentBaseAction {
     private final Logger logger = LoggerFactory.getLogger(AuthAction.class);
-//    @Autowired
-//    private AgentManager agentManager;
+    @Autowired
+    private AgentManager agentManager;
     @Autowired
     private AccessTokenManager accessTokenManager;
     @Autowired

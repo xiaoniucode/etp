@@ -40,6 +40,10 @@ message TunnelCreateResponse {
   uint32 code = 2;
   optional string message = 3;
 }
+message StreamOpenResponse{
+    uint32 tunnel_id=1;
+    uint32 code=2;
+}
 message AuthResponse{
   string clientId = 1;
   uint32 connectionId = 4;

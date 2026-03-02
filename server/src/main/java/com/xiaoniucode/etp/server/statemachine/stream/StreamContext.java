@@ -74,6 +74,7 @@ public class StreamContext extends ProcessContextImpl {
             if (future.isSuccess()) {
                 logger.debug("数据转发成功：streamId={}", streamId);
             }
+           // ReferenceCountUtil.release(payload);
         });
     }
 

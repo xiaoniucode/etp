@@ -36,7 +36,6 @@ public class CreateTunnelPoolAction extends AgentBaseAction {
 
 
         //创建独立连接池隧道
-
         TunnelContext tunnelContext = TunnelManager.createTunnelContext(connectionId);
         tunnelContext.setConnectionId(connectionId);
         bootstrap.connect(config.getServerAddr(), config.getServerPort()).addListener((ChannelFutureListener) future -> {
