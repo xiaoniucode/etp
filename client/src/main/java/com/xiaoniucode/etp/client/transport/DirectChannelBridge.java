@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.client.transport;
 
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFutureListener;
@@ -30,9 +31,9 @@ public  class DirectChannelBridge extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (!target.isActive()) {
-//            if (ReferenceCountUtil.refCnt(msg) > 0) {
-//                ReferenceCountUtil.release(msg);
-//            }
+            if (ReferenceCountUtil.refCnt(msg) > 0) {
+                ReferenceCountUtil.release(msg);
+            }
             return;
         }
         if (!beforeForward(ctx, msg)) {
@@ -43,20 +44,14 @@ public  class DirectChannelBridge extends ChannelDuplexHandler {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-
-        closeOnFlush(target);
-        ctx.fireChannelInactive();
-       // super.channelInactive(ctx);
+        ChannelUtils.closeOnFlush(target);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-
         logger.warn("数据转发异常: 数据流方向={}, {}", direction, cause.getMessage());
-        closeOnFlush(ctx.channel());
-        closeOnFlush(target);
-        ctx.fireExceptionCaught(cause);
-       // super.exceptionCaught(ctx, cause);
+        ChannelUtils.closeOnFlush(ctx.channel());
+        ChannelUtils.closeOnFlush(target);
     }
 
     /**
@@ -72,9 +67,9 @@ public  class DirectChannelBridge extends ChannelDuplexHandler {
 
     private void forwardToTarget(ChannelHandlerContext ctx, Object msg) {
         if (!target.isActive()) {
-//            if (ReferenceCountUtil.refCnt(msg) > 0) {
-//                ReferenceCountUtil.release(msg);
-//            }
+            if (ReferenceCountUtil.refCnt(msg) > 0) {
+                ReferenceCountUtil.release(msg);
+            }
             return;
         }
         ReferenceCountUtil.retain(msg);
@@ -83,23 +78,18 @@ public  class DirectChannelBridge extends ChannelDuplexHandler {
                 if (!f.isSuccess()) {
                     logger.error("消息转发失败: {}", f.cause().getMessage());
                     //关闭当前读数据的通道
-                    closeOnFlush(ctx.channel());
+                    ChannelUtils.closeOnFlush(ctx.channel());
                     //关闭要写入的目标通道
-                    closeOnFlush(target);
+                    ChannelUtils.closeOnFlush(target);
                 }else {
                     logger.debug("转发成功");
                 }
             } finally {
-//                if (ReferenceCountUtil.refCnt(msg) > 0) {
-//                    ReferenceCountUtil.release(msg);
-//                }
+                if (ReferenceCountUtil.refCnt(msg) > 0) {
+                    ReferenceCountUtil.release(msg);
+                }
             }
         });
     }
 
-    private static void closeOnFlush(Channel ch) {
-        if (ch.isActive()) {
-            ch.writeAndFlush(ch.alloc().buffer(0)).addListener(ChannelFutureListener.CLOSE);
-        }
-    }
 }

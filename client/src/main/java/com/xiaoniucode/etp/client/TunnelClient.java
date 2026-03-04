@@ -3,11 +3,8 @@ package com.xiaoniucode.etp.client;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
-import com.xiaoniucode.etp.client.manager.MuxConnHolder;
-import com.xiaoniucode.etp.client.manager.MuxConnManager;
 import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.client.transport.RealServerHandler;
-import com.xiaoniucode.etp.client.helper.TunnelClientHelper;
 import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
 import com.xiaoniucode.etp.client.manager.EventBusManager;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
@@ -52,8 +49,6 @@ public final class TunnelClient implements Lifecycle {
         try {
             EventBusManager.register(new ApplicationInitListener());
             EventBusManager.publishAsync(new ApplicationInitEvent(config));
-            TunnelClientHelper.setTunnelClient(this);
-
             initializeStateMachine();
 
             stateMachine.fireEvent(AgentState.IDLE, AgentEvent.START, clientContext);
@@ -64,7 +59,7 @@ public final class TunnelClient implements Lifecycle {
     }
 
     private void initializeStateMachine() {
-        stateMachine = AgentStateMachineBuilder.buildStateMachine();
+        stateMachine = AgentStateMachineBuilder.getStateMachine();
         stateMachine.showStateMachine();
         clientContext = new AgentContext(config);
         clientContext.setStateMachine(stateMachine);
@@ -98,8 +93,6 @@ public final class TunnelClient implements Lifecycle {
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);
                     }
                 });
-        MuxConnManager muxManager = new MuxConnManager(controlBootstrap, config.getServerAddr(), config.getServerPort());
-        MuxConnHolder.set(muxManager);
         serverBootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) {

@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamState;
+import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelManager;
 import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
@@ -19,6 +20,7 @@ public class StreamCloseAction extends StreamBaseAction {
 
         Channel server = context.getServer();
         ChannelUtils.closeOnFlush(server);
+        //TunnelManager.release();
         StreamManager.removeStreamContext(streamId);
         //todo 判断请求来自哪里 control.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_CLOSE));
         logger.debug("隧道关闭 - localIp={} localPort={}", context.getLocalIp(),context.getLocalPort());

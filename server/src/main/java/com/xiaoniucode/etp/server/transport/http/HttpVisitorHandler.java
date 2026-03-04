@@ -17,9 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/**
- * 处理来自公网访问者的请求
- */
 @Component
 @ChannelHandler.Sharable
 public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {

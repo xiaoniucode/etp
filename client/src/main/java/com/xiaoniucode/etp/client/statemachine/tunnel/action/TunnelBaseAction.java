@@ -1,7 +1,10 @@
-package com.xiaoniucode.etp.client.statemachine.tunnel;
+package com.xiaoniucode.etp.client.statemachine.tunnel.action;
 
 
 import com.alibaba.cola.statemachine.Action;
+import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelContext;
+import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelEvent;
+import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelState;
 
 public abstract class TunnelBaseAction implements Action<TunnelState, TunnelEvent, TunnelContext> {
     @Override

@@ -1,10 +1,9 @@
 package com.xiaoniucode.etp.client.statemachine.stream.action;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.client.statemachine.stream.StreamConstants;
-import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
-import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
-import com.xiaoniucode.etp.client.statemachine.stream.StreamState;
+import com.xiaoniucode.etp.client.statemachine.stream.*;
+import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelContext;
+import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelManager;
 import com.xiaoniucode.etp.client.transport.DirectBridgeFactory;
 import com.xiaoniucode.etp.core.codec.NewStreamCodec;
 import com.xiaoniucode.etp.core.message.Message;
@@ -47,37 +46,47 @@ public class StreamOpenAction extends StreamBaseAction {
                     Channel server = serverFuture.channel();
                     server.config().setOption(ChannelOption.AUTO_READ, false);
                     server.attr(AttributeKeys.STREAM_ID).set(streamId);
-                    //获取一条隧道
 
-                    Channel tunnel = null;
-                    if (control != null && control.isActive()) {
-                        context.setServer(server);
-                        // todo context.setTunnel(tunnel);
+                    TunnelConfig tunnelConfig = TunnelConfig.builder()
+                            .isMux(context.isMuxTunnel())
+                            .encrypt(context.isEncrypt())
+                            .compress(context.isCompress())
+                            .build();
+                    //获取一个连接
+                    TunnelManager.acquire(tunnelConfig).ifPresent(tunnelContext -> {
+                        Channel tunnel = tunnelContext.getTunnel();
+                        if (control != null && control.isActive()) {
+                            context.setServer(server);
+                            context.setTunnel(tunnel);
+                            Integer connectionId = agentContext.getConnectionId();
+                            Message.StreamOpenResponse req = Message.StreamOpenResponse.newBuilder()
+                                    .setCode(0)
+                                    .setConnectionId(connectionId)
+                                    .setTunnelId(tunnelContext.getTunnelId())
+                                    .build();
+                            ByteBuf payload = ProtobufUtil.toByteBuf(req, control.alloc());
 
-                        Message.StreamOpenResponse req = Message.StreamOpenResponse.newBuilder()
-                                .setCode(0).setTunnelId(1111).build();
-                        ByteBuf payload = ProtobufUtil.toByteBuf(req, control.alloc());
-
-                        control.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload)).addListener(f -> {
-                            if (f.isSuccess()) {
-                                context.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
-                                if (!context.isMuxTunnel()) {
-                                    //删除自定义协议
-                                    server.pipeline().remove(NettyConstants.REAL_SERVER_HANDLER);
-                                    tunnel.pipeline().remove(NettyConstants.TMSP_CODEC);
-                                    tunnel.pipeline().remove(NettyConstants.CONTROL_FRAME_HANDLER);
-                                    tunnel.pipeline().remove(NettyConstants.IDLE_CHECK_HANDLER);
-                                    //隧道桥接
-                                    DirectBridgeFactory.bridge(tunnel, server);
-                                    logger.debug("独立隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
-                                } else {
-                                    logger.debug("共享隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
+                            control.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload)).addListener(f -> {
+                                if (f.isSuccess()) {
+                                    context.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
+                                    if (!context.isMuxTunnel()) {
+                                        //删除自定义协议
+                                        server.pipeline().remove(NettyConstants.REAL_SERVER_HANDLER);
+                                        tunnel.pipeline().remove(NettyConstants.TMSP_CODEC);
+                                        tunnel.pipeline().remove(NettyConstants.CONTROL_FRAME_HANDLER);
+                                        tunnel.pipeline().remove(NettyConstants.IDLE_CHECK_HANDLER);
+                                        //隧道桥接
+                                        DirectBridgeFactory.bridge(tunnel, server);
+                                        logger.debug("独立隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
+                                    } else {
+                                        logger.debug("共享隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
+                                    }
+                                    //开启真实目标服务可读
+                                    server.config().setOption(ChannelOption.AUTO_READ, true);
                                 }
-                                //开启真实目标服务可读
-                                server.config().setOption(ChannelOption.AUTO_READ, true);
-                            }
-                        });
-                    }
+                            });
+                        }
+                    });
                 } else {
                     control.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_ERROR));
                     logger.error("隧道创建失败 - [服务地址={}:服务端口={}] 不可用!", localIp, localPort);

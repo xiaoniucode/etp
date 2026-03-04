@@ -2,7 +2,6 @@ package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
 import com.xiaoniucode.etp.server.manager.AccessTokenManager;
-import com.xiaoniucode.etp.server.old.AgentSessionManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.convert.AccessTokenConvert;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.CreateAccessTokenRequest;
@@ -25,8 +24,6 @@ import java.util.stream.Collectors;
 public class AccessTokenServiceImpl implements AccessTokenService {
     @Autowired
     private AccessTokenRepository accessTokenRepository;
-    @Autowired
-    private AgentSessionManager agentSessionManager;
     @Autowired
     private AccessTokenConvert accessTokenConvert;
     @Autowired
@@ -55,8 +52,8 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         return accessTokens.stream()
                 .map(accessToken -> {
                     AccessTokenDTO dto = accessTokenConvert.toDTO(accessToken);
-                    Integer onlineClient = agentSessionManager.getOnlineAgents(accessToken.getToken());
-                    dto.setOnlineClient(onlineClient);
+                   // Integer onlineClient = agentSessionManager.getOnlineAgents(accessToken.getToken());
+                    dto.setOnlineClient(10);
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -67,8 +64,8 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         AccessToken accessToken = accessTokenRepository.findById(id)
                 .orElseThrow(() -> new BizException("访问令牌不存在"));
         AccessTokenDTO dto = accessTokenConvert.toDTO(accessToken);
-        Integer onlineClient = agentSessionManager.getOnlineAgents(accessToken.getToken());
-        dto.setOnlineClient(onlineClient);
+        //Integer onlineClient = agentSessionManager.getOnlineAgents(accessToken.getToken());
+        dto.setOnlineClient(1);
         return dto;
     }
 

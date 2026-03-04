@@ -40,29 +40,37 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     @Autowired
     @Qualifier("agentStateMachine")
     private StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine;
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
         byte msgType = frame.getMsgType();
         switch (msgType) {
             case TMSP.MSG_AUTH -> {
                 ByteBuf payload = frame.getPayload();
-                AgentContext agentContext = agentManager.createAgent(ctx.channel(),agentStateMachine);
+                AgentContext agentContext = agentManager.createAgent(ctx.channel(), agentStateMachine);
                 Message.AuthInfo authInfo = ProtobufUtil.parseFrom(payload, Message.AuthInfo.parser());
                 agentContext.setVariable(AgentConstants.AGENT_AUTH_INFO, authInfo);
 
                 agentContext.fireEvent(AgentEvent.AUTH_START);
             }
-            //创建隧道
+
             case TMSP.MSG_TUNNEL_CREATE -> {
                 int connectionId = frame.getStreamId();
                 boolean isMuxTunnel = frame.isMuxTunnel();
                 agentManager.getAgentContext(connectionId).ifPresent(agentContext -> {
                     Message.TunnelCreateRequest req = ProtobufUtil.parseFrom(frame.getPayload(), Message.TunnelCreateRequest.parser());
-                    int tunnelId = req.getTunnelId();
-                    TunnelContext tunnelContext = tunnelManager.createTunnelContext(connectionId, tunnelId, ctx.channel(), isMuxTunnel);
-                    tunnelContext.setClientId(agentContext.getClientId());
-                    tunnelContext.setControl(agentContext.getControl());
-                    tunnelContext.setStateMachine(tunnelStateMachine);
+                    TunnelContext context = TunnelContext.builder()
+                            .connectionId(connectionId)
+                            .compress(frame.isCompressed())
+                            .control(agentContext.getControl())
+                            .isMux(isMuxTunnel)
+                            .encrypt(frame.isEncrypted())
+                            .tunnel(ctx.channel())
+                            .stateMachine(tunnelStateMachine)
+                            .state(TunnelState.IDLE)
+                            .tunnelId(req.getTunnelId()).build();
+
+                    TunnelContext tunnelContext = tunnelManager.registerContext(context);
                     tunnelContext.fireEvent(TunnelEvent.CREATE);
                 });
             }
@@ -70,13 +78,18 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             //----------------------------------------------------------------------------------------//
             case TMSP.MSG_STREAM_OPEN_RESP -> {
                 int streamId = frame.getStreamId();
-                Channel tunnel = ctx.channel();
+
                 StreamContext streamContext = visitorManager.getStreamContext(streamId);
                 if (streamContext == null) {
                     logger.warn("流上下文不存在 - [streamId={}]", streamId);
                     return;
                 }
-                streamContext.setTunnel(tunnel);
+                ByteBuf payload = frame.getPayload();
+                Message.StreamOpenResponse resp = ProtobufUtil.parseFrom(payload, Message.StreamOpenResponse.parser());
+                String tunnelId = resp.getTunnelId();
+                streamContext.setMux(frame.isMuxTunnel());
+                streamContext.setVariable("tunnelId", tunnelId);
+                streamContext.setVariable("connectionId", resp.getConnectionId());
                 streamContext.setCompress(frame.isCompressed());
                 streamContext.setEncrypt(frame.isEncrypted());
                 streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);

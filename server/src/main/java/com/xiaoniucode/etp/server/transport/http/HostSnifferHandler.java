@@ -12,10 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * 用于解析请求头
- * 不能标注@Sharable注解
- */
 public class HostSnifferHandler extends ByteToMessageDecoder {
     private final Logger logger = LoggerFactory.getLogger(HostSnifferHandler.class);
     private boolean sniffing = true;
@@ -69,9 +65,6 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
         ctx.pipeline().remove(this);
     }
 
-    /**
-     * 解析 Authorization 头
-     */
     private String parseAuthHeader(String content) {
         String[] lines = content.split("\\r?\\n");
         for (String line : lines) {
@@ -110,5 +103,4 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
         }
         return null;
     }
-
 }

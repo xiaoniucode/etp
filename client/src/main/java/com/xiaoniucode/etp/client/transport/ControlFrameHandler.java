@@ -67,7 +67,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 ByteBuf payload = frame.getPayload();
                 Message.TunnelCreateResponse resp = ProtobufUtil.parseFrom(payload, Message.TunnelCreateResponse.parser());
                 if (resp.getCode() == 0) {
-                    int tunnelId = resp.getTunnelId();
+                    String tunnelId = resp.getTunnelId();
                     TunnelManager.getTunnelContext(tunnelId).ifPresent(tunnelContext -> {
                         tunnelContext.fireEvent(TunnelEvent.CREATE_RESPONSE);
                     });

@@ -14,7 +14,8 @@ public enum AgentEvent {
     AUTH_FAILURE,        // 认证失败
     STOP,                // 停止
     NETWORK_ERROR,       //网络错误
-    CREATE_TUNNEL_POOL,  //创建隧道池
+    DISCONNECT,           //连接断开
+    CREATE_TUNNEL_POOL,   //创建隧道池
 
     PROXY_CREATE,          // 发送创建代理请求
     PROXY_CREATE_RESP,     // 接收创建代理响应

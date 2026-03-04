@@ -7,7 +7,6 @@ import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.domain.ClientInfo;
 import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
 import com.xiaoniucode.etp.server.manager.domain.valid.ValidInfo;
-import com.xiaoniucode.etp.server.old.ClientManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +40,6 @@ public class ProxyManager {
      * proxyId -->clientId
      */
     private final Map<String, String> proxyIdToClientId = new ConcurrentHashMap<>();
-    @Autowired
-    private ClientManager clientManager;
     @Autowired
     private DomainManager domainManager;
     @Autowired
@@ -101,10 +98,10 @@ public class ProxyManager {
             domainManager.addDomains(proxyConfig.getProxyId(), domainInfos);
             logger.debug("代理创建成功: [客户端ID={},代理名称={},域名={}]", clientId, proxyConfig.getName(), domains);
         }
-        ClientInfo clientInfo = clientManager.getClient(clientId);
-        if (clientInfo != null) {
-            clientInfo.addProxy(proxyConfig);
-        }
+//        ClientInfo clientInfo = clientManager.getClient(clientId);
+//        if (clientInfo != null) {
+//            clientInfo.addProxy(proxyConfig);
+//        }
         proxyIdToClientId.put(proxyId, clientId);
         proxyIdToProxyConfig.put(proxyId, proxyConfig);
         clientIdToProxyConfigs.computeIfAbsent(clientId, k ->
@@ -123,15 +120,15 @@ public class ProxyManager {
         return Optional.ofNullable(removeProxy(proxyId, null));
     }
 
-    public ProxyConfig removeProxyByName(String clientId, String name) {
-        ClientInfo client = clientManager.getClient(clientId);
-        ProxyConfig config = client.getProxyConfig(name);
-        return removeProxy(config.getProxyId(), null);
-    }
-
+//    public ProxyConfig removeProxyByName(String clientId, String name) {
+//        ClientInfo client = clientManager.getClient(clientId);
+//        ProxyConfig config = client.getProxyConfig(name);
+//        return removeProxy(config.getProxyId(), null);
+//    }
+//
     public ProxyConfig removeProxy(String proxyId, Consumer<ProxyConfig> callback) {
         String clientId = proxyIdToClientId.get(proxyId);
-        ClientInfo clientInfo = clientManager.getClient(clientId);
+        ClientInfo clientInfo =null;
         if (clientInfo == null) {
             return null;
         }
@@ -198,7 +195,7 @@ public class ProxyManager {
         if (clientId == null || config == null) {
             return ValidInfo.fail("客户端ID或代理配置不能为空");
         }
-        ClientInfo client = clientManager.getClient(clientId);
+        ClientInfo client = null;
         if (client == null) {
             logger.error("客户端不存在: {}", clientId);
             return ValidInfo.fail("客户端ID不存在: " + clientId);

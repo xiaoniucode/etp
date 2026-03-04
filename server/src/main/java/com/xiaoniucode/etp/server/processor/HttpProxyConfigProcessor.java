@@ -4,8 +4,7 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.old.AgentSessionManager;
-import com.xiaoniucode.etp.server.old.VisitorStreamManager;
+
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +17,7 @@ import java.util.Set;
 public class HttpProxyConfigProcessor implements ProxyConfigProcessor {
     private final Logger logger = LoggerFactory.getLogger(HttpProxyConfigProcessor.class);
     @Autowired
-    private AgentSessionManager agentSessionManager;
-    @Autowired
     private ProxyManager proxyManager;
-    @Autowired
-    private VisitorStreamManager visitorSessionManager;
 
     @Override
     public boolean supports(ProtocolType protocol) {
@@ -35,15 +30,15 @@ public class HttpProxyConfigProcessor implements ProxyConfigProcessor {
         ProxyStatus status = proxyConfig.getStatus();
         Set<String> domains = proxyConfig.getDomainInfo().getFullDomains();
         if (status.isOpen()) {
-            agentSessionManager.addDomainsToAgentSession(clientId, domains);
+           // agentSessionManager.addDomainsToAgentSession(clientId, domains);
             logger.debug("HTTP隧道开启：{}", domains);
         } else if (status.isClosed()) {
-            agentSessionManager.removeDomainsToAgentSession(clientId, domains);
-            visitorSessionManager.closeStreamsByDomains(domains);
+           // agentSessionManager.removeDomainsToAgentSession(clientId, domains);
+            //visitorSessionManager.closeStreamsByDomains(domains);
             logger.debug("HTTP隧道关闭：{}", domains);
         } else if (status.isDeleted()) {
-            agentSessionManager.removeDomainsToAgentSession(clientId, domains);
-            visitorSessionManager.closeStreamsByDomains(domains);
+            //agentSessionManager.removeDomainsToAgentSession(clientId, domains);
+            //visitorSessionManager.closeStreamsByDomains(domains);
             MetricsCollector.removeCollectors(domains);
             logger.debug("HTTP隧道删除：{}", domains);
         }

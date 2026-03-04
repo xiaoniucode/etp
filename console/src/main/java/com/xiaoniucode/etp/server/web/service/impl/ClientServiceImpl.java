@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
-import com.xiaoniucode.etp.server.old.AgentSessionManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.client.convert.ClientConvert;
 import com.xiaoniucode.etp.server.web.controller.client.request.BatchDeleteClientRequest;
@@ -20,16 +19,14 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
-    @Autowired
-    private AgentSessionManager agentSessionManager;
 
     @Override
     public List<ClientDTO> findAll() {
         List<Client> clients = clientRepository.findAll();
         List<ClientDTO> clientDTOs = ClientConvert.INSTANCE.toDTOList(clients);
         for (ClientDTO clientDTO : clientDTOs) {
-            boolean isOnline = agentSessionManager.isOnline(clientDTO.getId());
-            clientDTO.setIsOnline(isOnline);
+            //boolean isOnline = agentSessionManager.isOnline(clientDTO.getId());
+            clientDTO.setIsOnline(false);
         }
         return clientDTOs;
     }
@@ -38,8 +35,8 @@ public class ClientServiceImpl implements ClientService {
     public ClientDTO findById(String id) {
         Client client = clientRepository.findById(id).orElseThrow(() -> new BizException("客户端不存在"));
         ClientDTO clientDTO = ClientConvert.INSTANCE.toDTO(client);
-        boolean isOnline = agentSessionManager.isOnline(id);
-        clientDTO.setIsOnline(isOnline);
+       // boolean isOnline = agentSessionManager.isOnline(id);
+        clientDTO.setIsOnline(false);
         return clientDTO;
     }
 
@@ -55,7 +52,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void kickout(String clientId) {
-        agentSessionManager.kickoutAgent(clientId);
+       // agentSessionManager.kickoutAgent(clientId);
     }
 
     @Override

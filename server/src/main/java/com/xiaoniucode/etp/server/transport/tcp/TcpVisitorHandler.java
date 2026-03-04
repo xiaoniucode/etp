@@ -35,7 +35,6 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         StreamContext streamContext = visitorManager.createStreamContext(visitor,stateMachine);
         streamContext.setCurrentProtocol(ProtocolType.TCP);
         streamContext.fireEvent(StreamEvent.STREAM_OPEN);
-        //super.channelActive(ctx);
     }
 
     @Override
@@ -67,7 +66,6 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         visitorManager.getStreamContext(visitor).ifPresent(streamContext -> {
             Channel tunnel = streamContext.getTunnel();
             if (tunnel != null && tunnel.isActive()) {
-                // visitor 的写缓冲区状态  -->  控制 tunnel 的读取
                 boolean writable = visitor.isWritable();
                 tunnel.config().setOption(ChannelOption.AUTO_READ, writable);
             }

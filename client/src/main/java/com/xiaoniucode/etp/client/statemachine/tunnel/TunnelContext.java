@@ -15,7 +15,7 @@ public class TunnelContext extends ProcessContextImpl {
     /**
      * 隧道唯一标识
      */
-    private int tunnelId;
+    private String tunnelId;
     /**
      * 控制隧道的连接 ID
      */

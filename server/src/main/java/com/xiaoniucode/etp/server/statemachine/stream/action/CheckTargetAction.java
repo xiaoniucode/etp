@@ -62,7 +62,7 @@ public class CheckTargetAction extends StreamBaseAction {
             target.setPort(3306);
             config.getTargets().add(target);
             TransportConfig transportConfig = new TransportConfig();
-            transportConfig.setMux(true);
+            transportConfig.setMux(false);
             config.setTransport(transportConfig);
         }
         if (protocol.isHttp()){

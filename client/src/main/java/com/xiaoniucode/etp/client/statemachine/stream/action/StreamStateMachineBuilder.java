@@ -1,11 +1,14 @@
-package com.xiaoniucode.etp.client.statemachine.stream;
+package com.xiaoniucode.etp.client.statemachine.stream.action;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.alibaba.cola.statemachine.StateMachineFactory;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
-import com.xiaoniucode.etp.client.statemachine.stream.action.StreamCloseAction;
+import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
+import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
+import com.xiaoniucode.etp.client.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.client.statemachine.stream.action.StreamOpenAction;
+import com.xiaoniucode.etp.client.statemachine.stream.action.StreamCloseAction;
 
 public class StreamStateMachineBuilder {
     

@@ -33,16 +33,17 @@ message AuthInfo {
   optional string arch = 7;
 }
 message TunnelCreateRequest{
-  uint32 tunnel_id = 1;
+  string tunnel_id = 1;
 }
 message TunnelCreateResponse {
-  uint32 tunnel_id = 1;
+  string tunnel_id = 1;
   uint32 code = 2;
   optional string message = 3;
 }
 message StreamOpenResponse{
-    uint32 tunnel_id=1;
-    uint32 code=2;
+  uint32 connection_id = 1;
+  string tunnel_id = 2;
+  uint32 code = 3;
 }
 message AuthResponse{
   string clientId = 1;

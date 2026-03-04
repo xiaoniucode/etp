@@ -18,48 +18,85 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 
 /**
- * 初始化数据传输隧道
+ * 预创建数据传输隧道
  * 多路复用隧道 加密+压缩排列组合
  * 独立隧道连接池
  */
 public class CreateTunnelPoolAction extends AgentBaseAction {
+    private final int DEFAULT_DIRECT_COUNT = 6;
+
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         Integer connectionId = context.getConnectionId();
         Bootstrap bootstrap = context.getControlBootstrap();
         AppConfig config = context.getConfig();
 
-
         //创建多路复用隧道
         //如果配置了TLS证书可创建加密隧道
         //TLS+压缩 空 TLS+空 压缩+空
 
-
         //创建独立连接池隧道
-        TunnelContext tunnelContext = TunnelManager.createTunnelContext(connectionId);
-        tunnelContext.setConnectionId(connectionId);
-        bootstrap.connect(config.getServerAddr(), config.getServerPort()).addListener((ChannelFutureListener) future -> {
-            if (!future.isSuccess()) {
-                tunnelContext.fireEvent(TunnelEvent.CLOSE);
-            } else {
-                Channel tunnel = future.channel();
-                Message.TunnelCreateRequest body = Message.TunnelCreateRequest.newBuilder()
-                        .setTunnelId(tunnelContext.getTunnelId())
-                        .build();
-                ByteBuf payload = ProtobufUtil.toByteBuf(body, tunnel.alloc());
-                TMSPFrame frame = new TMSPFrame(connectionId, TMSP.MSG_TUNNEL_CREATE, payload);
-                frame.setMuxTunnel(false);
-                tunnel.writeAndFlush(frame).addListener((ChannelFutureListener) f -> {
-                    if (f.isSuccess()) {
-                        tunnelContext.setTunnelType(TunnelType.DIRECT);
-                        tunnelContext.setTunnel(tunnel);
-                        tunnelContext.fireEvent(TunnelEvent.CONNECT);
-                    } else {
-                        tunnel.close();
-                        tunnelContext.fireEvent(TunnelEvent.CLOSE);
-                    }
-                });
-            }
-        });
+        for (int i = 0; i < 4; i++) {
+            TunnelContext tunnelContext = TunnelManager.createTunnelContext(connectionId);
+            tunnelContext.setConnectionId(connectionId);
+            bootstrap.connect(config.getServerAddr(), config.getServerPort()).addListener((ChannelFutureListener) future -> {
+                if (!future.isSuccess()) {
+                    tunnelContext.fireEvent(TunnelEvent.CLOSE);
+                } else {
+                    Channel tunnel = future.channel();
+                    Message.TunnelCreateRequest body = Message.TunnelCreateRequest.newBuilder()
+                            .setTunnelId(tunnelContext.getTunnelId())
+                            .build();
+                    ByteBuf payload = ProtobufUtil.toByteBuf(body, tunnel.alloc());
+                    TMSPFrame frame = new TMSPFrame(connectionId, TMSP.MSG_TUNNEL_CREATE, payload);
+                    frame.setMuxTunnel(false);
+
+                    tunnel.writeAndFlush(frame).addListener((ChannelFutureListener) f -> {
+                        if (f.isSuccess()) {
+                            tunnelContext.setTunnelType(TunnelType.DIRECT);
+                            tunnelContext.setTunnel(tunnel);
+                            tunnelContext.fireEvent(TunnelEvent.CONNECT);
+                        } else {
+                            tunnel.close();
+                            tunnelContext.fireEvent(TunnelEvent.CLOSE);
+                        }
+                    });
+                }
+            });
+        }
+
+    }
+    public void createDirectTunnel(AgentContext context){
+        Integer connectionId = context.getConnectionId();
+        Bootstrap bootstrap = context.getControlBootstrap();
+        AppConfig config = context.getConfig();
+        for (int i = 0; i < DEFAULT_DIRECT_COUNT; i++) {
+            TunnelContext tunnelContext = TunnelManager.createTunnelContext(connectionId);
+            tunnelContext.setConnectionId(connectionId);
+            bootstrap.connect(config.getServerAddr(), config.getServerPort()).addListener((ChannelFutureListener) future -> {
+                if (!future.isSuccess()) {
+                    tunnelContext.fireEvent(TunnelEvent.CLOSE);
+                } else {
+                    Channel tunnel = future.channel();
+                    Message.TunnelCreateRequest body = Message.TunnelCreateRequest.newBuilder()
+                            .setTunnelId(tunnelContext.getTunnelId())
+                            .build();
+                    ByteBuf payload = ProtobufUtil.toByteBuf(body, tunnel.alloc());
+                    TMSPFrame frame = new TMSPFrame(connectionId, TMSP.MSG_TUNNEL_CREATE, payload);
+                    frame.setMuxTunnel(false);
+
+                    tunnel.writeAndFlush(frame).addListener((ChannelFutureListener) f -> {
+                        if (f.isSuccess()) {
+                            tunnelContext.setTunnelType(TunnelType.DIRECT);
+                            tunnelContext.setTunnel(tunnel);
+                            tunnelContext.fireEvent(TunnelEvent.CONNECT);
+                        } else {
+                            tunnel.close();
+                            tunnelContext.fireEvent(TunnelEvent.CLOSE);
+                        }
+                    });
+                }
+            });
+        }
     }
 }

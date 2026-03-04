@@ -34,6 +34,7 @@ public class StreamContext extends ProcessContextImpl {
     private ProtocolType currentProtocol = ProtocolType.TCP;
     private boolean compress;
     private boolean encrypt;
+    private boolean mux;
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
 
 

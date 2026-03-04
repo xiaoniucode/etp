@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.statemachine.tunnel.action;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.statemachine.TunnelType;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.statemachine.tunnel.*;
 import io.netty.buffer.ByteBuf;
@@ -22,8 +23,11 @@ public class CreateTunnelAction extends TunnelBaseAction {
     @Override
     protected void doExecute(TunnelState from, TunnelState to, TunnelEvent event, TunnelContext context) {
         logger.debug("开始建立隧道");
-        Channel control = context.getControl();
+        TunnelType tunnelType = context.getTunnelType();
+        TunnelContext register = directTunnelPoolManager.register(context);
 
+        //独立隧道池创建
+        Channel control = context.getControl();
         Message.TunnelCreateResponse resp = Message.TunnelCreateResponse.newBuilder()
                 .setTunnelId(context.getTunnelId())
                 .setCode(0)
@@ -31,13 +35,7 @@ public class CreateTunnelAction extends TunnelBaseAction {
                 .build();
         ByteBuf payload = ProtobufUtil.toByteBuf(resp, control.alloc());
         TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_TUNNEL_CREATE_RESP, payload);
-        control.writeAndFlush(frame).addListener(future -> {
-            if (future.isSuccess()){
-                System.out.println();
-            }else {
-
-            }
-        });
-
+        control.writeAndFlush(frame);
+      context.fireEvent(TunnelEvent.CREATE_SUCCESS);
     }
 }

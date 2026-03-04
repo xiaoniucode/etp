@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.statemachine.tunnel;
 
 import com.alibaba.cola.statemachine.StateMachine;
+import com.xiaoniucode.etp.core.statemachine.TunnelType;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
 import io.netty.channel.Channel;
 import lombok.*;
@@ -14,19 +15,16 @@ public  class TunnelContext extends ProcessContextImpl {
     /**
      * 隧道唯一标识
      */
-    private Integer tunnelId;
+    private String tunnelId;
     /**
-     * 客户端 ID
-     */
-    private String clientId;
-    /**
-     * 连接 ID
+     * 客户端连接 ID
      */
     private int connectionId;
     /**
      * 隧道类型
      */
     private TunnelType tunnelType;
+    private boolean isMux;
     /**
      * 连接管道
      */
@@ -35,6 +33,15 @@ public  class TunnelContext extends ProcessContextImpl {
      * 控制隧道
      */
     private Channel control;
+    /**
+     * 是否压缩
+     */
+    private boolean compress;
+    /**
+     * 是否加密
+     */
+    private boolean encrypt;
+    private ProtocolFeature feature;
     /**
      * 连接状态
      */

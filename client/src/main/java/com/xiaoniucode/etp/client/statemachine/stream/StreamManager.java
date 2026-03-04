@@ -4,8 +4,6 @@ import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import io.netty.channel.Channel;
-
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +15,7 @@ public class StreamManager {
         if (streams.containsKey(streamId)) {
             throw new IllegalArgumentException("streamId 已经存在");
         }
-        StateMachine<StreamState, StreamEvent, StreamContext> stateMachine = StreamStateMachineBuilder.buildStateMachine(streamId);
+        StateMachine<StreamState, StreamEvent, StreamContext> stateMachine = StreamStateMachineBuilder.getStateMachine();
         StreamContext streamContext = new StreamContext(streamId, stateMachine, agentContext);
 
         streams.put(streamId, streamContext);

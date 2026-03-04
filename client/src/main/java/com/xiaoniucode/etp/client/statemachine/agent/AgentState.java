@@ -8,5 +8,6 @@ public enum AgentState {
     AUTHENTICATING,   // 认证中
     CONNECTED,        // 已连接
     FAILED,           // 失败
+    DISCONNECTED,       //断开连接
     STOPPED           // 已停止
 }

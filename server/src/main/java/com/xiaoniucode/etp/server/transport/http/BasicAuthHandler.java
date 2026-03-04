@@ -18,9 +18,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 
-/**
- * Basic Auth 认证
- */
 @Component
 @ChannelHandler.Sharable
 public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
