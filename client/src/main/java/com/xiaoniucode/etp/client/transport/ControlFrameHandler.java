@@ -66,12 +66,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             case TMSP.MSG_TUNNEL_CREATE_RESP: {
                 ByteBuf payload = frame.getPayload();
                 Message.TunnelCreateResponse resp = ProtobufUtil.parseFrom(payload, Message.TunnelCreateResponse.parser());
-                if (resp.getCode() == 0) {
-                    String tunnelId = resp.getTunnelId();
-                    TunnelManager.getTunnelContext(tunnelId).ifPresent(tunnelContext -> {
-                        tunnelContext.fireEvent(TunnelEvent.CREATE_RESPONSE);
-                    });
-                }
+                String tunnelId = resp.getTunnelId();
+                TunnelManager.getTunnelContext(tunnelId).ifPresent(tunnelContext -> {
+                    tunnelContext.setVariable("tunnel_create_response", resp);
+                    tunnelContext.fireEvent(TunnelEvent.CREATE_RESPONSE);
+                });
                 break;
             }
 

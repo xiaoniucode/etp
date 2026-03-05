@@ -33,19 +33,50 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         Channel visitor = context.getVisitor();
         String tunnelId = context.getVariableAs("tunnelId", String.class);
-        Integer connectionId = context.getVariableAs("connectionId", Integer.class);
         Optional<TunnelContext> tc = tunnelManager.getTunnel(context.isMux(), tunnelId);
         if (tc.isPresent()) {
             TunnelContext tunnelContext = tc.get();
             Channel tunnel = tunnelContext.getTunnel();
             context.setTunnel(tunnel);
+
+            boolean mux = context.isMux();
+            boolean encrypt = context.isEncrypt();
+            boolean compress = context.isCompress();
+
+            ChannelPipeline pipeline = tunnel.pipeline();
+            if (!mux) {
+                String[] handlersToRemove = {
+                    NettyConstants.HTTP_VISITOR_HANDLER,
+                    NettyConstants.TCP_VISITOR_HANDLER,
+                    NettyConstants.TMSP_CODEC,
+                    NettyConstants.CONTROL_FRAME_HANDLER,
+                    NettyConstants.IDLE_CHECK_HANDLER
+                };
+                
+                for (String handlerName : handlersToRemove) {
+                    if (pipeline.get(handlerName) != null) {
+                        pipeline.remove(handlerName);
+                    }
+                }
+//
+//                if (!encrypt) {
+//                    if (pipeline.get(NettyConstants.TLS_HANDLER) != null) {
+//                        pipeline.remove(NettyConstants.TLS_HANDLER);
+//                    }
+//                }
+//                if (compress) {
+//                    if (encrypt) {
+//                        pipeline.addAfter(NettyConstants.TLS_HANDLER, NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
+//                        pipeline.addAfter(NettyConstants.TLS_HANDLER, NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
+//                    } else {
+//                        pipeline.addFirst(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
+//                        pipeline.addFirst(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
+//                    }
+//                }
+            }
+
             if (!context.getProxyConfig().isMuxTunnel()) {
                 StreamManager visitorManager = context.getVisitorManager();
-                //删除自定义协议
-                visitor.pipeline().remove(NettyConstants.TCP_VISITOR_HANDLER);
-                tunnel.pipeline().remove(NettyConstants.TMSP_CODEC);
-                tunnel.pipeline().remove(NettyConstants.CONTROL_FRAME_HANDLER);
-                tunnel.pipeline().remove(NettyConstants.IDLE_CHECK_HANDLER);
                 //隧道桥接
                 DirectBridgeFactory.bridge(visitorManager, visitor, tunnel, context.getCurrentProtocol());
                 logger.debug("独立隧道建立成功: {}", context.getTarget());
@@ -53,7 +84,6 @@ public class StreamOpenResponseAction extends StreamBaseAction {
                 logger.debug("共享隧道建立成功: {}", context.getTarget());
             }
             addCompressOrEncryptIfNecessary(context);
-            //开启访问流可读
             visitor.config().setOption(ChannelOption.AUTO_READ, true);
             if (context.getCurrentProtocol().isHttp()) {
                 context.relayHttpFirstPackage();

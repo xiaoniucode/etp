@@ -65,6 +65,18 @@ public class CheckTargetAction extends StreamBaseAction {
             transportConfig.setMux(false);
             config.setTransport(transportConfig);
         }
+        if (remotePort==8608){
+            config.setRemotePort(8608);
+            config.setProtocol(ProtocolType.TCP);
+            config.setStatus(ProxyStatus.OPEN);
+            config.setProxyId("1001");
+            target.setHost("127.0.0.1");
+            target.setPort(5201);
+            config.getTargets().add(target);
+            TransportConfig transportConfig = new TransportConfig();
+            transportConfig.setMux(false);
+            config.setTransport(transportConfig);
+        }
         if (protocol.isHttp()){
             config.setProtocol(ProtocolType.HTTP);
             config.setStatus(ProxyStatus.OPEN);

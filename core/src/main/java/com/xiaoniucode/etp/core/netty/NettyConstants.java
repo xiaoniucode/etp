@@ -7,6 +7,7 @@ public interface NettyConstants {
     String REAL_SERVER_HANDLER = "realServerHandler";
     String TLS_HANDLER = "tlsHandler";
     String TCP_VISITOR_HANDLER = "tcpVisitorHandler";
+    String HTTP_VISITOR_HANDLER = "httpVisitorHandler";
 
 
     String SNAPPY_ENCODER = "SnappyEncoder";

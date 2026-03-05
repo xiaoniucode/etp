@@ -28,6 +28,6 @@ public class MuxTunnelManager {
     }
 
     public TunnelContext register(TunnelContext context) {
-        return null;
+        return context;
     }
 }

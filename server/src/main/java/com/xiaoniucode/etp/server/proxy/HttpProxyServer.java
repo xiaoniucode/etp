@@ -1,5 +1,8 @@
 package com.xiaoniucode.etp.server.proxy;
 
+import com.xiaoniucode.etp.common.Constants;
+import com.xiaoniucode.etp.core.netty.AttributeKeys;
+import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
@@ -61,11 +64,11 @@ public class HttpProxyServer implements Lifecycle {
                         @Override
                         protected void initChannel(SocketChannel sc) {
                             sc.pipeline().addLast(new HostSnifferHandler());
-                           // sc.pipeline().addLast(httpIpCheckHandler);
-                          //  sc.pipeline().addLast(basicAuthHandler);
-                          //  sc.pipeline().addLast(trafficMetricsHandler);
-                         //   sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
-                            sc.pipeline().addLast(httpVisitorHandler);
+                            // sc.pipeline().addLast(httpIpCheckHandler);
+                            //  sc.pipeline().addLast(basicAuthHandler);
+                            //  sc.pipeline().addLast(trafficMetricsHandler);
+                            //   sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
+                            sc.pipeline().addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);
                         }
                     });
             serverBootstrap.bind(httpProxyPort).syncUninterruptibly().get();

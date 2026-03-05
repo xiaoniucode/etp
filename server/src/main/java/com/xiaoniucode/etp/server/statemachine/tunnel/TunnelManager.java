@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.statemachine.tunnel;
 
-import com.xiaoniucode.etp.core.statemachine.TunnelType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +17,6 @@ public class TunnelManager {
 
     public TunnelContext registerContext(TunnelContext context) {
         boolean mux = context.isMux();
-        TunnelType tunnelType = mux ? TunnelType.MUX : TunnelType.DIRECT;
-        context.setTunnelType(tunnelType);
         if (mux) {
             return muxTunnelManager.register(context);
         } else {

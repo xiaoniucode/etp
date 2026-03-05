@@ -35,7 +35,7 @@ public class StreamOpenAction extends StreamBaseAction {
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN, buffer);
         boolean muxTunnel = config.isMuxTunnel();
         frame.setMuxTunnel(muxTunnel);
-        frame.setCompressed(true);
+        frame.setCompressed(false);
         frame.setEncrypted(config.isEncryptEnabled());
         control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {

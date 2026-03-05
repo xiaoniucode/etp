@@ -45,17 +45,13 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
         closeOnFlush(target);
-        ctx.fireChannelInactive();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-
         logger.warn("数据转发异常: 数据流方向={}, {}", direction, cause.getMessage());
         closeOnFlush(ctx.channel());
         closeOnFlush(target);
-//        ctx.fireExceptionCaught(cause);
-        super.exceptionCaught(ctx, cause);
     }
 
     /**
@@ -89,9 +85,9 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
                     logger.debug("数据转发成功");
                 }
             } finally {
-//                if (ReferenceCountUtil.refCnt(msg) > 0) {
-//                    ReferenceCountUtil.release(msg);
-//                }
+                if (ReferenceCountUtil.refCnt(msg) > 0) {
+                    ReferenceCountUtil.release(msg);
+                }
             }
         });
     }

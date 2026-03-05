@@ -3,7 +3,6 @@ package com.xiaoniucode.etp.client.statemachine.tunnel;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.common.UUIDGenerator;
 import com.xiaoniucode.etp.client.statemachine.stream.TunnelConfig;
-import com.xiaoniucode.etp.core.statemachine.TunnelType;
 
 import java.util.Map;
 import java.util.Optional;
@@ -48,13 +47,13 @@ public class TunnelManager {
     }
 
     public static void release(TunnelContext tunnelContext) {
-        if (tunnelContext.getTunnelType()== TunnelType.DIRECT){
+        if (!tunnelContext.isMux()){
             DirectConnectionPool.release(tunnelContext);
         }
     }
 
     public static void remove(TunnelContext context) {
-        if (context.getTunnelType()== TunnelType.DIRECT){
+        if (!context.isMux()){
             DirectConnectionPool.remove(context);
         }
     }

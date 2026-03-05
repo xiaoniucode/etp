@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.statemachine.tunnel;
 
-import com.xiaoniucode.etp.core.statemachine.TunnelType;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,8 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 独立隧道连接池
@@ -21,12 +18,11 @@ public class DirectTunnelPoolManager {
     private final Map<String, TunnelContext> tunnelIdToTunnels = new ConcurrentHashMap<>();
 
     public synchronized TunnelContext register(TunnelContext context) {
-        context.setTunnelType(TunnelType.DIRECT);
+        context.setMux(context.isMux());
         Map<String, TunnelContext> clientTunnels = clientToTunnels.computeIfAbsent(context.getConnectionId(), k -> new ConcurrentHashMap<>());
         clientTunnels.put(context.getTunnelId(), context);
         tunnelIdToTunnels.put(context.getTunnelId(), context);
         return context;
-
     }
 
     /**

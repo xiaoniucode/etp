@@ -14,7 +14,7 @@ public class TunnelCloseAction extends TunnelBaseAction {
 
     @Override
     protected void doExecute(TunnelState from, TunnelState to, TunnelEvent event, TunnelContext context) {
-        logger.debug("清理隧道资源: tunnelId={} TunnelType={}", context.getTunnelId(), context.getTunnelType().name());
+        logger.debug("清理隧道资源: tunnelId={}", context.getTunnelId());
         Channel tunnel = context.getTunnel();
         ChannelUtils.closeOnFlush(tunnel);
         TunnelManager.remove(context);

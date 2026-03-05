@@ -6,7 +6,6 @@ import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.xiaoniucode.etp.client.statemachine.tunnel.action.TunnelCloseAction;
 import com.xiaoniucode.etp.client.statemachine.tunnel.action.TunnelCreateRespAction;
-import com.xiaoniucode.etp.client.statemachine.tunnel.action.TunnelCreateSuccessAction;
 
 public class TunnelStateMachineBuilder {
 
@@ -37,7 +36,8 @@ public class TunnelStateMachineBuilder {
                     .to(TunnelState.ESTABLISHED)
                     .on(TunnelEvent.CREATE_SUCCESS)
                     .when(ctx -> true)
-                    .perform(new TunnelCreateSuccessAction());
+                    .perform((from, to, event, context) ->
+                            context.setState(to));
 
             builder.externalTransitions()
                     .fromAmong(TunnelState.ESTABLISHED, TunnelState.CREATING)
@@ -45,8 +45,6 @@ public class TunnelStateMachineBuilder {
                     .on(TunnelEvent.CLOSE)
                     .when(ctx -> true)
                     .perform(new TunnelCloseAction());
-
-
             builder.build(MACHINE_ID);
             return StateMachineFactory.get(MACHINE_ID);
         }

@@ -6,6 +6,8 @@ import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelContext;
 import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelManager;
 import com.xiaoniucode.etp.client.transport.DirectBridgeFactory;
 import com.xiaoniucode.etp.core.codec.NewStreamCodec;
+import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
+import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.core.netty.NettyConstants;
@@ -34,6 +36,9 @@ public class StreamOpenAction extends StreamBaseAction {
             NewStreamCodec.NewStreamInfo visitorInfo = context.getVariableAs(StreamConstants.VISIT_INFO, NewStreamCodec.NewStreamInfo.class);
             String localIp = visitorInfo.getLocalIp();
             int localPort = visitorInfo.getLocalPort();
+            boolean encrypt = context.isEncrypt();
+            boolean compress = context.isCompress();
+
             context.setLocalIp(localIp);
             context.setLocalPort(localPort);
 
@@ -74,7 +79,22 @@ public class StreamOpenAction extends StreamBaseAction {
                                         server.pipeline().remove(NettyConstants.REAL_SERVER_HANDLER);
                                         tunnel.pipeline().remove(NettyConstants.TMSP_CODEC);
                                         tunnel.pipeline().remove(NettyConstants.CONTROL_FRAME_HANDLER);
-                                        tunnel.pipeline().remove(NettyConstants.IDLE_CHECK_HANDLER);
+                                       // tunnel.pipeline().remove(NettyConstants.IDLE_CHECK_HANDLER);
+//                                        ChannelPipeline pipeline = tunnel.pipeline();
+//                                        if (!encrypt) {
+//                                            if (pipeline.get(NettyConstants.TLS_HANDLER) != null) {
+//                                                pipeline.remove(NettyConstants.TLS_HANDLER);
+//                                            }
+//                                        }
+//                                        if (compress) {
+//                                            if (encrypt) {
+//                                                pipeline.addAfter(NettyConstants.TLS_HANDLER, NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
+//                                                pipeline.addAfter(NettyConstants.TLS_HANDLER, NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
+//                                            } else {
+//                                                pipeline.addFirst(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
+//                                                pipeline.addFirst(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
+//                                            }
+//                                        }
                                         //隧道桥接
                                         DirectBridgeFactory.bridge(tunnel, server);
                                         logger.debug("独立隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
