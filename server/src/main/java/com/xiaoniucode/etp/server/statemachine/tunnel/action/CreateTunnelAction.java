@@ -26,22 +26,19 @@ public class CreateTunnelAction extends TunnelBaseAction {
     @Override
     protected void doExecute(TunnelState from, TunnelState to, TunnelEvent event, TunnelContext context) {
         logger.debug("开始建立隧道");
-        directTunnelPoolManager.register(context);
+        Boolean compress = context.getVariableAs("compress", Boolean.class);
+        Boolean encrypt = context.getVariableAs("encrypt", Boolean.class);
 
-        boolean mux = context.isMux();
-        boolean encrypt = context.isEncrypt();
-        boolean compress = context.isCompress();
+        boolean isMuxTunnel = context.isMux();
         Channel tunnel = context.getTunnel();
         ChannelPipeline pipeline = tunnel.pipeline();
         //只处理共享隧道，独立隧道打开流响应再处理
-        if (mux) {
-            if (!encrypt) {
-                if (pipeline.get(NettyConstants.TLS_HANDLER) != null) {
-                    pipeline.remove(NettyConstants.TLS_HANDLER);
-                }
+        if (isMuxTunnel) {
+            if (Boolean.FALSE.equals(encrypt) && pipeline.get(NettyConstants.TLS_HANDLER) != null) {
+                pipeline.remove(NettyConstants.TLS_HANDLER);
             }
-            if (compress) {
-                if (encrypt) {
+            if (Boolean.TRUE.equals(compress)) {
+                if (Boolean.TRUE.equals(encrypt)) {
                     pipeline.addAfter(NettyConstants.TLS_HANDLER, NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
                     pipeline.addAfter(NettyConstants.TLS_HANDLER, NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
                 } else {
@@ -50,6 +47,8 @@ public class CreateTunnelAction extends TunnelBaseAction {
                 }
             }
         }
+        directTunnelPoolManager.register(context);
+
         Channel control = context.getControl();
         Message.TunnelCreateResponse resp = Message.TunnelCreateResponse.newBuilder()
                 .setTunnelId(context.getTunnelId())

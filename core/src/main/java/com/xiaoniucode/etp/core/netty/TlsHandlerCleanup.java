@@ -7,14 +7,14 @@ import io.netty.handler.ssl.SslHandler;
 
 import java.util.concurrent.TimeUnit;
 
-public class PipelineSwitcher {
+public class TlsHandlerCleanup {
 
     /**
      * 删除 tls 处理器并清空channel
      *
      * @param pipeline 管道
      */
-    private static void removeTlsGracefully(ChannelPipeline pipeline) {
+    public static void removeTlsGracefully(ChannelPipeline pipeline) {
         SslHandler sslHandler = pipeline.get(SslHandler.class);
         if (sslHandler != null) {
             // 标记正在移除 TLS，停止新的解码
@@ -26,11 +26,11 @@ public class PipelineSwitcher {
                     .addListener(f -> {
                         // 确保所有数据都被处理
                         if (sslHandler.engine().isOutboundDone()) {
-                            pipeline.remove("tls");
+                            pipeline.remove(NettyConstants.TLS_HANDLER);
                         } else {
                             // 如果还有数据，等待一小段时间
                             channel.eventLoop().schedule(() -> {
-                                pipeline.remove("tls");
+                                pipeline.remove(NettyConstants.TLS_HANDLER);
                             }, 100, TimeUnit.MILLISECONDS);
                         }
                     });

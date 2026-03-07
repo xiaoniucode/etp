@@ -4,6 +4,7 @@ import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
@@ -21,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
  * 控制隧道消息处理器
  */
@@ -34,9 +37,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     private StreamManager visitorManager;
     @Autowired
     private TunnelManager tunnelManager;
-    @Autowired
-    @Qualifier("tunnelStateMachine")
-    private StateMachine<TunnelState, TunnelEvent, TunnelContext> tunnelStateMachine;
+
     @Autowired
     @Qualifier("agentStateMachine")
     private StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine;
@@ -50,29 +51,25 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 AgentContext agentContext = agentManager.createAgent(ctx.channel(), agentStateMachine);
                 Message.AuthInfo authInfo = ProtobufUtil.parseFrom(payload, Message.AuthInfo.parser());
                 agentContext.setVariable(AgentConstants.AGENT_AUTH_INFO, authInfo);
-
                 agentContext.fireEvent(AgentEvent.AUTH_START);
             }
 
             case TMSP.MSG_TUNNEL_CREATE -> {
-                int connectionId = frame.getStreamId();
-                boolean isMuxTunnel = frame.isMuxTunnel();
-                agentManager.getAgentContext(connectionId).ifPresent(agentContext -> {
+                Optional<AgentContext> ag = agentManager.getAgentContext(frame.getStreamId());
+                if (ag.isPresent()) {
+                    AgentContext agentContext = ag.get();
                     Message.TunnelCreateRequest req = ProtobufUtil.parseFrom(frame.getPayload(), Message.TunnelCreateRequest.parser());
-                    TunnelContext context = TunnelContext.builder()
-                            .connectionId(connectionId)
-                            .compress(frame.isCompressed())
-                            .control(agentContext.getControl())
-                            .isMux(isMuxTunnel)
-                            .encrypt(frame.isEncrypted())
-                            .tunnel(ctx.channel())
-                            .stateMachine(tunnelStateMachine)
-                            .state(TunnelState.IDLE)
-                            .tunnelId(req.getTunnelId()).build();
-
-                    TunnelContext tunnelContext = tunnelManager.registerContext(context);
+                    TunnelContext tunnelContext = tunnelManager.createContext(
+                            agentContext,
+                            req.getTunnelId(),
+                            ctx.channel(),
+                            frame.isMuxTunnel());
+                    tunnelContext.setVariable("compress", frame.isCompressed());
+                    tunnelContext.setVariable("encrypt", frame.isEncrypted());
                     tunnelContext.fireEvent(TunnelEvent.CREATE);
-                });
+                } else {
+                    ChannelUtils.closeOnFlush(ctx.channel());
+                }
             }
 
             //----------------------------------------------------------------------------------------//

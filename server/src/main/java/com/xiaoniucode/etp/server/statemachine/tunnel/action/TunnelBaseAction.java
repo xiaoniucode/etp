@@ -5,12 +5,16 @@ import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelContext;
 import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelEvent;
 import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelState;
 
-public abstract class TunnelBaseAction  implements Action<TunnelState, TunnelEvent, TunnelContext> {
+public abstract class TunnelBaseAction implements Action<TunnelState, TunnelEvent, TunnelContext> {
 
     @Override
     public final void execute(TunnelState from, TunnelState to, TunnelEvent event, TunnelContext context) {
-        context.setState(to);
-        doExecute(from, to, event, context);
+        try {
+            context.setState(to);
+            doExecute(from, to, event, context);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     protected abstract void doExecute(TunnelState from, TunnelState to, TunnelEvent event, TunnelContext context);

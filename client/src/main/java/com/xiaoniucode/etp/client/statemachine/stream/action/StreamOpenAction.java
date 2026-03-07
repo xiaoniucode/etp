@@ -2,7 +2,6 @@ package com.xiaoniucode.etp.client.statemachine.stream.action;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.stream.*;
-import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelContext;
 import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelManager;
 import com.xiaoniucode.etp.client.transport.DirectBridgeFactory;
 import com.xiaoniucode.etp.core.codec.NewStreamCodec;
@@ -13,19 +12,18 @@ import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.netty.TlsHandlerCleanup;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 public class StreamOpenAction extends StreamBaseAction {
     private final Logger logger = LoggerFactory.getLogger(StreamOpenAction.class);
-    private static final Queue<Channel> pool = new ConcurrentLinkedQueue<>();
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
@@ -36,8 +34,6 @@ public class StreamOpenAction extends StreamBaseAction {
             NewStreamCodec.NewStreamInfo visitorInfo = context.getVariableAs(StreamConstants.VISIT_INFO, NewStreamCodec.NewStreamInfo.class);
             String localIp = visitorInfo.getLocalIp();
             int localPort = visitorInfo.getLocalPort();
-            boolean encrypt = context.isEncrypt();
-            boolean compress = context.isCompress();
 
             context.setLocalIp(localIp);
             context.setLocalPort(localPort);
@@ -73,35 +69,13 @@ public class StreamOpenAction extends StreamBaseAction {
 
                             control.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload)).addListener(f -> {
                                 if (f.isSuccess()) {
-                                    context.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
                                     if (!context.isMuxTunnel()) {
-                                        //删除自定义协议
-                                        server.pipeline().remove(NettyConstants.REAL_SERVER_HANDLER);
-                                        tunnel.pipeline().remove(NettyConstants.TMSP_CODEC);
-                                        tunnel.pipeline().remove(NettyConstants.CONTROL_FRAME_HANDLER);
-                                       // tunnel.pipeline().remove(NettyConstants.IDLE_CHECK_HANDLER);
-//                                        ChannelPipeline pipeline = tunnel.pipeline();
-//                                        if (!encrypt) {
-//                                            if (pipeline.get(NettyConstants.TLS_HANDLER) != null) {
-//                                                pipeline.remove(NettyConstants.TLS_HANDLER);
-//                                            }
-//                                        }
-//                                        if (compress) {
-//                                            if (encrypt) {
-//                                                pipeline.addAfter(NettyConstants.TLS_HANDLER, NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
-//                                                pipeline.addAfter(NettyConstants.TLS_HANDLER, NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
-//                                            } else {
-//                                                pipeline.addFirst(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
-//                                                pipeline.addFirst(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
-//                                            }
-//                                        }
-                                        //隧道桥接
-                                        DirectBridgeFactory.bridge(tunnel, server);
+                                        handDirectTunnelHandlers(agentContext, context);
                                         logger.debug("独立隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
                                     } else {
                                         logger.debug("共享隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
                                     }
-                                    //开启真实目标服务可读
+                                    context.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
                                     server.config().setOption(ChannelOption.AUTO_READ, true);
                                 }
                             });
@@ -114,5 +88,63 @@ public class StreamOpenAction extends StreamBaseAction {
             });
             context.removeVariable(StreamConstants.VISIT_INFO);
         }
+    }
+
+    private void handDirectTunnelHandlers(AgentContext agentContext, StreamContext context) {
+        if (context == null || context.isMuxTunnel()) {
+            return;
+        }
+        Channel tunnel = context.getTunnel();
+        Channel server = context.getServer();
+
+        if (tunnel == null || server == null) {
+            logger.warn("隧道或服务器通道为null，跳过直接隧道处理");
+            return;
+        }
+
+        ChannelPipeline tunnelPipeline = tunnel.pipeline();
+        ChannelPipeline serverPipeline = server.pipeline();
+
+        if (tunnelPipeline == null || serverPipeline == null) {
+            logger.warn("隧道或服务器管道为null，跳过直接隧道处理");
+            return;
+        }
+        if (serverPipeline.get(NettyConstants.REAL_SERVER_HANDLER) != null) {
+            serverPipeline.remove(NettyConstants.REAL_SERVER_HANDLER);
+        }
+
+        if (tunnelPipeline.get(NettyConstants.TMSP_CODEC) != null) {
+            tunnelPipeline.remove(NettyConstants.TMSP_CODEC);
+        }
+        if (tunnelPipeline.get(NettyConstants.CONTROL_FRAME_HANDLER) != null) {
+            tunnelPipeline.remove(NettyConstants.CONTROL_FRAME_HANDLER);
+        }
+        if (tunnelPipeline.get(NettyConstants.IDLE_CHECK_HANDLER) != null) {
+            tunnelPipeline.remove(NettyConstants.IDLE_CHECK_HANDLER);
+        }
+        boolean encrypt = context.isEncrypt();
+        boolean compress = context.isCompress();
+        if (!encrypt && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
+            TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
+        } else {
+            SslContext tlsContext = agentContext.getTlsContext();
+            if (tlsContext != null) {
+                SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc());
+                tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
+            }
+        }
+        if (compress) {
+            tunnelPipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
+            tunnelPipeline.addLast(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
+        } else {
+            if (tunnelPipeline.get(NettyConstants.SNAPPY_ENCODER) != null) {
+                tunnelPipeline.remove(NettyConstants.SNAPPY_ENCODER);
+            }
+            if (tunnelPipeline.get(NettyConstants.SNAPPY_DECODER) != null) {
+                tunnelPipeline.remove(NettyConstants.SNAPPY_DECODER);
+            }
+        }
+        //隧道桥接
+        DirectBridgeFactory.bridge(tunnel, server);
     }
 }

@@ -12,6 +12,7 @@ import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
 import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
 import com.xiaoniucode.etp.server.transport.ControlFrameHandler;
+import com.xiaoniucode.etp.server.transport.TlsContextHolder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -56,6 +57,7 @@ public class TunnelServer implements Lifecycle {
             eventBus.publishSync(new TunnelServerStartingEvent());
             if (config.getTlsConfig().getEnable()) {
                 tlsContext = SslContextFactory.createServerSslContext(config.getTlsConfig());
+                TlsContextHolder.initialize(tlsContext);
             }
             tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();

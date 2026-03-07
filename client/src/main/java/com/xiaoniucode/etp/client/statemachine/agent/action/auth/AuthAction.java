@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.statemachine.agent.action.auth;
 
-import com.xiaoniucode.etp.client.common.utils.MavenArchiverUtil;
+import com.xiaoniucode.etp.client.common.utils.AppVersionUtil;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
@@ -28,7 +28,7 @@ public class AuthAction extends AgentBaseAction {
             // 构建认证消息
             Message.AuthInfo authInfo = Message.AuthInfo.newBuilder()
                     .setToken(config.getAuthConfig().getToken())
-                    .setVersion(MavenArchiverUtil.getVersion())
+                    .setVersion(AppVersionUtil.getVersion())
 //                    .setClientType(Message.ClientType.BINARY_DEVICE)
 //                    .setOs(OSUtils.getOS())
 //                    .setName(OSUtils.getHostName())

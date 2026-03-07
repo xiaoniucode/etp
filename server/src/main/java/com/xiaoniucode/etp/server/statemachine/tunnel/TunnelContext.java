@@ -19,6 +19,9 @@ public  class TunnelContext extends ProcessContextImpl {
      * 客户端连接 ID
      */
     private int connectionId;
+    /**
+     * 是否是多路复用隧道
+     */
     private boolean isMux;
     /**
      * 连接管道
@@ -28,15 +31,6 @@ public  class TunnelContext extends ProcessContextImpl {
      * 控制隧道
      */
     private Channel control;
-    /**
-     * 是否压缩
-     */
-    private boolean compress;
-    /**
-     * 是否加密
-     */
-    private boolean encrypt;
-    private ProtocolFeature feature;
     /**
      * 连接状态
      */

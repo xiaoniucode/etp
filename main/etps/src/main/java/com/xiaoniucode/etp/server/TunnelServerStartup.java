@@ -21,7 +21,7 @@ public class TunnelServerStartup {
         AppConfig config = ConfigParser.parse(args);
         Dashboard dashboard = config.getDashboard();
         SpringApplicationBuilder builder = new SpringApplicationBuilder(TunnelServerStartup.class);
-        if (dashboard.getEnable()) {
+        if (Boolean.TRUE.equals(dashboard.getEnable())) {
             builder.properties("spring.main.web-application-type=servlet", "server.port=" + dashboard.getPort());
         } else {
             builder.properties("spring.main.web-application-type=none");
