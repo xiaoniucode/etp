@@ -12,7 +12,9 @@ public class DirectConnectionPool {
     private static final Logger logger = LoggerFactory.getLogger(DirectConnectionPool.class);
     private static final int MAX_TUNNEL_POOL_SIZE = 100;
     private static final Queue<TunnelContext> pool = new ConcurrentLinkedQueue<>();
+    private DirectConnectionPool() {
 
+    }
 
     public static boolean add(TunnelContext tunnelContext) {
         if (pool.size() > MAX_TUNNEL_POOL_SIZE) {

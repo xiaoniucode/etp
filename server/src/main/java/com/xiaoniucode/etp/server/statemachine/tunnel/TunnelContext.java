@@ -31,6 +31,8 @@ public  class TunnelContext extends ProcessContextImpl {
      * 控制隧道
      */
     private Channel control;
+    private boolean encrypt;
+    private boolean compress;
     /**
      * 连接状态
      */

@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.client.statemachine.tunnel;
 
 import com.alibaba.cola.statemachine.StateMachine;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
 import io.netty.channel.Channel;
 import lombok.*;
@@ -30,6 +31,7 @@ public class TunnelContext extends ProcessContextImpl {
      */
     private Channel tunnel;
     private TunnelState state = TunnelState.IDLE;
+    private AgentContext agentContext;
     private StateMachine<TunnelState, TunnelEvent, TunnelContext> stateMachine;
 
     public void fireEvent(TunnelEvent event) {

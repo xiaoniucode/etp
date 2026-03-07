@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.tunnel;
 
+import com.xiaoniucode.etp.core.netty.ProtocolFeature;
 import org.springframework.stereotype.Component;
 
 
@@ -13,17 +14,20 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class MuxTunnelManager {
     private final Map<ProtocolFeature, TunnelContext> tunnels = new ConcurrentHashMap<>();
+    private final Map<String, TunnelContext> contextMap = new ConcurrentHashMap<>();
 
-    public TunnelContext add(ProtocolFeature feature, TunnelContext context) {
-        TunnelContext tunnelContext = tunnels.putIfAbsent(feature, context);
-        return tunnelContext;
+    public TunnelContext add(TunnelContext context) {
+        ProtocolFeature feature = ProtocolFeature.toProtocolFeature(context.isEncrypt(), context.isCompress());
+        contextMap.put(context.getTunnelId(),context);
+        return tunnels.put(feature, context);
     }
 
-    public Optional<TunnelContext> get(ProtocolFeature feature) {
-        TunnelContext tunnelContext = tunnels.get(feature);
+    public Optional<TunnelContext> get(String tunnelId) {
+        TunnelContext tunnelContext = contextMap.get(tunnelId);
         return Optional.ofNullable(tunnelContext);
     }
-    public void remove(){
+
+    public void remove() {
 
     }
 

@@ -2,7 +2,9 @@ package com.xiaoniucode.etp.client.statemachine.tunnel;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.common.UUIDGenerator;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.stream.TunnelConfig;
+import com.xiaoniucode.etp.core.netty.ProtocolFeature;
 
 import java.util.Map;
 import java.util.Optional;
@@ -11,16 +13,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TunnelManager {
     private static final Map<String, TunnelContext> tunnels = new ConcurrentHashMap<>();
 
-    public static TunnelContext createTunnelContext(int connectionId) {
+    public static TunnelContext createTunnelContext(AgentContext agentContext, int connectionId, boolean isMux) {
         String tunnelId = UUIDGenerator.generate();
 
         StateMachine<TunnelState, TunnelEvent, TunnelContext> stateMachine = TunnelStateMachineBuilder.getStateMachine();
         TunnelContext tunnelContext = new TunnelContext();
         tunnelContext.setStateMachine(stateMachine);
         tunnelContext.setTunnelId(tunnelId);
+        tunnelContext.setAgentContext(agentContext);
         tunnelContext.setConnectionId(connectionId);
         tunnels.put(tunnelId, tunnelContext);
-        DirectConnectionPool.add(tunnelContext);
         return tunnelContext;
     }
 

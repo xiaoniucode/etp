@@ -49,7 +49,7 @@ public class CheckTargetAction extends StreamBaseAction {
             target.setHost("127.0.0.1");
             target.setPort(3306);
             TransportConfig transportConfig = new TransportConfig();
-            transportConfig.setMux(false);
+            transportConfig.setMux(true);
             config.setTransport(transportConfig);
             config.getTargets().add(target);
         }

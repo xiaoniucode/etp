@@ -1,13 +1,15 @@
 package com.xiaoniucode.etp.client.statemachine.tunnel.action;
 
-import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelContext;
-import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelEvent;
-import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelState;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.client.statemachine.tunnel.*;
 import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
 import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
 import com.xiaoniucode.etp.core.netty.NettyConstants;
+import com.xiaoniucode.etp.core.netty.TlsHandlerCleanup;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,30 +18,38 @@ public class TunnelCreateRespAction extends TunnelBaseAction {
 
     @Override
     protected void doExecute(TunnelState from, TunnelState to, TunnelEvent event, TunnelContext context) {
-        logger.debug("处理隧道创建响应, tunnelId={}, 多路复用={}, 加密={}, 压缩={}", 
-            context.getTunnelId(), context.isMux(), context.isEncrypt(), context.isCompress());
-
-        boolean mux = context.isMux();
+        logger.debug("创建隧道, tunnelId={}, 多路复用={}, 加密={}, 压缩={}",
+                context.getTunnelId(), context.isMux(), context.isEncrypt(), context.isCompress());
+        boolean isMux = context.isMux();
         boolean encrypt = context.isEncrypt();
         boolean compress = context.isCompress();
         Channel tunnel = context.getTunnel();
-        ChannelPipeline pipeline = tunnel.pipeline();
-        if (mux) {
-            if (!encrypt) {
-                if (pipeline.get(NettyConstants.TLS_HANDLER) != null) {
-                    pipeline.remove(NettyConstants.TLS_HANDLER);
+        ChannelPipeline tunnelPipeline = tunnel.pipeline();
+        if (isMux) {
+            if (!encrypt && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
+                TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
+            } else {
+                AgentContext agentContext = context.getAgentContext();
+                SslContext tlsContext = agentContext.getTlsContext();
+                if (tlsContext != null) {
+                    SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc());
+                    tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
                 }
             }
             if (compress) {
-                if (encrypt) {
-                    pipeline.addAfter(NettyConstants.TLS_HANDLER, NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
-                    pipeline.addAfter(NettyConstants.TLS_HANDLER, NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
-                } else {
-                    pipeline.addFirst(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
-                    pipeline.addFirst(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
+                tunnelPipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
+                tunnelPipeline.addLast(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
+            } else {
+                if (tunnelPipeline.get(NettyConstants.SNAPPY_ENCODER) != null) {
+                    tunnelPipeline.remove(NettyConstants.SNAPPY_ENCODER);
+                }
+                if (tunnelPipeline.get(NettyConstants.SNAPPY_DECODER) != null) {
+                    tunnelPipeline.remove(NettyConstants.SNAPPY_DECODER);
                 }
             }
+            MuxConnectionPool.add(context);
+        } else {
+            DirectConnectionPool.add(context);
         }
-
     }
 }

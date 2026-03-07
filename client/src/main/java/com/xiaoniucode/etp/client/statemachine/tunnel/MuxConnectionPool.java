@@ -1,5 +1,7 @@
 package com.xiaoniucode.etp.client.statemachine.tunnel;
 
+import com.xiaoniucode.etp.core.netty.ProtocolFeature;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +20,10 @@ public class MuxConnectionPool {
         return Optional.ofNullable(tunnelContext);
     }
 
-    public static void add(ProtocolFeature feature, TunnelContext context) {
+    public static void add(TunnelContext context) {
+        boolean compress = context.isCompress();
+        boolean encrypt = context.isEncrypt();
+        ProtocolFeature feature=   ProtocolFeature.toProtocolFeature(encrypt,compress);
         caches.put(feature, context);
     }
 }

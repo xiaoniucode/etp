@@ -70,19 +70,10 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         ChannelPipeline tunnelPipeline = tunnel.pipeline();
         ChannelPipeline visitorPipeline = visitor.pipeline();
 
-        if (!encrypt && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
-            TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
-        } else {
-            SslContext tlsContext = TlsContextHolder.get();
-            if (tlsContext != null) {
-                SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc());
-                tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
-            }
-        }
+
         String[] handlersToRemove = {
                 NettyConstants.TMSP_CODEC,
-                NettyConstants.CONTROL_FRAME_HANDLER,
-                NettyConstants.IDLE_CHECK_HANDLER
+                NettyConstants.CONTROL_FRAME_HANDLER
         };
 
         for (String handlerName : handlersToRemove) {
@@ -95,6 +86,15 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         }
         if (visitorPipeline.get(NettyConstants.HTTP_VISITOR_HANDLER) != null) {
             visitorPipeline.remove(NettyConstants.HTTP_VISITOR_HANDLER);
+        }
+        if (!encrypt && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
+            TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
+        } else {
+            SslContext tlsContext = TlsContextHolder.get();
+            if (tlsContext != null) {
+                SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc());
+                tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
+            }
         }
         if (compress) {
             tunnelPipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());

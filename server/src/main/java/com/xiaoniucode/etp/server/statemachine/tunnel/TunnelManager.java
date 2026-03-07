@@ -24,26 +24,21 @@ public class TunnelManager {
 
     public Optional<TunnelContext> getTunnel(boolean mux, String tunnelId) {
         if (mux) {
-            return Optional.empty();
+            return muxTunnelManager.get(tunnelId);
         } else {
             return Optional.ofNullable(directTunnelPoolManager.borrow(tunnelId));
         }
     }
 
     public TunnelContext createContext(AgentContext agentContext, String tunnelId, Channel tunnel, boolean isMuxTunnel) {
-        TunnelContext context = TunnelContext.builder()
+        return TunnelContext.builder()
                 .connectionId(agentContext.getConnectionId())
                 .control(agentContext.getControl())
                 .isMux(isMuxTunnel)
                 .tunnel(tunnel)
+                .state(TunnelState.IDLE)
                 .stateMachine(tunnelStateMachine)
                 .tunnelId(tunnelId)
                 .build();
-        context.setState(TunnelState.IDLE);
-        if (isMuxTunnel) {
-            return muxTunnelManager.register(context);
-        } else {
-            return directTunnelPoolManager.register(context);
-        }
     }
 }

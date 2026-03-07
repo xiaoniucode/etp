@@ -66,14 +66,17 @@ public class StreamOpenAction extends StreamBaseAction {
                                     .setTunnelId(tunnelContext.getTunnelId())
                                     .build();
                             ByteBuf payload = ProtobufUtil.toByteBuf(req, control.alloc());
-
-                            control.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload)).addListener(f -> {
+                            TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload);
+                            frame.setCompressed(frame.isCompressed());
+                            frame.setEncrypted(frame.isEncrypted());
+                            frame.setMuxTunnel(context.isMuxTunnel());
+                            control.writeAndFlush(frame).addListener(f -> {
                                 if (f.isSuccess()) {
                                     if (!context.isMuxTunnel()) {
                                         handDirectTunnelHandlers(agentContext, context);
-                                        logger.debug("独立隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
+                                        logger.debug("独立隧道创建成功 - [隧道ID={},目标地址={}，目标端口={}]", tunnelContext.getTunnelId(), localIp, localPort);
                                     } else {
-                                        logger.debug("共享隧道创建成功 - [目标地址={}，目标端口={}]", localIp, localPort);
+                                        logger.debug("共享隧道创建成功 - [隧道ID={},目标地址={}，目标端口={}]", tunnelContext.getTunnelId(), localIp, localPort);
                                     }
                                     context.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
                                     server.config().setOption(ChannelOption.AUTO_READ, true);
@@ -118,9 +121,6 @@ public class StreamOpenAction extends StreamBaseAction {
         }
         if (tunnelPipeline.get(NettyConstants.CONTROL_FRAME_HANDLER) != null) {
             tunnelPipeline.remove(NettyConstants.CONTROL_FRAME_HANDLER);
-        }
-        if (tunnelPipeline.get(NettyConstants.IDLE_CHECK_HANDLER) != null) {
-            tunnelPipeline.remove(NettyConstants.IDLE_CHECK_HANDLER);
         }
         boolean encrypt = context.isEncrypt();
         boolean compress = context.isCompress();

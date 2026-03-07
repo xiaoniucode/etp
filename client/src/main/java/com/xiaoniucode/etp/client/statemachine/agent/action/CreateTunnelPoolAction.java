@@ -29,7 +29,7 @@ public class CreateTunnelPoolAction extends AgentBaseAction {
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-      //  createMuxTunnels(context);
+        createMuxTunnels(context);
         createDirectTunnels(context);
     }
 
@@ -66,12 +66,12 @@ public class CreateTunnelPoolAction extends AgentBaseAction {
         return configs;
     }
 
-    private void createTunnel(AgentContext context, TunnelConfig tunnelConfig, boolean isMux) {
-        Integer connectionId = context.getConnectionId();
-        Bootstrap bootstrap = context.getControlBootstrap();
-        AppConfig config = context.getConfig();
+    private void createTunnel(AgentContext agentContext, TunnelConfig tunnelConfig, boolean isMux) {
+        Integer connectionId = agentContext.getConnectionId();
+        Bootstrap bootstrap = agentContext.getControlBootstrap();
+        AppConfig config = agentContext.getConfig();
 
-        TunnelContext tunnelContext = TunnelManager.createTunnelContext(connectionId);
+        TunnelContext tunnelContext = TunnelManager.createTunnelContext(agentContext,connectionId,isMux);
         tunnelContext.setConnectionId(connectionId);
 
         bootstrap.connect(config.getServerAddr(), config.getServerPort()).addListener((ChannelFutureListener) future -> {
