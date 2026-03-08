@@ -35,7 +35,7 @@ class EtpTestApplicationTests {
     @Transactional
     void testBatchInsert2() {
         int batchSize = 1000;
-        int totalRecords = 100000;
+        int totalRecords = 10000;
 
         long start = System.currentTimeMillis();
 

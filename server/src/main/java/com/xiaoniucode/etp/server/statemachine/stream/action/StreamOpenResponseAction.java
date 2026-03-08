@@ -49,6 +49,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             if (context.getCurrentProtocol().isHttp()) {
                 context.relayHttpFirstPackage();
             }
+            context.setWriteQueue(tc.get().getWriteQueue());
             Channel visitor = context.getVisitor();
             visitor.config().setOption(ChannelOption.AUTO_READ, true);
         } else {

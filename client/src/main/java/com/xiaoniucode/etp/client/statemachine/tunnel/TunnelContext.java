@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.client.statemachine.tunnel;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.core.netty.NettyBatchWriteQueue;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
 import io.netty.channel.Channel;
 import lombok.*;
@@ -26,6 +27,7 @@ public class TunnelContext extends ProcessContextImpl {
     private boolean mux;
     private boolean encrypt;
     private boolean compress;
+    private NettyBatchWriteQueue writeQueue;
     /**
      * 连接管道
      */

@@ -9,9 +9,11 @@ import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
+import com.xiaoniucode.etp.core.netty.NettyBatchWriteQueue;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -35,6 +37,7 @@ public class StreamContext extends ProcessContextImpl {
     private boolean compress;
     private boolean encrypt;
     private boolean mux;
+    private NettyBatchWriteQueue writeQueue;
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
 
 
@@ -67,16 +70,26 @@ public class StreamContext extends ProcessContextImpl {
 
     public void relayToTunnel(ByteBuf payload) {
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_DATA, payload);
-        tunnel.writeAndFlush(frame).addListener(future -> {
-            if (!future.isSuccess()) {
-                visitor.close();
-                logger.error("数据转发失败");
-            }
-            if (future.isSuccess()) {
-                logger.debug("数据转发成功：streamId={}", streamId);
-            }
-           // ReferenceCountUtil.release(payload);
-        });
+        if (writeQueue != null) {
+            writeQueue.enqueue(frame).addListener((ChannelFutureListener) future -> {
+                if (future.isSuccess()) {
+                   logger.debug("批量发送");
+                } else {
+                    visitor.close();
+                }
+            });
+        } else {
+            tunnel.writeAndFlush(frame).addListener(future -> {
+                if (!future.isSuccess()) {
+                    visitor.close();
+                    logger.error("数据转发失败");
+                }
+                if (future.isSuccess()) {
+                    logger.debug("数据转发成功：streamId={}", streamId);
+                }
+                ReferenceCountUtil.release(payload);
+            });
+        }
     }
 
     /**

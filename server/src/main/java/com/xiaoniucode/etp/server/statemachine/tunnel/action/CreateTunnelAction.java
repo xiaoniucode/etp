@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.netty.TlsHandlerCleanup;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.statemachine.tunnel.*;
+import com.xiaoniucode.etp.core.netty.NettyBatchWriteQueue;
 import com.xiaoniucode.etp.server.transport.TlsContextHolder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -60,6 +61,8 @@ public class CreateTunnelAction extends TunnelBaseAction {
                     tunnelPipeline.remove(NettyConstants.SNAPPY_DECODER);
                 }
             }
+            NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
+            context.setWriteQueue(writeQueue);
             muxTunnelManager.add(context);
         } else {
             directTunnelPoolManager.register(context);

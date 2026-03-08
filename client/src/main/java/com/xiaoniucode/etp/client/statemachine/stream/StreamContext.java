@@ -5,9 +5,11 @@ import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.netty.NettyBatchWriteQueue;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +33,7 @@ public class StreamContext extends ProcessContextImpl {
     private boolean isMuxTunnel;
     private AgentContext agentContext;
     private StreamManager streamManager;
+    private NettyBatchWriteQueue writeQueue;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
@@ -66,11 +69,21 @@ public class StreamContext extends ProcessContextImpl {
             return;
         }
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_DATA, payload);
-        tunnel.writeAndFlush(frame).addListener(future -> {
-            if (!future.isSuccess()) {
-                logger.warn("转发到隧道失败 streamId={}", streamId);
-            }
-        });
+        if (writeQueue!=null){
+            writeQueue.enqueue(frame).addListener((ChannelFutureListener) future -> {
+                if (future.isSuccess()) {
+                    logger.debug("批量发送");
+                } else {
+                    server.close();
+                }
+            });
+        }else {
+            tunnel.writeAndFlush(frame).addListener(future -> {
+                if (!future.isSuccess()) {
+                    logger.warn("转发到隧道失败 streamId={}", streamId);
+                }
+            });
+        }
     }
 }
 

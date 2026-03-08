@@ -59,6 +59,8 @@ public class StreamOpenAction extends StreamBaseAction {
                         if (control != null && control.isActive()) {
                             context.setServer(server);
                             context.setTunnel(tunnel);
+                            context.setWriteQueue(tunnelContext.getWriteQueue());
+
                             Integer connectionId = agentContext.getConnectionId();
                             Message.StreamOpenResponse req = Message.StreamOpenResponse.newBuilder()
                                     .setCode(0)

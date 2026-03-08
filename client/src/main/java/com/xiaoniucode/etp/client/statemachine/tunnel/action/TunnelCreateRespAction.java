@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.tunnel.*;
 import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
 import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
+import com.xiaoniucode.etp.core.netty.NettyBatchWriteQueue;
 import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.netty.TlsHandlerCleanup;
 import io.netty.channel.Channel;
@@ -47,6 +48,8 @@ public class TunnelCreateRespAction extends TunnelBaseAction {
                     tunnelPipeline.remove(NettyConstants.SNAPPY_DECODER);
                 }
             }
+            NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
+            context.setWriteQueue(writeQueue);
             MuxConnectionPool.add(context);
         } else {
             DirectConnectionPool.add(context);

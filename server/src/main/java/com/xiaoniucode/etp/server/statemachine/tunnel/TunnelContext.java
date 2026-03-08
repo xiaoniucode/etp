@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.statemachine.tunnel;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
+import com.xiaoniucode.etp.core.netty.NettyBatchWriteQueue;
 import io.netty.channel.Channel;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public  class TunnelContext extends ProcessContextImpl {
+public class TunnelContext extends ProcessContextImpl {
     /**
      * 隧道唯一标识
      */
@@ -33,14 +34,17 @@ public  class TunnelContext extends ProcessContextImpl {
     private Channel control;
     private boolean encrypt;
     private boolean compress;
+    private NettyBatchWriteQueue writeQueue;
     /**
      * 连接状态
      */
     private TunnelState state = TunnelState.IDLE;
     private StateMachine<TunnelState, TunnelEvent, TunnelContext> stateMachine;
+
     public boolean isActive() {
         return tunnel != null && tunnel.isActive();
     }
+
     public void fireEvent(TunnelEvent event) {
         stateMachine.fireEvent(getState(), event, this);
     }
