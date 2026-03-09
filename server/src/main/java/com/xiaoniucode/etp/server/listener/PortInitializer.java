@@ -46,6 +46,9 @@ public class PortInitializer implements EventListener<TunnelServerBindEvent> {
             portListenerManager.bindPort(8033);//todo
             portListenerManager.bindPort(3307);//todo
             portListenerManager.bindPort(8608);//todo
+            portListenerManager.bindPort(5202);//todo
+            portListenerManager.bindPort(5203);//todo
+            portListenerManager.bindPort(8035);//todo
             for (ProxyConfig proxy : configs) {
                 if (proxy.getStatus() == ProxyStatus.CLOSED) {
                     continue;

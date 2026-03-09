@@ -11,12 +11,12 @@ import com.xiaoniucode.etp.client.statemachine.agent.action.auth.HandleAuthSucce
 import com.xiaoniucode.etp.client.statemachine.agent.action.CreateTunnelPoolAction;
 
 public class AgentStateMachineBuilder {
-    
+
     private static final String MACHINE_ID = "clientStateMachine";
-    
+
     private static class StateMachineHolder {
         private static final StateMachine<AgentState, AgentEvent, AgentContext> INSTANCE = build();
-        
+
         private static StateMachine<AgentState, AgentEvent, AgentContext> build() {
             StateMachineBuilder<AgentState, AgentEvent, AgentContext> builder = StateMachineBuilderFactory.create();
 
@@ -107,22 +107,21 @@ public class AgentStateMachineBuilder {
                     .when(ctx -> true)
                     .perform(handleConnectFailureAction);
 
-            // 重试
+            // 重新连接
             builder.externalTransition()
-                    .from(AgentState.FAILED)
-                    .to(AgentState.CONNECTING)
+                    .from(AgentState.CONNECTED)
+                    .to(AgentState.CONNECTED)
                     .on(AgentEvent.RETRY)
                     .when(ctx -> true)
                     .perform(connectAction);
 
-            // 停止
-            builder.externalTransition()
-                    .from(AgentState.FAILED)
+            // 停止户端进程
+            builder.externalTransitions()
+                    .fromAmong(AgentState.FAILED, AgentState.CONNECTING, AgentState.CONNECTED)
                     .to(AgentState.STOPPED)
                     .on(AgentEvent.STOP)
                     .when(ctx -> true)
                     .perform(stopAction);
-
 
             builder.externalTransition()
                     .from(AgentState.CONNECTED)
@@ -136,7 +135,7 @@ public class AgentStateMachineBuilder {
             return StateMachineFactory.get(MACHINE_ID);
         }
     }
-    
+
     public static StateMachine<AgentState, AgentEvent, AgentContext> getStateMachine() {
         return StateMachineHolder.INSTANCE;
     }

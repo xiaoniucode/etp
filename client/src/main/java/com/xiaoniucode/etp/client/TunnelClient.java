@@ -60,8 +60,8 @@ public final class TunnelClient implements Lifecycle {
 
     private void initializeStateMachine() {
         stateMachine = AgentStateMachineBuilder.getStateMachine();
-        stateMachine.showStateMachine();
         clientContext = new AgentContext(config);
+        clientContext.setTunnelClient(this);
         clientContext.setStateMachine(stateMachine);
         serverWorkBootstrap = NettyEventLoopFactory.eventLoopGroup();
         Bootstrap serverBootstrap = new Bootstrap()
@@ -76,7 +76,7 @@ public final class TunnelClient implements Lifecycle {
 
         controlBootstrap.group(controlWorkerGroup)
                 .channel(NettyEventLoopFactory.socketChannelClass())
-                .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(256 * 1024, 4 * 1024 * 1024))
+                .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(4 * 1024 * 1024, 64 * 1024 * 1024))
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
@@ -115,5 +115,11 @@ public final class TunnelClient implements Lifecycle {
             serverWorkBootstrap.shutdownGracefully();
         }
         EventBusManager.shutdown();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        Runtime.getRuntime().halt(0);
     }
 }

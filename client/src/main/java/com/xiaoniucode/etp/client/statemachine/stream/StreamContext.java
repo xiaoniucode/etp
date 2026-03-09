@@ -1,7 +1,6 @@
 package com.xiaoniucode.etp.client.statemachine.stream;
 
 import com.alibaba.cola.statemachine.StateMachine;
-
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
@@ -15,8 +14,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 @Getter
 @Setter
 public class StreamContext extends ProcessContextImpl {
@@ -71,16 +68,16 @@ public class StreamContext extends ProcessContextImpl {
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_DATA, payload);
         if (writeQueue!=null){
             writeQueue.enqueue(frame).addListener((ChannelFutureListener) future -> {
-                if (future.isSuccess()) {
-                    logger.debug("批量发送");
-                } else {
+                if (!future.isSuccess()) {
                     server.close();
+                    //
                 }
             });
         }else {
             tunnel.writeAndFlush(frame).addListener(future -> {
                 if (!future.isSuccess()) {
                     logger.warn("转发到隧道失败 streamId={}", streamId);
+                    server.close();
                 }
             });
         }

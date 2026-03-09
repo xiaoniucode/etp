@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 抽象管道桥接器，用于实现两个channel双向转发数据
  */
-public  class DirectChannelBridge extends ChannelDuplexHandler {
+public class DirectChannelBridge extends ChannelDuplexHandler {
     private final Logger logger = LoggerFactory.getLogger(DirectChannelBridge.class);
     /**
      * 对端Channel - 数据要写给的对方
@@ -30,10 +30,8 @@ public  class DirectChannelBridge extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        if (!target.isActive()) {
-            if (ReferenceCountUtil.refCnt(msg) > 0) {
-                ReferenceCountUtil.release(msg);
-            }
+        if (!target.isActive() || !target.isOpen() || !target.isWritable()) {
+            ReferenceCountUtil.release(msg);
             return;
         }
         if (!beforeForward(ctx, msg)) {
@@ -43,13 +41,13 @@ public  class DirectChannelBridge extends ChannelDuplexHandler {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         ChannelUtils.closeOnFlush(target);
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.warn("数据转发异常: 数据流方向={}, {}", direction, cause.getMessage());
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        logger.error("数据转发异常: 数据流方向={}, ", direction, cause);
         ChannelUtils.closeOnFlush(ctx.channel());
         ChannelUtils.closeOnFlush(target);
     }
@@ -67,27 +65,23 @@ public  class DirectChannelBridge extends ChannelDuplexHandler {
 
     private void forwardToTarget(ChannelHandlerContext ctx, Object msg) {
         if (!target.isActive()) {
-            if (ReferenceCountUtil.refCnt(msg) > 0) {
-                ReferenceCountUtil.release(msg);
-            }
+            ReferenceCountUtil.release(msg);
             return;
         }
         ReferenceCountUtil.retain(msg);
         target.writeAndFlush(msg).addListener((ChannelFutureListener) f -> {
             try {
                 if (!f.isSuccess()) {
-                    logger.error("消息转发失败: {}", f.cause().getMessage());
+                    logger.error("消息转发失败", f.cause());
                     //关闭当前读数据的通道
                     ChannelUtils.closeOnFlush(ctx.channel());
                     //关闭要写入的目标通道
                     ChannelUtils.closeOnFlush(target);
-                }else {
+                } else {
                     logger.debug("转发成功");
                 }
             } finally {
-                if (ReferenceCountUtil.refCnt(msg) > 0) {
-                    ReferenceCountUtil.release(msg);
-                }
+                ReferenceCountUtil.release(msg);
             }
         });
     }

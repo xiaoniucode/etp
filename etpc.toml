@@ -4,9 +4,9 @@ serverPort = 9527
 [auth]
 token = "5E793FAD27AA713D"
 [auth.retry]
-initialDelay = 1
-maxDelay = 10
-maxRetries = 5
+initialDelay = 2
+maxDelay = 8
+maxRetries = 3
 
 [mux]
 enable=true #全局开启，代理可覆盖
@@ -16,9 +16,9 @@ enable=true #全局开启，代理可覆盖
 
 [tls]
 enable = false
-certFile = "cert/openssl/chain.pem"
-keyFile = "cert/openssl/privkey.pem"
-caFile = "cert/openssl/chain.pem"
+certFile = "cert/client.crt"
+keyFile = "cert/client.key"
+caFile = "cert/ca.crt"
 
 [[proxies]]
 name = "web1"

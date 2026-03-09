@@ -107,7 +107,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         if (clientContext.getControl() == ctx.channel()) {
-            clientContext.fireEvent(AgentEvent.NETWORK_ERROR);
+            clientContext.fireEvent(AgentEvent.RETRY);
         } else {
             logger.error("数据隧道断开：channel-{}", ctx.channel().id());
             ctx.close();

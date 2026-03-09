@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.client.statemachine.agent;
 
 import com.alibaba.cola.statemachine.StateMachine;
+import com.xiaoniucode.etp.client.TunnelClient;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
 import io.netty.bootstrap.Bootstrap;
@@ -25,9 +26,9 @@ public class AgentContext extends ProcessContextImpl {
     private EventLoopGroup serverWorkerGroup;
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
     private int retryCount;
-    private boolean stopped;
     private boolean authenticated;
     private Channel control;
+    private TunnelClient tunnelClient;
     public AgentContext(AppConfig config) {
         this.config = config;
     }

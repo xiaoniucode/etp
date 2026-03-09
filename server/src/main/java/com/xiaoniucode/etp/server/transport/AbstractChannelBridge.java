@@ -30,9 +30,7 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (!target.isActive()) {
-            if (ReferenceCountUtil.refCnt(msg) > 0) {
-                ReferenceCountUtil.release(msg);
-            }
+            ReferenceCountUtil.release(msg);
             return;
         }
         if (!beforeForward(ctx, msg)) {
@@ -49,7 +47,7 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.warn("数据转发异常: 数据流方向={}, {}", direction, cause.getMessage());
+        logger.warn("数据转发异常: 数据流方向={}", direction, cause);
         closeOnFlush(ctx.channel());
         closeOnFlush(target);
     }
@@ -66,28 +64,24 @@ public abstract class AbstractChannelBridge extends ChannelDuplexHandler {
     }
 
     private void forwardToTarget(ChannelHandlerContext ctx, Object msg) {
-        if (!target.isActive()) {
-            if (ReferenceCountUtil.refCnt(msg) > 0) {
-                ReferenceCountUtil.release(msg);
-            }
+        if (!target.isActive() || !target.isOpen() || !target.isWritable()) {
+            ReferenceCountUtil.release(msg);
             return;
         }
         ReferenceCountUtil.retain(msg);
         target.writeAndFlush(msg).addListener((ChannelFutureListener) f -> {
             try {
                 if (!f.isSuccess()) {
-                    logger.error("消息转发失败: {}", f.cause().getMessage());
+                    logger.error("消息转发失败", f.cause());
                     //关闭当前读数据的通道
                     closeOnFlush(ctx.channel());
                     //关闭要写入的目标通道
                     closeOnFlush(target);
-                }else {
+                } else {
                     logger.debug("数据转发成功");
                 }
             } finally {
-                if (ReferenceCountUtil.refCnt(msg) > 0) {
-                    ReferenceCountUtil.release(msg);
-                }
+                ReferenceCountUtil.release(msg);
             }
         });
     }

@@ -15,9 +15,6 @@ public class NetworkErrorAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.error("网络错误");
-        Channel control = context.getControl();
-        control.close();
-
         context.fireEvent(AgentEvent.RETRY);
     }
 }

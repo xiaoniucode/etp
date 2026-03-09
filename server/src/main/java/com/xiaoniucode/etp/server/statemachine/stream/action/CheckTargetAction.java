@@ -31,6 +31,7 @@ public class CheckTargetAction extends StreamBaseAction {
 
     @Autowired
     private AgentManager agentManager;
+
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         Channel visitor = context.getVisitor();
@@ -41,7 +42,7 @@ public class CheckTargetAction extends StreamBaseAction {
         ProxyConfig config = new ProxyConfig();
 
         Target target = new Target();
-        if (remotePort==8033){
+        if (remotePort == 8033) {
             config.setRemotePort(8033);
             config.setProtocol(ProtocolType.TCP);
             config.setStatus(ProxyStatus.OPEN);
@@ -53,7 +54,7 @@ public class CheckTargetAction extends StreamBaseAction {
             config.setTransport(transportConfig);
             config.getTargets().add(target);
         }
-        if (remotePort==3307){
+        if (remotePort == 3307) {
             config.setRemotePort(3307);
             config.setProtocol(ProtocolType.TCP);
             config.setStatus(ProxyStatus.OPEN);
@@ -65,7 +66,7 @@ public class CheckTargetAction extends StreamBaseAction {
             transportConfig.setMux(false);
             config.setTransport(transportConfig);
         }
-        if (remotePort==8608){
+        if (remotePort == 8608) {
             config.setRemotePort(8608);
             config.setProtocol(ProtocolType.TCP);
             config.setStatus(ProxyStatus.OPEN);
@@ -77,7 +78,43 @@ public class CheckTargetAction extends StreamBaseAction {
             transportConfig.setMux(false);
             config.setTransport(transportConfig);
         }
-        if (protocol.isHttp()){
+        if (remotePort == 5203) {
+            config.setRemotePort(80);
+            config.setProtocol(ProtocolType.TCP);
+            config.setStatus(ProxyStatus.OPEN);
+            config.setProxyId("1001");
+            target.setHost("127.0.0.1");
+            target.setPort(80);
+            config.getTargets().add(target);
+            TransportConfig transportConfig = new TransportConfig();
+            transportConfig.setMux(true);
+            config.setTransport(transportConfig);
+        }
+        if (remotePort == 5202) {
+            config.setRemotePort(5202);
+            config.setProtocol(ProtocolType.TCP);
+            config.setStatus(ProxyStatus.OPEN);
+            config.setProxyId("1001");
+            target.setHost("127.0.0.1");
+            target.setPort(8321);
+            config.getTargets().add(target);
+            TransportConfig transportConfig = new TransportConfig();
+            transportConfig.setMux(false);
+            config.setTransport(transportConfig);
+        }
+        if (remotePort == 8035) {
+            config.setRemotePort(8035);
+            config.setProtocol(ProtocolType.TCP);
+            config.setStatus(ProxyStatus.OPEN);
+            config.setProxyId("1001");
+            target.setHost("127.0.0.1");
+            target.setPort(8032);
+            config.getTargets().add(target);
+            TransportConfig transportConfig = new TransportConfig();
+            transportConfig.setMux(true);
+            config.setTransport(transportConfig);
+        }
+        if (protocol.isHttp()) {
             config.setProtocol(ProtocolType.HTTP);
             config.setStatus(ProxyStatus.OPEN);
             config.setProxyId("1001");
@@ -89,9 +126,9 @@ public class CheckTargetAction extends StreamBaseAction {
             config.getTargets().add(target);
         }
 
-       agentManager.getAgentContextByProxyId(config.getProxyId()).ifPresent(agent -> {
-           context.setControl(agent.getControl());
-       });
+        agentManager.getAgentContextByProxyId(config.getProxyId()).ifPresent(agent -> {
+            context.setControl(agent.getControl());
+        });
         //ProxyConfig config = proxyManager.getByRemotePort(remotePort);
         if (config != null) {
             logger.debug("访问目标合法");
