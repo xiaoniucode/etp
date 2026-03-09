@@ -92,9 +92,13 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
         } else {
             SslContext tlsContext = TlsContextHolder.get();
-            if (tlsContext != null) {
-                SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc());
+            SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc());
+            if (tunnelPipeline.get(NettyConstants.TLS_HANDLER) == null) {
                 tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
+                logger.debug("添加 TLS handler");
+            } else {
+                tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
+                logger.debug("替换 TLS handler");
             }
         }
         if (compress) {

@@ -7,7 +7,7 @@ import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.netty.IdleCheckHandler;
 
 import com.xiaoniucode.etp.core.notify.EventBus;
-import com.xiaoniucode.etp.core.tls.SslContextFactory;
+import com.xiaoniucode.etp.core.tls.TlsHelper;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
 import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
@@ -56,7 +56,7 @@ public class TunnelServer implements Lifecycle {
             logger.debug("正在启动ETP服务");
             eventBus.publishSync(new TunnelServerStartingEvent());
             if (config.getTlsConfig().getEnable()) {
-                tlsContext = SslContextFactory.createServerSslContext(config.getTlsConfig());
+                tlsContext = TlsHelper.buildSslContext(false, config.getTlsConfig());
                 TlsContextHolder.initialize(tlsContext);
             }
             tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
@@ -76,7 +76,7 @@ public class TunnelServer implements Lifecycle {
                                 logger.debug("TLS加密处理器添加成功");
                             }
                             sc.pipeline()
-                                    .addLast(NettyConstants.TMSP_CODEC,TMSPCodec.create(10 * 1024 * 1024))
+                                    .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                     .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
                                     .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
                         }

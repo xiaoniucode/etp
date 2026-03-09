@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
-import com.xiaoniucode.etp.core.tls.SslContextFactory;
+import com.xiaoniucode.etp.core.tls.TlsHelper;
 import io.netty.handler.ssl.SslContext;
 
 public class InitSslAction extends AgentBaseAction {
@@ -15,10 +15,10 @@ public class InitSslAction extends AgentBaseAction {
         logger.debug("检查是否有必要初始化 TLS证书");
         try {
             AppConfig config = ctx.getConfig();
-            if (config.getTlsConfig().getEnable()) {
+            if (Boolean.TRUE.equals(config.getTlsConfig().getEnable())) {
                 logger.debug("初始化 SSL上下文");
-                SslContext tlsContext = SslContextFactory.createClientSslContext(config.getTlsConfig());
-                ctx.setTlsContext(tlsContext);
+                SslContext sslContext = TlsHelper.buildSslContext(true, config.getTlsConfig());
+                ctx.setTlsContext(sslContext);
             }
             ctx.getStateMachine().fireEvent(ctx.getState(), AgentEvent.SSL_INITIALIZED,ctx);
         } catch (Exception e) {

@@ -113,6 +113,8 @@ public class TunnelClientStartup {
                 .setMaxHistory(log.getMaxHistory())
                 .setTotalSizeCap(log.getTotalSizeCap())
                 .addLogger("io.netty.channel.ChannelHandlerMask", Level.INFO)
+                .addLogger("io.netty.handler.ssl.util.BouncyCastleUtil", Level.ERROR)
+                .addLogger("io.netty.handler.ssl", Level.WARN)
                 .build()
                 .configure();
     }

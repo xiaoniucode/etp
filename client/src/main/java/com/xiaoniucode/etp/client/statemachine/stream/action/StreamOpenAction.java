@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.client.statemachine.stream.action;
 
+import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.stream.*;
 import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelManager;
@@ -131,7 +132,8 @@ public class StreamOpenAction extends StreamBaseAction {
         } else {
             SslContext tlsContext = agentContext.getTlsContext();
             if (tlsContext != null) {
-                SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc());
+                AppConfig config = agentContext.getConfig();
+                SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc(), config.getServerAddr(), config.getServerPort());
                 tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
             }
         }

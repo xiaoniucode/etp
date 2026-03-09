@@ -1,4 +1,4 @@
-serverAddr = "127.0.0.1"
+serverAddr = "localhost"
 serverPort = 9527
 #认证
 [auth]
@@ -15,10 +15,10 @@ enable=true #全局开启，代理可覆盖
 #max_count = 8
 
 [tls]
-enable = false
-certFile = "cert/client.crt"
-keyFile = "cert/client.key"
-caFile = "cert/ca.crt"
+enable = true
+certFile = "cert/openssl/client.crt"
+keyFile = "cert/openssl/client.key"
+caFile = "cert/openssl/ca.crt"
 
 [[proxies]]
 name = "web1"

@@ -1,25 +1,31 @@
 package com.xiaoniucode.etp.core.domain;
 
 import io.netty.handler.ssl.ClientAuth;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
 public class TlsConfig {
     private Boolean enable;
     private String certFile;
     private String keyFile;
     private String caFile;
+    private String keyPassword;
+    private boolean testMode;
 
-    public TlsConfig() {
+    public TlsConfig(boolean enable,boolean isTestMode) {
+        this.enable=enable;
+        this.testMode=isTestMode;
     }
-    public TlsConfig(Boolean enable, String certFile, String keyFile, String caFile) {
+    public TlsConfig(Boolean enable, String certFile, String keyFile, String caFile,String keyPassword,boolean testMode) {
         this.enable = enable;
         this.certFile = certFile;
         this.keyFile = keyFile;
         this.caFile = caFile;
+        this.keyPassword=keyPassword;
+        this.testMode=testMode;
     }
     
     /**
@@ -38,7 +44,7 @@ public class TlsConfig {
      * 是否启用双向认证
      * @return 是否启用双向认证
      */
-    public boolean isMtlsEnabled() {
+    public boolean mTLSEnabled() {
         return caFile != null && !caFile.isEmpty();
     }
 }

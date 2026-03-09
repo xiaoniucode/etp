@@ -32,7 +32,7 @@ public class DefaultAppConfig implements AppConfig {
         private String serverAddr = "127.0.0.1";
         private int serverPort = 9527;
         private AuthConfig authConfig = new AuthConfig();
-        private TlsConfig tlsConfig = new TlsConfig();
+        private TlsConfig tlsConfig = new TlsConfig(true,true);
         private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
         private LogConfig logConfig;
         private ClientType clientType = ClientType.BINARY_DEVICE;

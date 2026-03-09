@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.stream.action;
 
+import com.xiaoniucode.etp.core.domain.EncryptionConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.domain.TransportConfig;
@@ -74,7 +75,9 @@ public class CheckTargetAction extends StreamBaseAction {
             target.setHost("127.0.0.1");
             target.setPort(5201);
             config.getTargets().add(target);
+            EncryptionConfig en = EncryptionConfig.builder().enable(true).build();
             TransportConfig transportConfig = new TransportConfig();
+            transportConfig.setEncrypt(en);
             transportConfig.setMux(false);
             config.setTransport(transportConfig);
         }
@@ -110,7 +113,9 @@ public class CheckTargetAction extends StreamBaseAction {
             target.setHost("127.0.0.1");
             target.setPort(8032);
             config.getTargets().add(target);
+            EncryptionConfig en = EncryptionConfig.builder().enable(true).build();
             TransportConfig transportConfig = new TransportConfig();
+            transportConfig.setEncrypt(en);
             transportConfig.setMux(true);
             config.setTransport(transportConfig);
         }

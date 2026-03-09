@@ -75,7 +75,8 @@ public class TomlConfigLoader implements ConfigSource {
             String certFile = tlsTable.getString("certFile");
             String keyFile = tlsTable.getString("keyFile");
             String caFile = tlsTable.getString("caFile");
-            builder.tlsConfig(new TlsConfig(enable, certFile, keyFile, caFile));
+            String keyPass = tlsTable.getString("keyPass");
+            builder.tlsConfig(new TlsConfig(enable, certFile, keyFile, caFile,keyPass, false));
         }
 
         // 读取代理配置

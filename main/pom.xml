@@ -7,7 +7,6 @@
     <packaging>pom</packaging>
     <name>etp-main</name>
     <properties>
-        <java.version>25</java.version>
         <lombok.version>1.18.42</lombok.version>
         <shade.mainClass>custom</shade.mainClass>
     </properties>

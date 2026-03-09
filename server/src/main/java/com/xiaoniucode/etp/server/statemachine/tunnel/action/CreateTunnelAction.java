@@ -16,6 +16,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
+import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,11 @@ public class CreateTunnelAction extends TunnelBaseAction {
     protected DirectTunnelPoolManager directTunnelPoolManager;
     @Autowired
     protected MuxTunnelManager muxTunnelManager;
-
     @Override
     protected void doExecute(TunnelState from, TunnelState to, TunnelEvent event, TunnelContext context) {
         logger.debug("开始建立隧道");
-        Boolean compress = context.getVariableAs("compress", Boolean.class);
-        Boolean encrypt = context.getVariableAs("encrypt", Boolean.class);
+        boolean compress = context.getVariableAs("compress", Boolean.class);
+        boolean encrypt = context.getVariableAs("encrypt", Boolean.class);
         context.setCompress(compress);
         context.setEncrypt(encrypt);
         boolean isMuxTunnel = context.isMux();
@@ -41,16 +41,22 @@ public class CreateTunnelAction extends TunnelBaseAction {
         //只处理共享隧道，独立隧道打开流响应再处理
         if (isMuxTunnel) {
             ChannelPipeline tunnelPipeline = tunnel.pipeline();
-            if (Boolean.TRUE.equals(!encrypt) && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
+            if (!encrypt && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
                 TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
             } else {
                 SslContext tlsContext = TlsContextHolder.get();
                 if (tlsContext != null) {
                     SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc());
-                    tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
+                    if (tunnelPipeline.get(NettyConstants.TLS_HANDLER) == null) {
+                        tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
+                        logger.debug("添加 TLS handler");
+                    } else {
+                        tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
+                        logger.debug("替换 TLS handler");
+                    }
                 }
             }
-            if (Boolean.TRUE.equals(compress)) {
+            if (compress) {
                 tunnelPipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
                 tunnelPipeline.addLast(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
             } else {

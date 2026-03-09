@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.client.statemachine.tunnel.action;
 
+import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.tunnel.*;
 import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
@@ -33,7 +34,8 @@ public class TunnelCreateRespAction extends TunnelBaseAction {
                 AgentContext agentContext = context.getAgentContext();
                 SslContext tlsContext = agentContext.getTlsContext();
                 if (tlsContext != null) {
-                    SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc());
+                    AppConfig config = agentContext.getConfig();
+                    SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc(), config.getServerAddr(), config.getServerPort());
                     tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
                 }
             }

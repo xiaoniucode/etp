@@ -10,6 +10,7 @@
     <packaging>jar</packaging>
     <name>etps</name>
     <properties>
+        <java.version>25</java.version>
         <shade.mainClass>com.xiaoniucode.etp.server.TunnelServerStartup</shade.mainClass>
         <etp.version>0.10.0</etp.version>
     </properties>
