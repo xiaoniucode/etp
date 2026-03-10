@@ -15,7 +15,6 @@ import com.xiaoniucode.etp.server.transport.TlsContextHolder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             //处理独立隧道，协议转换，隧道桥接
             handleDirectTunnel(context);
             if (context.isMux()) {
-                logger.debug("共享隧道建立成功: {}", context.getTarget());
+                logger.debug("共享隧道建立成功: {}", context.getCurrentTarget());
             }
             //如果是 HTTP协议需要发送首次建立建立的时候读取到的第一个包
             if (context.getCurrentProtocol().isHttp()) {
@@ -91,15 +90,17 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         if (!encrypt && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
             TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
         } else {
-            SslContext tlsContext = TlsContextHolder.get();
-            SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc());
-            if (tunnelPipeline.get(NettyConstants.TLS_HANDLER) == null) {
-                tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
-                logger.debug("添加 TLS handler");
-            } else {
-                tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
-                logger.debug("替换 TLS handler");
-            }
+           TlsContextHolder.get().ifPresent(sslContext -> {
+               SslHandler sslHandler = sslContext.newHandler(tunnel.alloc());
+               if (tunnelPipeline.get(NettyConstants.TLS_HANDLER) == null) {
+                   tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
+                   logger.debug("添加 TLS handler");
+               } else {
+                   tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
+                   logger.debug("替换 TLS handler");
+               }
+           });
+
         }
         if (compress) {
             tunnelPipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
@@ -116,6 +117,6 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         StreamManager visitorManager = context.getVisitorManager();
         //隧道桥接
         DirectBridgeFactory.bridge(visitorManager, visitor, tunnel, context.getCurrentProtocol());
-        logger.debug("独立隧道建立成功: {}", context.getTarget());
+        logger.debug("独立隧道建立成功: {}", context.getCurrentTarget());
     }
 }

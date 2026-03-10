@@ -16,9 +16,9 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer{
     }
 
     @Override
-    public synchronized Target select(List<Target> targets, String proxyId) {
+    public synchronized Target select(List<Target> targets) {
         if (targets == null || targets.isEmpty()) {
-            logger.warn("目标服务器列表为空，代理ID: {}", proxyId);
+            logger.warn("目标服务器列表为空");
             return null;
         }
 
@@ -39,7 +39,7 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer{
             if (targets.get(currentIndex).getWeight() > currentWeight) {
                 Target selectedTarget = targets.get(currentIndex);
                 currentWeight++;
-                logger.debug("加权轮询选择目标服务器 {}，代理ID: {}", selectedTarget, proxyId);
+                logger.debug("加权轮询选择目标服务器 {}", selectedTarget);
                 return selectedTarget;
             }
         }

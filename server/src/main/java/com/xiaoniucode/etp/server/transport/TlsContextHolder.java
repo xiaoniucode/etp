@@ -2,6 +2,8 @@ package com.xiaoniucode.etp.server.transport;
 
 import io.netty.handler.ssl.SslContext;
 
+import java.util.Optional;
+
 public final class TlsContextHolder {
     private static SslContext tlsContext;
 
@@ -18,7 +20,7 @@ public final class TlsContextHolder {
         tlsContext = context;
     }
 
-    public static SslContext get() {
-        return tlsContext;
+    public static Optional<SslContext> get() {
+        return Optional.ofNullable(tlsContext);
     }
 }

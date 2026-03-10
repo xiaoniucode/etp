@@ -6,7 +6,7 @@ import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
-import com.xiaoniucode.etp.server.statemachine.stream.action.CheckTargetAction;
+import com.xiaoniucode.etp.server.statemachine.stream.action.TargetResolverAction;
 import com.xiaoniucode.etp.server.statemachine.stream.action.StreamCloseAction;
 import com.xiaoniucode.etp.server.statemachine.stream.action.StreamOpenAction;
 import com.xiaoniucode.etp.server.statemachine.stream.action.StreamOpenResponseAction;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class StreamStateMachineConfig {
     @Autowired
-    private CheckTargetAction checkTargetAction;
+    private TargetResolverAction targetResolverAction;
     @Autowired
     private StreamOpenAction streamOpenAction;
     @Autowired
@@ -34,7 +34,7 @@ public class StreamStateMachineConfig {
                 .to(StreamState.CHECKING_TARGET)
                 .on(StreamEvent.STREAM_OPEN)
                 .when(ctx -> true)
-                .perform(checkTargetAction);
+                .perform(targetResolverAction);
 
         // 检查访问目标 --> 连接中 校验完成
         builder.externalTransition()

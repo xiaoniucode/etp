@@ -10,6 +10,7 @@ import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
 import com.xiaoniucode.etp.core.netty.NettyBatchWriteQueue;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -24,13 +25,13 @@ import org.slf4j.LoggerFactory;
 public class StreamContext extends ProcessContextImpl {
     private final Logger logger = LoggerFactory.getLogger(StreamContext.class);
     private int streamId;
-    private Channel control;
+    private AgentContext agentContext;
     private Channel tunnel;
     private Channel visitor;
     private ProxyConfig proxyConfig;
     private String sourceAddress;
     private LoadBalancer loadBalancer;
-    private Target target;
+    private Target currentTarget;
     private StreamState state = StreamState.IDLE;
     private StreamManager visitorManager;
     private ProtocolType currentProtocol = ProtocolType.TCP;
@@ -61,7 +62,7 @@ public class StreamContext extends ProcessContextImpl {
         visitor.writeAndFlush(payload).addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {
                 visitor.close();
-                logger.debug("数据转发失败，目标服务：host={},port={}", target.getHost(), target.getPort());
+                logger.debug("数据转发失败，目标服务：host={},port={}", currentTarget.getHost(), currentTarget.getPort());
             } else {
                 logger.debug("数据转发成功：streamId={}", streamId);
             }

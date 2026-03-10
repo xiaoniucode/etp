@@ -22,6 +22,7 @@ public class TMSP {
     public static final byte MSG_ERROR = 0x06;          // 通用错误消息
     public static final byte MSG_TUNNEL_CREATE = 0x07;  // 隧道创建 客户端发起
     public static final byte MSG_TUNNEL_CREATE_RESP = 0x08;    // 隧道创建响应 服务端响应
+    public static final byte MSG_SERVICE_HEALTH_CHANGE = 0x09;    //内网服务健康改变
 
     // ────────────────────────────────────────────────
     // 配置管理消息（Proxy Config Control）—— 认证后才能使用

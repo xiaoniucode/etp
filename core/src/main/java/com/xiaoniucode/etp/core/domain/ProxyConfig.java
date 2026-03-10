@@ -12,42 +12,57 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Getter
 public class ProxyConfig {
     /**
-     * 唯一标识
+     * 代理ID 唯一标识
      */
     @Setter
     private String proxyId;
     /**
-     * 客户端内唯一
+     * 代理名称
      */
     @Setter
     private String name;
-    @Setter
-    private ProtocolType protocol;
-    @Setter
-    private Integer remotePort;
-    private final List<Target> targets = new CopyOnWriteArrayList<>();
     /**
-     * 代理的状态
+     * 协议类型
      */
     @Setter
-    private ProxyStatus status = ProxyStatus.OPEN;
+    private ProtocolType protocol;
+    /**
+     * TCP 代理 远程端口
+     */
+    @Setter
+    private Integer remotePort;
+    /**
+     * 代理目标服务
+     */
+    private final List<Target> targets = new CopyOnWriteArrayList<>();
+    /**
+     * 是否开启代理
+     */
+    @Setter
+    private boolean enable = true;
+    /**
+     * HTTP(s) 域名配置
+     */
     @Setter
     private DomainConfig domainInfo;
     /**
-     * 访问控制
+     * IP 防火墙
      */
     @Setter
     private AccessControlConfig accessControl;
     /**
-     * HTTP 协议有效
+     * HTTP Basic Auth配置
      */
     @Setter
     private BasicAuthConfig basicAuth;
     /**
-     * 带宽限制
+     * 带宽限制配置
      */
     @Setter
     private BandwidthConfig bandwidth;
+    /**
+     * 负载均衡配置
+     */
     @Setter
     private LoadBalanceConfig loadBalance;
     /**
@@ -55,19 +70,14 @@ public class ProxyConfig {
      */
     @Setter
     private TransportConfig transport;
-
+    /**
+     * 健康检查
+     */
+    @Setter
+    private HealthCheckConfig healthCheck;
 
     public boolean hasTransport() {
         return transport != null;
-    }
-
-    public boolean hasStatus() {
-        return status != null;
-    }
-
-
-    public boolean isOpen() {
-        return this.status == ProxyStatus.OPEN;
     }
 
     /**
@@ -127,10 +137,6 @@ public class ProxyConfig {
      */
     public boolean isLoadBalanceNeeded() {
         return targets.size() > 1;
-    }
-
-    public Target getSingleTarget() {
-        return targets.get(0);
     }
 
     public boolean addTarget(Target target) {

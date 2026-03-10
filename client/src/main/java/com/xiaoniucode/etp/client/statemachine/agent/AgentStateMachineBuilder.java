@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.client.statemachine.agent;
 
+import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.alibaba.cola.statemachine.StateMachineFactory;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
@@ -114,6 +115,14 @@ public class AgentStateMachineBuilder {
                     .on(AgentEvent.RETRY)
                     .when(ctx -> true)
                     .perform(connectAction);
+
+            // 重新连接
+            builder.externalTransition()
+                    .from(AgentState.CONNECTED)
+                    .to(AgentState.CONNECTED)
+                    .on(AgentEvent.CONNECT_SUCCESS)
+                    .when(ctx -> true)
+                    .perform((from, to, event, context) -> context.setState(to));
 
             // 停止户端进程
             builder.externalTransitions()

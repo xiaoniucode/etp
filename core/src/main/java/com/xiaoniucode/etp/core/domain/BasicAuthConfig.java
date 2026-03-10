@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Getter
 public class BasicAuthConfig {
     @Setter
-    private boolean enable = false;
+    private boolean enable;
     private final Set<HttpUser> users = new CopyOnWriteArraySet<>();
     private final Map<String, HttpUser> cache = new ConcurrentHashMap<>();
 

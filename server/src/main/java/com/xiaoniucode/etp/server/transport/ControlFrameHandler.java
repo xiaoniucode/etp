@@ -106,6 +106,10 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
                 });
             }
+            //内网目标服务健康上报
+            case TMSP.MSG_SERVICE_HEALTH_CHANGE -> {
+
+            }
         }
     }
 

@@ -7,7 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"host", "port"})
-@ToString
 public class Target {
     /**
      * 目标 主机 地址

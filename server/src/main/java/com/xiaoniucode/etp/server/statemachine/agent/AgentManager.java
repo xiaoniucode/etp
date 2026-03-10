@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.statemachine.agent;
 
 import com.alibaba.cola.statemachine.StateMachine;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.server.generator.ConnectionIdGenerator;
 import io.netty.channel.Channel;
@@ -42,6 +43,9 @@ public class AgentManager {
     }
 
     public Optional<AgentContext> getAgentContextByProxyId(String proxyId) {
+        if (!StringUtils.hasText(proxyId)) {
+            throw new IllegalArgumentException("proxyId can not null");
+        }
         return Optional.ofNullable(proxyIdToContext.get(proxyId));
     }
 

@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.loadbalance;
 
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.LoadBalanceConfig;
 import com.xiaoniucode.etp.core.enums.LoadBalanceStrategy;
 import org.springframework.stereotype.Component;
 
@@ -10,14 +10,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoadBalancerFactory {
     /**
-     * 获取负载均衡器
+     * 获取负载均衡器，如果为空返回一个默认的
      */
-    public LoadBalancer getLoadBalancer(ProxyConfig config) {
+    public LoadBalancer getLoadBalancer(LoadBalanceConfig config) {
         LoadBalanceStrategy strategy;
-        if (config.hasLoadBalance()) {
-            strategy = config.getLoadBalance().getStrategy();
+        if (config == null || !config.hasStrategy()) {
+            strategy = LoadBalanceConfig.DEFAULT_STRATEGY;
         } else {
-            strategy = LoadBalanceStrategy.ROUND_ROBIN;
+            strategy = config.getStrategy();
         }
         return switch (strategy) {
             case RANDOM -> new RandomLoadBalancer();

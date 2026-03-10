@@ -9,13 +9,10 @@ maxDelay = 8
 maxRetries = 3
 
 [mux]
-enable=true #全局开启，代理可覆盖
-#main_count = 2          # 范围1-8，默认2
-#min_count = 2           # 低负载热缩容到2
-#max_count = 8
+enable = true #全局开启，代理可覆盖
 
 [tls]
-enable = true
+enable = false
 certFile = "cert/openssl/client.crt"
 keyFile = "cert/openssl/client.key"
 caFile = "cert/openssl/ca.crt"
@@ -23,21 +20,17 @@ caFile = "cert/openssl/ca.crt"
 [[proxies]]
 name = "web1"
 protocol = "http"
-localIp = "localhost"
-localPort = 8081
 autoDomain = false
 customDomains = ["a.domain1.com"]
 status = 1
 
-
 [[proxies]]
 name = "web11"
 protocol = "http"
-localIp = "localhost"
-localPort = 8030
 autoDomain = true
 subDomains = ["a", "b"]
 status = 1
+mux = false
 [proxies.basic_auth]
 enable = true
 users = [
@@ -50,26 +43,50 @@ mode = "allow"
 allow = ["43.135.115.160/32"]
 deny = []
 
+
+
 [[proxies]]
 name = "fullstack2"
 protocol = "http"
-localIp = "localhost"
-localPort = 8091
 customDomains = ["etpp.domain2.com"]
-status = 1
-encrypt = false
-compress = false
+enable = true
 targets = [
     { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
     { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 ]
+
 [proxies.load_balance]
-strategy = "random" # roundrobin/weight/random/leastconn
+strategy = "random" # 负载均衡策略 roundrobin/weight/random/leastconn
+[proxies.health_check]
+enable = true
+interval = 5 #检查间隔
+timeout = 2 #连接超时
+maxFail = 3
+
+[proxies.transport]
+mux = false
+compress = false
+encrypt = true
+
+[proxies.access_control]
+enable = true
+mode = "allow"
+allow = ["43.135.115.160/32"]
+deny = []
+
+[proxies.bandwidth]
+limit = "20M" #总带宽限制(可选) 20Mbps
+limitIn = "2M" #入口带宽限制(可选)
+limitOut = "2M" #出口带宽限制(可选)
+
+
+
+
+
+
 [[proxies]]
 name = "web2"
 protocol = "http"
-localIp = "localhost"
-localPort = 8030
 customDomains = ["etp.domain2.com"]
 encrypt = false
 compress = false
@@ -86,8 +103,6 @@ users = [
 [[proxies]]
 name = "web22"
 protocol = "http"
-localIp = "localhost"
-localPort = 8030
 customDomains = ["etp2.domain2.com"]
 encrypt = false
 compress = false
@@ -99,8 +114,6 @@ limitOut = "2M" #出口带宽限制(可选)
 [[proxies]]
 name = "mysql"
 protocol = "tcp"
-localPort = 3306
-remotePort = 3307
 status = 1
 encrypt = false
 compress = false
@@ -113,11 +126,10 @@ deny = []
 [[proxies]]
 name = "mysql2"
 protocol = "tcp"
-localPort = 3306
-remotePort = 3308
 status = 1
 encrypt = false
 compress = false
+remotePort = 3307
 targets = [
     { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
     { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
@@ -125,8 +137,6 @@ targets = [
 [[proxies]]
 name = "redis"
 protocol = "tcp"
-localPort = 6379
-remotePort = 6380
 status = 1
 encrypt = true
 compress = true

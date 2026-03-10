@@ -24,6 +24,6 @@ public class StreamCloseAction extends StreamBaseAction{
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_CLOSE);
         control.writeAndFlush(frame);
         context.getVisitorManager().removeStreamContext(streamId);
-        logger.debug("关闭隧道 streamId={} host={} port={}",streamId,context.getTarget().getHost(),context.getTarget().getPort());
+        logger.debug("关闭隧道 streamId={} host={} port={}",streamId,context.getCurrentTarget().getHost(),context.getCurrentTarget().getPort());
     }
 }

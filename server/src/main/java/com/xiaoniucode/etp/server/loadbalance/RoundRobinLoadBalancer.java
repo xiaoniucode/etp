@@ -16,9 +16,9 @@ public class RoundRobinLoadBalancer implements LoadBalancer{
     }
 
     @Override
-    public Target select(List<Target> targets, String proxyId) {
+    public Target select(List<Target> targets) {
         if (targets == null || targets.isEmpty()) {
-            logger.warn("目标服务器列表为空，代理ID: {}", proxyId);
+            logger.warn("目标服务器列表为空");
             return null;
         }
 
@@ -27,7 +27,7 @@ public class RoundRobinLoadBalancer implements LoadBalancer{
             index = -index;
         }
         Target selectedTarget = targets.get(index);
-        logger.debug("轮询选择目标服务器 {}，代理ID: {}", selectedTarget, proxyId);
+        logger.debug("轮询选择目标服务器 {}", selectedTarget);
         return selectedTarget;
     }
 }

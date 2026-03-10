@@ -18,9 +18,9 @@ public class LeastConnectionLoadBalancer implements LoadBalancer{
     }
 
     @Override
-    public synchronized Target select(List<Target> targets, String proxyId) {
+    public synchronized Target select(List<Target> targets) {
         if (targets == null || targets.isEmpty()) {
-            logger.warn("目标服务器列表为空，代理ID: {}", proxyId);
+            logger.warn("目标服务器列表为空");
             return null;
         }
 
@@ -41,8 +41,8 @@ public class LeastConnectionLoadBalancer implements LoadBalancer{
             }
         }
 
-        logger.debug("最少连接数选择目标服务器 {}，当前连接数: {}，代理ID: {}",
-            selectedTarget, connectionCountMap.get(selectedTarget).get(), proxyId);
+        logger.debug("最少连接数选择目标服务器 {}，当前连接数: {}",
+            selectedTarget, connectionCountMap.get(selectedTarget).get());
 
         return selectedTarget;
     }
