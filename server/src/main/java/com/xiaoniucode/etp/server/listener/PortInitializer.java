@@ -1,14 +1,12 @@
 package com.xiaoniucode.etp.server.listener;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
-import com.xiaoniucode.etp.server.event.TcpProxyInitializedEvent;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
-import com.xiaoniucode.etp.server.manager.PortManager;
-import com.xiaoniucode.etp.server.manager.PortListenerManager;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.port.PortManager;
+import com.xiaoniucode.etp.server.port.PortAcceptor;
+import com.xiaoniucode.etp.server.proxy.ProxyManager;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +26,7 @@ public class PortInitializer implements EventListener<TunnelServerBindEvent> {
     @Autowired
     private PortManager portManager;
     @Autowired
-    private PortListenerManager portListenerManager;
+    private PortAcceptor portAcceptor;
 
     @Autowired
     private ProxyManager proxyManager;
@@ -42,20 +40,20 @@ public class PortInitializer implements EventListener<TunnelServerBindEvent> {
     public void onEvent(TunnelServerBindEvent event) {
         try {
             ProxyConfig proxyConfig = new ProxyConfig();
-            Collection<ProxyConfig> configs = proxyManager.getTcpProxies();
-            portListenerManager.bindPort(8033);//todo
-            portListenerManager.bindPort(3307);//todo
-            portListenerManager.bindPort(8608);//todo
-            portListenerManager.bindPort(5202);//todo
-            portListenerManager.bindPort(5203);//todo
-            portListenerManager.bindPort(8035);//todo
+            Collection<ProxyConfig> configs = proxyManager.findAllTcpProxies();
+            portAcceptor.bindPort(8033);//todo
+            portAcceptor.bindPort(3307);//todo
+            portAcceptor.bindPort(8608);//todo
+            portAcceptor.bindPort(5202);//todo
+            portAcceptor.bindPort(5203);//todo
+            portAcceptor.bindPort(8035);//todo
             for (ProxyConfig proxy : configs) {
-                if (proxy.getStatus() == ProxyStatus.CLOSED) {
+                if (!proxy.isEnable()) {
                     continue;
                 }
                 Integer remotePort = proxy.getRemotePort();
                 if (portManager.isAvailable(remotePort)) {
-                    portListenerManager.bindPort(remotePort);
+                    portAcceptor.bindPort(remotePort);
 
                     logger.info("成功绑定端口: {}", remotePort);
                 } else {

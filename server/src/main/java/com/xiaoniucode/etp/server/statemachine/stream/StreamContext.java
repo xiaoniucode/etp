@@ -33,7 +33,6 @@ public class StreamContext extends ProcessContextImpl {
     private LoadBalancer loadBalancer;
     private Target currentTarget;
     private StreamState state = StreamState.IDLE;
-    private StreamManager visitorManager;
     private ProtocolType currentProtocol = ProtocolType.TCP;
     private boolean compress;
     private boolean encrypt;

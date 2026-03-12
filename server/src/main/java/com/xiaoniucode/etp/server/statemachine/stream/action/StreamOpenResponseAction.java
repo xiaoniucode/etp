@@ -31,6 +31,8 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     private final Logger logger = LoggerFactory.getLogger(StreamOpenResponseAction.class);
     @Autowired
     private TunnelManager tunnelManager;
+    @Autowired
+    private StreamManager streamManager;
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
@@ -90,16 +92,16 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         if (!encrypt && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
             TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
         } else {
-           TlsContextHolder.get().ifPresent(sslContext -> {
-               SslHandler sslHandler = sslContext.newHandler(tunnel.alloc());
-               if (tunnelPipeline.get(NettyConstants.TLS_HANDLER) == null) {
-                   tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
-                   logger.debug("添加 TLS handler");
-               } else {
-                   tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
-                   logger.debug("替换 TLS handler");
-               }
-           });
+            TlsContextHolder.get().ifPresent(sslContext -> {
+                SslHandler sslHandler = sslContext.newHandler(tunnel.alloc());
+                if (tunnelPipeline.get(NettyConstants.TLS_HANDLER) == null) {
+                    tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
+                    logger.debug("添加 TLS handler");
+                } else {
+                    tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
+                    logger.debug("替换 TLS handler");
+                }
+            });
 
         }
         if (compress) {
@@ -113,10 +115,8 @@ public class StreamOpenResponseAction extends StreamBaseAction {
                 tunnelPipeline.remove(NettyConstants.SNAPPY_DECODER);
             }
         }
-
-        StreamManager visitorManager = context.getVisitorManager();
         //隧道桥接
-        DirectBridgeFactory.bridge(visitorManager, visitor, tunnel, context.getCurrentProtocol());
+        DirectBridgeFactory.bridge(streamManager, visitor, tunnel, context.getCurrentProtocol());
         logger.debug("独立隧道建立成功: {}", context.getCurrentTarget());
     }
 }

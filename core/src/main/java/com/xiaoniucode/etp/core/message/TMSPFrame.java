@@ -34,6 +34,11 @@ public class TMSPFrame {
      */
     private ByteBuf payload;
 
+    public TMSPFrame(byte msgType, ByteBuf payload) {
+        this.msgType = msgType;
+        this.payload = payload;
+    }
+
     public TMSPFrame(int streamId, byte msgType) {
         this.streamId = streamId;
         this.msgType = msgType;

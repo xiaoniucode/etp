@@ -4,15 +4,16 @@ import com.google.protobuf.ProtocolStringList;
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.core.message.Message;
-import com.xiaoniucode.etp.core.notify.EventBus;
+import com.xiaoniucode.etp.core.message.TMSP;
+import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.generator.UUIDGenerator;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.manager.domain.valid.ValidInfo;
+import com.xiaoniucode.etp.server.proxy.ProxyManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.utils.CommandMessageUtils;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -30,52 +31,35 @@ public class ProxyCreateAction extends AgentBaseAction {
     private final Logger logger = LoggerFactory.getLogger(ProxyCreateAction.class);
     @Autowired
     private ProxyManager proxyManager;
-//    @Autowired
-//    private ProxyConfigProcessorExecutor executor;
-    @Autowired
-    private EventBus eventBus;
     @Resource
     private AppConfig appConfig;
-    @Autowired
-    private UUIDGenerator uuidGenerator;
+
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-
-        Message.NewProxy proxy = context.getVariableAs("newProxy", Message.NewProxy.class);
         Channel control = context.getControl();
-        String clientId = context.getClientId();
-        ClientType clientType = context.getClientType();
+        try {
+            Message.NewProxy proxy = context.getVariableAs("newProxy", Message.NewProxy.class);
+            String clientId = context.getClientId();
+            ProxyConfig config = buildProxyConfig(proxy);
+            ProxyConfig register = proxyManager.register(clientId, config);
+            control.writeAndFlush(buildResponse(register));
+            logger.debug("代理注册成功: {}", register);
+        } catch (Exception e) {
+            logger.error("代理配置注册失败", e);
+            sendErrorMessage(e.getMessage(), control);
+        }
+    }
 
-        ProxyConfig config = buildProxyConfig(proxy);
-        ValidInfo validInfo = proxyManager.validProxy(clientId, config);
-//        if (validInfo.isInValid()) {
-//            logger.warn("无效配置：[客户端标识={}，代理名称={}]", clientId, config.getName());
-//            control.writeAndFlush(CommandMessageUtils.buildErrorMessage(400, validInfo.getMessage()));
-//            return;
-//        }
-//        if (validInfo.isUpdate()) {
-//            proxyManager.removeProxyByName(clientId, config.getName());
-//        }
-//        control.writeAndFlush(buildResponse(config));
-//        proxyManager.addProxy(clientId, config, proxyConfig -> {
-//           // executor.execute(proxyConfig);
-//            if (validInfo.isNew()) {
-//                eventBus.publishAsync(new ProxyCreatedEvent(clientId, clientType, proxyConfig));
-//            }
-//            if (validInfo.isUpdate()) {
-//                eventBus.publishAsync(new ProxyUpdatedEvent(clientId, clientType, proxyConfig));
-//            }
-//            control.writeAndFlush(buildResponse(proxyConfig));
-//            logger.debug("代理注册成功: [代理名称={}]", proxyConfig.getName());
-//        });
+    public void sendErrorMessage(String message, Channel control) {
+        Message.ConfigMessage msg = CommandMessageUtils.buildErrorMessage(1, message);
+        ByteBuf payload = ProtobufUtil.toByteBuf(msg, control.alloc());
+        TMSPFrame frame = new TMSPFrame(TMSP.MSG_ERROR, payload);
+        control.writeAndFlush(frame);
     }
 
     private ProxyConfig buildProxyConfig(Message.NewProxy proxy) {
-        String proxyId = uuidGenerator.uuid32();
-
         ProxyConfig config = new ProxyConfig();
-        config.setProxyId(proxyId);
         config.setName(proxy.getName());
         List<Target> targets = proxy.getTargetsList().stream().map(p -> {
             Target target = new Target();
@@ -95,7 +79,7 @@ public class ProxyCreateAction extends AgentBaseAction {
         }
         config.setProtocol(ProtocolType.getByName(proxy.getProtocol().name()));
         if (proxy.hasStatus()) {
-            config.setStatus(ProxyStatus.fromStatus(proxy.getStatus()));
+            // config.setStatus(ProxyStatus.fromStatus(proxy.getStatus()));
         }
         if (proxy.hasDomain()) {
             Message.DomainInfo domainInfo = proxy.getDomain();

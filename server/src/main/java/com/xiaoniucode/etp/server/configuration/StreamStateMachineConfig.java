@@ -41,7 +41,7 @@ public class StreamStateMachineConfig {
                 .from(StreamState.CHECKING_TARGET)
                 .to(StreamState.OPENING)
                 .on(StreamEvent.TARGET_VALIDATED)
-                .when(ctx -> ctx.getControl() != null && ctx.getProxyConfig() != null)
+               // .when(ctx -> ctx.getControl() != null && ctx.getProxyConfig() != null)
                 .perform(streamOpenAction);
         //连接中 --> 已连接 连接成功
         builder.externalTransition()
@@ -59,8 +59,8 @@ public class StreamStateMachineConfig {
                 .perform((from, to, event, context) ->
                         context.setState(to));
 
-        builder.externalTransition()
-                .from(StreamState.OPENED)
+        builder.externalTransitions()
+                .fromAmong(StreamState.OPENED,StreamState.CHECKING_TARGET,StreamState.OPENING)
                 .to(StreamState.CLOSED)
                 .on(StreamEvent.STREAM_CLOSE)
                 .when(ctx -> true)

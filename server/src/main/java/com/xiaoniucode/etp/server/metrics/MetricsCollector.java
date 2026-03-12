@@ -4,7 +4,7 @@ package com.xiaoniucode.etp.server.metrics;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.utils.BeanHelper;
+import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
 import com.xiaoniucode.etp.server.metrics.domain.Metrics;
 import com.xiaoniucode.etp.server.metrics.domain.Count;
 import io.netty.channel.Channel;
@@ -70,7 +70,7 @@ public class MetricsCollector {
         if (StringUtils.hasText(domain)) {
             key = domain;
         } else {
-            AppConfig config = BeanHelper.getBean(AppConfig.class);
+            AppConfig config = SpringContextHolder.getBean(AppConfig.class);
             if (config.getHttpProxyPort() == remotePort || config.getHttpsProxyPort() == remotePort) {
                 return;
             }

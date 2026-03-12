@@ -3,9 +3,9 @@ package com.xiaoniucode.etp.server.transport.http;
 import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.server.proxy.ProxyManager;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
-import com.xiaoniucode.etp.server.manager.DomainManager;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.vhost.DomainManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,7 +32,7 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
         Channel visitor = ctx.channel();
         String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
         String proxyId = domainManager.getProxyId(domain);
-        ProxyConfig config = proxyManager.getById(proxyId);
+        ProxyConfig config = proxyManager.findById(proxyId).get();
         String basicAuthHeader = visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).get();
 
         BasicAuthConfig basicAuth = config.getBasicAuth();

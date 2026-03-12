@@ -8,7 +8,7 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
-import com.xiaoniucode.etp.server.manager.AccessTokenManager;
+import com.xiaoniucode.etp.server.security.AccessTokenManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;

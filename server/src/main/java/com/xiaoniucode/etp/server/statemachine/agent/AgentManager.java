@@ -22,9 +22,10 @@ public class AgentManager {
      */
     private final Map<Integer, AgentContext> connToContext = new ConcurrentHashMap<>();
     /**
-     * proxyId
+     * proxyId --> agent context index
      */
-    private final Map<String, AgentContext> proxyIdToContext = new ConcurrentHashMap<>();
+    private final Map<String, AgentContext> proxyToContextIndex = new ConcurrentHashMap<>();
+    private final Map<String, AgentContext> clientToContextIndex = new ConcurrentHashMap<>();
 
     @Autowired
     private ConnectionIdGenerator connectionIdGenerator;
@@ -42,28 +43,36 @@ public class AgentManager {
         return Optional.ofNullable(connToContext.get(connectionId));
     }
 
+    public Optional<AgentContext> getAgentContext(String clientId) {
+        return Optional.ofNullable(clientToContextIndex.get(clientId));
+    }
+
     public Optional<AgentContext> getAgentContextByProxyId(String proxyId) {
         if (!StringUtils.hasText(proxyId)) {
             throw new IllegalArgumentException("proxyId can not null");
         }
-        return Optional.ofNullable(proxyIdToContext.get(proxyId));
+        return Optional.ofNullable(proxyToContextIndex.get(proxyId));
     }
 
     public void addProxyContextIndex(String proxyId, AgentContext context) {
-        proxyIdToContext.put(proxyId, context);
+        proxyToContextIndex.put(proxyId, context);
     }
 
     public AgentContext createAgent(Channel control, StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine) {
         int connectionId = connectionIdGenerator.nextConnId();
-        AgentContext AgentContext = new AgentContext(this, agentStateMachine);
-        AgentContext.setControl(control);
+        AgentContext agentContext = new AgentContext(agentStateMachine);
+        agentContext.setControl(control);
         control.attr(AttributeKeys.CONNECTION_ID).set(connectionId);
-        AgentContext.setConnectionId(connectionId);
-        connToContext.put(connectionId, AgentContext);
-        return AgentContext;
+        agentContext.setConnectionId(connectionId);
+        connToContext.put(connectionId, agentContext);
+        return agentContext;
     }
 
     public int getOnlineCount() {
         return connToContext.size();
+    }
+
+    public void removeProxyContextIndex(String proxyId) {
+        clientToContextIndex.remove(proxyId);
     }
 }

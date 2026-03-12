@@ -9,8 +9,12 @@ public abstract class AgentBaseAction implements Action<AgentState, AgentEvent, 
 
     @Override
     public final void execute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-        context.setState(to);
-        doExecute(from, to, event, context);
+        try {
+            context.setState(to);
+            doExecute(from, to, event, context);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     protected abstract void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context);

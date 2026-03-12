@@ -2,7 +2,6 @@ package com.xiaoniucode.etp.core.domain;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 
-import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +10,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class ProxyConfig {
+    @Setter
+    String clientId;
     /**
      * 代理ID 唯一标识
      */

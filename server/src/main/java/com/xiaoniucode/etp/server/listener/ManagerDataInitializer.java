@@ -5,7 +5,7 @@ import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
 import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
-import com.xiaoniucode.etp.server.manager.AccessTokenManager;
+import com.xiaoniucode.etp.server.security.AccessTokenManager;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;

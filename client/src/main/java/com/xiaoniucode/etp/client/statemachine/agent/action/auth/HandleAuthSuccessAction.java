@@ -62,8 +62,8 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
                 .addAllTargets(targets)
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
 
-        if (config.isOpen()) {
-            newProxyBuilder.setStatus(config.getStatus().getCode());
+        if (config.isEnable()) {
+            newProxyBuilder.setStatus(1);//todo test
         }
         Message.Compress compress = Message.Compress.newBuilder().setEnable(config.isCompressEnabled()).build();
         newProxyBuilder.setCompress(compress);

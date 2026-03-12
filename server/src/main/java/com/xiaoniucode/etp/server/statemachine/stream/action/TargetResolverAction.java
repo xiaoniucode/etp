@@ -8,7 +8,7 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancerFactory;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.proxy.ProxyManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
@@ -105,15 +105,15 @@ public class TargetResolverAction extends StreamBaseAction {
 
     private ProxyConfig resolveProxyConfig(StreamContext context) {
         Channel visitor = context.getVisitor();
-        //获取目标代理
         if (context.getCurrentProtocol() == ProtocolType.HTTP) {
             String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
+            return proxyManager.findByDomain(domain).orElse(null);
 
         } else if (context.getCurrentProtocol() == ProtocolType.TCP) {
             int remotePort = getListenerPort(visitor);
+            return proxyManager.findByRemotePort(remotePort).orElse(null);
         }
-        //Agent 不可用、隧道不存在、隧道未激活时触发关闭流事件
-        return new ProxyConfig();
+        return null;
     }
 
     private int getListenerPort(Channel visitor) {

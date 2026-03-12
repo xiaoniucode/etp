@@ -24,10 +24,7 @@ public class AgentContext extends ProcessContextImpl {
     private String arch;
     private String name;
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
-    private AgentManager agentManager;
-
-    public AgentContext(AgentManager agentManager, StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine) {
-        this.agentManager = agentManager;
+    public AgentContext( StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine) {
         stateMachine = agentStateMachine;
     }
 

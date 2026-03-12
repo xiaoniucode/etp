@@ -28,6 +28,10 @@ public class DomainConfig {
      */
     private Boolean autoDomain;
 
+    public void setFullDomains(Set<String>domains){
+        this.fullDomains.clear();
+        this.fullDomains.addAll(domains);
+    }
     /**
      * 是否有自定义域名
      */
@@ -55,10 +59,7 @@ public class DomainConfig {
      *
      * @return 域名类型
      */
-    public DomainType getDomainType(ProtocolType protocol) {
-        if (ProtocolType.isTcp(protocol)) {
-            return null;
-        }
+    public DomainType getDomainType() {
         if (!customDomains.isEmpty()) {
             return DomainType.CUSTOM_DOMAIN;
         }

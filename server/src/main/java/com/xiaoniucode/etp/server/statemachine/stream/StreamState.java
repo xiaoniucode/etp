@@ -6,5 +6,4 @@ public enum StreamState {
     OPENING,      // 打开中
     OPENED,       // 已打开
     CLOSED,       // 已关闭
-    FAILED        // 失败
 }

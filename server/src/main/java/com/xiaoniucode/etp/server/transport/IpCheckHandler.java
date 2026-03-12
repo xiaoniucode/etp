@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.transport;
 
-import com.xiaoniucode.etp.server.manager.AccessControlManager;
+import com.xiaoniucode.etp.server.security.AccessControlManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
