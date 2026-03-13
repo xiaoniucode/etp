@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.core.domain;
 
+import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 
 import lombok.Getter;
@@ -11,7 +12,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Getter
 public class ProxyConfig {
     @Setter
-    String clientId;
+    private String clientId;
+    @Setter
+    private ClientType clientType;
     /**
      * 代理ID 唯一标识
      */
@@ -85,14 +88,14 @@ public class ProxyConfig {
      * 是否启用加密
      */
     public boolean isEncryptEnabled() {
-        return transport != null && transport.getEncrypt() != null && transport.getEncrypt().getEnable();
+        return transport != null  && transport.getEncrypt();
     }
 
     /**
      * 是否启用压缩
      */
     public boolean isCompressEnabled() {
-        return transport != null && transport.getCompress() != null && transport.getCompress().getEnable();
+        return transport != null && transport.getCompress();
     }
 
     public boolean hasAccessControl() {
@@ -165,7 +168,7 @@ public class ProxyConfig {
     }
 
     public boolean isMuxTunnel() {
-        return transport != null && transport.isMux();
+        return transport != null && transport.getMux();
     }
 }
 

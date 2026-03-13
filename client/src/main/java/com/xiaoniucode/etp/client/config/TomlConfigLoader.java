@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.client.config;
 
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.config.domain.LogConfig;
+import com.xiaoniucode.etp.client.config.domain.MuxConfig;
 import com.xiaoniucode.etp.client.config.domain.RetryConfig;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.common.utils.TomlUtils;
@@ -12,7 +13,6 @@ import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.LoadBalanceStrategy;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.Getter;
 
 import java.util.*;
@@ -47,6 +47,15 @@ public class TomlConfigLoader implements ConfigSource {
             validatePort(serverPortValue.intValue());
             builder.serverPort(serverPortValue.intValue());
         }
+        Toml muxTable = root.getTable("mux");
+        Boolean globalMuxV = null;
+        if (muxTable != null) {
+            MuxConfig muxConfig = new MuxConfig();
+            globalMuxV = muxTable.getBoolean("enable", true);
+            muxConfig.setEnable(globalMuxV);
+            builder.muxConfig(muxConfig);
+        }
+
 
         // 读取认证配置
         Toml authTable = root.getTable("auth");
@@ -76,7 +85,7 @@ public class TomlConfigLoader implements ConfigSource {
             String keyFile = tlsTable.getString("keyFile");
             String caFile = tlsTable.getString("caFile");
             String keyPass = tlsTable.getString("keyPass");
-            builder.tlsConfig(new TlsConfig(enable, certFile, keyFile, caFile,keyPass, false));
+            builder.tlsConfig(new TlsConfig(enable, certFile, keyFile, caFile, keyPass, false));
         }
 
         // 读取代理配置
@@ -94,9 +103,7 @@ public class TomlConfigLoader implements ConfigSource {
                 Boolean autoDomain = proxyTable.getBoolean("autoDomain", true);
                 List<String> customDomains = proxyTable.getList("customDomains");
                 List<String> subDomains = proxyTable.getList("subDomains");
-                Long statusValue = proxyTable.getLong("status", ProxyStatus.OPEN.getCode().longValue());
-                Boolean encrypt = proxyTable.getBoolean("encrypt");
-                Boolean compress = proxyTable.getBoolean("compress");
+                Boolean enableV = proxyTable.getBoolean("enable", true);
 
                 if (StringUtils.hasText(name)) {
                     proxyConfig.setName(name.trim());
@@ -127,32 +134,31 @@ public class TomlConfigLoader implements ConfigSource {
                     validatePort(remotePortValue.intValue());
                     proxyConfig.setRemotePort(remotePortValue.intValue());
                 }
-//                if (autoDomain != null) {
-//                    proxyConfig.setAutoDomain(autoDomain);
-//                }
-//                if (customDomains != null && !customDomains.isEmpty()) {
-//                    for (String domain : customDomains) {
-//                        if (StringUtils.hasText(domain)) {
-//                            proxyConfig.getCustomDomains().add(domain.trim());
-//                        }
-//                    }
-//                }
-//                if (subDomains != null && !subDomains.isEmpty()) {
-//                    for (String domain : subDomains) {
-//                        if (StringUtils.hasText(domain)) {
-//                            proxyConfig.getSubDomains().add(domain.trim());
-//                        }
-//                    }
-//                }
-//                if (statusValue != null) {
-//                    proxyConfig.setStatus(ProxyStatus.fromStatus(statusValue.intValue()));
-//                }
-//                if (encrypt != null) {
-//                    proxyConfig.setEncrypt(encrypt);
-//                }
-//                if (compress != null) {
-//                    proxyConfig.setCompress(compress);
-//                }
+                if (proxyConfig.isHttp()) {
+                    DomainConfig domainConfig = new DomainConfig();
+                    if (autoDomain != null) {
+                        domainConfig.setAutoDomain(autoDomain);
+                    }
+                    if (customDomains != null && !customDomains.isEmpty()) {
+                        for (String domain : customDomains) {
+                            if (StringUtils.hasText(domain)) {
+                                domainConfig.getCustomDomains().add(domain.trim());
+                            }
+                        }
+                    }
+                    if (subDomains != null && !subDomains.isEmpty()) {
+                        for (String domain : subDomains) {
+                            if (StringUtils.hasText(domain)) {
+                                domainConfig.getSubDomains().add(domain.trim());
+                            }
+                        }
+                    }
+                    proxyConfig.setDomainInfo(domainConfig);
+                }
+
+                if (enableV != null) {
+                    proxyConfig.setEnable(enableV);
+                }
                 //访问控制
                 Toml accessControl = proxyTable.getTable("access_control");
                 if (accessControl != null) {
@@ -208,6 +214,29 @@ public class TomlConfigLoader implements ConfigSource {
                     }
                     proxyConfig.setLoadBalance(loadBalanceConfig);
                 }
+
+                //传输
+                Toml transport = proxyTable.getTable("transport");
+                TransportConfig transportConfig = new TransportConfig();
+                if (transport != null) {
+                    Boolean muxV = transport.getBoolean("mux");
+                    Boolean compressV = transport.getBoolean("compress");
+                    Boolean encryptV = transport.getBoolean("encrypt");
+                    if (compressV != null) {
+                        transportConfig.setMux(compressV);
+                    }
+                    if (encryptV != null) {
+                        transportConfig.setEncrypt(encryptV);
+                    }
+                    if (muxV != null) {
+                        transportConfig.setMux(muxV);
+                    } else if (globalMuxV != null) {
+                        transportConfig.setMux(globalMuxV);
+                    }
+                } else if (globalMuxV != null) {
+                    transportConfig.setMux(globalMuxV);
+                }
+                proxyConfig.setTransport(transportConfig);
             }
             builder.proxies(proxies);
         }

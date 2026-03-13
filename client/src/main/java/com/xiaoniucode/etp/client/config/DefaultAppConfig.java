@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.client.config;
 
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.config.domain.LogConfig;
+import com.xiaoniucode.etp.client.config.domain.MuxConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.core.enums.ClientType;
@@ -17,6 +18,7 @@ public class DefaultAppConfig implements AppConfig {
     private final List<ProxyConfig> proxies;
     private final LogConfig logConfig;
     private final ClientType clientType;
+    private final MuxConfig muxConfig;
 
     private DefaultAppConfig(Builder builder) {
         this.serverAddr = builder.serverAddr;
@@ -26,16 +28,18 @@ public class DefaultAppConfig implements AppConfig {
         this.proxies = builder.proxies;
         this.logConfig = builder.logConfig;
         this.clientType = builder.clientType;
+        this.muxConfig = builder.muxConfig;
     }
 
     public static class Builder {
         private String serverAddr = "127.0.0.1";
         private int serverPort = 9527;
         private AuthConfig authConfig = new AuthConfig();
-        private TlsConfig tlsConfig = new TlsConfig(true,true);
+        private TlsConfig tlsConfig = new TlsConfig(true, true);
         private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
         private LogConfig logConfig;
         private ClientType clientType = ClientType.BINARY_DEVICE;
+        private MuxConfig muxConfig = new MuxConfig(true);
 
         public Builder serverAddr(String serverAddr) {
             this.serverAddr = serverAddr;
@@ -54,6 +58,11 @@ public class DefaultAppConfig implements AppConfig {
 
         public Builder tlsConfig(TlsConfig tlsConfig) {
             this.tlsConfig = tlsConfig;
+            return this;
+        }
+
+        public Builder muxConfig(MuxConfig muxConfig) {
+            this.muxConfig = muxConfig;
             return this;
         }
 
@@ -90,6 +99,11 @@ public class DefaultAppConfig implements AppConfig {
     @Override
     public AuthConfig getAuthConfig() {
         return authConfig;
+    }
+
+    @Override
+    public MuxConfig getMuxConfig() {
+        return muxConfig;
     }
 
     @Override

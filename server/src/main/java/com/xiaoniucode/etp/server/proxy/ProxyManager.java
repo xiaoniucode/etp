@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProxyManager {
-    public ProxyConfig register(String clientId, ProxyConfig proxyConfig) throws EtpException;
+    public ProxyConfig register(ProxyConfig proxyConfig) throws EtpException;
 
     public Optional<ProxyConfig> delete(String proxyId) throws EtpException;
 

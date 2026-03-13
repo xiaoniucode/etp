@@ -7,8 +7,6 @@ import java.util.List;
 public interface ProxyStore {
     ProxyConfig add(ProxyConfig config);
 
-    ProxyConfig update(ProxyConfig config);
-
     ProxyConfig findById(String proxyId);
 
     List<ProxyConfig> findByClientId(String clientId);
@@ -24,6 +22,8 @@ public interface ProxyStore {
     List<ProxyConfig> findAllTcpProxies();
 
     void deleteById(String proxyId);
+
+    void deleteByClientId(String clientId);
 
     boolean existsById(String proxyId);
 

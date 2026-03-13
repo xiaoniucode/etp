@@ -7,13 +7,13 @@ import lombok.Getter;
 @Getter
 public enum ClientType {
     /**
-     * 临时客户端，生命周期同客户端连接session
+     * 会话级客户端
      */
-    WEB_SESSION(0, "web_session", true),
+    SESSION_CLINT(0, "Session client", true),
     /**
-     * 二进制持久化设备
+     * 二进制客户端
      */
-    BINARY_DEVICE(1, "binary_device", false);
+    BINARY_DEVICE(1, "Binary device", false);
     private final Integer code;
     private final String description;
     private final boolean temporary;
@@ -28,7 +28,7 @@ public enum ClientType {
     }
 
     public boolean isWebSession() {
-        return this == WEB_SESSION;
+        return this == SESSION_CLINT;
     }
 
     public boolean isBinaryDevice() {

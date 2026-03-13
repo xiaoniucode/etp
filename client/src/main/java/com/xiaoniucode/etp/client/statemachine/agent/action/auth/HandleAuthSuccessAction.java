@@ -32,8 +32,7 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
         Channel control = context.getControl();
         for (ProxyConfig config : proxies) {
             Message.NewProxy newProxy = buildNewProxy(config);
-            Message.ConfigMessage message = Message.ConfigMessage.newBuilder().setNewProxy(newProxy).build();
-            ByteBuf payload = ProtobufUtil.toByteBuf(message, control.alloc());
+            ByteBuf payload = ProtobufUtil.toByteBuf(newProxy, control.alloc());
             TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE, payload);
             control.write(frame);
         }
@@ -63,12 +62,9 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
 
         if (config.isEnable()) {
-            newProxyBuilder.setStatus(1);//todo test
+            newProxyBuilder.setEnable(true);
         }
-        Message.Compress compress = Message.Compress.newBuilder().setEnable(config.isCompressEnabled()).build();
-        newProxyBuilder.setCompress(compress);
-        Message.Encrypt encrypt = Message.Encrypt.newBuilder().setEnable(config.isEncryptEnabled()).build();
-        newProxyBuilder.setEncrypt(encrypt);
+
         switch (protocol) {
             case TCP:
                 if (config.hasRemotePort()) {
@@ -105,6 +101,24 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
                 }
                 break;
         }
+        //传输
+        if (config.hasTransport()) {
+            Message.Transport.Builder builder = Message.Transport.newBuilder();
+            TransportConfig transport = config.getTransport();
+            Boolean encrypt = transport.getEncrypt();
+            Boolean compress = transport.getCompress();
+            Boolean mux = transport.getMux();
+            if (encrypt != null) {
+                builder.setEncrypt(encrypt);
+            }
+            if (compress != null) {
+                builder.setCompress(compress);
+            }
+            if (mux != null) {
+                builder.setMux(mux);
+            }
+        }
+
         //访问控制
         if (config.hasAccessControl()) {
             AccessControlConfig access = config.getAccessControl();

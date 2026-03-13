@@ -2,9 +2,12 @@ package com.xiaoniucode.etp.server.proxy;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.exceptions.PortConflictException;
 import com.xiaoniucode.etp.server.port.PortManager;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
+import com.xiaoniucode.etp.server.store.ProxyStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +17,10 @@ import java.util.Objects;
 public class TcpOperationDelegate implements ProxyOperationDelegate {
     @Autowired
     private PortManager portManager;
+    @Autowired
+    private AgentManager agentManager;
+    @Autowired
+    private ProxyStore proxyStore;
 
     @Override
     public boolean supports(ProxyConfig config) {
@@ -34,11 +41,22 @@ public class TcpOperationDelegate implements ProxyOperationDelegate {
     @Override
     public void onCreate(ProxyConfig config) throws EtpException {
         Integer remotePort = config.getRemotePort();
+        ClientType clientType = config.getClientType();
+        String name = config.getName();
+        ProxyConfig exist = proxyStore.findByClientIdAndName(config.getClientId(), name);
+        //处理临时客户端名称冲突
+        if (exist != null && clientType == ClientType.BINARY_DEVICE) {
+            throw new EtpException("代理配置名称不能重复");
+        }
         if (remotePort == null) {
             remotePort = portManager.acquire();
         }
         if (remotePort == null) {
             throw new EtpException("无可用端口，请联系管理员");
+        }
+        //处理临时客户端名字重复
+        if (exist != null && (clientType == ClientType.SESSION_CLINT)) {
+            config.setName(remotePort + "." + name);
         }
         config.setRemotePort(remotePort);
     }

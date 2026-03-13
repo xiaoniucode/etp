@@ -98,7 +98,7 @@ public class AuthAction extends AgentBaseAction {
                 return ClientType.BINARY_DEVICE;
             }
             case WEB_SESSION -> {
-                return ClientType.WEB_SESSION;
+                return ClientType.SESSION_CLINT;
             }
         }
         return null;

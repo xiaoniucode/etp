@@ -9,7 +9,7 @@ maxDelay = 8
 maxRetries = 3
 
 [mux]
-enable = true #全局开启，代理可覆盖
+enable = true #全局开启，可覆盖
 
 [tls]
 enable = false
@@ -23,14 +23,20 @@ protocol = "http"
 autoDomain = false
 customDomains = ["a.domain1.com"]
 status = 1
-
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
+    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
+]
 [[proxies]]
 name = "web11"
 protocol = "http"
 autoDomain = true
 subDomains = ["a", "b"]
 status = 1
-mux = false
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
+    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
+]
 [proxies.basic_auth]
 enable = true
 users = [
@@ -42,8 +48,6 @@ enable = true
 mode = "allow"
 allow = ["43.135.115.160/32"]
 deny = []
-
-
 
 [[proxies]]
 name = "fullstack2"
@@ -79,17 +83,14 @@ limit = "20M" #总带宽限制(可选) 20Mbps
 limitIn = "2M" #入口带宽限制(可选)
 limitOut = "2M" #出口带宽限制(可选)
 
-
-
-
-
-
 [[proxies]]
 name = "web2"
 protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
+    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
+]
 customDomains = ["etp.domain2.com"]
-encrypt = false
-compress = false
 [proxies.access_control]
 enable = true
 mode = "allow"
@@ -104,9 +105,10 @@ users = [
 name = "web22"
 protocol = "http"
 customDomains = ["etp2.domain2.com"]
-encrypt = false
-compress = false
-
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
+    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
+]
 [proxies.bandwidth] #带宽限制
 limit = "20M" #总带宽限制(可选)
 limitIn = "2M" #入口带宽限制(可选)
@@ -115,9 +117,10 @@ limitOut = "2M" #出口带宽限制(可选)
 name = "mysql"
 protocol = "tcp"
 status = 1
-encrypt = false
-compress = false
-
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
+    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
+]
 [proxies.access_control] #访问控制
 enable = true
 mode = "allow"
@@ -127,8 +130,6 @@ deny = []
 name = "mysql2"
 protocol = "tcp"
 status = 1
-encrypt = false
-compress = false
 remotePort = 3307
 targets = [
     { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
@@ -138,8 +139,6 @@ targets = [
 name = "redis"
 protocol = "tcp"
 status = 1
-encrypt = true
-compress = true
 targets = [
     { host = "10.1.1.2", port = 6379, weight = 70, name = "redis-1" },
     { host = "10.1.1.1", port = 6379, weight = 30, name = "redis-2" }

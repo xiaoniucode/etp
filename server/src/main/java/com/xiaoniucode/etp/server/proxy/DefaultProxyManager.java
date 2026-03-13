@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.proxy;
 
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
@@ -29,21 +30,25 @@ public class DefaultProxyManager implements ProxyManager {
 
 
     @Override
-    public synchronized ProxyConfig register(String clientId, ProxyConfig newConfig) throws EtpException {
+    public synchronized ProxyConfig register(ProxyConfig config) throws EtpException {
+        String clientId = config.getClientId();
+        if (!StringUtils.hasText(clientId)) {
+            throw new EtpException("clientId 不能为空");
+        }
         //检查是否已经存在了，如果存在则更新、不存在则创建
-        Optional<ProxyConfig> existing = findByClientIdAndName(clientId, newConfig.getName());
-        ProxyOperationDelegate delegate = proxyRegisterDelegateFactory.getDelegate(newConfig);
+        Optional<ProxyConfig> existing = findByClientIdAndName(clientId, config.getName());
+        ProxyOperationDelegate delegate = proxyRegisterDelegateFactory.getDelegate(config);
         if (existing.isPresent()) {
             ProxyConfig oldConfig = existing.get();
-            if (ProxyConfigComparator.isChanged(oldConfig, newConfig)) {
+            if (ProxyConfigComparator.isChanged(oldConfig, config)) {
                 //如果配置发生了变化
-                return updateProxy(clientId, oldConfig, newConfig, delegate);
+                return updateProxy(clientId, oldConfig, config, delegate);
             } else {
                 return oldConfig;
             }
         } else {
             //新建
-            return createProxy(clientId, newConfig, delegate);
+            return createProxy(clientId, config, delegate);
         }
     }
 
@@ -56,9 +61,10 @@ public class DefaultProxyManager implements ProxyManager {
         newConfig.setClientId(clientId);
 
         delegate.onUpdate(oldConfig, newConfig);
-
-        //更新存储
-        proxyStore.update(oldConfig);
+        //删除旧的
+        proxyStore.deleteById(oldConfig.getProxyId());
+        //添加
+        proxyStore.add(newConfig);
 
         //触发监听器通知
         listeners.forEach(listener -> listener.onUpdated(oldConfig, newConfig));
@@ -79,7 +85,7 @@ public class DefaultProxyManager implements ProxyManager {
         proxyStore.add(newConfig);
 
         //通知
-        listeners.forEach(listener->listener.onAdded(newConfig));
+        listeners.forEach(listener -> listener.onAdded(newConfig));
         return newConfig;
     }
 

@@ -42,7 +42,10 @@ public class ProxyCreateAction extends AgentBaseAction {
             Message.NewProxy proxy = context.getVariableAs("newProxy", Message.NewProxy.class);
             String clientId = context.getClientId();
             ProxyConfig config = buildProxyConfig(proxy);
-            ProxyConfig register = proxyManager.register(clientId, config);
+            config.setClientId(clientId);
+            config.setClientType(context.getClientType());
+
+            ProxyConfig register = proxyManager.register(config);
             control.writeAndFlush(buildResponse(register));
             logger.debug("代理注册成功: {}", register);
         } catch (Exception e) {
@@ -78,8 +81,8 @@ public class ProxyCreateAction extends AgentBaseAction {
             config.setRemotePort(proxy.getRemotePort());
         }
         config.setProtocol(ProtocolType.getByName(proxy.getProtocol().name()));
-        if (proxy.hasStatus()) {
-            // config.setStatus(ProxyStatus.fromStatus(proxy.getStatus()));
+        if (proxy.hasEnable()) {
+            config.setEnable(proxy.getEnable());
         }
         if (proxy.hasDomain()) {
             Message.DomainInfo domainInfo = proxy.getDomain();
@@ -102,25 +105,14 @@ public class ProxyCreateAction extends AgentBaseAction {
             if (transport.hasMux()) {
                 transportConfig.setMux(transport.getMux());
             }
-            if (transport.hasProtocol()) {
-                Message.TransportProtocolType protocol = transport.getProtocol();
-                TransportProtocol tp = TransportProtocol.fromName(protocol.getValueDescriptor().getName());
-                transportConfig.setProtocol(tp);
-            }
             if (transport.hasCompress()) {
-                Message.Compress compress = transport.getCompress();
-                CompressionConfig compressionConfig = new CompressionConfig();
-                compressionConfig.setEnable(compress.getEnable());
-                transportConfig.setCompress(compressionConfig);
+                transportConfig.setCompress( transport.getCompress());
             }
             if (transport.hasEncrypt()) {
-                EncryptionConfig encryptionConfig = new EncryptionConfig();
-                Message.Encrypt encrypt = transport.getEncrypt();
-                encryptionConfig.setEnable(encrypt.getEnable());
-                transportConfig.setEncrypt(encryptionConfig);
+                transportConfig.setEncrypt(transport.getEncrypt());
             }
+            config.setTransport(transportConfig);
         }
-
 
         if (proxy.hasAccessControl()) {
             Message.AccessControl accessControl = proxy.getAccessControl();
@@ -170,22 +162,27 @@ public class ProxyCreateAction extends AgentBaseAction {
 
     private Message.ConfigMessage buildResponse(ProxyConfig config) {
         ProtocolType protocol = config.getProtocol();
-        Set<String> domains = config.getDomainInfo().getFullDomains();
-        String host = appConfig.getServerAddr();
         StringBuilder remoteAddr = new StringBuilder();
-        if (ProtocolType.isHttp(protocol)) {
-            int httpProxyPort = appConfig.getHttpProxyPort();
-            for (String domain : domains) {
-                remoteAddr.append("http://").append(domain);
-                if (httpProxyPort != 80) {
-                    remoteAddr.append(":").append(httpProxyPort);
+        if (protocol.isHttp()) {
+            DomainConfig domainInfo = config.getDomainInfo();
+            if (domainInfo != null) {
+                Set<String> domains = domainInfo.getFullDomains();
+                if (ProtocolType.isHttp(protocol)) {
+                    int httpProxyPort = appConfig.getHttpProxyPort();
+                    for (String domain : domains) {
+                        remoteAddr.append("http://").append(domain);
+                        if (httpProxyPort != 80) {
+                            remoteAddr.append(":").append(httpProxyPort);
+                        }
+                        remoteAddr.append("\n");
+                    }
                 }
-                remoteAddr.append("\n");
             }
 
-        } else if (ProtocolType.isTcp(protocol)) {
+        } else if (protocol.isTcp()) {
+            String serverAddr = appConfig.getServerAddr();
             Integer remotePort = config.getRemotePort();
-            remoteAddr.append(host).append(":").append(remotePort);
+            remoteAddr.append(serverAddr).append(":").append(remotePort);
         }
         return CommandMessageUtils.buildNewProxyResp(config.getName(), remoteAddr.toString());
     }

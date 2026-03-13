@@ -20,6 +20,7 @@ public class HttpOperationDelegate implements ProxyOperationDelegate {
     private DomainManager domainManager;
     @Autowired
     private DomainGenerator domainGenerator;
+
     @Override
     public boolean supports(ProxyConfig config) {
         return config.isHttp();
@@ -28,6 +29,9 @@ public class HttpOperationDelegate implements ProxyOperationDelegate {
     @Override
     public void validate(ProxyConfig config) throws EtpException {
         DomainConfig domainInfo = config.getDomainInfo();
+        if (domainInfo == null) {
+            throw new EtpException("HTTP(s)协议必须配置域名");
+        }
         DomainType domainType = domainInfo.getDomainType();
         if (DomainType.CUSTOM_DOMAIN == domainType) {
             Set<String> customDomains = domainInfo.getCustomDomains();
