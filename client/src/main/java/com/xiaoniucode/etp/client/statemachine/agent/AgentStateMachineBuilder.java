@@ -138,7 +138,12 @@ public class AgentStateMachineBuilder {
                     .on(AgentEvent.PROXY_CREATE_RESP)
                     .when(ctx -> true)
                     .perform(new ProxyCreateResponseAction());
-
+            builder.externalTransition()
+                    .from(AgentState.CONNECTED)
+                    .to(AgentState.CONNECTED)
+                    .on(AgentEvent.ERROR)
+                    .when(ctx -> true)
+                    .perform(new ErrorAction());
             // 构建状态机
             builder.build(MACHINE_ID);
             return StateMachineFactory.get(MACHINE_ID);

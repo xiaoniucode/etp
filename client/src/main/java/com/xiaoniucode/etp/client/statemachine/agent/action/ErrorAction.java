@@ -7,11 +7,11 @@ import com.xiaoniucode.etp.core.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProxyCreateResponseAction extends AgentBaseAction {
-    private final Logger logger= LoggerFactory.getLogger(ProxyCreateResponseAction.class);
+public class ErrorAction extends AgentBaseAction{
+    private final Logger logger= LoggerFactory.getLogger(ErrorAction.class);
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-        Message.NewProxyResp newProxyResp = context.getVariableAs("NEW_PROXY_RESP", Message.NewProxyResp.class);
-        logger.info(newProxyResp.getRemoteAddr());
+        Message.Error error = context.getVariableAs("ERROR", Message.Error.class);
+        logger.error(error.getMessage());
     }
 }

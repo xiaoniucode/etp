@@ -39,8 +39,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         switch (msgType) {
             //********************Agent***********************//
             case TMSP.MSG_AUTH_RESP: {
-                ByteBuf payload = frame.getPayload();
-                Message.AuthResponse authResponse = ProtobufUtil.parseFrom(payload, Message.AuthResponse.parser());
+                Message.AuthResponse authResponse = ProtobufUtil.parseFrom(frame.getPayload(), Message.AuthResponse.parser());
                 int connectionId = authResponse.getConnectionId();
                 int code = authResponse.getCode();
                 if (code == 0) {
@@ -54,13 +53,22 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 break;
             }
             case TMSP.MSG_PROXY_CREATE_RESP: {
+                Message.NewProxyResp newProxyResp = ProtobufUtil.parseFrom(frame.getPayload(), Message.NewProxyResp.parser());
+                clientContext.setVariable("NEW_PROXY_RESP", newProxyResp);
                 clientContext.fireEvent(AgentEvent.PROXY_CREATE_RESP);
                 break;
             }
             case TMSP.MSG_GOAWAY: {
+
                 clientContext.fireEvent(AgentEvent.STOP);
                 break;
 
+            }
+            case TMSP.MSG_ERROR: {
+                Message.Error error = ProtobufUtil.parseFrom(frame.getPayload(), Message.Error.parser());
+                clientContext.setVariable("ERROR", error);
+                clientContext.fireEvent(AgentEvent.ERROR);
+                break;
             }
             //********************Tunnel***********************//
             case TMSP.MSG_TUNNEL_CREATE_RESP: {

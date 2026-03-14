@@ -100,9 +100,7 @@ public class TomlConfigLoader implements ConfigSource {
                 String localIp = proxyTable.getString("localIp", "127.0.0.1");
                 Long localPortValue = proxyTable.getLong("localPort");
                 Long remotePortValue = proxyTable.getLong("remotePort");
-                Boolean autoDomain = proxyTable.getBoolean("autoDomain", true);
-                List<String> customDomains = proxyTable.getList("customDomains");
-                List<String> subDomains = proxyTable.getList("subDomains");
+
                 Boolean enableV = proxyTable.getBoolean("enable", true);
 
                 if (StringUtils.hasText(name)) {
@@ -135,6 +133,9 @@ public class TomlConfigLoader implements ConfigSource {
                     proxyConfig.setRemotePort(remotePortValue.intValue());
                 }
                 if (proxyConfig.isHttp()) {
+                    Boolean autoDomain = proxyTable.getBoolean("autoDomain", true);
+                    List<String> customDomains = proxyTable.getList("customDomains");
+                    List<String> subDomains = proxyTable.getList("subDomains");
                     DomainConfig domainConfig = new DomainConfig();
                     if (autoDomain != null) {
                         domainConfig.setAutoDomain(autoDomain);

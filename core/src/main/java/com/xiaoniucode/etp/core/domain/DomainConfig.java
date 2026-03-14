@@ -4,12 +4,14 @@ import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Getter
 @Setter
+@ToString
 public class DomainConfig {
     /**
      * 任意自定义域名

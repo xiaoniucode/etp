@@ -41,7 +41,7 @@ public class HttpOperationDelegate implements ProxyOperationDelegate {
                 }
             }
         }
-        if (StringUtils.hasText(config.getName())) {
+        if (!StringUtils.hasText(config.getName())) {
             throw new EtpException("代理名不能为空！");
         }
     }

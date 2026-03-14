@@ -12,7 +12,6 @@ import com.xiaoniucode.etp.server.proxy.ProxyManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.server.utils.CommandMessageUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import jakarta.annotation.Resource;
@@ -46,7 +45,9 @@ public class ProxyCreateAction extends AgentBaseAction {
             config.setClientType(context.getClientType());
 
             ProxyConfig register = proxyManager.register(config);
-            control.writeAndFlush(buildResponse(register));
+            Message.NewProxyResp newProxyResp = buildResponse(register);
+            TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, ProtobufUtil.toByteBuf(newProxyResp, control.alloc()));
+            control.writeAndFlush(frame);
             logger.debug("代理注册成功: {}", register);
         } catch (Exception e) {
             logger.error("代理配置注册失败", e);
@@ -55,15 +56,15 @@ public class ProxyCreateAction extends AgentBaseAction {
     }
 
     public void sendErrorMessage(String message, Channel control) {
-        Message.ConfigMessage msg = CommandMessageUtils.buildErrorMessage(1, message);
+        Message.Error msg = Message.Error.newBuilder().setMessage(message).build();
         ByteBuf payload = ProtobufUtil.toByteBuf(msg, control.alloc());
         TMSPFrame frame = new TMSPFrame(TMSP.MSG_ERROR, payload);
         control.writeAndFlush(frame);
     }
 
     private ProxyConfig buildProxyConfig(Message.NewProxy proxy) {
-        ProxyConfig config = new ProxyConfig();
-        config.setName(proxy.getName());
+        ProxyConfig proxyConfig = new ProxyConfig();
+        proxyConfig.setName(proxy.getName());
         List<Target> targets = proxy.getTargetsList().stream().map(p -> {
             Target target = new Target();
             target.setHost(p.getHost());
@@ -76,13 +77,13 @@ public class ProxyCreateAction extends AgentBaseAction {
             }
             return target;
         }).toList();
-        config.addTargets(targets);
+        proxyConfig.addTargets(targets);
         if (proxy.hasRemotePort()) {
-            config.setRemotePort(proxy.getRemotePort());
+            proxyConfig.setRemotePort(proxy.getRemotePort());
         }
-        config.setProtocol(ProtocolType.getByName(proxy.getProtocol().name()));
+        proxyConfig.setProtocol(ProtocolType.getByName(proxy.getProtocol().name()));
         if (proxy.hasEnable()) {
-            config.setEnable(proxy.getEnable());
+            proxyConfig.setEnable(proxy.getEnable());
         }
         if (proxy.hasDomain()) {
             Message.DomainInfo domainInfo = proxy.getDomain();
@@ -98,6 +99,7 @@ public class ProxyCreateAction extends AgentBaseAction {
             if (!subDomainsList.isEmpty()) {
                 domainConfig.getSubDomains().addAll(subDomainsList);
             }
+            proxyConfig.setDomainInfo(domainConfig);
         }
         if (proxy.hasTransport()) {
             TransportConfig transportConfig = new TransportConfig();
@@ -106,12 +108,12 @@ public class ProxyCreateAction extends AgentBaseAction {
                 transportConfig.setMux(transport.getMux());
             }
             if (transport.hasCompress()) {
-                transportConfig.setCompress( transport.getCompress());
+                transportConfig.setCompress(transport.getCompress());
             }
             if (transport.hasEncrypt()) {
                 transportConfig.setEncrypt(transport.getEncrypt());
             }
-            config.setTransport(transportConfig);
+            proxyConfig.setTransport(transportConfig);
         }
 
         if (proxy.hasAccessControl()) {
@@ -120,22 +122,22 @@ public class ProxyCreateAction extends AgentBaseAction {
             AccessControlMode accessControlMode = AccessControlMode.fromValue(accessControl.getMode().name());
             Set<String> allow = new HashSet<>(accessControl.getAllowList());
             Set<String> deny = new HashSet<>(accessControl.getDenyList());
-            config.setAccessControl(new AccessControlConfig(enable, accessControlMode, allow, deny));
+            proxyConfig.setAccessControl(new AccessControlConfig(enable, accessControlMode, allow, deny));
         }
-        if (config.getProtocol().isHttp() && proxy.hasBasicAuth()) {
+        if (proxyConfig.getProtocol().isHttp() && proxy.hasBasicAuth()) {
             Message.BasicAuth basicAuth = proxy.getBasicAuth();
             Set<HttpUser> users = basicAuth.getHttpUsersList().stream()
                     .map(httpUser -> new HttpUser(httpUser.getUser(), httpUser.getPass()))
                     .collect(Collectors.toSet());
             BasicAuthConfig basicAuthConfig = new BasicAuthConfig(basicAuth.getEnable(), users);
-            config.setBasicAuth(basicAuthConfig);
+            proxyConfig.setBasicAuth(basicAuthConfig);
         }
         if (proxy.hasBandwidth()) {
             Message.Bandwidth bandwidth = proxy.getBandwidth();
             BandwidthConfig bandwidthConfig = new BandwidthConfig(bandwidth.getLimit(),
                     bandwidth.getLimitIn(),
                     bandwidth.getLimitOut());
-            config.setBandwidth(bandwidthConfig);
+            proxyConfig.setBandwidth(bandwidthConfig);
         }
         if (proxy.hasLoadBalance()) {
             LoadBalanceConfig loadBalanceConfig = new LoadBalanceConfig();
@@ -143,9 +145,9 @@ public class ProxyCreateAction extends AgentBaseAction {
             if (loadBalance.hasStrategy()) {
                 loadBalanceConfig.setStrategy(toJavaType(loadBalance.getStrategy()));
             }
-            config.setLoadBalance(loadBalanceConfig);
+            proxyConfig.setLoadBalance(loadBalanceConfig);
         }
-        return config;
+        return proxyConfig;
     }
 
     private LoadBalanceStrategy toJavaType(Message.LoadBalanceStrategy strategy) {
@@ -160,7 +162,7 @@ public class ProxyCreateAction extends AgentBaseAction {
         };
     }
 
-    private Message.ConfigMessage buildResponse(ProxyConfig config) {
+    private Message.NewProxyResp buildResponse(ProxyConfig config) {
         ProtocolType protocol = config.getProtocol();
         StringBuilder remoteAddr = new StringBuilder();
         if (protocol.isHttp()) {
@@ -184,6 +186,8 @@ public class ProxyCreateAction extends AgentBaseAction {
             Integer remotePort = config.getRemotePort();
             remoteAddr.append(serverAddr).append(":").append(remotePort);
         }
-        return CommandMessageUtils.buildNewProxyResp(config.getName(), remoteAddr.toString());
+        return Message.NewProxyResp.newBuilder().setProxyId(config.getProxyId())
+                .setProxyName(config.getName())
+                .setRemoteAddr(remoteAddr.toString()).build();
     }
 }

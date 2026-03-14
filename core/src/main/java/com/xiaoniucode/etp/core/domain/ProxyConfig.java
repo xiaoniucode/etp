@@ -3,13 +3,13 @@ package com.xiaoniucode.etp.core.domain;
 import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
+@ToString
 public class ProxyConfig {
     @Setter
     private String clientId;

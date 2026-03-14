@@ -109,8 +109,9 @@ message NewProxy {
   optional Transport transport = 15;
 }
 message NewProxyResp {
-  string proxy_name = 1;
-  string remote_addr = 2;
+  string proxyId=1;
+  string proxy_name = 2;
+  string remote_addr = 3;
 }
 
 message Error {

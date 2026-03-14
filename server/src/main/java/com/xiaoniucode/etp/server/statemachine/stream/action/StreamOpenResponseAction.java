@@ -10,8 +10,8 @@ import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelContext;
 import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelManager;
-import com.xiaoniucode.etp.server.transport.DirectBridgeFactory;
 import com.xiaoniucode.etp.server.transport.TlsContextHolder;
+import com.xiaoniucode.etp.server.transport.bridge.DirectBridgeFactory;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
@@ -31,8 +31,6 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     private final Logger logger = LoggerFactory.getLogger(StreamOpenResponseAction.class);
     @Autowired
     private TunnelManager tunnelManager;
-    @Autowired
-    private StreamManager streamManager;
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
@@ -59,16 +57,16 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         context.removeVariable("tunnelId");
     }
 
-    private void handleDirectTunnel(StreamContext context) {
+    private void handleDirectTunnel(StreamContext streamContext) {
         //多路复用隧道不用额外处理，已经预先处理过了
-        if (context.isMux()) {
+        if (streamContext.isMux()) {
             return;
         }
-        boolean encrypt = context.isEncrypt();
-        boolean compress = context.isCompress();
+        boolean encrypt = streamContext.isEncrypt();
+        boolean compress = streamContext.isCompress();
 
-        Channel tunnel = context.getTunnel();
-        Channel visitor = context.getVisitor();
+        Channel tunnel = streamContext.getTunnel();
+        Channel visitor = streamContext.getVisitor();
         ChannelPipeline tunnelPipeline = tunnel.pipeline();
         ChannelPipeline visitorPipeline = visitor.pipeline();
 
@@ -116,7 +114,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             }
         }
         //隧道桥接
-        DirectBridgeFactory.bridge(streamManager, visitor, tunnel, context.getCurrentProtocol());
-        logger.debug("独立隧道建立成功: {}", context.getCurrentTarget());
+        DirectBridgeFactory.bridge(streamContext,visitor,tunnel);
+        logger.debug("独立隧道建立成功: {}", streamContext.getCurrentTarget());
     }
 }
