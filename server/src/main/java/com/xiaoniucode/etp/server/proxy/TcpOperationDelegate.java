@@ -8,6 +8,8 @@ import com.xiaoniucode.etp.server.exceptions.PortConflictException;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.store.ProxyStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,7 @@ import java.util.Objects;
 
 @Component
 public class TcpOperationDelegate implements ProxyOperationDelegate {
+    private final Logger logger = LoggerFactory.getLogger(TcpOperationDelegate.class);
     @Autowired
     private PortManager portManager;
     @Autowired
@@ -29,11 +32,7 @@ public class TcpOperationDelegate implements ProxyOperationDelegate {
 
     @Override
     public void validate(ProxyConfig config) throws EtpException {
-        Integer port = config.getRemotePort();
-        if (port != null && !portManager.isAvailable(port)) {
-            throw new PortConflictException(port);
-        }
-        if (StringUtils.hasText(config.getName())) {
+        if (!StringUtils.hasText(config.getName())) {
             throw new EtpException("代理名不能为空！");
         }
     }
@@ -41,6 +40,11 @@ public class TcpOperationDelegate implements ProxyOperationDelegate {
     @Override
     public void onCreate(ProxyConfig config) throws EtpException {
         Integer remotePort = config.getRemotePort();
+        if (remotePort != null && !portManager.isAvailable(remotePort)) {
+            logger.error("端口已被占用: {}", remotePort);
+            throw new PortConflictException(remotePort);
+        }
+
         ClientType clientType = config.getClientType();
         String name = config.getName();
         ProxyConfig exist = proxyStore.findByClientIdAndName(config.getClientId(), name);

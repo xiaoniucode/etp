@@ -1,11 +1,10 @@
-package com.xiaoniucode.etp.client.statemachine.agent.action.auth;
+package com.xiaoniucode.etp.client.statemachine.agent.action;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.ConfigUtils;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
-import com.xiaoniucode.etp.client.statemachine.agent.action.AgentBaseAction;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.LoadBalanceStrategy;
@@ -117,6 +116,7 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
             if (mux != null) {
                 builder.setMux(mux);
             }
+            newProxyBuilder.setTransport(builder.build());
         }
 
         //访问控制

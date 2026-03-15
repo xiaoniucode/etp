@@ -25,6 +25,9 @@ public class AgentManager {
      * proxyId --> agent context index
      */
     private final Map<String, AgentContext> proxyToContextIndex = new ConcurrentHashMap<>();
+    /**
+     * clientId --> context
+     */
     private final Map<String, AgentContext> clientToContextIndex = new ConcurrentHashMap<>();
 
     @Autowired
@@ -66,6 +69,9 @@ public class AgentManager {
         agentContext.setConnectionId(connectionId);
         connToContext.put(connectionId, agentContext);
         return agentContext;
+    }
+    public void addClientContextIndex(String clientId, AgentContext context){
+        clientToContextIndex.put(clientId,context);
     }
 
     public int getOnlineCount() {

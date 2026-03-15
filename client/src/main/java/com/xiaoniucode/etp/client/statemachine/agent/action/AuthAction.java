@@ -1,11 +1,11 @@
-package com.xiaoniucode.etp.client.statemachine.agent.action.auth;
+package com.xiaoniucode.etp.client.statemachine.agent.action;
 
 import com.xiaoniucode.etp.client.common.utils.AppVersionUtil;
+import com.xiaoniucode.etp.client.common.utils.OSUtils;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
-import com.xiaoniucode.etp.client.statemachine.agent.action.AgentBaseAction;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
@@ -28,10 +28,11 @@ public class AuthAction extends AgentBaseAction {
             // 构建认证消息
             Message.AuthInfo authInfo = Message.AuthInfo.newBuilder()
                     .setToken(config.getAuthConfig().getToken())
+                    .setClientId("1001001")//todo test clientId
                     .setVersion(AppVersionUtil.getVersion())
-//                    .setClientType(Message.ClientType.BINARY_DEVICE)
-//                    .setOs(OSUtils.getOS())
-//                    .setName(OSUtils.getHostName())
+                    .setClientType(Message.ClientType.BINARY_DEVICE)
+                    .setOs(OSUtils.getOS())
+                    .setName(OSUtils.getHostName())
                     .build();
             // 发送认证消息
             ByteBuf buf = ProtobufUtil.toByteBuf(authInfo, control.alloc());

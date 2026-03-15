@@ -12,6 +12,6 @@ public class ProxyCreateResponseAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         Message.NewProxyResp newProxyResp = context.getVariableAs("NEW_PROXY_RESP", Message.NewProxyResp.class);
-        logger.info(newProxyResp.getRemoteAddr());
+        logger.info("远程访问地址：{}",newProxyResp.getRemoteAddr());
     }
 }

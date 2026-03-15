@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class HttpOperationDelegate implements ProxyOperationDelegate {
@@ -48,12 +49,10 @@ public class HttpOperationDelegate implements ProxyOperationDelegate {
 
     @Override
     public void onCreate(ProxyConfig config) throws EtpException {
-
-        Set<DomainInfo> domains = domainGenerator.generate(config);
-
+        Set<DomainInfo> domainInfos = domainGenerator.generate(config);
         DomainConfig domainInfo = config.getDomainInfo();
-
-
+        Set<String> domains = domainInfos.stream().map(DomainInfo::getFullDomain).collect(Collectors.toSet());
+        domainInfo.setFullDomains(domains);
     }
 
     @Override

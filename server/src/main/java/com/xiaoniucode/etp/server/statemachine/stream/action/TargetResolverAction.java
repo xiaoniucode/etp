@@ -1,9 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.stream.action;
 
-import com.xiaoniucode.etp.core.domain.HealthCheckConfig;
-import com.xiaoniucode.etp.core.domain.LoadBalanceConfig;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.domain.Target;
+import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
@@ -15,6 +12,7 @@ import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.server.loadbalance.HealthManager;
+import com.xiaoniucode.etp.server.transport.BandwidthLimiter;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import org.slf4j.Logger;
@@ -60,6 +58,10 @@ public class TargetResolverAction extends StreamBaseAction {
                 logger.warn("无可用的后端目标: proxyId={}", config.getProxyId());
                 context.fireEvent(StreamEvent.STREAM_CLOSE);
                 return;
+            }
+            BandwidthConfig bandwidth = config.getBandwidth();
+            if (bandwidth != null) {
+                context.setBandwidthLimiter(new BandwidthLimiter(bandwidth));
             }
             context.setCurrentTarget(selectedTarget);
             context.fireEvent(StreamEvent.TARGET_VALIDATED);

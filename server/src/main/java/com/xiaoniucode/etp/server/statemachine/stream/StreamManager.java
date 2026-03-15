@@ -40,9 +40,6 @@ public class StreamManager {
 
     public boolean removeStreamContext(int streamId) {
         StreamContext remove = visitors.remove(streamId);
-        if (remove == null) {
-            logger.error("流上下文删除失败，未找到上下文信息 streamId={}", streamId);
-        }
         return remove != null;
     }
 

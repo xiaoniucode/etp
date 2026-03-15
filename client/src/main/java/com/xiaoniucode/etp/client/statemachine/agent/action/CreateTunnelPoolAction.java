@@ -25,7 +25,7 @@ import java.util.List;
  * 独立隧道连接池
  */
 public class CreateTunnelPoolAction extends AgentBaseAction {
-    private static final int DEFAULT_DIRECT_COUNT = 6;
+    private static final int DEFAULT_DIRECT_COUNT = 100;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {

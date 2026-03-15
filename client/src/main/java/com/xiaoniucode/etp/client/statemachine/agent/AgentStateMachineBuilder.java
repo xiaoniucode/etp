@@ -1,14 +1,13 @@
 package com.xiaoniucode.etp.client.statemachine.agent;
 
-import com.alibaba.cola.statemachine.Action;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.alibaba.cola.statemachine.StateMachineFactory;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.xiaoniucode.etp.client.statemachine.agent.action.*;
-import com.xiaoniucode.etp.client.statemachine.agent.action.auth.AuthAction;
-import com.xiaoniucode.etp.client.statemachine.agent.action.auth.HandleAuthFailureAction;
-import com.xiaoniucode.etp.client.statemachine.agent.action.auth.HandleAuthSuccessAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.AuthAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.HandleAuthFailureAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.HandleAuthSuccessAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.CreateTunnelPoolAction;
 
 public class AgentStateMachineBuilder {

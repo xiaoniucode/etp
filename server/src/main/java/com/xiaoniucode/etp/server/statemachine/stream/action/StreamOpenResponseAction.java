@@ -46,7 +46,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             }
             //如果是 HTTP协议需要发送首次建立建立的时候读取到的第一个包
             if (context.getCurrentProtocol().isHttp()) {
-                context.relayHttpFirstPackage();
+                context.relayHttpFirstPackage(context.isMux());
             }
             context.setWriteQueue(tc.get().getWriteQueue());
             Channel visitor = context.getVisitor();
@@ -114,7 +114,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             }
         }
         //隧道桥接
-        DirectBridgeFactory.bridge(streamContext,visitor,tunnel);
+        DirectBridgeFactory.bridge(streamContext,visitor,tunnel,streamContext.getBandwidthLimiter());
         logger.debug("独立隧道建立成功: {}", streamContext.getCurrentTarget());
     }
 }

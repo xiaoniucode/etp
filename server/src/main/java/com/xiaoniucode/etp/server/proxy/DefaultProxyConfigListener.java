@@ -25,14 +25,12 @@ public class DefaultProxyConfigListener implements ProxyConfigListener {
 
     @Override
     public void onAdded(ProxyConfig config) {
+        agentManager.getAgentContext(config.getClientId()).ifPresent(agentContext -> {
+            agentManager.addProxyContextIndex(config.getProxyId(), agentContext);
+        });
         if (config.isTcp()) {
             Integer remotePort = config.getRemotePort();
             portAcceptor.bindPort(remotePort);
-            //如果客户端登陆需要添加上下文索引
-            agentManager.getAgentContext(config.getClientId()).ifPresent(agentContext -> {
-                agentManager.addProxyContextIndex(config.getProxyId(), agentContext);
-            });
-
         } else if (config.isHttp()) {
             // agentSessionManager.addDomainsToAgentSession(clientId, domains);
         }

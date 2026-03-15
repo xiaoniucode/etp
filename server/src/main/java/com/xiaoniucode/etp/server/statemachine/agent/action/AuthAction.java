@@ -73,7 +73,7 @@ public class AuthAction extends AgentBaseAction {
         context.setVersion(authInfo.getVersion());
         context.setOs(authInfo.getOs());
         context.setArch(authInfo.getArch());
-
+        agentManager.addClientContextIndex(clientId, context);
         Message.AuthResponse authResponse = Message.AuthResponse.newBuilder().setCode(0)
                 .setConnectionId(context.getConnectionId())
                 .setClientId(clientId)
