@@ -39,7 +39,6 @@ public class AgentStateMachineConfig {
                 .on(AgentEvent.AUTH_SUCCESS)
                 .when(ctx -> true).perform(proxyInitAction);
 
-
         builder.externalTransition()
                 .from(AgentState.AUTHENTICATED)
                 .to(AgentState.AUTHENTICATED)

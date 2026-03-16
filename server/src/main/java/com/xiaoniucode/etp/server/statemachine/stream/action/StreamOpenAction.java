@@ -43,7 +43,7 @@ public class StreamOpenAction extends StreamBaseAction {
 
         frame.setMuxTunnel(config.isMuxTunnel());
         frame.setCompressed(context.isCompress());
-        frame.setEncrypted(config.isEncryptEnabled());
+        frame.setEncrypted(config.isEncrypt());
 
         control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {

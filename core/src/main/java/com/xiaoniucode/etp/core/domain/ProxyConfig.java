@@ -87,15 +87,15 @@ public class ProxyConfig {
     /**
      * 是否启用加密
      */
-    public boolean isEncryptEnabled() {
-        return transport != null  && transport.getEncrypt();
+    public boolean isEncrypt() {
+        return transport != null && Boolean.TRUE.equals(transport.getEncrypt());
     }
 
     /**
      * 是否启用压缩
      */
-    public boolean isCompressEnabled() {
-        return transport != null && transport.getCompress();
+    public boolean isCompress() {
+        return transport != null && Boolean.TRUE.equals(transport.getCompress());
     }
 
     public boolean hasAccessControl() {

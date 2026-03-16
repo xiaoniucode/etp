@@ -98,7 +98,6 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 ByteBuf payload = frame.getPayload();
                 int streamId = frame.getStreamId();
                 StreamManager.getStreamContext(streamId).ifPresent(streamContext -> {
-                    streamContext.fireEvent(StreamEvent.STREAM_DATA);
                     streamContext.relayToServer(payload);
                 });
                 break;

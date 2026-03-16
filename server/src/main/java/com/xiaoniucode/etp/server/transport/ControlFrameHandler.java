@@ -7,13 +7,11 @@ import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamConstants;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
-import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelContext;
-import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelEvent;
-import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelManager;
-import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelState;
+import com.xiaoniucode.etp.server.statemachine.tunnel.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
@@ -64,8 +62,8 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                             req.getTunnelId(),
                             ctx.channel(),
                             frame.isMuxTunnel());
-                    tunnelContext.setVariable("compress", frame.isCompressed());
-                    tunnelContext.setVariable("encrypt", frame.isEncrypted());
+                    tunnelContext.setVariable(TunnelConstants.COMPRESS, frame.isCompressed());
+                    tunnelContext.setVariable(TunnelConstants.ENCRYPT, frame.isEncrypted());
                     tunnelContext.fireEvent(TunnelEvent.CREATE);
                 } else {
                     ChannelUtils.closeOnFlush(ctx.channel());
@@ -85,8 +83,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 Message.StreamOpenResponse resp = ProtobufUtil.parseFrom(payload, Message.StreamOpenResponse.parser());
                 String tunnelId = resp.getTunnelId();
                 streamContext.setMux(frame.isMuxTunnel());
-                streamContext.setVariable("tunnelId", tunnelId);
-                streamContext.setVariable("connectionId", resp.getConnectionId());
+                streamContext.setVariable(StreamConstants.TUNNEL_ID, tunnelId);
                 streamContext.setCompress(frame.isCompressed());
                 streamContext.setEncrypt(frame.isEncrypted());
                 streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
@@ -95,14 +92,12 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 int streamId = frame.getStreamId();
                 ByteBuf payload = frame.getPayload().retain();
                 StreamContext streamContext = visitorManager.getStreamContext(streamId);
-                streamContext.fireEvent(StreamEvent.STREAM_DATA);
                 streamContext.sendPayloadToVisitor(payload);
-
             }
             case TMSP.MSG_PROXY_CREATE -> {
                 agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
                     Message.NewProxy newProxy = ProtobufUtil.parseFrom(frame.getPayload(), Message.NewProxy.parser());
-                    agentContext.setVariable("newProxy", newProxy);
+                    agentContext.setVariable(AgentConstants.NEWA_PROXY, newProxy);
                     agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
                 });
             }

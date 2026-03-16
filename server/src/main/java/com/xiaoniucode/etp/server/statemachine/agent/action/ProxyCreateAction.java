@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.proxy.ProxyManager;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentConstants;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
@@ -38,9 +39,10 @@ public class ProxyCreateAction extends AgentBaseAction {
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         Channel control = context.getControl();
         try {
-            Message.NewProxy proxy = context.getVariableAs("newProxy", Message.NewProxy.class);
+            Message.NewProxy proxy = context.getVariableAs(AgentConstants.NEWA_PROXY, Message.NewProxy.class);
             String clientId = context.getClientId();
             ProxyConfig config = buildProxyConfig(proxy);
+            logger.debug("{}", config);
             config.setClientId(clientId);
             config.setClientType(context.getClientType());
 
@@ -52,6 +54,8 @@ public class ProxyCreateAction extends AgentBaseAction {
         } catch (Exception e) {
             logger.error("代理配置注册失败", e);
             sendErrorMessage(e.getMessage(), control);
+        } finally {
+            context.removeVariable(AgentConstants.NEWA_PROXY);
         }
     }
 

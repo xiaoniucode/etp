@@ -4,10 +4,7 @@ import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
 import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
 import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.netty.TlsHandlerCleanup;
-import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
-import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
-import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
-import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
+import com.xiaoniucode.etp.server.statemachine.stream.*;
 import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelContext;
 import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelManager;
 import com.xiaoniucode.etp.server.transport.TlsContextHolder;
@@ -34,7 +31,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
-        String tunnelId = context.getVariableAs("tunnelId", String.class);
+        String tunnelId = context.getVariableAs(StreamConstants.TUNNEL_ID, String.class);
         Optional<TunnelContext> tc = tunnelManager.getTunnel(context.isMux(), tunnelId);
         if (tc.isPresent()) {
             Channel tunnel = tc.get().getTunnel();
@@ -54,7 +51,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         } else {
             context.fireEvent(StreamEvent.STREAM_OPEN_FAILURE);
         }
-        context.removeVariable("tunnelId");
+        context.removeVariable(StreamConstants.TUNNEL_ID);
     }
 
     private void handleDirectTunnel(StreamContext streamContext) {

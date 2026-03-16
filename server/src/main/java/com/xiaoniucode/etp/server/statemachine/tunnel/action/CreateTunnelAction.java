@@ -29,59 +29,66 @@ public class CreateTunnelAction extends TunnelBaseAction {
     protected DirectTunnelPoolManager directTunnelPoolManager;
     @Autowired
     protected MuxTunnelManager muxTunnelManager;
+
     @Override
     protected void doExecute(TunnelState from, TunnelState to, TunnelEvent event, TunnelContext context) {
-        logger.debug("开始建立隧道");
-        boolean compress = context.getVariableAs("compress", Boolean.class);
-        boolean encrypt = context.getVariableAs("encrypt", Boolean.class);
-        context.setCompress(compress);
-        context.setEncrypt(encrypt);
-        boolean isMuxTunnel = context.isMux();
-        Channel tunnel = context.getTunnel();
-        //只处理共享隧道，独立隧道打开流响应再处理
-        if (isMuxTunnel) {
-            ChannelPipeline tunnelPipeline = tunnel.pipeline();
-            if (!encrypt && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
-                TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
-            } else {
-               TlsContextHolder.get().ifPresent(sslContext -> {
-                   SslHandler sslHandler = sslContext.newHandler(tunnel.alloc());
-                   if (tunnelPipeline.get(NettyConstants.TLS_HANDLER) == null) {
-                       tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
-                       logger.debug("添加 TLS handler");
-                   } else {
-                       tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
-                       logger.debug("替换 TLS handler");
-                   }
-               });
+        try {
+            logger.debug("开始建立隧道");
+            boolean compress = context.getVariableAs(TunnelConstants.COMPRESS, Boolean.class);
+            boolean encrypt = context.getVariableAs(TunnelConstants.ENCRYPT, Boolean.class);
+            context.setCompress(compress);
+            context.setEncrypt(encrypt);
+            boolean isMuxTunnel = context.isMux();
+            Channel tunnel = context.getTunnel();
+            //只处理共享隧道，独立隧道打开流响应再处理
+            if (isMuxTunnel) {
+                ChannelPipeline tunnelPipeline = tunnel.pipeline();
+                if (!encrypt && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
+                    TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
+                } else {
+                    TlsContextHolder.get().ifPresent(sslContext -> {
+                        SslHandler sslHandler = sslContext.newHandler(tunnel.alloc());
+                        if (tunnelPipeline.get(NettyConstants.TLS_HANDLER) == null) {
+                            tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
+                            logger.debug("添加 TLS handler");
+                        } else {
+                            tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
+                            logger.debug("替换 TLS handler");
+                        }
+                    });
 
-            }
-            if (compress) {
-                tunnelPipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
-                tunnelPipeline.addLast(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
+                }
+                if (compress) {
+                    tunnelPipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
+                    tunnelPipeline.addLast(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
+                } else {
+                    if (tunnelPipeline.get(NettyConstants.SNAPPY_ENCODER) != null) {
+                        tunnelPipeline.remove(NettyConstants.SNAPPY_ENCODER);
+                    }
+                    if (tunnelPipeline.get(NettyConstants.SNAPPY_DECODER) != null) {
+                        tunnelPipeline.remove(NettyConstants.SNAPPY_DECODER);
+                    }
+                }
+                NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
+                context.setWriteQueue(writeQueue);
+                muxTunnelManager.add(context);
             } else {
-                if (tunnelPipeline.get(NettyConstants.SNAPPY_ENCODER) != null) {
-                    tunnelPipeline.remove(NettyConstants.SNAPPY_ENCODER);
-                }
-                if (tunnelPipeline.get(NettyConstants.SNAPPY_DECODER) != null) {
-                    tunnelPipeline.remove(NettyConstants.SNAPPY_DECODER);
-                }
+                directTunnelPoolManager.register(context);
             }
-            NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
-            context.setWriteQueue(writeQueue);
-            muxTunnelManager.add(context);
-        } else {
-            directTunnelPoolManager.register(context);
+            Channel control = context.getControl();
+            Message.TunnelCreateResponse resp = Message.TunnelCreateResponse.newBuilder()
+                    .setTunnelId(context.getTunnelId())
+                    .setCode(0)
+                    .setTunnelId(context.getTunnelId())
+                    .build();
+
+            ByteBuf payload = ProtobufUtil.toByteBuf(resp, control.alloc());
+            TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_TUNNEL_CREATE_RESP, payload);
+            control.writeAndFlush(frame);
+            context.fireEvent(TunnelEvent.CREATE_SUCCESS);
+        } finally {
+            context.removeVariable(TunnelConstants.COMPRESS);
+            context.removeVariable(TunnelConstants.ENCRYPT);
         }
-        Channel control = context.getControl();
-        Message.TunnelCreateResponse resp = Message.TunnelCreateResponse.newBuilder()
-                .setTunnelId(context.getTunnelId())
-                .setCode(0)
-                .setTunnelId(context.getTunnelId())
-                .build();
-        ByteBuf payload = ProtobufUtil.toByteBuf(resp, control.alloc());
-        TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_TUNNEL_CREATE_RESP, payload);
-        control.writeAndFlush(frame);
-        context.fireEvent(TunnelEvent.CREATE_SUCCESS);
     }
 }

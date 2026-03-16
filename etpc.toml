@@ -106,7 +106,7 @@ name = "web22"
 protocol = "http"
 customDomains = ["etp.domain2.com"]
 targets = [
-    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" }
+    { host = "127.0.0.1", port = 9998, weight = 70, name = "web-instance-1" }
 #    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 ]
 #[proxies.bandwidth] #带宽限制
@@ -139,10 +139,14 @@ targets = [
     { host = "127.0.0.1", port = 3306, weight = 70, name = "mysql-instance-1" },
     { host = "127.0.0.1", port = 3306, weight = 30, name = "mysql-instance-2" }
 ]
-[proxies.bandwidth] #带宽限制
-limit = "128k" #总带宽限制(可选)
-limitIn = "64k" #入口带宽限制(可选)
-limitOut = "64k" #出口带宽限制(可选)
+[proxies.transport]
+mux = false
+compress = false
+encrypt = false
+#[proxies.bandwidth] #带宽限制
+#limit = "128k" #总带宽限制(可选)
+#limitIn = "64k" #入口带宽限制(可选)
+#limitOut = "64k" #出口带宽限制(可选)
 [[proxies]]
 name = "redis"
 protocol = "tcp"
@@ -157,6 +161,16 @@ limitIn = "1M" #入口带宽限制(可选)
 limitOut = "1M" #出口带宽限制(可选)
 [proxies.loadbalance]
 strategy = "weight" # 策略：roundrobin/weight/random/leastconn
+
+[[proxies]]
+name = "postgre"
+protocol = "tcp"
+remotePort=5433
+enable = true
+targets = [
+    { host = "127.0.0.1", port = 5432, weight = 70, name = "web-instance-1" },
+    { host = "127.0.0.1", port = 5432, weight = 30, name = "web-instance-2" }
+]
 #日志
 [log]
 level = "debug"

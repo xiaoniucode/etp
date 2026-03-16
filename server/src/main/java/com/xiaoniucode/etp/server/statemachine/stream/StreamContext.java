@@ -66,7 +66,7 @@ public class StreamContext extends ProcessContextImpl {
                 visitor.close();
                 logger.debug("数据转发失败，目标服务：host={},port={}", currentTarget.getHost(), currentTarget.getPort());
             } else {
-                logger.debug("数据转发成功：streamId={}", streamId);
+                logger.debug("数据转发到隧道成功：streamId={}", streamId);
             }
         });
     }
@@ -79,7 +79,7 @@ public class StreamContext extends ProcessContextImpl {
                     visitor.close();
                     logger.error("数据转发失败");
                 } else {
-                    logger.debug("数据转发成功：streamId={}", streamId);
+                    logger.debug("数据转发到访问者成功：streamId={}", streamId);
                 }
                 //  ReferenceCountUtil.release(payload);
             });
