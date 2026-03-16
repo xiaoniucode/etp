@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.loadbalance;
 
 import com.xiaoniucode.etp.core.domain.LoadBalanceConfig;
 import com.xiaoniucode.etp.core.enums.LoadBalanceStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -9,6 +10,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class LoadBalancerFactory {
+    @Autowired
+    private LeastConnLoadBalancer leastConnLoadBalancer;
+
     /**
      * 获取负载均衡器，如果为空返回一个默认的
      */
@@ -21,7 +25,7 @@ public class LoadBalancerFactory {
         }
         return switch (strategy) {
             case RANDOM -> new RandomLoadBalancer();
-            case LEAST_CONN -> new LeastConnectionLoadBalancer();
+            case LEAST_CONN -> leastConnLoadBalancer;
             case WEIGHT -> new WeightRoundRobinLoadBalancer();
             default -> new RoundRobinLoadBalancer();
         };

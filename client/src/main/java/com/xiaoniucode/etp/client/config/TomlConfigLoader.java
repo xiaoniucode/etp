@@ -205,7 +205,7 @@ public class TomlConfigLoader implements ConfigSource {
                     proxyConfig.setBandwidth(bandwidthConfig);
                 }
                 //负载均衡配置
-                Toml loadBalance = proxyTable.getTable("load_balance");
+                Toml loadBalance = proxyTable.getTable("loadbalance");
                 if (loadBalance != null) {
                     LoadBalanceConfig loadBalanceConfig = new LoadBalanceConfig();
                     String strategy = loadBalance.getString("strategy");

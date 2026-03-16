@@ -90,8 +90,7 @@ public class TargetResolverAction extends StreamBaseAction {
         if (config.isLoadBalanceNeeded()) {
             LoadBalanceConfig loadBalanceConfig = config.getLoadBalance();
             LoadBalancer loadBalancer = loadBalancerFactory.getLoadBalancer(loadBalanceConfig);
-            context.setLoadBalancer(loadBalancer);
-            Target selected = loadBalancer.select(availableTargets);
+            Target selected = loadBalancer.select(config.getProxyId(), availableTargets);
             if (selected != null) {
                 logger.debug("负载均衡选择: {} -> {}:{}",
                         config.getName(), selected.getHost(), selected.getPort());

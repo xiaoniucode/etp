@@ -32,7 +32,6 @@ public class StreamContext extends ProcessContextImpl {
     private Channel visitor;
     private ProxyConfig proxyConfig;
     private String sourceAddress;
-    private LoadBalancer loadBalancer;
     private Target currentTarget;
     private StreamState state = StreamState.IDLE;
     private ProtocolType currentProtocol = ProtocolType.TCP;

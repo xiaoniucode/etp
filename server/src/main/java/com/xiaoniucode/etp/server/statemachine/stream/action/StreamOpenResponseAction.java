@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
 import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
 import com.xiaoniucode.etp.core.netty.NettyConstants;
 import com.xiaoniucode.etp.core.netty.TlsHandlerCleanup;
+import com.xiaoniucode.etp.server.loadbalance.LeastConnHooks;
 import com.xiaoniucode.etp.server.statemachine.stream.*;
 import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelContext;
 import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelManager;
@@ -28,7 +29,8 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     private final Logger logger = LoggerFactory.getLogger(StreamOpenResponseAction.class);
     @Autowired
     private TunnelManager tunnelManager;
-
+    @Autowired
+    private LeastConnHooks leastConnHooks;
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         String tunnelId = context.getVariableAs(StreamConstants.TUNNEL_ID, String.class);
@@ -45,11 +47,14 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             if (context.getCurrentProtocol().isHttp()) {
                 context.relayHttpFirstPackage(context.isMux());
             }
+            leastConnHooks.onStreamOpened(context);
             context.setWriteQueue(tc.get().getWriteQueue());
             Channel visitor = context.getVisitor();
             visitor.config().setOption(ChannelOption.AUTO_READ, true);
         } else {
+            // 打开失败也要收敛到 CLOSE，避免资源/计数泄漏
             context.fireEvent(StreamEvent.STREAM_OPEN_FAILURE);
+            context.fireEvent(StreamEvent.STREAM_CLOSE);
         }
         context.removeVariable(StreamConstants.TUNNEL_ID);
     }

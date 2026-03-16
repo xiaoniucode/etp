@@ -16,5 +16,5 @@ public interface LoadBalancer {
      * @param targets 可用的目标列表
      * @return 选中的目标，如果没有可用返回null
      */
-    Target select(List<Target> targets);
+    Target select(String proxyId,List<Target> targets);
 }
