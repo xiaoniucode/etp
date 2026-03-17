@@ -3,15 +3,18 @@ package com.xiaoniucode.etp.server.loadbalance;
 import com.xiaoniucode.etp.core.domain.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-
+@Component
 public class RoundRobinLoadBalancer implements LoadBalancer{
     private static final Logger logger = LoggerFactory.getLogger(RoundRobinLoadBalancer.class);
-    private final AtomicInteger currentIndex = new AtomicInteger(-1);
+    private final AtomicInteger currentIndex;
 
     public RoundRobinLoadBalancer() {
+        this.currentIndex = new AtomicInteger(new Random().nextInt(1000));
         logger.debug("创建轮询负载均衡器");
     }
 
@@ -22,10 +25,14 @@ public class RoundRobinLoadBalancer implements LoadBalancer{
             return null;
         }
 
-        int index = currentIndex.incrementAndGet() % targets.size();
-        if (index < 0) {
-            index = -index;
+        if (targets.size() == 1) {
+            Target selectedTarget = targets.getFirst();
+            logger.debug("只有一个目标服务器，直接选择 {}", selectedTarget);
+            return selectedTarget;
         }
+
+        int pos = currentIndex.incrementAndGet() & Integer.MAX_VALUE;
+        int index = pos % targets.size();
         Target selectedTarget = targets.get(index);
         logger.debug("轮询选择目标服务器 {}", selectedTarget);
         return selectedTarget;

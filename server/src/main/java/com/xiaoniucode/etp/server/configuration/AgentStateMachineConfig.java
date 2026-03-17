@@ -5,7 +5,7 @@ import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.action.AuthAction;
-import com.xiaoniucode.etp.server.statemachine.agent.action.AgentBaseAction;
+import com.xiaoniucode.etp.server.statemachine.agent.action.DisconnectAction;
 import com.xiaoniucode.etp.server.statemachine.agent.action.ProxyCreateAction;
 import com.xiaoniucode.etp.server.statemachine.agent.action.ProxyInitAction;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
@@ -22,6 +22,8 @@ public class AgentStateMachineConfig {
     private ProxyCreateAction proxyCreateAction;
     @Autowired
     private ProxyInitAction proxyInitAction;
+    @Autowired
+    private DisconnectAction disconnectAction;
 
     @Bean("agentStateMachine")
     public StateMachine<AgentState, AgentEvent, AgentContext> createStateMachine() {
@@ -35,17 +37,22 @@ public class AgentStateMachineConfig {
 
         builder.externalTransition()
                 .from(AgentState.AUTHENTICATING)
-                .to(AgentState.AUTHENTICATED)
+                .to(AgentState.ESTABLISHED)
                 .on(AgentEvent.AUTH_SUCCESS)
                 .when(ctx -> true).perform(proxyInitAction);
 
         builder.externalTransition()
-                .from(AgentState.AUTHENTICATED)
-                .to(AgentState.AUTHENTICATED)
+                .from(AgentState.ESTABLISHED)
+                .to(AgentState.ESTABLISHED)
                 .on(AgentEvent.PROXY_CREATE_REQUEST)
                 .when(ctx -> true)
                 .perform(proxyCreateAction);
-
+        builder.externalTransitions()
+                .fromAmong(AgentState.ESTABLISHED, AgentState.FAILED, AgentState.AUTHENTICATING)
+                .to(AgentState.DISCONNECTED)
+                .on(AgentEvent.DISCONNECT)
+                .when(ctx -> true)
+                .perform(disconnectAction);
         return builder.build("agent-state-machine");
     }
 }

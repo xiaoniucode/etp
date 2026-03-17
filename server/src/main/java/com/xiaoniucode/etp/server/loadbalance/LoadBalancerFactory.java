@@ -12,6 +12,12 @@ import org.springframework.stereotype.Component;
 public class LoadBalancerFactory {
     @Autowired
     private LeastConnLoadBalancer leastConnLoadBalancer;
+    @Autowired
+    private WeightRoundRobinLoadBalancer weightRoundRobinLoadBalancer;
+    @Autowired
+    private RandomLoadBalancer randomLoadBalancer;
+    @Autowired
+    private RoundRobinLoadBalancer roundRobinLoadBalancer;
 
     /**
      * 获取负载均衡器，如果为空返回一个默认的
@@ -24,10 +30,10 @@ public class LoadBalancerFactory {
             strategy = config.getStrategy();
         }
         return switch (strategy) {
-            case RANDOM -> new RandomLoadBalancer();
+            case RANDOM -> randomLoadBalancer;
             case LEAST_CONN -> leastConnLoadBalancer;
-            case WEIGHT -> new WeightRoundRobinLoadBalancer();
-            default -> new RoundRobinLoadBalancer();
+            case WEIGHT -> weightRoundRobinLoadBalancer;
+            case ROUND_ROBIN -> roundRobinLoadBalancer;
         };
     }
 }

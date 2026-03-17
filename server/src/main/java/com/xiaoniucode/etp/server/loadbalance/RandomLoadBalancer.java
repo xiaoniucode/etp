@@ -3,9 +3,11 @@ package com.xiaoniucode.etp.server.loadbalance;
 import com.xiaoniucode.etp.core.domain.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-
+import java.util.concurrent.ThreadLocalRandom;
+@Component
 public class RandomLoadBalancer implements LoadBalancer{
     private static final Logger logger = LoggerFactory.getLogger(RandomLoadBalancer.class);
 
@@ -19,7 +21,7 @@ public class RandomLoadBalancer implements LoadBalancer{
             logger.warn("目标服务器列表为空");
             return null;
         }
-        int index = (int) (Math.random() * targets.size());
+        int index = ThreadLocalRandom.current().nextInt(targets.size());
         Target selectedTarget = targets.get(index);
         logger.debug("随机选择目标服务器 {}", selectedTarget);
         return selectedTarget;

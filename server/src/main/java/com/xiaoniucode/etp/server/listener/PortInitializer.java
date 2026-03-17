@@ -39,14 +39,7 @@ public class PortInitializer implements EventListener<TunnelServerBindEvent> {
     @Override
     public void onEvent(TunnelServerBindEvent event) {
         try {
-            ProxyConfig proxyConfig = new ProxyConfig();
             Collection<ProxyConfig> configs = proxyManager.findAllTcpProxies();
-            portAcceptor.bindPort(8033);//todo
-            portAcceptor.bindPort(3307);//todo
-            portAcceptor.bindPort(8608);//todo
-            portAcceptor.bindPort(5202);//todo
-            portAcceptor.bindPort(5203);//todo
-            portAcceptor.bindPort(8035);//todo
             for (ProxyConfig proxy : configs) {
                 if (!proxy.isEnable()) {
                     continue;

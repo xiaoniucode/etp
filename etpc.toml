@@ -137,14 +137,14 @@ status = 1
 remotePort = 3309
 targets = [
     { host = "127.0.0.1", port = 3306, weight = 70, name = "mysql-instance-1" },
-    { host = "127.0.0.1", port = 3307, weight = 30, name = "mysql-instance-2" }
+    { host = "127.0.0.1", port = 3307, weight = 90, name = "mysql-instance-2" }
 ]
 [proxies.transport]
 mux = false
 compress = false
 encrypt = false
 [proxies.loadbalance]
-strategy = "leastconn" # 策略：roundrobin/weight/random/leastconn
+strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 
 #[proxies.bandwidth] #带宽限制
 #limit = "128k" #总带宽限制(可选)
@@ -163,7 +163,7 @@ limit = "2M" #总带宽限制(可选)
 limitIn = "1M" #入口带宽限制(可选)
 limitOut = "1M" #出口带宽限制(可选)
 [proxies.loadbalance]
-strategy = "weight" # 策略：roundrobin/weight/random/leastconn
+strategy = "random" # 策略：roundrobin/weight/random/leastconn
 
 [[proxies]]
 name = "postgre"

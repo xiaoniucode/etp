@@ -111,7 +111,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         logger.debug("控制隧道断开");
-        agentManager.getAgentContext(ctx.channel()).ifPresent(connCtx -> {
+        agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
 
         });
     }
