@@ -66,8 +66,17 @@ public class DefaultAppConfig implements AppConfig {
             return this;
         }
 
-        public Builder proxies(List<ProxyConfig> proxies) {
-            this.proxies = proxies;
+        public Builder addProxies(List<ProxyConfig> proxies) {
+            if (proxies != null) {
+                this.proxies.addAll(proxies);
+            }
+            return this;
+        }
+
+        public Builder addProxy(ProxyConfig proxyConfig) {
+            if (this.proxies != null) {
+                this.proxies.add(proxyConfig);
+            }
             return this;
         }
 

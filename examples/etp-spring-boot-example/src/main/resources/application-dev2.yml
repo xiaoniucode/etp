@@ -1,0 +1,17 @@
+etp:
+  client:
+    enable: true
+    server-addr: 127.0.0.1 # IP or domain
+    auth:
+      token: 5E793FAD27AA713D
+
+
+
+
+
+
+
+
+
+
+

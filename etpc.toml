@@ -66,6 +66,7 @@ caFile = "cert/openssl/ca.crt"
 #interval = 5 #检查间隔
 #timeout = 2 #连接超时
 #maxFail = 3
+#path="/health" #健康检查路径(HTTP协议)
 #
 #[proxies.transport]
 #mux = false
@@ -79,6 +80,7 @@ caFile = "cert/openssl/ca.crt"
 #deny = []
 #
 #[proxies.bandwidth]
+#enable= true
 #limit = "20M" #总带宽限制(可选) 20Mbps
 #limitIn = "2M" #入口带宽限制(可选)
 #limitOut = "2M" #出口带宽限制(可选)

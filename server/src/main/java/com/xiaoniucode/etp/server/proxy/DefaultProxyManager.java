@@ -60,11 +60,7 @@ public class DefaultProxyManager implements ProxyManager {
         newConfig.setProxyId(oldConfig.getProxyId());
         newConfig.setClientId(clientId);
 
-        delegate.onUpdate(oldConfig, newConfig);
-        //删除旧的
-        proxyStore.deleteById(oldConfig.getProxyId());
-        //添加
-        proxyStore.add(newConfig);
+        delegate.onUpdate(oldConfig,newConfig);
 
         //触发监听器通知
         listeners.forEach(listener -> listener.onUpdated(oldConfig, newConfig));

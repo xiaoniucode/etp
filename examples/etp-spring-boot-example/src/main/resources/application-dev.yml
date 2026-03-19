@@ -1,25 +1,58 @@
 etp:
   client:
     enable: true
-#    server-addr: 127.0.0.1
-#    server-port: 9527
-#    protocol: http
-#    local-ip: 127.0.0.1
+    server-addr: 127.0.0.1
+    server-port: 9527
+    auth:
+      token: 5E793FAD27AA713D
+      retry:
+        initial-delay: 1
+        max-delay: 20
+        max-retries: 5
+
     access-control:
+      enable: true
       allow:
         - localhost
         - 192.168.0.1
-      enable: true
+
       mode: allow
       deny:
-        - 127.0.0.2
-        - 127.0.0.3
-    auth:
-      token: 5E793FAD27AA713D
-#      retry:
-#        max-retries: 1
-#        max-delay: 10
-#        initial-delay: 2
+        - 127.0.0.1/32
+        - 127.0.0.3/34
+    bandwidth:
+      limit: 2M
+      limit-in: 1M
+      limit-out: 1M
+    basic-auth:
+      enable: true
+      users:
+        - user: admin
+          pass: 123
+        - user: guest
+          pass: 123
+    proxy:
+      protocol: http
+      local-ip: 127.0.0.1
+      auto-domain: true # http only
+      custom-domains: # http only
+        - example.com
+        - test.com
+      sub-domains: # http only
+        - api
+        - ui
+      remote-port: 8082 #tcp only
+    transport:
+      compress: true
+      encrypt: true
+      multiplex: true
+    tls:
+      enable: true
+      cert-file: classpath:certs/client.crt
+      key-file: classpath:certs/client.key
+      ca-file: classpath:certs/ca.crt
+      key-password: 123456
+
 
 
 

@@ -239,7 +239,7 @@ public class TomlConfigLoader implements ConfigSource {
                 }
                 proxyConfig.setTransport(transportConfig);
             }
-            builder.proxies(proxies);
+            builder.addProxies(proxies);
         }
 
         // 读取日志配置

@@ -2,24 +2,28 @@ package com.xiaoniucode.etp.autoconfigure;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.DefaultAppConfig;
+import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.TunnelClient;
+import com.xiaoniucode.etp.client.config.domain.RetryConfig;
+import com.xiaoniucode.etp.core.domain.AccessControlConfig;
+import com.xiaoniucode.etp.core.domain.BandwidthConfig;
+import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
+import com.xiaoniucode.etp.core.domain.DomainConfig;
+import com.xiaoniucode.etp.core.domain.HttpUser;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
+import com.xiaoniucode.etp.core.domain.TransportConfig;
+import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.ClientType;
-import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.core.env.Environment;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-/**
- * etp客户端启动、停止生命周期
- *
- * @author liuxin
- */
 public class EtpClientStartStopLifecycle implements SmartLifecycle {
     private final Logger logger = LoggerFactory.getLogger(EtpClientStartStopLifecycle.class);
     private final EtpClientProperties properties;
@@ -37,25 +41,95 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
 
     @Override
     public void start() {
+        String applicationName = environment.getProperty("spring.application.name");
+        int localPort = webServerPortListener.getActualPort();
+
+        ProxyProperties proxy = properties.getProxy();
+        AccessControlProperties accessControl = properties.getAccessControl();
+        BandwidthProperties bandwidth = properties.getBandwidth();
+        TransportProperties transport = properties.getTransport();
+        BasicAuthProperties basicAuth = properties.getBasicAuth();
+        TlsProperties tls = properties.getTls();
+        AuthProperties auth = properties.getAuth();
+
+        // 创建并配置 ProxyConfig
         ProxyConfig proxyConfig = new ProxyConfig();
-        proxyConfig.setName(environment.getProperty("spring.application.name"));
-        proxyConfig.setLocalIp(properties.getLocalIp());
-        proxyConfig.setProtocol(properties.getProtocol());
-        proxyConfig.setRemotePort(properties.getRemotePort());
-        proxyConfig.setLocalPort(webServerPortListener.getActualPort());
-        proxyConfig.setStatus(ProxyStatus.OPEN);
-        proxyConfig.setAccessControl(properties.getAccessControlConfig());
-        List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
-        proxies.add(proxyConfig);
+        proxyConfig.setName(applicationName);
+        proxyConfig.addTarget(new Target(proxy.getLocalIp(), localPort, 1, applicationName));
+        proxyConfig.setEnable(true);
+        proxyConfig.setProtocol(proxy.getProtocol());
+        proxyConfig.setRemotePort(proxy.getRemotePort());
+
+        // 配置访问控制
+        AccessControlConfig accessControlConfig = new AccessControlConfig(
+                accessControl.isEnable(),
+                AccessControlMode.valueOf(accessControl.getMode().name()),
+                accessControl.getAllow(),
+                accessControl.getDeny()
+        );
+        proxyConfig.setAccessControl(accessControlConfig);
+
+        // 配置带宽限制
+        BandwidthConfig bandwidthConfig = new BandwidthConfig(
+                bandwidth.getLimit(),
+                bandwidth.getLimitIn(),
+                bandwidth.getLimitOut()
+        );
+        proxyConfig.setBandwidth(bandwidthConfig);
+
+        // 配置域名信息
+        DomainConfig domainConfig = new DomainConfig();
+        domainConfig.setAutoDomain(proxy.getAutoDomain());
+        domainConfig.getCustomDomains().addAll(proxy.getCustomDomains());
+        domainConfig.getSubDomains().addAll(proxy.getSubDomains());
+        proxyConfig.setDomainInfo(domainConfig);
+
+        // 配置基础认证
+        if (basicAuth.isEnable() && !basicAuth.getUsers().isEmpty()) {
+            Set<HttpUser> users = basicAuth.getUsers().stream()
+                    .map(user -> new HttpUser(user.getUser(), user.getPass()))
+                    .collect(Collectors.toSet());
+            BasicAuthConfig basicAuthConfig = new BasicAuthConfig(basicAuth.isEnable(), users);
+            proxyConfig.setBasicAuth(basicAuthConfig);
+        }
+
+        // 配置传输
+        TransportConfig transportConfig = new TransportConfig(
+                transport.isMultiplex(),
+                transport.isEncrypt(),
+                transport.isCompress()
+        );
+        proxyConfig.setTransport(transportConfig);
+
+        // 配置TLS
+        TlsConfig tlsConfig = new TlsConfig(
+                tls.getEnable(),
+                tls.isTestMode()
+        );
+        tlsConfig.setCertFile(tls.getCertFile());
+        tlsConfig.setKeyFile(tls.getKeyFile());
+        tlsConfig.setCaFile(tls.getCaFile());
+        tlsConfig.setKeyPassword(tls.getKeyPassword());
+
+        // 配置认证
+        AuthConfig authConfig = new AuthConfig();
+        authConfig.setToken(auth.getToken());
+        RetryConfig retryConfig = new RetryConfig();
+        retryConfig.setInitialDelay(auth.getRetry().getInitialDelay());
+        retryConfig.setMaxDelay(auth.getRetry().getMaxDelay());
+        retryConfig.setMaxRetries(auth.getRetry().getMaxRetries());
+        authConfig.setRetry(retryConfig);
+        // 构建 AppConfig
         AppConfig config = new DefaultAppConfig
                 .Builder()
                 .serverAddr(properties.getServerAddr())
                 .serverPort(properties.getServerPort())
-                .clientType(ClientType.WEB_SESSION)
-                .tlsConfig(properties.getTls())
-                .authConfig(properties.getAuthConfig())
-                .proxies(proxies)
+                .clientType(ClientType.SESSION_CLINT)
+                .tlsConfig(tlsConfig)
+                .authConfig(authConfig)
+                .addProxy(proxyConfig)
                 .build();
+
         tunnelClient = new TunnelClient(config);
         tunnelClient.start();
         running = true;

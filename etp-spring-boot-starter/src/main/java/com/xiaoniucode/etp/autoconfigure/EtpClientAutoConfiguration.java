@@ -8,11 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-/**
- * etp客户端自动配置
- *
- * @author liuxin
- */
 @Configuration
 @ConditionalOnClass(SmartLifecycle.class)
 @ConditionalOnProperty(prefix = "etp.client", name = "enable", havingValue = "true", matchIfMissing = false)

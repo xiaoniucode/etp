@@ -190,7 +190,8 @@ public class ProxyCreateAction extends AgentBaseAction {
             Integer remotePort = config.getRemotePort();
             remoteAddr.append(serverAddr).append(":").append(remotePort);
         }
-        return Message.NewProxyResp.newBuilder().setProxyId(config.getProxyId())
+        return Message.NewProxyResp.newBuilder()
+                .setProxyId(config.getProxyId())
                 .setProxyName(config.getName())
                 .setRemoteAddr(remoteAddr.toString()).build();
     }
