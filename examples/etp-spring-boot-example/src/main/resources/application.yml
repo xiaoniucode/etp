@@ -2,6 +2,6 @@ server:
   port: 8084
 spring:
   profiles:
-    active: dev
+    active: dev2
   application:
     name: 订单服务

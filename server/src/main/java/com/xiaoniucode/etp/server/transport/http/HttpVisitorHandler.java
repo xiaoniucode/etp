@@ -34,22 +34,19 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (contextOpt.isPresent()) {
             StreamContext context = contextOpt.get();
             if (context.getState() == StreamState.OPENED) {
-                ByteBuf payload = buf.retain();
-                context.relayToTunnel(payload);
+                context.relayToTunnel(buf.retain());
             } else {
                 logger.error("隧道未开启，无法传输数据");
             }
-
         } else {
             logger.debug("[HTTP] 创建流上下文");
             buf.retain();
             visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(buf);
-            StreamContext streamContext = visitorManager.createStreamContext(visitor,stateMachine);
+            StreamContext streamContext = visitorManager.createStreamContext(visitor, stateMachine);
             streamContext.setCurrentProtocol(ProtocolType.HTTP);
             streamContext.fireEvent(StreamEvent.STREAM_OPEN);
         }
     }
-
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {

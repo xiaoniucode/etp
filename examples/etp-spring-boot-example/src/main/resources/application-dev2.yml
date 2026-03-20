@@ -4,8 +4,11 @@ etp:
     server-addr: 127.0.0.1 # IP or domain
     auth:
       token: 5E793FAD27AA713D
-
-
+    tls:
+      enable: false
+    transport:
+      multiplex: true
+      encrypt: false
 
 
 

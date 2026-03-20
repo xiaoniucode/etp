@@ -9,7 +9,7 @@ public class TransportProperties implements Serializable {
     /**
      * 是否启用多路复用隧道
      */
-    private boolean multiplex = false;
+    private boolean multiplex = true;
 
     /**
      * 是否启用压缩
@@ -19,5 +19,5 @@ public class TransportProperties implements Serializable {
     /**
      * 是否启用加密
      */
-    private boolean encrypt = false;
+    private boolean encrypt = true;
 }

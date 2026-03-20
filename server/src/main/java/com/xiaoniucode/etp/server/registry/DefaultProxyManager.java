@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class DefaultProxyManager implements ProxyManager {
+public class  DefaultProxyManager implements ProxyManager {
     private final UUIDGenerator uuidGenerator;
     private final List<ProxyConfigListener> listeners = new CopyOnWriteArrayList<>();
     private final ProxyStore proxyStore;
@@ -27,8 +27,6 @@ public class DefaultProxyManager implements ProxyManager {
             this.listeners.addAll(allCallbacks);
         }
     }
-
-
     @Override
     public synchronized ProxyConfig register(ProxyConfig config) throws EtpException {
         String clientId = config.getClientId();

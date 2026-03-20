@@ -22,6 +22,7 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.StringUtils;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -140,6 +141,9 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
 
     public String getAbsolutePath(String location) {
         try {
+            if (!StringUtils.hasText(location)){
+                return null;
+            }
             Resource resource = resourceLoader.getResource(location);
             return resource.getFile().getAbsolutePath();
         } catch (Exception e) {

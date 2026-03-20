@@ -92,7 +92,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 int streamId = frame.getStreamId();
                 ByteBuf payload = frame.getPayload().retain();
                 StreamContext streamContext = visitorManager.getStreamContext(streamId);
-                streamContext.sendPayloadToVisitor(payload);
+                streamContext.relayToVisitor(payload);
             }
             case TMSP.MSG_PROXY_CREATE -> {
                 agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {

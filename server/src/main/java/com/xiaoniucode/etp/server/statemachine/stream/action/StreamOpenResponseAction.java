@@ -1,19 +1,15 @@
 package com.xiaoniucode.etp.server.statemachine.stream.action;
 
-import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
-import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
-import com.xiaoniucode.etp.core.netty.NettyConstants;
-import com.xiaoniucode.etp.core.netty.TlsHandlerCleanup;
+import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.server.loadbalance.LeastConnHooks;
 import com.xiaoniucode.etp.server.statemachine.stream.*;
 import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelContext;
 import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelManager;
-import com.xiaoniucode.etp.server.transport.TlsContextHolder;
-import com.xiaoniucode.etp.server.transport.bridge.DirectBridgeFactory;
+import com.xiaoniucode.etp.server.transport.bridge.TunnelBridge;
+import com.xiaoniucode.etp.server.transport.bridge.TunnelBridgeFactory;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.handler.ssl.SslHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +27,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     private TunnelManager tunnelManager;
     @Autowired
     private LeastConnHooks leastConnHooks;
+
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         String tunnelId = context.getVariableAs(StreamConstants.TUNNEL_ID, String.class);
@@ -38,18 +35,21 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         if (tc.isPresent()) {
             Channel tunnel = tc.get().getTunnel();
             context.setTunnel(tunnel);
-            //处理独立隧道，协议转换，隧道桥接
-            handleDirectTunnel(context);
+            Channel visitor = context.getVisitor();
+            TunnelBridge tunnelBridge;
             if (context.isMux()) {
+                tunnelBridge = TunnelBridgeFactory.buildMux(context);
                 logger.debug("共享隧道建立成功: {}", context.getCurrentTarget());
-            }
-            //如果是 HTTP协议需要发送首次建立建立的时候读取到的第一个包
-            if (context.getCurrentProtocol().isHttp()) {
-                context.relayHttpFirstPackage(context.isMux());
+            } else {
+                logger.debug("独立隧道建立成功: {}", context.getCurrentTarget());
+                tunnelBridge = TunnelBridgeFactory.buildDirect(context);
             }
             leastConnHooks.onStreamOpened(context);
             context.setWriteQueue(tc.get().getWriteQueue());
-            Channel visitor = context.getVisitor();
+            //如果是 HTTP协议需要发送首次建立建立的时候读取到的第一个包
+            if (context.getCurrentProtocol().isHttp()) {
+                relayHttpFirstPackage(visitor, tunnelBridge);
+            }
             visitor.config().setOption(ChannelOption.AUTO_READ, true);
         } else {
             // 打开失败也要收敛到 CLOSE，避免资源/计数泄漏
@@ -59,64 +59,12 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         context.removeVariable(StreamConstants.TUNNEL_ID);
     }
 
-    private void handleDirectTunnel(StreamContext streamContext) {
-        //多路复用隧道不用额外处理，已经预先处理过了
-        if (streamContext.isMux()) {
-            return;
-        }
-        boolean encrypt = streamContext.isEncrypt();
-        boolean compress = streamContext.isCompress();
-
-        Channel tunnel = streamContext.getTunnel();
-        Channel visitor = streamContext.getVisitor();
-        ChannelPipeline tunnelPipeline = tunnel.pipeline();
-        ChannelPipeline visitorPipeline = visitor.pipeline();
-
-
-        String[] handlersToRemove = {
-                NettyConstants.TMSP_CODEC,
-                NettyConstants.CONTROL_FRAME_HANDLER
-        };
-
-        for (String handlerName : handlersToRemove) {
-            if (tunnelPipeline.get(handlerName) != null) {
-                tunnelPipeline.remove(handlerName);
-            }
-        }
-        if (visitorPipeline.get(NettyConstants.TCP_VISITOR_HANDLER) != null) {
-            visitorPipeline.remove(NettyConstants.TCP_VISITOR_HANDLER);
-        }
-        if (visitorPipeline.get(NettyConstants.HTTP_VISITOR_HANDLER) != null) {
-            visitorPipeline.remove(NettyConstants.HTTP_VISITOR_HANDLER);
-        }
-        if (!encrypt && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
-            TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
-        } else {
-            TlsContextHolder.get().ifPresent(sslContext -> {
-                SslHandler sslHandler = sslContext.newHandler(tunnel.alloc());
-                if (tunnelPipeline.get(NettyConstants.TLS_HANDLER) == null) {
-                    tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
-                    logger.debug("添加 TLS handler");
-                } else {
-                    tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
-                    logger.debug("替换 TLS handler");
-                }
-            });
-
-        }
-        if (compress) {
-            tunnelPipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
-            tunnelPipeline.addLast(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
-        } else {
-            if (tunnelPipeline.get(NettyConstants.SNAPPY_ENCODER) != null) {
-                tunnelPipeline.remove(NettyConstants.SNAPPY_ENCODER);
-            }
-            if (tunnelPipeline.get(NettyConstants.SNAPPY_DECODER) != null) {
-                tunnelPipeline.remove(NettyConstants.SNAPPY_DECODER);
-            }
-        }
-        //隧道桥接
-        DirectBridgeFactory.bridge(streamContext,visitor,tunnel,streamContext.getBandwidthLimiter());
-        logger.debug("独立隧道建立成功: {}", streamContext.getCurrentTarget());
+    /**
+     * 发送HTTP 协议首次缓存的第一个数据包
+     */
+    public void relayHttpFirstPackage(Channel visitor, TunnelBridge tunnelBridge) {
+        ByteBuf cached = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).get();
+        tunnelBridge.relayToTunnel(cached);
+        visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(null);
     }
 }

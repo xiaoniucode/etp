@@ -28,11 +28,12 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Autowired
     @Qualifier("streamStateMachine")
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         logger.debug("[TCP]收到访问者请求");
         Channel visitor = ctx.channel();
-        StreamContext streamContext = visitorManager.createStreamContext(visitor,stateMachine);
+        StreamContext streamContext = visitorManager.createStreamContext(visitor, stateMachine);
         streamContext.setCurrentProtocol(ProtocolType.TCP);
         streamContext.fireEvent(StreamEvent.STREAM_OPEN);
     }
@@ -43,10 +44,7 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Optional<StreamContext> contextOpt = visitorManager.getStreamContext(visitor);
         if (contextOpt.isPresent()) {
             StreamContext streamContext = contextOpt.get();
-            if (streamContext.getProxyConfig().isMuxTunnel()) {
-                ByteBuf payload = msg.retain();
-                streamContext.relayToTunnel(payload);
-            }
+            streamContext.relayToTunnel(msg.retain());
         } else {
             ctx.fireChannelRead(msg.retain());
         }
