@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.listener;
+package com.xiaoniucode.etp.server.web.listener;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.notify.EventBus;
@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
-import com.xiaoniucode.etp.server.proxy.ProxyManager;
+import com.xiaoniucode.etp.server.registry.ProxyManager;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

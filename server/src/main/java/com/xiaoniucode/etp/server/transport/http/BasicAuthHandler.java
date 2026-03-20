@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.transport.http;
 import com.xiaoniucode.etp.core.netty.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.proxy.ProxyManager;
+import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
 import com.xiaoniucode.etp.server.vhost.DomainManager;
 import io.netty.channel.Channel;

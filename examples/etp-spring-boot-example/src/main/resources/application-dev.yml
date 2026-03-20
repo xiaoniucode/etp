@@ -9,28 +9,29 @@ etp:
         initial-delay: 1
         max-delay: 20
         max-retries: 5
-#
-#    access-control:
-#      enable: true
-#      allow:
-#        - localhost
-#        - 192.168.0.1
-#
-#      mode: allow
-#      deny:
-#        - 127.0.0.1/32
-#        - 127.0.0.3/34
-#    bandwidth:
-#      limit: 2M
-#      limit-in: 1M
-#      limit-out: 1M
-#    basic-auth:
-#      enable: true
-#      users:
-#        - user: admin
-#          pass: 123
-#        - user: guest
-#          pass: 123
+
+    access-control:
+      enable: true
+      allow:
+        - localhost
+        - 127.0.0.1
+        - 192.168.0.1
+
+      mode: allow
+      deny:
+        - 127.0.0.2/32
+        - 127.0.0.3/34
+    bandwidth:
+      limit: 2M
+      limit-in: 1M
+      limit-out: 1M
+    basic-auth:
+      enable: true
+      users:
+        - user: admin
+          pass: 123
+        - user: guest
+          pass: 123
     proxy:
       protocol: tcp
       local-ip: 127.0.0.1
@@ -41,11 +42,11 @@ etp:
       sub-domains: # http only
         - api
         - ui
-#      remote-port: 8086 #tcp only
+    #      remote-port: 8086 #tcp only
     transport:
-      compress: true
-      encrypt: false
-      multiplex: true
+      compress: true # 压缩传输隧道，默认关闭
+      encrypt: false # 加密传输隧道，默认开启，采用测试模式证书，生产环境请使用自定义证书
+      multiplex: true # 多路复用传输隧道，默认开启
     tls:
       enable: false
       cert-file: classpath:certs/client.crt

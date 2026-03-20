@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.proxy.ProxyManager;
+import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;

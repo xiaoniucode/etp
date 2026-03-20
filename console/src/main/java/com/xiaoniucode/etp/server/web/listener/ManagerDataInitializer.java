@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.listener;
+package com.xiaoniucode.etp.server.web.listener;
 
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;

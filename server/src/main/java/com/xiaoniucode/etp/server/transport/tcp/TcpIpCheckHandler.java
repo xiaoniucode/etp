@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.transport.tcp;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.proxy.ProxyManager;
+import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.transport.IpCheckHandler;
 import com.xiaoniucode.etp.server.security.AccessControlManager;
 import io.netty.channel.Channel;

@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.server.proxy;
+package com.xiaoniucode.etp.server.registry;
 
 import com.xiaoniucode.etp.core.domain.DomainConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
