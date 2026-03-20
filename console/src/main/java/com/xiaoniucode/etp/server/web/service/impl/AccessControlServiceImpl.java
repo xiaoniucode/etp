@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
-import com.xiaoniucode.etp.server.manager.AccessControlManager;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.security.AccessControlManager;
+import com.xiaoniucode.etp.server.proxy.ProxyManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.accesscontrol.convert.AccessControlConvert;
 import com.xiaoniucode.etp.server.web.controller.accesscontrol.dto.AccessControlDTO;

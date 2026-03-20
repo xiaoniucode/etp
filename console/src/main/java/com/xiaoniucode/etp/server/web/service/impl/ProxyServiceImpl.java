@@ -7,14 +7,9 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
-import com.xiaoniucode.etp.server.manager.DomainManager;
-import com.xiaoniucode.etp.server.manager.PortManager;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.manager.domain.AutoDomainInfo;
-import com.xiaoniucode.etp.server.manager.domain.CustomDomainInfo;
-import com.xiaoniucode.etp.server.manager.domain.DomainInfo;
-import com.xiaoniucode.etp.server.manager.domain.SubDomainInfo;
-import com.xiaoniucode.etp.server.processor.ProxyConfigProcessorExecutor;
+import com.xiaoniucode.etp.server.vhost.DomainManager;
+import com.xiaoniucode.etp.server.port.PortManager;
+import com.xiaoniucode.etp.server.proxy.ProxyManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.client.response.ClientDTO;
 import com.xiaoniucode.etp.server.web.controller.proxy.convert.HttpProxyConvert;
@@ -36,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,16 +53,14 @@ public class ProxyServiceImpl implements ProxyService {
     private DomainManager domainManager;
     @Autowired
     private PortManager portManager;
-    @Autowired
-    private ProxyConfigProcessorExecutor processorExecutor;
-    @Autowired
-    private UUIDGenerator uuidGenerator;
+
 
     /**
      * 创建 TCP 代理
      */
     @Transactional(rollbackFor = Exception.class)
     public void createTcpProxy(TcpProxyCreateRequest request) {
+
         //检查是否开启了 TLS
         if (request.getEncrypt() && !appConfig.getTlsConfig().getEnable()) {
             throw new BizException("不支持隧道加密，未配置加密证书");
@@ -90,8 +82,9 @@ public class ProxyServiceImpl implements ProxyService {
         if (proxyRepository.findByClientIdAndName(clientId, request.getName()) != null) {
             throw new BizException("名称重复");
         }
+        ProxyConfig register = proxyManager.register(null);
+        String proxyId = register.getProxyId();
 
-        String proxyId = uuidGenerator.uuid32();
         Proxy newProxy = new Proxy();
         newProxy.setId(proxyId);
         newProxy.setClientId(request.getClientId());
@@ -105,14 +98,11 @@ public class ProxyServiceImpl implements ProxyService {
         newProxy.setEncrypt(request.getEncrypt());
         newProxy.setCompress(request.getCompress());
 
+
         proxyRepository.save(newProxy);
-        executeProxyCreation(clientId, buildTcpProxyConfig(newProxy));
+
     }
 
-
-    public void executeProxyCreation(String clientId, ProxyConfig config) {
-        proxyManager.addProxy(clientId, config, proxyConfig -> processorExecutor.execute(proxyConfig));
-    }
 
     /**
      * 创建 HTTP 代理
@@ -131,7 +121,8 @@ public class ProxyServiceImpl implements ProxyService {
         if (proxyRepository.findByClientIdAndName(clientId, request.getName()) != null) {
             throw new BizException("名称已经存在了，请更换一个");
         }
-        String proxyId = uuidGenerator.uuid32();
+        ProxyConfig register = proxyManager.register(null);
+        String proxyId = register.getProxyId();
         Proxy newProxy = new Proxy();
         newProxy.setId(proxyId);
         newProxy.setClientId(request.getClientId());
@@ -148,28 +139,28 @@ public class ProxyServiceImpl implements ProxyService {
         proxyRepository.save(newProxy);
 
         ProxyConfig proxyConfig = buildHttpProxyConfig(newProxy, request.getDomains());
-        proxyManager.addProxy(clientId, proxyConfig, config -> {
-            Set<DomainInfo> domains = domainManager.getDomains(config.getProxyId());
-            List<ProxyDomain> batch = domains.stream().map(domainInfo -> {
-                ProxyDomain proxyDomain = new ProxyDomain();
-                proxyDomain.setProxyId(proxyId);
-                if (domainInfo instanceof CustomDomainInfo customDomain) {
-                    proxyDomain.setDomain(customDomain.getFullDomain());
-                }
-                if (domainInfo instanceof SubDomainInfo subDomain) {
-                    proxyDomain.setBaseDomain(subDomain.getBaseDomain());
-                    proxyDomain.setDomain(subDomain.getSubDomain());
-                }
-                if (domainInfo instanceof AutoDomainInfo autoDomain) {
-                    proxyDomain.setBaseDomain(autoDomain.getBaseDomain());
-                    proxyDomain.setDomain(autoDomain.getPrefix());
-                }
-                return proxyDomain;
-            }).toList();
-            proxyDomainRepository.saveAllAndFlush(batch);
-
-            processorExecutor.execute(config);
-        });
+//        proxyManager.addProxy(clientId, proxyConfig, config -> {
+//            Set<DomainInfo> domains = domainManager.getDomains(config.getProxyId());
+//            List<ProxyDomain> batch = domains.stream().map(domainInfo -> {
+//                ProxyDomain proxyDomain = new ProxyDomain();
+//                proxyDomain.setProxyId(proxyId);
+//                if (domainInfo instanceof CustomDomainInfo customDomain) {
+//                    proxyDomain.setDomain(customDomain.getFullDomain());
+//                }
+//                if (domainInfo instanceof SubDomainInfo subDomain) {
+//                    proxyDomain.setBaseDomain(subDomain.getBaseDomain());
+//                    proxyDomain.setDomain(subDomain.getSubDomain());
+//                }
+//                if (domainInfo instanceof AutoDomainInfo autoDomain) {
+//                    proxyDomain.setBaseDomain(autoDomain.getBaseDomain());
+//                    proxyDomain.setDomain(autoDomain.getPrefix());
+//                }
+//                return proxyDomain;
+//            }).toList();
+//            proxyDomainRepository.saveAllAndFlush(batch);
+//
+//            processorExecutor.execute(config);
+//        });
 
     }
 
@@ -179,7 +170,7 @@ public class ProxyServiceImpl implements ProxyService {
         proxyConfig.setProxyId(proxy.getId());
 //        proxyConfig.setLocalIp(proxy.getLocalIp());todo
 //        proxyConfig.setLocalPort(proxy.getLocalPort());
-        proxyConfig.setStatus(proxy.getStatus());
+//        proxyConfig.setStatus(proxy.getStatus());
         proxyConfig.setProtocol(ProtocolType.TCP);
         proxyConfig.setRemotePort(proxy.getRemotePort());
 //        proxyConfig.setCompress(proxy.getCompress());
@@ -203,16 +194,16 @@ public class ProxyServiceImpl implements ProxyService {
 
         proxyRepository.save(existingProxy);
         ProxyConfig proxyConfig = buildTcpProxyConfig(existingProxy);
-        ProxyConfig oldProxyConfig = proxyManager.updateProxy(proxyConfig);
 
-        if (!Objects.equals(proxyConfig.getRemotePort(), oldProxyConfig.getRemotePort())) {
-            //处理旧的配置
-            oldProxyConfig.setStatus(ProxyStatus.DELETED);
-            processorExecutor.execute(oldProxyConfig);
-        } else if (proxyConfig.getStatus().isOpen()) {
-            //新配置端口变化，状态为开启状态
-            processorExecutor.execute(proxyConfig);
-        }
+//
+//        if (!Objects.equals(proxyConfig.getRemotePort(), oldProxyConfig.getRemotePort())) {
+//            //处理旧的配置
+//            oldProxyConfig.setStatus(ProxyStatus.DELETED);
+//            processorExecutor.execute(oldProxyConfig);
+//        } else if (proxyConfig.getStatus().isOpen()) {
+//            //新配置端口变化，状态为开启状态
+//            processorExecutor.execute(proxyConfig);
+//        }
     }
 
     @Override
@@ -233,31 +224,32 @@ public class ProxyServiceImpl implements ProxyService {
 
         proxyDomainRepository.deleteAll(proxyDomainRepository.findByProxyId(request.getId()));
 
-        ProxyConfig proxyConfig = buildHttpProxyConfig(existingProxy, request.getDomains());
-        proxyManager.updateProxy(proxyConfig, (newConfig, oldConfig) -> {
-            Set<DomainInfo> domains = domainManager.getDomains(newConfig.getProxyId());
-            List<ProxyDomain> batch = domains.stream().map(domainInfo -> {
-                ProxyDomain proxyDomain = new ProxyDomain();
-                proxyDomain.setProxyId(proxyId);
-                if (domainInfo instanceof CustomDomainInfo customDomain) {
-                    proxyDomain.setDomain(customDomain.getFullDomain());
-                }
-                if (domainInfo instanceof SubDomainInfo subDomain) {
-                    proxyDomain.setBaseDomain(subDomain.getBaseDomain());
-                    proxyDomain.setDomain(subDomain.getSubDomain());
-                }
-                if (domainInfo instanceof AutoDomainInfo autoDomain) {
-                    proxyDomain.setBaseDomain(autoDomain.getBaseDomain());
-                    proxyDomain.setDomain(autoDomain.getPrefix());
-                }
-                return proxyDomain;
-            }).toList();
+//        ProxyConfig proxyConfig = buildHttpProxyConfig(existingProxy, request.getDomains());
+//        proxyManager.updateProxy(proxyConfig, (newConfig, oldConfig) -> {
+//            Set<DomainInfo> domains = domainManager.getDomains(newConfig.getProxyId());
+//            List<ProxyDomain> batch = domains.stream().map(domainInfo -> {
+//                ProxyDomain proxyDomain = new ProxyDomain();
+//                proxyDomain.setProxyId(proxyId);
+//                if (domainInfo instanceof CustomDomainInfo customDomain) {
+//                    proxyDomain.setDomain(customDomain.getFullDomain());
+//                }
+//                if (domainInfo instanceof SubDomainInfo subDomain) {
+//                    proxyDomain.setBaseDomain(subDomain.getBaseDomain());
+//                    proxyDomain.setDomain(subDomain.getSubDomain());
+//                }
+//                if (domainInfo instanceof AutoDomainInfo autoDomain) {
+//                    proxyDomain.setBaseDomain(autoDomain.getBaseDomain());
+//                    proxyDomain.setDomain(autoDomain.getPrefix());
+//                }
+//                return proxyDomain;
+//            }).toList();
+//
+//            proxyDomainRepository.saveAllAndFlush(batch);
+////            oldConfig.setStatus(ProxyStatus.DELETED);
+//            processorExecutor.execute(oldConfig);
+//            processorExecutor.execute(newConfig);
 
-            proxyDomainRepository.saveAllAndFlush(batch);
-            oldConfig.setStatus(ProxyStatus.DELETED);
-            processorExecutor.execute(oldConfig);
-            processorExecutor.execute(newConfig);
-        });
+//        });
     }
 
     private ProxyConfig buildHttpProxyConfig(Proxy proxy, Set<String> domains) {
@@ -266,7 +258,7 @@ public class ProxyServiceImpl implements ProxyService {
         proxyConfig.setProxyId(proxy.getId());
 //        proxyConfig.setLocalIp(proxy.getLocalIp());todo
 //        proxyConfig.setLocalPort(proxy.getLocalPort());
-        proxyConfig.setStatus(proxy.getStatus());
+//        proxyConfig.setStatus(proxy.getStatus());
         proxyConfig.setProtocol(ProtocolType.HTTP);
         proxyConfig.setRemotePort(null);
 //        proxyConfig.setCompress(proxy.getCompress());
@@ -329,16 +321,13 @@ public class ProxyServiceImpl implements ProxyService {
      * 删除代理
      */
     @Transactional
-    public void deleteProxy(String proxyId) {
+    public void deleteProxy(String proxyId) throws Exception {
         if (!proxyRepository.existsById(proxyId)) {
             throw new BizException("代理不存在: " + proxyId);
         }
-        proxyDomainRepository.deleteAll(proxyDomainRepository.findByProxyId(proxyId));
-        proxyRepository.deleteById(proxyId);
-        proxyManager.removeProxyById(proxyId).ifPresent(c -> {
-            c.setStatus(ProxyStatus.DELETED);
-            processorExecutor.execute(c);
-        });
+        proxyManager.delete(proxyId);
+//        proxyDomainRepository.deleteAll(proxyDomainRepository.findByProxyId(proxyId));
+//        proxyRepository.deleteById(proxyId);
     }
 
     @Override
@@ -350,12 +339,12 @@ public class ProxyServiceImpl implements ProxyService {
         //删除域名信息
         proxyDomainRepository.deleteByProxyIdIn(proxyIds);
         //删除内存状态
-        for (String proxyId : proxyIds) {
-            proxyManager.removeProxyById(proxyId).ifPresent(c -> {
-                c.setStatus(ProxyStatus.DELETED);
-                processorExecutor.execute(c);
-            });
-        }
+//        for (String proxyId : proxyIds) {
+//            proxyManager.removeProxyById(proxyId).ifPresent(c -> {
+//                c.setStatus(ProxyStatus.DELETED);
+//                processorExecutor.execute(c);
+//            });
+//        }
     }
 
     @Override
@@ -365,9 +354,9 @@ public class ProxyServiceImpl implements ProxyService {
             ProxyStatus status = proxy.getStatus();
             proxy.setStatus(status.toggle());
             //更新内存状态
-            ProxyConfig proxyConfig = proxyManager.changeStatus(proxy.getId(), proxy.getStatus());
-            processorExecutor.execute(proxyConfig);
-            proxyRepository.saveAndFlush(proxy);
+//            ProxyConfig proxyConfig = proxyManager.changeStatus(proxy.getId(), proxy.getStatus());
+//            processorExecutor.execute(proxyConfig);
+//            proxyRepository.saveAndFlush(proxy);
         });
     }
 }

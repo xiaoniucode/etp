@@ -31,7 +31,7 @@ public interface ProxyService {
     /**
      * 删除代理
      */
-    void deleteProxy(String id);
+    void deleteProxy(String id) throws Exception;
 
     /**
      * 根据 ID 查询tcp代理

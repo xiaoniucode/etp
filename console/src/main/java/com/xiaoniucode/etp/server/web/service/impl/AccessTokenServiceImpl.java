@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
-import com.xiaoniucode.etp.server.manager.AccessTokenManager;
+import com.xiaoniucode.etp.server.security.AccessTokenManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.convert.AccessTokenConvert;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.CreateAccessTokenRequest;
