@@ -7,6 +7,7 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ResourceLoader;
 
 @Configuration
 @ConditionalOnClass(SmartLifecycle.class)
@@ -16,8 +17,8 @@ public class EtpClientAutoConfiguration {
     @Bean
     public SmartLifecycle etpClientLifecycle(Environment environment,
                                              WebServerPortListener webServerPortListener,
-                                             EtpClientProperties properties) {
-        return new EtpClientStartStopLifecycle(environment, webServerPortListener,properties);
+                                             EtpClientProperties properties, ResourceLoader resourceLoader) {
+        return new EtpClientStartStopLifecycle(environment, webServerPortListener,properties,resourceLoader);
     }
 
     @Bean

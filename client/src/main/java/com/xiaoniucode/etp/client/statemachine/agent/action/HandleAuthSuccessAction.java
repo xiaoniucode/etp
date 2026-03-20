@@ -139,12 +139,17 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
         //带宽限制
         if (config.hasBandwidthLimit()) {
             BandwidthConfig bandwidth = config.getBandwidth();
-            Message.Bandwidth bw = Message.Bandwidth.newBuilder()
-                    .setLimit(bandwidth.getLimit())
-                    .setLimitIn(bandwidth.getLimitIn())
-                    .setLimitOut(bandwidth.getLimitOut())
-                    .build();
-            newProxyBuilder.setBandwidth(bw);
+            Message.Bandwidth.Builder bw = Message.Bandwidth.newBuilder();
+            if (bandwidth.hasLimit()) {
+                bw.setLimit(bandwidth.getLimit());
+            }
+            if (bandwidth.hasInLimit()) {
+                bw.setLimitIn(bandwidth.getLimitIn());
+            }
+            if (bandwidth.hasOutLimit()) {
+                bw.setLimitOut(bandwidth.getLimitOut());
+            }
+            newProxyBuilder.setBandwidth(bw.build());
         }
         //负载均衡
         if (config.hasLoadBalance()) {

@@ -9,6 +9,7 @@ import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.CorruptedFrameException;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.util.ReferenceCountUtil;
 
 public class TMSPCodec {
     /**
@@ -39,33 +40,38 @@ public class TMSPCodec {
                 //数据包不足，等待下一次
                 return null;
             }
+            try {
+                int magic = byteBuf.readInt();
+                if (magic != TMSP.MAGIC) {
+                    throw new CorruptedFrameException("无效魔数: " + magic);
+                }
 
-            int magic = byteBuf.readInt();
-            if (magic != TMSP.MAGIC) {
-                // 释放无效帧
-                byteBuf.release();
-                throw new CorruptedFrameException("Invalid magic: " + magic);
-            }
-            byte version = byteBuf.readByte();
-            byte msgType = byteBuf.readByte();
-            int streamId = byteBuf.readInt();
-            byte flags = byteBuf.readByte();
-            TMSPFrame frame = new TMSPFrame(streamId, msgType);
-            frame.setMagic(magic);
-            frame.setVersion(version);
-            frame.setFlags(flags);
+                byte version = byteBuf.readByte();
+                byte msgType = byteBuf.readByte();
+                int streamId = byteBuf.readInt();
+                byte flags = byteBuf.readByte();
 
-            int length = byteBuf.readInt();
-            if (length < 0) {
-                byteBuf.release();
-                throw new CorruptedFrameException("Negative length: " + length);
+                TMSPFrame frame = new TMSPFrame(streamId, msgType);
+                frame.setMagic(magic);
+                frame.setVersion(version);
+                frame.setFlags(flags);
+
+                int length = byteBuf.readInt();
+                if (length < 0) {
+                    throw new CorruptedFrameException("负长度: " + length);
+                }
+                if (length > 0) {
+                    ByteBuf payload = byteBuf.readSlice(length);
+                    payload.retain();
+                    frame.setPayload(payload);
+                }
+                return frame;
+            } catch (Exception e) {
+                ReferenceCountUtil.release(byteBuf);
+                throw new CorruptedFrameException("Failed to decode frame: " + e.getMessage(), e);
+            }finally {
+                ReferenceCountUtil.safeRelease(byteBuf);
             }
-            if (length > 0) {
-                ByteBuf payload = byteBuf.readSlice(length);
-                payload.retain();
-                frame.setPayload(payload);
-            }
-            return frame;
         }
     }
 

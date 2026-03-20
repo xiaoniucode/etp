@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,12 +33,13 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
     private TunnelClient tunnelClient;
     private final Environment environment;
     private final WebServerPortListener webServerPortListener;
+    private final ResourceLoader resourceLoader;
 
-
-    public EtpClientStartStopLifecycle(Environment environment, WebServerPortListener webServerPortListener, EtpClientProperties properties) {
+    public EtpClientStartStopLifecycle(Environment environment, WebServerPortListener webServerPortListener, EtpClientProperties properties, ResourceLoader resourceLoader) {
         this.environment = environment;
         this.properties = properties;
         this.webServerPortListener = webServerPortListener;
+        this.resourceLoader = resourceLoader;
     }
 
     @Override
@@ -106,9 +109,9 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
                 tls.getEnable(),
                 tls.isTestMode()
         );
-        tlsConfig.setCertFile(tls.getCertFile());
-        tlsConfig.setKeyFile(tls.getKeyFile());
-        tlsConfig.setCaFile(tls.getCaFile());
+        tlsConfig.setCertFile(getAbsolutePath(tls.getCertFile()));
+        tlsConfig.setKeyFile(getAbsolutePath(tls.getKeyFile()));
+        tlsConfig.setCaFile(getAbsolutePath(tls.getCaFile()));
         tlsConfig.setKeyPassword(tls.getKeyPassword());
 
         // 配置认证
@@ -133,6 +136,15 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
         tunnelClient = new TunnelClient(config);
         tunnelClient.start();
         running = true;
+    }
+
+    public String getAbsolutePath(String location) {
+        try {
+            Resource resource = resourceLoader.getResource(location);
+            return resource.getFile().getAbsolutePath();
+        } catch (Exception e) {
+            throw new RuntimeException("无法加载 TLS 证书文件: " + location, e);
+        }
     }
 
     @Override

@@ -16,6 +16,8 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.util.ReferenceCountUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +73,7 @@ public class CreateTunnelPoolAction extends AgentBaseAction {
         Bootstrap bootstrap = agentContext.getControlBootstrap();
         AppConfig config = agentContext.getConfig();
 
-        TunnelContext tunnelContext = TunnelManager.createTunnelContext(agentContext,connectionId,isMux);
+        TunnelContext tunnelContext = TunnelManager.createTunnelContext(agentContext, connectionId, isMux);
         tunnelContext.setConnectionId(connectionId);
 
         bootstrap.connect(config.getServerAddr(), config.getServerPort()).addListener((ChannelFutureListener) future -> {
@@ -97,6 +99,7 @@ public class CreateTunnelPoolAction extends AgentBaseAction {
                     tunnelContext.setTunnel(tunnel);
                     tunnelContext.fireEvent(TunnelEvent.CONNECT);
                 } else {
+                    ReferenceCountUtil.release(payload);
                     tunnel.close();
                     tunnelContext.fireEvent(TunnelEvent.CLOSE);
                 }

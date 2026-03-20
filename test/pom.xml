@@ -15,8 +15,8 @@
         <etp.version>0.10.0</etp.version>
 
         <java.version>17</java.version>
-        <maven.test.skip>true</maven.test.skip>
-        <skipTests>true</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+        <skipTests>false</skipTests>
         <mysql-connector-j.version>8.0.33</mysql-connector-j.version>
         <lombok.version>1.18.42</lombok.version>
         <junit.version>4.13.2</junit.version>
@@ -44,6 +44,16 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.78.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.78.1</version>
+        </dependency>
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
@@ -65,6 +75,11 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.128.Final</version>
+        </dependency>
         <!-- ACME4J dependencies -->
         <dependency>
             <groupId>org.shredzone.acme4j</groupId>
@@ -76,16 +91,10 @@
             <artifactId>acme4j-utils</artifactId>
             <version>2.16</version>
         </dependency>
-        <!-- Bouncy Castle for PKCS#12 support -->
         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.78.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.78.1</version>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
