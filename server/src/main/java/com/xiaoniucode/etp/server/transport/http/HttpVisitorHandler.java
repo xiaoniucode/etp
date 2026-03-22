@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.transport.http;
 
 import com.alibaba.cola.statemachine.StateMachine;
-import com.xiaoniucode.etp.core.netty.AttributeKeys;
+import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
@@ -34,7 +34,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (contextOpt.isPresent()) {
             StreamContext context = contextOpt.get();
             if (context.getState() == StreamState.OPENED) {
-                context.relayToTunnel(buf.retain());
+                context.forwardToLocal(buf);
             } else {
                 logger.error("隧道未开启，无法传输数据");
             }

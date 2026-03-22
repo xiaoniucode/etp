@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.statemachine.tunnel;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
-import com.xiaoniucode.etp.core.netty.NettyBatchWriteQueue;
+import com.xiaoniucode.etp.core.transport.NettyBatchWriteQueue;
 import io.netty.channel.Channel;
 import lombok.*;
 

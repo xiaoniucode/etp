@@ -89,16 +89,15 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 streamContext.setVariable(StreamConstants.VISIT_INFO, visitorInfo);
                 streamContext.setCompress(frame.isCompressed());
                 streamContext.setEncrypt(frame.isEncrypted());
-                streamContext.setMuxTunnel(frame.isMuxTunnel());
+                streamContext.setMultiplex(frame.isMuxTunnel());
 
                 streamContext.fireEvent(StreamEvent.STREAM_OPEN);
                 break;
             }
             case TMSP.MSG_STREAM_DATA: {
-                ByteBuf payload = frame.getPayload();
                 int streamId = frame.getStreamId();
                 StreamManager.getStreamContext(streamId).ifPresent(streamContext -> {
-                    streamContext.relayToServer(payload);
+                    streamContext.forwardToLocal(frame.getPayload());
                 });
                 break;
             }

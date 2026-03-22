@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.client.statemachine.stream;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.core.netty.AttributeKeys;
+import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import io.netty.channel.Channel;
 import java.util.Map;
 import java.util.Optional;

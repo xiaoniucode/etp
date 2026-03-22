@@ -3,7 +3,9 @@ package com.xiaoniucode.etp.server.statemachine.agent;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
+import com.xiaoniucode.etp.core.transport.AbstractAgentContext;
 import io.netty.channel.Channel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -11,15 +13,14 @@ import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
-public class AgentContext extends ProcessContextImpl {
+@EqualsAndHashCode(callSuper = true)
+public class AgentContext extends AbstractAgentContext {
     private final Logger logger = LoggerFactory.getLogger(AgentContext.class);
     private AgentState state = AgentState.IDLE;
-    private Integer connectionId;
-    private Channel control;
+    private ClientType clientType;
     private String clientId;
     private String token;
     private String version;
-    private ClientType clientType;
     private String os;
     private String arch;
     private String name;

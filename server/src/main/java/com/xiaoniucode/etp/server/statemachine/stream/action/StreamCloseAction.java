@@ -29,7 +29,7 @@ public class StreamCloseAction extends StreamBaseAction {
         Channel visitor = context.getVisitor();
         leastConnHooks.onStreamClosed(context);
         ChannelUtils.closeOnFlush(visitor);
-        AgentContext agentContext = context.getAgentContext();
+        AgentContext agentContext = (AgentContext) context.getAgentContext();
         streamManager.removeStreamContext(streamId);
         if (agentContext != null) {
             Channel control = agentContext.getControl();

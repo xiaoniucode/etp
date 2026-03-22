@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.tunnel;
 
-import com.xiaoniucode.etp.core.netty.ProtocolFeature;
+import com.xiaoniucode.etp.core.transport.ProtocolFeature;
 import org.springframework.stereotype.Component;
 
 

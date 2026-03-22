@@ -42,12 +42,7 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
         Channel visitor = ctx.channel();
         Optional<StreamContext> contextOpt = visitorManager.getStreamContext(visitor);
-        if (contextOpt.isPresent()) {
-            StreamContext streamContext = contextOpt.get();
-            streamContext.relayToTunnel(msg.retain());
-        } else {
-            ctx.fireChannelRead(msg.retain());
-        }
+        contextOpt.ifPresent(streamContext -> streamContext.forwardToLocal(msg));
     }
 
     @Override

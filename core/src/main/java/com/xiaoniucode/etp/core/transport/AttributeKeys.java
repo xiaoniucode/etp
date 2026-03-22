@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.core.netty;
+package com.xiaoniucode.etp.core.transport;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import io.netty.buffer.ByteBuf;
@@ -9,7 +9,6 @@ import io.netty.util.AttributeKey;
  * @author liuxin
  */
 public class AttributeKeys {
-    public static final AttributeKey<String> SESSION_ID = AttributeKey.valueOf("etp.sessionId");
     public static final AttributeKey<Integer> CONNECTION_ID = AttributeKey.valueOf("etp.connection_id");
     public static final AttributeKey<Integer> STREAM_ID = AttributeKey.valueOf("etp.streamId");
     public static final AttributeKey<String> BASIC_AUTH_HEADER = AttributeKey.valueOf("etp.token");

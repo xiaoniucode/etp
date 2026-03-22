@@ -1,8 +1,8 @@
-package com.xiaoniucode.etp.server.transport.bridge;
+package com.xiaoniucode.etp.client.transport.bridge;
 
+import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.core.transport.CompressTunnelBridgeDecorator;
 import com.xiaoniucode.etp.core.transport.TunnelBridge;
-import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 
 public class TunnelBridgeFactory {
 
@@ -18,7 +18,6 @@ public class TunnelBridgeFactory {
     public static TunnelBridge buildMux(StreamContext ctx) {
         final TunnelBridge base = new MultiplexTunnelBridge(ctx);
         TunnelBridge bridge = base;
-        bridge = new RateLimitTunnelBridgeDecorator(bridge, ctx);
         return bridge;
     }
 }

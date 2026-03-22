@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.statemachine.stream.action;
 
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.core.netty.AttributeKeys;
+import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancerFactory;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
@@ -63,6 +63,8 @@ public class TargetResolverAction extends StreamBaseAction {
             if (bandwidth != null) {
                 context.setBandwidthLimiter(new BandwidthLimiter(bandwidth));
             }
+            context.setCompress(config.isCompress());
+            context.setEncrypt(config.isEncrypt());
             context.setCurrentTarget(selectedTarget);
             context.fireEvent(StreamEvent.TARGET_VALIDATED);
         } else {

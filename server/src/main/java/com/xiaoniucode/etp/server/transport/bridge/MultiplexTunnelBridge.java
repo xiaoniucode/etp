@@ -3,10 +3,13 @@ package com.xiaoniucode.etp.server.transport.bridge;
 import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.transport.TunnelBridge;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +26,8 @@ public class MultiplexTunnelBridge implements TunnelBridge {
     }
 
     @Override
-    public void relayToTunnel(ByteBuf payload) {
-        if (!streamContext.isMux()) {
+    public void forwardToLocal(ByteBuf payload) {
+        if (!streamContext.isMultiplex()) {
             payload.release();
             return;
         }
@@ -33,12 +36,15 @@ public class MultiplexTunnelBridge implements TunnelBridge {
             payload.release();
             return;
         }
+        ReferenceCountUtil.retain(payload);
         TMSPFrame frame = new TMSPFrame(streamContext.getStreamId(), TMSP.MSG_STREAM_DATA, payload);
-        tunnel.writeAndFlush(frame);
+        tunnel.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
+
+        });
     }
 
     @Override
-    public void relayToVisitor(ByteBuf payload) {
+    public void forwardToRemote(ByteBuf payload) {
         Channel visitor = streamContext.getVisitor();
         int streamId = streamContext.getStreamId();
         Target currentTarget = streamContext.getCurrentTarget();
@@ -48,7 +54,9 @@ public class MultiplexTunnelBridge implements TunnelBridge {
         if (visitor == null || !visitor.isActive()) {
             logger.debug("通道未激活，数据转发失败：streamId={}", streamId);
             payload.release();
+            return;
         }
+        ReferenceCountUtil.retain(payload);
         visitor.writeAndFlush(payload).addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {
                 visitor.close();

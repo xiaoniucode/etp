@@ -224,7 +224,7 @@ public class TomlConfigLoader implements ConfigSource {
                     Boolean compressV = transport.getBoolean("compress");
                     Boolean encryptV = transport.getBoolean("encrypt");
                     if (compressV != null) {
-                        transportConfig.setMux(compressV);
+                        transportConfig.setCompress(compressV);
                     }
                     if (encryptV != null) {
                         transportConfig.setEncrypt(encryptV);

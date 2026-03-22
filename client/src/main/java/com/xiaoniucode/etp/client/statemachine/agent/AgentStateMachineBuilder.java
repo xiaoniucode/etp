@@ -43,7 +43,6 @@ public class AgentStateMachineBuilder {
                     .from(AgentState.CONFIG_CHECKING)
                     .to(AgentState.SSL_INITIALIZING)
                     .on(AgentEvent.CONFIG_CHECKED)
-                    .when(AgentContext::isConfigValid)
                     .perform(initSslAction);
 
             // 连接尝试

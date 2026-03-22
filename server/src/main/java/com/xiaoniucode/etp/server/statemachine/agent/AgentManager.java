@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.statemachine.agent;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.common.utils.StringUtils;
-import com.xiaoniucode.etp.core.netty.AttributeKeys;
+import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.server.generator.ConnectionIdGenerator;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.core.netty;
+package com.xiaoniucode.etp.core.transport;
 
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
@@ -26,17 +26,17 @@ public class IdleCheckHandler extends IdleStateHandler {
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
         switch (evt.state()) {
             case WRITER_IDLE:
-                ctx.channel().writeAndFlush(new TMSPFrame(0, TMSP.MSG_PING));
+               ctx.channel().writeAndFlush(new TMSPFrame(0, TMSP.MSG_PING));
                 logger.debug("发送心跳包给 {}", ctx.channel().remoteAddress());
                 break;
 
             case READER_IDLE:
                 logger.warn("读空闲超时，即将关闭连接 {}", ctx.channel().remoteAddress());
-                ctx.channel().close();
+               //todo ctx.channel().close();
                 break;
             case ALL_IDLE:
                 logger.debug("读写空闲超时，即将关闭连接 {}", ctx.channel().remoteAddress());
-                ctx.channel().close();
+              //todo  ctx.channel().close();
                 break;
         }
 

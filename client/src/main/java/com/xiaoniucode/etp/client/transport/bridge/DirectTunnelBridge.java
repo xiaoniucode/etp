@@ -1,9 +1,9 @@
-package com.xiaoniucode.etp.server.transport.bridge;
+package com.xiaoniucode.etp.client.transport.bridge;
 
+import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.RawByteBufChannelHandler;
 import com.xiaoniucode.etp.core.transport.TunnelBridge;
-import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -15,13 +15,13 @@ import org.slf4j.LoggerFactory;
 public class DirectTunnelBridge implements TunnelBridge {
     private final Logger logger = LoggerFactory.getLogger(DirectTunnelBridge.class);
     private final StreamContext streamContext;
-    private final Channel visitor;
     private final Channel tunnel;
+    private final Channel server;
 
     public DirectTunnelBridge(StreamContext streamContext) {
         this.streamContext = streamContext;
-        this.visitor = streamContext.getVisitor();
         this.tunnel = streamContext.getTunnel();
+        this.server = streamContext.getServer();
     }
 
     @Override
@@ -36,11 +36,28 @@ public class DirectTunnelBridge implements TunnelBridge {
                 pipeline.remove(handlerName);
             }
         }
-        pipeline.addLast(new RawByteBufChannelHandler(streamContext, false));
+        pipeline.addLast(new RawByteBufChannelHandler(streamContext, true));
     }
 
     @Override
     public void forwardToLocal(ByteBuf payload) {
+        if (!server.isActive() || !server.isWritable()) {
+            ReferenceCountUtil.release(payload);
+            return;
+        }
+        ReferenceCountUtil.retain(payload);
+        server.writeAndFlush(payload).addListener((ChannelFutureListener) f -> {
+            if (f.isSuccess()) {
+                logger.debug("数据成功转发给服务");
+            } else {
+                logger.debug("数据转发给服务失败");
+            }
+           // ReferenceCountUtil.release(payload);
+        });
+    }
+
+    @Override
+    public void forwardToRemote(ByteBuf payload) {
         if (!tunnel.isActive() || !tunnel.isWritable()) {
             ReferenceCountUtil.release(payload);
             return;
@@ -48,28 +65,11 @@ public class DirectTunnelBridge implements TunnelBridge {
         ReferenceCountUtil.retain(payload);
         tunnel.writeAndFlush(payload).addListener((ChannelFutureListener) f -> {
             if (f.isSuccess()) {
-                logger.debug("数据转发到内网成功：streamId={}", streamContext.getStreamId());
+                logger.debug("数据成功转发到远程");
             } else {
-                logger.debug("数据转发到内网失败：streamId={}", streamContext.getStreamId());
+                logger.debug("数据转发到远程失败");
             }
-            // ReferenceCountUtil.release(payload);
-        });
-    }
-
-    @Override
-    public void forwardToRemote(ByteBuf payload) {
-        if (!visitor.isActive() || !visitor.isWritable()) {
-            ReferenceCountUtil.release(payload);
-            return;
-        }
-        ReferenceCountUtil.retain(payload);
-        visitor.writeAndFlush(payload).addListener((ChannelFutureListener) f -> {
-            if (f.isSuccess()) {
-                logger.debug("数据转发给访问者成功：streamId={}", streamContext.getStreamId());
-            } else {
-                logger.debug("数据转发给访问者失败：streamId={}", streamContext.getStreamId());
-            }
-            // ReferenceCountUtil.release(payload);
+           // ReferenceCountUtil.release(payload);
         });
     }
 }

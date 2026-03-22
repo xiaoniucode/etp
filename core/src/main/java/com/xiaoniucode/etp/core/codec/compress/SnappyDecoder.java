@@ -8,9 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * Snappy压缩解码器
- */
+
 public class SnappyDecoder extends SnappyFrameDecoder {
     private static final Logger logger = LoggerFactory.getLogger(SnappyDecoder.class);
 

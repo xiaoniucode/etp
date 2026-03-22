@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.statemachine.tunnel;
 
-import com.xiaoniucode.etp.core.netty.ProtocolFeature;
+import com.xiaoniucode.etp.core.transport.ProtocolFeature;
 
 import java.util.Map;
 import java.util.Optional;

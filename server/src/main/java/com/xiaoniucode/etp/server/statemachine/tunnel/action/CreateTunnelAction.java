@@ -5,18 +5,16 @@ import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
-import com.xiaoniucode.etp.core.netty.NettyConstants;
-import com.xiaoniucode.etp.core.netty.TlsHandlerCleanup;
+import com.xiaoniucode.etp.core.transport.NettyConstants;
+import com.xiaoniucode.etp.core.transport.TlsHandlerCleanup;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.statemachine.tunnel.*;
-import com.xiaoniucode.etp.core.netty.NettyBatchWriteQueue;
+import com.xiaoniucode.etp.core.transport.NettyBatchWriteQueue;
 import com.xiaoniucode.etp.server.transport.TlsContextHolder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
-import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +57,8 @@ public class CreateTunnelAction extends TunnelBaseAction {
 
                 }
                 if (compress) {
-                    tunnelPipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
-                    tunnelPipeline.addLast(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
+                    tunnelPipeline.addAfter(NettyConstants.CONTROL_FRAME_HANDLER,NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
+                    tunnelPipeline.addBefore(NettyConstants.TMSP_CODEC,NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
                 } else {
                     if (tunnelPipeline.get(NettyConstants.SNAPPY_ENCODER) != null) {
                         tunnelPipeline.remove(NettyConstants.SNAPPY_ENCODER);

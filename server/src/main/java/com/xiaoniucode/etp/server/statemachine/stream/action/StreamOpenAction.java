@@ -25,7 +25,7 @@ public class StreamOpenAction extends StreamBaseAction {
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         int streamId = context.getStreamId();
-        AgentContext agentContext = context.getAgentContext();
+        AgentContext agentContext =(AgentContext) context.getAgentContext();
         Channel control = agentContext.getControl();
         ProxyConfig config = context.getProxyConfig();
         if (!control.isActive()) {

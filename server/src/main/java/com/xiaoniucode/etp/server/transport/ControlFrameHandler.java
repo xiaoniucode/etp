@@ -82,7 +82,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 ByteBuf payload = frame.getPayload();
                 Message.StreamOpenResponse resp = ProtobufUtil.parseFrom(payload, Message.StreamOpenResponse.parser());
                 String tunnelId = resp.getTunnelId();
-                streamContext.setMux(frame.isMuxTunnel());
+                streamContext.setMultiplex(frame.isMuxTunnel());
                 streamContext.setVariable(StreamConstants.TUNNEL_ID, tunnelId);
                 streamContext.setCompress(frame.isCompressed());
                 streamContext.setEncrypt(frame.isEncrypted());
@@ -90,9 +90,8 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             }
             case TMSP.MSG_STREAM_DATA -> {
                 int streamId = frame.getStreamId();
-                ByteBuf payload = frame.getPayload().retain();
                 StreamContext streamContext = visitorManager.getStreamContext(streamId);
-                streamContext.relayToVisitor(payload);
+                streamContext.forwardToRemote(frame.getPayload());
             }
             case TMSP.MSG_PROXY_CREATE -> {
                 agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {

@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.core.netty;
+package com.xiaoniucode.etp.core.transport;
 
 public enum ProtocolFeature {
     PLAIN, COMPRESS, ENCRYPT, ENCRYPT_COMPRESS;

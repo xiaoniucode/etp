@@ -6,9 +6,7 @@ import io.netty.handler.codec.compression.SnappyFrameEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Snappy 压缩编码器
- */
+
 public class SnappyEncoder extends SnappyFrameEncoder {
     private static final Logger logger = LoggerFactory.getLogger(SnappyEncoder.class);
 

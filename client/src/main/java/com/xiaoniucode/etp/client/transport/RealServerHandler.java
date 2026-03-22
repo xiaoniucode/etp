@@ -26,15 +26,7 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         Channel visitor = ctx.channel();
         Optional<StreamContext> streamCtx = StreamManager.getStreamContext(visitor);
-        if (streamCtx.isPresent()) {
-            StreamContext streamContext = streamCtx.get();
-            if (streamContext.isMuxTunnel()) {
-                ByteBuf payload = msg.retain();
-                streamContext.relayToTunnel(payload);
-            }
-        } else {
-            ctx.fireChannelRead(msg.retain());
-        }
+        streamCtx.ifPresent(streamContext -> streamContext.forwardToRemote(msg));
     }
 
     @Override

@@ -1,5 +1,5 @@
 
-package com.xiaoniucode.etp.core.netty;
+package com.xiaoniucode.etp.core.transport;
 
 
 import java.util.LinkedList;

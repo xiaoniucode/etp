@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.metrics;
 
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
-import com.xiaoniucode.etp.core.netty.AttributeKeys;
+import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
 import com.xiaoniucode.etp.server.metrics.domain.Metrics;

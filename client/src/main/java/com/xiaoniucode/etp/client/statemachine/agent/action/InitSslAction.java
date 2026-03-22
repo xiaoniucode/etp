@@ -23,7 +23,6 @@ public class InitSslAction extends AgentBaseAction {
             ctx.getStateMachine().fireEvent(ctx.getState(), AgentEvent.SSL_INITIALIZED,ctx);
         } catch (Exception e) {
             logger.error("SSL 初始化失败", e);
-            ctx.setSslInitialized(false);
             ctx.getStateMachine().fireEvent(ctx.getState(), AgentEvent.STOP,ctx);
         }
     }

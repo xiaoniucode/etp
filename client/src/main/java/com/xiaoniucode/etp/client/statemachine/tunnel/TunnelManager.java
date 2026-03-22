@@ -4,7 +4,7 @@ import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.common.UUIDGenerator;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.stream.TunnelConfig;
-import com.xiaoniucode.etp.core.netty.ProtocolFeature;
+import com.xiaoniucode.etp.core.transport.ProtocolFeature;
 
 import java.util.Map;
 import java.util.Optional;

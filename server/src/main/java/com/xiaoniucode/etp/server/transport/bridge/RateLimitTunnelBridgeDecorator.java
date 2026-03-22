@@ -1,6 +1,8 @@
 package com.xiaoniucode.etp.server.transport.bridge;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.transport.AbstractTunnelBridgeDecorator;
+import com.xiaoniucode.etp.core.transport.TunnelBridge;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.transport.BandwidthLimiter;
@@ -10,21 +12,23 @@ import io.netty.channel.Channel;
 import io.netty.util.ReferenceCountUtil;
 
 public class RateLimitTunnelBridgeDecorator extends AbstractTunnelBridgeDecorator {
+    private final StreamContext streamContext;
 
     public RateLimitTunnelBridgeDecorator(TunnelBridge delegate, StreamContext streamContext) {
-        super(delegate, streamContext);
+        super(delegate);
+        this.streamContext = streamContext;
     }
 
     @Override
-    public void relayToTunnel(ByteBuf payload) {
+    public void forwardToLocal(ByteBuf payload) {
         BandwidthLimiter limiter = streamContext.getBandwidthLimiter();
         if (limiter == null) {
-            delegate.relayToTunnel(payload);
+            delegate.forwardToLocal(payload);
             return;
         }
 
         if (limiter.tryUpload(payload)) {
-            delegate.relayToTunnel(payload);
+            delegate.forwardToLocal(payload);
             return;
         }
 
@@ -44,15 +48,15 @@ public class RateLimitTunnelBridgeDecorator extends AbstractTunnelBridgeDecorato
     }
 
     @Override
-    public void relayToVisitor(ByteBuf payload) {
+    public void forwardToRemote(ByteBuf payload) {
         BandwidthLimiter limiter = streamContext.getBandwidthLimiter();
         if (limiter == null) {
-            delegate.relayToVisitor(payload);
+            delegate.forwardToRemote(payload);
             return;
         }
 
         if (limiter.tryDownload(payload)) {
-            delegate.relayToVisitor(payload);
+            delegate.forwardToRemote(payload);
             return;
         }
         try {

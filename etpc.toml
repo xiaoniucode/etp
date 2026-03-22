@@ -106,9 +106,9 @@ caFile = "cert/openssl/ca.crt"
 [[proxies]]
 name = "web22"
 protocol = "http"
-customDomains = ["etp.domain2.com"]
+customDomains = ["etp12.domain2.com"]
 targets = [
-    { host = "127.0.0.1", port = 9998, weight = 70, name = "web-instance-1" }
+    { host = "127.0.0.1", port = 3006, weight = 70, name = "web-instance-1" }
 #    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 ]
 #[proxies.bandwidth] #带宽限制
@@ -117,7 +117,7 @@ targets = [
 #limitOut = "2M" #出口带宽限制(可选)
 [proxies.transport]
 mux = true
-compress = false
+compress = true
 encrypt = false
 #[[proxies]]
 #name = "mysql"
@@ -139,11 +139,11 @@ status = 1
 remotePort = 3309
 targets = [
     { host = "127.0.0.1", port = 3306, weight = 70, name = "mysql-instance-1" },
-    { host = "127.0.0.1", port = 3307, weight = 90, name = "mysql-instance-2" }
+    { host = "127.0.0.1", port = 3306, weight = 90, name = "mysql-instance-2" }
 ]
 [proxies.transport]
 mux = false
-compress = false
+compress = true
 encrypt = false
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn

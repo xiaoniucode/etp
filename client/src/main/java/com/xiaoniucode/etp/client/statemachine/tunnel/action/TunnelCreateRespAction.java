@@ -5,9 +5,9 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.tunnel.*;
 import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
 import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
-import com.xiaoniucode.etp.core.netty.NettyBatchWriteQueue;
-import com.xiaoniucode.etp.core.netty.NettyConstants;
-import com.xiaoniucode.etp.core.netty.TlsHandlerCleanup;
+import com.xiaoniucode.etp.core.transport.NettyBatchWriteQueue;
+import com.xiaoniucode.etp.core.transport.NettyConstants;
+import com.xiaoniucode.etp.core.transport.TlsHandlerCleanup;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.ssl.SslContext;
@@ -40,8 +40,8 @@ public class TunnelCreateRespAction extends TunnelBaseAction {
                 }
             }
             if (compress) {
-                tunnelPipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
-                tunnelPipeline.addLast(NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
+                tunnelPipeline.addAfter(NettyConstants.CONTROL_FRAME_HANDLER,NettyConstants.SNAPPY_ENCODER, new SnappyEncoder());
+                tunnelPipeline.addBefore(NettyConstants.TMSP_CODEC,NettyConstants.SNAPPY_DECODER, new SnappyDecoder());
             } else {
                 if (tunnelPipeline.get(NettyConstants.SNAPPY_ENCODER) != null) {
                     tunnelPipeline.remove(NettyConstants.SNAPPY_ENCODER);
