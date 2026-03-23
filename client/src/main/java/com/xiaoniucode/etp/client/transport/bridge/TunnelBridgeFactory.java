@@ -9,7 +9,7 @@ public class TunnelBridgeFactory {
     public static TunnelBridge buildDirect(StreamContext ctx) {
         final TunnelBridge base = new DirectTunnelBridge(ctx);
         TunnelBridge bridge = base;
-        bridge = new CompressTunnelBridgeDecorator(bridge, ctx);
+//        bridge = new CompressTunnelBridgeDecorator(bridge, ctx);
 //        bridge = new TlsTunnelBridgeDecorator(bridge, ctx);
 //        bridge = new RateLimitTunnelBridgeDecorator(bridge, ctx);
         return bridge;

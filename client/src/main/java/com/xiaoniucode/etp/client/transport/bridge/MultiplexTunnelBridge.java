@@ -34,36 +34,38 @@ public class MultiplexTunnelBridge implements TunnelBridge {
             streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
-        ReferenceCountUtil.retain(payload);
-        server.writeAndFlush(payload).addListener((ChannelFutureListener) future -> {
+        server.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) future -> {
+            logger.debug("流 {} 引用计数为：{}", streamContext.getStreamId(), payload.refCnt());
+            ReferenceCountUtil.release(payload);
             if (!future.isSuccess()) {
                 server.close();
-                logger.debug("数据转发到内网失败");
+                logger.warn("数据转发到内网真实服务失败：streamId={}", streamId);
             } else {
-                logger.debug("数据转发到内网成功：streamId={}", streamId);
+                logger.debug("数据转发到内网真实服务成功：streamId={}", streamId);
             }
-           // ReferenceCountUtil.safeRelease(payload);
         });
     }
 
     @Override
     public void forwardToRemote(ByteBuf payload) {
         if (!streamContext.isMultiplex()) {
-            payload.release();
+            ReferenceCountUtil.release(payload);
             return;
         }
-        Channel tunnel = streamContext.getTunnel();
+        Channel tunnel = streamContext.getTunnelEntry().getChannel();
         if (tunnel == null) {
             payload.release();
             return;
         }
-        ReferenceCountUtil.retain(payload);
-        TMSPFrame frame = new TMSPFrame(streamContext.getStreamId(), TMSP.MSG_STREAM_DATA, payload);
+        TMSPFrame frame = new TMSPFrame(streamContext.getStreamId(), TMSP.MSG_STREAM_DATA, payload.retain());
         tunnel.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
+            logger.debug("流 {} 引用计数为：{}", streamContext.getStreamId(), payload.refCnt());
+            ReferenceCountUtil.release(payload);
+            int streamId = streamContext.getStreamId();
             if (!future.isSuccess()) {
-                logger.debug("数据转发给访问者失败");
+                logger.warn("数据转发到远程隧道失败: streamId={}", streamId);
             } else {
-                logger.debug("数据转发给访问者成功");
+                logger.debug("数据转发到远程隧道成功: streamId={}", streamId);
             }
         });
     }

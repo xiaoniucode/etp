@@ -33,7 +33,7 @@ public class AuthAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         Channel control = context.getControl();
-        Message.AuthInfo authInfo = context.getVariableAs(AgentConstants.AGENT_AUTH_INFO, Message.AuthInfo.class);
+        Message.AuthInfo authInfo = context.getAndRemoveAs(AgentConstants.AGENT_AUTH_INFO, Message.AuthInfo.class);
         String token = authInfo.getToken();
         boolean hasToken = accessTokenManager.hasToken(token);
         if (!hasToken) {
@@ -87,7 +87,6 @@ public class AuthAction extends AgentBaseAction {
         context.fireEvent(AgentEvent.AUTH_SUCCESS);
 
         control.writeAndFlush(authFrame);
-        context.removeVariable(AgentConstants.AGENT_AUTH_INFO);
         logger.debug("客户端认证成功：[客户端ID={}，版本号={}]", context.getClientId(), context.getVersion());
     }
 

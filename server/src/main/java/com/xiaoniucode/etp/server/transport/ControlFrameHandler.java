@@ -4,14 +4,12 @@ import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.transport.IntSet;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
-import com.xiaoniucode.etp.server.statemachine.stream.StreamConstants;
-import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
-import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
-import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
-import com.xiaoniucode.etp.server.statemachine.tunnel.*;
+import com.xiaoniucode.etp.server.statemachine.agent.command.TunnelCreateCmd;
+import com.xiaoniucode.etp.server.statemachine.stream.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
@@ -21,6 +19,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 控制隧道消息处理器
@@ -32,9 +31,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     @Autowired
     private AgentManager agentManager;
     @Autowired
-    private StreamManager visitorManager;
-    @Autowired
-    private TunnelManager tunnelManager;
+    private StreamManager streamManager;
 
     @Autowired
     @Qualifier("agentStateMachine")
@@ -56,15 +53,13 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 Optional<AgentContext> ag = agentManager.getAgentContext(frame.getStreamId());
                 if (ag.isPresent()) {
                     AgentContext agentContext = ag.get();
+                    Channel control = agentContext.getControl();
                     Message.TunnelCreateRequest req = ProtobufUtil.parseFrom(frame.getPayload(), Message.TunnelCreateRequest.parser());
-                    TunnelContext tunnelContext = tunnelManager.createContext(
-                            agentContext,
-                            req.getTunnelId(),
-                            ctx.channel(),
-                            frame.isMuxTunnel());
-                    tunnelContext.setVariable(TunnelConstants.COMPRESS, frame.isCompressed());
-                    tunnelContext.setVariable(TunnelConstants.ENCRYPT, frame.isEncrypted());
-                    tunnelContext.fireEvent(TunnelEvent.CREATE);
+                    TunnelCreateCmd cmd = new TunnelCreateCmd(ctx.channel(), frame.isEncrypted(), frame.isMuxTunnel(), req.getTunnelId());
+                    control.eventLoop().execute(() -> {
+                        agentContext.setVariable("tunnelCreateCmd", cmd);
+                        agentContext.fireEvent(AgentEvent.CREATE_TUNNEL);
+                    });
                 } else {
                     ChannelUtils.closeOnFlush(ctx.channel());
                 }
@@ -74,7 +69,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             case TMSP.MSG_STREAM_OPEN_RESP -> {
                 int streamId = frame.getStreamId();
 
-                StreamContext streamContext = visitorManager.getStreamContext(streamId);
+                StreamContext streamContext = streamManager.getStreamContext(streamId);
                 if (streamContext == null) {
                     logger.warn("流上下文不存在 - [streamId={}]", streamId);
                     return;
@@ -90,7 +85,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             }
             case TMSP.MSG_STREAM_DATA -> {
                 int streamId = frame.getStreamId();
-                StreamContext streamContext = visitorManager.getStreamContext(streamId);
+                StreamContext streamContext = streamManager.getStreamContext(streamId);
                 streamContext.forwardToRemote(frame.getPayload());
             }
             case TMSP.MSG_PROXY_CREATE -> {
@@ -121,5 +116,34 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         agentManager.getAgentContext(ctx.channel()).ifPresent(connCtx -> {
 
         });
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        Channel tunnel = ctx.channel();
+        boolean writable = tunnel.isWritable();
+        logger.warn("控制隧道可写性变化：{}", writable);
+        if (writable) {
+            //数据隧道恢复可写，恢复暂停的访问者读取
+            IntSet pausedStreamIds = streamManager.getPausedStreamIds(tunnel);
+            logger.debug("获取到 {} 条暂停流数量", pausedStreamIds.size());
+            if (!pausedStreamIds.isEmpty()) {
+                logger.debug("控制隧道恢复可写，恢复 {} 个访问者读取", pausedStreamIds.size());
+                pausedStreamIds.stream().forEach(streamId -> {
+                    StreamContext streamContext = streamManager.getStreamContext(streamId);
+                    if (streamContext != null) {
+                        Channel visitor = streamContext.getVisitor();
+                        if (visitor != null) {
+                            ctx.executor().schedule(() -> {
+                                visitor.config().setOption(ChannelOption.AUTO_READ, true);
+                                visitor.read();
+                                streamManager.removePausedStream(tunnel, streamId);
+                            }, 5, TimeUnit.MILLISECONDS);//延迟5ms，避免隧道在临界状态下来回切换，防止"乒乓效应"
+                        }
+                    }
+                });
+            }
+        }
+        super.channelWritabilityChanged(ctx);
     }
 }

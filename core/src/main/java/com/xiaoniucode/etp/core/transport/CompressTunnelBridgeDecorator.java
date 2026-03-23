@@ -18,10 +18,9 @@ package com.xiaoniucode.etp.core.transport;
 
 import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
 import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.compression.Lz4FrameDecoder;
-import io.netty.handler.codec.compression.Lz4FrameEncoder;
 
 public class CompressTunnelBridgeDecorator extends AbstractTunnelBridgeDecorator {
     private final AbstractStreamContext streamContext;
@@ -34,7 +33,7 @@ public class CompressTunnelBridgeDecorator extends AbstractTunnelBridgeDecorator
     public void open() {
         //Lz4FrameDecoder lz4FrameDecoder = new Lz4FrameDecoder();
        // Lz4FrameEncoder lz4FrameEncoder = new Lz4FrameEncoder();
-        Channel tunnel = streamContext.getTunnel();
+        Channel tunnel = streamContext.getTunnelEntry().getChannel();
         if (tunnel == null) {
             delegate.open();
             return;
@@ -60,5 +59,15 @@ public class CompressTunnelBridgeDecorator extends AbstractTunnelBridgeDecorator
         }
 
         delegate.open();
+    }
+
+    @Override
+    public void forwardToLocal(ByteBuf payload) {
+        super.forwardToLocal(payload);
+    }
+
+    @Override
+    public void forwardToRemote(ByteBuf payload) {
+        super.forwardToRemote(payload);
     }
 }

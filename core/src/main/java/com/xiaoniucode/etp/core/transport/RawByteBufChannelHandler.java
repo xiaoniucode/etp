@@ -29,11 +29,16 @@ public class RawByteBufChannelHandler extends SimpleChannelInboundHandler<ByteBu
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
         if (forwardToLocal){
             streamContext.forwardToLocal(msg);
         }else {
             streamContext.forwardToRemote(msg);
         }
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        super.channelWritabilityChanged(ctx);
     }
 }

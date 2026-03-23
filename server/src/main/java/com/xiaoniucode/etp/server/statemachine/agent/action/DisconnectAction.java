@@ -5,7 +5,6 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
-import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,6 @@ public class DisconnectAction extends AgentBaseAction {
     private final Logger logger = LoggerFactory.getLogger(DisconnectAction.class);
     @Autowired
     private AgentManager agentManager;
-    @Autowired
-    private TunnelManager tunnelManager;
     @Autowired
     private StreamManager streamManager;
 

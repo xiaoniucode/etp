@@ -6,12 +6,12 @@ import com.xiaoniucode.etp.client.statemachine.stream.StreamConstants;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
-import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelEvent;
-import com.xiaoniucode.etp.client.statemachine.tunnel.TunnelManager;
 import com.xiaoniucode.etp.core.codec.NewStreamCodec;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.transport.IntSet;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -59,7 +61,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 break;
             }
             case TMSP.MSG_GOAWAY: {
-
+                logger.debug("收到停止信号，准备停止客户端");
                 clientContext.fireEvent(AgentEvent.STOP);
                 break;
 
@@ -75,10 +77,15 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 ByteBuf payload = frame.getPayload();
                 Message.TunnelCreateResponse resp = ProtobufUtil.parseFrom(payload, Message.TunnelCreateResponse.parser());
                 String tunnelId = resp.getTunnelId();
-                TunnelManager.getTunnelContext(tunnelId).ifPresent(tunnelContext -> {
-                    tunnelContext.setVariable("tunnel_create_response", resp);
-                    tunnelContext.fireEvent(TunnelEvent.CREATE_RESPONSE);
+                clientContext.getControl().eventLoop().execute(() -> {
+                    clientContext.setVariable("tunnelId", tunnelId);
+                    clientContext.setVariable("compress", frame.isCompressed());
+                    clientContext.setVariable("encrypt", frame.isEncrypted());
+                    clientContext.setVariable("multiplex", frame.isMuxTunnel());
+                    clientContext.setVariable("tunnel_create_response", resp);
+                    clientContext.fireEvent(AgentEvent.CREATE_TUNNEL_POOL_RESP);
                 });
+
                 break;
             }
 
@@ -116,26 +123,24 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             clientContext.fireEvent(AgentEvent.RETRY);
         } else {
             logger.error("数据隧道断开：channel-{}", ctx.channel().id());
-            ctx.close();
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        Channel channel = ctx.channel();
         //控制隧道
-        if (ctx.channel() == clientContext.getControl()) {
+        if (channel == clientContext.getControl()) {
             if (isNetworkException(cause)) {
                 if (clientContext.getControl() == ctx.channel()) {
                     logger.error("控制隧道网络错误", cause);
                     clientContext.fireEvent(AgentEvent.NETWORK_ERROR);
                 }
-            } else {
-                clientContext.fireEvent(AgentEvent.STOP);
             }
         } else {
-            logger.error("数据隧道异常", cause);
+            logger.error("数据连接异常，关闭数据连接", cause);
             //数据隧道
-            ctx.close();
+            ChannelUtils.closeOnFlush(channel);
         }
     }
 
@@ -152,4 +157,40 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         }
         return false;
     }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        logger.warn("隧道可写性发生变化：{}", ctx.channel().isWritable());
+        Channel tunnel = ctx.channel();
+        if (tunnel == clientContext.getControl()) {
+            logger.warn("控制隧道可写性发生变化，暂不处理");
+            return;
+        }
+        boolean writable = tunnel.isWritable();
+        if (writable) {
+            //数据隧道恢复可写，恢复暂停的从服务器读取
+            IntSet pausedStreamIds = StreamManager.getPausedStreamIds(tunnel);
+            if (!pausedStreamIds.isEmpty()) {
+                logger.debug("控制隧道恢复可写，恢复 {} 个访问者读取", pausedStreamIds.size());
+                pausedStreamIds.stream().forEach(streamId -> {
+                    Optional<StreamContext> streamContextOpt = StreamManager.getStreamContext(streamId);
+                    if (streamContextOpt.isPresent()) {
+                        StreamContext streamContext = streamContextOpt.get();
+                        Channel server = streamContext.getServer();
+                        if (server != null) {
+                            ctx.executor().schedule(() -> {
+                                server.config().setOption(ChannelOption.AUTO_READ, true);
+                                server.read();
+                                StreamManager.removePausedStream(tunnel, streamId);
+                            }, 5, TimeUnit.MILLISECONDS);
+                        }
+                    }
+                });
+            }
+        }
+        super.channelWritabilityChanged(ctx);
+    }
 }
+
+
+

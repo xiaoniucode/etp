@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.transport.AbstractStreamContext;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.transport.BandwidthLimiter;
 import io.netty.channel.Channel;
 import lombok.EqualsAndHashCode;
@@ -22,6 +23,7 @@ public class StreamContext extends AbstractStreamContext {
     private Target currentTarget;
     private ProtocolType currentProtocol = ProtocolType.TCP;
     private BandwidthLimiter bandwidthLimiter;
+    private AgentContext agentContext;
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
 
     public StreamContext(int streamId, StateMachine<StreamState, StreamEvent, StreamContext> streamStateMachine) {

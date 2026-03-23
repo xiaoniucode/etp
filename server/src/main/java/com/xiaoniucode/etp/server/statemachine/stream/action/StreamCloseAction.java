@@ -9,6 +9,8 @@ import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
+import com.xiaoniucode.etp.server.transport.connection.DirectPool;
+import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,10 @@ public class StreamCloseAction extends StreamBaseAction {
     private StreamManager streamManager;
     @Autowired
     private LeastConnHooks leastConnHooks;
+    @Autowired
+    private DirectPool directPool;
+    @Autowired
+    private MultiplexPool multiplexPool;
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
@@ -29,7 +35,12 @@ public class StreamCloseAction extends StreamBaseAction {
         Channel visitor = context.getVisitor();
         leastConnHooks.onStreamClosed(context);
         ChannelUtils.closeOnFlush(visitor);
-        AgentContext agentContext = (AgentContext) context.getAgentContext();
+        AgentContext agentContext = context.getAgentContext();
+
+        if (!context.isMultiplex()) {
+            directPool.release(agentContext.getClientId(), context.getTunnelEntry());
+        }
+
         streamManager.removeStreamContext(streamId);
         if (agentContext != null) {
             Channel control = agentContext.getControl();

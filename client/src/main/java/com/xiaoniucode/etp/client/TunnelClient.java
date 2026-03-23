@@ -11,6 +11,8 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentStateMachineBuilder;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
+import com.xiaoniucode.etp.client.transport.connection.DirectPool;
+import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
@@ -20,6 +22,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslHandler;
 
 import org.slf4j.Logger;
@@ -63,32 +66,40 @@ public final class TunnelClient implements Lifecycle {
         clientContext = new AgentContext(config);
         clientContext.setTunnelClient(this);
         clientContext.setStateMachine(stateMachine);
+        clientContext.setDirectPool(new DirectPool());
+        clientContext.setMultiplexPool(new MultiplexPool());
         serverWorkBootstrap = NettyEventLoopFactory.eventLoopGroup();
         Bootstrap serverBootstrap = new Bootstrap()
                 .group(serverWorkBootstrap)
                 .channel(NettyEventLoopFactory.socketChannelClass())
                 .option(ChannelOption.SO_KEEPALIVE, true)
-                .option(ChannelOption.TCP_NODELAY, true);
-
+                .option(ChannelOption.TCP_NODELAY, true)
+//                .option(ChannelOption.SO_BACKLOG, 4096)
+//                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel sc) {
+                    }
+                });
         Bootstrap controlBootstrap = new Bootstrap();
         ControlFrameHandler controlTunnelHandler = new ControlFrameHandler(clientContext);
         controlWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
 
         controlBootstrap.group(controlWorkerGroup)
                 .channel(NettyEventLoopFactory.socketChannelClass())
-                .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(4 * 1024 * 1024, 64 * 1024 * 1024))
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+//                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+//                .option(ChannelOption.SO_BACKLOG, 4096)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
                         if (Boolean.TRUE.equals(config.getTlsConfig().getEnable()) && clientContext.getTlsContext() != null) {
-                            SslHandler sslHandler = clientContext.getTlsContext().newHandler(sc.alloc(),config.getServerAddr(), config.getServerPort());
+                            SslHandler sslHandler = clientContext.getTlsContext().newHandler(sc.alloc(), config.getServerAddr(), config.getServerPort());
                             sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
                         }
                         sc.pipeline()
-                                .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
+                                .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(2 * 1024 * 1024))
                                 .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);
                     }

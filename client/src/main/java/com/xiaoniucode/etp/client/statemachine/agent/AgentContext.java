@@ -3,6 +3,8 @@ package com.xiaoniucode.etp.client.statemachine.agent;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.TunnelClient;
 import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.transport.connection.DirectPool;
+import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
 import com.xiaoniucode.etp.core.transport.AbstractAgentContext;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
@@ -23,6 +25,8 @@ public class AgentContext extends AbstractAgentContext {
     private int retryCount;
     private boolean authenticated;
     private TunnelClient tunnelClient;
+    private DirectPool directPool;
+    private MultiplexPool multiplexPool;
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
 
     public AgentContext(AppConfig config) {

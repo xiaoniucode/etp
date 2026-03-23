@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.client.transport;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
+import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
@@ -23,10 +24,20 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-        Channel visitor = ctx.channel();
-        Optional<StreamContext> streamCtx = StreamManager.getStreamContext(visitor);
-        streamCtx.ifPresent(streamContext -> streamContext.forwardToRemote(msg));
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
+        Channel server = ctx.channel();
+        Optional<StreamContext> streamCtx = StreamManager.getStreamContext(server);
+        streamCtx.ifPresent(streamContext -> {
+                    TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
+                    Channel tunnel = tunnelEntry.getChannel();
+                    if (!tunnel.isWritable()) {
+                        logger.warn("数据无法转发到远程，流量过高，隧道不可写，暂停从服务读取，streamId={}", streamContext.getStreamId());
+                        server.config().setOption(ChannelOption.AUTO_READ, false);
+                        StreamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
+                    }
+                    streamContext.forwardToRemote(msg);
+                }
+        );
     }
 
     @Override
@@ -37,17 +48,14 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        logger.warn("服务端可写状态发生变化，当前状态：{}", ctx.channel().isWritable());
         Channel server = ctx.channel();
         StreamManager.getStreamContext(server).ifPresent(streamContext -> {
-            Channel tunnel = streamContext.getTunnel();
-            if (tunnel != null && tunnel.isActive()) {
-                boolean shouldRead = tunnel.isWritable();
+            Channel tunnel = streamContext.getTunnelEntry().getChannel();
+            if (tunnel != null) {
+                logger.warn("隧道流量过高，改变隧道的可读状态，无法写入服务器，当前隧道可写状态：{}", tunnel.isWritable());
+                boolean shouldRead = server.isWritable();
                 tunnel.config().setOption(ChannelOption.AUTO_READ, shouldRead);
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("真实服务 writability changed, streamId={}, tunnel writable={}, set AUTO_READ={}",
-                            streamContext.getStreamId(), tunnel.isWritable(), shouldRead);
-                }
             }
         });
         super.channelWritabilityChanged(ctx);
@@ -59,4 +67,5 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
         //server exe
         super.exceptionCaught(ctx, cause);
     }
+
 }

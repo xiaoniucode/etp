@@ -55,22 +55,15 @@ public class TMSPCodec {
                 frame.setMagic(magic);
                 frame.setVersion(version);
                 frame.setFlags(flags);
-
                 int length = byteBuf.readInt();
-                if (length < 0) {
-                    throw new CorruptedFrameException("负长度: " + length);
-                }
                 if (length > 0) {
                     ByteBuf payload = byteBuf.readSlice(length);
-                    payload.retain();
                     frame.setPayload(payload);
                 }
                 return frame;
             } catch (Exception e) {
                 ReferenceCountUtil.release(byteBuf);
-                throw new CorruptedFrameException("Failed to decode frame: " + e.getMessage(), e);
-            }finally {
-                ReferenceCountUtil.safeRelease(byteBuf);
+                throw e;
             }
         }
     }

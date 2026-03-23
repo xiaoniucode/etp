@@ -40,12 +40,10 @@ public class ProcessContextImpl implements ProcessContext {
         return variables.containsKey(name);
     }
 
-    @Override
-    public <T> T getVariableAs(String name, Class<T> clazz) {
-        Object value = getVariable(name);
-        return clazz.cast(value);
+    public <T> T getAndRemoveAs(String name, Class<T> clazz) {
+        Object value = variables.remove(name);
+        return value != null ? clazz.cast(value) : null;
     }
-
     @Override
     public <T> T getVariableAsSafe(String name, Class<T> clazz) {
         Object value = getVariable(name);

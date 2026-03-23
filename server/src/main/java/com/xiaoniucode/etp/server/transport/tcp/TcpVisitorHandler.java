@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.transport.tcp;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
@@ -42,7 +43,17 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
         Channel visitor = ctx.channel();
         Optional<StreamContext> contextOpt = visitorManager.getStreamContext(visitor);
-        contextOpt.ifPresent(streamContext -> streamContext.forwardToLocal(msg));
+        contextOpt.ifPresent(streamContext -> {
+                    TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
+                    Channel tunnel = tunnelEntry.getChannel();
+                    if (!tunnel.isWritable()) {
+                        logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
+                        visitor.config().setOption(ChannelOption.AUTO_READ, false);
+                        visitorManager.addPausedStreamId(tunnel, streamContext.getStreamId());
+                    }
+                    streamContext.forwardToLocal(msg);
+                }
+        );
     }
 
     @Override
@@ -57,10 +68,14 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel visitor = ctx.channel();
         visitorManager.getStreamContext(visitor).ifPresent(streamContext -> {
-            Channel tunnel = streamContext.getTunnel();
-            if (tunnel != null && tunnel.isActive()) {
+            Channel tunnel = streamContext.getTunnelEntry().getChannel();
+            if (tunnel != null) {
+                logger.warn("流量过高，触发背压");
                 boolean writable = visitor.isWritable();
                 tunnel.config().setOption(ChannelOption.AUTO_READ, writable);
+                if (writable) {
+                    tunnel.read();
+                }
             }
         });
         super.channelWritabilityChanged(ctx);

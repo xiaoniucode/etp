@@ -3,7 +3,6 @@ package com.xiaoniucode.etp.client.statemachine.stream;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.core.transport.AbstractStreamContext;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import lombok.AccessLevel;
 import lombok.Getter;

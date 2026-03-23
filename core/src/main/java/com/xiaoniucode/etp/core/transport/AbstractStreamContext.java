@@ -18,7 +18,6 @@ package com.xiaoniucode.etp.core.transport;
 
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,13 +25,12 @@ import lombok.Setter;
 @Setter
 public abstract class AbstractStreamContext extends ProcessContextImpl {
     protected int streamId;
-    protected Channel tunnel;
+    protected TunnelEntry tunnelEntry;
     protected boolean compress;
     protected boolean encrypt;
     protected boolean multiplex;
     protected AbstractAgentContext agentContext;
     protected TunnelBridge tunnelBridge;
-    protected NettyBatchWriteQueue writeQueue;
 
     public void forwardToRemote(ByteBuf payload) {
         if (tunnelBridge == null) {

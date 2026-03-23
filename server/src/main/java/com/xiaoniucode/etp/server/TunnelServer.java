@@ -15,11 +15,9 @@ import com.xiaoniucode.etp.server.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.server.transport.TlsContextHolder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.WriteBufferWaterMark;
+import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslContext;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -63,10 +61,14 @@ public class TunnelServer implements Lifecycle {
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(tunnelBossGroup, tunnelWorkerGroup)
-                    .option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(4 * 1024 * 1024, 64 * 1024 * 1024))
                     .option(ChannelOption.SO_KEEPALIVE, true)
                     .option(ChannelOption.TCP_NODELAY, true)
-                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+//                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+//                    .option(ChannelOption.SO_BACKLOG, 8192)
+//                    .childOption(ChannelOption.SO_SNDBUF, 16 * 1024 * 1024)   // 发送缓冲 16MB
+//                    .childOption(ChannelOption.SO_RCVBUF, 16 * 1024 * 1024)   // 接收缓冲 16MB
+                    .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
+                            new WriteBufferWaterMark(64 * 1024, 256 * 1024))
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override

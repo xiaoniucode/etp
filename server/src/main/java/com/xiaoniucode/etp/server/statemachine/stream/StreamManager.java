@@ -2,6 +2,8 @@ package com.xiaoniucode.etp.server.statemachine.stream;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
+import com.xiaoniucode.etp.core.transport.IntSet;
+import com.xiaoniucode.etp.core.transport.PausedStreamRegistry;
 import com.xiaoniucode.etp.server.generator.StreamIdGenerator;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -21,6 +23,7 @@ public class StreamManager {
      * streamId -->连接上下文
      */
     private final Map<Integer, StreamContext> visitors = new ConcurrentHashMap<>();
+    private final PausedStreamRegistry pausedStreamRegistry = new PausedStreamRegistry();
     @Autowired
     private StreamIdGenerator streamIdGenerator;
 
@@ -90,5 +93,17 @@ public class StreamManager {
 
     public void closeStreams(String domain) {
 
+    }
+
+    public void addPausedStreamId(Channel tunnel, int streamId) {
+        pausedStreamRegistry.addPausedStreamId(tunnel, streamId);
+    }
+
+    public IntSet getPausedStreamIds(Channel tunnel) {
+        return pausedStreamRegistry.getPausedStreamIds(tunnel);
+    }
+
+    public void removePausedStream(Channel tunnel, int streamId) {
+        pausedStreamRegistry.removePausedStream(tunnel, streamId);
     }
 }

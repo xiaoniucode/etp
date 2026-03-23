@@ -20,7 +20,7 @@ public class DirectTunnelBridge implements TunnelBridge {
 
     public DirectTunnelBridge(StreamContext streamContext) {
         this.streamContext = streamContext;
-        this.tunnel = streamContext.getTunnel();
+        this.tunnel = streamContext.getTunnelEntry().getChannel();
         this.server = streamContext.getServer();
     }
 
@@ -42,6 +42,7 @@ public class DirectTunnelBridge implements TunnelBridge {
     @Override
     public void forwardToLocal(ByteBuf payload) {
         if (!server.isActive() || !server.isWritable()) {
+            logger.error("服务器连接不可写，丢弃数据：streamId={}", streamContext.getStreamId());
             ReferenceCountUtil.release(payload);
             return;
         }
@@ -59,6 +60,7 @@ public class DirectTunnelBridge implements TunnelBridge {
     @Override
     public void forwardToRemote(ByteBuf payload) {
         if (!tunnel.isActive() || !tunnel.isWritable()) {
+            logger.error("隧道不可写，丢弃数据：streamId={}", streamContext.getStreamId());
             ReferenceCountUtil.release(payload);
             return;
         }

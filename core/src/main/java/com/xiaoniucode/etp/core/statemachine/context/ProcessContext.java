@@ -15,7 +15,5 @@ public interface ProcessContext {
 
     boolean hasVariable(String name);
 
-    <T> T getVariableAs(String name, Class<T> clazz);
-
     <T> T getVariableAsSafe(String name, Class<T> clazz);
 }

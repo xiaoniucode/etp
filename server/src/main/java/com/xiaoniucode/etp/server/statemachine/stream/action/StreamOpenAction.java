@@ -12,6 +12,7 @@ import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,7 @@ public class StreamOpenAction extends StreamBaseAction {
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         int streamId = context.getStreamId();
-        AgentContext agentContext =(AgentContext) context.getAgentContext();
+        AgentContext agentContext = context.getAgentContext();
         Channel control = agentContext.getControl();
         ProxyConfig config = context.getProxyConfig();
         if (!control.isActive()) {
@@ -46,8 +47,8 @@ public class StreamOpenAction extends StreamBaseAction {
         frame.setEncrypted(config.isEncrypt());
 
         control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
+            ReferenceCountUtil.release(buffer);
             if (!future.isSuccess()) {
-                buffer.release();
                 context.fireEvent(StreamEvent.STREAM_CLOSE);
             } else {
                 control.eventLoop().schedule(() -> {

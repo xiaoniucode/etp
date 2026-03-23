@@ -39,7 +39,7 @@ public class ProxyCreateAction extends AgentBaseAction {
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         Channel control = context.getControl();
         try {
-            Message.NewProxy proxy = context.getVariableAs(AgentConstants.NEWA_PROXY, Message.NewProxy.class);
+            Message.NewProxy proxy = context.getAndRemoveAs(AgentConstants.NEWA_PROXY, Message.NewProxy.class);
             String clientId = context.getClientId();
             ProxyConfig config = buildProxyConfig(proxy);
             logger.debug("{}", config);

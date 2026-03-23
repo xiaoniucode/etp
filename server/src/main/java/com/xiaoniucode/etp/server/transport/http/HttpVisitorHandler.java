@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.transport.http;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
@@ -32,9 +33,16 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Channel visitor = ctx.channel();
         Optional<StreamContext> contextOpt = visitorManager.getStreamContext(visitor);
         if (contextOpt.isPresent()) {
-            StreamContext context = contextOpt.get();
-            if (context.getState() == StreamState.OPENED) {
-                context.forwardToLocal(buf);
+            StreamContext streamContext = contextOpt.get();
+            if (streamContext.getState() == StreamState.OPENED) {
+                TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
+                Channel tunnel = tunnelEntry.getChannel();
+                if (!tunnel.isWritable()) {
+                    logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
+                    visitor.config().setOption(ChannelOption.AUTO_READ, false);
+                    visitorManager.addPausedStreamId(tunnel, streamContext.getStreamId());
+                }
+                streamContext.forwardToLocal(buf);
             } else {
                 logger.error("隧道未开启，无法传输数据");
             }
@@ -47,6 +55,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             streamContext.fireEvent(StreamEvent.STREAM_OPEN);
         }
     }
+
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
@@ -68,9 +77,14 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel visitor = ctx.channel();
         visitorManager.getStreamContext(visitor).ifPresent(streamContext -> {
-            Channel tunnel = streamContext.getTunnel();
+            Channel tunnel = streamContext.getTunnelEntry().getChannel();
             if (tunnel != null) {
-                tunnel.config().setOption(ChannelOption.AUTO_READ, visitor.isWritable());
+                logger.warn("流量过高，触发背压");
+                boolean writable = visitor.isWritable();
+                tunnel.config().setOption(ChannelOption.AUTO_READ, writable);
+                if (writable) {
+                    tunnel.read();
+                }
             }
         });
         super.channelWritabilityChanged(ctx);

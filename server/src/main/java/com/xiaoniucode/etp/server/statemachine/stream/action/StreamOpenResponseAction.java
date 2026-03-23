@@ -1,10 +1,12 @@
 package com.xiaoniucode.etp.server.statemachine.stream.action;
 
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
+import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.server.loadbalance.LeastConnHooks;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.stream.*;
-import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelContext;
-import com.xiaoniucode.etp.server.statemachine.tunnel.TunnelManager;
+import com.xiaoniucode.etp.server.transport.connection.DirectPool;
+import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
 import com.xiaoniucode.etp.core.transport.TunnelBridge;
 import com.xiaoniucode.etp.server.transport.bridge.TunnelBridgeFactory;
 import io.netty.buffer.ByteBuf;
@@ -15,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 /**
  * 流打开成功处理
  */
@@ -24,42 +24,41 @@ import java.util.Optional;
 public class StreamOpenResponseAction extends StreamBaseAction {
     private final Logger logger = LoggerFactory.getLogger(StreamOpenResponseAction.class);
     @Autowired
-    private TunnelManager tunnelManager;
+    private DirectPool directPool;
+    @Autowired
+    private MultiplexPool multiplexPool;
     @Autowired
     private LeastConnHooks leastConnHooks;
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
-        try {
-            String tunnelId = context.getVariableAs(StreamConstants.TUNNEL_ID, String.class);
-            Optional<TunnelContext> tc = tunnelManager.getTunnel(context.isMultiplex(), tunnelId);
-            if (tc.isPresent()) {
-                Channel tunnel = tc.get().getTunnel();
-                context.setTunnel(tunnel);
-                Channel visitor = context.getVisitor();
-                TunnelBridge tunnelBridge;
-                if (context.isMultiplex()) {
-                    tunnelBridge = TunnelBridgeFactory.buildMux(context);
-                    logger.debug("共享隧道建立成功: {}", context.getCurrentTarget());
-                } else {
-                    tunnelBridge = TunnelBridgeFactory.buildDirect(context);
-                    logger.debug("独立隧道建立成功: {}", context.getCurrentTarget());
-                }
-                tunnelBridge.open();
-                context.setTunnelBridge(tunnelBridge);
-                leastConnHooks.onStreamOpened(context);
-                context.setWriteQueue(tc.get().getWriteQueue());
-                //如果是 HTTP协议需要发送首次建立建立的时候读取到的第一个包
-                if (context.getCurrentProtocol().isHttp()) {
-                    relayHttpFirstPackage(visitor, tunnelBridge);
-                }
-                visitor.config().setOption(ChannelOption.AUTO_READ, true);
-            } else {
-                context.fireEvent(StreamEvent.STREAM_CLOSE);
-            }
-        } finally {
-            context.removeVariable(StreamConstants.TUNNEL_ID);
+        String tunnelId = context.getAndRemoveAs(StreamConstants.TUNNEL_ID, String.class);
+        AgentContext agentContext = context.getAgentContext();
+        String clientId = agentContext.getClientId();
+        TunnelEntry tunnelEntry;
+        if (context.isMultiplex()) {
+            tunnelEntry = multiplexPool.acquire(clientId, context.isEncrypt());
+        } else {
+            tunnelEntry = directPool.borrow(clientId, tunnelId);
         }
+        context.setTunnelEntry(tunnelEntry);
+        Channel visitor = context.getVisitor();
+        TunnelBridge tunnelBridge;
+        if (context.isMultiplex()) {
+            tunnelBridge = TunnelBridgeFactory.buildMux(context);
+            logger.debug("共享隧道建立成功: {}", context.getCurrentTarget());
+        } else {
+            tunnelBridge = TunnelBridgeFactory.buildDirect(context);
+            logger.debug("独立隧道建立成功: {}", context.getCurrentTarget());
+        }
+        tunnelBridge.open();
+        context.setTunnelBridge(tunnelBridge);
+        leastConnHooks.onStreamOpened(context);
+        //如果是 HTTP协议需要发送首次建立建立的时候读取到的第一个包
+        if (context.getCurrentProtocol().isHttp()) {
+            relayHttpFirstPackage(visitor, tunnelBridge);
+        }
+        visitor.config().setOption(ChannelOption.AUTO_READ, true);
     }
 
     /**

@@ -51,6 +51,7 @@ public class TargetResolverAction extends StreamBaseAction {
 
         Optional<AgentContext> gentContextOpt = agentManager.getAgentContextByProxyId(config.getProxyId());
         if (gentContextOpt.isPresent()) {
+            context.setAgentContext(gentContextOpt.get());
             context.setProxyConfig(config);
             context.setAgentContext(gentContextOpt.get());
             Target selectedTarget = selectTarget(config, context);

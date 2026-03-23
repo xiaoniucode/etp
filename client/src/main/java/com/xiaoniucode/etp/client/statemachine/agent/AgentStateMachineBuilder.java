@@ -30,6 +30,7 @@ public class AgentStateMachineBuilder {
             AuthAction handleConnectSuccessAction = new AuthAction();
             CreateTunnelPoolAction createTunnelPoolAction = new CreateTunnelPoolAction();
             StopAction stopAction = new StopAction();
+            TunnelCreateRespAction tunnelCreateRespAction = new TunnelCreateRespAction();
             // 配置检查
             builder.externalTransition()
                     .from(AgentState.IDLE)
@@ -90,6 +91,13 @@ public class AgentStateMachineBuilder {
                     .on(AgentEvent.CREATE_TUNNEL_POOL)
                     .when(context -> true)
                     .perform(createTunnelPoolAction);
+            builder.externalTransition()
+                    .from(AgentState.CONNECTED)
+                    .to(AgentState.CONNECTED)
+                    .on(AgentEvent.CREATE_TUNNEL_POOL_RESP)
+                    .when(context -> true)
+                    .perform(tunnelCreateRespAction);
+
 
             // 认证失败
             builder.externalTransition()

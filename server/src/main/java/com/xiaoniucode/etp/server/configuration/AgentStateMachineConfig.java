@@ -4,10 +4,7 @@ import com.alibaba.cola.statemachine.StateMachine;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.server.statemachine.agent.action.AuthAction;
-import com.xiaoniucode.etp.server.statemachine.agent.action.DisconnectAction;
-import com.xiaoniucode.etp.server.statemachine.agent.action.ProxyCreateAction;
-import com.xiaoniucode.etp.server.statemachine.agent.action.ProxyInitAction;
+import com.xiaoniucode.etp.server.statemachine.agent.action.*;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +21,8 @@ public class AgentStateMachineConfig {
     private ProxyInitAction proxyInitAction;
     @Autowired
     private DisconnectAction disconnectAction;
+    @Autowired
+    private CreateTunnelAction createTunnelAction;
 
     @Bean("agentStateMachine")
     public StateMachine<AgentState, AgentEvent, AgentContext> createStateMachine() {
@@ -47,6 +46,12 @@ public class AgentStateMachineConfig {
                 .on(AgentEvent.PROXY_CREATE_REQUEST)
                 .when(ctx -> true)
                 .perform(proxyCreateAction);
+        builder.externalTransition()
+                .from(AgentState.ESTABLISHED)
+                .to(AgentState.ESTABLISHED)
+                .on(AgentEvent.CREATE_TUNNEL)
+                .when(ctx -> true)
+                .perform(createTunnelAction);
         builder.externalTransitions()
                 .fromAmong(AgentState.ESTABLISHED, AgentState.FAILED, AgentState.AUTHENTICATING)
                 .to(AgentState.DISCONNECTED)
