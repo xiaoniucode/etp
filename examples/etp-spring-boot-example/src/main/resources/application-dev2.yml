@@ -2,18 +2,20 @@ etp:
   client:
     enable: true
     server-addr: 127.0.0.1 # IP or domain
+    proxy:
+      custom-domains: test.domain1.com
     auth:
       token: 5E793FAD27AA713D
     tls:
       enable: false
     transport:
-      multiplex: false
+      multiplex: true
       encrypt: false
       compress: false
     bandwidth:
-      limit: 2M
-      limit-in: 1M
-      limit-out: 1M
+      limit: 10M
+#      limit-in: 1M
+#      limit-out: 1M
 
 
 

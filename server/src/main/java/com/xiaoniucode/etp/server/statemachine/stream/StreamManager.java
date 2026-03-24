@@ -1,10 +1,12 @@
 package com.xiaoniucode.etp.server.statemachine.stream;
 
 import com.alibaba.cola.statemachine.StateMachine;
+import com.xiaoniucode.etp.core.domain.BandwidthConfig;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.transport.IntSet;
 import com.xiaoniucode.etp.core.transport.PausedStreamRegistry;
 import com.xiaoniucode.etp.server.generator.StreamIdGenerator;
+import com.xiaoniucode.etp.server.transport.BandwidthLimiter;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class StreamManager {
@@ -24,6 +27,14 @@ public class StreamManager {
      */
     private final Map<Integer, StreamContext> visitors = new ConcurrentHashMap<>();
     private final PausedStreamRegistry pausedStreamRegistry = new PausedStreamRegistry();
+    /**
+     * proxyId --> BandWithLimiter
+     */
+    private final Map<String, BandwidthLimiter> proxyLimiters = new ConcurrentHashMap<>();
+    /**
+     * 存储每个代理的活跃流计数
+     */
+    private final Map<String, AtomicInteger> proxyStreamCount = new ConcurrentHashMap<>();
     @Autowired
     private StreamIdGenerator streamIdGenerator;
 
@@ -105,5 +116,33 @@ public class StreamManager {
 
     public void removePausedStream(Channel tunnel, int streamId) {
         pausedStreamRegistry.removePausedStream(tunnel, streamId);
+    }
+
+    public BandwidthLimiter getOrCreateProxyLimiter(String proxyId, BandwidthConfig bandwidthConfig) {
+        return proxyLimiters.computeIfAbsent(proxyId, id -> {
+            proxyStreamCount.put(proxyId, new AtomicInteger(0));
+            logger.debug("创建代理限流器：proxyId={}", proxyId);
+            return new BandwidthLimiter(bandwidthConfig);
+        });
+    }
+
+    public void incrementStreamCount(String proxyId) {
+        AtomicInteger count = proxyStreamCount.get(proxyId);
+        if (count != null) {
+            count.incrementAndGet();
+        }
+    }
+
+    public void decrementStreamCount(String proxyId) {
+        AtomicInteger count = proxyStreamCount.get(proxyId);
+        if (count != null && count.decrementAndGet() == 0) {
+            // 最后一个流关闭，释放限流器
+            proxyLimiters.remove(proxyId);
+            proxyStreamCount.remove(proxyId);
+            logger.debug("释放代理限流器：proxyId={}", proxyId);
+        }
+    }
+    public BandwidthLimiter getProxyLimiter(String proxyId) {
+        return proxyLimiters.get(proxyId);
     }
 }

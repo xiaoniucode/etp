@@ -42,7 +42,7 @@ public class DirectTunnelBridge implements TunnelBridge {
         pipeline.addLast(new SimpleChannelInboundHandler<ByteBuf>() {
             @Override
             protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
-                forwardToLocal(msg);
+                streamContext.forwardToLocal(msg);
             }
 
             @Override

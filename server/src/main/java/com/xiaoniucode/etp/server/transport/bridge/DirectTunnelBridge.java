@@ -43,7 +43,7 @@ public class DirectTunnelBridge implements TunnelBridge {
 
             @Override
             protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
-                forwardToRemote(msg);
+                streamContext.forwardToRemote(msg);
             }
 
             @Override

@@ -10,6 +10,7 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.server.loadbalance.HealthManager;
 import com.xiaoniucode.etp.server.transport.BandwidthLimiter;
@@ -44,7 +45,7 @@ public class TargetResolverAction extends StreamBaseAction {
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
         ProxyConfig config = resolveProxyConfig(context);
         if (config == null || !config.isEnable()) {
-            logger.debug("代理不可用，关闭流：streamId={}",context.getStreamId());
+            logger.debug("代理不可用，关闭流：streamId={}", context.getStreamId());
             context.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
@@ -56,20 +57,23 @@ public class TargetResolverAction extends StreamBaseAction {
             context.setAgentContext(gentContextOpt.get());
             Target selectedTarget = selectTarget(config, context);
             if (selectedTarget == null) {
-                logger.warn("无可用 proxyId={} 后端目标，关闭流: streamId={}", config.getProxyId(),context.getStreamId());
+                logger.warn("无可用 proxyId={} 后端目标，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
                 context.fireEvent(StreamEvent.STREAM_CLOSE);
                 return;
             }
             BandwidthConfig bandwidth = config.getBandwidth();
             if (bandwidth != null) {
-                context.setBandwidthLimiter(new BandwidthLimiter(bandwidth));
+                StreamManager streamManager = context.getStreamManager();
+                BandwidthLimiter bandwidthLimiter = streamManager.getOrCreateProxyLimiter(config.getProxyId(), bandwidth);
+                context.setBandwidthLimiter(bandwidthLimiter);
+                streamManager.incrementStreamCount(config.getProxyId());
             }
             context.setCompress(config.isCompress());
             context.setEncrypt(config.isEncrypt());
             context.setCurrentTarget(selectedTarget);
             context.fireEvent(StreamEvent.TARGET_VALIDATED);
         } else {
-            logger.debug("代理 {} 客户端不可用，关闭流: streamId={}", config.getProxyId(),context.getStreamId());
+            logger.debug("代理 {} 客户端不可用，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
             //客户端不可用
             context.fireEvent(StreamEvent.STREAM_CLOSE);
         }

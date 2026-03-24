@@ -47,6 +47,8 @@ public class StreamCloseAction extends StreamBaseAction {
             directPool.release(agentContext.getClientId(), tunnelEntry);
         }
 
+        streamManager.decrementStreamCount(context.getProxyConfig().getProxyId());
+
         streamManager.removeStreamContext(streamId);
         if (agentContext != null) {
             Channel control = agentContext.getControl();
