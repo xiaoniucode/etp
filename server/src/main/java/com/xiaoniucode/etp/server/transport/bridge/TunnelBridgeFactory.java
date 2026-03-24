@@ -10,14 +10,14 @@ public class TunnelBridgeFactory {
         TunnelBridge bridge = base;
 //        bridge = new CompressTunnelBridgeDecorator(bridge, ctx);
 //        bridge = new TlsTunnelBridgeDecorator(bridge, ctx);
-//        bridge = new RateLimitTunnelBridgeDecorator(bridge, ctx);
+        bridge = new RateLimitTunnelBridgeDecorator(bridge, ctx);
         return bridge;
     }
 
     public static TunnelBridge buildMux(StreamContext ctx) {
         final TunnelBridge base = new MultiplexTunnelBridge(ctx);
         TunnelBridge bridge = base;
-//        bridge = new RateLimitTunnelBridgeDecorator(bridge, ctx);
+        bridge = new RateLimitTunnelBridgeDecorator(bridge, ctx);
         return bridge;
     }
 }

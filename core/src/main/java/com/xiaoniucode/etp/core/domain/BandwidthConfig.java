@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.core.domain;
 
-import lombok.Getter;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import lombok.ToString;
 
 @ToString
@@ -9,19 +9,16 @@ public class BandwidthConfig {
      * 总带宽限制
      * 单位（bps）
      */
-    @Getter
     private String limit;
     /**
      * 入口带宽限制（下载）
      * 单位（bps）
      */
-    @Getter
     private String limitIn;
     /**
      * 出口带宽限制（上传）
      * 单位（bps）
      */
-    @Getter
     private String limitOut;
     private Long limitBytes;
     private Long limitInBytes;
@@ -164,23 +161,44 @@ public class BandwidthConfig {
     }
 
     /**
-     * 检查是否有限速配置
+     * 检查总限速原始字符串是否已配置
      */
-    public boolean hasLimit() {
-        return limitBytes != null || limitInBytes != null || limitOutBytes != null;
+    public boolean hasLimitConfigured() {
+        return StringUtils.hasText(limit);
     }
 
     /**
-     * 检查入口是否限速
+     * 检查入口限速原始字符串是否已配置
      */
-    public boolean hasInLimit() {
+    public boolean hasLimitInConfigured() {
+        return StringUtils.hasText(limitIn);
+    }
+
+    /**
+     * 检查出口限速原始字符串是否已配置
+     */
+    public boolean hasLimitOutConfigured() {
+        return StringUtils.hasText(limitOut);
+    }
+
+    /**
+     * 检查总限速是否有效
+     */
+    public boolean hasLimitEffective() {
+        return limitBytes != null;
+    }
+
+    /**
+     * 检查入口是否有效限速
+     */
+    public boolean hasInLimitEffective() {
         return getEffectiveInLimit() != null;
     }
 
     /**
-     * 检查出口是否限速
+     * 检查出口是否有效限速
      */
-    public boolean hasOutLimit() {
+    public boolean hasOutLimitEffective() {
         return getEffectiveOutLimit() != null;
     }
 
@@ -197,5 +215,17 @@ public class BandwidthConfig {
     public void setLimitOut(String limitOut) {
         this.limitOut = limitOut;
         parseAndValidate();
+    }
+
+    public String getLimit() {
+        return limit;
+    }
+
+    public String getLimitIn() {
+        return limitIn;
+    }
+
+    public String getLimitOut() {
+        return limitOut;
     }
 }

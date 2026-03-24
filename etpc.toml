@@ -142,16 +142,16 @@ targets = [
     { host = "127.0.0.1", port = 3306, weight = 90, name = "mysql-instance-2" }
 ]
 [proxies.transport]
-mux = false
+mux = true
 compress = false
 encrypt = false
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 
-#[proxies.bandwidth] #带宽限制
-#limit = "128k" #总带宽限制(可选)
-#limitIn = "64k" #入口带宽限制(可选)
-#limitOut = "64k" #出口带宽限制(可选)
+[proxies.bandwidth] #带宽限制
+limit = "128k" #总带宽限制(可选)
+limitIn = "64k" #入口带宽限制(可选)
+limitOut = "64k" #出口带宽限制(可选)
 [[proxies]]
 name = "redis"
 protocol = "tcp"
@@ -160,10 +160,7 @@ targets = [
     { host = "10.1.1.2", port = 6379, weight = 70, name = "redis-1" },
     { host = "10.1.1.1", port = 6379, weight = 30, name = "redis-2" }
 ]
-[proxies.bandwidth] #带宽限制
-limit = "2M" #总带宽限制(可选)
-limitIn = "1M" #入口带宽限制(可选)
-limitOut = "1M" #出口带宽限制(可选)
+
 [proxies.loadbalance]
 strategy = "random" # 策略：roundrobin/weight/random/leastconn
 
@@ -199,7 +196,7 @@ protocol = "tcp"
 enable=true
 remotePort = 5203
 targets = [
-    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
+#    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
 ]
 [proxies.transport]
@@ -208,7 +205,10 @@ compress = false
 encrypt = false
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
-
+[proxies.bandwidth] #带宽限制
+#limit = "2M" #总带宽限制(可选)
+#limitIn = "10M" #入口带宽限制(可选)
+limitOut = "10M" #出口带宽限制(可选)
 
 #日志
 [log]

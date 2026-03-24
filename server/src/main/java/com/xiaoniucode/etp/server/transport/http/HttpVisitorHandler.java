@@ -48,8 +48,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             }
         } else {
             logger.debug("[HTTP] 创建流上下文");
-            buf.retain();
-            visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(buf);
+            visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(buf.retain());
             StreamContext streamContext = streamManager.createStreamContext(visitor, stateMachine);
             streamContext.setCurrentProtocol(ProtocolType.HTTP);
             streamContext.setStreamManager(streamManager);
@@ -62,7 +61,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void channelInactive(ChannelHandlerContext ctx) {
         Channel visitor = ctx.channel();
         streamManager.getStreamContext(visitor).ifPresent(streamContext -> {
-            logger.debug("访问者连接断开，关闭流: streamId={}", streamContext.getStreamId());
+            logger.debug("[HTTP]访问者连接断开，关闭流: streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
         });
     }

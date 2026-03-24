@@ -10,7 +10,10 @@ etp:
       multiplex: false
       encrypt: false
       compress: false
-
+    bandwidth:
+      limit: 2M
+      limit-in: 1M
+      limit-out: 1M
 
 
 
