@@ -51,12 +51,12 @@ public final class TcpProxyServer implements Lifecycle {
         serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NettyEventLoopFactory.serverSocketChannelClass())
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .option(ChannelOption.TCP_NODELAY, true)
-//                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.TCP_NODELAY, true)
+                .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 //                .option(ChannelOption.SO_BACKLOG, 4096)
-                .childOption(ChannelOption.SO_SNDBUF, 16 * 1024 * 1024)   // 发送缓冲 16MB
-                .childOption(ChannelOption.SO_RCVBUF, 16 * 1024 * 1024)   // 接收缓冲 16MB
+//                .childOption(ChannelOption.SO_SNDBUF, 16 * 1024 * 1024)   // 发送缓冲 16MB
+//                .childOption(ChannelOption.SO_RCVBUF, 16 * 1024 * 1024)   // 接收缓冲 16MB
                 .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
                         new WriteBufferWaterMark(64 * 1024, 256 * 1024))
                 .childHandler(new ChannelInitializer<SocketChannel>() {

@@ -7,7 +7,7 @@ etp:
     tls:
       enable: false
     transport:
-      multiplex: true
+      multiplex: false
       encrypt: false
       compress: false
 

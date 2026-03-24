@@ -30,34 +30,36 @@ public class StreamOpenAction extends StreamBaseAction {
         Channel control = agentContext.getControl();
         ProxyConfig config = context.getProxyConfig();
         if (!control.isActive()) {
-            logger.warn("当前控制通道已关闭: proxyName={}", config.getName());
+            logger.warn("客户端 {} 控制通道未激活，关闭流 streamId={}", agentContext.getClientId(), streamId);
             context.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
-
+        if (!control.isWritable()) {
+            logger.warn("客户端 {} 控制隧道不可写", agentContext.getClientId());
+        }
         Target target = context.getCurrentTarget();
-
-        ByteBuf buffer = control.alloc().buffer();
-        NewStreamCodec.encode(buffer, target.getHost(), target.getPort());
-
-        TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN, buffer);
+        ByteBuf payload = control.alloc().buffer();
+        NewStreamCodec.encode(payload, target.getHost(), target.getPort());
+        TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN, payload);
 
         frame.setMuxTunnel(config.isMuxTunnel());
         frame.setCompressed(context.isCompress());
         frame.setEncrypted(config.isEncrypt());
 
         control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
-            ReferenceCountUtil.release(buffer);
+            logger.debug("打开流请求引用计数：{}", payload.refCnt());
+            ReferenceCountUtil.release(payload);
             if (!future.isSuccess()) {
+                logger.error("打开流消息发送失败，关闭流：streamId={} error={}", streamId, future.cause().getMessage());
                 context.fireEvent(StreamEvent.STREAM_CLOSE);
             } else {
                 control.eventLoop().schedule(() -> {
                     if (context.getState() == StreamState.OPENING) {
-                        logger.warn("打开流超时: stream={}", streamId);
+                        logger.warn("打开流超时，关闭流 stream={}", streamId);
                         context.fireEvent(StreamEvent.STREAM_CLOSE);
                     }
                 }, 10, TimeUnit.SECONDS); // 如果10秒状态未改变，超时处理
-                logger.debug("Stream open success: proxyName: {} - target: {}", config.getName(), target);
+                logger.debug("流 {} 打开成功 代理名: {} 访问目标：{}", streamId, config.getName(), target);
             }
         });
     }

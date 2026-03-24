@@ -25,7 +25,7 @@ import java.util.Optional;
 public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final Logger logger = LoggerFactory.getLogger(TcpVisitorHandler.class);
     @Autowired
-    private StreamManager visitorManager;
+    private StreamManager streamManager;
     @Autowired
     @Qualifier("streamStateMachine")
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
@@ -34,22 +34,23 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void channelActive(ChannelHandlerContext ctx) {
         logger.debug("[TCP]收到访问者请求");
         Channel visitor = ctx.channel();
-        StreamContext streamContext = visitorManager.createStreamContext(visitor, stateMachine);
+        StreamContext streamContext = streamManager.createStreamContext(visitor, stateMachine);
         streamContext.setCurrentProtocol(ProtocolType.TCP);
+        streamContext.setStreamManager(streamManager);
         streamContext.fireEvent(StreamEvent.STREAM_OPEN);
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
         Channel visitor = ctx.channel();
-        Optional<StreamContext> contextOpt = visitorManager.getStreamContext(visitor);
+        Optional<StreamContext> contextOpt = streamManager.getStreamContext(visitor);
         contextOpt.ifPresent(streamContext -> {
                     TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
                     Channel tunnel = tunnelEntry.getChannel();
                     if (!tunnel.isWritable()) {
                         logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
                         visitor.config().setOption(ChannelOption.AUTO_READ, false);
-                        visitorManager.addPausedStreamId(tunnel, streamContext.getStreamId());
+                        streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
                     }
                     streamContext.forwardToLocal(msg);
                 }
@@ -58,7 +59,7 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        visitorManager.getStreamContext(ctx.channel()).ifPresent(streamContext -> {
+        streamManager.getStreamContext(ctx.channel()).ifPresent(streamContext -> {
             streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
         });
         super.channelInactive(ctx);
@@ -66,11 +67,11 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        logger.warn("流量过高，触发背压");
         Channel visitor = ctx.channel();
-        visitorManager.getStreamContext(visitor).ifPresent(streamContext -> {
+        streamManager.getStreamContext(visitor).ifPresent(streamContext -> {
             Channel tunnel = streamContext.getTunnelEntry().getChannel();
             if (tunnel != null) {
-                logger.warn("流量过高，触发背压");
                 boolean writable = visitor.isWritable();
                 tunnel.config().setOption(ChannelOption.AUTO_READ, writable);
                 if (writable) {

@@ -1,16 +1,19 @@
 package com.xiaoniucode.etp.client.transport.bridge;
 
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
+import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
+import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
+import com.xiaoniucode.etp.core.transport.IntSet;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
-import com.xiaoniucode.etp.core.transport.RawByteBufChannelHandler;
 import com.xiaoniucode.etp.core.transport.TunnelBridge;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class DirectTunnelBridge implements TunnelBridge {
     private final Logger logger = LoggerFactory.getLogger(DirectTunnelBridge.class);
@@ -36,42 +39,78 @@ public class DirectTunnelBridge implements TunnelBridge {
                 pipeline.remove(handlerName);
             }
         }
-        pipeline.addLast(new RawByteBufChannelHandler(streamContext, true));
+        pipeline.addLast(new SimpleChannelInboundHandler<ByteBuf>() {
+            @Override
+            protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
+                forwardToLocal(msg);
+            }
+
+            @Override
+            public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+                logger.warn("隧道可写状态发生变化：{}", ctx.channel().isWritable());
+                logger.warn("隧道可写性发生变化：{}", ctx.channel().isWritable());
+                Channel tunnel = ctx.channel();
+                boolean writable = tunnel.isWritable();
+                if (writable) {
+                    //数据隧道恢复可写，恢复暂停的从服务器读取
+                    IntSet pausedStreamIds = StreamManager.getPausedStreamIds(tunnel);
+                    if (!pausedStreamIds.isEmpty()) {
+                        logger.debug("控制隧道恢复可写，恢复 {} 个访问者读取", pausedStreamIds.size());
+                        pausedStreamIds.stream().forEach(streamId -> {
+                            Optional<StreamContext> streamContextOpt = StreamManager.getStreamContext(streamId);
+                            if (streamContextOpt.isPresent()) {
+                                StreamContext streamContext = streamContextOpt.get();
+                                Channel server = streamContext.getServer();
+                                if (server != null) {
+                                    ctx.executor().schedule(() -> {
+                                        server.config().setOption(ChannelOption.AUTO_READ, true);
+                                        server.read();
+                                        StreamManager.removePausedStream(tunnel, streamId);
+                                    }, 5, TimeUnit.MILLISECONDS);
+                                }
+                            }
+                        });
+                    }
+                }
+                super.channelWritabilityChanged(ctx);
+            }
+        });
     }
 
     @Override
     public void forwardToLocal(ByteBuf payload) {
-        if (!server.isActive() || !server.isWritable()) {
-            logger.error("服务器连接不可写，丢弃数据：streamId={}", streamContext.getStreamId());
+        if (!server.isActive()) {
+            logger.error("真实服务连接没有激活，关闭流：streamId={}", streamContext.getStreamId());
             ReferenceCountUtil.release(payload);
+            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
-        ReferenceCountUtil.retain(payload);
-        server.writeAndFlush(payload).addListener((ChannelFutureListener) f -> {
+        server.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) f -> {
+            logger.debug("流 {} 引用计数为：{}", streamContext.getStreamId(), payload.refCnt());
             if (f.isSuccess()) {
-                logger.debug("数据成功转发给服务");
+                logger.debug("数据成功转发给真实服务成功");
             } else {
-                logger.debug("数据转发给服务失败");
+                logger.debug("数据转发给真实服务失败",f.cause());
+                streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             }
-           // ReferenceCountUtil.release(payload);
         });
     }
 
     @Override
     public void forwardToRemote(ByteBuf payload) {
-        if (!tunnel.isActive() || !tunnel.isWritable()) {
-            logger.error("隧道不可写，丢弃数据：streamId={}", streamContext.getStreamId());
+        if (!tunnel.isActive()) {
+            logger.error("隧道没有激活，关闭流：streamId={}", streamContext.getStreamId());
             ReferenceCountUtil.release(payload);
+            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
-        ReferenceCountUtil.retain(payload);
-        tunnel.writeAndFlush(payload).addListener((ChannelFutureListener) f -> {
+        tunnel.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) f -> {
+            logger.debug("流 {} 引用计数为：{}", streamContext.getStreamId(), payload.refCnt());
             if (f.isSuccess()) {
-                logger.debug("数据成功转发到远程");
+                logger.debug("数据成功转发到远程成功");
             } else {
-                logger.debug("数据转发到远程失败");
+                logger.debug("数据转发到远程失败",f.cause());
             }
-           // ReferenceCountUtil.release(payload);
         });
     }
 }

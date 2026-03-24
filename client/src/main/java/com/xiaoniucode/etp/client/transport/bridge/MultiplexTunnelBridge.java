@@ -15,9 +15,13 @@ import org.slf4j.LoggerFactory;
 public class MultiplexTunnelBridge implements TunnelBridge {
     private final Logger logger = LoggerFactory.getLogger(MultiplexTunnelBridge.class);
     private final StreamContext streamContext;
+    private final Channel tunnel;
+    private final Channel server;
 
     public MultiplexTunnelBridge(StreamContext streamContext) {
         this.streamContext = streamContext;
+        this.tunnel = streamContext.getTunnelEntry().getChannel();
+        this.server = streamContext.getServer();
     }
 
     @Override
@@ -26,10 +30,9 @@ public class MultiplexTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToLocal(ByteBuf payload) {
-        Channel server = streamContext.getServer();
         int streamId = streamContext.getStreamId();
         if (server == null || !server.isActive()) {
-            logger.debug("通道未激活，数据转发到内网失败：streamId={}", streamId);
+            logger.debug("通道未激活，数据转发到内网失败，关闭流：streamId={}", streamId);
             ReferenceCountUtil.release(payload);
             streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
@@ -38,8 +41,8 @@ public class MultiplexTunnelBridge implements TunnelBridge {
             logger.debug("流 {} 引用计数为：{}", streamContext.getStreamId(), payload.refCnt());
             ReferenceCountUtil.release(payload);
             if (!future.isSuccess()) {
-                server.close();
-                logger.warn("数据转发到内网真实服务失败：streamId={}", streamId);
+                logger.warn("数据转发到内网真实服务失败，关闭流：streamId={}", streamId, future.cause());
+                streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             } else {
                 logger.debug("数据转发到内网真实服务成功：streamId={}", streamId);
             }
@@ -48,13 +51,10 @@ public class MultiplexTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToRemote(ByteBuf payload) {
-        if (!streamContext.isMultiplex()) {
+        if (tunnel == null || !tunnel.isActive()) {
+            logger.debug("通道未激活，数据转发到远程失败，关闭流：streamId={}", streamContext.getStreamId());
             ReferenceCountUtil.release(payload);
-            return;
-        }
-        Channel tunnel = streamContext.getTunnelEntry().getChannel();
-        if (tunnel == null) {
-            payload.release();
+            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
         TMSPFrame frame = new TMSPFrame(streamContext.getStreamId(), TMSP.MSG_STREAM_DATA, payload.retain());
@@ -63,7 +63,8 @@ public class MultiplexTunnelBridge implements TunnelBridge {
             ReferenceCountUtil.release(payload);
             int streamId = streamContext.getStreamId();
             if (!future.isSuccess()) {
-                logger.warn("数据转发到远程隧道失败: streamId={}", streamId);
+                logger.warn("数据转发到远程隧道失败: streamId={}", streamId, future.cause());
+                streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             } else {
                 logger.debug("数据转发到远程隧道成功: streamId={}", streamId);
             }

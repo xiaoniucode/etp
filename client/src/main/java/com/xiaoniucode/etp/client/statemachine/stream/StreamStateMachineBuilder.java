@@ -8,15 +8,15 @@ import com.xiaoniucode.etp.client.statemachine.stream.action.StreamCloseAction;
 import com.xiaoniucode.etp.client.statemachine.stream.action.StreamOpenAction;
 
 public class StreamStateMachineBuilder {
-    
+
     private static final String MACHINE_ID = "streamStateMachine";
-    
+
     private static class StateMachineHolder {
         private static final StateMachine<StreamState, StreamEvent, StreamContext> INSTANCE = build();
-        
+
         private static StateMachine<StreamState, StreamEvent, StreamContext> build() {
-            StateMachineBuilder<StreamState, StreamEvent, StreamContext> builder = 
-                StateMachineBuilderFactory.create();
+            StateMachineBuilder<StreamState, StreamEvent, StreamContext> builder =
+                    StateMachineBuilderFactory.create();
 
             builder.externalTransition()
                     .from(StreamState.IDLE)
@@ -39,8 +39,8 @@ public class StreamStateMachineBuilder {
                     .when(ctx -> true)
                     .perform((from, to, event, context) -> context.setState(to));
 
-            builder.externalTransition()
-                    .from(StreamState.OPENED)
+            builder.externalTransitions()
+                    .fromAmong(StreamState.OPENED, StreamState.OPENING)
                     .to(StreamState.CLOSED)
                     .on(StreamEvent.STREAM_CLOSE)
                     .when(ctx -> true)
@@ -50,7 +50,7 @@ public class StreamStateMachineBuilder {
             return StateMachineFactory.get(MACHINE_ID);
         }
     }
-    
+
     public static StateMachine<StreamState, StreamEvent, StreamContext> getStateMachine() {
         return StateMachineHolder.INSTANCE;
     }

@@ -44,7 +44,7 @@ public class TargetResolverAction extends StreamBaseAction {
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
         ProxyConfig config = resolveProxyConfig(context);
         if (config == null || !config.isEnable()) {
-            logger.debug("代理不可用");
+            logger.debug("代理不可用，关闭流：streamId={}",context.getStreamId());
             context.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
@@ -56,7 +56,7 @@ public class TargetResolverAction extends StreamBaseAction {
             context.setAgentContext(gentContextOpt.get());
             Target selectedTarget = selectTarget(config, context);
             if (selectedTarget == null) {
-                logger.warn("无可用的后端目标: proxyId={}", config.getProxyId());
+                logger.warn("无可用 proxyId={} 后端目标，关闭流: streamId={}", config.getProxyId(),context.getStreamId());
                 context.fireEvent(StreamEvent.STREAM_CLOSE);
                 return;
             }
@@ -69,7 +69,7 @@ public class TargetResolverAction extends StreamBaseAction {
             context.setCurrentTarget(selectedTarget);
             context.fireEvent(StreamEvent.TARGET_VALIDATED);
         } else {
-            logger.debug("代理客户端不可用: proxyId={}", config.getProxyId());
+            logger.debug("代理 {} 客户端不可用，关闭流: streamId={}", config.getProxyId(),context.getStreamId());
             //客户端不可用
             context.fireEvent(StreamEvent.STREAM_CLOSE);
         }

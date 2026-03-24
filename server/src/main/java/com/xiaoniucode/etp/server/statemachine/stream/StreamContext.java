@@ -24,6 +24,7 @@ public class StreamContext extends AbstractStreamContext {
     private ProtocolType currentProtocol = ProtocolType.TCP;
     private BandwidthLimiter bandwidthLimiter;
     private AgentContext agentContext;
+    private StreamManager streamManager;
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
 
     public StreamContext(int streamId, StateMachine<StreamState, StreamEvent, StreamContext> streamStateMachine) {

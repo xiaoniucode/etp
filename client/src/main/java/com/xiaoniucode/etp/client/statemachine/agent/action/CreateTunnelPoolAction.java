@@ -17,12 +17,17 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.util.ReferenceCountUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 预创建数据传输隧道
  */
+@Slf4j
 public class CreateTunnelPoolAction extends AgentBaseAction {
-    private static final int DEFAULT_DIRECT_COUNT = 10;
+    private final Logger logger = LoggerFactory.getLogger(CreateTunnelPoolAction.class);
+    private static final int DEFAULT_DIRECT_COUNT = 30;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -69,13 +74,16 @@ public class CreateTunnelPoolAction extends AgentBaseAction {
                         .build();
                 ByteBuf payload = ProtobufUtil.toByteBuf(body, tunnel.alloc());
                 TMSPFrame frame = new TMSPFrame(connectionId, TMSP.MSG_TUNNEL_CREATE, payload);
-
                 frame.setMuxTunnel(isMultiplex);
                 frame.setEncrypted(isTls);
 
                 tunnel.writeAndFlush(frame).addListener((ChannelFutureListener) f -> {
+                    logger.debug("隧道创建请求数据包引用计数：{}", payload.refCnt());
+                    ReferenceCountUtil.release(payload);
                     if (!f.isSuccess()) {
-                        ReferenceCountUtil.release(payload);
+                        logger.error("隧道创建请求发送失败！");
+                    } else {
+                        logger.debug("隧道创建请求发送成功");
                     }
                 });
             }

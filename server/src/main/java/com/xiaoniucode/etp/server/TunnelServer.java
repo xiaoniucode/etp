@@ -61,9 +61,9 @@ public class TunnelServer implements Lifecycle {
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(tunnelBossGroup, tunnelWorkerGroup)
-                    .option(ChannelOption.SO_KEEPALIVE, true)
-                    .option(ChannelOption.TCP_NODELAY, true)
-//                    .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .childOption(ChannelOption.TCP_NODELAY, true)
+                    .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 //                    .option(ChannelOption.SO_BACKLOG, 8192)
 //                    .childOption(ChannelOption.SO_SNDBUF, 16 * 1024 * 1024)   // 发送缓冲 16MB
 //                    .childOption(ChannelOption.SO_RCVBUF, 16 * 1024 * 1024)   // 接收缓冲 16MB

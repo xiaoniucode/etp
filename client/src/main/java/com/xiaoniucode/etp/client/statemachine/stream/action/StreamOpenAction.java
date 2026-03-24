@@ -90,7 +90,6 @@ public class StreamOpenAction extends StreamBaseAction {
                     logger.error("隧道创建失败 - [服务地址={}:服务端口={}] 不可用!", localIp, localPort);
                 }
             });
-            context.removeVariable(StreamConstants.VISIT_INFO);
         }
     }
 }

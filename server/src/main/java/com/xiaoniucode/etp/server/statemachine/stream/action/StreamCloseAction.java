@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.statemachine.stream.action;
 
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.loadbalance.LeastConnHooks;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
@@ -36,9 +37,14 @@ public class StreamCloseAction extends StreamBaseAction {
         leastConnHooks.onStreamClosed(context);
         ChannelUtils.closeOnFlush(visitor);
         AgentContext agentContext = context.getAgentContext();
-
+        TunnelEntry tunnelEntry = context.getTunnelEntry();
+        if (tunnelEntry != null) {
+            Channel tunnel = tunnelEntry.getChannel();
+            logger.debug("隧道 {} 激活状态：{}，隧道可写状态：{}",tunnelEntry.getTunnelId(), tunnel.isActive(), tunnel.isWritable());
+            tunnel.config().setAutoRead(true);
+        }
         if (!context.isMultiplex()) {
-            directPool.release(agentContext.getClientId(), context.getTunnelEntry());
+            directPool.release(agentContext.getClientId(), tunnelEntry);
         }
 
         streamManager.removeStreamContext(streamId);
@@ -48,6 +54,6 @@ public class StreamCloseAction extends StreamBaseAction {
             control.writeAndFlush(frame);
         }
 
-        logger.debug("关闭隧道: streamId={}", context.getStreamId());
+        logger.debug("关闭流: streamId={}", context.getStreamId());
     }
 }

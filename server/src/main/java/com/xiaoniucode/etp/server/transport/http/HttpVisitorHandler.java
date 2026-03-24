@@ -23,7 +23,7 @@ import java.util.Optional;
 public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final Logger logger = LoggerFactory.getLogger(HttpVisitorHandler.class);
     @Autowired
-    private StreamManager visitorManager;
+    private StreamManager streamManager;
     @Autowired
     @Qualifier("streamStateMachine")
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
@@ -31,7 +31,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
         Channel visitor = ctx.channel();
-        Optional<StreamContext> contextOpt = visitorManager.getStreamContext(visitor);
+        Optional<StreamContext> contextOpt = streamManager.getStreamContext(visitor);
         if (contextOpt.isPresent()) {
             StreamContext streamContext = contextOpt.get();
             if (streamContext.getState() == StreamState.OPENED) {
@@ -40,7 +40,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 if (!tunnel.isWritable()) {
                     logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
                     visitor.config().setOption(ChannelOption.AUTO_READ, false);
-                    visitorManager.addPausedStreamId(tunnel, streamContext.getStreamId());
+                    streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
                 }
                 streamContext.forwardToLocal(buf);
             } else {
@@ -50,8 +50,9 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             logger.debug("[HTTP] 创建流上下文");
             buf.retain();
             visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(buf);
-            StreamContext streamContext = visitorManager.createStreamContext(visitor, stateMachine);
+            StreamContext streamContext = streamManager.createStreamContext(visitor, stateMachine);
             streamContext.setCurrentProtocol(ProtocolType.HTTP);
+            streamContext.setStreamManager(streamManager);
             streamContext.fireEvent(StreamEvent.STREAM_OPEN);
         }
     }
@@ -60,7 +61,8 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         Channel visitor = ctx.channel();
-        visitorManager.getStreamContext(visitor).ifPresent(streamContext -> {
+        streamManager.getStreamContext(visitor).ifPresent(streamContext -> {
+            logger.debug("访问者连接断开，关闭流: streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
         });
     }
@@ -68,7 +70,8 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error(cause.getMessage(), cause);
-        visitorManager.getStreamContext(ctx.channel()).ifPresent(streamContext -> {
+        streamManager.getStreamContext(ctx.channel()).ifPresent(streamContext -> {
+            logger.warn("[HTTP] 访问者连接发生异常，关闭流: streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
         });
     }
@@ -76,7 +79,8 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel visitor = ctx.channel();
-        visitorManager.getStreamContext(visitor).ifPresent(streamContext -> {
+        logger.warn("[HTTP] 访问者可写性发生变化：{}", visitor.isWritable());
+        streamManager.getStreamContext(visitor).ifPresent(streamContext -> {
             Channel tunnel = streamContext.getTunnelEntry().getChannel();
             if (tunnel != null) {
                 logger.warn("流量过高，触发背压");

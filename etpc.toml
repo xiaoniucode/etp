@@ -142,7 +142,7 @@ targets = [
     { host = "127.0.0.1", port = 3306, weight = 90, name = "mysql-instance-2" }
 ]
 [proxies.transport]
-mux = true
+mux = false
 compress = false
 encrypt = false
 [proxies.loadbalance]
@@ -182,6 +182,22 @@ name = "test"
 protocol = "tcp"
 enable=true
 remotePort = 5202
+targets = [
+    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
+    { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
+]
+[proxies.transport]
+mux = false
+compress = false
+encrypt = false
+[proxies.loadbalance]
+strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
+
+[[proxies]]
+name = "test_mux"
+protocol = "tcp"
+enable=true
+remotePort = 5203
 targets = [
     { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }

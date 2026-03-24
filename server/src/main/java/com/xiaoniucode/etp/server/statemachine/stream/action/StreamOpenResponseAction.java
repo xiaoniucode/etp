@@ -46,10 +46,10 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         TunnelBridge tunnelBridge;
         if (context.isMultiplex()) {
             tunnelBridge = TunnelBridgeFactory.buildMux(context);
-            logger.debug("共享隧道建立成功: {}", context.getCurrentTarget());
+            logger.debug("共享隧道建立成功，访问目标: {}", context.getCurrentTarget());
         } else {
             tunnelBridge = TunnelBridgeFactory.buildDirect(context);
-            logger.debug("独立隧道建立成功: {}", context.getCurrentTarget());
+            logger.debug("独立隧道建立成功，隧道ID: {}", tunnelEntry.getTunnelId());
         }
         tunnelBridge.open();
         context.setTunnelBridge(tunnelBridge);

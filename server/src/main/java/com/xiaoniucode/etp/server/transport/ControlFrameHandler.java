@@ -54,8 +54,14 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 if (ag.isPresent()) {
                     AgentContext agentContext = ag.get();
                     Channel control = agentContext.getControl();
+                    Channel tunnel = ctx.channel();
+                    if (control == tunnel) {
+                        logger.error("控制隧道和消息来源与数据隧道相同，消息异常，关闭连接");
+                        ChannelUtils.closeOnFlush(ctx.channel());
+                        return;
+                    }
                     Message.TunnelCreateRequest req = ProtobufUtil.parseFrom(frame.getPayload(), Message.TunnelCreateRequest.parser());
-                    TunnelCreateCmd cmd = new TunnelCreateCmd(ctx.channel(), frame.isEncrypted(), frame.isMuxTunnel(), req.getTunnelId());
+                    TunnelCreateCmd cmd = new TunnelCreateCmd(tunnel, frame.isEncrypted(), frame.isMuxTunnel(), req.getTunnelId());
                     control.eventLoop().execute(() -> {
                         agentContext.setVariable("tunnelCreateCmd", cmd);
                         agentContext.fireEvent(AgentEvent.CREATE_TUNNEL);
@@ -106,15 +112,17 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     public void channelInactive(ChannelHandlerContext ctx) {
         logger.debug("控制隧道断开");
         agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
-
+            Channel control = agentContext.getControl();
+            ChannelUtils.closeOnFlush(control);
         });
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error("控制连接异常", cause);
-        agentManager.getAgentContext(ctx.channel()).ifPresent(connCtx -> {
-
+        logger.error("控制连接异常: ", cause);
+        agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
+            Channel control = agentContext.getControl();
+            ChannelUtils.closeOnFlush(control);
         });
     }
 
