@@ -140,8 +140,9 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         } else {
             logger.error("数据连接异常，关闭数据连接", cause);
             //数据隧道
-            ChannelUtils.closeOnFlush(channel);
+           // ChannelUtils.closeOnFlush(channel);
         }
+        logger.error(cause.getMessage(),cause);
     }
 
     private boolean isNetworkException(Throwable cause) {

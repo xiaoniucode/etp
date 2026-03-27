@@ -46,12 +46,17 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Optional<StreamContext> contextOpt = streamManager.getStreamContext(visitor);
         contextOpt.ifPresent(streamContext -> {
                     TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
+                    if (tunnelEntry==null){
+                        logger.error("tunnel entry is null");
+                        return;
+                    }
                     Channel tunnel = tunnelEntry.getChannel();
                     if (!tunnel.isWritable()) {
                         logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
                         visitor.config().setOption(ChannelOption.AUTO_READ, false);
                         streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
                     }
+                    logger.debug("[TCP] 流 {} 引用计数为：{}",streamContext.getStreamId(),msg.refCnt());
                     streamContext.forwardToLocal(msg);
                 }
         );

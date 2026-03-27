@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.client;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
+import com.xiaoniucode.etp.client.transport.CompressHandler;
 import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.client.transport.RealServerHandler;
 import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
@@ -18,6 +19,7 @@ import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.transport.IdleCheckHandler;
+import com.xiaoniucode.etp.core.transport.compress.MultiplexSnappyDecoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -62,12 +64,14 @@ public final class TunnelClient implements Lifecycle {
     }
 
     private void initializeStateMachine() {
+        CompressHandler compressHandler = new CompressHandler();
         stateMachine = AgentStateMachineBuilder.getStateMachine();
         clientContext = new AgentContext(config);
         clientContext.setTunnelClient(this);
         clientContext.setStateMachine(stateMachine);
         clientContext.setDirectPool(new DirectPool());
         clientContext.setMultiplexPool(new MultiplexPool());
+
         serverWorkBootstrap = NettyEventLoopFactory.eventLoopGroup();
         Bootstrap serverBootstrap = new Bootstrap()
                 .group(serverWorkBootstrap)
@@ -80,7 +84,10 @@ public final class TunnelClient implements Lifecycle {
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel sc) {
+                    protected void initChannel(SocketChannel ch) {
+                        ChannelPipeline p = ch.pipeline();
+//                        p.addLast(compressHandler);
+                        p.addLast(NettyConstants.REAL_SERVER_HANDLER, new RealServerHandler(clientContext));
                     }
                 });
         Bootstrap controlBootstrap = new Bootstrap();
@@ -104,17 +111,12 @@ public final class TunnelClient implements Lifecycle {
                         }
                         sc.pipeline()
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
-                                .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
+                               // .addLast(new MultiplexSnappyDecoder())
+                               // .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);
                     }
                 });
-        serverBootstrap.handler(new ChannelInitializer<SocketChannel>() {
-            @Override
-            protected void initChannel(SocketChannel ch) {
-                ChannelPipeline p = ch.pipeline();
-                p.addLast(NettyConstants.REAL_SERVER_HANDLER, new RealServerHandler(clientContext));
-            }
-        });
+
         clientContext.setControlBootstrap(controlBootstrap);
         clientContext.setControlWorkerGroup(controlWorkerGroup);
         clientContext.setServerBootstrap(serverBootstrap);

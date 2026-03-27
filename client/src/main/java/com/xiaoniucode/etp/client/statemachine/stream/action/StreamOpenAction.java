@@ -66,7 +66,7 @@ public class StreamOpenAction extends StreamBaseAction {
                         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload);
                         frame.setCompressed(context.isCompress());
                         frame.setEncrypted(context.isEncrypt());
-                        frame.setMuxTunnel(context.isMultiplex());
+                        frame.setMultiplexTunnel(context.isMultiplex());
                         control.writeAndFlush(frame).addListener(f -> {
                             if (f.isSuccess()) {
                                 TunnelBridge tunnelBridge;

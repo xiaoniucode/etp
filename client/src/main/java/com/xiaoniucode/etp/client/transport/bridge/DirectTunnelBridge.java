@@ -81,7 +81,6 @@ public class DirectTunnelBridge implements TunnelBridge {
     public void forwardToLocal(ByteBuf payload) {
         if (!server.isActive()) {
             logger.error("真实服务连接没有激活，关闭流：streamId={}", streamContext.getStreamId());
-            ReferenceCountUtil.release(payload);
             streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
@@ -100,7 +99,6 @@ public class DirectTunnelBridge implements TunnelBridge {
     public void forwardToRemote(ByteBuf payload) {
         if (!tunnel.isActive()) {
             logger.error("隧道没有激活，关闭流：streamId={}", streamContext.getStreamId());
-            ReferenceCountUtil.release(payload);
             streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }

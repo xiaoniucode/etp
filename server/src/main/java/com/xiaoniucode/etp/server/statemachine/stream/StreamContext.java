@@ -26,10 +26,13 @@ public class StreamContext extends AbstractStreamContext {
     private AgentContext agentContext;
     private StreamManager streamManager;
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
-
     public StreamContext(int streamId, StateMachine<StreamState, StreamEvent, StreamContext> streamStateMachine) {
         this.streamId = streamId;
         this.stateMachine = streamStateMachine;
+    }
+
+    public boolean hasBandwidthLimiter() {
+        return bandwidthLimiter != null;
     }
 
     public void fireEvent(StreamEvent event) {

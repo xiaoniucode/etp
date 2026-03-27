@@ -83,8 +83,8 @@ public class DirectTunnelBridge implements TunnelBridge {
     @Override
     public void forwardToLocal(ByteBuf payload) {
         if (!tunnel.isActive()) {
-            logger.error("隧道不可写：streamId={}", streamContext.getStreamId());
-            ReferenceCountUtil.release(payload);
+            logger.error("隧道没有激活：streamId={}", streamContext.getStreamId());
+            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
         tunnel.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) f -> {
@@ -101,8 +101,8 @@ public class DirectTunnelBridge implements TunnelBridge {
     @Override
     public void forwardToRemote(ByteBuf payload) {
         if (!visitor.isActive()) {
-            logger.error("访问者通道不可写：streamId={}", streamContext.getStreamId());
-            ReferenceCountUtil.release(payload);
+            logger.error("访问者通道没有激活：streamId={}", streamContext.getStreamId());
+            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
         visitor.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) f -> {

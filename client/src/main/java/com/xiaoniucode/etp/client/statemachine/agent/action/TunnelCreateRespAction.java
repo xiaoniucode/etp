@@ -45,7 +45,9 @@ public class TunnelCreateRespAction extends AgentBaseAction {
                     if (tlsContext != null) {
                         AppConfig config = agentContext.getConfig();
                         SslHandler sslHandler = tlsContext.newHandler(tunnel.alloc(), config.getServerAddr(), config.getServerPort());
-                        tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
+                        if (tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
+                          //  tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
+                        }
                     }
                 }
             } else {

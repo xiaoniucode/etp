@@ -32,6 +32,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
+        logger.debug("收到流 {} 打开通知", context.getStreamId());
         String tunnelId = context.getAndRemoveAs(StreamConstants.TUNNEL_ID, String.class);
         AgentContext agentContext = context.getAgentContext();
         String clientId = agentContext.getClientId();
@@ -40,6 +41,9 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             tunnelEntry = multiplexPool.acquire(clientId, context.isEncrypt());
         } else {
             tunnelEntry = directPool.borrow(clientId, tunnelId);
+        }
+        if (tunnelEntry==null){
+            throw new IllegalArgumentException("tunnelEntry 不能为空");
         }
         context.setTunnelEntry(tunnelEntry);
         Channel visitor = context.getVisitor();
@@ -59,6 +63,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             relayHttpFirstPackage(visitor, tunnelBridge);
         }
         visitor.config().setOption(ChannelOption.AUTO_READ, true);
+        logger.debug("流 {} 打开成功，可以从访问者读数据", context.getStreamId());
     }
 
     /**

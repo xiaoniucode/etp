@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.core.tls.TlsHelper;
+import com.xiaoniucode.etp.core.transport.TlsContextHolder;
 import io.netty.handler.ssl.SslContext;
 
 public class InitSslAction extends AgentBaseAction {
@@ -18,6 +19,7 @@ public class InitSslAction extends AgentBaseAction {
             if (Boolean.TRUE.equals(config.getTlsConfig().getEnable())) {
                 logger.debug("初始化 SSL上下文");
                 SslContext sslContext = TlsHelper.buildSslContext(true, config.getTlsConfig());
+                TlsContextHolder.initialize(sslContext);
                 ctx.setTlsContext(sslContext);
             }
             ctx.getStateMachine().fireEvent(ctx.getState(), AgentEvent.SSL_INITIALIZED,ctx);

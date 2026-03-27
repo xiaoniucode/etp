@@ -12,12 +12,11 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.core.transport.NettyBatchWriteQueue;
 import com.xiaoniucode.etp.server.statemachine.agent.command.TunnelCreateCmd;
-import com.xiaoniucode.etp.server.transport.TlsContextHolder;
+import com.xiaoniucode.etp.core.transport.TlsContextHolder;
 import com.xiaoniucode.etp.server.transport.connection.DirectPool;
 import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.ssl.SslHandler;
@@ -57,7 +56,7 @@ public class CreateTunnelAction extends AgentBaseAction {
                         tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
                         logger.debug("添加 TLS handler");
                     } else {
-                        tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
+                        // tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
                         logger.debug("替换 TLS handler");
                     }
                 });
@@ -73,14 +72,29 @@ public class CreateTunnelAction extends AgentBaseAction {
         ByteBuf payload = ProtobufUtil.toByteBuf(resp, control.alloc());
         TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_TUNNEL_CREATE_RESP, payload);
         frame.setEncrypted(encrypt);
-        frame.setMuxTunnel(multiplex);
+        frame.setMultiplexTunnel(multiplex);
+        if (!control.isActive() || !control.isWritable()) {
+            logger.error("控制通道不可用，隧道创建结果结果发送失败");
+            return;
+        }
         control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
             logger.debug("隧道创建结果响应引用计数：{}", payload.refCnt());
-            ReferenceCountUtil.release(payload);
+            if (!future.isSuccess()) {
+                logger.error("隧道创建结果响应失败", future.cause());
+            }
         });
     }
 
     public void createPool(String clientId, String tunnelId, boolean isMultiplex, boolean isEncrypt, Channel tunnel) {
+        if (tunnel==null){
+            throw new IllegalArgumentException("tunnel 不能为空");
+        }
+        if (clientId==null){
+            throw new IllegalArgumentException("clientId 不能为空");
+        }
+        if (tunnelId==null){
+            throw new IllegalArgumentException("tunnelId 不能为空");
+        }
         NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
         TunnelEntry poolEntry = new TunnelEntry(tunnelId, tunnel, writeQueue);
         poolEntry.setActive(true);

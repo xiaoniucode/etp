@@ -12,6 +12,8 @@ import com.xiaoniucode.etp.server.security.AccessTokenManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,12 +83,17 @@ public class AuthAction extends AgentBaseAction {
                 .build();
 
         TMSPFrame authFrame = new TMSPFrame(0, TMSP.MSG_AUTH_RESP);
-        authFrame.setPayload(ProtobufUtil.toByteBuf(authResponse, control.alloc()));
+        ByteBuf payload = ProtobufUtil.toByteBuf(authResponse, control.alloc());
+        authFrame.setPayload(payload);
 
         //todo eventBus.publishAsync(new AgentAuthEvent(context));
         context.fireEvent(AgentEvent.AUTH_SUCCESS);
 
-        control.writeAndFlush(authFrame);
+        control.writeAndFlush(authFrame).addListener((ChannelFutureListener) future -> {
+            if (!future.isSuccess()){
+                logger.error("发送认证成功消息失败",future.cause());
+            }
+        });
         logger.debug("客户端认证成功：[客户端ID={}，版本号={}]", context.getClientId(), context.getVersion());
     }
 

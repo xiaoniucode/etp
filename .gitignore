@@ -32,3 +32,5 @@ etp.trace.db
 /arthas-bin/
 /console-ui
 /skills
+
+/netty-demo

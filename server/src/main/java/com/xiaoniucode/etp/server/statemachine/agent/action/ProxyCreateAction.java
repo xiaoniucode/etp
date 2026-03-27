@@ -15,6 +15,8 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,14 +50,19 @@ public class ProxyCreateAction extends AgentBaseAction {
 
             ProxyConfig register = proxyManager.register(config);
             Message.NewProxyResp newProxyResp = buildResponse(register);
-            TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, ProtobufUtil.toByteBuf(newProxyResp, control.alloc()));
-            control.writeAndFlush(frame);
+            ByteBuf payload = ProtobufUtil.toByteBuf(newProxyResp, control.alloc());
+            TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, payload);
+            control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
+                if (future.isSuccess()){
+                    logger.debug("代理配置 {} 创建结果发送成功",register.getName());
+                }else {
+                    logger.error("代理配置 {} 创建失败",register.getName(),future.cause());
+                }
+            });
             logger.debug("代理注册成功: {}", register);
         } catch (Exception e) {
             logger.error("代理配置注册失败", e);
             sendErrorMessage(e.getMessage(), control);
-        } finally {
-            context.removeVariable(AgentConstants.NEWA_PROXY);
         }
     }
 

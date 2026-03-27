@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 @Slf4j
 public class CreateTunnelPoolAction extends AgentBaseAction {
     private final Logger logger = LoggerFactory.getLogger(CreateTunnelPoolAction.class);
-    private static final int DEFAULT_DIRECT_COUNT = 30;
+    private static final int DEFAULT_DIRECT_COUNT = 0;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -74,14 +74,13 @@ public class CreateTunnelPoolAction extends AgentBaseAction {
                         .build();
                 ByteBuf payload = ProtobufUtil.toByteBuf(body, tunnel.alloc());
                 TMSPFrame frame = new TMSPFrame(connectionId, TMSP.MSG_TUNNEL_CREATE, payload);
-                frame.setMuxTunnel(isMultiplex);
+                frame.setMultiplexTunnel(isMultiplex);
                 frame.setEncrypted(isTls);
 
                 tunnel.writeAndFlush(frame).addListener((ChannelFutureListener) f -> {
                     logger.debug("隧道创建请求数据包引用计数：{}", payload.refCnt());
-                    ReferenceCountUtil.release(payload);
                     if (!f.isSuccess()) {
-                        logger.error("隧道创建请求发送失败！");
+                        logger.error("隧道创建请求发送失败！", f.cause());
                     } else {
                         logger.debug("隧道创建请求发送成功");
                     }

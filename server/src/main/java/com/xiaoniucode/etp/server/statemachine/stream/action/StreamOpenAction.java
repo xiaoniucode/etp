@@ -42,13 +42,12 @@ public class StreamOpenAction extends StreamBaseAction {
         NewStreamCodec.encode(payload, target.getHost(), target.getPort());
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN, payload);
 
-        frame.setMuxTunnel(config.isMuxTunnel());
+        frame.setMultiplexTunnel(config.isMuxTunnel());
         frame.setCompressed(context.isCompress());
         frame.setEncrypted(config.isEncrypt());
 
         control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
             logger.debug("打开流请求引用计数：{}", payload.refCnt());
-            ReferenceCountUtil.release(payload);
             if (!future.isSuccess()) {
                 logger.error("打开流消息发送失败，关闭流：streamId={} error={}", streamId, future.cause().getMessage());
                 context.fireEvent(StreamEvent.STREAM_CLOSE);
@@ -59,7 +58,7 @@ public class StreamOpenAction extends StreamBaseAction {
                         context.fireEvent(StreamEvent.STREAM_CLOSE);
                     }
                 }, 10, TimeUnit.SECONDS); // 如果10秒状态未改变，超时处理
-                logger.debug("流 {} 打开成功 代理名: {} 访问目标：{}", streamId, config.getName(), target);
+                logger.debug("流 {} 打开请求发送成功 代理名: {} 访问目标：{}", streamId, config.getName(), target);
             }
         });
     }

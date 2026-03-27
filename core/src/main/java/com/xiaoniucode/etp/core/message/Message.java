@@ -2080,6 +2080,440 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
   }
 
+  public interface LimitNotifyOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.LimitNotify)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>uint32 delayMs = 1;</code>
+     * @return The delayMs.
+     */
+    int getDelayMs();
+  }
+  /**
+   * Protobuf type {@code com.xiaoniucode.etp.core.message.LimitNotify}
+   */
+  public static final class LimitNotify extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.message.LimitNotify)
+      LimitNotifyOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "LimitNotify");
+    }
+    // Use LimitNotify.newBuilder() to construct.
+    private LimitNotify(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private LimitNotify() {
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_LimitNotify_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_LimitNotify_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.xiaoniucode.etp.core.message.Message.LimitNotify.class, com.xiaoniucode.etp.core.message.Message.LimitNotify.Builder.class);
+    }
+
+    public static final int DELAYMS_FIELD_NUMBER = 1;
+    private int delayMs_ = 0;
+    /**
+     * <code>uint32 delayMs = 1;</code>
+     * @return The delayMs.
+     */
+    @java.lang.Override
+    public int getDelayMs() {
+      return delayMs_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (delayMs_ != 0) {
+        output.writeUInt32(1, delayMs_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (delayMs_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(1, delayMs_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.xiaoniucode.etp.core.message.Message.LimitNotify)) {
+        return super.equals(obj);
+      }
+      com.xiaoniucode.etp.core.message.Message.LimitNotify other = (com.xiaoniucode.etp.core.message.Message.LimitNotify) obj;
+
+      if (getDelayMs()
+          != other.getDelayMs()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + DELAYMS_FIELD_NUMBER;
+      hash = (53 * hash) + getDelayMs();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(com.xiaoniucode.etp.core.message.Message.LimitNotify prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code com.xiaoniucode.etp.core.message.LimitNotify}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.message.LimitNotify)
+        com.xiaoniucode.etp.core.message.Message.LimitNotifyOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_LimitNotify_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_LimitNotify_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.xiaoniucode.etp.core.message.Message.LimitNotify.class, com.xiaoniucode.etp.core.message.Message.LimitNotify.Builder.class);
+      }
+
+      // Construct using com.xiaoniucode.etp.core.message.Message.LimitNotify.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        delayMs_ = 0;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_LimitNotify_descriptor;
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.LimitNotify getDefaultInstanceForType() {
+        return com.xiaoniucode.etp.core.message.Message.LimitNotify.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.LimitNotify build() {
+        com.xiaoniucode.etp.core.message.Message.LimitNotify result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.LimitNotify buildPartial() {
+        com.xiaoniucode.etp.core.message.Message.LimitNotify result = new com.xiaoniucode.etp.core.message.Message.LimitNotify(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(com.xiaoniucode.etp.core.message.Message.LimitNotify result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.delayMs_ = delayMs_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.xiaoniucode.etp.core.message.Message.LimitNotify) {
+          return mergeFrom((com.xiaoniucode.etp.core.message.Message.LimitNotify)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.LimitNotify other) {
+        if (other == com.xiaoniucode.etp.core.message.Message.LimitNotify.getDefaultInstance()) return this;
+        if (other.getDelayMs() != 0) {
+          setDelayMs(other.getDelayMs());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                delayMs_ = input.readUInt32();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private int delayMs_ ;
+      /**
+       * <code>uint32 delayMs = 1;</code>
+       * @return The delayMs.
+       */
+      @java.lang.Override
+      public int getDelayMs() {
+        return delayMs_;
+      }
+      /**
+       * <code>uint32 delayMs = 1;</code>
+       * @param value The delayMs to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDelayMs(int value) {
+
+        delayMs_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>uint32 delayMs = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearDelayMs() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        delayMs_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.LimitNotify)
+    }
+
+    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.message.LimitNotify)
+    private static final com.xiaoniucode.etp.core.message.Message.LimitNotify DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.xiaoniucode.etp.core.message.Message.LimitNotify();
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.LimitNotify getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<LimitNotify>
+        PARSER = new com.google.protobuf.AbstractParser<LimitNotify>() {
+      @java.lang.Override
+      public LimitNotify parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<LimitNotify> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<LimitNotify> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.LimitNotify getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface TunnelCreateRequestOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.TunnelCreateRequest)
       com.google.protobuf.MessageOrBuilder {
@@ -15968,6 +16402,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_xiaoniucode_etp_core_message_AuthInfo_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_xiaoniucode_etp_core_message_LimitNotify_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_com_xiaoniucode_etp_core_message_LimitNotify_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_xiaoniucode_etp_core_message_TunnelCreateRequest_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -16063,67 +16502,68 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       "e\022\026\n\tclient_id\030\t \001(\tH\000\210\001\001\022\021\n\004name\030\003 \001(\tH" +
       "\001\210\001\001\022\017\n\002os\030\006 \001(\tH\002\210\001\001\022\021\n\004arch\030\007 \001(\tH\003\210\001\001" +
       "B\014\n\n_client_idB\007\n\005_nameB\005\n\003_osB\007\n\005_arch\"" +
-      "(\n\023TunnelCreateRequest\022\021\n\ttunnel_id\030\001 \001(" +
-      "\t\"Y\n\024TunnelCreateResponse\022\021\n\ttunnel_id\030\001" +
-      " \001(\t\022\014\n\004code\030\002 \001(\r\022\024\n\007message\030\003 \001(\tH\000\210\001\001" +
-      "B\n\n\010_message\"L\n\022StreamOpenResponse\022\025\n\rco" +
-      "nnection_id\030\001 \001(\r\022\021\n\ttunnel_id\030\002 \001(\t\022\014\n\004" +
-      "code\030\003 \001(\r\"f\n\014AuthResponse\022\020\n\010clientId\030\001" +
-      " \001(\t\022\024\n\014connectionId\030\004 \001(\r\022\014\n\004code\030\002 \001(\r" +
-      "\022\024\n\007message\030\003 \001(\tH\000\210\001\001B\n\n\010_message\"x\n\rAc" +
-      "cessControl\022\016\n\006enable\030\001 \001(\010\022:\n\004mode\030\002 \001(" +
-      "\0162,.com.xiaoniucode.etp.core.message.Acc" +
-      "essMode\022\r\n\005allow\030\003 \003(\t\022\014\n\004deny\030\004 \003(\t\"&\n\010" +
-      "HttpUser\022\014\n\004user\030\001 \001(\t\022\014\n\004pass\030\002 \001(\t\"[\n\t" +
-      "BasicAuth\022\016\n\006enable\030\001 \001(\010\022>\n\nhttp_users\030" +
-      "\002 \003(\0132*.com.xiaoniucode.etp.core.message" +
-      ".HttpUser\"s\n\tBandwidth\022\022\n\005limit\030\001 \001(\tH\000\210" +
-      "\001\001\022\025\n\010limit_in\030\002 \001(\tH\001\210\001\001\022\026\n\tlimit_out\030\003" +
-      " \001(\tH\002\210\001\001B\010\n\006_limitB\013\n\t_limit_inB\014\n\n_lim" +
-      "it_out\"`\n\006Target\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002" +
-      " \001(\r\022\021\n\004name\030\004 \001(\tH\000\210\001\001\022\023\n\006weight\030\005 \001(\005H" +
-      "\001\210\001\001B\007\n\005_nameB\t\n\007_weight\"h\n\013LoadBalance\022" +
-      "L\n\010strategy\030\001 \001(\01625.com.xiaoniucode.etp." +
-      "core.message.LoadBalanceStrategyH\000\210\001\001B\013\n" +
-      "\t_strategy\"c\n\nDomainInfo\022\030\n\013auto_domain\030" +
-      "\001 \001(\010H\000\210\001\001\022\026\n\016custom_domains\030\002 \003(\t\022\023\n\013su" +
-      "b_domains\030\003 \003(\tB\016\n\014_auto_domain\"k\n\tTrans" +
-      "port\022\020\n\003mux\030\001 \001(\010H\000\210\001\001\022\024\n\007encrypt\030\003 \001(\010H" +
-      "\001\210\001\001\022\025\n\010compress\030\004 \001(\010H\002\210\001\001B\006\n\004_muxB\n\n\010_" +
-      "encryptB\013\n\t_compress\"\344\005\n\010NewProxy\022\014\n\004nam" +
-      "e\030\001 \001(\t\0229\n\007targets\030\002 \003(\0132(.com.xiaoniuco" +
-      "de.etp.core.message.Target\022\023\n\006enable\030\003 \001" +
-      "(\010H\000\210\001\001\022@\n\010protocol\030\006 \001(\0162..com.xiaoniuc" +
-      "ode.etp.core.message.ProtocolType\022\030\n\013rem" +
-      "ote_port\030\007 \001(\rH\001\210\001\001\022A\n\006domain\030\010 \001(\0132,.co" +
-      "m.xiaoniucode.etp.core.message.DomainInf" +
-      "oH\002\210\001\001\022L\n\016access_control\030\013 \001(\0132/.com.xia" +
-      "oniucode.etp.core.message.AccessControlH" +
-      "\003\210\001\001\022D\n\nbasic_auth\030\014 \001(\0132+.com.xiaoniuco" +
-      "de.etp.core.message.BasicAuthH\004\210\001\001\022C\n\tba" +
-      "ndwidth\030\r \001(\0132+.com.xiaoniucode.etp.core" +
-      ".message.BandwidthH\005\210\001\001\022H\n\014load_balance\030" +
-      "\016 \001(\0132-.com.xiaoniucode.etp.core.message" +
-      ".LoadBalanceH\006\210\001\001\022C\n\ttransport\030\017 \001(\0132+.c" +
-      "om.xiaoniucode.etp.core.message.Transpor" +
-      "tH\007\210\001\001B\t\n\007_enableB\016\n\014_remote_portB\t\n\007_do" +
-      "mainB\021\n\017_access_controlB\r\n\013_basic_authB\014" +
-      "\n\n_bandwidthB\017\n\r_load_balanceB\014\n\n_transp" +
-      "ort\"H\n\014NewProxyResp\022\017\n\007proxyId\030\001 \001(\t\022\022\n\n" +
-      "proxy_name\030\002 \001(\t\022\023\n\013remote_addr\030\003 \001(\t\"&\n" +
-      "\005Error\022\014\n\004code\030\001 \001(\005\022\017\n\007message\030\002 \001(\t\"\340\001" +
-      "\n\rConfigMessage\022?\n\tnew_proxy\030e \001(\0132*.com" +
-      ".xiaoniucode.etp.core.message.NewProxyH\000" +
-      "\022H\n\016new_proxy_resp\030f \001(\0132..com.xiaoniuco" +
-      "de.etp.core.message.NewProxyRespH\000\0229\n\005er" +
-      "ror\030\315\001 \001(\0132\'.com.xiaoniucode.etp.core.me" +
-      "ssage.ErrorH\000B\t\n\007payload*!\n\014ProtocolType" +
-      "\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001*0\n\nClientType\022\021\n\rBIN" +
-      "ARY_DEVICE\020\000\022\017\n\013WEB_SESSION\020\001*!\n\nAccessM" +
-      "ode\022\t\n\005ALLOW\020\000\022\010\n\004DENY\020\001*N\n\023LoadBalanceS" +
-      "trategy\022\017\n\013ROUND_ROBIN\020\000\022\n\n\006WEIGHT\020\001\022\n\n\006" +
-      "RANDOM\020\002\022\016\n\nLEAST_CONN\020\003*\"\n\025TransportPro" +
-      "tocolType\022\t\n\005T_TCP\020\000b\006proto3"
+      "\036\n\013LimitNotify\022\017\n\007delayMs\030\001 \001(\r\"(\n\023Tunne" +
+      "lCreateRequest\022\021\n\ttunnel_id\030\001 \001(\t\"Y\n\024Tun" +
+      "nelCreateResponse\022\021\n\ttunnel_id\030\001 \001(\t\022\014\n\004" +
+      "code\030\002 \001(\r\022\024\n\007message\030\003 \001(\tH\000\210\001\001B\n\n\010_mes" +
+      "sage\"L\n\022StreamOpenResponse\022\025\n\rconnection" +
+      "_id\030\001 \001(\r\022\021\n\ttunnel_id\030\002 \001(\t\022\014\n\004code\030\003 \001" +
+      "(\r\"f\n\014AuthResponse\022\020\n\010clientId\030\001 \001(\t\022\024\n\014" +
+      "connectionId\030\004 \001(\r\022\014\n\004code\030\002 \001(\r\022\024\n\007mess" +
+      "age\030\003 \001(\tH\000\210\001\001B\n\n\010_message\"x\n\rAccessCont" +
+      "rol\022\016\n\006enable\030\001 \001(\010\022:\n\004mode\030\002 \001(\0162,.com." +
+      "xiaoniucode.etp.core.message.AccessMode\022" +
+      "\r\n\005allow\030\003 \003(\t\022\014\n\004deny\030\004 \003(\t\"&\n\010HttpUser" +
+      "\022\014\n\004user\030\001 \001(\t\022\014\n\004pass\030\002 \001(\t\"[\n\tBasicAut" +
+      "h\022\016\n\006enable\030\001 \001(\010\022>\n\nhttp_users\030\002 \003(\0132*." +
+      "com.xiaoniucode.etp.core.message.HttpUse" +
+      "r\"s\n\tBandwidth\022\022\n\005limit\030\001 \001(\tH\000\210\001\001\022\025\n\010li" +
+      "mit_in\030\002 \001(\tH\001\210\001\001\022\026\n\tlimit_out\030\003 \001(\tH\002\210\001" +
+      "\001B\010\n\006_limitB\013\n\t_limit_inB\014\n\n_limit_out\"`" +
+      "\n\006Target\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\r\022\021\n\004" +
+      "name\030\004 \001(\tH\000\210\001\001\022\023\n\006weight\030\005 \001(\005H\001\210\001\001B\007\n\005" +
+      "_nameB\t\n\007_weight\"h\n\013LoadBalance\022L\n\010strat" +
+      "egy\030\001 \001(\01625.com.xiaoniucode.etp.core.mes" +
+      "sage.LoadBalanceStrategyH\000\210\001\001B\013\n\t_strate" +
+      "gy\"c\n\nDomainInfo\022\030\n\013auto_domain\030\001 \001(\010H\000\210" +
+      "\001\001\022\026\n\016custom_domains\030\002 \003(\t\022\023\n\013sub_domain" +
+      "s\030\003 \003(\tB\016\n\014_auto_domain\"k\n\tTransport\022\020\n\003" +
+      "mux\030\001 \001(\010H\000\210\001\001\022\024\n\007encrypt\030\003 \001(\010H\001\210\001\001\022\025\n\010" +
+      "compress\030\004 \001(\010H\002\210\001\001B\006\n\004_muxB\n\n\010_encryptB" +
+      "\013\n\t_compress\"\344\005\n\010NewProxy\022\014\n\004name\030\001 \001(\t\022" +
+      "9\n\007targets\030\002 \003(\0132(.com.xiaoniucode.etp.c" +
+      "ore.message.Target\022\023\n\006enable\030\003 \001(\010H\000\210\001\001\022" +
+      "@\n\010protocol\030\006 \001(\0162..com.xiaoniucode.etp." +
+      "core.message.ProtocolType\022\030\n\013remote_port" +
+      "\030\007 \001(\rH\001\210\001\001\022A\n\006domain\030\010 \001(\0132,.com.xiaoni" +
+      "ucode.etp.core.message.DomainInfoH\002\210\001\001\022L" +
+      "\n\016access_control\030\013 \001(\0132/.com.xiaoniucode" +
+      ".etp.core.message.AccessControlH\003\210\001\001\022D\n\n" +
+      "basic_auth\030\014 \001(\0132+.com.xiaoniucode.etp.c" +
+      "ore.message.BasicAuthH\004\210\001\001\022C\n\tbandwidth\030" +
+      "\r \001(\0132+.com.xiaoniucode.etp.core.message" +
+      ".BandwidthH\005\210\001\001\022H\n\014load_balance\030\016 \001(\0132-." +
+      "com.xiaoniucode.etp.core.message.LoadBal" +
+      "anceH\006\210\001\001\022C\n\ttransport\030\017 \001(\0132+.com.xiaon" +
+      "iucode.etp.core.message.TransportH\007\210\001\001B\t" +
+      "\n\007_enableB\016\n\014_remote_portB\t\n\007_domainB\021\n\017" +
+      "_access_controlB\r\n\013_basic_authB\014\n\n_bandw" +
+      "idthB\017\n\r_load_balanceB\014\n\n_transport\"H\n\014N" +
+      "ewProxyResp\022\017\n\007proxyId\030\001 \001(\t\022\022\n\nproxy_na" +
+      "me\030\002 \001(\t\022\023\n\013remote_addr\030\003 \001(\t\"&\n\005Error\022\014" +
+      "\n\004code\030\001 \001(\005\022\017\n\007message\030\002 \001(\t\"\340\001\n\rConfig" +
+      "Message\022?\n\tnew_proxy\030e \001(\0132*.com.xiaoniu" +
+      "code.etp.core.message.NewProxyH\000\022H\n\016new_" +
+      "proxy_resp\030f \001(\0132..com.xiaoniucode.etp.c" +
+      "ore.message.NewProxyRespH\000\0229\n\005error\030\315\001 \001" +
+      "(\0132\'.com.xiaoniucode.etp.core.message.Er" +
+      "rorH\000B\t\n\007payload*!\n\014ProtocolType\022\007\n\003TCP\020" +
+      "\000\022\010\n\004HTTP\020\001*0\n\nClientType\022\021\n\rBINARY_DEVI" +
+      "CE\020\000\022\017\n\013WEB_SESSION\020\001*!\n\nAccessMode\022\t\n\005A" +
+      "LLOW\020\000\022\010\n\004DENY\020\001*N\n\023LoadBalanceStrategy\022" +
+      "\017\n\013ROUND_ROBIN\020\000\022\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002" +
+      "\022\016\n\nLEAST_CONN\020\003*\"\n\025TransportProtocolTyp" +
+      "e\022\t\n\005T_TCP\020\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -16135,98 +16575,104 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_AuthInfo_descriptor,
         new java.lang.String[] { "Token", "Version", "ClientType", "ClientId", "Name", "Os", "Arch", });
-    internal_static_com_xiaoniucode_etp_core_message_TunnelCreateRequest_descriptor =
+    internal_static_com_xiaoniucode_etp_core_message_LimitNotify_descriptor =
       getDescriptor().getMessageType(1);
+    internal_static_com_xiaoniucode_etp_core_message_LimitNotify_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_xiaoniucode_etp_core_message_LimitNotify_descriptor,
+        new java.lang.String[] { "DelayMs", });
+    internal_static_com_xiaoniucode_etp_core_message_TunnelCreateRequest_descriptor =
+      getDescriptor().getMessageType(2);
     internal_static_com_xiaoniucode_etp_core_message_TunnelCreateRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_TunnelCreateRequest_descriptor,
         new java.lang.String[] { "TunnelId", });
     internal_static_com_xiaoniucode_etp_core_message_TunnelCreateResponse_descriptor =
-      getDescriptor().getMessageType(2);
+      getDescriptor().getMessageType(3);
     internal_static_com_xiaoniucode_etp_core_message_TunnelCreateResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_TunnelCreateResponse_descriptor,
         new java.lang.String[] { "TunnelId", "Code", "Message", });
     internal_static_com_xiaoniucode_etp_core_message_StreamOpenResponse_descriptor =
-      getDescriptor().getMessageType(3);
+      getDescriptor().getMessageType(4);
     internal_static_com_xiaoniucode_etp_core_message_StreamOpenResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_StreamOpenResponse_descriptor,
         new java.lang.String[] { "ConnectionId", "TunnelId", "Code", });
     internal_static_com_xiaoniucode_etp_core_message_AuthResponse_descriptor =
-      getDescriptor().getMessageType(4);
+      getDescriptor().getMessageType(5);
     internal_static_com_xiaoniucode_etp_core_message_AuthResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_AuthResponse_descriptor,
         new java.lang.String[] { "ClientId", "ConnectionId", "Code", "Message", });
     internal_static_com_xiaoniucode_etp_core_message_AccessControl_descriptor =
-      getDescriptor().getMessageType(5);
+      getDescriptor().getMessageType(6);
     internal_static_com_xiaoniucode_etp_core_message_AccessControl_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_AccessControl_descriptor,
         new java.lang.String[] { "Enable", "Mode", "Allow", "Deny", });
     internal_static_com_xiaoniucode_etp_core_message_HttpUser_descriptor =
-      getDescriptor().getMessageType(6);
+      getDescriptor().getMessageType(7);
     internal_static_com_xiaoniucode_etp_core_message_HttpUser_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_HttpUser_descriptor,
         new java.lang.String[] { "User", "Pass", });
     internal_static_com_xiaoniucode_etp_core_message_BasicAuth_descriptor =
-      getDescriptor().getMessageType(7);
+      getDescriptor().getMessageType(8);
     internal_static_com_xiaoniucode_etp_core_message_BasicAuth_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_BasicAuth_descriptor,
         new java.lang.String[] { "Enable", "HttpUsers", });
     internal_static_com_xiaoniucode_etp_core_message_Bandwidth_descriptor =
-      getDescriptor().getMessageType(8);
+      getDescriptor().getMessageType(9);
     internal_static_com_xiaoniucode_etp_core_message_Bandwidth_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Bandwidth_descriptor,
         new java.lang.String[] { "Limit", "LimitIn", "LimitOut", });
     internal_static_com_xiaoniucode_etp_core_message_Target_descriptor =
-      getDescriptor().getMessageType(9);
+      getDescriptor().getMessageType(10);
     internal_static_com_xiaoniucode_etp_core_message_Target_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Target_descriptor,
         new java.lang.String[] { "Host", "Port", "Name", "Weight", });
     internal_static_com_xiaoniucode_etp_core_message_LoadBalance_descriptor =
-      getDescriptor().getMessageType(10);
+      getDescriptor().getMessageType(11);
     internal_static_com_xiaoniucode_etp_core_message_LoadBalance_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_LoadBalance_descriptor,
         new java.lang.String[] { "Strategy", });
     internal_static_com_xiaoniucode_etp_core_message_DomainInfo_descriptor =
-      getDescriptor().getMessageType(11);
+      getDescriptor().getMessageType(12);
     internal_static_com_xiaoniucode_etp_core_message_DomainInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_DomainInfo_descriptor,
         new java.lang.String[] { "AutoDomain", "CustomDomains", "SubDomains", });
     internal_static_com_xiaoniucode_etp_core_message_Transport_descriptor =
-      getDescriptor().getMessageType(12);
+      getDescriptor().getMessageType(13);
     internal_static_com_xiaoniucode_etp_core_message_Transport_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Transport_descriptor,
         new java.lang.String[] { "Mux", "Encrypt", "Compress", });
     internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor =
-      getDescriptor().getMessageType(13);
+      getDescriptor().getMessageType(14);
     internal_static_com_xiaoniucode_etp_core_message_NewProxy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor,
         new java.lang.String[] { "Name", "Targets", "Enable", "Protocol", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalance", "Transport", });
     internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_descriptor =
-      getDescriptor().getMessageType(14);
+      getDescriptor().getMessageType(15);
     internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_descriptor,
         new java.lang.String[] { "ProxyId", "ProxyName", "RemoteAddr", });
     internal_static_com_xiaoniucode_etp_core_message_Error_descriptor =
-      getDescriptor().getMessageType(15);
+      getDescriptor().getMessageType(16);
     internal_static_com_xiaoniucode_etp_core_message_Error_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Error_descriptor,
         new java.lang.String[] { "Code", "Message", });
     internal_static_com_xiaoniucode_etp_core_message_ConfigMessage_descriptor =
-      getDescriptor().getMessageType(16);
+      getDescriptor().getMessageType(17);
     internal_static_com_xiaoniucode_etp_core_message_ConfigMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_ConfigMessage_descriptor,

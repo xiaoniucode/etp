@@ -9,15 +9,17 @@ import com.xiaoniucode.etp.core.transport.IdleCheckHandler;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.tls.TlsHelper;
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
 import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
 import com.xiaoniucode.etp.server.transport.ControlFrameHandler;
-import com.xiaoniucode.etp.server.transport.TlsContextHolder;
+import com.xiaoniucode.etp.core.transport.TlsContextHolder;
+import com.xiaoniucode.etp.server.transport.MultiplexDownloadRateLimitHandler;
+import com.xiaoniucode.etp.core.transport.compress.MultiplexSnappyDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslContext;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -59,27 +61,27 @@ public class TunnelServer implements Lifecycle {
             }
             tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
+            MultiplexDownloadRateLimitHandler multiplexDownloadRateLimitHandler = SpringContextHolder.getBean(MultiplexDownloadRateLimitHandler.class);
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(tunnelBossGroup, tunnelWorkerGroup)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.TCP_NODELAY, true)
                     .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 //                    .option(ChannelOption.SO_BACKLOG, 8192)
-//                    .childOption(ChannelOption.SO_SNDBUF, 16 * 1024 * 1024)   // 发送缓冲 16MB
-//                    .childOption(ChannelOption.SO_RCVBUF, 16 * 1024 * 1024)   // 接收缓冲 16MB
                     .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
                             new WriteBufferWaterMark(64 * 1024, 256 * 1024))
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            if (config.getTlsConfig().getEnable()) {
+                            if (config.getTlsConfig().getEnable() && tlsContext != null) {
                                 sc.pipeline().addLast(NettyConstants.TLS_HANDLER, tlsContext.newHandler(sc.alloc()));
-                                logger.debug("TLS加密处理器添加成功");
                             }
                             sc.pipeline()
                                     .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
-                                    .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
+//                                    .addLast(multiplexDownloadRateLimitHandler)
+                                    .addLast(new MultiplexSnappyDecoder())
+                                   // .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
                                     .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
                         }
                     });

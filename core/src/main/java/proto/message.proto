@@ -32,6 +32,9 @@ message AuthInfo {
   optional string os = 6;
   optional string arch = 7;
 }
+message LimitNotify{
+   uint32 delayMs=1;
+}
 message TunnelCreateRequest{
   string tunnel_id = 1;
 }

@@ -39,72 +39,76 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
-        byte msgType = frame.getMsgType();
-        switch (msgType) {
-            case TMSP.MSG_AUTH -> {
-                ByteBuf payload = frame.getPayload();
-                AgentContext agentContext = agentManager.createAgent(ctx.channel(), agentStateMachine);
-                Message.AuthInfo authInfo = ProtobufUtil.parseFrom(payload, Message.AuthInfo.parser());
-                agentContext.setVariable(AgentConstants.AGENT_AUTH_INFO, authInfo);
-                agentContext.fireEvent(AgentEvent.AUTH_START);
-            }
+        try {
+            byte msgType = frame.getMsgType();
+            switch (msgType) {
+                case TMSP.MSG_AUTH -> {
+                    ByteBuf payload = frame.getPayload();
+                    AgentContext agentContext = agentManager.createAgent(ctx.channel(), agentStateMachine);
+                    Message.AuthInfo authInfo = ProtobufUtil.parseFrom(payload, Message.AuthInfo.parser());
+                    agentContext.setVariable(AgentConstants.AGENT_AUTH_INFO, authInfo);
+                    agentContext.fireEvent(AgentEvent.AUTH_START);
+                }
 
-            case TMSP.MSG_TUNNEL_CREATE -> {
-                Optional<AgentContext> ag = agentManager.getAgentContext(frame.getStreamId());
-                if (ag.isPresent()) {
-                    AgentContext agentContext = ag.get();
-                    Channel control = agentContext.getControl();
-                    Channel tunnel = ctx.channel();
-                    if (control == tunnel) {
-                        logger.error("控制隧道和消息来源与数据隧道相同，消息异常，关闭连接");
+                case TMSP.MSG_TUNNEL_CREATE -> {
+                    Optional<AgentContext> ag = agentManager.getAgentContext(frame.getStreamId());
+                    if (ag.isPresent()) {
+                        AgentContext agentContext = ag.get();
+                        Channel control = agentContext.getControl();
+                        Channel tunnel = ctx.channel();
+                        if (control == tunnel) {
+                            logger.error("控制隧道和消息来源与数据隧道相同，消息异常，关闭连接");
+                            ChannelUtils.closeOnFlush(ctx.channel());
+                            return;
+                        }
+                        Message.TunnelCreateRequest req = ProtobufUtil.parseFrom(frame.getPayload(), Message.TunnelCreateRequest.parser());
+                        TunnelCreateCmd cmd = new TunnelCreateCmd(tunnel, frame.isEncrypted(), frame.isMuxTunnel(), req.getTunnelId());
+                        control.eventLoop().execute(() -> {
+                            agentContext.setVariable("tunnelCreateCmd", cmd);
+                            agentContext.fireEvent(AgentEvent.CREATE_TUNNEL);
+                        });
+                    } else {
                         ChannelUtils.closeOnFlush(ctx.channel());
+                    }
+                }
+
+                //----------------------------------------------------------------------------------------//
+                case TMSP.MSG_STREAM_OPEN_RESP -> {
+                    int streamId = frame.getStreamId();
+
+                    StreamContext streamContext = streamManager.getStreamContext(streamId);
+                    if (streamContext == null) {
+                        logger.warn("流上下文不存在 - [streamId={}]", streamId);
                         return;
                     }
-                    Message.TunnelCreateRequest req = ProtobufUtil.parseFrom(frame.getPayload(), Message.TunnelCreateRequest.parser());
-                    TunnelCreateCmd cmd = new TunnelCreateCmd(tunnel, frame.isEncrypted(), frame.isMuxTunnel(), req.getTunnelId());
-                    control.eventLoop().execute(() -> {
-                        agentContext.setVariable("tunnelCreateCmd", cmd);
-                        agentContext.fireEvent(AgentEvent.CREATE_TUNNEL);
+                    ByteBuf payload = frame.getPayload();
+                    Message.StreamOpenResponse resp = ProtobufUtil.parseFrom(payload, Message.StreamOpenResponse.parser());
+                    String tunnelId = resp.getTunnelId();
+                    streamContext.setMultiplex(frame.isMuxTunnel());
+                    streamContext.setVariable(StreamConstants.TUNNEL_ID, tunnelId);
+                    streamContext.setCompress(frame.isCompressed());
+                    streamContext.setEncrypt(frame.isEncrypted());
+                    streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
+                }
+                case TMSP.MSG_STREAM_DATA -> {
+                    int streamId = frame.getStreamId();
+                    StreamContext streamContext = streamManager.getStreamContext(streamId);
+                    streamContext.forwardToRemote(frame.getPayload());
+                }
+                case TMSP.MSG_PROXY_CREATE -> {
+                    agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
+                        Message.NewProxy newProxy = ProtobufUtil.parseFrom(frame.getPayload(), Message.NewProxy.parser());
+                        agentContext.setVariable(AgentConstants.NEWA_PROXY, newProxy);
+                        agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
                     });
-                } else {
-                    ChannelUtils.closeOnFlush(ctx.channel());
+                }
+                //内网目标服务健康上报
+                case TMSP.MSG_SERVICE_HEALTH_CHANGE -> {
+
                 }
             }
-
-            //----------------------------------------------------------------------------------------//
-            case TMSP.MSG_STREAM_OPEN_RESP -> {
-                int streamId = frame.getStreamId();
-
-                StreamContext streamContext = streamManager.getStreamContext(streamId);
-                if (streamContext == null) {
-                    logger.warn("流上下文不存在 - [streamId={}]", streamId);
-                    return;
-                }
-                ByteBuf payload = frame.getPayload();
-                Message.StreamOpenResponse resp = ProtobufUtil.parseFrom(payload, Message.StreamOpenResponse.parser());
-                String tunnelId = resp.getTunnelId();
-                streamContext.setMultiplex(frame.isMuxTunnel());
-                streamContext.setVariable(StreamConstants.TUNNEL_ID, tunnelId);
-                streamContext.setCompress(frame.isCompressed());
-                streamContext.setEncrypt(frame.isEncrypted());
-                streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
-            }
-            case TMSP.MSG_STREAM_DATA -> {
-                int streamId = frame.getStreamId();
-                StreamContext streamContext = streamManager.getStreamContext(streamId);
-                streamContext.forwardToRemote(frame.getPayload());
-            }
-            case TMSP.MSG_PROXY_CREATE -> {
-                agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
-                    Message.NewProxy newProxy = ProtobufUtil.parseFrom(frame.getPayload(), Message.NewProxy.parser());
-                    agentContext.setVariable(AgentConstants.NEWA_PROXY, newProxy);
-                    agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
-                });
-            }
-            //内网目标服务健康上报
-            case TMSP.MSG_SERVICE_HEALTH_CHANGE -> {
-
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -122,7 +126,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         logger.error("控制连接异常: ", cause);
         agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
             Channel control = agentContext.getControl();
-            ChannelUtils.closeOnFlush(control);
+           // ChannelUtils.closeOnFlush(control);
         });
     }
 
@@ -152,6 +156,5 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 });
             }
         }
-        super.channelWritabilityChanged(ctx);
     }
 }

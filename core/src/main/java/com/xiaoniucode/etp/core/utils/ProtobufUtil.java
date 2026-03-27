@@ -8,17 +8,18 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
+import io.netty.util.ReferenceCountUtil;
 
 import java.io.IOException;
 
 public class ProtobufUtil {
     public static <T extends MessageLite> ByteBuf toByteBuf(T message, ByteBufAllocator alloc) {
         ByteBuf buf = alloc.buffer();
-        try (ByteBufOutputStream out = new ByteBufOutputStream(buf)) {
+        try (ByteBufOutputStream out = new ByteBufOutputStream(buf,false)) {
             message.writeTo(out);
             return buf;
         } catch (IOException e) {
-            buf.release();
+            ReferenceCountUtil.release(buf);
             throw new RuntimeException("Protobuf 编码失败", e);
         }
     }
@@ -27,11 +28,10 @@ public class ProtobufUtil {
             throw new IllegalArgumentException("payload 为空");
         }
         try {
-            return parser.parseFrom(new ByteBufInputStream(payload.retain()));
+            return parser.parseFrom(new ByteBufInputStream(payload,false));
         } catch (InvalidProtocolBufferException e) {
+            ReferenceCountUtil.release(payload);
             throw new RuntimeException("解析 Protobuf 失败", e);
-        } finally {
-            payload.release();
         }
     }
 }

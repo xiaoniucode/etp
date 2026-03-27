@@ -60,6 +60,12 @@ public class TMSP {
     public static final byte FLAG_ENCRYPTED = 0x02;   // 0000 0010 压缩
     public static final byte FLAG_MUX = 0x04;        //  0000 0100 多路复用
 
+    // bit 3~5 用来表示压缩算法类型（最多支持 8 种）
+    public static final byte COMPRESS_NONE       = 0x00;   // 0000 0000
+    public static final byte COMPRESS_LZ4        = 0x08;   // 0000 1000  (bit 3)
+    public static final byte COMPRESS_SNAPPY     = 0x10;   // 0001 0000  (bit 4)
+
+    public static final byte COMPRESS_MASK       = 0x38;   // 0011 1000  (bit 3~5，用于掩码)
     /**
      * 获取主版本号
      *

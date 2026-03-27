@@ -4,12 +4,14 @@ import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.notify.EventBus;
+import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
 import com.xiaoniucode.etp.server.event.TcpProxyInitializedEvent;
+import com.xiaoniucode.etp.server.transport.CompressHandler;
+import com.xiaoniucode.etp.server.transport.UploadRateLimitHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.flush.FlushConsolidationHandler;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Getter;
@@ -49,14 +51,14 @@ public final class TcpProxyServer implements Lifecycle {
         bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
         workerGroup = NettyEventLoopFactory.eventLoopGroup();
         serverBootstrap = new ServerBootstrap();
+        CompressHandler compressHandler = SpringContextHolder.getBean(CompressHandler.class);
+        UploadRateLimitHandler uploadRateLimitHandler = SpringContextHolder.getBean(UploadRateLimitHandler.class);
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NettyEventLoopFactory.serverSocketChannelClass())
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
 //                .option(ChannelOption.SO_BACKLOG, 4096)
-//                .childOption(ChannelOption.SO_SNDBUF, 16 * 1024 * 1024)   // 发送缓冲 16MB
-//                .childOption(ChannelOption.SO_RCVBUF, 16 * 1024 * 1024)   // 接收缓冲 16MB
                 .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
                         new WriteBufferWaterMark(64 * 1024, 256 * 1024))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -64,6 +66,8 @@ public final class TcpProxyServer implements Lifecycle {
                     protected void initChannel(SocketChannel sc) {
                         // sc.pipeline().addLast(tcpIpCheckHandler);
                         //  sc.pipeline().addLast(new TrafficMetricsHandler());
+                        sc.pipeline().addLast(compressHandler);
+                      //  sc.pipeline().addLast(uploadRateLimitHandler);
                         sc.pipeline().addLast(NettyConstants.TCP_VISITOR_HANDLER, tcpVisitorHandler);
                     }
                 });
