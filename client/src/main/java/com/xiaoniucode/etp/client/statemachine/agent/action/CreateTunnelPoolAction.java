@@ -7,15 +7,23 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 
 import com.xiaoniucode.etp.client.transport.connection.DirectPool;
 import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
+import com.xiaoniucode.etp.core.codec.TMSPCodec;
+import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -27,7 +35,7 @@ import org.slf4j.LoggerFactory;
 @Slf4j
 public class CreateTunnelPoolAction extends AgentBaseAction {
     private final Logger logger = LoggerFactory.getLogger(CreateTunnelPoolAction.class);
-    private static final int DEFAULT_DIRECT_COUNT = 0;
+    private static final int DEFAULT_DIRECT_COUNT = 10;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -48,16 +56,33 @@ public class CreateTunnelPoolAction extends AgentBaseAction {
      */
     private void createDirectTunnels(AgentContext context) {
         for (int i = 0; i < DEFAULT_DIRECT_COUNT; i++) {
-            createTunnel(context, context.getTlsContext() != null, false);
+            createTunnel(context, false, false);
         }
     }
 
     private void createTunnel(AgentContext agentContext, boolean isTls, boolean isMultiplex) {
         Integer connectionId = agentContext.getConnectionId();
-        Bootstrap bootstrap = agentContext.getControlBootstrap();
         AppConfig config = agentContext.getConfig();
+        Bootstrap dataBootstrap = new Bootstrap()
+                .group(agentContext.getControlWorkerGroup())
+                .channel(NettyEventLoopFactory.socketChannelClass())
+                .option(ChannelOption.SO_KEEPALIVE, true)
+                .option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel sc) {
+                        if (isTls && agentContext.getTlsContext() != null) {
+                            SslHandler sslHandler = agentContext.getTlsContext().newHandler(sc.alloc(), config.getServerAddr(), config.getServerPort());
+                            sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
+                        }
+                        sc.pipeline()
+                                .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
+                                .addLast(NettyConstants.CONTROL_FRAME_HANDLER, agentContext.getControlFrameHandler());
+                    }
+                });
 
-        bootstrap.connect(config.getServerAddr(), config.getServerPort()).addListener((ChannelFutureListener) future -> {
+        dataBootstrap.connect(config.getServerAddr(), config.getServerPort()).addListener((ChannelFutureListener) future -> {
             Channel tunnel = future.channel();
             TunnelEntry tunnelEntry;
             if (future.isSuccess()) {

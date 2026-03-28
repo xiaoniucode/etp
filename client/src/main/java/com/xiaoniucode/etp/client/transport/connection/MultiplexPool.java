@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.client.transport.connection;
 
 import com.xiaoniucode.etp.client.common.UUIDGenerator;
 import com.xiaoniucode.etp.core.transport.NettyBatchWriteQueue;
+import com.xiaoniucode.etp.core.transport.PipelineConfigure;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import io.netty.channel.Channel;
 
@@ -33,5 +34,13 @@ public class MultiplexPool {
             plainTunnelEntry.setActive(true);
             return plainTunnelEntry;
         }
+    }
+
+    public void clearTunnel(boolean isTls) {
+        if (isTls) {
+            this.tlsTunnelEntry = null;
+            return;
+        }
+        this.plainTunnelEntry = null;
     }
 }

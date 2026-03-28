@@ -27,7 +27,7 @@ public class DirectPool {
                 return tunnels.remove(mapEntry.getKey());
             } else {
                 logger.warn("Tunnel {} is not active, removing from pool", entry.getTunnelId());
-                closeTunnel(entry.getTunnelId());
+                removeTunnel(entry.getTunnelId());
             }
         }
         logger.warn("No active tunnels available in the pool");
@@ -68,7 +68,7 @@ public class DirectPool {
         }
     }
 
-    public void closeTunnel(String tunnelId) {
+    public void removeTunnel(String tunnelId) {
         TunnelEntry entry = tunnels.remove(tunnelId);
         if (entry != null) {
             Channel tunnel = entry.getChannel();

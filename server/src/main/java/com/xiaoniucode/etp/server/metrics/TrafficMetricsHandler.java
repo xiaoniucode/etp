@@ -6,11 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-/**
- * 用于统计通道流量和消息指标
- *
- * @author liuxin
- */
 @ChannelHandler.Sharable
 @Component
 public class TrafficMetricsHandler extends ChannelDuplexHandler {

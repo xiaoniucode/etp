@@ -43,7 +43,7 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
         Channel visitor = ctx.channel();
         Optional<StreamContext> streamContextOpt = streamManager.getStreamContext(visitor);
         if (streamContextOpt.isEmpty()) {
-            ctx.fireChannelRead(payload);
+            ctx.fireChannelRead(payload.retain());
             return;
         }
         StreamContext streamContext = streamContextOpt.get();
@@ -54,7 +54,7 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
         }
         if (limiter.tryUpload(payload)) {
             logger.debug("访问速度正常，继续转发：streamId={}", streamContext.getStreamId());
-            ctx.fireChannelRead(payload);
+            ctx.fireChannelRead(payload.retain());
             return;
         }
         int bytes = payload.readableBytes();
@@ -74,7 +74,7 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
             scheduleResume(streamContext, visitor, waitNanos);
         }
         logger.debug("发送限流时从访问流收到的数据包到内网");
-        ctx.fireChannelRead(payload);
+        ctx.fireChannelRead(payload.retain());
     }
 
     private void scheduleResume(StreamContext streamContext, Channel channel, long waitNanos) {

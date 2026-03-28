@@ -1,21 +1,20 @@
 package com.xiaoniucode.etp.server;
 
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
+import com.xiaoniucode.etp.core.transport.EtpOptionalSslHandler;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.server.Lifecycle;
-import com.xiaoniucode.etp.core.transport.IdleCheckHandler;
 
 import com.xiaoniucode.etp.core.notify.EventBus;
-import com.xiaoniucode.etp.core.tls.TlsHelper;
+import com.xiaoniucode.etp.core.transport.tls.TlsHelper;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
 import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
 import com.xiaoniucode.etp.server.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.core.transport.TlsContextHolder;
-import com.xiaoniucode.etp.server.transport.MultiplexDownloadRateLimitHandler;
-import com.xiaoniucode.etp.core.transport.compress.MultiplexSnappyDecoder;
+import com.xiaoniucode.etp.server.transport.DownloadRateLimitHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -25,8 +24,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * 控制隧道服务容器
@@ -61,26 +58,22 @@ public class TunnelServer implements Lifecycle {
             }
             tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
-            MultiplexDownloadRateLimitHandler multiplexDownloadRateLimitHandler = SpringContextHolder.getBean(MultiplexDownloadRateLimitHandler.class);
+            DownloadRateLimitHandler downloadRateLimitHandler = SpringContextHolder.getBean(DownloadRateLimitHandler.class);
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(tunnelBossGroup, tunnelWorkerGroup)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.TCP_NODELAY, true)
                     .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-//                    .option(ChannelOption.SO_BACKLOG, 8192)
-                    .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
-                            new WriteBufferWaterMark(64 * 1024, 256 * 1024))
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
                             if (config.getTlsConfig().getEnable() && tlsContext != null) {
-                                sc.pipeline().addLast(NettyConstants.TLS_HANDLER, tlsContext.newHandler(sc.alloc()));
+                                sc.pipeline().addLast("optionalSsl", new EtpOptionalSslHandler(tlsContext));
                             }
                             sc.pipeline()
                                     .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
-//                                    .addLast(multiplexDownloadRateLimitHandler)
-                                    .addLast(new MultiplexSnappyDecoder())
+                                    .addLast(downloadRateLimitHandler)
                                    // .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
                                     .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
                         }

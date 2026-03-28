@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.transport.connection;
 
+import com.xiaoniucode.etp.core.transport.PipelineConfigure;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
-import com.xiaoniucode.etp.server.transport.CompressHandler;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ public class MultiplexPool {
     public TunnelEntry acquire(String clientId, boolean isTls) {
         Pool pool = clientPools.get(clientId);
         if (pool == null) {
-            logger.warn("客户端 {} 连接池为空，没有可用连接",clientId);
+            logger.warn("客户端 {} 连接池为空，没有可用连接", clientId);
             return null;
         }
         return pool.acquire(isTls);

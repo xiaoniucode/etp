@@ -22,7 +22,7 @@ public class TunnelClientStartup {
     public static void main(String[] args) {
         try {
             Debugger.enableDebug();
-            System.setProperty("io.netty.leakDetection.level", "DISABLED");
+            System.setProperty("io.netty.leakDetection.level", "PARANOID");
             AppConfig config = buildConfig(args);
 
             initLogback(config);

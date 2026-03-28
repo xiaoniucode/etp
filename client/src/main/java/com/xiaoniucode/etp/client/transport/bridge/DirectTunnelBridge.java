@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.core.transport.IntSet;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
+import com.xiaoniucode.etp.core.transport.PipelineConfigure;
 import com.xiaoniucode.etp.core.transport.TunnelBridge;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -30,15 +31,7 @@ public class DirectTunnelBridge implements TunnelBridge {
     @Override
     public void open() {
         ChannelPipeline pipeline = tunnel.pipeline();
-        String[] handlersToRemove = {
-                NettyConstants.TMSP_CODEC,
-                NettyConstants.CONTROL_FRAME_HANDLER
-        };
-        for (String handlerName : handlersToRemove) {
-            if (pipeline.get(handlerName) != null) {
-                pipeline.remove(handlerName);
-            }
-        }
+        PipelineConfigure.removeControlHandler(tunnel);
         pipeline.addLast(new SimpleChannelInboundHandler<ByteBuf>() {
             @Override
             protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
@@ -74,12 +67,16 @@ public class DirectTunnelBridge implements TunnelBridge {
                 }
                 super.channelWritabilityChanged(ctx);
             }
+            @Override
+            public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+                logger.error("独立隧道传输发生异常",cause);
+            }
         });
     }
 
     @Override
     public void forwardToLocal(ByteBuf payload) {
-        if (!server.isActive()) {
+        if (streamContext.isChannelClosed(server)) {
             logger.error("真实服务连接没有激活，关闭流：streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
@@ -97,7 +94,7 @@ public class DirectTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToRemote(ByteBuf payload) {
-        if (!tunnel.isActive()) {
+        if (streamContext.isChannelClosed(tunnel)) {
             logger.error("隧道没有激活，关闭流：streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;

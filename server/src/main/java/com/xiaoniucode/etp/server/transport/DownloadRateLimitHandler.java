@@ -34,31 +34,36 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @ChannelHandler.Sharable
-public class MultiplexDownloadRateLimitHandler extends SimpleChannelInboundHandler<TMSPFrame> {
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(MultiplexDownloadRateLimitHandler.class);
+public class DownloadRateLimitHandler extends SimpleChannelInboundHandler<TMSPFrame> {
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(DownloadRateLimitHandler.class);
     @Autowired
+
     private StreamManager streamManager;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) throws Exception {
         ByteBuf payload = frame.getPayload();
         if (payload == null || !payload.isReadable()) {
-            ctx.fireChannelRead(frame);
+            ctx.fireChannelRead(frame.retain());
             return;
         }
         int streamId = frame.getStreamId();
         //只限制数据传输
         if (frame.getMsgType() != TMSP.MSG_STREAM_DATA) {
-            ctx.fireChannelRead(frame);
+            ctx.fireChannelRead(frame.retain());
             return;
         }
         StreamContext streamContext = streamManager.getStreamContext(streamId);
         if (streamContext == null) {
             logger.warn("未找到 streamId={} 的 StreamContext，跳过限流", streamId);
-            ctx.fireChannelRead(frame);
+            ctx.fireChannelRead(frame.retain());
             return;
         }
         BandwidthLimiter limiter = streamContext.getBandwidthLimiter();
+        if (limiter==null){
+            ctx.fireChannelRead(frame.retain());
+            return;
+        }
         TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
         Channel tunnel = tunnelEntry.getChannel();
         Channel visitor = streamContext.getVisitor();
@@ -81,7 +86,7 @@ public class MultiplexDownloadRateLimitHandler extends SimpleChannelInboundHandl
         }
         logger.debug("发送限流时从访问流收到的数据包到内网");
 
-        ctx.fireChannelRead(frame);
+        ctx.fireChannelRead(frame.retain());
     }
 
     private void scheduleResume(StreamContext streamContext, Channel tunnel,Channel visitor, long waitNanos) {

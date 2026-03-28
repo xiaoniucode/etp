@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.client.statemachine.agent;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.TunnelClient;
 import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.client.transport.connection.DirectPool;
 import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
 import com.xiaoniucode.etp.core.transport.AbstractAgentContext;
@@ -27,6 +28,7 @@ public class AgentContext extends AbstractAgentContext {
     private TunnelClient tunnelClient;
     private DirectPool directPool;
     private MultiplexPool multiplexPool;
+    private ControlFrameHandler controlFrameHandler;
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
 
     public AgentContext(AppConfig config) {

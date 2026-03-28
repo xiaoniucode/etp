@@ -12,10 +12,11 @@ maxRetries = 5
 enable = true #全局开启，可覆盖
 
 [tls]
-enable = false
-certFile = "cert/openssl/client.crt"
-keyFile = "cert/openssl/client.key"
-caFile = "cert/openssl/ca.crt"
+enable = true
+testMode=false
+certFile = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.crt"
+keyFile = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.key"
+caFile = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 
 #[[proxies]]
 #name = "web1"
@@ -174,6 +175,8 @@ targets = [
     { host = "127.0.0.1", port = 5432, weight = 30, name = "web-instance-2" }
 ]
 
+
+
 [[proxies]]
 name = "test"
 protocol = "tcp"
@@ -193,6 +196,8 @@ strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 limit = "1M" #总带宽限制(可选)
 #limitIn = "10M" #入口带宽限制(可选)
 #limitOut = "10M" #出口带宽限制(可选)
+
+
 [[proxies]]
 name = "test_mux"
 protocol = "tcp"
@@ -204,12 +209,12 @@ targets = [
 ]
 [proxies.transport]
 mux = true
-compress = true
-encrypt = false
+compress = false
+encrypt = true
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 [proxies.bandwidth] #带宽限制
-limit = "100k" #总带宽限制(可选)
+limit = "2M" #总带宽限制(可选)
 #limitIn = "10M" #入口带宽限制(可选)
 #limitOut = "10M" #出口带宽限制(可选)
 

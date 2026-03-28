@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.core.tls;
+package com.xiaoniucode.etp.core.transport.tls;
 
 import com.xiaoniucode.etp.core.domain.TlsConfig;
 import io.netty.handler.ssl.*;
@@ -18,25 +18,21 @@ public class TlsHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(TlsHelper.class);
 
     public static SslContext buildSslContext(boolean forClient, TlsConfig tlsConfig) throws IOException, CertificateException {
-        SslProvider provider;
-        if (OpenSsl.isAvailable()) {
-            provider = SslProvider.OPENSSL;
-            LOGGER.info("Using OpenSSL provider");
-        } else {
-            provider = SslProvider.JDK;
-            LOGGER.info("Using JDK SSL provider");
-        }
+        SslProvider provider = SslProvider.OPENSSL;
+        LOGGER.info("Using OpenSSL provider");
         boolean isTestMode = tlsConfig.isTestMode();
         if (forClient) {
             if (isTestMode) {
                 return SslContextBuilder
                         .forClient()
                         .protocols("TLSv1.3")
-                        .sslProvider(SslProvider.JDK)
+                        .sslProvider(SslProvider.OPENSSL)
                         .trustManager(InsecureTrustManagerFactory.INSTANCE)
                         .build();
             } else {
-                SslContextBuilder sslContextBuilder = SslContextBuilder.forClient().sslProvider(SslProvider.JDK);
+                SslContextBuilder sslContextBuilder = SslContextBuilder
+                        .forClient()
+                        .sslProvider(SslProvider.OPENSSL);
 
                 if (!tlsConfig.mTLSEnabled()) {
                     sslContextBuilder.trustManager(InsecureTrustManagerFactory.INSTANCE);

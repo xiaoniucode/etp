@@ -107,7 +107,8 @@ public class TomlConfigSource implements ConfigSource {
             String keyFile = tlsTable.getString("keyFile");
             String caFile = tlsTable.getString("caFile");
             String keyPass = tlsTable.getString("keyPass");
-            TlsConfig tlsConfig = new TlsConfig(enable, certFile, keyFile, caFile, keyPass, false);
+            boolean testMode = tlsTable.getBoolean("testMode", false);
+            TlsConfig tlsConfig = new TlsConfig(enable, certFile, keyFile, caFile, keyPass, testMode);
             builder.tls(tlsConfig);
         }
     }

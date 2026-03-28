@@ -3,16 +3,12 @@ package com.xiaoniucode.etp.server.statemachine.agent.action;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
-import com.xiaoniucode.etp.core.transport.NettyConstants;
-import com.xiaoniucode.etp.core.transport.TunnelEntry;
-import com.xiaoniucode.etp.core.transport.TlsHandlerCleanup;
+import com.xiaoniucode.etp.core.transport.*;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
-import com.xiaoniucode.etp.core.transport.NettyBatchWriteQueue;
 import com.xiaoniucode.etp.server.statemachine.agent.command.TunnelCreateCmd;
-import com.xiaoniucode.etp.core.transport.TlsContextHolder;
 import com.xiaoniucode.etp.server.transport.connection.DirectPool;
 import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
 import io.netty.buffer.ByteBuf;
@@ -43,25 +39,6 @@ public class CreateTunnelAction extends AgentBaseAction {
         boolean multiplex = cmd.isMultiplex();
         boolean encrypt = cmd.isEncrypt();
         String clientId = context.getClientId();
-
-        //只处理共享隧道，独立隧道打开流响应再处理
-        if (multiplex) {
-            ChannelPipeline tunnelPipeline = tunnel.pipeline();
-            if (!encrypt && tunnelPipeline.get(NettyConstants.TLS_HANDLER) != null) {
-                TlsHandlerCleanup.removeTlsGracefully(tunnelPipeline);
-            } else {
-                TlsContextHolder.get().ifPresent(sslContext -> {
-                    SslHandler sslHandler = sslContext.newHandler(tunnel.alloc());
-                    if (tunnelPipeline.get(NettyConstants.TLS_HANDLER) == null) {
-                        tunnelPipeline.addFirst(NettyConstants.TLS_HANDLER, sslHandler);
-                        logger.debug("添加 TLS handler");
-                    } else {
-                        // tunnelPipeline.replace(NettyConstants.TLS_HANDLER, NettyConstants.TLS_HANDLER, sslHandler);
-                        logger.debug("替换 TLS handler");
-                    }
-                });
-            }
-        }
         createPool(clientId, tunnelId, multiplex, encrypt, tunnel);
         Channel control = context.getControl();
         Message.TunnelCreateResponse resp = Message.TunnelCreateResponse.newBuilder()
@@ -86,13 +63,13 @@ public class CreateTunnelAction extends AgentBaseAction {
     }
 
     public void createPool(String clientId, String tunnelId, boolean isMultiplex, boolean isEncrypt, Channel tunnel) {
-        if (tunnel==null){
+        if (tunnel == null) {
             throw new IllegalArgumentException("tunnel 不能为空");
         }
-        if (clientId==null){
+        if (clientId == null) {
             throw new IllegalArgumentException("clientId 不能为空");
         }
-        if (tunnelId==null){
+        if (tunnelId == null) {
             throw new IllegalArgumentException("tunnelId 不能为空");
         }
         NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);

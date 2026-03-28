@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
-import com.xiaoniucode.etp.core.tls.TlsHelper;
+import com.xiaoniucode.etp.core.transport.tls.TlsHelper;
 import com.xiaoniucode.etp.core.transport.TlsContextHolder;
 import io.netty.handler.ssl.SslContext;
 

@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class TunnelServerStartup {
     public static void main(String[] args) {
         Debugger.enableDebug();
+        System.setProperty("io.netty.leakDetection.level", "PARANOID");
         AppConfig config = ConfigParser.parse(args);
         Dashboard dashboard = config.getDashboard();
         SpringApplicationBuilder builder = new SpringApplicationBuilder(TunnelServerStartup.class);

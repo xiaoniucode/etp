@@ -93,7 +93,9 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 case TMSP.MSG_STREAM_DATA -> {
                     int streamId = frame.getStreamId();
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
-                    streamContext.forwardToRemote(frame.getPayload());
+                    if (streamContext!=null){
+                        streamContext.forwardToRemote(frame.getPayload());
+                    }
                 }
                 case TMSP.MSG_PROXY_CREATE -> {
                     agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {

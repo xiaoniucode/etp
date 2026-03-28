@@ -18,8 +18,10 @@ package com.xiaoniucode.etp.core.transport;
 
 import com.xiaoniucode.etp.core.statemachine.context.ProcessContextImpl;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
+
 
 @Getter
 @Setter
@@ -44,5 +46,9 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
             return;
         }
         tunnelBridge.forwardToLocal(payload);
+    }
+
+    public boolean isChannelClosed(Channel channel) {
+        return channel == null ||! channel.isActive() && !channel.isWritable() ;
     }
 }

@@ -32,5 +32,6 @@ public class StreamContext extends AbstractStreamContext {
     public void fireEvent(StreamEvent event) {
         stateMachine.fireEvent(state, event, this);
     }
+
 }
 

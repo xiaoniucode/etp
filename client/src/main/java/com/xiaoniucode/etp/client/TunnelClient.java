@@ -3,7 +3,6 @@ package com.xiaoniucode.etp.client;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
-import com.xiaoniucode.etp.client.transport.CompressHandler;
 import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.client.transport.RealServerHandler;
 import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
@@ -18,19 +17,14 @@ import com.xiaoniucode.etp.core.codec.TMSPCodec;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.server.Lifecycle;
-import com.xiaoniucode.etp.core.transport.IdleCheckHandler;
-import com.xiaoniucode.etp.core.transport.compress.MultiplexSnappyDecoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.ssl.SslHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * 代理客户端服务容器
@@ -55,7 +49,6 @@ public final class TunnelClient implements Lifecycle {
             EventBusManager.register(new ApplicationInitListener());
             EventBusManager.publishAsync(new ApplicationInitEvent(config));
             initializeStateMachine();
-
             stateMachine.fireEvent(AgentState.IDLE, AgentEvent.START, clientContext);
 
         } catch (Exception e) {
@@ -64,7 +57,6 @@ public final class TunnelClient implements Lifecycle {
     }
 
     private void initializeStateMachine() {
-        CompressHandler compressHandler = new CompressHandler();
         stateMachine = AgentStateMachineBuilder.getStateMachine();
         clientContext = new AgentContext(config);
         clientContext.setTunnelClient(this);
@@ -78,20 +70,17 @@ public final class TunnelClient implements Lifecycle {
                 .channel(NettyEventLoopFactory.socketChannelClass())
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.WRITE_BUFFER_WATER_MARK,
-                        new WriteBufferWaterMark(64 * 1024, 256 * 1024))
-//                .option(ChannelOption.SO_BACKLOG, 4096)
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
                         ChannelPipeline p = ch.pipeline();
-//                        p.addLast(compressHandler);
                         p.addLast(NettyConstants.REAL_SERVER_HANDLER, new RealServerHandler(clientContext));
                     }
                 });
         Bootstrap controlBootstrap = new Bootstrap();
         ControlFrameHandler controlTunnelHandler = new ControlFrameHandler(clientContext);
+        clientContext.setControlFrameHandler(controlTunnelHandler);
         controlWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
 
         controlBootstrap.group(controlWorkerGroup)
@@ -99,24 +88,20 @@ public final class TunnelClient implements Lifecycle {
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-//                .option(ChannelOption.SO_BACKLOG, 4096)
-                .option(ChannelOption.WRITE_BUFFER_WATER_MARK,
-                        new WriteBufferWaterMark(64 * 1024, 256 * 1024))
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
                         if (Boolean.TRUE.equals(config.getTlsConfig().getEnable()) && clientContext.getTlsContext() != null) {
-                            SslHandler sslHandler = clientContext.getTlsContext().newHandler(sc.alloc(), config.getServerAddr(), config.getServerPort());
+                            SslHandler sslHandler = clientContext.getTlsContext().newHandler(
+                                    sc.alloc(), config.getServerAddr(), config.getServerPort());
                             sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
                         }
                         sc.pipeline()
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
-                               // .addLast(new MultiplexSnappyDecoder())
-                               // .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
+                                // .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);
                     }
                 });
-
         clientContext.setControlBootstrap(controlBootstrap);
         clientContext.setControlWorkerGroup(controlWorkerGroup);
         clientContext.setServerBootstrap(serverBootstrap);
