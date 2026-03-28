@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DirectPool {
     
     /**
-     * 最大总连接数
+     * 最大回收总连接数限制
      */
     private static final int MAX_TOTAL_CONNECTIONS = 100;
     
@@ -77,11 +77,6 @@ public class DirectPool {
         if (clientId == null || tunnelEntry == null || tunnelEntry.getTunnelId() == null) {
             return false;
         }
-        
-        if (totalConnections.get() >= MAX_TOTAL_CONNECTIONS) {
-            return false;
-        }
-        
         totalConnections.incrementAndGet();
         if (tunnelEntry.isEncrypt()) {
             encryptConnections.incrementAndGet();

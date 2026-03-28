@@ -1,9 +1,9 @@
 package com.xiaoniucode.etp.client.statemachine.stream.action;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.client.statemachine.agent.command.CreateConnCommand;
 import com.xiaoniucode.etp.client.statemachine.stream.*;
-import com.xiaoniucode.etp.client.transport.connection.DirectPool;
-import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
 import com.xiaoniucode.etp.client.transport.bridge.TunnelBridgeFactory;
 import com.xiaoniucode.etp.core.codec.NewStreamCodec;
 import com.xiaoniucode.etp.core.message.Message;
@@ -19,8 +19,20 @@ import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
+
 public class StreamOpenAction extends StreamBaseAction {
     private final Logger logger = LoggerFactory.getLogger(StreamOpenAction.class);
+
+    /**
+     * 最大重试次数
+     */
+    private static final int MAX_RETRY_COUNT = 3;
+
+    /**
+     * 每次重试等待时间（毫秒）
+     */
+    private static final long RETRY_INTERVAL_MS = 500;
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
@@ -43,19 +55,15 @@ public class StreamOpenAction extends StreamBaseAction {
                     Channel server = serverFuture.channel();
                     server.config().setOption(ChannelOption.AUTO_READ, false);
                     server.attr(AttributeKeys.STREAM_ID).set(streamId);
-                    //获取一个连接
-                    TunnelEntry tunnelEntry;
-                    if (context.isMultiplex()) {
-                        MultiplexPool multiplexPool = agentContext.getMultiplexPool();
-                        tunnelEntry = multiplexPool.acquire(context.isEncrypt());
-                    } else {
-                        DirectPool directPool = agentContext.getDirectPool();
-                        tunnelEntry = directPool.borrow(context.isEncrypt());
-                    }
+
+                    TunnelEntry tunnelEntry = getOrCreateTunnel(context);
+
                     if (tunnelEntry == null) {
-                        logger.warn("没有可用连接");
+                        logger.error("获取隧道失败，关闭流：streamId={}", streamId);
+                        context.fireEvent(StreamEvent.STREAM_CLOSE);
                         return;
                     }
+
                     if (control != null && control.isActive()) {
                         context.setServer(server);
                         context.setTunnelEntry(tunnelEntry);
@@ -95,5 +103,51 @@ public class StreamOpenAction extends StreamBaseAction {
                 }
             });
         }
+    }
+
+    /**
+     * 获取或创建隧道
+     * 先尝试获取，如果没有则触发创建并等待重试
+     */
+    private TunnelEntry getOrCreateTunnel(StreamContext context) {
+        AgentContext agentContext = (AgentContext) context.getAgentContext();
+
+        TunnelEntry tunnelEntry = agentContext.getConn(context.isEncrypt(), context.isMultiplex());
+        if (tunnelEntry != null) {
+            return tunnelEntry;
+        }
+
+        logger.warn("没有可用连接，开始创建新隧道");
+
+        CreateConnCommand createConnCommand;
+        if (context.isMultiplex()) {
+            createConnCommand = CreateConnCommand.ofMultiplex(context.isEncrypt());
+        } else {
+            createConnCommand = CreateConnCommand.ofDirect(context.isEncrypt(),1);
+        }
+        agentContext.setVariable("create_conn_command", createConnCommand);
+        agentContext.fireEvent(AgentEvent.CREATE_NEW_CONN);
+
+        // 等待后重试获取
+        for (int i = 1; i <= MAX_RETRY_COUNT; i++) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(RETRY_INTERVAL_MS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.error("等待被中断", e);
+                return null;
+            }
+
+            tunnelEntry = agentContext.getConn(context.isEncrypt(), context.isMultiplex());
+            if (tunnelEntry != null) {
+                logger.debug("第 {} 次重试后获取到隧道", i);
+                return tunnelEntry;
+            }
+
+            logger.debug("第 {} 次重试仍未获取到隧道，继续等待", i);
+        }
+
+        logger.error("重试 {} 次后仍未获取到可用连接", MAX_RETRY_COUNT);
+        return null;
     }
 }

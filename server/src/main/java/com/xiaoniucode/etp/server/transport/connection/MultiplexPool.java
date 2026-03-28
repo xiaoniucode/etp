@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.transport.connection;
 
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,16 @@ public class MultiplexPool {
         pool.setChannel(isTls, entry);
     }
 
+    public void offline(String clientId) {
+        if (clientId == null) {
+            return;
+        }
+        Pool pool = clientPools.remove(clientId);
+        if (pool != null) {
+            pool.offline();
+        }
+    }
+
     static class Pool {
         protected TunnelEntry plainChannel;
         protected TunnelEntry tlsChannel;
@@ -48,6 +59,11 @@ public class MultiplexPool {
             } else {
                 this.plainChannel = entry;
             }
+        }
+
+        public void offline() {
+            ChannelUtils.closeOnFlush(plainChannel.getChannel());
+            ChannelUtils.closeOnFlush(tlsChannel.getChannel());
         }
     }
 

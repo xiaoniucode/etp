@@ -21,6 +21,8 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslHandler;
 
 import org.slf4j.Logger;
@@ -82,7 +84,7 @@ public final class TunnelClient implements Lifecycle {
         ControlFrameHandler controlTunnelHandler = new ControlFrameHandler(clientContext);
         clientContext.setControlFrameHandler(controlTunnelHandler);
         controlWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
-
+        LoggingHandler loggingHandler = new LoggingHandler(LogLevel.DEBUG);
         controlBootstrap.group(controlWorkerGroup)
                 .channel(NettyEventLoopFactory.socketChannelClass())
                 .option(ChannelOption.SO_KEEPALIVE, true)
@@ -97,6 +99,7 @@ public final class TunnelClient implements Lifecycle {
                             sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
                         }
                         sc.pipeline()
+                                .addLast(loggingHandler)
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                 // .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);

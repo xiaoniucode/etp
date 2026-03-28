@@ -1,0 +1,46 @@
+package com.xiaoniucode.etp.client.statemachine.agent.action.tunnel;
+
+import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
+import com.xiaoniucode.etp.client.statemachine.agent.action.AgentBaseAction;
+import com.xiaoniucode.etp.client.statemachine.agent.command.CreateConnCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * 创建新的连接
+ * 支持多路复用连接和独立连接，独立连接支持自定义批量创建
+ */
+public class CreateNewConnAction extends AgentBaseAction {
+
+    private static final Logger logger = LoggerFactory.getLogger(CreateNewConnAction.class);
+
+    @Override
+    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
+        CreateConnCommand command = context.getAndRemoveAs("create_conn_command", CreateConnCommand.class);
+
+        if (command == null) {
+            logger.error("创建连接命令参数为空");
+            return;
+        }
+
+        String validateResult = command.validate();
+        if (validateResult != null) {
+            logger.error("创建连接参数校验失败：{}", validateResult);
+            return;
+        }
+
+        AppConfig config = context.getConfig();
+
+        if (command.isMultiplex()) {
+            TunnelConnCreateHelper.createMultiplexTunnel(context, config, command.isEncrypted());
+        } else {
+            int count = command.getEffectiveDirectCount();
+            for (int i = 0; i < count; i++) {
+                TunnelConnCreateHelper.createDirectTunnel(context, config, command.isEncrypted());
+            }
+        }
+    }
+}

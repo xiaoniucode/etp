@@ -6,5 +6,6 @@ public enum StreamEvent {
     STREAM_OPEN_FAILURE,  // 打开流失败
     STREAM_CLOSE,         // 收到关闭流请求
     STREAM_RESET,         // 收到重置流请求
-    STREAM_DATA           // 收到流数据
+    STREAM_DATA,          // 收到流数据
+    CREATE_NEW_CONN       //创建一个新的连接
 }

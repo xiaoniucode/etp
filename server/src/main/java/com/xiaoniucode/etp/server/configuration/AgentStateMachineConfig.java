@@ -20,7 +20,7 @@ public class AgentStateMachineConfig {
     @Autowired
     private ProxyInitAction proxyInitAction;
     @Autowired
-    private DisconnectAction disconnectAction;
+    private GoawayAction disconnectAction;
     @Autowired
     private CreateTunnelAction createTunnelAction;
 

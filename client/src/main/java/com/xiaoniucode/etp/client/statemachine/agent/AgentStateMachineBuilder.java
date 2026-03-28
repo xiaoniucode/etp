@@ -8,7 +8,8 @@ import com.xiaoniucode.etp.client.statemachine.agent.action.*;
 import com.xiaoniucode.etp.client.statemachine.agent.action.AuthAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.HandleAuthFailureAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.HandleAuthSuccessAction;
-import com.xiaoniucode.etp.client.statemachine.agent.action.CreateTunnelPoolAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.tunnel.CreateConnPoolAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.tunnel.CreateNewConnAction;
 
 public class AgentStateMachineBuilder {
 
@@ -28,7 +29,7 @@ public class AgentStateMachineBuilder {
             HandleAuthFailureAction handleAuthFailureAction = new HandleAuthFailureAction();
             HandleConnectFailureAction handleConnectFailureAction = new HandleConnectFailureAction();
             AuthAction handleConnectSuccessAction = new AuthAction();
-            CreateTunnelPoolAction createTunnelPoolAction = new CreateTunnelPoolAction();
+            CreateConnPoolAction createTunnelPoolAction = new CreateConnPoolAction();
             StopAction stopAction = new StopAction();
             TunnelCreateRespAction tunnelCreateRespAction = new TunnelCreateRespAction();
             // 配置检查
@@ -150,6 +151,14 @@ public class AgentStateMachineBuilder {
                     .on(AgentEvent.ERROR)
                     .when(ctx -> true)
                     .perform(new ErrorAction());
+
+            builder.externalTransition()
+                    .from(AgentState.CONNECTED)
+                    .to(AgentState.CONNECTED)
+                    .on(AgentEvent.CREATE_NEW_CONN)
+                    .when(ctx -> true)
+                    .perform(new CreateNewConnAction());
+
             // 构建状态机
             builder.build(MACHINE_ID);
             return StateMachineFactory.get(MACHINE_ID);

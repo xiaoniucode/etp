@@ -16,6 +16,7 @@ public enum AgentEvent {
     NETWORK_ERROR,       //网络错误
     DISCONNECT,           //连接断开
     CREATE_TUNNEL_POOL,   //创建隧道池
+    CREATE_NEW_CONN,      //创建单个连接
     CREATE_TUNNEL_POOL_RESP,   //创建隧道池响应
 
     PROXY_CREATE,          // 发送创建代理请求

@@ -7,6 +7,7 @@ import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.client.transport.connection.DirectPool;
 import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
 import com.xiaoniucode.etp.core.transport.AbstractAgentContext;
+import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.handler.ssl.SslContext;
@@ -37,5 +38,15 @@ public class AgentContext extends AbstractAgentContext {
 
     public void fireEvent(AgentEvent clientEvent) {
         stateMachine.fireEvent(state, clientEvent, this);
+    }
+
+    public TunnelEntry getConn(boolean encrypt, boolean multiplex) {
+        TunnelEntry tunnelEntry;
+        if (multiplex) {
+            tunnelEntry = multiplexPool.acquire(encrypt);
+        } else {
+            tunnelEntry = directPool.borrow(encrypt);
+        }
+        return tunnelEntry;
     }
 }
