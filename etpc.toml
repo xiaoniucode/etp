@@ -189,7 +189,7 @@ targets = [
 [proxies.transport]
 mux = false
 compress = false
-encrypt = false
+encrypt = true
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 [proxies.bandwidth] #带宽限制
@@ -205,6 +205,26 @@ enable=true
 remotePort = 5203
 targets = [
 #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
+    { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
+]
+[proxies.transport]
+mux = true
+compress = false
+encrypt = false
+[proxies.loadbalance]
+strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
+[proxies.bandwidth] #带宽限制
+limit = "2M" #总带宽限制(可选)
+#limitIn = "10M" #入口带宽限制(可选)
+#limitOut = "10M" #出口带宽限制(可选)
+
+[[proxies]]
+name = "test_mux_tls"
+protocol = "tcp"
+enable=true
+remotePort = 5204
+targets = [
+    #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
 ]
 [proxies.transport]

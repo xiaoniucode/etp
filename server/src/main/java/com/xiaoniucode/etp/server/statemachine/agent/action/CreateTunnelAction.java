@@ -72,8 +72,9 @@ public class CreateTunnelAction extends AgentBaseAction {
         if (tunnelId == null) {
             throw new IllegalArgumentException("tunnelId 不能为空");
         }
+        logger.debug("创建隧道 客户端ID={} 隧道ID={} 加密={} 多路复用={}",clientId,tunnelId,isEncrypt,isMultiplex);
         NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
-        TunnelEntry poolEntry = new TunnelEntry(tunnelId, tunnel, writeQueue);
+        TunnelEntry poolEntry = new TunnelEntry(tunnelId,isEncrypt, tunnel, writeQueue);
         poolEntry.setActive(true);
         if (isMultiplex) {
             multiplexPool.setChannel(clientId, isEncrypt, poolEntry);

@@ -40,7 +40,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         if (context.isMultiplex()) {
             tunnelEntry = multiplexPool.acquire(clientId, context.isEncrypt());
         } else {
-            tunnelEntry = directPool.borrow(clientId, tunnelId);
+            tunnelEntry = directPool.borrow(clientId, tunnelId, context.isEncrypt());
         }
         if (tunnelEntry==null){
             throw new IllegalArgumentException("tunnelEntry 不能为空");

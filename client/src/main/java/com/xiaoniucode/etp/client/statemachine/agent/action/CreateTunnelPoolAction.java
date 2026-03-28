@@ -47,16 +47,26 @@ public class CreateTunnelPoolAction extends AgentBaseAction {
      * 创建多路复用隧道
      */
     private void createMultiplexTunnel(AgentContext context) {
-        createTunnel(context, true, true);
         createTunnel(context, false, true);
+        if (context.getTlsContext() == null) {
+            return;
+        }
+        createTunnel(context, true, true);
+
     }
 
     /**
      * 创建独立隧道
      */
     private void createDirectTunnels(AgentContext context) {
-        for (int i = 0; i < DEFAULT_DIRECT_COUNT; i++) {
+        for (int i = 0; i < DEFAULT_DIRECT_COUNT / 2; i++) {
             createTunnel(context, false, false);
+        }
+        if (context.getTlsContext() == null) {
+            return;
+        }
+        for (int i = 0; i < DEFAULT_DIRECT_COUNT / 2; i++) {
+            createTunnel(context, true, false);
         }
     }
 
@@ -72,7 +82,7 @@ public class CreateTunnelPoolAction extends AgentBaseAction {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
-                        if (isTls && agentContext.getTlsContext() != null) {
+                        if (isTls) {
                             SslHandler sslHandler = agentContext.getTlsContext().newHandler(sc.alloc(), config.getServerAddr(), config.getServerPort());
                             sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
                         }
@@ -91,7 +101,7 @@ public class CreateTunnelPoolAction extends AgentBaseAction {
                     tunnelEntry = multiplexPool.createChannel(isTls, tunnel);
                 } else {
                     DirectPool directPool = agentContext.getDirectPool();
-                    tunnelEntry = directPool.createTunnel(tunnel);
+                    tunnelEntry = directPool.createTunnel(tunnel, isTls);
                 }
 
                 Message.TunnelCreateRequest body = Message.TunnelCreateRequest.newBuilder()

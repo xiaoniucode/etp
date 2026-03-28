@@ -50,7 +50,11 @@ public class StreamOpenAction extends StreamBaseAction {
                         tunnelEntry = multiplexPool.acquire(context.isEncrypt());
                     } else {
                         DirectPool directPool = agentContext.getDirectPool();
-                        tunnelEntry = directPool.borrow();
+                        tunnelEntry = directPool.borrow(context.isEncrypt());
+                    }
+                    if (tunnelEntry == null) {
+                        logger.warn("没有可用连接");
+                        return;
                     }
                     if (control != null && control.isActive()) {
                         context.setServer(server);

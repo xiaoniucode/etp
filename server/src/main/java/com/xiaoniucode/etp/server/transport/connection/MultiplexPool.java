@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.transport.connection;
 
-import com.xiaoniucode.etp.core.transport.PipelineConfigure;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;

@@ -17,7 +17,7 @@ public class MultiplexPool {
 
     public TunnelEntry createChannel(boolean isTls, Channel tunnel) {
         String tunnelId = UUIDGenerator.generate();
-        TunnelEntry tunnelEntry = new TunnelEntry(tunnelId, tunnel, NettyBatchWriteQueue.createWriteQueue(tunnel));
+        TunnelEntry tunnelEntry = new TunnelEntry(tunnelId,isTls, tunnel, NettyBatchWriteQueue.createWriteQueue(tunnel));
         if (isTls) {
             this.tlsTunnelEntry = tunnelEntry;
         } else {

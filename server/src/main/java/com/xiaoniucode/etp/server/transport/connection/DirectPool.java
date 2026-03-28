@@ -5,23 +5,54 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 独立隧道连接池
  */
 @Component
 public class DirectPool {
+    
+    /**
+     * 最大总连接数
+     */
+    private static final int MAX_TOTAL_CONNECTIONS = 100;
+    
+    /**
+     * 总连接数计数器
+     */
+    private final AtomicInteger totalConnections = new AtomicInteger(0);
+    
+    /**
+     * 明文连接数计数器
+     */
+    private final AtomicInteger plainConnections = new AtomicInteger(0);
+    
+    /**
+     * 加密连接数计数器
+     */
+    private final AtomicInteger encryptConnections = new AtomicInteger(0);
+    
     /**
      * clientId --> Pool
      */
     private final ConcurrentHashMap<String, Pool> clientPools = new ConcurrentHashMap<>();
 
-    public TunnelEntry borrow(String clientId, String tunnelId) {
+    public TunnelEntry borrow(String clientId, String tunnelId, boolean isEncrypt) {
         Pool pool = clientPools.get(clientId);
         if (pool == null) {
             return null;
         }
-        return pool.borrow(tunnelId);
+        TunnelEntry entry = isEncrypt ? pool.borrowEncrypt(tunnelId) : pool.borrowPlain(tunnelId);
+        if (entry != null) {
+            totalConnections.decrementAndGet();
+            if (isEncrypt) {
+                encryptConnections.decrementAndGet();
+            } else {
+                plainConnections.decrementAndGet();
+            }
+        }
+        return entry;
     }
 
     public void release(String clientId, TunnelEntry tunnelEntry) {
@@ -42,53 +73,151 @@ public class DirectPool {
         }
     }
 
-    public void register(String clientId, TunnelEntry tunnelEntry) {
+    public boolean register(String clientId, TunnelEntry tunnelEntry) {
         if (clientId == null || tunnelEntry == null || tunnelEntry.getTunnelId() == null) {
-            return;
+            return false;
         }
+        
+        if (totalConnections.get() >= MAX_TOTAL_CONNECTIONS) {
+            return false;
+        }
+        
+        totalConnections.incrementAndGet();
+        if (tunnelEntry.isEncrypt()) {
+            encryptConnections.incrementAndGet();
+        } else {
+            plainConnections.incrementAndGet();
+        }
+        
         Pool pool = clientPools.computeIfAbsent(clientId, k -> new Pool());
-
         pool.register(tunnelEntry.getTunnelId(), tunnelEntry);
+        return true;
     }
 
     public void offline(String clientId) {
         Pool pool = clientPools.remove(clientId);
         if (pool != null) {
+            int plainCount = pool.plainPools.size();
+            int encryptCount = pool.encryptPools.size();
+            
+            totalConnections.addAndGet(-(plainCount + encryptCount));
+            plainConnections.addAndGet(-plainCount);
+            encryptConnections.addAndGet(-encryptCount);
+            
             pool.offline();
         }
     }
+    
+    /**
+     * 获取总连接数
+     */
+    public int getTotalConnections() {
+        return totalConnections.get();
+    }
+    
+    /**
+     * 获取明文连接数
+     */
+    public int getPlainConnections() {
+        return plainConnections.get();
+    }
+    
+    /**
+     * 获取加密连接数
+     */
+    public int getEncryptConnections() {
+        return encryptConnections.get();
+    }
+    
+    /**
+     * 获取最大总连接数
+     */
+    public int getMaxTotalConnections() {
+        return MAX_TOTAL_CONNECTIONS;
+    }
+    
+    /**
+     * 判断连接数是否超过限制
+     */
+    public boolean isConnectionLimitReached() {
+        return totalConnections.get() >= MAX_TOTAL_CONNECTIONS;
+    }
 
-    static class Pool {
-        /**
-         * tunnelId --> PoolEntry
-         */
-        private final Map<String, TunnelEntry> pools = new ConcurrentHashMap<>();
+    class Pool {
+        private final Map<String, TunnelEntry> plainPools = new ConcurrentHashMap<>();
+        private final Map<String, TunnelEntry> encryptPools = new ConcurrentHashMap<>();
 
-        public TunnelEntry borrow(String tunnelId) {
-            return pools.remove(tunnelId);
+        public TunnelEntry borrowPlain(String tunnelId) {
+            return plainPools.remove(tunnelId);
         }
 
-        public void register(String tunnelId, TunnelEntry channel) {
-            pools.putIfAbsent(tunnelId, channel);
+        public TunnelEntry borrowEncrypt(String tunnelId) {
+            return encryptPools.remove(tunnelId);
         }
 
-        public void remove(String tunnelId) {
-            pools.remove(tunnelId);
+        public void register(String tunnelId, TunnelEntry tunnelEntry) {
+            if (tunnelEntry.isEncrypt()) {
+                encryptPools.putIfAbsent(tunnelId, tunnelEntry);
+            } else {
+                plainPools.putIfAbsent(tunnelId, tunnelEntry);
+            }
+
         }
 
-        public void release(String tunnelId, TunnelEntry channel) {
-            if (pools.containsKey(tunnelId)) {
-                pools.put(tunnelId, channel);
+        public void registerPlain(String tunnelId, TunnelEntry channel) {
+            if (plainPools.putIfAbsent(tunnelId, channel) == null) {
+                totalConnections.incrementAndGet();
+                plainConnections.incrementAndGet();
             }
         }
 
+        public void registerEncrypt(String tunnelId, TunnelEntry channel) {
+            if (encryptPools.putIfAbsent(tunnelId, channel) == null) {
+                totalConnections.incrementAndGet();
+                encryptConnections.incrementAndGet();
+            }
+        }
+
+        public void remove(String tunnelId) {
+            if (plainPools.remove(tunnelId) != null) {
+                totalConnections.decrementAndGet();
+                plainConnections.decrementAndGet();
+            }
+            if (encryptPools.remove(tunnelId) != null) {
+                totalConnections.decrementAndGet();
+                encryptConnections.decrementAndGet();
+            }
+        }
+
+        public void release(String tunnelId, TunnelEntry tunnelEntry) {
+            if (tunnelEntry == null) {
+                return;
+            }
+            if (tunnelEntry.isEncrypt()) {
+                if (encryptPools.containsKey(tunnelId)) {
+                    encryptPools.put(tunnelId, tunnelEntry);
+                }
+            } else {
+                if (plainPools.containsKey(tunnelId)) {
+                    plainPools.put(tunnelId, tunnelEntry);
+                }
+            }
+
+        }
+
         public void offline() {
-            pools.values().forEach(ch -> {
+            plainPools.values().forEach(ch -> {
                 if (ch != null && ch.getChannel().isActive()) {
                     ch.getChannel().close();
                 }
             });
-            pools.clear();
+            encryptPools.values().forEach(ch -> {
+                if (ch != null && ch.getChannel().isActive()) {
+                    ch.getChannel().close();
+                }
+            });
+            plainPools.clear();
+            encryptPools.clear();
         }
     }
 

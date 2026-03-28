@@ -28,11 +28,11 @@ public class TunnelCreateRespAction extends AgentBaseAction {
         if (multiplex) {
             MultiplexPool multiplexPool = agentContext.getMultiplexPool();
             tunnelEntry = multiplexPool.activeTunnel(encrypt);
-            logger.debug("激活共享隧道: tunnelId={} 激活状态：{}", tunnelEntry.getTunnelId(), tunnelEntry.isActive());
+            logger.debug("激活共享隧道: tunnelId={} 激活状态：{} 是否加密：{}", tunnelEntry.getTunnelId(), tunnelEntry.isActive(),encrypt);
         } else {
             DirectPool directPool = agentContext.getDirectPool();
             tunnelEntry = directPool.activateTunnel(resp.getTunnelId());
-            logger.debug("激活独立隧道: tunnelId={} 激活状态：{}", tunnelEntry.getTunnelId(), tunnelEntry.isActive());
+            logger.debug("激活独立隧道: tunnelId={} 激活状态：{} 是否加密：{}", tunnelEntry.getTunnelId(), tunnelEntry.isActive(),encrypt);
         }
     }
 
