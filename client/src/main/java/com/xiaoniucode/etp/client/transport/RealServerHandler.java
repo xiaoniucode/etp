@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.client.transport;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
+import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import io.netty.buffer.ByteBuf;
@@ -31,7 +32,7 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
                     TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
                     Channel tunnel = tunnelEntry.getChannel();
                     if (!tunnel.isWritable()) {
-                        logger.warn("数据无法转发到远程，流量过高，隧道不可写，暂停从服务读取，streamId={}", streamContext.getStreamId());
+                        logger.debug("数据无法转发到远程，流量过高，隧道不可写，暂停从服务读取，streamId={}", streamContext.getStreamId());
                         server.config().setOption(ChannelOption.AUTO_READ, false);
                         StreamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
                     }
@@ -41,9 +42,12 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        //流断开 server
-        super.channelInactive(ctx);
+    public void channelInactive(ChannelHandlerContext ctx) {
+        Channel server = ctx.channel();
+        Optional<StreamContext> streamCtx = StreamManager.getStreamContext(server);
+        streamCtx.ifPresent(streamContext -> {
+            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+        });
     }
 
     @Override
@@ -58,14 +62,11 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 tunnel.config().setOption(ChannelOption.AUTO_READ, shouldRead);
             }
         });
-        super.channelWritabilityChanged(ctx);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         logger.error(cause.getMessage(), cause);
-        //server exe
-        super.exceptionCaught(ctx, cause);
     }
 
 }

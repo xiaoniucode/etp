@@ -13,6 +13,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.WriteBufferWaterMark;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.flush.FlushConsolidationHandler;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
@@ -53,19 +54,15 @@ public class HttpProxyServer implements Lifecycle {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
-//                    .childOption(ChannelOption.SO_RCVBUF, 64 * 1024)
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .childOption(ChannelOption.WRITE_BUFFER_WATER_MARK,
-                            new WriteBufferWaterMark(64 * 1024, 256 * 1024))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
                             sc.pipeline().addLast(new HostSnifferHandler());
-                             sc.pipeline().addLast(httpIpCheckHandler);
-                            //  sc.pipeline().addLast(basicAuthHandler);
+                            sc.pipeline().addLast(httpIpCheckHandler);
+                            sc.pipeline().addLast(basicAuthHandler);
                             //  sc.pipeline().addLast(trafficMetricsHandler);
-                            //   sc.pipeline().addLast(new FlushConsolidationHandler(256, true));
                             sc.pipeline().addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);
                         }
                     });

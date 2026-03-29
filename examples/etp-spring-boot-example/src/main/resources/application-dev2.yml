@@ -12,12 +12,18 @@ etp:
       key-file: classpath:certs/client.key
       ca-file: classpath:certs/ca.crt
       test-mode: false
+    basic-auth:
+      enabled: true
+      users:
+        - user: admin
+          pass: 123
+
     transport:
-      multiplex: false
+      multiplex: true
       encrypt: true
       compress: false
     bandwidth:
-      limit: 100K
+      limit: 100M
     access-control:
       enabled: true
       allow:

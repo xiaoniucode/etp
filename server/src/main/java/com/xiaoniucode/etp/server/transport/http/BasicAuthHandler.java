@@ -23,48 +23,41 @@ import java.util.Base64;
 public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
     private final Logger logger = LoggerFactory.getLogger(BasicAuthHandler.class);
     @Autowired
-    private DomainManager domainManager;
-    @Autowired
     private ProxyManager proxyManager;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel visitor = ctx.channel();
         String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
-        String proxyId = domainManager.getProxyId(domain);
-        ProxyConfig config = proxyManager.findById(proxyId).get();
-        String basicAuthHeader = visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).get();
-
-        BasicAuthConfig basicAuth = config.getBasicAuth();
-        if (basicAuth != null && basicAuth.isEnabled()) {
-            if (basicAuthHeader == null || !basicAuthHeader.toLowerCase().startsWith("basic ")) {
-                NettyHttpUtils.sendBasicAuth(visitor);
-                return;
-            }
-            try {
-                String base64Credentials = basicAuthHeader.substring(6).trim();
-                String credentials = new String(Base64.getDecoder().decode(base64Credentials), CharsetUtil.UTF_8);
-                String[] parts = credentials.split(":", 2);
-
-                if (parts.length == 2) {
-                    String username = parts[0];
-                    String password = parts[1];
-                    if (!basicAuth.check(username, password)) {
-                        NettyHttpUtils.sendBasicAuth(visitor);
-                        return;
-                    }
-                } else {
+        proxyManager.findByDomain(domain).ifPresent(config -> {
+            String basicAuthHeader = visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).get();
+            BasicAuthConfig basicAuth = config.getBasicAuth();
+            if (basicAuth != null && basicAuth.isEnabled()) {
+                if (basicAuthHeader == null || !basicAuthHeader.toLowerCase().startsWith("basic ")) {
                     NettyHttpUtils.sendBasicAuth(visitor);
                     return;
                 }
-            } catch (Exception e) {
-                logger.debug("Basic Auth 解码失败: {}", e.getMessage());
-                NettyHttpUtils.sendBasicAuth(visitor);
-                return;
+                try {
+                    String base64Credentials = basicAuthHeader.substring(6).trim();
+                    String credentials = new String(Base64.getDecoder().decode(base64Credentials), CharsetUtil.UTF_8);
+                    String[] parts = credentials.split(":", 2);
+
+                    if (parts.length == 2) {
+                        String username = parts[0];
+                        String password = parts[1];
+                        if (!basicAuth.check(username, password)) {
+                            NettyHttpUtils.sendBasicAuth(visitor);
+                        }
+                    } else {
+                        NettyHttpUtils.sendBasicAuth(visitor);
+                    }
+                } catch (Exception e) {
+                    logger.debug("Basic Auth 解码失败: {}", e.getMessage());
+                    NettyHttpUtils.sendBasicAuth(visitor);
+                }
             }
-        }
-        //传递给下一个处理器
-        super.channelRead(ctx, msg);
+        });
+        ctx.fireChannelRead(msg);
     }
 
 }
