@@ -7,8 +7,8 @@ import com.xiaoniucode.etp.core.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProxyCreateResponseAction extends AgentBaseAction {
-    private final Logger logger= LoggerFactory.getLogger(ProxyCreateResponseAction.class);
+public class ProxyCreationResponseAction extends AgentBaseAction {
+    private final Logger logger= LoggerFactory.getLogger(ProxyCreationResponseAction.class);
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         Message.NewProxyResp newProxyResp = context.getAndRemoveAs("NEW_PROXY_RESP", Message.NewProxyResp.class);

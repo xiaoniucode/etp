@@ -1,24 +1,29 @@
 etp:
   client:
-    enable: true
+    enabled: true
     server-addr: 127.0.0.1 # IP or domain
     proxy:
       custom-domains: test.domain1.com
     auth:
       token: 5E793FAD27AA713D
     tls:
-      enable: false
+      enabled: true
+      cert-file: classpath:certs/client.crt
+      key-file: classpath:certs/client.key
+      ca-file: classpath:certs/ca.crt
+      test-mode: false
     transport:
-      multiplex: true
-      encrypt: false
+      multiplex: false
+      encrypt: true
       compress: false
     bandwidth:
-      limit: 10M
+      limit: 100K
+    access-control:
+      enabled: true
+      allow:
+        - 127.0.0.1
 #      limit-in: 1M
 #      limit-out: 1M
-
-
-
 
 
 

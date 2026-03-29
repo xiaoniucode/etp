@@ -1,6 +1,6 @@
 etp:
   client:
-    enable: true
+    enabled: true
     server-addr: 127.0.0.1
     server-port: 9527
     auth:
@@ -21,8 +21,8 @@ etp:
 #      deny:
 #        - 127.0.0.2/32
 #        - 127.0.0.3/34
-#    bandwidth:
-#      limit: 2M
+    bandwidth:
+      limit: 100M
 #      limit-in: 1M
 #      limit-out: 1M
 #    basic-auth:
@@ -44,15 +44,17 @@ etp:
 #        - ui
     #      remote-port: 8086 #tcp only
     transport:
-      compress: true # 压缩传输隧道，默认关闭
+      compress: false # 压缩传输隧道，默认关闭
       encrypt: false # 加密传输隧道，默认开启，采用测试模式证书，生产环境请使用自定义证书
       multiplex: true # 多路复用传输隧道，默认开启
     tls:
-      enable: false
       cert-file: classpath:certs/client.crt
       key-file: classpath:certs/client.key
       ca-file: classpath:certs/ca.crt
       test-mode: false
+      enabled: false
+    access-control:
+      enabled: false
 
 
 

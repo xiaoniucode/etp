@@ -59,7 +59,7 @@ public final class TcpProxyServer implements Lifecycle {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
-                        // sc.pipeline().addLast(tcpIpCheckHandler);
+                         sc.pipeline().addLast(tcpIpCheckHandler);
                         //  sc.pipeline().addLast(new TrafficMetricsHandler());
                         sc.pipeline().addLast(uploadRateLimitHandler);
                         sc.pipeline().addLast(NettyConstants.TCP_VISITOR_HANDLER, tcpVisitorHandler);

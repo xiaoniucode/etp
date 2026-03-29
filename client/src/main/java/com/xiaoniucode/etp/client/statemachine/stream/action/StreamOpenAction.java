@@ -84,14 +84,15 @@ public class StreamOpenAction extends StreamBaseAction {
                                 TunnelBridge tunnelBridge;
                                 if (context.isMultiplex()) {
                                     tunnelBridge = TunnelBridgeFactory.buildMux(context);
-                                    logger.debug("共享隧道创建成功 - [隧道ID={},目标地址={}，目标端口={}]", tunnelEntry.getTunnelId(), localIp, localPort);
+                                    logger.debug("流打开成功 - [隧道类型=多路复用， 目标地址={}，目标端口={}]", localIp, localPort);
                                 } else {
                                     tunnelBridge = TunnelBridgeFactory.buildDirect(context);
-                                    logger.debug("独立隧道创建成功 - [隧道ID={},目标地址={}，目标端口={}]", tunnelEntry.getTunnelId(), localIp, localPort);
+                                    logger.debug("流打开成功 - [隧道类型=独立连接， 目标地址={}，目标端口={}]", localIp, localPort);
                                 }
                                 tunnelBridge.open();
                                 context.setTunnelBridge(tunnelBridge);
                                 context.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
+                                tunnelEntry.getChannel().config().setOption(ChannelOption.AUTO_READ, true);
                                 server.config().setOption(ChannelOption.AUTO_READ, true);
                             }
                         });
@@ -99,7 +100,7 @@ public class StreamOpenAction extends StreamBaseAction {
 
                 } else {
                     control.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_ERROR));
-                    logger.error("隧道创建失败 - [服务地址={}:服务端口={}] 不可用!", localIp, localPort);
+                    logger.error("流打开失败 - [服务地址={}:服务端口={}] 不可用!", localIp, localPort);
                 }
             });
         }
@@ -123,7 +124,7 @@ public class StreamOpenAction extends StreamBaseAction {
         if (context.isMultiplex()) {
             createConnCommand = CreateConnCommand.ofMultiplex(context.isEncrypt());
         } else {
-            createConnCommand = CreateConnCommand.ofDirect(context.isEncrypt(),1);
+            createConnCommand = CreateConnCommand.ofDirect(context.isEncrypt(), 1);
         }
         agentContext.setVariable("create_conn_command", createConnCommand);
         agentContext.fireEvent(AgentEvent.CREATE_NEW_CONN);

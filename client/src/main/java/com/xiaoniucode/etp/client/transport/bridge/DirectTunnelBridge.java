@@ -40,8 +40,7 @@ public class DirectTunnelBridge implements TunnelBridge {
 
             @Override
             public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-                logger.warn("隧道可写状态发生变化：{}", ctx.channel().isWritable());
-                logger.warn("隧道可写性发生变化：{}", ctx.channel().isWritable());
+                logger.debug("隧道可写状态发生变化：{}", ctx.channel().isWritable());
                 Channel tunnel = ctx.channel();
                 boolean writable = tunnel.isWritable();
                 if (writable) {

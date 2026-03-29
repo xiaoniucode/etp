@@ -40,10 +40,11 @@ public class StreamCloseAction extends StreamBaseAction {
         TunnelEntry tunnelEntry = context.getTunnelEntry();
         if (tunnelEntry != null) {
             Channel tunnel = tunnelEntry.getChannel();
-            logger.debug("隧道 {} 激活状态：{}，隧道可写状态：{}",tunnelEntry.getTunnelId(), tunnel.isActive(), tunnel.isWritable());
+            logger.debug("隧道 {} 激活状态：{}，隧道可写状态：{}", tunnelEntry.getTunnelId(), tunnel.isActive(), tunnel.isWritable());
             tunnel.config().setAutoRead(true);
         }
-        if (!context.isMultiplex()) {
+        if (!context.isMultiplex() && tunnelEntry != null) {
+            logger.debug("回收客户端 {} 独立连接 {}", agentContext.getClientId(), tunnelEntry.getTunnelId());
             directPool.release(agentContext.getClientId(), tunnelEntry);
         }
 

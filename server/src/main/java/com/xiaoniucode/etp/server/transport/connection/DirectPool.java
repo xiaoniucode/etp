@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.transport.connection;
 
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
+import io.netty.channel.Channel;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -12,27 +13,27 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Component
 public class DirectPool {
-    
+
     /**
      * 最大回收总连接数限制
      */
     private static final int MAX_TOTAL_CONNECTIONS = 100;
-    
+
     /**
      * 总连接数计数器
      */
     private final AtomicInteger totalConnections = new AtomicInteger(0);
-    
+
     /**
      * 明文连接数计数器
      */
     private final AtomicInteger plainConnections = new AtomicInteger(0);
-    
+
     /**
      * 加密连接数计数器
      */
     private final AtomicInteger encryptConnections = new AtomicInteger(0);
-    
+
     /**
      * clientId --> Pool
      */
@@ -83,7 +84,7 @@ public class DirectPool {
         } else {
             plainConnections.incrementAndGet();
         }
-        
+
         Pool pool = clientPools.computeIfAbsent(clientId, k -> new Pool());
         pool.register(tunnelEntry.getTunnelId(), tunnelEntry);
         return true;
@@ -94,43 +95,43 @@ public class DirectPool {
         if (pool != null) {
             int plainCount = pool.plainPools.size();
             int encryptCount = pool.encryptPools.size();
-            
+
             totalConnections.addAndGet(-(plainCount + encryptCount));
             plainConnections.addAndGet(-plainCount);
             encryptConnections.addAndGet(-encryptCount);
-            
+
             pool.offline();
         }
     }
-    
+
     /**
      * 获取总连接数
      */
     public int getTotalConnections() {
         return totalConnections.get();
     }
-    
+
     /**
      * 获取明文连接数
      */
     public int getPlainConnections() {
         return plainConnections.get();
     }
-    
+
     /**
      * 获取加密连接数
      */
     public int getEncryptConnections() {
         return encryptConnections.get();
     }
-    
+
     /**
      * 获取最大总连接数
      */
     public int getMaxTotalConnections() {
         return MAX_TOTAL_CONNECTIONS;
     }
-    
+
     /**
      * 判断连接数是否超过限制
      */
@@ -188,16 +189,13 @@ public class DirectPool {
             if (tunnelEntry == null) {
                 return;
             }
+            Channel channel = tunnelEntry.getChannel();
+            channel.config().setAutoRead(true);
             if (tunnelEntry.isEncrypt()) {
-                if (encryptPools.containsKey(tunnelId)) {
-                    encryptPools.put(tunnelId, tunnelEntry);
-                }
+                encryptPools.putIfAbsent(tunnelId, tunnelEntry);
             } else {
-                if (plainPools.containsKey(tunnelId)) {
-                    plainPools.put(tunnelId, tunnelEntry);
-                }
+                plainPools.putIfAbsent(tunnelId, tunnelEntry);
             }
-
         }
 
         public void offline() {

@@ -9,7 +9,7 @@ max_delay = 8
 max_retries = 5
 [connection_pool]
 # 是否预创建连接池（默认false）
-enabled = true
+enabled = false
 
 # 多路复用隧道配置
 [connection_pool.multiplex]

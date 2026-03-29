@@ -11,7 +11,7 @@ import org.springframework.core.io.ResourceLoader;
 
 @Configuration
 @ConditionalOnClass(SmartLifecycle.class)
-@ConditionalOnProperty(prefix = "etp.client", name = "enable", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "etp.client", name = "enabled", havingValue = "true", matchIfMissing = false)
 @EnableConfigurationProperties(EtpClientProperties.class)
 public class EtpClientAutoConfiguration {
     @Bean

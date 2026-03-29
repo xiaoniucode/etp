@@ -144,7 +144,7 @@ public class AgentStateMachineBuilder {
                     .to(AgentState.CONNECTED)
                     .on(AgentEvent.PROXY_CREATE_RESP)
                     .when(ctx -> true)
-                    .perform(new ProxyCreateResponseAction());
+                    .perform(new ProxyCreationResponseAction());
             builder.externalTransition()
                     .from(AgentState.CONNECTED)
                     .to(AgentState.CONNECTED)

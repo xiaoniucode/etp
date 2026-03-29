@@ -40,7 +40,7 @@ public class StreamStateMachineBuilder {
                     .perform((from, to, event, context) -> context.setState(to));
 
             builder.externalTransitions()
-                    .fromAmong(StreamState.OPENED, StreamState.OPENING)
+                    .fromAmong(StreamState.OPENED, StreamState.OPENING,StreamState.FAILED)
                     .to(StreamState.CLOSED)
                     .on(StreamEvent.STREAM_CLOSE)
                     .when(ctx -> true)

@@ -12,7 +12,7 @@ public class EtpClientProperties {
     /**
      * 是否启用 ETP 代理
      */
-    private boolean enable = false;
+    private boolean enabled = false;
 
     /**
      * 代理服务地址

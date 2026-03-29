@@ -60,27 +60,30 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setName(applicationName);
         proxyConfig.addTarget(new Target(proxy.getLocalIp(), localPort, 1, applicationName));
-        proxyConfig.setEnable(true);
+        proxyConfig.setEnabled(true);
         proxyConfig.setProtocol(proxy.getProtocol());
         proxyConfig.setRemotePort(proxy.getRemotePort());
 
         // 配置访问控制
         AccessControlConfig accessControlConfig = new AccessControlConfig(
-                accessControl.isEnable(),
+                accessControl.isEnabled(),
                 AccessControlMode.valueOf(accessControl.getMode().name()),
                 accessControl.getAllow(),
                 accessControl.getDeny()
         );
         proxyConfig.setAccessControl(accessControlConfig);
+        if (StringUtils.hasText(bandwidth.getLimit())||
+                StringUtils.hasText(bandwidth.getLimitIn())||
+        StringUtils.hasText(bandwidth.getLimitOut())){
+            // 配置带宽限制
+            BandwidthConfig bandwidthConfig = new BandwidthConfig(
+                    bandwidth.getLimit(),
+                    bandwidth.getLimitIn(),
+                    bandwidth.getLimitOut()
+            );
 
-        // 配置带宽限制
-        BandwidthConfig bandwidthConfig = new BandwidthConfig(
-                bandwidth.getLimit(),
-                bandwidth.getLimitIn(),
-                bandwidth.getLimitOut()
-        );
-        proxyConfig.setBandwidth(bandwidthConfig);
-
+            proxyConfig.setBandwidth(bandwidthConfig);
+        }
         // 配置域名信息
         DomainConfig domainConfig = new DomainConfig();
         domainConfig.setAutoDomain(proxy.getAutoDomain());
@@ -89,11 +92,11 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
         proxyConfig.setDomainInfo(domainConfig);
 
         // 配置基础认证
-        if (basicAuth.isEnable() && !basicAuth.getUsers().isEmpty()) {
+        if (basicAuth.isEnabled() && !basicAuth.getUsers().isEmpty()) {
             Set<HttpUser> users = basicAuth.getUsers().stream()
                     .map(user -> new HttpUser(user.getUser(), user.getPass()))
                     .collect(Collectors.toSet());
-            BasicAuthConfig basicAuthConfig = new BasicAuthConfig(basicAuth.isEnable(), users);
+            BasicAuthConfig basicAuthConfig = new BasicAuthConfig(basicAuth.isEnabled(), users);
             proxyConfig.setBasicAuth(basicAuthConfig);
         }
 
@@ -107,7 +110,7 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
 
         // 配置TLS
         TlsConfig tlsConfig = new TlsConfig(
-                tls.getEnable(),
+                tls.getEnabled(),
                 tls.isTestMode()
         );
         tlsConfig.setCertFile(getAbsolutePath(tls.getCertFile()));

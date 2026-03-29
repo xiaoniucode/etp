@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class TlsProperties {
-    private Boolean enable = true;
+    private Boolean enabled = true;
     private String certFile;
     private String keyFile;
     private String caFile;

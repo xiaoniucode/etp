@@ -11,7 +11,7 @@ import java.util.Set;
 @Data
 public class AccessControlProperties  implements Serializable {
     @Setter
-    private boolean enable = false;
+    private boolean enabled = false;
     @Setter
     @NestedConfigurationProperty
     private AccessControlMode mode = AccessControlMode.ALLOW;

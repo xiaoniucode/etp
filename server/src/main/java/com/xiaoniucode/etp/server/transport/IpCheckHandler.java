@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.transport;
 
 import com.xiaoniucode.etp.server.security.AccessControlManager;
+import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -49,7 +50,7 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
         boolean checkAccess = accessControlManager.checkAccess(proxyId, visitorIp);
         if (!checkAccess) {
             logger.debug("来源IP {} 无访问权限",visitorIp);
-            visitor.close();
+            NettyHttpUtils.sendHttp403(visitor);
         }
     }
 }

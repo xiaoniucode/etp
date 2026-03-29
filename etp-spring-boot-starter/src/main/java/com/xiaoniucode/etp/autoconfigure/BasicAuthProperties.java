@@ -11,7 +11,7 @@ public class BasicAuthProperties implements Serializable {
     /**
      * 是否启用基础认证
      */
-    private boolean enable = false;
+    private boolean enabled = false;
 
     /**
      * 用户列表

@@ -161,10 +161,10 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        logger.warn("隧道可写性发生变化：{}", ctx.channel().isWritable());
+        logger.debug("隧道可写性发生变化：{}", ctx.channel().isWritable());
         Channel tunnel = ctx.channel();
         if (tunnel == agentContext.getControl()) {
-            logger.warn("控制隧道可写性发生变化，暂不处理");
+            logger.debug("控制隧道可写性发生变化，暂不处理");
             return;
         }
         boolean writable = tunnel.isWritable();

@@ -42,8 +42,9 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         } else {
             tunnelEntry = directPool.borrow(clientId, tunnelId, context.isEncrypt());
         }
-        if (tunnelEntry==null){
-            throw new IllegalArgumentException("tunnelEntry 不能为空");
+        if (tunnelEntry == null) {
+            context.fireEvent(StreamEvent.STREAM_CLOSE);
+            return;
         }
         context.setTunnelEntry(tunnelEntry);
         Channel visitor = context.getVisitor();
