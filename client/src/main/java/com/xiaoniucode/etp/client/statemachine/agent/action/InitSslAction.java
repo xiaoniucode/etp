@@ -16,7 +16,7 @@ public class InitSslAction extends AgentBaseAction {
         logger.debug("检查是否有必要初始化 TLS证书");
         try {
             AppConfig config = ctx.getConfig();
-            if (Boolean.TRUE.equals(config.getTlsConfig().getEnable())) {
+            if (Boolean.TRUE.equals(config.getTlsConfig().getEnabled())) {
                 logger.debug("初始化 SSL上下文");
                 SslContext sslContext = TlsHelper.buildSslContext(true, config.getTlsConfig());
                 TlsContextHolder.initialize(sslContext);

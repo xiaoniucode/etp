@@ -43,7 +43,7 @@ public class ProxyConfig {
      * 是否开启代理
      */
     @Setter
-    private boolean enable = true;
+    private boolean enabled = true;
     /**
      * HTTP(s) 域名配置
      */
@@ -168,7 +168,7 @@ public class ProxyConfig {
     }
 
     public boolean isMuxTunnel() {
-        return transport != null && transport.getMux();
+        return transport != null && transport.getMultiplex();
     }
 }
 

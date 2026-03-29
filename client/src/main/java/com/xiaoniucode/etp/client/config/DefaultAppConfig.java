@@ -1,8 +1,9 @@
 package com.xiaoniucode.etp.client.config;
 
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
+import com.xiaoniucode.etp.client.config.domain.ConnectionPoolConfig;
 import com.xiaoniucode.etp.client.config.domain.LogConfig;
-import com.xiaoniucode.etp.client.config.domain.MuxConfig;
+import com.xiaoniucode.etp.client.config.domain.MultiplexConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.core.enums.ClientType;
@@ -18,7 +19,8 @@ public class DefaultAppConfig implements AppConfig {
     private final List<ProxyConfig> proxies;
     private final LogConfig logConfig;
     private final ClientType clientType;
-    private final MuxConfig muxConfig;
+    private final MultiplexConfig multiplexConfig;
+    private final ConnectionPoolConfig connectionPoolConfig;
 
     private DefaultAppConfig(Builder builder) {
         this.serverAddr = builder.serverAddr;
@@ -28,7 +30,8 @@ public class DefaultAppConfig implements AppConfig {
         this.proxies = builder.proxies;
         this.logConfig = builder.logConfig;
         this.clientType = builder.clientType;
-        this.muxConfig = builder.muxConfig;
+        this.multiplexConfig = builder.muxConfig;
+        this.connectionPoolConfig = builder.connectionPoolConfig;
     }
 
     public static class Builder {
@@ -39,7 +42,8 @@ public class DefaultAppConfig implements AppConfig {
         private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
         private LogConfig logConfig;
         private ClientType clientType = ClientType.BINARY_DEVICE;
-        private MuxConfig muxConfig = new MuxConfig(true);
+        private MultiplexConfig muxConfig = new MultiplexConfig(true);
+        private ConnectionPoolConfig connectionPoolConfig = new ConnectionPoolConfig();
 
         public Builder serverAddr(String serverAddr) {
             this.serverAddr = serverAddr;
@@ -61,8 +65,13 @@ public class DefaultAppConfig implements AppConfig {
             return this;
         }
 
-        public Builder muxConfig(MuxConfig muxConfig) {
+        public Builder muxConfig(MultiplexConfig muxConfig) {
             this.muxConfig = muxConfig;
+            return this;
+        }
+
+        public Builder connectionPoolConfig(ConnectionPoolConfig connectionPoolConfig) {
+            this.connectionPoolConfig = connectionPoolConfig;
             return this;
         }
 
@@ -111,8 +120,13 @@ public class DefaultAppConfig implements AppConfig {
     }
 
     @Override
-    public MuxConfig getMuxConfig() {
-        return muxConfig;
+    public MultiplexConfig getMultiplexConfig() {
+        return multiplexConfig;
+    }
+
+    @Override
+    public ConnectionPoolConfig getConnectionPoolConfig() {
+        return connectionPoolConfig;
     }
 
     @Override

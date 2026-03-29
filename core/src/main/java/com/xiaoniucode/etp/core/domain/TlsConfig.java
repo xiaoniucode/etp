@@ -8,19 +8,19 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 public class TlsConfig {
-    private Boolean enable;
+    private Boolean enabled;
     private String certFile;
     private String keyFile;
     private String caFile;
     private String keyPassword;
     private boolean testMode;
 
-    public TlsConfig(boolean enable,boolean isTestMode) {
-        this.enable=enable;
+    public TlsConfig(boolean enabled, boolean isTestMode) {
+        this.enabled = enabled;
         this.testMode=isTestMode;
     }
-    public TlsConfig(Boolean enable, String certFile, String keyFile, String caFile,String keyPassword,boolean testMode) {
-        this.enable = enable;
+    public TlsConfig(Boolean enabled, String certFile, String keyFile, String caFile, String keyPassword, boolean testMode) {
+        this.enabled = enabled;
         this.certFile = certFile;
         this.keyFile = keyFile;
         this.caFile = caFile;

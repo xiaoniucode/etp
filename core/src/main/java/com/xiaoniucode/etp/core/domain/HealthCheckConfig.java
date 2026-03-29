@@ -11,7 +11,7 @@ public class HealthCheckConfig {
     /**
      * 是否开启健康检查
      */
-    private boolean enable;
+    private boolean enabled;
     /**
      * 检查间隔
      */

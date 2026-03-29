@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MuxConfig {
-    private boolean enable;
+public class MultiplexConfig {
+    private boolean enabled;
 }

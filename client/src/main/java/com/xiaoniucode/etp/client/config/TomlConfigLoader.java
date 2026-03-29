@@ -1,9 +1,6 @@
 package com.xiaoniucode.etp.client.config;
 
-import com.xiaoniucode.etp.client.config.domain.AuthConfig;
-import com.xiaoniucode.etp.client.config.domain.LogConfig;
-import com.xiaoniucode.etp.client.config.domain.MuxConfig;
-import com.xiaoniucode.etp.client.config.domain.RetryConfig;
+import com.xiaoniucode.etp.client.config.domain.*;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
@@ -36,8 +33,8 @@ public class TomlConfigLoader implements ConfigSource {
         Toml root = TomlUtils.readToml(path);
         DefaultAppConfig.Builder builder = DefaultAppConfig.builder();
 
-        String serverAddrValue = root.getString("serverAddr");
-        Long serverPortValue = root.getLong("serverPort");
+        String serverAddrValue = root.getString("server_addr");
+        Long serverPortValue = root.getLong("server_port");
 
         if (StringUtils.hasText(serverAddrValue)) {
             builder.serverAddr(serverAddrValue.trim());
@@ -47,15 +44,39 @@ public class TomlConfigLoader implements ConfigSource {
             validatePort(serverPortValue.intValue());
             builder.serverPort(serverPortValue.intValue());
         }
-        Toml muxTable = root.getTable("mux");
+        Toml muxTable = root.getTable("multiplex");
         Boolean globalMuxV = null;
         if (muxTable != null) {
-            MuxConfig muxConfig = new MuxConfig();
-            globalMuxV = muxTable.getBoolean("enable", true);
-            muxConfig.setEnable(globalMuxV);
+            MultiplexConfig muxConfig = new MultiplexConfig();
+            globalMuxV = muxTable.getBoolean("enabled", true);
+            muxConfig.setEnabled(globalMuxV);
             builder.muxConfig(muxConfig);
         }
 
+        // 读取连接池配置
+        Toml connectionPoolTable = root.getTable("connection_pool");
+        if (connectionPoolTable != null) {
+            ConnectionPoolConfig connectionPoolConfig = new ConnectionPoolConfig();
+            connectionPoolConfig.setEnabled(connectionPoolTable.getBoolean("enabled", false));
+            
+            // 读取多路复用连接池配置
+            Toml multiplexPoolTable = connectionPoolTable.getTable("multiplex");
+            if (multiplexPoolTable != null) {
+                ConnectionPoolConfig.MultiplexPoolConfig multiplexPoolConfig = connectionPoolConfig.getMultiplex();
+                multiplexPoolConfig.setPlain(multiplexPoolTable.getBoolean("plain_enabled", false));
+                multiplexPoolConfig.setEncrypt(multiplexPoolTable.getBoolean("encrypt_enabled", false));
+            }
+            
+            // 读取独立连接池配置
+            Toml directPoolTable = connectionPoolTable.getTable("direct");
+            if (directPoolTable != null) {
+                ConnectionPoolConfig.DirectPoolConfig directPoolConfig = connectionPoolConfig.getDirect();
+                directPoolConfig.setPlainCount(directPoolTable.getLong("plain_count", 0L).intValue());
+                directPoolConfig.setEncryptCount(directPoolTable.getLong("encrypt_count", 0L).intValue());
+            }
+            
+            builder.connectionPoolConfig(connectionPoolConfig);
+        }
 
         // 读取认证配置
         Toml authTable = root.getTable("auth");
@@ -65,9 +86,9 @@ public class TomlConfigLoader implements ConfigSource {
             authConfig.setToken(token.trim());
             Toml retry = authTable.getTable("retry");
             if (retry != null) {
-                Long initialDelaySecValue = retry.getLong("initialDelay", 0L);
-                Long maxDelaySecValue = retry.getLong("maxDelay", 0L);
-                Long maxRetriesValue = retry.getLong("maxRetries", 0L);
+                Long initialDelaySecValue = retry.getLong("initial_delay", 0L);
+                Long maxDelaySecValue = retry.getLong("max_delay", 0L);
+                Long maxRetriesValue = retry.getLong("max_retries", 0L);
                 RetryConfig retryConfig = new RetryConfig();
                 retryConfig.setInitialDelay(initialDelaySecValue.intValue());
                 retryConfig.setMaxDelay(maxDelaySecValue.intValue());
@@ -80,13 +101,13 @@ public class TomlConfigLoader implements ConfigSource {
         // 读取 TLS 配置
         Toml tlsTable = root.getTable("tls");
         if (tlsTable != null) {
-            Boolean enable = tlsTable.getBoolean("enable", false);
-            String certFile = tlsTable.getString("certFile");
-            String keyFile = tlsTable.getString("keyFile");
-            String caFile = tlsTable.getString("caFile");
-            String keyPass = tlsTable.getString("keyPass");
-            boolean testMode = tlsTable.getBoolean("testMode", false);
-            builder.tlsConfig(new TlsConfig(enable, certFile, keyFile, caFile, keyPass, testMode));
+            Boolean enabled = tlsTable.getBoolean("enabled", false);
+            String certFile = tlsTable.getString("cert_file");
+            String keyFile = tlsTable.getString("key_file");
+            String caFile = tlsTable.getString("ca_file");
+            String keyPass = tlsTable.getString("key_pass");
+            boolean testMode = tlsTable.getBoolean("test_mode", false);
+            builder.tlsConfig(new TlsConfig(enabled, certFile, keyFile, caFile, keyPass, testMode));
         }
 
         // 读取代理配置
@@ -100,9 +121,9 @@ public class TomlConfigLoader implements ConfigSource {
                 String protocol = proxyTable.getString("protocol");
                 String localIp = proxyTable.getString("localIp", "127.0.0.1");
                 Long localPortValue = proxyTable.getLong("localPort");
-                Long remotePortValue = proxyTable.getLong("remotePort");
+                Long remotePortValue = proxyTable.getLong("remote_port");
 
-                Boolean enableV = proxyTable.getBoolean("enable", true);
+                Boolean enableV = proxyTable.getBoolean("enabled", true);
 
                 if (StringUtils.hasText(name)) {
                     proxyConfig.setName(name.trim());
@@ -134,9 +155,9 @@ public class TomlConfigLoader implements ConfigSource {
                     proxyConfig.setRemotePort(remotePortValue.intValue());
                 }
                 if (proxyConfig.isHttp()) {
-                    Boolean autoDomain = proxyTable.getBoolean("autoDomain", true);
-                    List<String> customDomains = proxyTable.getList("customDomains");
-                    List<String> subDomains = proxyTable.getList("subDomains");
+                    Boolean autoDomain = proxyTable.getBoolean("auto_domain", true);
+                    List<String> customDomains = proxyTable.getList("custom_domains");
+                    List<String> subDomains = proxyTable.getList("sub_domains");
                     DomainConfig domainConfig = new DomainConfig();
                     if (autoDomain != null) {
                         domainConfig.setAutoDomain(autoDomain);
@@ -159,19 +180,19 @@ public class TomlConfigLoader implements ConfigSource {
                 }
 
                 if (enableV != null) {
-                    proxyConfig.setEnable(enableV);
+                    proxyConfig.setEnabled(enableV);
                 }
                 //访问控制
                 Toml accessControl = proxyTable.getTable("access_control");
                 if (accessControl != null) {
-                    Boolean enable = accessControl.getBoolean("enable", false);
+                    Boolean enabled = accessControl.getBoolean("enabled", false);
                     String mode = accessControl.getString("mode");
                     if (!StringUtils.hasText(mode)) {
                         throw new IllegalArgumentException("必须指定访问控制模式");
                     }
                     List<String> allow = accessControl.getList("allow", new ArrayList<>());
                     List<String> deny = accessControl.getList("deny", new ArrayList<>());
-                    AccessControlConfig accessControlConfig = new AccessControlConfig(enable,
+                    AccessControlConfig accessControlConfig = new AccessControlConfig(enabled,
                             AccessControlMode.fromValue(mode),
                             new HashSet<>(allow),
                             new HashSet<>(deny));
@@ -183,7 +204,7 @@ public class TomlConfigLoader implements ConfigSource {
                 if (ProtocolType.isHttp(protocol)) {
                     Toml basicAuth = proxyTable.getTable("basic_auth");
                     if (basicAuth != null) {
-                        Boolean enable = basicAuth.getBoolean("enable", false);
+                        Boolean enabled = basicAuth.getBoolean("enabled", false);
                         HashSet<HttpUser> sets = new HashSet<>();
                         List<HashMap> users = basicAuth.getList("users");
                         if (users != null && !users.isEmpty()) {
@@ -193,15 +214,15 @@ public class TomlConfigLoader implements ConfigSource {
                                 sets.add(new HttpUser(user, pass));
                             }
                         }
-                        proxyConfig.setBasicAuth(new BasicAuthConfig(enable, sets));
+                        proxyConfig.setBasicAuth(new BasicAuthConfig(enabled, sets));
                     }
                 }
                 //带宽限制
                 Toml bandwidth = proxyTable.getTable("bandwidth");
                 if (bandwidth != null) {
                     String limit = bandwidth.getString("limit");
-                    String limitIn = bandwidth.getString("limitIn");
-                    String limitOut = bandwidth.getString("limitOut");
+                    String limitIn = bandwidth.getString("limit_in");
+                    String limitOut = bandwidth.getString("limit_out");
                     if (StringUtils.hasText(limit) || StringUtils.hasText(limitIn) || StringUtils.hasText(limitOut)) {
                         BandwidthConfig bandwidthConfig = new BandwidthConfig(limit, limitIn, limitOut);
                         proxyConfig.setBandwidth(bandwidthConfig);
@@ -223,7 +244,7 @@ public class TomlConfigLoader implements ConfigSource {
                 Toml transport = proxyTable.getTable("transport");
                 TransportConfig transportConfig = new TransportConfig();
                 if (transport != null) {
-                    Boolean muxV = transport.getBoolean("mux");
+                    Boolean muxV = transport.getBoolean("multiplex");
                     Boolean compressV = transport.getBoolean("compress");
                     Boolean encryptV = transport.getBoolean("encrypt");
                     if (compressV != null) {
@@ -233,12 +254,12 @@ public class TomlConfigLoader implements ConfigSource {
                         transportConfig.setEncrypt(encryptV);
                     }
                     if (muxV != null) {
-                        transportConfig.setMux(muxV);
+                        transportConfig.setMultiplex(muxV);
                     } else if (globalMuxV != null) {
-                        transportConfig.setMux(globalMuxV);
+                        transportConfig.setMultiplex(globalMuxV);
                     }
                 } else if (globalMuxV != null) {
-                    transportConfig.setMux(globalMuxV);
+                    transportConfig.setMultiplex(globalMuxV);
                 }
                 proxyConfig.setTransport(transportConfig);
             }
@@ -252,10 +273,10 @@ public class TomlConfigLoader implements ConfigSource {
             String level = logTable.getString("level");
             String path = logTable.getString("path");
             String name = logTable.getString("name");
-            String archivePattern = logTable.getString("archivePattern");
-            String logPattern = logTable.getString("logPattern");
-            Long maxHistoryValue = logTable.getLong("maxHistory");
-            String totalSizeCap = logTable.getString("totalSizeCap");
+            String archivePattern = logTable.getString("archive_pattern");
+            String logPattern = logTable.getString("log_pattern");
+            Long maxHistoryValue = logTable.getLong("max_history");
+            String totalSizeCap = logTable.getString("total_size_cap");
 
             if (StringUtils.hasText(level)) {
                 logConfig.setLevel(level.trim());

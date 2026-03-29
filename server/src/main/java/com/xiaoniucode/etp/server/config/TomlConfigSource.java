@@ -43,24 +43,24 @@ public class TomlConfigSource implements ConfigSource {
     }
 
     private void parseRoot(AppConfig.Builder builder, Toml root) {
-        String serverAddrValue = root.getString("serverAddr", DEFAULT_HOST);
+        String serverAddrValue = root.getString("server_addr", DEFAULT_HOST);
         if (StringUtils.hasText(serverAddrValue)) {
             builder.serverAddr(serverAddrValue.trim());
         }
 
-        Long serverPortValue = root.getLong("serverPort", (long) DEFAULT_BIND_PORT);
+        Long serverPortValue = root.getLong("server_port", (long) DEFAULT_BIND_PORT);
         validatePort(serverPortValue.intValue());
         builder.serverPort(serverPortValue.intValue());
 
-        List<String> baseDomains = root.getList("baseDomains", new ArrayList<>());
+        List<String> baseDomains = root.getList("base_domains", new ArrayList<>());
         builder.baseDomains(new HashSet<>(baseDomains));
 
-        Long httpProxyPort = root.getLong("httpProxyPort", 80L);
+        Long httpProxyPort = root.getLong("http_proxy_port", 80L);
         int httpPort = httpProxyPort.intValue();
         validatePort(httpPort);
         builder.httpProxyPort(httpPort);
 
-        Long httpsProxyPort = root.getLong("httpsProxyPort", 443L);
+        Long httpsProxyPort = root.getLong("https_proxy_port", 443L);
         int httpsPort = httpsProxyPort.intValue();
         validatePort(httpsPort);
         builder.httpsProxyPort(httpsPort);
@@ -76,8 +76,8 @@ public class TomlConfigSource implements ConfigSource {
     private void parseDashboard(AppConfig.Builder builder, Toml root) {
         Toml dash = root.getTable("dashboard");
         if (dash != null) {
-            Boolean enable = dash.getBoolean("enable", false);
-            if (enable != null && enable) {
+            Boolean enabled = dash.getBoolean("enabled", false);
+            if (enabled != null && enabled) {
                 String addr = dash.getString("addr", DEFAULT_DASHBOARD_HOST);
                 Long port = dash.getLong("port", (long) DEFAULT_DASHBOARD_PORT);
                 String username = dash.getString("username");
@@ -102,13 +102,13 @@ public class TomlConfigSource implements ConfigSource {
     private void parseTls(AppConfig.Builder builder, Toml root) {
         Toml tlsTable = root.getTable("tls");
         if (tlsTable != null) {
-            Boolean enable = tlsTable.getBoolean("enable", false);
-            String certFile = tlsTable.getString("certFile");
-            String keyFile = tlsTable.getString("keyFile");
-            String caFile = tlsTable.getString("caFile");
-            String keyPass = tlsTable.getString("keyPass");
-            boolean testMode = tlsTable.getBoolean("testMode", false);
-            TlsConfig tlsConfig = new TlsConfig(enable, certFile, keyFile, caFile, keyPass, testMode);
+            Boolean enabled = tlsTable.getBoolean("enabled", false);
+            String certFile = tlsTable.getString("cert_file");
+            String keyFile = tlsTable.getString("key_file");
+            String caFile = tlsTable.getString("ca_file");
+            String keyPass = tlsTable.getString("key_pass");
+            boolean testMode = tlsTable.getBoolean("test_mode", false);
+            TlsConfig tlsConfig = new TlsConfig(enabled, certFile, keyFile, caFile, keyPass, testMode);
             builder.tls(tlsConfig);
         }
     }
@@ -140,7 +140,7 @@ public class TomlConfigSource implements ConfigSource {
         for (Toml tokenTable : accessTokenTables) {
             String name = tokenTable.getString("name");
             String token = tokenTable.getString("token");
-            Long maxClients = tokenTable.getLong("maxClients");
+            Long maxClients = tokenTable.getLong("max_clients");
             if (tokenTemp.contains(token)) {
                 throw new IllegalArgumentException("AccessToken令牌冲突，不能存在重复的令牌！ " + token);
             }

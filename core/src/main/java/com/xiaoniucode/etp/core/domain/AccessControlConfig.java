@@ -13,14 +13,14 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @NoArgsConstructor
 public class AccessControlConfig implements Serializable {
     @Setter
-    private boolean enable = false;
+    private boolean enabled = false;
     @Setter
     private AccessControlMode mode;
     private final Set<String> allow = new CopyOnWriteArraySet<>();
     private final Set<String> deny = new CopyOnWriteArraySet<>();
 
-    public AccessControlConfig(Boolean enable, AccessControlMode mode, Set<String> allow, Set<String> deny) {
-        this.enable = enable;
+    public AccessControlConfig(Boolean enabled, AccessControlMode mode, Set<String> allow, Set<String> deny) {
+        this.enabled = enabled;
         this.mode = mode;
         if (allow != null && !allow.isEmpty()) {
             this.allow.addAll(allow);

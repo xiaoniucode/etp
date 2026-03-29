@@ -54,7 +54,7 @@ public class TunnelServer implements Lifecycle {
         try {
             logger.debug("正在启动ETP服务");
             eventBus.publishSync(new TunnelServerStartingEvent());
-            if (config.getTlsConfig().getEnable()) {
+            if (config.getTlsConfig().getEnabled()) {
                 tlsContext = TlsHelper.buildSslContext(false, config.getTlsConfig());
                 TlsContextHolder.initialize(tlsContext);
             }
@@ -72,7 +72,7 @@ public class TunnelServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            if (config.getTlsConfig().getEnable() && tlsContext != null) {
+                            if (config.getTlsConfig().getEnabled() && tlsContext != null) {
                                 sc.pipeline().addLast(new OptionalSslHandler(tlsContext));
                             }
                             sc.pipeline()

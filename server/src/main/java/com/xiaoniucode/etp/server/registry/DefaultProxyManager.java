@@ -147,8 +147,8 @@ public class  DefaultProxyManager implements ProxyManager {
         Optional<ProxyConfig> opt = findById(proxyId);
         if (opt.isPresent()) {
             ProxyConfig proxyConfig = opt.get();
-            if (proxyConfig.isEnable() != enable) {
-                proxyConfig.setEnable(enable);
+            if (proxyConfig.isEnabled() != enable) {
+                proxyConfig.setEnabled(enable);
                 listeners.forEach(listener -> listener.onStatusChanged(proxyConfig, enable));
             }
             return proxyConfig;

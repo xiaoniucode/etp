@@ -1,8 +1,9 @@
 package com.xiaoniucode.etp.client.config;
 
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
+import com.xiaoniucode.etp.client.config.domain.ConnectionPoolConfig;
 import com.xiaoniucode.etp.client.config.domain.LogConfig;
-import com.xiaoniucode.etp.client.config.domain.MuxConfig;
+import com.xiaoniucode.etp.client.config.domain.MultiplexConfig;
 import com.xiaoniucode.etp.common.config.Config;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
@@ -16,7 +17,8 @@ public interface AppConfig extends Config {
     int getServerPort();
 
     AuthConfig getAuthConfig();
-    MuxConfig getMuxConfig();
+    MultiplexConfig getMultiplexConfig();
+    ConnectionPoolConfig getConnectionPoolConfig();
 
     TlsConfig getTlsConfig();
 

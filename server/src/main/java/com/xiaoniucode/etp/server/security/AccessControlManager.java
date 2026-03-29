@@ -32,7 +32,7 @@ public class AccessControlManager {
           }
         ProxyConfig proxyConfig = opt.get();
         AccessControlConfig accessControl = proxyConfig.getAccessControl();
-        if (accessControl == null || !accessControl.isEnable()) {
+        if (accessControl == null || !accessControl.isEnabled()) {
             matcherMap.remove(proxyId);
             return true;
         }

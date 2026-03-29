@@ -15,7 +15,6 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -94,7 +93,7 @@ public class ProxyCreateAction extends AgentBaseAction {
         }
         proxyConfig.setProtocol(ProtocolType.getByName(proxy.getProtocol().name()));
         if (proxy.hasEnable()) {
-            proxyConfig.setEnable(proxy.getEnable());
+            proxyConfig.setEnabled(proxy.getEnable());
         }
         if (proxy.hasDomain()) {
             Message.DomainInfo domainInfo = proxy.getDomain();
@@ -116,7 +115,7 @@ public class ProxyCreateAction extends AgentBaseAction {
             TransportConfig transportConfig = new TransportConfig();
             Message.Transport transport = proxy.getTransport();
             if (transport.hasMux()) {
-                transportConfig.setMux(transport.getMux());
+                transportConfig.setMultiplex(transport.getMux());
             }
             if (transport.hasCompress()) {
                 transportConfig.setCompress(transport.getCompress());

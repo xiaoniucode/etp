@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransportConfig {
-    private Boolean mux;
+    private Boolean multiplex;
     private Boolean encrypt;
     private Boolean compress;
 }

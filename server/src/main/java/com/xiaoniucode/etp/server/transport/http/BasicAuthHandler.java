@@ -36,7 +36,7 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
         String basicAuthHeader = visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).get();
 
         BasicAuthConfig basicAuth = config.getBasicAuth();
-        if (basicAuth != null && basicAuth.isEnable()) {
+        if (basicAuth != null && basicAuth.isEnabled()) {
             if (basicAuthHeader == null || !basicAuthHeader.toLowerCase().startsWith("basic ")) {
                 NettyHttpUtils.sendBasicAuth(visitor);
                 return;

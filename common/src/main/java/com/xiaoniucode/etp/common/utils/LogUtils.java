@@ -65,12 +65,12 @@ public class LogUtils {
                 logConfig.setName(name);
             }
 
-            String archivePattern = log.getString("archivePattern");
+            String archivePattern = log.getString("archive_pattern");
             if (StringUtils.hasText(archivePattern)) {
                 logConfig.setArchivePattern(archivePattern);
             }
 
-            String pattern = log.getString("logPattern");
+            String pattern = log.getString("log_pattern");
             if (StringUtils.hasText(pattern)) {
                 logConfig.setLogPattern(pattern);
             } else {
@@ -80,12 +80,12 @@ public class LogUtils {
                 }
             }
 
-            Long maxHistory = log.getLong("maxHistory");
+            Long maxHistory = log.getLong("max_history");
             if (maxHistory != null) {
                 logConfig.setMaxHistory(maxHistory.intValue());
             }
 
-            String totalSizeCap = log.getString("totalSizeCap");
+            String totalSizeCap = log.getString("total_size_cap");
             if (StringUtils.hasText(totalSizeCap)) {
                 logConfig.setTotalSizeCap(totalSizeCap);
             }

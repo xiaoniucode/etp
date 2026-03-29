@@ -1,28 +1,45 @@
-serverAddr = "localhost"
-serverPort = 9527
+server_addr = "localhost"
+server_port = 9527
 #认证
 [auth]
 token = "5E793FAD27AA713D"
 [auth.retry]
-initialDelay = 2
-maxDelay = 8
-maxRetries = 5
+initial_delay = 2
+max_delay = 8
+max_retries = 5
+[connection_pool]
+# 是否预创建连接池（默认false）
+enabled = true
 
-[mux]
-enable = true #全局开启，可覆盖
+# 多路复用隧道配置
+[connection_pool.multiplex]
+# 是否创建明文多路复用隧道
+plain_enabled = true
+# 是否创建加密多路复用隧道（需要tls.enable=true）
+encrypt_enabled = true
+
+# 独立隧道配置
+[connection_pool.direct]
+# 明文独立隧道数量（默认1）
+plain_count = 1
+# 加密独立隧道数量（默认1，需要tls.enable=true）
+encrypt_count = 2
+
+[multiplex]
+enabled = true #全局开启，可覆盖
 
 [tls]
-enable = true
-testMode=false
-certFile = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.crt"
-keyFile = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.key"
-caFile = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
+enabled = true
+test_mode=false
+cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.crt"
+key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.key"
+ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 
 #[[proxies]]
 #name = "web1"
 #protocol = "http"
-#autoDomain = false
-#customDomains = ["a.domain1.com"]
+#auto_domain = false
+#custom_domains = ["a.domain1.com"]
 #status = 1
 #targets = [
 #    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
@@ -31,21 +48,21 @@ caFile = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 #[[proxies]]
 #name = "web11"
 #protocol = "http"
-#autoDomain = true
-#subDomains = ["a", "b"]
+#auto_domain = true
+#sub_domains = ["a", "b"]
 #status = 1
 #targets = [
 #    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
 #    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 #]
 #[proxies.basic_auth]
-#enable = true
+#enabled = true
 #users = [
 #    { user = "user1", pass = "pass1" },
 #    { user = "user2", pass = "pass2" }
 #]
 #[proxies.access_control]
-#enable = true
+#enabled = true
 #mode = "allow"
 #allow = ["43.135.115.160/32"]
 #deny = []
@@ -53,8 +70,8 @@ caFile = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 #[[proxies]]
 #name = "fullstack2"
 #protocol = "http"
-#customDomains = ["etpp.domain2.com"]
-#enable = true
+#custom_domains = ["etpp.domain2.com"]
+#enabled = true
 #targets = [
 #    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
 #    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
@@ -63,28 +80,28 @@ caFile = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 #[proxies.load_balance]
 #strategy = "random" # 负载均衡策略 roundrobin/weight/random/leastconn
 #[proxies.health_check]
-#enable = true
+#enabled = true
 #interval = 5 #检查间隔
 #timeout = 2 #连接超时
-#maxFail = 3
+#max_fail = 3
 #path="/health" #健康检查路径(HTTP协议)
 #
 #[proxies.transport]
-#mux = false
+#multiplex = false
 #compress = false
 #encrypt = true
 #
 #[proxies.access_control]
-#enable = true
+#enabled = true
 #mode = "allow"
 #allow = ["43.135.115.160/32"]
 #deny = []
 #
 #[proxies.bandwidth]
-#enable= true
+#enabled= true
 #limit = "20M" #总带宽限制(可选) 20Mbps
-#limitIn = "2M" #入口带宽限制(可选)
-#limitOut = "2M" #出口带宽限制(可选)
+#limit_in = "2M" #入口带宽限制(可选)
+#limit_out = "2M" #出口带宽限制(可选)
 #
 #[[proxies]]
 #name = "web2"
@@ -93,13 +110,13 @@ caFile = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 #    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
 #    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 #]
-#customDomains = ["etp.domain2.com"]
+#custom_domains = ["etp.domain2.com"]
 #[proxies.access_control]
-#enable = true
+#enabled = true
 #mode = "allow"
 #allow = ["127.0.0.1"]
 #[proxies.basic_auth]
-#enable = true
+#enabled = true
 #users = [
 #    { user = "user1", pass = "123" },
 #    { user = "user2", pass = "456" }
@@ -107,17 +124,17 @@ caFile = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 [[proxies]]
 name = "web22"
 protocol = "http"
-customDomains = ["etp12.domain2.com"]
+custom_domains = ["etp12.domain2.com"]
 targets = [
     { host = "127.0.0.1", port = 3006, weight = 70, name = "web-instance-1" }
 #    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 ]
 #[proxies.bandwidth] #带宽限制
 #limit = "20M" #总带宽限制(可选)
-#limitIn = "2M" #入口带宽限制(可选)
-#limitOut = "2M" #出口带宽限制(可选)
+#limit_in = "2M" #入口带宽限制(可选)
+#limit_out = "2M" #出口带宽限制(可选)
 [proxies.transport]
-mux = true
+multiplex = true
 compress = true
 encrypt = false
 #[[proxies]]
@@ -129,7 +146,7 @@ encrypt = false
 #    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 #]
 #[proxies.access_control] #访问控制
-#enable = true
+#enabled = true
 #mode = "allow"
 #allow = ["127.0.0.1"]
 #deny = []
@@ -137,13 +154,13 @@ encrypt = false
 name = "mysql2"
 protocol = "tcp"
 status = 1
-remotePort = 3309
+remote_port = 3309
 targets = [
     { host = "127.0.0.1", port = 3306, weight = 70, name = "mysql-instance-1" },
     { host = "127.0.0.1", port = 3306, weight = 90, name = "mysql-instance-2" }
 ]
 [proxies.transport]
-mux = true
+multiplex = true
 compress = false
 encrypt = false
 [proxies.loadbalance]
@@ -151,8 +168,8 @@ strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 
 [proxies.bandwidth] #带宽限制
 limit = "128k" #总带宽限制(可选)
-limitIn = "64k" #入口带宽限制(可选)
-limitOut = "64k" #出口带宽限制(可选)
+limit_in = "64k" #入口带宽限制(可选)
+limit_out = "64k" #出口带宽限制(可选)
 [[proxies]]
 name = "redis"
 protocol = "tcp"
@@ -168,8 +185,8 @@ strategy = "random" # 策略：roundrobin/weight/random/leastconn
 [[proxies]]
 name = "postgre"
 protocol = "tcp"
-remotePort=5433
-enable = true
+remote_port=5433
+enabled = true
 targets = [
     { host = "127.0.0.1", port = 5432, weight = 70, name = "web-instance-1" },
     { host = "127.0.0.1", port = 5432, weight = 30, name = "web-instance-2" }
@@ -180,70 +197,70 @@ targets = [
 [[proxies]]
 name = "test"
 protocol = "tcp"
-enable=true
-remotePort = 5202
+enabled=true
+remote_port = 5202
 targets = [
 #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
 ]
 [proxies.transport]
-mux = false
+multiplex = false
 compress = false
 encrypt = true
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 [proxies.bandwidth] #带宽限制
 limit = "1M" #总带宽限制(可选)
-#limitIn = "10M" #入口带宽限制(可选)
-#limitOut = "10M" #出口带宽限制(可选)
+#limit_in = "10M" #入口带宽限制(可选)
+#limit_out = "10M" #出口带宽限制(可选)
 
 
 [[proxies]]
 name = "test_mux"
 protocol = "tcp"
-enable=true
-remotePort = 5203
+enabled=true
+remote_port = 5203
 targets = [
 #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
 ]
 [proxies.transport]
-mux = true
+multiplex = true
 compress = false
 encrypt = false
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 [proxies.bandwidth] #带宽限制
 limit = "2M" #总带宽限制(可选)
-#limitIn = "10M" #入口带宽限制(可选)
-#limitOut = "10M" #出口带宽限制(可选)
+#limit_in = "10M" #入口带宽限制(可选)
+#limit_out = "10M" #出口带宽限制(可选)
 
 [[proxies]]
 name = "test_mux_tls"
 protocol = "tcp"
-enable=true
-remotePort = 5204
+enabled=true
+remote_port = 5204
 targets = [
     #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
 ]
 [proxies.transport]
-mux = true
+multiplex = true
 compress = false
 encrypt = true
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 [proxies.bandwidth] #带宽限制
 limit = "2M" #总带宽限制(可选)
-#limitIn = "10M" #入口带宽限制(可选)
-#limitOut = "10M" #出口带宽限制(可选)
+#limit_in = "10M" #入口带宽限制(可选)
+#limit_out = "10M" #出口带宽限制(可选)
 
 #日志
 [log]
 level = "debug"
 path = "log"
 name = "etpc.log"
-archivePattern = "etpc.%d{yyyy-MM-dd}.log"
-logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-maxHistory = 30
-totalSizeCap = "3GB"
+archive_pattern = "etpc.%d{yyyy-MM-dd}.log"
+log_pattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+max_history = 30
+total_size_cap = "3GB"

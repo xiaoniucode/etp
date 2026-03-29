@@ -44,7 +44,7 @@ public class TargetResolverAction extends StreamBaseAction {
         Channel visitor = context.getVisitor();
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
         ProxyConfig config = resolveProxyConfig(context);
-        if (config == null || !config.isEnable()) {
+        if (config == null || !config.isEnabled()) {
             logger.debug("代理不可用，关闭流：streamId={}", context.getStreamId());
             context.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
@@ -87,7 +87,7 @@ public class TargetResolverAction extends StreamBaseAction {
         List<Target> availableTargets = targets;
         HealthCheckConfig healthCheck = config.getHealthCheck();
         //获取健康目标服务列表
-        if (healthCheck != null && healthCheck.isEnable()) {
+        if (healthCheck != null && healthCheck.isEnabled()) {
             availableTargets = healthManager.getAvailableTargets(config.getProxyId(), targets);
         }
         if (CollectionUtils.isEmpty(availableTargets)) {

@@ -60,7 +60,7 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
                 .addAllTargets(targets)
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
 
-        if (config.isEnable()) {
+        if (config.isEnabled()) {
             newProxyBuilder.setEnable(true);
         }
 
@@ -85,7 +85,7 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
                 //Basic Auth 认证
                 if (config.hasBasicAuth()) {
                     BasicAuthConfig basicAuth = config.getBasicAuth();
-                    Message.BasicAuth.Builder basicAuthBuilder = Message.BasicAuth.newBuilder().setEnable(basicAuth.isEnable());
+                    Message.BasicAuth.Builder basicAuthBuilder = Message.BasicAuth.newBuilder().setEnable(basicAuth.isEnabled());
                     Set<HttpUser> users = basicAuth.getUsers();
                     if (users != null && !users.isEmpty()) {
                         for (HttpUser user : users) {
@@ -106,7 +106,7 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
             TransportConfig transport = config.getTransport();
             Boolean encrypt = transport.getEncrypt();
             Boolean compress = transport.getCompress();
-            Boolean mux = transport.getMux();
+            Boolean mux = transport.getMultiplex();
             if (encrypt != null) {
                 builder.setEncrypt(encrypt);
             }
@@ -124,7 +124,7 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
             AccessControlConfig access = config.getAccessControl();
             Message.AccessControl.Builder accessControlbuilder = Message.AccessControl
                     .newBuilder()
-                    .setEnable(access.isEnable())
+                    .setEnable(access.isEnabled())
                     .setMode(Message.AccessMode.valueOf(access.getMode().name()));
             if (access.hasAllow()) {
                 Set<String> allow = access.getAllow();

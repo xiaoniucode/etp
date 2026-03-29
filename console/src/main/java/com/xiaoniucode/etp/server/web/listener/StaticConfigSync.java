@@ -50,7 +50,7 @@ public class StaticConfigSync implements EventListener<TunnelServerBindEvent> {
     @Override
     public void onEvent(TunnelServerBindEvent event) {
         try {
-            if (config.getDashboard().getEnable()) {
+            if (config.getDashboard().getEnabled()) {
                 syncDashboardUser();
                 syncSystemSettings();
                 syncAccessTokens();

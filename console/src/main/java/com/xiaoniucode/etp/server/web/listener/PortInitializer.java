@@ -41,7 +41,7 @@ public class PortInitializer implements EventListener<TunnelServerBindEvent> {
         try {
             Collection<ProxyConfig> configs = proxyManager.findAllTcpProxies();
             for (ProxyConfig proxy : configs) {
-                if (!proxy.isEnable()) {
+                if (!proxy.isEnabled()) {
                     continue;
                 }
                 Integer remotePort = proxy.getRemotePort();

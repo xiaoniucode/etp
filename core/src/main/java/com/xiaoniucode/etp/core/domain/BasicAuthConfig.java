@@ -11,12 +11,12 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Getter
 public class BasicAuthConfig {
     @Setter
-    private boolean enable;
+    private boolean enabled;
     private final Set<HttpUser> users = new CopyOnWriteArraySet<>();
     private final Map<String, HttpUser> cache = new ConcurrentHashMap<>();
 
-    public BasicAuthConfig(boolean enable, Set<HttpUser> users) {
-        this.enable = enable;
+    public BasicAuthConfig(boolean enabled, Set<HttpUser> users) {
+        this.enabled = enabled;
         if (users != null && !users.isEmpty()) {
             for (HttpUser user : users) {
                 this.users.add(user);
