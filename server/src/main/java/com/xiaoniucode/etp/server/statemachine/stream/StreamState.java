@@ -1,9 +1,28 @@
 package com.xiaoniucode.etp.server.statemachine.stream;
 
 public enum StreamState {
-    IDLE,  // 初始状态
-    CHECKING_TARGET,//检查目标
-    OPENING,      // 打开中
-    OPENED,       // 已打开
-    CLOSED,       // 已关闭
+    /**
+     * 初始状态
+     */
+    IDLE,
+    
+    /**
+     * 打开中
+     */
+    OPENING,
+    
+    /**
+     * 已打开
+     */
+    OPENED,
+    
+    /**
+     * 打开失败
+     */
+    FAILED,
+    
+    /**
+     * 已关闭
+     */
+    CLOSED
 }

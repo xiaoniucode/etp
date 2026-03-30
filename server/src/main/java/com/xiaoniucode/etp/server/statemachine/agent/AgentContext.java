@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 @EqualsAndHashCode(callSuper = true)
 public class AgentContext extends AbstractAgentContext {
     private final Logger logger = LoggerFactory.getLogger(AgentContext.class);
-    private AgentState state = AgentState.IDLE;
+    private AgentState state = AgentState.NEW;
     private ClientType clientType;
     private String clientId;
     private String token;
@@ -25,11 +25,12 @@ public class AgentContext extends AbstractAgentContext {
     private String arch;
     private String name;
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
-    public AgentContext( StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine) {
+
+    public AgentContext(StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine) {
         stateMachine = agentStateMachine;
     }
 
     public void fireEvent(AgentEvent event) {
-        stateMachine.fireEvent(getState(), event, this);
+        stateMachine.fireEvent(state, event, this);
     }
 }

@@ -19,10 +19,10 @@ public class HandleAuthFailureAction extends AgentBaseAction {
         if (retryCount <= retryConfig.getMaxRetries()) {
             logger.debug("准备重试连接，第 {} 次", retryCount);
             // 触发重试事件
-            ctx.getStateMachine().fireEvent(AgentState.FAILED, AgentEvent.RETRY, ctx);
+            ctx.fireEvent(AgentEvent.RETRY);
         } else {
             logger.error("达到最大重试次数，停止尝试");
-            ctx.getStateMachine().fireEvent(AgentState.FAILED, AgentEvent.STOP, ctx);
+            ctx.fireEvent(AgentEvent.STOP);
         }
     }
 }

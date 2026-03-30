@@ -11,160 +11,159 @@ import com.xiaoniucode.etp.client.statemachine.agent.action.HandleAuthSuccessAct
 import com.xiaoniucode.etp.client.statemachine.agent.action.tunnel.CreateConnPoolAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.tunnel.CreateNewConnAction;
 
+/**
+ * 客户端代理状态机构建器
+ * 负责构建和配置客户端代理的状态机，管理客户端的各种状态转换
+ */
 public class AgentStateMachineBuilder {
 
+    /**
+     * 状态机 ID
+     */
     private static final String MACHINE_ID = "clientStateMachine";
 
+    /**
+     * 状态机持有者
+     */
     private static class StateMachineHolder {
+        /**
+         * 状态机实例
+         */
         private static final StateMachine<AgentState, AgentEvent, AgentContext> INSTANCE = build();
 
+        /**
+         * 构建状态机
+         * @return 构建好的状态机实例
+         */
         private static StateMachine<AgentState, AgentEvent, AgentContext> build() {
             StateMachineBuilder<AgentState, AgentEvent, AgentContext> builder = StateMachineBuilderFactory.create();
 
-            // 创建动作实例
+            // 初始化各种动作处理器
             CheckConfigAction checkConfigAction = new CheckConfigAction();
             InitSslAction initSslAction = new InitSslAction();
             ConnectAction connectAction = new ConnectAction();
+            AuthAction authAction = new AuthAction();
             HandleAuthSuccessAction handleAuthSuccessAction = new HandleAuthSuccessAction();
             HandleAuthFailureAction handleAuthFailureAction = new HandleAuthFailureAction();
             HandleConnectFailureAction handleConnectFailureAction = new HandleConnectFailureAction();
-            AuthAction handleConnectSuccessAction = new AuthAction();
+            NetworkErrorAction networkErrorAction = new NetworkErrorAction();
+            GoawayAction stopAction = new GoawayAction();
+
             CreateConnPoolAction createTunnelPoolAction = new CreateConnPoolAction();
-            StopAction stopAction = new StopAction();
             TunnelCreateRespAction tunnelCreateRespAction = new TunnelCreateRespAction();
-            // 配置检查
+            ProxyCreationResponseAction proxyCreationResponseAction = new ProxyCreationResponseAction();
+            ErrorAction errorAction = new ErrorAction();
+            CreateNewConnAction createNewConnAction = new CreateNewConnAction();
+
+            // 启动客户端
             builder.externalTransition()
                     .from(AgentState.IDLE)
-                    .to(AgentState.CONFIG_CHECKING)
+                    .to(AgentState.CONNECTING)
                     .on(AgentEvent.START)
-                    .when(ctx -> true)
                     .perform(checkConfigAction);
 
-            // SSL初始化
-            builder.externalTransition()
-                    .from(AgentState.CONFIG_CHECKING)
-                    .to(AgentState.SSL_INITIALIZING)
+            // 配置检查
+            builder.internalTransition()
+                    .within(AgentState.CONNECTING)
                     .on(AgentEvent.CONFIG_CHECKED)
                     .perform(initSslAction);
 
-            // 连接尝试
-            builder.externalTransition()
-                    .from(AgentState.SSL_INITIALIZING)
-                    .to(AgentState.CONNECTING)
+            // SSL 初始化
+            builder.internalTransition()
+                    .within(AgentState.CONNECTING)
                     .on(AgentEvent.SSL_INITIALIZED)
-                    .when(context -> true)
                     .perform(connectAction);
 
-            // 从CONNECTED状态发生网络错误 → FAILED
-            builder.externalTransition()
-                    .from(AgentState.CONNECTED)
-                    .to(AgentState.FAILED)
-                    .on(AgentEvent.NETWORK_ERROR)
-                    .when(ctx -> true)
-                    .perform(new NetworkErrorAction());
-
-            builder.externalTransitions()
-                    .fromAmong(AgentState.CONNECTED)
-                    .to(AgentState.DISCONNECTED)
-                    .on(AgentEvent.DISCONNECT)
-                    .when(ctx -> true)
-                    .perform(new ClearAction());
-
-            // 连接成功后开始认证
-            builder.externalTransition()
-                    .from(AgentState.CONNECTING)
-                    .to(AgentState.AUTHENTICATING)
+            // TCP 连接成功
+            builder.internalTransition()
+                    .within(AgentState.CONNECTING)
                     .on(AgentEvent.CONNECT_SUCCESS)
-                    .when(ctx -> true)
-                    .perform(handleConnectSuccessAction);
+                    .perform(authAction);
 
             // 认证成功
             builder.externalTransition()
-                    .from(AgentState.AUTHENTICATING)
+                    .from(AgentState.CONNECTING)
                     .to(AgentState.CONNECTED)
                     .on(AgentEvent.AUTH_SUCCESS)
                     .when(AgentContext::isAuthenticated)
                     .perform(handleAuthSuccessAction);
-            //创建隧道池
-            builder.externalTransition()
-                    .from(AgentState.CONNECTED)
-                    .to(AgentState.CONNECTED)
-                    .on(AgentEvent.CREATE_TUNNEL_POOL)
-                    .when(context -> true)
-                    .perform(createTunnelPoolAction);
-            builder.externalTransition()
-                    .from(AgentState.CONNECTED)
-                    .to(AgentState.CONNECTED)
-                    .on(AgentEvent.CREATE_TUNNEL_POOL_RESP)
-                    .when(context -> true)
-                    .perform(tunnelCreateRespAction);
-
 
             // 认证失败
             builder.externalTransition()
-                    .from(AgentState.AUTHENTICATING)
+                    .from(AgentState.CONNECTING)
                     .to(AgentState.FAILED)
                     .on(AgentEvent.AUTH_FAILURE)
-                    .when(ctx -> !ctx.isAuthenticated())
                     .perform(handleAuthFailureAction);
-            // 连接失败
+
+            // TCP 连接失败
             builder.externalTransition()
                     .from(AgentState.CONNECTING)
                     .to(AgentState.FAILED)
                     .on(AgentEvent.CONNECT_FAILURE)
-                    .when(ctx -> true)
                     .perform(handleConnectFailureAction);
 
-            // 重新连接
+            // 运行中出现网络错误
             builder.externalTransition()
                     .from(AgentState.CONNECTED)
-                    .to(AgentState.CONNECTED)
+                    .to(AgentState.DISCONNECTED)
+                    .on(AgentEvent.NETWORK_ERROR)
+                    .perform(networkErrorAction);
+
+            // 处理创建隧道池请求
+            builder.internalTransition()
+                    .within(AgentState.CONNECTED)
+                    .on(AgentEvent.CREATE_TUNNEL_POOL)
+                    .perform(createTunnelPoolAction);
+
+            // 处理隧道创建响应
+            builder.internalTransition()
+                    .within(AgentState.CONNECTED)
+                    .on(AgentEvent.CREATE_TUNNEL_POOL_RESP)
+                    .perform(tunnelCreateRespAction);
+
+            // 处理代理创建响应
+            builder.internalTransition()
+                    .within(AgentState.CONNECTED)
+                    .on(AgentEvent.PROXY_CREATE_RESP)
+                    .perform(proxyCreationResponseAction);
+
+            // 创建新连接
+            builder.internalTransition()
+                    .within(AgentState.CONNECTED)
+                    .on(AgentEvent.CREATE_NEW_CONN)
+                    .perform(createNewConnAction);
+
+            // 处理错误
+            builder.internalTransition()
+                    .within(AgentState.CONNECTED)
+                    .on(AgentEvent.ERROR)
+                    .perform(errorAction);
+
+            // 重连
+            builder.externalTransition()
+                    .from(AgentState.DISCONNECTED)
+                    .to(AgentState.CONNECTING)
                     .on(AgentEvent.RETRY)
-                    .when(ctx -> true)
                     .perform(connectAction);
 
-            // 重新连接
-            builder.externalTransition()
-                    .from(AgentState.CONNECTED)
-                    .to(AgentState.CONNECTED)
-                    .on(AgentEvent.CONNECT_SUCCESS)
-                    .when(ctx -> true)
-                    .perform((from, to, event, context) -> context.setState(to));
-
-            // 停止户端进程
+            // 停止客户端
             builder.externalTransitions()
-                    .fromAmong(AgentState.FAILED, AgentState.CONNECTING, AgentState.CONNECTED)
-                    .to(AgentState.STOPPED)
+                    .fromAmong(AgentState.IDLE, AgentState.CONNECTING,
+                            AgentState.CONNECTED, AgentState.DISCONNECTED,
+                            AgentState.FAILED)
+                    .to(AgentState.SHUTDOWN)
                     .on(AgentEvent.STOP)
-                    .when(ctx -> true)
                     .perform(stopAction);
 
-            builder.externalTransition()
-                    .from(AgentState.CONNECTED)
-                    .to(AgentState.CONNECTED)
-                    .on(AgentEvent.PROXY_CREATE_RESP)
-                    .when(ctx -> true)
-                    .perform(new ProxyCreationResponseAction());
-            builder.externalTransition()
-                    .from(AgentState.CONNECTED)
-                    .to(AgentState.CONNECTED)
-                    .on(AgentEvent.ERROR)
-                    .when(ctx -> true)
-                    .perform(new ErrorAction());
-
-            builder.externalTransition()
-                    .from(AgentState.CONNECTED)
-                    .to(AgentState.CONNECTED)
-                    .on(AgentEvent.CREATE_NEW_CONN)
-                    .when(ctx -> true)
-                    .perform(new CreateNewConnAction());
-
-            // 构建状态机
             builder.build(MACHINE_ID);
             return StateMachineFactory.get(MACHINE_ID);
         }
     }
 
+    /**
+     * 获取状态机实例
+     * @return 状态机实例
+     */
     public static StateMachine<AgentState, AgentEvent, AgentContext> getStateMachine() {
         return StateMachineHolder.INSTANCE;
     }

@@ -14,36 +14,59 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+/**
+ * 服务端流状态机配置
+ * 负责配置服务端流的状态机，管理流的各种状态转换
+ */
 @Component
 public class StreamStateMachineConfig {
+    /**
+     * 目标解析动作
+     */
     @Autowired
     private TargetResolverAction targetResolverAction;
+
+    /**
+     * 流打开动作
+     */
     @Autowired
     private StreamOpenAction streamOpenAction;
+
+    /**
+     * 流打开响应动作
+     */
     @Autowired
     private StreamOpenResponseAction streamOpenResponseAction;
+
+    /**
+     * 流关闭动作
+     */
     @Autowired
     private StreamCloseAction streamCloseAction;
 
+    /**
+     * 创建流状态机
+     * @return 流状态机实例
+     */
     @Bean("streamStateMachine")
     public StateMachine<StreamState, StreamEvent, StreamContext> create() {
         StateMachineBuilder<StreamState, StreamEvent, StreamContext> builder = StateMachineBuilderFactory.create();
-        //初始化 --> 检查访问目标
+
+        // 打开流
         builder.externalTransition()
                 .from(StreamState.IDLE)
-                .to(StreamState.CHECKING_TARGET)
+                .to(StreamState.OPENING)
                 .on(StreamEvent.STREAM_OPEN)
                 .when(ctx -> true)
                 .perform(targetResolverAction);
 
-        // 检查访问目标 --> 连接中 校验完成
-        builder.externalTransition()
-                .from(StreamState.CHECKING_TARGET)
-                .to(StreamState.OPENING)
+        // 目标验证完成
+        builder.internalTransition()
+                .within(StreamState.OPENING)
                 .on(StreamEvent.TARGET_VALIDATED)
-               // .when(ctx -> ctx.getControl() != null && ctx.getProxyConfig() != null)
                 .perform(streamOpenAction);
-        //连接中 --> 已连接 连接成功
+
+        // 打开流成功
         builder.externalTransition()
                 .from(StreamState.OPENING)
                 .to(StreamState.OPENED)
@@ -51,16 +74,25 @@ public class StreamStateMachineConfig {
                 .when(ctx -> true)
                 .perform(streamOpenResponseAction);
 
+        // 打开流失败
         builder.externalTransition()
-                .from(StreamState.OPENED)
-                .to(StreamState.OPENED)
+                .from(StreamState.OPENING)
+                .to(StreamState.FAILED)
+                .on(StreamEvent.STREAM_OPEN_FAILURE)
+                .when(ctx -> true)
+                .perform(streamCloseAction);
+
+        // 处理流数据
+        builder.internalTransition()
+                .within(StreamState.OPENED)
                 .on(StreamEvent.STREAM_DATA)
                 .when(ctx -> true)
                 .perform((from, to, event, context) ->
                         context.setState(to));
 
+        // 关闭流
         builder.externalTransitions()
-                .fromAmong(StreamState.OPENED,StreamState.CHECKING_TARGET,StreamState.OPENING)
+                .fromAmong(StreamState.OPENED, StreamState.FAILED, StreamState.OPENING)
                 .to(StreamState.CLOSED)
                 .on(StreamEvent.STREAM_CLOSE)
                 .when(ctx -> true)
