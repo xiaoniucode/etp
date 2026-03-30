@@ -32,15 +32,15 @@ public class AgentPersistenceListener implements EventListener<AgentAuthEvent> {
     @Override
     @Transactional
     public void onEvent(AgentAuthEvent event) {
-        ClientSaveRequest request = new ClientSaveRequest(
-                event.getClientId(),
-                event.getName(),
-                event.getClientType(),
-                event.getToken(),
-                event.getArch(),
-                event.getOs(),
-                event.getVersion());
-        clientService.saveClient(request);
-        logger.debug("保存客户端：{}", request);
+//        ClientSaveRequest request = new ClientSaveRequest(
+//                event.getClientId(),
+//                event.getName(),
+//                event.getClientType(),
+//                event.getToken(),
+//                event.getArch(),
+//                event.getOs(),
+//                event.getVersion());
+//        clientService.saveClient(request);
+//        logger.debug("保存客户端：{}", request);
     }
 }

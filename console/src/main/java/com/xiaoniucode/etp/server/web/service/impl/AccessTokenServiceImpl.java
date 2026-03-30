@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
-import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
-import com.xiaoniucode.etp.server.security.AccessTokenManager;
+import com.xiaoniucode.etp.server.config.domain.TokenInfo;
+import com.xiaoniucode.etp.server.security.TokenManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.convert.AccessTokenConvert;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.request.CreateAccessTokenRequest;
@@ -27,7 +27,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     @Autowired
     private AccessTokenConvert accessTokenConvert;
     @Autowired
-    private AccessTokenManager accessTokenManager;
+    private TokenManager accessTokenManager;
     @Autowired
     private EntityManager entityManager;
 
@@ -42,7 +42,8 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         accessToken.setMaxClient(maxClient);
         String token = UUID.randomUUID().toString().replaceAll("-", "");
         accessToken.setToken(token);
-        accessTokenManager.addAccessToken(new AccessTokenInfo(name, token, maxClient));
+//        AccessTokenInfo accessTokenInfo = new AccessTokenInfo();
+//        accessTokenManager.addAccessToken(accessTokenInfo);
         return accessTokenRepository.save(accessToken);
     }
 
@@ -77,7 +78,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         existingToken.setName(request.getName());
         existingToken.setMaxClient(request.getMaxClient());
 
-        AccessTokenInfo accessToken = accessTokenManager.getAccessToken(existingToken.getToken());
+        TokenInfo accessToken = accessTokenManager.getAccessToken(existingToken.getToken());
         accessToken.setName(request.getName());
         accessToken.setMaxClients(request.getMaxClient());
 
@@ -89,7 +90,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     public void delete(Integer id) {
         AccessToken accessToken = accessTokenRepository.findById(id)
                 .orElseThrow(() -> new BizException("访问令牌不存在"));
-        accessTokenManager.removeAccessToken(accessToken.getToken());
+        accessTokenManager.removeToken(accessToken.getToken());
         accessTokenRepository.deleteById(id);
     }
 
@@ -100,7 +101,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         List<AccessToken> accessTokens = accessTokenRepository.findByIdIn(ids);
         if (accessTokens != null && !accessTokens.isEmpty()) {
             accessTokens.forEach(accessToken -> {
-                accessTokenManager.removeAccessToken(accessToken.getToken());
+                accessTokenManager.removeToken(accessToken.getToken());
             });
             List<Integer> list = accessTokens.stream().map(AccessToken::getId).toList();
             entityManager.flush();

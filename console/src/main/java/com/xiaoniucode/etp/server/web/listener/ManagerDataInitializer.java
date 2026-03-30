@@ -3,9 +3,9 @@ package com.xiaoniucode.etp.server.web.listener;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
+import com.xiaoniucode.etp.server.config.domain.TokenInfo;
 import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
-import com.xiaoniucode.etp.server.security.AccessTokenManager;
+import com.xiaoniucode.etp.server.security.TokenManager;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -18,10 +18,6 @@ import java.util.List;
 @Component
 public class ManagerDataInitializer implements EventListener<TunnelServerStartingEvent> {
     private final Logger logger = LoggerFactory.getLogger(ManagerDataInitializer.class);
-    @Resource
-    private AppConfig appConfig;
-    @Autowired
-    private AccessTokenManager accessTokenManager;
     @Autowired
     private EventBus eventBus;
 
@@ -32,8 +28,6 @@ public class ManagerDataInitializer implements EventListener<TunnelServerStartin
 
     @Override
     public void onEvent(TunnelServerStartingEvent event) {
-        List<AccessTokenInfo> accessTokens = appConfig.getAccessTokens();
-        accessTokenManager.addAccessTokens(accessTokens);
-        logger.debug("添加 {}个 访问令牌到管理器",accessTokens.size());
+
     }
 }

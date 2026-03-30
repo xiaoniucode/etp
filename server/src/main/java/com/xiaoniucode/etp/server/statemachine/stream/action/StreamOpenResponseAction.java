@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.statemachine.stream.action;
 
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
+import com.xiaoniucode.etp.server.config.domain.AgentInfo;
 import com.xiaoniucode.etp.server.loadbalance.LeastConnHooks;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.stream.*;
@@ -35,7 +36,8 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         logger.debug("收到流 {} 打开通知", context.getStreamId());
         String tunnelId = context.getAndRemoveAs(StreamConstants.TUNNEL_ID, String.class);
         AgentContext agentContext = context.getAgentContext();
-        String clientId = agentContext.getClientId();
+        AgentInfo agentInfo = agentContext.getAgentInfo();
+        String clientId = agentInfo.getAgentId();
         TunnelEntry tunnelEntry;
         if (context.isMultiplex()) {
             tunnelEntry = multiplexPool.acquire(clientId, context.isEncrypt());

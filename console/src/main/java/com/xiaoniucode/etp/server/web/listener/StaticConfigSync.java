@@ -105,14 +105,14 @@ public class StaticConfigSync implements EventListener<TunnelServerBindEvent> {
     }
 
     public void syncAccessTokens() {
-        List<AccessTokenInfo> configTokens = config.getAccessTokens();
+        List<TokenInfo> configTokens = config.getAccessTokens();
         if (configTokens == null || configTokens.isEmpty()) {
             return;
         }
 
         // 提取 token 列表
         List<String> tokenValues = configTokens.stream()
-                .map(AccessTokenInfo::getToken)
+                .map(TokenInfo::getToken)
                 .collect(Collectors.toList());
 
         // 批量查询已存在的 token

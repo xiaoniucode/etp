@@ -24,7 +24,7 @@ public class ProxyInitAction extends AgentBaseAction{
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.debug("初始化客户端配置信息");
         //如果有代理配置信息则添加索引
-        List<ProxyConfig> configs = proxyManager.findByClientId(context.getClientId());
+        List<ProxyConfig> configs = proxyManager.findByClientId(context.getAgentInfo().getAgentId());
         configs.forEach(config -> {
             agentManager.addProxyContextIndex(config.getProxyId(),context);
         });

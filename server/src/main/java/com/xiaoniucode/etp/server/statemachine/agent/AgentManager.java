@@ -26,7 +26,7 @@ public class AgentManager {
      */
     private final Map<String, AgentContext> proxyToContextIndex = new ConcurrentHashMap<>();
     /**
-     * clientId --> context
+     * agentId --> context
      */
     private final Map<String, AgentContext> clientToContextIndex = new ConcurrentHashMap<>();
 

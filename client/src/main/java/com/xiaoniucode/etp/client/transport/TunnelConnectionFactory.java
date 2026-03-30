@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.client.transport;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
-import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
+import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;

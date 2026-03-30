@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.client.statemachine.agent.action;
 import com.xiaoniucode.etp.client.common.utils.AppVersionUtil;
 import com.xiaoniucode.etp.client.common.utils.OSUtils;
 import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
@@ -24,13 +25,13 @@ public class AuthAction extends AgentBaseAction {
         try {
             logger.debug("开始认证");
             AppConfig config = ctx.getConfig();
+            AuthConfig authConfig = config.getAuthConfig();
             Channel control = ctx.getControl();
             // 构建认证消息
             Message.AuthInfo authInfo = Message.AuthInfo.newBuilder()
                     .setToken(config.getAuthConfig().getToken())
-                    .setClientId("1001001")//todo test clientId
                     .setVersion(AppVersionUtil.getVersion())
-                    .setClientType(Message.ClientType.BINARY_DEVICE)
+                    .setAgentType(Message.AgentType.BINARY_DEVICE)
                     .setOs(OSUtils.getOS())
                     .setName(OSUtils.getHostName())
                     .build();

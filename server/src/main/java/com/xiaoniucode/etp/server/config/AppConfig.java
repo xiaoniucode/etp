@@ -5,7 +5,7 @@ import com.xiaoniucode.etp.common.log.LogConfig;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.server.config.domain.Dashboard;
 import com.xiaoniucode.etp.server.config.domain.PortRange;
-import com.xiaoniucode.etp.server.config.domain.AccessTokenInfo;
+import com.xiaoniucode.etp.server.config.domain.TokenInfo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +25,7 @@ public class AppConfig implements Config {
     private PortRange portRange;
     private Set<String> baseDomains;
     private TlsConfig tlsConfig;
-    private List<AccessTokenInfo> accessTokens;
+    private List<TokenInfo> accessTokens;
 
     private AppConfig(Builder builder) {
         this.serverAddr = builder.serverAddr;
@@ -50,7 +50,7 @@ public class AppConfig implements Config {
         private LogConfig logConfig;
         private Dashboard dashboard = new Dashboard(false);
         private PortRange portRange = new PortRange(1, 65535);
-        private List<AccessTokenInfo> accessTokens = new CopyOnWriteArrayList<>();
+        private List<TokenInfo> accessTokens = new CopyOnWriteArrayList<>();
 
         public Builder serverAddr(String serverAddr) {
             this.serverAddr = serverAddr;
@@ -82,7 +82,7 @@ public class AppConfig implements Config {
             return this;
         }
 
-        public Builder accessTokens(List<AccessTokenInfo> accessTokens) {
+        public Builder accessTokens(List<TokenInfo> accessTokens) {
             this.accessTokens = accessTokens;
             return this;
         }

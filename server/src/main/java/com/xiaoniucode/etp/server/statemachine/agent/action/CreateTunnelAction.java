@@ -38,7 +38,7 @@ public class CreateTunnelAction extends AgentBaseAction {
         String tunnelId = cmd.getTunnelId();
         boolean multiplex = cmd.isMultiplex();
         boolean encrypt = cmd.isEncrypt();
-        String clientId = context.getClientId();
+        String clientId = context.getAgentInfo().getAgentId();
         createPool(clientId, tunnelId, multiplex, encrypt, tunnel);
         Channel control = context.getControl();
         Message.TunnelCreateResponse resp = Message.TunnelCreateResponse.newBuilder()

@@ -134,17 +134,27 @@ public class TomlConfigSource implements ConfigSource {
             return;
         }
 
-        List<AccessTokenInfo> accessTokens = new CopyOnWriteArrayList<>();
+        List<TokenInfo> accessTokens = new CopyOnWriteArrayList<>();
         Set<String> tokenTemp = new HashSet<>();
 
         for (Toml tokenTable : accessTokenTables) {
             String name = tokenTable.getString("name");
             String token = tokenTable.getString("token");
             Long maxClients = tokenTable.getLong("max_clients");
+            Long maxDevices = tokenTable.getLong("max_devices");
+            Long maxConnections = tokenTable.getLong("max_connections");
+            Long deviceTimeout = tokenTable.getLong("device_timeout");
             if (tokenTemp.contains(token)) {
                 throw new IllegalArgumentException("AccessToken令牌冲突，不能存在重复的令牌！ " + token);
             }
-            AccessTokenInfo accessToken = new AccessTokenInfo(name, token, maxClients.intValue());
+            TokenInfo accessToken = new TokenInfo(
+                    name, 
+                    token, 
+                    maxClients != null ? maxClients.intValue() : null, 
+                    maxDevices != null ? maxDevices.intValue() : null, 
+                    maxConnections != null ? maxConnections.intValue() : null, 
+                    deviceTimeout != null ? deviceTimeout.intValue() : null
+            );
             accessTokens.add(accessToken);
             tokenTemp.add(token);
         }

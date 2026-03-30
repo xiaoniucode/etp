@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server;
 
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
-import com.xiaoniucode.etp.core.factory.NettyEventLoopFactory;
+import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 
 import com.xiaoniucode.etp.core.notify.EventBus;

@@ -27,7 +27,7 @@ public class GoawayAction extends AgentBaseAction {
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-        String clientId = context.getClientId();
+        String clientId = context.getAgentInfo().getAgentId();
         logger.debug("{} 客户端断开，开始清理资源", clientId);
         try {
             // 清理流资源

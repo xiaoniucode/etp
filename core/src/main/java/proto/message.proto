@@ -5,7 +5,7 @@ enum ProtocolType {
   TCP = 0;
   HTTP = 1;
 }
-enum ClientType{
+enum AgentType{
   BINARY_DEVICE = 0;
   WEB_SESSION = 1;
 }
@@ -26,8 +26,8 @@ enum TransportProtocolType{
 message AuthInfo {
   string token = 1;
   string version = 5;
-  ClientType client_type = 4;
-  optional string client_id = 9;
+  AgentType agent_type = 4;
+  optional string agent_id = 9;
   optional string name = 3;
   optional string os = 6;
   optional string arch = 7;

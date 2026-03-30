@@ -30,12 +30,12 @@ public class StreamOpenAction extends StreamBaseAction {
         Channel control = agentContext.getControl();
         ProxyConfig config = context.getProxyConfig();
         if (!control.isActive()) {
-            logger.warn("客户端 {} 控制通道未激活，关闭流 streamId={}", agentContext.getClientId(), streamId);
+            logger.warn("客户端 {} 控制通道未激活，关闭流 streamId={}", agentContext.getAgentInfo().getAgentId(), streamId);
             context.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
         if (!control.isWritable()) {
-            logger.warn("客户端 {} 控制隧道不可写", agentContext.getClientId());
+            logger.warn("客户端 {} 控制隧道不可写", agentContext.getAgentInfo().getAgentId());
         }
         Target target = context.getCurrentTarget();
         ByteBuf payload = control.alloc().buffer();

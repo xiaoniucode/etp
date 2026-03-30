@@ -41,11 +41,11 @@ public class ProxyCreateAction extends AgentBaseAction {
         Channel control = context.getControl();
         try {
             Message.NewProxy proxy = context.getAndRemoveAs(AgentConstants.NEWA_PROXY, Message.NewProxy.class);
-            String clientId = context.getClientId();
+            String clientId = context.getAgentInfo().getAgentId();
             ProxyConfig config = buildProxyConfig(proxy);
             logger.debug("{}", config);
             config.setClientId(clientId);
-            config.setClientType(context.getClientType());
+            config.setClientType(context.getAgentInfo().getClientType());
 
             ProxyConfig register = proxyManager.register(config);
             Message.NewProxyResp newProxyResp = buildResponse(register);
