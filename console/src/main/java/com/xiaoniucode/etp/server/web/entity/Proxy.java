@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.entity;
 
-import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
@@ -39,7 +39,7 @@ public class Proxy {
 
     @Column(name = "clientType", nullable = false)
     @Convert(converter = ClientTypeConverter.class)
-    private ClientType clientType;
+    private AgentType clientType;
 
     @Column(name = "local_ip", nullable = false)
     private String localIp;

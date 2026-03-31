@@ -1,6 +1,6 @@
 server_addr = "localhost"
 server_port = 9527
-#认证
+
 [auth]
 token = "5E793FAD27AA713D"
 [auth.retry]
@@ -255,7 +255,7 @@ limit = "2M" #总带宽限制(可选)
 #limit_in = "10M" #入口带宽限制(可选)
 #limit_out = "10M" #出口带宽限制(可选)
 
-#日志
+#文件日志
 [log]
 level = "debug"
 path = "log"
@@ -263,4 +263,8 @@ name = "etpc.log"
 archive_pattern = "etpc.%d{yyyy-MM-dd}.log"
 log_pattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 max_history = 30
-total_size_cap = "3GB"
+total_size_cap = "1GB"
+## 控制台日志
+#[log.console]
+#level = "info"
+#log_pattern = "%d{HH:mm:ss} %msg%n"

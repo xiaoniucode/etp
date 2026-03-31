@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.config.domain;
 
-import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.AgentType;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,7 +11,7 @@ import java.time.temporal.ChronoUnit;
 public class AgentInfo implements Serializable {
     private String agentId;
     private String name;
-    private ClientType clientType;
+    private AgentType agentType;
     private String token;
     private String version;
     private String os;

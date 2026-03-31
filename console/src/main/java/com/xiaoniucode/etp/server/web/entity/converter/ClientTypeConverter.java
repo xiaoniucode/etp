@@ -1,13 +1,13 @@
 package com.xiaoniucode.etp.server.web.entity.converter;
 
-import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.AgentType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter
-public class ClientTypeConverter implements AttributeConverter<ClientType, Integer> {
+public class ClientTypeConverter implements AttributeConverter<AgentType, Integer> {
     @Override
-    public Integer convertToDatabaseColumn(ClientType clientType) {
+    public Integer convertToDatabaseColumn(AgentType clientType) {
         if (clientType==null){
             return null;
         }
@@ -15,10 +15,10 @@ public class ClientTypeConverter implements AttributeConverter<ClientType, Integ
     }
 
     @Override
-    public ClientType convertToEntityAttribute(Integer status) {
+    public AgentType convertToEntityAttribute(Integer status) {
         if (status==null){
             return null;
         }
-        return ClientType.fromCode(status);
+        return AgentType.fromCode(status);
     }
 }

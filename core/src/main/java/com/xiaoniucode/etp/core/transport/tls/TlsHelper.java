@@ -15,11 +15,10 @@ import java.security.cert.CertificateException;
 
 public class TlsHelper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TlsHelper.class);
+    private static final Logger logger = LoggerFactory.getLogger(TlsHelper.class);
 
     public static SslContext buildSslContext(boolean forClient, TlsConfig tlsConfig) throws IOException, CertificateException {
         SslProvider provider = SslProvider.OPENSSL;
-        LOGGER.info("Using OpenSSL provider");
         boolean isTestMode = tlsConfig.isTestMode();
         if (forClient) {
             if (isTestMode) {

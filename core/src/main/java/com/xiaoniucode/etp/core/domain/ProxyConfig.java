@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.core.domain;
 
-import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 
 import lombok.*;
@@ -14,7 +14,7 @@ public class ProxyConfig {
     @Setter
     private String clientId;
     @Setter
-    private ClientType clientType;
+    private AgentType clientType;
     /**
      * 代理ID 唯一标识
      */

@@ -7,7 +7,7 @@ import com.xiaoniucode.etp.client.config.domain.MultiplexConfig;
 import com.xiaoniucode.etp.common.config.Config;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
-import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.AgentType;
 
 import java.util.List;
 
@@ -25,6 +25,6 @@ public interface AppConfig extends Config {
     List<ProxyConfig> getProxies();
 
     LogConfig getLogConfig();
-    ClientType getClientType();
+    AgentType getAgentType();
 
 }

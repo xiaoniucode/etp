@@ -6,8 +6,8 @@ enum ProtocolType {
   HTTP = 1;
 }
 enum AgentType{
-  BINARY_DEVICE = 0;
-  WEB_SESSION = 1;
+  BINARY = 0;
+  SESSION = 1;
 }
 enum AccessMode {
   ALLOW = 0;
@@ -49,7 +49,7 @@ message StreamOpenResponse{
   uint32 code = 3;
 }
 message AuthResponse{
-  string clientId = 1;
+  string agentId = 1;
   uint32 connectionId = 4;
   uint32 code = 2;
   optional string message = 3;

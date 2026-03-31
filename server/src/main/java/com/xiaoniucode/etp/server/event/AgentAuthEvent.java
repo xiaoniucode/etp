@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.event;
 
-import com.xiaoniucode.etp.core.enums.ClientType;
 import com.xiaoniucode.etp.core.notify.Event;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import lombok.Getter;

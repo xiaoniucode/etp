@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
@@ -89,7 +89,7 @@ public class ProxyServiceImpl implements ProxyService {
         newProxy.setClientId(request.getClientId());
         newProxy.setName(request.getName());
         newProxy.setProtocol(ProtocolType.TCP);
-        newProxy.setClientType(ClientType.fromCode(client.getClientType()));
+        newProxy.setClientType(AgentType.fromCode(client.getClientType()));
         newProxy.setLocalIp(request.getLocalIp());
         newProxy.setLocalPort(request.getLocalPort());
         newProxy.setRemotePort(remotePort);
@@ -127,7 +127,7 @@ public class ProxyServiceImpl implements ProxyService {
         newProxy.setClientId(request.getClientId());
         newProxy.setName(request.getName());
         newProxy.setProtocol(ProtocolType.HTTP);
-        newProxy.setClientType(ClientType.fromCode(client.getClientType()));
+        newProxy.setClientType(AgentType.fromCode(client.getClientType()));
         newProxy.setLocalIp(request.getLocalIp());
         newProxy.setLocalPort(request.getLocalPort());
         newProxy.setStatus(ProxyStatus.fromStatus(request.getStatus()));

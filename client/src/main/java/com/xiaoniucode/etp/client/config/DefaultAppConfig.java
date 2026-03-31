@@ -6,7 +6,7 @@ import com.xiaoniucode.etp.client.config.domain.LogConfig;
 import com.xiaoniucode.etp.client.config.domain.MultiplexConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
-import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.AgentType;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -18,7 +18,7 @@ public class DefaultAppConfig implements AppConfig {
     private final TlsConfig tlsConfig;
     private final List<ProxyConfig> proxies;
     private final LogConfig logConfig;
-    private final ClientType clientType;
+    private final AgentType clientType;
     private final MultiplexConfig multiplexConfig;
     private final ConnectionPoolConfig connectionPoolConfig;
 
@@ -29,7 +29,7 @@ public class DefaultAppConfig implements AppConfig {
         this.tlsConfig = builder.tlsConfig;
         this.proxies = builder.proxies;
         this.logConfig = builder.logConfig;
-        this.clientType = builder.clientType;
+        this.clientType = builder.agentType;
         this.multiplexConfig = builder.muxConfig;
         this.connectionPoolConfig = builder.connectionPoolConfig;
     }
@@ -41,7 +41,7 @@ public class DefaultAppConfig implements AppConfig {
         private TlsConfig tlsConfig = new TlsConfig(true, true);
         private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
         private LogConfig logConfig;
-        private ClientType clientType = ClientType.BINARY_DEVICE;
+        private AgentType agentType = AgentType.BINARY;
         private MultiplexConfig muxConfig = new MultiplexConfig(true);
         private ConnectionPoolConfig connectionPoolConfig = new ConnectionPoolConfig();
 
@@ -94,8 +94,8 @@ public class DefaultAppConfig implements AppConfig {
             return this;
         }
 
-        public Builder clientType(ClientType clientType) {
-            this.clientType = clientType;
+        public Builder agentType(AgentType agentType) {
+            this.agentType = agentType;
             return this;
         }
 
@@ -145,7 +145,7 @@ public class DefaultAppConfig implements AppConfig {
     }
 
     @Override
-    public ClientType getClientType() {
+    public AgentType getAgentType() {
         return clientType;
     }
 

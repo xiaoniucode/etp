@@ -149,13 +149,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
   public enum AgentType
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
-     * <code>BINARY_DEVICE = 0;</code>
+     * <code>BINARY = 0;</code>
      */
-    BINARY_DEVICE(0),
+    BINARY(0),
     /**
-     * <code>WEB_SESSION = 1;</code>
+     * <code>SESSION = 1;</code>
      */
-    WEB_SESSION(1),
+    SESSION(1),
     UNRECOGNIZED(-1),
     ;
 
@@ -169,13 +169,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         "AgentType");
     }
     /**
-     * <code>BINARY_DEVICE = 0;</code>
+     * <code>BINARY = 0;</code>
      */
-    public static final int BINARY_DEVICE_VALUE = 0;
+    public static final int BINARY_VALUE = 0;
     /**
-     * <code>WEB_SESSION = 1;</code>
+     * <code>SESSION = 1;</code>
      */
-    public static final int WEB_SESSION_VALUE = 1;
+    public static final int SESSION_VALUE = 1;
 
 
     public final int getNumber() {
@@ -202,8 +202,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      */
     public static AgentType forNumber(int value) {
       switch (value) {
-        case 0: return BINARY_DEVICE;
-        case 1: return WEB_SESSION;
+        case 0: return BINARY;
+        case 1: return SESSION;
         default: return null;
       }
     }
@@ -1076,7 +1076,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (((bitField0_ & 0x00000002) != 0)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 3, name_);
       }
-      if (agentType_ != com.xiaoniucode.etp.core.message.Message.AgentType.BINARY_DEVICE.getNumber()) {
+      if (agentType_ != com.xiaoniucode.etp.core.message.Message.AgentType.BINARY.getNumber()) {
         output.writeEnum(4, agentType_);
       }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(version_)) {
@@ -1106,7 +1106,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (((bitField0_ & 0x00000002) != 0)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(3, name_);
       }
-      if (agentType_ != com.xiaoniucode.etp.core.message.Message.AgentType.BINARY_DEVICE.getNumber()) {
+      if (agentType_ != com.xiaoniucode.etp.core.message.Message.AgentType.BINARY.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(4, agentType_);
       }
@@ -4442,16 +4442,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string clientId = 1;</code>
-     * @return The clientId.
+     * <code>string agentId = 1;</code>
+     * @return The agentId.
      */
-    java.lang.String getClientId();
+    java.lang.String getAgentId();
     /**
-     * <code>string clientId = 1;</code>
-     * @return The bytes for clientId.
+     * <code>string agentId = 1;</code>
+     * @return The bytes for agentId.
      */
     com.google.protobuf.ByteString
-        getClientIdBytes();
+        getAgentIdBytes();
 
     /**
      * <code>uint32 connectionId = 4;</code>
@@ -4504,7 +4504,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       super(builder);
     }
     private AuthResponse() {
-      clientId_ = "";
+      agentId_ = "";
       message_ = "";
     }
 
@@ -4522,39 +4522,39 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     }
 
     private int bitField0_;
-    public static final int CLIENTID_FIELD_NUMBER = 1;
+    public static final int AGENTID_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
-    private volatile java.lang.Object clientId_ = "";
+    private volatile java.lang.Object agentId_ = "";
     /**
-     * <code>string clientId = 1;</code>
-     * @return The clientId.
+     * <code>string agentId = 1;</code>
+     * @return The agentId.
      */
     @java.lang.Override
-    public java.lang.String getClientId() {
-      java.lang.Object ref = clientId_;
+    public java.lang.String getAgentId() {
+      java.lang.Object ref = agentId_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        clientId_ = s;
+        agentId_ = s;
         return s;
       }
     }
     /**
-     * <code>string clientId = 1;</code>
-     * @return The bytes for clientId.
+     * <code>string agentId = 1;</code>
+     * @return The bytes for agentId.
      */
     @java.lang.Override
     public com.google.protobuf.ByteString
-        getClientIdBytes() {
-      java.lang.Object ref = clientId_;
+        getAgentIdBytes() {
+      java.lang.Object ref = agentId_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        clientId_ = b;
+        agentId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -4644,8 +4644,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(clientId_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 1, clientId_);
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(agentId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, agentId_);
       }
       if (code_ != 0) {
         output.writeUInt32(2, code_);
@@ -4665,8 +4665,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (size != -1) return size;
 
       size = 0;
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(clientId_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, clientId_);
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(agentId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, agentId_);
       }
       if (code_ != 0) {
         size += com.google.protobuf.CodedOutputStream
@@ -4694,8 +4694,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       com.xiaoniucode.etp.core.message.Message.AuthResponse other = (com.xiaoniucode.etp.core.message.Message.AuthResponse) obj;
 
-      if (!getClientId()
-          .equals(other.getClientId())) return false;
+      if (!getAgentId()
+          .equals(other.getAgentId())) return false;
       if (getConnectionId()
           != other.getConnectionId()) return false;
       if (getCode()
@@ -4716,8 +4716,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + CLIENTID_FIELD_NUMBER;
-      hash = (53 * hash) + getClientId().hashCode();
+      hash = (37 * hash) + AGENTID_FIELD_NUMBER;
+      hash = (53 * hash) + getAgentId().hashCode();
       hash = (37 * hash) + CONNECTIONID_FIELD_NUMBER;
       hash = (53 * hash) + getConnectionId();
       hash = (37 * hash) + CODE_FIELD_NUMBER;
@@ -4857,7 +4857,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        clientId_ = "";
+        agentId_ = "";
         connectionId_ = 0;
         code_ = 0;
         message_ = "";
@@ -4895,7 +4895,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       private void buildPartial0(com.xiaoniucode.etp.core.message.Message.AuthResponse result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.clientId_ = clientId_;
+          result.agentId_ = agentId_;
         }
         if (((from_bitField0_ & 0x00000002) != 0)) {
           result.connectionId_ = connectionId_;
@@ -4923,8 +4923,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.AuthResponse other) {
         if (other == com.xiaoniucode.etp.core.message.Message.AuthResponse.getDefaultInstance()) return this;
-        if (!other.getClientId().isEmpty()) {
-          clientId_ = other.clientId_;
+        if (!other.getAgentId().isEmpty()) {
+          agentId_ = other.agentId_;
           bitField0_ |= 0x00000001;
           onChanged();
         }
@@ -4966,7 +4966,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 done = true;
                 break;
               case 10: {
-                clientId_ = input.readStringRequireUtf8();
+                agentId_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000001;
                 break;
               } // case 10
@@ -5002,73 +5002,73 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       private int bitField0_;
 
-      private java.lang.Object clientId_ = "";
+      private java.lang.Object agentId_ = "";
       /**
-       * <code>string clientId = 1;</code>
-       * @return The clientId.
+       * <code>string agentId = 1;</code>
+       * @return The agentId.
        */
-      public java.lang.String getClientId() {
-        java.lang.Object ref = clientId_;
+      public java.lang.String getAgentId() {
+        java.lang.Object ref = agentId_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          clientId_ = s;
+          agentId_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>string clientId = 1;</code>
-       * @return The bytes for clientId.
+       * <code>string agentId = 1;</code>
+       * @return The bytes for agentId.
        */
       public com.google.protobuf.ByteString
-          getClientIdBytes() {
-        java.lang.Object ref = clientId_;
+          getAgentIdBytes() {
+        java.lang.Object ref = agentId_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          clientId_ = b;
+          agentId_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>string clientId = 1;</code>
-       * @param value The clientId to set.
+       * <code>string agentId = 1;</code>
+       * @param value The agentId to set.
        * @return This builder for chaining.
        */
-      public Builder setClientId(
+      public Builder setAgentId(
           java.lang.String value) {
         if (value == null) { throw new NullPointerException(); }
-        clientId_ = value;
+        agentId_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <code>string clientId = 1;</code>
+       * <code>string agentId = 1;</code>
        * @return This builder for chaining.
        */
-      public Builder clearClientId() {
-        clientId_ = getDefaultInstance().getClientId();
+      public Builder clearAgentId() {
+        agentId_ = getDefaultInstance().getAgentId();
         bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
         return this;
       }
       /**
-       * <code>string clientId = 1;</code>
-       * @param value The bytes for clientId to set.
+       * <code>string agentId = 1;</code>
+       * @param value The bytes for agentId to set.
        * @return This builder for chaining.
        */
-      public Builder setClientIdBytes(
+      public Builder setAgentIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) { throw new NullPointerException(); }
         checkByteStringIsUtf8(value);
-        clientId_ = value;
+        agentId_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
@@ -16507,63 +16507,63 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       "reateResponse\022\021\n\ttunnel_id\030\001 \001(\t\022\014\n\004code" +
       "\030\002 \001(\r\022\024\n\007message\030\003 \001(\tH\000\210\001\001B\n\n\010_message" +
       "\"L\n\022StreamOpenResponse\022\025\n\rconnection_id\030" +
-      "\001 \001(\r\022\021\n\ttunnel_id\030\002 \001(\t\022\014\n\004code\030\003 \001(\r\"f" +
-      "\n\014AuthResponse\022\020\n\010clientId\030\001 \001(\t\022\024\n\014conn" +
-      "ectionId\030\004 \001(\r\022\014\n\004code\030\002 \001(\r\022\024\n\007message\030" +
-      "\003 \001(\tH\000\210\001\001B\n\n\010_message\"x\n\rAccessControl\022" +
-      "\016\n\006enable\030\001 \001(\010\022:\n\004mode\030\002 \001(\0162,.com.xiao" +
-      "niucode.etp.core.message.AccessMode\022\r\n\005a" +
-      "llow\030\003 \003(\t\022\014\n\004deny\030\004 \003(\t\"&\n\010HttpUser\022\014\n\004" +
-      "user\030\001 \001(\t\022\014\n\004pass\030\002 \001(\t\"[\n\tBasicAuth\022\016\n" +
-      "\006enable\030\001 \001(\010\022>\n\nhttp_users\030\002 \003(\0132*.com." +
-      "xiaoniucode.etp.core.message.HttpUser\"s\n" +
-      "\tBandwidth\022\022\n\005limit\030\001 \001(\tH\000\210\001\001\022\025\n\010limit_" +
-      "in\030\002 \001(\tH\001\210\001\001\022\026\n\tlimit_out\030\003 \001(\tH\002\210\001\001B\010\n" +
-      "\006_limitB\013\n\t_limit_inB\014\n\n_limit_out\"`\n\006Ta" +
-      "rget\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\r\022\021\n\004name" +
-      "\030\004 \001(\tH\000\210\001\001\022\023\n\006weight\030\005 \001(\005H\001\210\001\001B\007\n\005_nam" +
-      "eB\t\n\007_weight\"h\n\013LoadBalance\022L\n\010strategy\030" +
-      "\001 \001(\01625.com.xiaoniucode.etp.core.message" +
-      ".LoadBalanceStrategyH\000\210\001\001B\013\n\t_strategy\"c" +
-      "\n\nDomainInfo\022\030\n\013auto_domain\030\001 \001(\010H\000\210\001\001\022\026" +
-      "\n\016custom_domains\030\002 \003(\t\022\023\n\013sub_domains\030\003 " +
-      "\003(\tB\016\n\014_auto_domain\"k\n\tTransport\022\020\n\003mux\030" +
-      "\001 \001(\010H\000\210\001\001\022\024\n\007encrypt\030\003 \001(\010H\001\210\001\001\022\025\n\010comp" +
-      "ress\030\004 \001(\010H\002\210\001\001B\006\n\004_muxB\n\n\010_encryptB\013\n\t_" +
-      "compress\"\344\005\n\010NewProxy\022\014\n\004name\030\001 \001(\t\0229\n\007t" +
-      "argets\030\002 \003(\0132(.com.xiaoniucode.etp.core." +
-      "message.Target\022\023\n\006enable\030\003 \001(\010H\000\210\001\001\022@\n\010p" +
-      "rotocol\030\006 \001(\0162..com.xiaoniucode.etp.core" +
-      ".message.ProtocolType\022\030\n\013remote_port\030\007 \001" +
-      "(\rH\001\210\001\001\022A\n\006domain\030\010 \001(\0132,.com.xiaoniucod" +
-      "e.etp.core.message.DomainInfoH\002\210\001\001\022L\n\016ac" +
-      "cess_control\030\013 \001(\0132/.com.xiaoniucode.etp" +
-      ".core.message.AccessControlH\003\210\001\001\022D\n\nbasi" +
-      "c_auth\030\014 \001(\0132+.com.xiaoniucode.etp.core." +
-      "message.BasicAuthH\004\210\001\001\022C\n\tbandwidth\030\r \001(" +
-      "\0132+.com.xiaoniucode.etp.core.message.Ban" +
-      "dwidthH\005\210\001\001\022H\n\014load_balance\030\016 \001(\0132-.com." +
-      "xiaoniucode.etp.core.message.LoadBalance" +
-      "H\006\210\001\001\022C\n\ttransport\030\017 \001(\0132+.com.xiaoniuco" +
-      "de.etp.core.message.TransportH\007\210\001\001B\t\n\007_e" +
-      "nableB\016\n\014_remote_portB\t\n\007_domainB\021\n\017_acc" +
-      "ess_controlB\r\n\013_basic_authB\014\n\n_bandwidth" +
-      "B\017\n\r_load_balanceB\014\n\n_transport\"H\n\014NewPr" +
-      "oxyResp\022\017\n\007proxyId\030\001 \001(\t\022\022\n\nproxy_name\030\002" +
-      " \001(\t\022\023\n\013remote_addr\030\003 \001(\t\"&\n\005Error\022\014\n\004co" +
-      "de\030\001 \001(\005\022\017\n\007message\030\002 \001(\t\"\340\001\n\rConfigMess" +
-      "age\022?\n\tnew_proxy\030e \001(\0132*.com.xiaoniucode" +
-      ".etp.core.message.NewProxyH\000\022H\n\016new_prox" +
-      "y_resp\030f \001(\0132..com.xiaoniucode.etp.core." +
-      "message.NewProxyRespH\000\0229\n\005error\030\315\001 \001(\0132\'" +
-      ".com.xiaoniucode.etp.core.message.ErrorH" +
-      "\000B\t\n\007payload*!\n\014ProtocolType\022\007\n\003TCP\020\000\022\010\n" +
-      "\004HTTP\020\001*/\n\tAgentType\022\021\n\rBINARY_DEVICE\020\000\022" +
-      "\017\n\013WEB_SESSION\020\001*!\n\nAccessMode\022\t\n\005ALLOW\020" +
-      "\000\022\010\n\004DENY\020\001*N\n\023LoadBalanceStrategy\022\017\n\013RO" +
-      "UND_ROBIN\020\000\022\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022\016\n\nL" +
-      "EAST_CONN\020\003*\"\n\025TransportProtocolType\022\t\n\005" +
-      "T_TCP\020\000b\006proto3"
+      "\001 \001(\r\022\021\n\ttunnel_id\030\002 \001(\t\022\014\n\004code\030\003 \001(\r\"e" +
+      "\n\014AuthResponse\022\017\n\007agentId\030\001 \001(\t\022\024\n\014conne" +
+      "ctionId\030\004 \001(\r\022\014\n\004code\030\002 \001(\r\022\024\n\007message\030\003" +
+      " \001(\tH\000\210\001\001B\n\n\010_message\"x\n\rAccessControl\022\016" +
+      "\n\006enable\030\001 \001(\010\022:\n\004mode\030\002 \001(\0162,.com.xiaon" +
+      "iucode.etp.core.message.AccessMode\022\r\n\005al" +
+      "low\030\003 \003(\t\022\014\n\004deny\030\004 \003(\t\"&\n\010HttpUser\022\014\n\004u" +
+      "ser\030\001 \001(\t\022\014\n\004pass\030\002 \001(\t\"[\n\tBasicAuth\022\016\n\006" +
+      "enable\030\001 \001(\010\022>\n\nhttp_users\030\002 \003(\0132*.com.x" +
+      "iaoniucode.etp.core.message.HttpUser\"s\n\t" +
+      "Bandwidth\022\022\n\005limit\030\001 \001(\tH\000\210\001\001\022\025\n\010limit_i" +
+      "n\030\002 \001(\tH\001\210\001\001\022\026\n\tlimit_out\030\003 \001(\tH\002\210\001\001B\010\n\006" +
+      "_limitB\013\n\t_limit_inB\014\n\n_limit_out\"`\n\006Tar" +
+      "get\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\r\022\021\n\004name\030" +
+      "\004 \001(\tH\000\210\001\001\022\023\n\006weight\030\005 \001(\005H\001\210\001\001B\007\n\005_name" +
+      "B\t\n\007_weight\"h\n\013LoadBalance\022L\n\010strategy\030\001" +
+      " \001(\01625.com.xiaoniucode.etp.core.message." +
+      "LoadBalanceStrategyH\000\210\001\001B\013\n\t_strategy\"c\n" +
+      "\nDomainInfo\022\030\n\013auto_domain\030\001 \001(\010H\000\210\001\001\022\026\n" +
+      "\016custom_domains\030\002 \003(\t\022\023\n\013sub_domains\030\003 \003" +
+      "(\tB\016\n\014_auto_domain\"k\n\tTransport\022\020\n\003mux\030\001" +
+      " \001(\010H\000\210\001\001\022\024\n\007encrypt\030\003 \001(\010H\001\210\001\001\022\025\n\010compr" +
+      "ess\030\004 \001(\010H\002\210\001\001B\006\n\004_muxB\n\n\010_encryptB\013\n\t_c" +
+      "ompress\"\344\005\n\010NewProxy\022\014\n\004name\030\001 \001(\t\0229\n\007ta" +
+      "rgets\030\002 \003(\0132(.com.xiaoniucode.etp.core.m" +
+      "essage.Target\022\023\n\006enable\030\003 \001(\010H\000\210\001\001\022@\n\010pr" +
+      "otocol\030\006 \001(\0162..com.xiaoniucode.etp.core." +
+      "message.ProtocolType\022\030\n\013remote_port\030\007 \001(" +
+      "\rH\001\210\001\001\022A\n\006domain\030\010 \001(\0132,.com.xiaoniucode" +
+      ".etp.core.message.DomainInfoH\002\210\001\001\022L\n\016acc" +
+      "ess_control\030\013 \001(\0132/.com.xiaoniucode.etp." +
+      "core.message.AccessControlH\003\210\001\001\022D\n\nbasic" +
+      "_auth\030\014 \001(\0132+.com.xiaoniucode.etp.core.m" +
+      "essage.BasicAuthH\004\210\001\001\022C\n\tbandwidth\030\r \001(\013" +
+      "2+.com.xiaoniucode.etp.core.message.Band" +
+      "widthH\005\210\001\001\022H\n\014load_balance\030\016 \001(\0132-.com.x" +
+      "iaoniucode.etp.core.message.LoadBalanceH" +
+      "\006\210\001\001\022C\n\ttransport\030\017 \001(\0132+.com.xiaoniucod" +
+      "e.etp.core.message.TransportH\007\210\001\001B\t\n\007_en" +
+      "ableB\016\n\014_remote_portB\t\n\007_domainB\021\n\017_acce" +
+      "ss_controlB\r\n\013_basic_authB\014\n\n_bandwidthB" +
+      "\017\n\r_load_balanceB\014\n\n_transport\"H\n\014NewPro" +
+      "xyResp\022\017\n\007proxyId\030\001 \001(\t\022\022\n\nproxy_name\030\002 " +
+      "\001(\t\022\023\n\013remote_addr\030\003 \001(\t\"&\n\005Error\022\014\n\004cod" +
+      "e\030\001 \001(\005\022\017\n\007message\030\002 \001(\t\"\340\001\n\rConfigMessa" +
+      "ge\022?\n\tnew_proxy\030e \001(\0132*.com.xiaoniucode." +
+      "etp.core.message.NewProxyH\000\022H\n\016new_proxy" +
+      "_resp\030f \001(\0132..com.xiaoniucode.etp.core.m" +
+      "essage.NewProxyRespH\000\0229\n\005error\030\315\001 \001(\0132\'." +
+      "com.xiaoniucode.etp.core.message.ErrorH\000" +
+      "B\t\n\007payload*!\n\014ProtocolType\022\007\n\003TCP\020\000\022\010\n\004" +
+      "HTTP\020\001*$\n\tAgentType\022\n\n\006BINARY\020\000\022\013\n\007SESSI" +
+      "ON\020\001*!\n\nAccessMode\022\t\n\005ALLOW\020\000\022\010\n\004DENY\020\001*" +
+      "N\n\023LoadBalanceStrategy\022\017\n\013ROUND_ROBIN\020\000\022" +
+      "\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022\016\n\nLEAST_CONN\020\003*" +
+      "\"\n\025TransportProtocolType\022\t\n\005T_TCP\020\000b\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -16604,7 +16604,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     internal_static_com_xiaoniucode_etp_core_message_AuthResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_AuthResponse_descriptor,
-        new java.lang.String[] { "ClientId", "ConnectionId", "Code", "Message", });
+        new java.lang.String[] { "AgentId", "ConnectionId", "Code", "Message", });
     internal_static_com_xiaoniucode_etp_core_message_AccessControl_descriptor =
       getDescriptor().getMessageType(6);
     internal_static_com_xiaoniucode_etp_core_message_AccessControl_fieldAccessorTable = new

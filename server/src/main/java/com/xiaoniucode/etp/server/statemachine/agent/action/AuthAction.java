@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
-import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
@@ -41,6 +41,7 @@ public class AuthAction extends AgentBaseAction {
     /**
      * 检查 Token 是否存在
      * 检查Token 并发限制
+     * todo 检查AgentId是否已经认证在线，避免重复登录 检查是否是断线重连
      * 检查agentId是否存在，不存在则创建 --> 检查该Token下已注册Agent数是否超过限制
      *
      */
@@ -58,30 +59,31 @@ public class AuthAction extends AgentBaseAction {
             context.fireEvent(AgentEvent.AUTH_FAILURE);
             return;
         }
-        TokenInfo accessToken = tokenManager.getAccessToken(token);
+        TokenInfo tokenInfo = tokenManager.getAccessToken(token);
         if (!tokenManager.checkConnectionsLimit(token)) {
-            logger.warn("访问令牌 {} 连接数已达上限 {}", token, accessToken.getMaxConnections());
+            logger.warn("访问令牌 {} 连接数已达上限 {}", token, tokenInfo.getMaxConnections());
             Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
                     .setCode(1)
-                    .setMessage("访问令牌 " + token + " 连接数已达上限:" + token).build();
+                    .setMessage("访问令牌 " + token + " 连接数已达上限:" + tokenInfo.getMaxConnections()).build();
             sendAuthError(control, authResponse);
             context.fireEvent(AgentEvent.AUTH_FAILURE);
             return;
         }
+
         //如果没有 agentId 则生成
         String agentId = authInfo.getAgentId();
         AgentInfo oldAgentInfo = null;
         if (!StringUtils.hasText(agentId)) {
             if (!tokenManager.checkAgentLimit(token)) {
-                logger.warn("访问令牌 {} 客户端注册数已达上限 {}", token, accessToken.getMaxClients());
+                logger.warn("访问令牌 {} 客户端注册数已达上限 {}", token, tokenInfo.getMaxClients());
                 Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
                         .setCode(1)
-                        .setMessage("访问令牌 " + token + " 客户端注册数已达上限:" + accessToken.getMaxClients()).build();
+                        .setMessage("访问令牌 " + token + " 客户端注册数已达上限:" + tokenInfo.getMaxClients()).build();
                 sendAuthError(control, authResponse);
                 context.fireEvent(AgentEvent.AUTH_FAILURE);
                 return;
             } else {
-                agentId = uuidGenerator.uuid32();
+                agentId = uuidGenerator.uuid16(true);
             }
         } else {
             //如果携带了 agentId 需要检查是否合法
@@ -109,7 +111,7 @@ public class AuthAction extends AgentBaseAction {
         agentManager.addClientContextIndex(agentId, context);
         Message.AuthResponse authResponse = Message.AuthResponse.newBuilder().setCode(0)
                 .setConnectionId(context.getConnectionId())
-                .setClientId(agentId)
+                .setAgentId(agentId)
                 .setMessage("认证成功")
                 .build();
 
@@ -123,14 +125,14 @@ public class AuthAction extends AgentBaseAction {
                 logger.error("发送认证成功消息失败", future.cause());
             }
         });
-        logger.debug("设备认证成功：[设备ID={}，版本号={}]", agentId, agentInfo.getVersion());
+        logger.debug("设备认证成功：[设备ID={}，设备类型={}，版本号={}]", agentId, agentInfo.getAgentType(), agentInfo.getVersion());
     }
 
     private AgentInfo createOrUpdateAgentInfo(String agentId, AgentInfo oldAgentInfo, Message.AuthInfo authInfo) {
         AgentInfo agentInfo = oldAgentInfo == null ? new AgentInfo() : oldAgentInfo;
         agentInfo.setToken(authInfo.getToken());
         agentInfo.setAgentId(agentId);
-        agentInfo.setClientType(getClientType(authInfo));
+        agentInfo.setAgentType(getAgentType(authInfo));
         agentInfo.setVersion(authInfo.getVersion());
         agentInfo.setOs(authInfo.getOs());
         agentInfo.setArch(authInfo.getArch());
@@ -144,13 +146,13 @@ public class AuthAction extends AgentBaseAction {
         return agentInfo;
     }
 
-    private ClientType getClientType(Message.AuthInfo authInfo) {
+    private AgentType getAgentType(Message.AuthInfo authInfo) {
         switch (authInfo.getAgentType()) {
-            case BINARY_DEVICE -> {
-                return ClientType.BINARY_DEVICE;
+            case BINARY -> {
+                return AgentType.BINARY;
             }
-            case WEB_SESSION -> {
-                return ClientType.SESSION_CLINT;
+            case SESSION -> {
+                return AgentType.SESSION;
             }
         }
         return null;

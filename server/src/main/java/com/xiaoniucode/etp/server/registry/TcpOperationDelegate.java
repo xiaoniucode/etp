@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.registry;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.exceptions.PortConflictException;
 import com.xiaoniucode.etp.server.port.PortManager;
@@ -45,11 +45,11 @@ public class TcpOperationDelegate implements ProxyOperationDelegate {
             throw new PortConflictException(remotePort);
         }
 
-        ClientType clientType = config.getClientType();
+        AgentType clientType = config.getClientType();
         String name = config.getName();
         ProxyConfig exist = proxyStore.findByClientIdAndName(config.getClientId(), name);
         //处理临时客户端名称冲突
-        if (exist != null && clientType == ClientType.BINARY_DEVICE) {
+        if (exist != null && clientType == AgentType.BINARY) {
             throw new EtpException("代理配置名称不能重复");
         }
         if (remotePort == null) {
@@ -59,7 +59,7 @@ public class TcpOperationDelegate implements ProxyOperationDelegate {
             throw new EtpException("无可用端口，请联系管理员");
         }
         //处理临时客户端名字重复
-        if (exist != null && (clientType == ClientType.SESSION_CLINT)) {
+        if (exist != null && (clientType == AgentType.SESSION)) {
             config.setName(remotePort + "." + name);
         }
         config.setRemotePort(remotePort);

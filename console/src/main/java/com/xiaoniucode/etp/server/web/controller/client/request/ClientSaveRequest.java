@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.controller.client.request;
 
-import com.xiaoniucode.etp.core.enums.ClientType;
+import com.xiaoniucode.etp.core.enums.AgentType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -10,7 +10,7 @@ public record ClientSaveRequest(
         @NotEmpty(message = "name 不能为空")
         String name,
         @NotNull(message = "clientType 不能为空")
-        ClientType clientType,
+        AgentType clientType,
         @NotEmpty(message = "token 不能为空")
         String token,
         @NotEmpty(message = "arch 不能为空")

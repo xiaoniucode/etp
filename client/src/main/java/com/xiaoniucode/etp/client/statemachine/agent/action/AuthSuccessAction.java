@@ -19,13 +19,9 @@ import io.netty.channel.Channel;
 import java.util.List;
 import java.util.Set;
 
-public class HandleAuthSuccessAction extends AgentBaseAction {
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(HandleAuthSuccessAction.class);
-
-
+public class AuthSuccessAction extends AgentBaseAction{
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-        logger.debug("认证成功");
         AppConfig configs = ConfigUtils.getConfig();
         List<ProxyConfig> proxies = configs.getProxies();
         Channel control = context.getControl();
@@ -38,7 +34,6 @@ public class HandleAuthSuccessAction extends AgentBaseAction {
         control.flush();
         context.fireEvent(AgentEvent.CREATE_TUNNEL_POOL);
     }
-
     private static Message.NewProxy buildNewProxy(ProxyConfig config) {
         ProtocolType protocol = config.getProtocol();
         Message.NewProxy.Builder newProxyBuilder = Message.NewProxy.newBuilder();

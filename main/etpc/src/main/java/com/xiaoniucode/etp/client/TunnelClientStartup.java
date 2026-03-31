@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.config.domain.LogConfig;
 import com.xiaoniucode.etp.common.*;
 import com.xiaoniucode.etp.common.log.LogbackConfigurator;
+import com.xiaoniucode.etp.core.enums.AgentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,11 +22,12 @@ public class TunnelClientStartup {
 
     public static void main(String[] args) {
         try {
-            Debugger.enableDebug();
-            System.setProperty("io.netty.leakDetection.level", "PARANOID");
             AppConfig config = buildConfig(args);
-
             initLogback(config);
+            if (config.getLogConfig().getLevel().equalsIgnoreCase("debug")){
+                Debugger.enableDebug();
+                System.setProperty("io.netty.leakDetection.level", "PARANOID");
+            }
             registerShutdownHook();
             tunnelClient = new TunnelClient(config);
             tunnelClient.start();
@@ -96,6 +98,7 @@ public class TunnelClientStartup {
             authConfig.setToken(cmdArgs.get("token"));
             builder.authConfig(authConfig);
         }
+        builder.agentType(AgentType.BINARY);
         return builder.build();
     }
 
@@ -108,7 +111,7 @@ public class TunnelClientStartup {
                 .setPath(log.getPath())
                 .setLogPattern(log.getLogPattern())
                 .setArchivePattern(log.getArchivePattern())
-                .setLogLevel(Level.toLevel(log.getLevel(),Level.INFO))
+                .setLogLevel(Level.toLevel(log.getLevel(), Level.INFO))
                 .setLogName(log.getName())
                 .setMaxHistory(log.getMaxHistory())
                 .setTotalSizeCap(log.getTotalSizeCap())

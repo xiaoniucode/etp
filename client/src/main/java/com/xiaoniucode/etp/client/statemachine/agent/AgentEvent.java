@@ -11,7 +11,7 @@ public enum AgentEvent {
     ERROR,              // 错误
     AUTH_START,         // 开始认证
     AUTH_SUCCESS,       // 认证成功
-    AUTH_FAILURE,        // 认证失败
+    AUTH_RESPONSE,       // 认证响应
     STOP,                // 停止
     NETWORK_ERROR,       //网络错误
     DISCONNECT,           //连接断开

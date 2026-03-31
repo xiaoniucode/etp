@@ -6,8 +6,7 @@ import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.xiaoniucode.etp.client.statemachine.agent.action.*;
 import com.xiaoniucode.etp.client.statemachine.agent.action.AuthAction;
-import com.xiaoniucode.etp.client.statemachine.agent.action.HandleAuthFailureAction;
-import com.xiaoniucode.etp.client.statemachine.agent.action.HandleAuthSuccessAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.AuthResponseAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.tunnel.CreateConnPoolAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.tunnel.CreateNewConnAction;
 
@@ -33,6 +32,7 @@ public class AgentStateMachineBuilder {
 
         /**
          * 构建状态机
+         *
          * @return 构建好的状态机实例
          */
         private static StateMachine<AgentState, AgentEvent, AgentContext> build() {
@@ -43,9 +43,9 @@ public class AgentStateMachineBuilder {
             InitSslAction initSslAction = new InitSslAction();
             ConnectAction connectAction = new ConnectAction();
             AuthAction authAction = new AuthAction();
-            HandleAuthSuccessAction handleAuthSuccessAction = new HandleAuthSuccessAction();
-            HandleAuthFailureAction handleAuthFailureAction = new HandleAuthFailureAction();
-            HandleConnectFailureAction handleConnectFailureAction = new HandleConnectFailureAction();
+            AuthResponseAction authResponseAction = new AuthResponseAction();
+            AuthSuccessAction authSuccessAction = new AuthSuccessAction();
+
             NetworkErrorAction networkErrorAction = new NetworkErrorAction();
             GoawayAction stopAction = new GoawayAction();
 
@@ -80,27 +80,23 @@ public class AgentStateMachineBuilder {
                     .on(AgentEvent.CONNECT_SUCCESS)
                     .perform(authAction);
 
+            // 认证响应
+            builder.internalTransition()
+                    .within(AgentState.CONNECTING)
+                    .on(AgentEvent.AUTH_RESPONSE)
+                    .perform(authResponseAction);
             // 认证成功
             builder.externalTransition()
                     .from(AgentState.CONNECTING)
                     .to(AgentState.CONNECTED)
                     .on(AgentEvent.AUTH_SUCCESS)
-                    .when(AgentContext::isAuthenticated)
-                    .perform(handleAuthSuccessAction);
+                    .perform(authSuccessAction);
 
-            // 认证失败
-            builder.externalTransition()
-                    .from(AgentState.CONNECTING)
-                    .to(AgentState.FAILED)
-                    .on(AgentEvent.AUTH_FAILURE)
-                    .perform(handleAuthFailureAction);
-
-            // TCP 连接失败
-            builder.externalTransition()
-                    .from(AgentState.CONNECTING)
-                    .to(AgentState.FAILED)
+            // TCP 连接失败 尝试重连
+            builder.internalTransition()
+                    .within(AgentState.CONNECTING)
                     .on(AgentEvent.CONNECT_FAILURE)
-                    .perform(handleConnectFailureAction);
+                    .perform(connectAction);
 
             // 运行中出现网络错误
             builder.externalTransition()
@@ -162,6 +158,7 @@ public class AgentStateMachineBuilder {
 
     /**
      * 获取状态机实例
+     *
      * @return 状态机实例
      */
     public static StateMachine<AgentState, AgentEvent, AgentContext> getStateMachine() {

@@ -42,16 +42,9 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             //********************Agent***********************//
             case TMSP.MSG_AUTH_RESP: {
                 Message.AuthResponse authResponse = ProtobufUtil.parseFrom(frame.getPayload(), Message.AuthResponse.parser());
-                int connectionId = authResponse.getConnectionId();
-                int code = authResponse.getCode();
-                if (code == 0) {
-                    agentContext.setConnectionId(connectionId);
-                    agentContext.setAuthenticated(true);
-                    agentContext.fireEvent(AgentEvent.AUTH_SUCCESS);
-                } else {
-                    agentContext.setAuthenticated(false);
-                    agentContext.fireEvent(AgentEvent.AUTH_FAILURE);
-                }
+                agentContext.setVariable("authResponse", authResponse);
+                agentContext.fireEvent(AgentEvent.AUTH_RESPONSE);
+
                 break;
             }
             case TMSP.MSG_PROXY_CREATE_RESP: {
@@ -140,9 +133,9 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         } else {
             logger.error("数据连接异常，关闭数据连接", cause);
             //数据隧道
-           // ChannelUtils.closeOnFlush(channel);
+            // ChannelUtils.closeOnFlush(channel);
         }
-        logger.error(cause.getMessage(),cause);
+        logger.error(cause.getMessage(), cause);
     }
 
     private boolean isNetworkException(Throwable cause) {

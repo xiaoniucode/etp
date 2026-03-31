@@ -45,7 +45,7 @@ public class ProxyCreateAction extends AgentBaseAction {
             ProxyConfig config = buildProxyConfig(proxy);
             logger.debug("{}", config);
             config.setClientId(clientId);
-            config.setClientType(context.getAgentInfo().getClientType());
+            config.setClientType(context.getAgentInfo().getAgentType());
 
             ProxyConfig register = proxyManager.register(config);
             Message.NewProxyResp newProxyResp = buildResponse(register);

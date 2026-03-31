@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.client;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
+import com.xiaoniucode.etp.client.manager.AgentIdentity;
 import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.client.transport.RealServerHandler;
 import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
@@ -38,7 +39,7 @@ public final class TunnelClient implements Lifecycle {
     private final AppConfig config;
     private EventLoopGroup controlWorkerGroup;
     private EventLoopGroup serverWorkBootstrap;
-    private AgentContext clientContext;
+    private AgentContext agentContext;
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
 
     public TunnelClient(AppConfig config) {
@@ -51,7 +52,7 @@ public final class TunnelClient implements Lifecycle {
             EventBusManager.register(new ApplicationInitListener());
             EventBusManager.publishAsync(new ApplicationInitEvent(config));
             initializeStateMachine();
-            stateMachine.fireEvent(AgentState.IDLE, AgentEvent.START, clientContext);
+            stateMachine.fireEvent(AgentState.IDLE, AgentEvent.START, agentContext);
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -60,11 +61,12 @@ public final class TunnelClient implements Lifecycle {
 
     private void initializeStateMachine() {
         stateMachine = AgentStateMachineBuilder.getStateMachine();
-        clientContext = new AgentContext(config);
-        clientContext.setTunnelClient(this);
-        clientContext.setStateMachine(stateMachine);
-        clientContext.setDirectPool(new DirectPool());
-        clientContext.setMultiplexPool(new MultiplexPool());
+        agentContext = new AgentContext(config);
+        agentContext.setTunnelClient(this);
+        agentContext.setStateMachine(stateMachine);
+        agentContext.setDirectPool(new DirectPool());
+        agentContext.setMultiplexPool(new MultiplexPool());
+        agentContext.setAgentIdentity(new AgentIdentity());
 
         serverWorkBootstrap = NettyEventLoopFactory.eventLoopGroup();
         Bootstrap serverBootstrap = new Bootstrap()
@@ -77,12 +79,12 @@ public final class TunnelClient implements Lifecycle {
                     @Override
                     protected void initChannel(SocketChannel ch) {
                         ChannelPipeline p = ch.pipeline();
-                        p.addLast(NettyConstants.REAL_SERVER_HANDLER, new RealServerHandler(clientContext));
+                        p.addLast(NettyConstants.REAL_SERVER_HANDLER, new RealServerHandler(agentContext));
                     }
                 });
         Bootstrap controlBootstrap = new Bootstrap();
-        ControlFrameHandler controlTunnelHandler = new ControlFrameHandler(clientContext);
-        clientContext.setControlFrameHandler(controlTunnelHandler);
+        ControlFrameHandler controlTunnelHandler = new ControlFrameHandler(agentContext);
+        agentContext.setControlFrameHandler(controlTunnelHandler);
         controlWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
         LoggingHandler loggingHandler = new LoggingHandler(LogLevel.DEBUG);
         controlBootstrap.group(controlWorkerGroup)
@@ -93,8 +95,8 @@ public final class TunnelClient implements Lifecycle {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
-                        if (Boolean.TRUE.equals(config.getTlsConfig().getEnabled()) && clientContext.getTlsContext() != null) {
-                            SslHandler sslHandler = clientContext.getTlsContext().newHandler(
+                        if (Boolean.TRUE.equals(config.getTlsConfig().getEnabled()) && agentContext.getTlsContext() != null) {
+                            SslHandler sslHandler = agentContext.getTlsContext().newHandler(
                                     sc.alloc(), config.getServerAddr(), config.getServerPort());
                             sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
                         }
@@ -105,10 +107,10 @@ public final class TunnelClient implements Lifecycle {
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);
                     }
                 });
-        clientContext.setControlBootstrap(controlBootstrap);
-        clientContext.setControlWorkerGroup(controlWorkerGroup);
-        clientContext.setServerBootstrap(serverBootstrap);
-        clientContext.setServerWorkerGroup(serverWorkBootstrap);
+        agentContext.setControlBootstrap(controlBootstrap);
+        agentContext.setControlWorkerGroup(controlWorkerGroup);
+        agentContext.setServerBootstrap(serverBootstrap);
+        agentContext.setServerWorkerGroup(serverWorkBootstrap);
     }
 
     @Override
