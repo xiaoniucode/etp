@@ -5,57 +5,88 @@ import com.xiaoniucode.etp.server.transport.tcp.TcpProxyServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.PreDestroy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.annotation.Nonnull;
 
-import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PortAcceptor {
-    private final Logger logger = LoggerFactory.getLogger(PortAcceptor.class);
+public final class PortAcceptor {
+
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(PortAcceptor.class);
+
     private final Map<Integer, Channel> portToChannel = new ConcurrentHashMap<>();
 
-    public void bindPort(Integer port) {
-        try {
-            TcpProxyServer tcpProxyServer = SpringContextHolder.getBean(TcpProxyServer.class);
-            ServerBootstrap serverBootstrap = tcpProxyServer.getServerBootstrap();
-            if (!portToChannel.containsKey(port)) {
+    /**
+     * 绑定并监听指定端口。
+     * @param port 要监听的端口。不可为null，需合法（0-65535）。
+     */
+    public void bindPort(@Nonnull final Integer port) {
+        if (port < 0 || port > 65535) {
+            logger.warn("尝试绑定非法端口: {}", port);
+            return;
+        }
+
+        portToChannel.computeIfAbsent(port, key -> {
+            try {
+                TcpProxyServer tcpProxyServer = SpringContextHolder.getBean(TcpProxyServer.class);
+                if (tcpProxyServer == null) {
+                    logger.error("TcpProxyServer Bean 未注册！");
+                    return null;
+                }
+                ServerBootstrap serverBootstrap = tcpProxyServer.getServerBootstrap();
                 ChannelFuture future = serverBootstrap.bind(port).sync();
-                portToChannel.put(port, future.channel());
+                Channel channel = future.channel();
+                logger.debug("成功绑定端口: {}", port);
+                return channel;
+            } catch (Throwable t) {
+                logger.error("绑定端口 {} 失败", port, t);
+                return null;
             }
-        } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
-        }
+        });
     }
 
-    public void stopPortListen(Integer remotePort) {
-        try {
-            Channel serverChannel = portToChannel.get(remotePort);
-            if (serverChannel != null) {
-                serverChannel.close().sync();
-                portToChannel.remove(remotePort);
-            }
-        } catch (Exception e) {
-            logger.error("停止服务失败：端口-{}", remotePort, e);
+    /**
+     * 停止监听指定端口。
+     * @param port 要释放的端口
+     */
+    public void stopPortListen(@Nonnull final Integer port) {
+        if (port < 0 || port > 65535) {
+            logger.warn("尝试停止非法端口: {}", port);
+            return;
         }
-    }
-
-    @PreDestroy
-    public void clearAll() {
-        logger.debug("清理代理端口资源占用");
-        for (Channel channel : portToChannel.values()) {
+        Channel channel = portToChannel.remove(port);
+        if (channel != null) {
             try {
                 channel.close().sync();
-                int port = channel.localAddress() != null ? ((InetSocketAddress) channel.localAddress()).getPort() : -1;
-                if (port != -1) {
-                    logger.info("成功释放端口: {}", port);
-                }
-            } catch (Exception e) {
-                logger.error("关闭 channel 失败", e);
+                logger.debug("停止端口监听成功: {}", port);
+            } catch (Throwable t) {
+                logger.error("停止服务失败：端口-{}", port, t);
+            }
+        } else {
+            logger.debug("要停止的端口{}未被绑定，无需操作。", port);
+        }
+    }
+
+    /**
+     * Bean销毁时自动清理所有绑定端口资源。
+     */
+    @PreDestroy
+    public void clearAll() {
+        logger.debug("开始清理所有代理端口资源占用...");
+        for (Map.Entry<Integer, Channel> entry : portToChannel.entrySet()) {
+            Integer port = entry.getKey();
+            Channel channel = entry.getValue();
+            try {
+                channel.close().sync();
+                logger.info("成功释放端口: {}", port);
+            } catch (Throwable t) {
+                logger.error("关闭端口 {} 的 channel 失败", port, t);
             }
         }
         portToChannel.clear();
+        logger.debug("代理端口资源清理完毕。");
     }
 }

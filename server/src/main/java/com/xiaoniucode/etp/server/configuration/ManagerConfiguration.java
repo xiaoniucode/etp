@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.configuration;
 
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.config.domain.PortRange;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
 import com.xiaoniucode.etp.server.port.PortManager;
@@ -41,7 +42,8 @@ public class ManagerConfiguration {
 
     @Bean
     public PortManager portManager() {
-        return new PortManager(config);
+        PortRange portRange = config.getPortRange();
+        return new PortManager(portRange.getStart(), portRange.getEnd());
     }
 
     @Bean
