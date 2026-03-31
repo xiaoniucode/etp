@@ -6,8 +6,8 @@ import com.xiaoniucode.etp.server.config.domain.AgentInfo;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 public class AgentContext extends AbstractAgentContext {
-    private final Logger logger = LoggerFactory.getLogger(AgentContext.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(AgentContext.class);
     private AgentState state = AgentState.NEW;
     private AgentInfo agentInfo;
     private LocalDateTime lastActiveTime;

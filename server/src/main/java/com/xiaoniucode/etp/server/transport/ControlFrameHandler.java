@@ -12,8 +12,8 @@ import com.xiaoniucode.etp.server.statemachine.agent.command.TunnelCreateCmd;
 import com.xiaoniucode.etp.server.statemachine.stream.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @ChannelHandler.Sharable
 public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> {
-    private final Logger logger = LoggerFactory.getLogger(ControlFrameHandler.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(ControlFrameHandler.class);
     @Autowired
     private AgentManager agentManager;
     @Autowired

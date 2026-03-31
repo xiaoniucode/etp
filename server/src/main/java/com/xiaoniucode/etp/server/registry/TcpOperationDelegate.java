@@ -8,8 +8,8 @@ import com.xiaoniucode.etp.server.exceptions.PortConflictException;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.store.ProxyStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Component
 public class TcpOperationDelegate implements ProxyOperationDelegate {
-    private final Logger logger = LoggerFactory.getLogger(TcpOperationDelegate.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(TcpOperationDelegate.class);
     @Autowired
     private PortManager portManager;
     @Autowired

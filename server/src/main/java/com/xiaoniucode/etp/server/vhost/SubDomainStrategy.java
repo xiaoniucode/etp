@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.vhost;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 @Component
 public class SubDomainStrategy implements DomainGenerationStrategy {
-    private static final Logger logger = LoggerFactory.getLogger(SubDomainStrategy.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(SubDomainStrategy.class);
     
     @Override
     public boolean supports(ProxyConfig config) {

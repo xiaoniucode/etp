@@ -14,8 +14,8 @@ import io.netty.channel.socket.SocketChannel;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author liuxin
  */
 public final class TcpProxyServer implements Lifecycle {
-    private static final Logger logger = LoggerFactory.getLogger(TcpProxyServer.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(TcpProxyServer.class);
     @Getter
     private ServerBootstrap serverBootstrap;
     private EventLoopGroup bossGroup;

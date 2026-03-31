@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.loadbalance;
 
 import com.xiaoniucode.etp.core.domain.Target;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class RoundRobinLoadBalancer implements LoadBalancer{
-    private static final Logger logger = LoggerFactory.getLogger(RoundRobinLoadBalancer.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(RoundRobinLoadBalancer.class);
     private final AtomicInteger currentIndex;
 
     public RoundRobinLoadBalancer() {

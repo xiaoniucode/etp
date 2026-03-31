@@ -16,13 +16,14 @@
 package com.xiaoniucode.etp.server.port;
 
 import com.xiaoniucode.etp.server.exceptions.EtpException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.BitSet;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 端口分配管理器
@@ -31,13 +32,12 @@ import java.util.Random;
  *
  */
 public class PortManager {
-    private final Logger logger = LoggerFactory.getLogger(PortManager.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(PortManager.class);
 
     private final BitSet allocatedPorts;
-    private int startPort = 1;
+    private final int startPort;
     private final int endPort;
     private final int portCount;
-    private final Random random = new Random();
 
     public PortManager(int start, int end) {
         startPort = Math.max(start, 1);
@@ -59,7 +59,7 @@ public class PortManager {
         }
         // 随机尝试最多20次
         for (int i = 0; i < 20; i++) {
-            int offset = random.nextInt(portCount);
+            int offset = ThreadLocalRandom.current().nextInt(portCount);
             int absPort = startPort + offset;
             if (allocatedPorts.get(offset)) continue;
             if (tryBindPort(absPort)) {

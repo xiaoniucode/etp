@@ -1,14 +1,14 @@
 package com.xiaoniucode.etp.server.vhost;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class DomainGenerator {
-    private final Logger logger = LoggerFactory.getLogger(DomainGenerator.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(DomainGenerator.class);
     private final String[] baseDomains;
     private final DomainManager domainManager;
     private final List<DomainGenerationStrategy> strategies;

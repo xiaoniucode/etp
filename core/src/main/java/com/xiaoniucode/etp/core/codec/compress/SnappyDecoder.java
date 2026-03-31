@@ -3,14 +3,14 @@ package com.xiaoniucode.etp.core.codec.compress;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.compression.SnappyFrameDecoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.List;
 
 
 public class SnappyDecoder extends SnappyFrameDecoder {
-    private static final Logger logger = LoggerFactory.getLogger(SnappyDecoder.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(SnappyDecoder.class);
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {

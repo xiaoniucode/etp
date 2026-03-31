@@ -7,13 +7,13 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.util.CharsetUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.List;
 
 public class HostSnifferHandler extends ByteToMessageDecoder {
-    private final Logger logger = LoggerFactory.getLogger(HostSnifferHandler.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(HostSnifferHandler.class);
     private boolean sniffing = true;
 
     public HostSnifferHandler() {

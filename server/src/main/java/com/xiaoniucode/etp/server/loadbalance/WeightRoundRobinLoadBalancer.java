@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.loadbalance;
 
 import com.xiaoniucode.etp.core.domain.Target;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer {
     /**
      * 日志记录器
      */
-    private static final Logger logger = LoggerFactory.getLogger(WeightRoundRobinLoadBalancer.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(WeightRoundRobinLoadBalancer.class);
 
     /**
      * 节点回收周期，单位：毫秒

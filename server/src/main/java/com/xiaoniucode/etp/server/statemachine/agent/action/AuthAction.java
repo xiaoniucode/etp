@@ -15,8 +15,8 @@ import com.xiaoniucode.etp.server.store.AgentStore;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @Component
 public class AuthAction extends AgentBaseAction {
-    private final Logger logger = LoggerFactory.getLogger(AuthAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(AuthAction.class);
     @Autowired
     private AgentManager agentManager;
     @Autowired

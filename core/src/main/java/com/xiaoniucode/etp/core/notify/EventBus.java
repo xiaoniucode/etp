@@ -5,8 +5,8 @@ import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 基于Disruptor 实现的事件总线
  */
 public class EventBus {
-    private final Logger logger = LoggerFactory.getLogger(EventBus.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(EventBus.class);
 
     private static final int DEFAULT_RING_BUFFER_SIZE = 16384;
     /**

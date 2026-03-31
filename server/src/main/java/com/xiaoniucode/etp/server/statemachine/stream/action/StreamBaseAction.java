@@ -4,11 +4,11 @@ import com.alibaba.cola.statemachine.Action;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 public abstract class StreamBaseAction implements Action<StreamState, StreamEvent, StreamContext> {
-private final Logger logger= LoggerFactory.getLogger(StreamBaseAction.class);
+private final InternalLogger logger= InternalLoggerFactory.getInstance(StreamBaseAction.class);
     @Override
     public final void execute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         context.setState(to);

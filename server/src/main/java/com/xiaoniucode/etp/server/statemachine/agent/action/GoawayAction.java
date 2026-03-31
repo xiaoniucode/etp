@@ -7,15 +7,15 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.transport.connection.DirectPool;
 import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
 @Component
 public class GoawayAction extends AgentBaseAction {
-    private final Logger logger = LoggerFactory.getLogger(GoawayAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(GoawayAction.class);
     @Autowired
     private AgentManager agentManager;
     @Autowired

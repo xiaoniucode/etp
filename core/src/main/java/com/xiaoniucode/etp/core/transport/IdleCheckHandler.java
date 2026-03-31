@@ -5,8 +5,8 @@ import com.xiaoniucode.etp.core.message.TMSPFrame;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  * @author liuxin
  */
 public class IdleCheckHandler extends IdleStateHandler {
-    private final Logger logger = LoggerFactory.getLogger(IdleCheckHandler.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(IdleCheckHandler.class);
 
     public IdleCheckHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
         super(readerIdleTime, writerIdleTime, allIdleTime, unit);

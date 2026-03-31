@@ -9,11 +9,11 @@ import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 public class MultiplexTunnelBridge implements TunnelBridge {
-    private final Logger logger = LoggerFactory.getLogger(MultiplexTunnelBridge.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(MultiplexTunnelBridge.class);
     private final StreamContext streamContext;
     private final TunnelEntry tunnelEntry;
     private final Channel visitor;

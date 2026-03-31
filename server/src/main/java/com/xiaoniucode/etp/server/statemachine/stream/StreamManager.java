@@ -8,8 +8,8 @@ import com.xiaoniucode.etp.core.transport.PausedStreamRegistry;
 import com.xiaoniucode.etp.server.generator.StreamIdGenerator;
 import com.xiaoniucode.etp.server.transport.BandwidthLimiter;
 import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class StreamManager {
-    private final Logger logger = LoggerFactory.getLogger(StreamManager.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(StreamManager.class);
     /**
      * streamId -->连接上下文
      */

@@ -2,14 +2,14 @@ package com.xiaoniucode.etp.server.metrics;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
 
 @ChannelHandler.Sharable
 @Component
 public class TrafficMetricsHandler extends ChannelDuplexHandler {
-    private final Logger logger = LoggerFactory.getLogger(TrafficMetricsHandler.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(TrafficMetricsHandler.class);
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

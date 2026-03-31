@@ -6,8 +6,8 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Component
 public class ProxyInitAction extends AgentBaseAction{
-    private final Logger logger= LoggerFactory.getLogger(ProxyInitAction.class);
+    private final InternalLogger logger= InternalLoggerFactory.getInstance(ProxyInitAction.class);
     @Autowired
     private ProxyManager proxyManager;
     @Autowired

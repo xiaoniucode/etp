@@ -7,15 +7,15 @@ import com.xiaoniucode.etp.server.security.AccessControlManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 @ChannelHandler.Sharable
 public class HttpIpCheckHandler extends IpCheckHandler {
-    private final Logger logger = LoggerFactory.getLogger(HttpIpCheckHandler.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(HttpIpCheckHandler.class);
     @Autowired
     private ProxyManager proxyManager;
 

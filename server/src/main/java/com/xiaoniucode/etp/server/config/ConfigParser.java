@@ -5,14 +5,14 @@ import com.xiaoniucode.etp.common.CommandLineArgs;
 import com.xiaoniucode.etp.common.PortChecker;
 import com.xiaoniucode.etp.common.log.LogConfig;
 import com.xiaoniucode.etp.common.log.LogbackConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class ConfigParser{
-    private static final Logger logger = LoggerFactory.getLogger(ConfigParser.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(ConfigParser.class);
 
     public static AppConfig parse(String[] args) {
         try {

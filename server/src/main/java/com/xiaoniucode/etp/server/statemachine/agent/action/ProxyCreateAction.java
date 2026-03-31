@@ -16,9 +16,9 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class ProxyCreateAction extends AgentBaseAction {
-    private final Logger logger = LoggerFactory.getLogger(ProxyCreateAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(ProxyCreateAction.class);
     @Autowired
     private ProxyManager proxyManager;
     @Resource

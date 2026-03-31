@@ -5,8 +5,8 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.server.generator.ConnectionIdGenerator;
 import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class AgentManager {
-    private final Logger logger = LoggerFactory.getLogger(AgentManager.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(AgentManager.class);
     /**
      * connectionId
      */

@@ -14,8 +14,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 /**
  * Http proxy server
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * @author xiaoniucode
  */
 public class HttpProxyServer implements Lifecycle {
-    private final Logger logger = LoggerFactory.getLogger(HttpProxyServer.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(HttpProxyServer.class);
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private final HttpVisitorHandler httpVisitorHandler;

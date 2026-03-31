@@ -22,10 +22,10 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.OptionalSslHandler;
 import io.netty.handler.ssl.SslContext;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 控制隧道服务容器
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author liuxin
  */
 public class TunnelServer implements Lifecycle {
-    private static final Logger logger = LoggerFactory.getLogger(TunnelServer.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(TunnelServer.class);
     private final AppConfig config;
     private EventLoopGroup tunnelBossGroup;
     private EventLoopGroup tunnelWorkerGroup;

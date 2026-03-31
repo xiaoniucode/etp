@@ -11,8 +11,8 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ import java.util.Base64;
 @Component
 @ChannelHandler.Sharable
 public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
-    private final Logger logger = LoggerFactory.getLogger(BasicAuthHandler.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(BasicAuthHandler.class);
     @Autowired
     private ProxyManager proxyManager;
 

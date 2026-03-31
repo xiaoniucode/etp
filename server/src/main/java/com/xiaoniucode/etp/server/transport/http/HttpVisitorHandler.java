@@ -10,8 +10,8 @@ import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ import java.util.Optional;
 @Component
 @ChannelHandler.Sharable
 public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
-    private final Logger logger = LoggerFactory.getLogger(HttpVisitorHandler.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(HttpVisitorHandler.class);
     @Autowired
     private StreamManager streamManager;
     @Autowired

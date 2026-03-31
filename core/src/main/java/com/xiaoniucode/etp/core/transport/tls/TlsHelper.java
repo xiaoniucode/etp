@@ -4,8 +4,8 @@ import com.xiaoniucode.etp.core.domain.TlsConfig;
 import io.netty.handler.ssl.*;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +15,7 @@ import java.security.cert.CertificateException;
 
 public class TlsHelper {
 
-    private static final Logger logger = LoggerFactory.getLogger(TlsHelper.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(TlsHelper.class);
 
     public static SslContext buildSslContext(boolean forClient, TlsConfig tlsConfig) throws IOException, CertificateException {
         SslProvider provider = SslProvider.OPENSSL;

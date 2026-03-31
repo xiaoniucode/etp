@@ -4,8 +4,8 @@ import com.xiaoniucode.etp.server.security.AccessControlManager;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.net.InetSocketAddress;
 
@@ -13,7 +13,7 @@ import java.net.InetSocketAddress;
  * IP 访问控制检查
  */
 public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
-    private final Logger logger = LoggerFactory.getLogger(IpCheckHandler.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(IpCheckHandler.class);
     private final AccessControlManager accessControlManager;
 
     public IpCheckHandler(AccessControlManager accessControlManager) {

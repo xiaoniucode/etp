@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.vhost;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 public class DomainManager {
-    private final Logger logger = LoggerFactory.getLogger(DomainManager.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(DomainManager.class);
     /**
      * proxyId --> DomainInfo
      */

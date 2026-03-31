@@ -14,14 +14,14 @@ import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.transport.connection.DirectPool;
 import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
 import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StreamCloseAction extends StreamBaseAction {
-    private final Logger logger = LoggerFactory.getLogger(StreamCloseAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(StreamCloseAction.class);
     @Autowired
     private StreamManager streamManager;
     @Autowired

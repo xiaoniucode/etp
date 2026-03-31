@@ -17,14 +17,14 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.ReferenceCountUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CreateTunnelAction extends AgentBaseAction {
-    private final Logger logger = LoggerFactory.getLogger(CreateTunnelAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(CreateTunnelAction.class);
     @Autowired
     private DirectPool directPool;
     @Autowired
