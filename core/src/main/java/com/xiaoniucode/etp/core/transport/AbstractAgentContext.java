@@ -21,9 +21,19 @@ import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Getter
 @Setter
 public abstract class AbstractAgentContext extends ProcessContextImpl {
     private Integer connectionId;
     private Channel control;
+    private final AtomicInteger missedHeartbeats = new AtomicInteger(0);
+    private LocalDateTime lastActiveTime = LocalDateTime.now();
+
+    public void updateActiveTime() {
+        this.lastActiveTime = LocalDateTime.now();
+        this.missedHeartbeats.set(0);
+    }
 }

@@ -11,8 +11,10 @@ import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
 import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.core.transport.TlsContextHolder;
+import com.xiaoniucode.etp.server.transport.ControlIdleCheckHandler;
 import com.xiaoniucode.etp.server.transport.DownloadRateLimitHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -63,6 +65,7 @@ public class TunnelServer implements Lifecycle {
 
             LoggingHandler loggingHandler = new LoggingHandler(LogLevel.DEBUG);
             DownloadRateLimitHandler downloadRateLimitHandler = SpringContextHolder.getBean(DownloadRateLimitHandler.class);
+            AgentManager agentManager = SpringContextHolder.getBean(AgentManager.class);
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(tunnelBossGroup, tunnelWorkerGroup)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
@@ -79,7 +82,7 @@ public class TunnelServer implements Lifecycle {
                                     .addLast(loggingHandler)
                                     .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                     .addLast(downloadRateLimitHandler)
-                                    // .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
+                                    .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER,new ControlIdleCheckHandler(agentManager))
                                     .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
                         }
                     });

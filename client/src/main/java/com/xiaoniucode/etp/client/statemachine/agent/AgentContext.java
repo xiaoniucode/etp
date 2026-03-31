@@ -13,11 +13,13 @@ import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.handler.ssl.SslContext;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = true)
 public class AgentContext extends AbstractAgentContext {
     private AgentState state = AgentState.IDLE;
     private AppConfig config;
@@ -35,8 +37,9 @@ public class AgentContext extends AbstractAgentContext {
     private AgentIdentity agentIdentity;
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
 
-    public AgentContext(AppConfig config) {
+    public AgentContext(AppConfig config, StateMachine<AgentState, AgentEvent, AgentContext> stateMachine) {
         this.config = config;
+        this.stateMachine=stateMachine;
     }
 
     public AgentType getAgentType() {

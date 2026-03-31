@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package com.xiaoniucode.etp.server.transport;
 
 import com.alibaba.cola.statemachine.StateMachine;
@@ -23,6 +38,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 控制隧道消息处理器
+ *
+ * @author xiaoniucode
  */
 @Component
 @ChannelHandler.Sharable
@@ -41,6 +58,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
         try {
             byte msgType = frame.getMsgType();
+            Optional<AgentContext> opt = agentManager.getAgentContext(frame.getStreamId());
+            opt.ifPresent(context -> {
+                context.updateActiveTime();
+                logger.debug("更新客户端 {} 最后激活时间", context.getAgentInfo().getAgentId());
+            });
             switch (msgType) {
                 case TMSP.MSG_AUTH -> {
                     ByteBuf payload = frame.getPayload();
@@ -71,11 +93,20 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         ChannelUtils.closeOnFlush(ctx.channel());
                     }
                 }
+                case TMSP.MSG_PING -> {
+                    Optional<AgentContext> ag = agentManager.getAgentContext(frame.getStreamId());
+                    if (ag.isPresent()) {
+                        AgentContext agentContext = ag.get();
+                        logger.debug("收到来自客户端 {} 的PING消息", agentContext.getAgentInfo().getAgentId());
+                        TMSPFrame pong = new TMSPFrame(0, TMSP.MSG_PONG);
+                        Channel control = agentContext.getControl();
+                        control.writeAndFlush(pong);
+                    }
+                }
 
                 //----------------------------------------------------------------------------------------//
                 case TMSP.MSG_STREAM_OPEN_RESP -> {
                     int streamId = frame.getStreamId();
-
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
                     if (streamContext == null) {
                         logger.warn("流上下文不存在 - [streamId={}]", streamId);
@@ -93,7 +124,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 case TMSP.MSG_STREAM_DATA -> {
                     int streamId = frame.getStreamId();
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
-                    if (streamContext!=null){
+                    if (streamContext != null) {
                         streamContext.forwardToRemote(frame.getPayload());
                     }
                 }
@@ -104,13 +135,9 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
                     });
                 }
-                //内网目标服务健康上报
-                case TMSP.MSG_SERVICE_HEALTH_CHANGE -> {
-
-                }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
@@ -128,7 +155,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         logger.error("控制连接异常: ", cause);
         agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
             Channel control = agentContext.getControl();
-           // ChannelUtils.closeOnFlush(control);
+            // ChannelUtils.closeOnFlush(control);
         });
     }
 

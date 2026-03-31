@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.client.transport;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
+import com.xiaoniucode.etp.core.transport.IdleCheckHandler;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import io.netty.bootstrap.Bootstrap;
@@ -14,6 +15,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslHandler;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -23,13 +25,13 @@ public class TunnelConnectionFactory {
 
     /**
      * 创建数据隧道连接
-     * 
+     *
      * @param agentContext Agent 上下文
      * @param config       应用配置
      * @param isEncrypt    是否加密
      * @param callback     连接创建成功后的回调
      */
-    public static void createConnection(AgentContext agentContext, 
+    public static void createConnection(AgentContext agentContext,
                                         AppConfig config,
                                         boolean isEncrypt,
                                         Consumer<Channel> callback) {
@@ -49,6 +51,7 @@ public class TunnelConnectionFactory {
                         }
                         sc.pipeline()
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
+                                .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(90, 60, 0, TimeUnit.SECONDS))
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, agentContext.getControlFrameHandler());
                     }
                 });

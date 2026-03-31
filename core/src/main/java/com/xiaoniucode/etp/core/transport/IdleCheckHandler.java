@@ -1,7 +1,23 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package com.xiaoniucode.etp.core.transport;
 
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -13,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 心跳检查
  *
- * @author liuxin
+ * @author xiaoniucode
  */
 public class IdleCheckHandler extends IdleStateHandler {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(IdleCheckHandler.class);
@@ -24,22 +40,18 @@ public class IdleCheckHandler extends IdleStateHandler {
 
     @Override
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
+        Channel channel = ctx.channel();
         switch (evt.state()) {
             case WRITER_IDLE:
-               ctx.channel().writeAndFlush(new TMSPFrame(0, TMSP.MSG_PING));
-                logger.debug("发送心跳包给 {}", ctx.channel().remoteAddress());
+                channel.writeAndFlush(new TMSPFrame(0, TMSP.MSG_PING));
+                logger.debug("发送心跳包给 {}", channel.remoteAddress());
                 break;
 
             case READER_IDLE:
-                logger.warn("读空闲超时，即将关闭连接 {}", ctx.channel().remoteAddress());
-               //todo ctx.channel().close();
-                break;
-            case ALL_IDLE:
-                logger.debug("读写空闲超时，即将关闭连接 {}", ctx.channel().remoteAddress());
-              //todo  ctx.channel().close();
+                logger.debug("读空闲超时，关闭连接 {}", channel.remoteAddress());
+                channel.close();
                 break;
         }
-
-        super.channelIdle(ctx, evt);
+        ctx.fireUserEventTriggered(evt);
     }
 }

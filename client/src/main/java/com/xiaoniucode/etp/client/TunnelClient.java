@@ -1,17 +1,16 @@
 package com.xiaoniucode.etp.client;
 
-import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
 import com.xiaoniucode.etp.client.manager.AgentIdentity;
 import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
+import com.xiaoniucode.etp.client.transport.ControlIdleCheckHandler;
 import com.xiaoniucode.etp.client.transport.RealServerHandler;
 import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
 import com.xiaoniucode.etp.client.manager.EventBusManager;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentStateMachineBuilder;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.client.transport.connection.DirectPool;
 import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
@@ -39,7 +38,7 @@ public final class TunnelClient implements Lifecycle {
     private EventLoopGroup controlWorkerGroup;
     private EventLoopGroup serverWorkBootstrap;
     private AgentContext agentContext;
-    private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
+
 
     public TunnelClient(AppConfig config) {
         this.config = config;
@@ -51,7 +50,7 @@ public final class TunnelClient implements Lifecycle {
             EventBusManager.register(new ApplicationInitListener());
             EventBusManager.publishAsync(new ApplicationInitEvent(config));
             initializeStateMachine();
-            stateMachine.fireEvent(AgentState.IDLE, AgentEvent.START, agentContext);
+            agentContext.fireEvent(AgentEvent.START);
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -59,10 +58,8 @@ public final class TunnelClient implements Lifecycle {
     }
 
     private void initializeStateMachine() {
-        stateMachine = AgentStateMachineBuilder.getStateMachine();
-        agentContext = new AgentContext(config);
+        agentContext = new AgentContext(config,AgentStateMachineBuilder.getStateMachine());
         agentContext.setTunnelClient(this);
-        agentContext.setStateMachine(stateMachine);
         agentContext.setDirectPool(new DirectPool());
         agentContext.setMultiplexPool(new MultiplexPool());
         agentContext.setAgentIdentity(new AgentIdentity());
@@ -100,9 +97,9 @@ public final class TunnelClient implements Lifecycle {
                             sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
                         }
                         sc.pipeline()
+                                .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER,new ControlIdleCheckHandler(agentContext))
                                 .addLast(loggingHandler)
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
-                                // .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(60, 60, 0, TimeUnit.SECONDS))
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);
                     }
                 });

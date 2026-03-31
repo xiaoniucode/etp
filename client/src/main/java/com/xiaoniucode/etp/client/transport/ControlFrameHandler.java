@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package com.xiaoniucode.etp.client.transport;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
@@ -24,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  *
- * @author liuxin
+ * @author xiaoniucode
  */
 @ChannelHandler.Sharable
 public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> {
@@ -38,13 +53,13 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
         byte msgType = frame.getMsgType();
+        agentContext.updateActiveTime();
         switch (msgType) {
             //********************Agent***********************//
             case TMSP.MSG_AUTH_RESP: {
                 Message.AuthResponse authResponse = ProtobufUtil.parseFrom(frame.getPayload(), Message.AuthResponse.parser());
                 agentContext.setVariable("authResponse", authResponse);
                 agentContext.fireEvent(AgentEvent.AUTH_RESPONSE);
-
                 break;
             }
             case TMSP.MSG_PROXY_CREATE_RESP: {
@@ -57,12 +72,15 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 logger.debug("收到停止信号，准备停止客户端");
                 agentContext.fireEvent(AgentEvent.STOP);
                 break;
-
             }
             case TMSP.MSG_ERROR: {
                 Message.Error error = ProtobufUtil.parseFrom(frame.getPayload(), Message.Error.parser());
                 agentContext.setVariable("ERROR", error);
                 agentContext.fireEvent(AgentEvent.ERROR);
+                break;
+            }
+            case TMSP.MSG_PONG: {
+                logger.debug("收到来自服务端的 PONG 消息");
                 break;
             }
             //********************Tunnel***********************//

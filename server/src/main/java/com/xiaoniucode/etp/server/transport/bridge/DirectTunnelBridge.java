@@ -31,6 +31,7 @@ public class DirectTunnelBridge implements TunnelBridge {
     public void open() {
         ChannelPipeline pipeline = tunnel.pipeline();
         PipelineConfigure.removeControlHandler(tunnel);
+        PipelineConfigure.addDataIdleCheckHandler(tunnel);
         pipeline.addLast(new SimpleChannelInboundHandler<ByteBuf>() {
 
             @Override
