@@ -16,13 +16,11 @@
 
 package com.xiaoniucode.etp.server.transport;
 
-import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
-import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.util.internal.logging.InternalLogger;

@@ -1,0 +1,55 @@
+/*
+ * Copyright 2026 xiaoniucode
+ */
+package com.xiaoniucode.etp.client.statemachine.agent.action;
+
+import com.xiaoniucode.etp.client.config.domain.RetryConfig;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+
+import java.util.concurrent.TimeUnit;
+
+public class RetryConnAction extends AgentBaseAction {
+
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(RetryConnAction.class);
+
+    @Override
+    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {
+        RetryConfig retryConfig = ctx.getConfig().getAuthConfig().getRetry();
+
+        int currentRetry = ctx.getRetryCount().incrementAndGet();
+        if (currentRetry > retryConfig.getMaxRetries()) {
+            logger.error("已达到最大重试次数 {}，停止重连", retryConfig.getMaxRetries());
+            ctx.fireEvent(AgentEvent.STOP);
+            return;
+        }
+
+        long delay = calculateDelay(ctx, retryConfig);
+        logger.warn("连接失败，第 {} 次重连将在 {} 秒后执行...", currentRetry, delay);
+
+        ctx.getControlWorkerGroup().schedule(() -> {
+            logger.debug("开始执行第 {} 次重连", currentRetry);
+            ctx.fireEvent(AgentEvent.RETRY);
+        }, delay, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 指数退避 + 抖动
+     */
+    private long calculateDelay(AgentContext ctx, RetryConfig retryConfig) {
+        int retries = ctx.getRetryCount().get();
+
+        if (retries <= 1) {
+            return retryConfig.getInitialDelay();
+        }
+        // 指数退避
+        long delay = Math.min(1L << (retries - 1), retryConfig.getMaxDelay());
+        // ±30% 随机抖动
+        long jitter = (long) (delay * 0.3 * (Math.random() * 2 - 1));
+
+        return Math.min(delay + jitter, retryConfig.getMaxDelay());
+    }
+}

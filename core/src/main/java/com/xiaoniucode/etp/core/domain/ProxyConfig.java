@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package com.xiaoniucode.etp.core.domain;
 
 import com.xiaoniucode.etp.core.enums.AgentType;
@@ -133,11 +148,7 @@ public class ProxyConfig {
     }
 
     /**
-     * 是否需要负载均衡
-     * 条件:
-     * 1. 有多个target
-     * 2. 没有配置负载均衡时，默认启用轮询
-     * 3. 配置了负载均衡时，按配置的策略
+     * 是否需要使用负载均衡
      */
     public boolean isLoadBalanceNeeded() {
         return targets.size() > 1;

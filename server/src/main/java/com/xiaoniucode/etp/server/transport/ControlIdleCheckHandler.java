@@ -15,7 +15,6 @@
  */
 package com.xiaoniucode.etp.server.transport;
 
-import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;

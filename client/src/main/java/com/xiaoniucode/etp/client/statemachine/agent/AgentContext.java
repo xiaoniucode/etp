@@ -17,6 +17,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -28,13 +30,13 @@ public class AgentContext extends AbstractAgentContext {
     private Bootstrap serverBootstrap;
     private EventLoopGroup controlWorkerGroup;
     private EventLoopGroup serverWorkerGroup;
-    private int retryCount;
     private boolean authenticated;
     private TunnelClient tunnelClient;
     private DirectPool directPool;
     private MultiplexPool multiplexPool;
     private ControlFrameHandler controlFrameHandler;
     private AgentIdentity agentIdentity;
+    private final AtomicInteger retryCount = new AtomicInteger(0);
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
 
     public AgentContext(AppConfig config, StateMachine<AgentState, AgentEvent, AgentContext> stateMachine) {

@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package com.xiaoniucode.etp.client.statemachine.agent;
 
 import com.alibaba.cola.statemachine.StateMachine;
@@ -38,24 +53,23 @@ public class AgentStateMachineBuilder {
         private static StateMachine<AgentState, AgentEvent, AgentContext> build() {
             StateMachineBuilder<AgentState, AgentEvent, AgentContext> builder = StateMachineBuilderFactory.create();
 
-            // 初始化各种动作处理器
+
             CheckConfigAction checkConfigAction = new CheckConfigAction();
             InitSslAction initSslAction = new InitSslAction();
             ConnectAction connectAction = new ConnectAction();
             AuthAction authAction = new AuthAction();
             AuthResponseAction authResponseAction = new AuthResponseAction();
             AuthSuccessAction authSuccessAction = new AuthSuccessAction();
-
             NetworkErrorAction networkErrorAction = new NetworkErrorAction();
-            GoawayAction stopAction = new GoawayAction();
-
+            GoawayAction goawayAction = new GoawayAction();
             CreateConnPoolAction createTunnelPoolAction = new CreateConnPoolAction();
             TunnelCreateRespAction tunnelCreateRespAction = new TunnelCreateRespAction();
             ProxyCreationResponseAction proxyCreationResponseAction = new ProxyCreationResponseAction();
             ErrorAction errorAction = new ErrorAction();
             CreateNewConnAction createNewConnAction = new CreateNewConnAction();
+            DisconnectedAction disconnectedAction = new DisconnectedAction();
+            RetryConnAction retryConnAction = new RetryConnAction();
 
-            // 启动客户端
             builder.externalTransition()
                     .from(AgentState.IDLE)
                     .to(AgentState.CONNECTING)
@@ -91,19 +105,34 @@ public class AgentStateMachineBuilder {
                     .to(AgentState.CONNECTED)
                     .on(AgentEvent.AUTH_SUCCESS)
                     .perform(authSuccessAction);
-
-            // TCP 连接失败 尝试重连
-            builder.internalTransition()
-                    .within(AgentState.CONNECTING)
-                    .on(AgentEvent.CONNECT_FAILURE)
-                    .perform(connectAction);
-
             // 运行中出现网络错误
             builder.externalTransition()
                     .from(AgentState.CONNECTED)
                     .to(AgentState.DISCONNECTED)
                     .on(AgentEvent.NETWORK_ERROR)
                     .perform(networkErrorAction);
+            // 断开连接
+            builder.externalTransition()
+                    .from(AgentState.CONNECTED)
+                    .to(AgentState.DISCONNECTED)
+                    .on(AgentEvent.DISCONNECT)
+                    .perform(disconnectedAction);
+            // 连接断开，尝试重连
+            builder.externalTransitions()
+                    .fromAmong(AgentState.DISCONNECTED)
+                    .to(AgentState.CONNECTING)
+                    .on(AgentEvent.RETRY)
+                    .perform(connectAction);
+            // 连接失败 尝试重连
+            builder.internalTransition()
+                    .within(AgentState.CONNECTING)
+                    .on(AgentEvent.CONNECT_FAILURE)
+                    .perform(retryConnAction);
+            //首次连接失败 尝试重试
+            builder.internalTransition()
+                    .within(AgentState.CONNECTING)
+                    .on(AgentEvent.RETRY)
+                    .perform(connectAction);
 
             // 处理创建隧道池请求
             builder.internalTransition()
@@ -135,13 +164,6 @@ public class AgentStateMachineBuilder {
                     .on(AgentEvent.ERROR)
                     .perform(errorAction);
 
-            // 重连
-            builder.externalTransition()
-                    .from(AgentState.DISCONNECTED)
-                    .to(AgentState.CONNECTING)
-                    .on(AgentEvent.RETRY)
-                    .perform(connectAction);
-
             // 停止客户端
             builder.externalTransitions()
                     .fromAmong(AgentState.IDLE, AgentState.CONNECTING,
@@ -149,7 +171,7 @@ public class AgentStateMachineBuilder {
                             AgentState.FAILED)
                     .to(AgentState.SHUTDOWN)
                     .on(AgentEvent.STOP)
-                    .perform(stopAction);
+                    .perform(goawayAction);
 
             builder.build(MACHINE_ID);
             return StateMachineFactory.get(MACHINE_ID);
