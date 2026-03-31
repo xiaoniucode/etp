@@ -12,15 +12,15 @@ import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 /**
  * 隧道连接创建辅助类
  */
 public class TunnelConnCreateHelper {
 
-    private static final Logger logger = LoggerFactory.getLogger(TunnelConnCreateHelper.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(TunnelConnCreateHelper.class);
 
     /**
      * 创建多路复用隧道并发送创建请求

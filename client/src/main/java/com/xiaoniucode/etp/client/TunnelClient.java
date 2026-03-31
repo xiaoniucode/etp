@@ -25,9 +25,8 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslHandler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 /**
  * 代理客户端服务容器
@@ -35,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author liuxin
  */
 public final class TunnelClient implements Lifecycle {
-    private final static Logger logger = LoggerFactory.getLogger(TunnelClient.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(TunnelClient.class);
     private final AppConfig config;
     private EventLoopGroup controlWorkerGroup;
     private EventLoopGroup serverWorkBootstrap;

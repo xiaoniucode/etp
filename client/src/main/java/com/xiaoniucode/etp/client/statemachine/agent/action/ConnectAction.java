@@ -8,6 +8,8 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 与服务端建立连接
  */
 public class ConnectAction extends AgentBaseAction {
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ConnectAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(ConnectAction.class);
     private final AtomicInteger retryCount = new AtomicInteger(0);
     private AppConfig appConfig;
     private AgentContext agentContext;

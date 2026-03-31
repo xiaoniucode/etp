@@ -7,9 +7,11 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.core.transport.tls.TlsHelper;
 import com.xiaoniucode.etp.core.transport.TlsContextHolder;
 import io.netty.handler.ssl.SslContext;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 public class InitSslAction extends AgentBaseAction {
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(InitSslAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(InitSslAction.class);
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {

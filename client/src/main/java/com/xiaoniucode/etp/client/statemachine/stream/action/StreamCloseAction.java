@@ -9,11 +9,11 @@ import com.xiaoniucode.etp.client.transport.connection.DirectPool;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 public class StreamCloseAction extends StreamBaseAction {
-    private final Logger logger = LoggerFactory.getLogger(StreamCloseAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(StreamCloseAction.class);
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {

@@ -7,11 +7,11 @@ import com.xiaoniucode.etp.client.transport.connection.DirectPool;
 import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 public class TunnelCreateRespAction extends AgentBaseAction {
-    private static final Logger logger = LoggerFactory.getLogger(TunnelCreateRespAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(TunnelCreateRespAction.class);
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext agentContext) {

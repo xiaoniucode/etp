@@ -5,3 +5,6 @@ spring:
     active: dev2
   application:
     name: 订单服务
+logging:
+  level:
+    com.xiaoniucode.etp: debug

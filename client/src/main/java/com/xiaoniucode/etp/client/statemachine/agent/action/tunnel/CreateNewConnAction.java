@@ -6,8 +6,8 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.client.statemachine.agent.action.AgentBaseAction;
 import com.xiaoniucode.etp.client.statemachine.agent.command.CreateConnCommand;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 /**
  * 创建新的连接
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CreateNewConnAction extends AgentBaseAction {
 
-    private static final Logger logger = LoggerFactory.getLogger(CreateNewConnAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(CreateNewConnAction.class);
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {

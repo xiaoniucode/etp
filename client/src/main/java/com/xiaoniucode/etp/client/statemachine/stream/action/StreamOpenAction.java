@@ -16,13 +16,13 @@ import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
 public class StreamOpenAction extends StreamBaseAction {
-    private final Logger logger = LoggerFactory.getLogger(StreamOpenAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(StreamOpenAction.class);
 
     /**
      * 最大重试次数

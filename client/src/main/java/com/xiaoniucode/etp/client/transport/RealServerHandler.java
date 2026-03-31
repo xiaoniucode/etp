@@ -7,8 +7,8 @@ import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.Optional;
 
@@ -17,7 +17,7 @@ import java.util.Optional;
  * @author liuxin
  */
 public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
-    private final Logger logger = LoggerFactory.getLogger(RealServerHandler.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(RealServerHandler.class);
     private final AgentContext agentContext;
 
     public RealServerHandler(AgentContext agentContext) {

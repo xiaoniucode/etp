@@ -15,10 +15,11 @@ import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import org.slf4j.Logger;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 public class AuthAction extends AgentBaseAction {
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AuthAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(AuthAction.class);
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {

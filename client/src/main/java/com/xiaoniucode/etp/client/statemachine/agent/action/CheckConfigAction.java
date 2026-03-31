@@ -6,9 +6,11 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.common.utils.StringUtils;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 public class CheckConfigAction extends AgentBaseAction {
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CheckConfigAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(CheckConfigAction.class);
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {

@@ -10,14 +10,14 @@ import com.xiaoniucode.etp.core.transport.TunnelBridge;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class DirectTunnelBridge implements TunnelBridge {
-    private final Logger logger = LoggerFactory.getLogger(DirectTunnelBridge.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(DirectTunnelBridge.class);
     private final StreamContext streamContext;
     private final Channel tunnel;
     private final Channel server;

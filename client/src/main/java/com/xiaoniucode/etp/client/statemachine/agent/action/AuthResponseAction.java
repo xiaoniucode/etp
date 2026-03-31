@@ -6,10 +6,11 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.message.Message;
-import org.slf4j.Logger;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 public class AuthResponseAction extends AgentBaseAction {
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AuthResponseAction.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(AuthResponseAction.class);
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {

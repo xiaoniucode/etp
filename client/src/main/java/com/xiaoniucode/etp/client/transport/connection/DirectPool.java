@@ -5,10 +5,10 @@ import com.xiaoniucode.etp.core.transport.NettyBatchWriteQueue;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +23,7 @@ public class DirectPool {
     /**
      * 日志记录器
      */
-    private final Logger logger = LoggerFactory.getLogger(DirectPool.class);
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(DirectPool.class);
     
     /**
      * 最大隧道池大小
