@@ -22,6 +22,9 @@ import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.xiaoniucode.etp.client.statemachine.agent.action.*;
 import com.xiaoniucode.etp.client.statemachine.agent.action.AuthAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.AuthResponseAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.ConnectAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.DisconnectedAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.RetryConnAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.tunnel.CreateConnPoolAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.tunnel.CreateNewConnAction;
 

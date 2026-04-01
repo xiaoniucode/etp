@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.store;
 
-import com.xiaoniucode.etp.server.config.domain.AgentInfo;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

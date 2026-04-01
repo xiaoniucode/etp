@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.store;
 
-import com.xiaoniucode.etp.server.config.domain.AgentInfo;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

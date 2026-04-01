@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server;
 
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
+import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.server.Lifecycle;
@@ -8,6 +9,7 @@ import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.transport.tls.TlsHelper;
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.config.domain.TransportConfig;
 import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
 import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
@@ -56,8 +58,11 @@ public class TunnelServer implements Lifecycle {
         try {
             logger.debug("正在启动ETP服务");
             eventBus.publishSync(new TunnelServerStartingEvent());
-            if (config.getTlsConfig().getEnabled()) {
-                tlsContext = TlsHelper.buildSslContext(false, config.getTlsConfig());
+            TransportConfig transportConfig = config.getTransportConfig();
+            TlsConfig tlsConfig = transportConfig.getTlsConfig();
+
+            if (tlsConfig == null || (tlsConfig != null && tlsConfig.isEnabled())) {
+                tlsContext = TlsHelper.buildSslContext(false, tlsConfig, tlsConfig == null);
                 TlsContextHolder.initialize(tlsContext);
             }
             tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
@@ -75,14 +80,14 @@ public class TunnelServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            if (config.getTlsConfig().getEnabled() && tlsContext != null) {
+                            if (tlsContext != null) {
                                 sc.pipeline().addLast(new OptionalSslHandler(tlsContext));
                             }
                             sc.pipeline()
                                     .addLast(loggingHandler)
                                     .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                     .addLast(downloadRateLimitHandler)
-                                    .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER,new ControlIdleCheckHandler(agentManager))
+                                    .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentManager))
                                     .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
                         }
                     });

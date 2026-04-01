@@ -1,7 +1,8 @@
 package com.xiaoniucode.etp.server.security;
 
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.domain.TokenInfo;
+import com.xiaoniucode.etp.server.config.domain.AuthConfig;
+import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.store.TokenStore;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -39,27 +40,31 @@ public class TokenManager {
     private AppConfig appConfig;
     @Autowired
     private TokenStore tokenStore;
+
     @PostConstruct
     public void init() {
-        List<TokenInfo> accessTokens = appConfig.getAccessTokens();
-        if (accessTokens != null && !accessTokens.isEmpty()) {
-            for (TokenInfo tokenInfo : accessTokens) {
-                if (tokenStore.existsByToken(tokenInfo.getToken())) {
-                    logger.warn("Token 令牌已经存在: {}", tokenInfo.getToken());
+        AuthConfig authConfig = appConfig.getAuthConfig();
+        List<TokenConfig> tokens = authConfig.getTokens();
+
+        if (tokens != null && !tokens.isEmpty()) {
+            for (TokenConfig tokenConfig : tokens) {
+                if (tokenStore.existsByToken(tokenConfig.getToken())) {
+                    logger.warn("Token 令牌已经存在: {}", tokenConfig.getToken());
                     continue;
                 }
-                tokenStore.save(tokenInfo);
-                connectionCountMap.putIfAbsent(tokenInfo.getToken(), new AtomicInteger(0));
-                agentIdMap.putIfAbsent(tokenInfo.getToken(), ConcurrentHashMap.newKeySet());
+                tokenStore.save(tokenConfig);
+                connectionCountMap.putIfAbsent(tokenConfig.getToken(), new AtomicInteger(0));
+                agentIdMap.putIfAbsent(tokenConfig.getToken(), ConcurrentHashMap.newKeySet());
 
                 logger.debug("添加访问令牌: {}, 最大设备数: {}, 最大连接数: {}",
-                        tokenInfo.getName(),
-                        tokenInfo.getMaxDevices() == TokenInfo.UNLIMITED_DEVICES ? "无限制" : tokenInfo.getMaxDevices(),
-                        tokenInfo.getMaxConnections() == TokenInfo.UNLIMITED_CONNECTIONS ? "无限制" : tokenInfo.getMaxConnections());
+                        tokenConfig.getName(),
+                        tokenConfig.getMaxDevices() == TokenConfig.UNLIMITED_DEVICES ? "无限制" : tokenConfig.getMaxDevices(),
+                        tokenConfig.getMaxConnections() == TokenConfig.UNLIMITED_CONNECTIONS ? "无限制" : tokenConfig.getMaxConnections());
             }
-            logger.debug("初始化访问令牌完成，共加载 {} 个令牌", accessTokens.size());
+            logger.debug("初始化访问令牌完成，共加载 {} 个令牌", tokens.size());
         }
     }
+
     /**
      * 获取或初始化连接数计数器
      *
@@ -100,7 +105,7 @@ public class TokenManager {
      * @param token 令牌
      * @return 令牌信息
      */
-    public TokenInfo getAccessToken(String token) {
+    public TokenConfig getAccessToken(String token) {
         return tokenStore.getByToken(token);
     }
 
@@ -120,8 +125,8 @@ public class TokenManager {
      * @param token 令牌
      * @return 被移除的令牌信息
      */
-    public Optional<TokenInfo> removeToken(String token) {
-        TokenInfo removedToken = tokenStore.deleteByToken(token);
+    public Optional<TokenConfig> removeToken(String token) {
+        TokenConfig removedToken = tokenStore.deleteByToken(token);
         if (removedToken != null) {
             connectionCountMap.remove(token);
             agentIdMap.remove(token);
@@ -131,17 +136,18 @@ public class TokenManager {
     }
 
     public boolean checkAgentLimit(String token) {
-        TokenInfo tokenInfo = getAccessToken(token);
-        if (tokenInfo == null) {
+        TokenConfig tokenConfig = getAccessToken(token);
+        if (tokenConfig == null) {
             return false;
         }
 
         Set<String> agentIds = getOrInitializeAgentIds(token);
-        if (tokenInfo.getMaxDevices() != TokenInfo.UNLIMITED_DEVICES) {
-            return agentIds.size() < tokenInfo.getMaxDevices();
+        if (tokenConfig.getMaxDevices() != TokenConfig.UNLIMITED_DEVICES) {
+            return agentIds.size() < tokenConfig.getMaxDevices();
         }
         return true;
     }
+
     /**
      * 检查连接数限制
      *
@@ -149,14 +155,14 @@ public class TokenManager {
      * @return 是否允许连接
      */
     public boolean checkConnectionsLimit(String token) {
-        TokenInfo tokenInfo = getAccessToken(token);
-        if (tokenInfo == null) {
+        TokenConfig tokenConfig = getAccessToken(token);
+        if (tokenConfig == null) {
             return false;
         }
-        
+
         AtomicInteger count = getOrInitializeConnectionCount(token);
-        if (tokenInfo.getMaxConnections() != TokenInfo.UNLIMITED_CONNECTIONS) {
-            return count.get() < tokenInfo.getMaxConnections();
+        if (tokenConfig.getMaxConnections() != TokenConfig.UNLIMITED_CONNECTIONS) {
+            return count.get() < tokenConfig.getMaxConnections();
         }
         return true;
     }
@@ -184,6 +190,7 @@ public class TokenManager {
             logger.debug("令牌 {} 连接数减少到: {}", token, newValue);
         }
     }
+
     /**
      * 获取当前连接数
      *

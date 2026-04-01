@@ -3,34 +3,31 @@ server_port = 9527
 
 [auth]
 token = "5E793FAD27AA713D"
-[auth.retry]
+
+[connection]
+[connection.retry]
 initial_delay = 2
 max_delay = 8
 max_retries = 5
-[connection_pool]
-# 是否预创建连接池（默认false）
+
+# 预创建连接池
+[connection.pool]
 enabled = false
 
-# 多路复用隧道配置
-[connection_pool.multiplex]
-# 是否创建明文多路复用隧道
-plain_enabled = true
-# 是否创建加密多路复用隧道（需要tls.enable=true）
-encrypt_enabled = true
+[connection.pool.multiplex]
+plain = true
+encrypted = true
 
-# 独立隧道配置
-[connection_pool.direct]
-# 明文独立隧道数量（默认1）
+[connection.pool.direct]
 plain_count = 1
-# 加密独立隧道数量（默认1，需要tls.enable=true）
 encrypt_count = 2
 
-[multiplex]
-enabled = true #全局开启，可覆盖
-
-[tls]
+[transport]
+[transport.multiplex]
 enabled = true
-test_mode=false
+
+[transport.tls]
+enabled = true
 cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.crt"
 key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.key"
 ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
@@ -127,7 +124,7 @@ protocol = "http"
 custom_domains = ["etp12.domain2.com"]
 targets = [
     { host = "127.0.0.1", port = 3006, weight = 70, name = "web-instance-1" }
-#    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
+    #    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 ]
 #[proxies.bandwidth] #带宽限制
 #limit = "20M" #总带宽限制(可选)
@@ -185,22 +182,19 @@ strategy = "random" # 策略：roundrobin/weight/random/leastconn
 [[proxies]]
 name = "postgre"
 protocol = "tcp"
-remote_port=5433
+remote_port = 5433
 enabled = true
 targets = [
     { host = "127.0.0.1", port = 5432, weight = 70, name = "web-instance-1" },
     { host = "127.0.0.1", port = 5432, weight = 30, name = "web-instance-2" }
 ]
-
-
-
 [[proxies]]
 name = "test"
 protocol = "tcp"
-enabled=true
+enabled = true
 remote_port = 5202
 targets = [
-#    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
+    #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
 ]
 [proxies.transport]
@@ -218,10 +212,10 @@ limit = "1M" #总带宽限制(可选)
 [[proxies]]
 name = "test_mux"
 protocol = "tcp"
-enabled=true
+enabled = true
 remote_port = 5203
 targets = [
-#    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
+    #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
 ]
 [proxies.transport]
@@ -238,7 +232,7 @@ limit = "2M" #总带宽限制(可选)
 [[proxies]]
 name = "test_mux_tls"
 protocol = "tcp"
-enabled=true
+enabled = true
 remote_port = 5204
 targets = [
     #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },

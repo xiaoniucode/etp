@@ -13,19 +13,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.client.statemachine.agent.action;
 
-import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
+package com.xiaoniucode.etp.client.config.domain;
 
-public class DisconnectedAction extends AgentBaseAction {
-    @Override
-    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-         //前置处理
+import lombok.Data;
+@Data
+public class PoolConfig {
+    private MultiplexPoolConfig multiplex = new MultiplexPoolConfig();
+    private DirectPoolConfig direct = new DirectPoolConfig();
 
+    @Data
+    public static class MultiplexPoolConfig {
+        private boolean plain;
+        private boolean encrypt;
+    }
 
-        //重新连接
-        context.fireEvent(AgentEvent.RETRY);
+    @Data
+    public static class DirectPoolConfig {
+        private int plainCount;
+        private int encryptCount;
     }
 }

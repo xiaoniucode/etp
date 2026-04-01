@@ -91,7 +91,7 @@ public final class TunnelClient implements Lifecycle {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
-                        if (Boolean.TRUE.equals(config.getTlsConfig().getEnabled()) && agentContext.getTlsContext() != null) {
+                        if (agentContext.getTlsContext() != null) {
                             SslHandler sslHandler = agentContext.getTlsContext().newHandler(
                                     sc.alloc(), config.getServerAddr(), config.getServerPort());
                             sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
@@ -123,6 +123,6 @@ public final class TunnelClient implements Lifecycle {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        Runtime.getRuntime().halt(0);
+        //Runtime.getRuntime().halt(0);
     }
 }

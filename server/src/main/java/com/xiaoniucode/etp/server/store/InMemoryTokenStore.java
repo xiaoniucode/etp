@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.store;
 
-import com.xiaoniucode.etp.server.config.domain.TokenInfo;
+import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -12,20 +12,20 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class InMemoryTokenStore implements TokenStore {
 
-    private final Map<String, TokenInfo> tokenMap = new ConcurrentHashMap<>();
+    private final Map<String, TokenConfig> tokenMap = new ConcurrentHashMap<>();
 
     @Override
-    public Optional<TokenInfo> findByToken(String token) {
+    public Optional<TokenConfig> findByToken(String token) {
         return Optional.ofNullable(tokenMap.get(token));
     }
 
     @Override
-    public TokenInfo getByToken(String token) {
+    public TokenConfig getByToken(String token) {
         return tokenMap.get(token);
     }
 
     @Override
-    public List<TokenInfo> findAll() {
+    public List<TokenConfig> findAll() {
         return new ArrayList<>(tokenMap.values());
     }
 
@@ -35,13 +35,13 @@ public class InMemoryTokenStore implements TokenStore {
     }
 
     @Override
-    public TokenInfo save(TokenInfo token) {
+    public TokenConfig save(TokenConfig token) {
         tokenMap.put(token.getToken(), token);
         return token;
     }
 
     @Override
-    public TokenInfo deleteByToken(String token) {
+    public TokenConfig deleteByToken(String token) {
        return tokenMap.remove(token);
     }
 }

@@ -1,7 +1,8 @@
 package com.xiaoniucode.etp.client.statemachine.agent.action.tunnel;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
-import com.xiaoniucode.etp.client.config.domain.ConnectionPoolConfig;
+import com.xiaoniucode.etp.client.config.domain.ConnectionConfig;
+import com.xiaoniucode.etp.client.config.domain.PoolConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
@@ -15,15 +16,14 @@ public class CreateConnPoolAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         AppConfig config = context.getConfig();
-        ConnectionPoolConfig connectionPoolConfig = config.getConnectionPoolConfig();
+        ConnectionConfig connectionConfig = config.getConnectionConfig();
         boolean hasTls = context.getTlsContext() != null;
-
-        if (!connectionPoolConfig.isEnabled()) {
+        if (!connectionConfig.isEnabled()) {
             return;
         }
 
         // 创建多路复用隧道
-        ConnectionPoolConfig.MultiplexPoolConfig multiplexPoolConfig = connectionPoolConfig.getMultiplex();
+       PoolConfig.MultiplexPoolConfig multiplexPoolConfig = connectionConfig.getPoolConfig().getMultiplex();
         if (multiplexPoolConfig.isPlain()) {
             TunnelConnCreateHelper.createMultiplexTunnel(context, config, false);
         }
@@ -32,7 +32,7 @@ public class CreateConnPoolAction extends AgentBaseAction {
         }
 
         // 创建独立隧道
-        ConnectionPoolConfig.DirectPoolConfig directPoolConfig = connectionPoolConfig.getDirect();
+       PoolConfig.DirectPoolConfig directPoolConfig = connectionConfig.getPoolConfig().getDirect();
         int plainCount = directPoolConfig.getPlainCount();
         int encryptCount = directPoolConfig.getEncryptCount();
         

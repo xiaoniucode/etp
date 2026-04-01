@@ -10,10 +10,11 @@ public class GoawayAction extends AgentBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(GoawayAction.class);
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {
-        logger.debug("客户端已停止");
+
         //清理资源
 
         //关闭进程
         ctx.getTunnelClient().stop();
+        logger.debug("客户端已停止");
     }
 }

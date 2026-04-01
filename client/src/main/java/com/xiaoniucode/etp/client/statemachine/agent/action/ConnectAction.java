@@ -40,11 +40,12 @@ public class ConnectAction extends AgentBaseAction {
             ChannelFuture channelFuture = controlBootstrap.connect(appConfig.getServerAddr(), appConfig.getServerPort());
             channelFuture.addListener((ChannelFutureListener) f -> {
                 if (f.isSuccess()) {
-                    logger.debug("成功连接到服务器");
+                    logger.debug("成功连接到服务器：{}:{}",appConfig.getServerAddr(),appConfig.getServerPort());
                     ctx.getRetryCount().set(0);
                     ctx.setControl(channelFuture.channel());
                     ctx.fireEvent(AgentEvent.CONNECT_SUCCESS);
                 } else {
+                    logger.error("无法连接到代理服务器：{}:{}",appConfig.getServerAddr(),appConfig.getServerPort());
                     ctx.fireEvent(AgentEvent.CONNECT_FAILURE);
                 }
             });

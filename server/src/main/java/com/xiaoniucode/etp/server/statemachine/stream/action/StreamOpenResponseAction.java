@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.statemachine.stream.action;
 
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
-import com.xiaoniucode.etp.server.config.domain.AgentInfo;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.loadbalance.LeastConnHooks;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.stream.*;

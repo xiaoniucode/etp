@@ -8,28 +8,27 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 public class TlsConfig {
-    private Boolean enabled;
+    private boolean enabled;
     private String certFile;
     private String keyFile;
     private String caFile;
     private String keyPassword;
-    private boolean testMode;
 
-    public TlsConfig(boolean enabled, boolean isTestMode) {
+    public TlsConfig(boolean enabled) {
         this.enabled = enabled;
-        this.testMode=isTestMode;
     }
-    public TlsConfig(Boolean enabled, String certFile, String keyFile, String caFile, String keyPassword, boolean testMode) {
+
+    public TlsConfig(boolean enabled, String certFile, String keyFile, String caFile, String keyPassword) {
         this.enabled = enabled;
         this.certFile = certFile;
         this.keyFile = keyFile;
         this.caFile = caFile;
-        this.keyPassword=keyPassword;
-        this.testMode=testMode;
+        this.keyPassword = keyPassword;
     }
-    
+
     /**
      * 获取客户端认证模式
+     *
      * @return 客户端认证模式
      */
     public ClientAuth getClientAuthMode() {
@@ -39,9 +38,10 @@ public class TlsConfig {
             return ClientAuth.NONE;
         }
     }
-    
+
     /**
      * 是否启用双向认证
+     *
      * @return 是否启用双向认证
      */
     public boolean mTLSEnabled() {

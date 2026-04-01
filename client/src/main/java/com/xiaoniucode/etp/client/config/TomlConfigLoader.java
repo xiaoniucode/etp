@@ -7,6 +7,7 @@ import com.moandjiezana.toml.Toml;
 import com.xiaoniucode.etp.common.config.ConfigSource;
 import com.xiaoniucode.etp.common.config.ConfigSourceType;
 import com.xiaoniucode.etp.core.domain.*;
+import com.xiaoniucode.etp.core.domain.TransportCustomConfig;
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.LoadBalanceStrategy;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
@@ -44,38 +45,86 @@ public class TomlConfigLoader implements ConfigSource {
             validatePort(serverPortValue.intValue());
             builder.serverPort(serverPortValue.intValue());
         }
-        Toml muxTable = root.getTable("multiplex");
-        Boolean globalMuxV = null;
-        if (muxTable != null) {
-            MultiplexConfig muxConfig = new MultiplexConfig();
-            globalMuxV = muxTable.getBoolean("enabled", true);
-            muxConfig.setEnabled(globalMuxV);
-            builder.muxConfig(muxConfig);
+        // 读取传输配置
+        Toml transportTable = root.getTable("transport");
+        TransportConfig globalTransportConfig = new TransportConfig();
+        MultiplexConfig multiplexConfig = new MultiplexConfig(true);
+        globalTransportConfig.setMultiplexConfig(multiplexConfig);
+        TlsConfig tlsConfig = new TlsConfig(true);
+        globalTransportConfig.setTlsConfig(tlsConfig);
+        if (transportTable != null) {
+            // 读取多路复用配置
+            Toml multiplexTable = transportTable.getTable("multiplex");
+            if (multiplexTable != null) {
+                Boolean enabled = multiplexTable.getBoolean("enabled", true);
+                multiplexConfig.setEnabled(enabled);
+                globalTransportConfig.setMultiplexConfig(multiplexConfig);
+            }
+
+            // 读取 TLS 配置
+            Toml tlsTable = transportTable.getTable("tls");
+            if (tlsTable != null) {
+                Boolean enabled = tlsTable.getBoolean("enabled", true);
+                String certFile = tlsTable.getString("cert_file");
+                String keyFile = tlsTable.getString("key_file");
+                String caFile = tlsTable.getString("ca_file");
+                String keyPass = tlsTable.getString("key_pass");
+                tlsConfig = new TlsConfig(enabled, certFile, keyFile, caFile, keyPass);
+                globalTransportConfig.setTlsConfig(tlsConfig);
+            }
+
+            builder.transportConfig(globalTransportConfig);
         }
 
-        // 读取连接池配置
-        Toml connectionPoolTable = root.getTable("connection_pool");
-        if (connectionPoolTable != null) {
-            ConnectionPoolConfig connectionPoolConfig = new ConnectionPoolConfig();
-            connectionPoolConfig.setEnabled(connectionPoolTable.getBoolean("enabled", false));
-            
-            // 读取多路复用连接池配置
-            Toml multiplexPoolTable = connectionPoolTable.getTable("multiplex");
-            if (multiplexPoolTable != null) {
-                ConnectionPoolConfig.MultiplexPoolConfig multiplexPoolConfig = connectionPoolConfig.getMultiplex();
-                multiplexPoolConfig.setPlain(multiplexPoolTable.getBoolean("plain_enabled", false));
-                multiplexPoolConfig.setEncrypt(multiplexPoolTable.getBoolean("encrypt_enabled", false));
+        // 读取连接配置
+        Toml connectionTable = root.getTable("connection");
+        if (connectionTable != null) {
+            ConnectionConfig connectionConfig = new ConnectionConfig();
+
+            // 读取重试配置
+            Toml retryTable = connectionTable.getTable("retry");
+            if (retryTable != null) {
+                RetryConfig retryConfig = new RetryConfig();
+                Long initialDelaySecValue = retryTable.getLong("initial_delay", 0L);
+                Long maxDelaySecValue = retryTable.getLong("max_delay", 0L);
+                Long maxRetriesValue = retryTable.getLong("max_retries", 0L);
+                if (initialDelaySecValue != null) {
+                    retryConfig.setInitialDelay(initialDelaySecValue.intValue());
+                }
+                if (maxDelaySecValue != null) {
+                    retryConfig.setMaxDelay(maxDelaySecValue.intValue());
+                }
+                if (maxRetriesValue != null) {
+                    retryConfig.setMaxRetries(maxRetriesValue.intValue());
+                }
+                connectionConfig.setRetryConfig(retryConfig);
             }
-            
-            // 读取独立连接池配置
-            Toml directPoolTable = connectionPoolTable.getTable("direct");
-            if (directPoolTable != null) {
-                ConnectionPoolConfig.DirectPoolConfig directPoolConfig = connectionPoolConfig.getDirect();
-                directPoolConfig.setPlainCount(directPoolTable.getLong("plain_count", 0L).intValue());
-                directPoolConfig.setEncryptCount(directPoolTable.getLong("encrypt_count", 0L).intValue());
+
+            // 读取连接池配置
+            Toml poolTable = connectionTable.getTable("pool");
+            if (poolTable != null) {
+                PoolConfig poolConfig = new PoolConfig();
+
+                // 读取多路复用连接池配置
+                Toml multiplexPoolTable = poolTable.getTable("multiplex");
+                if (multiplexPoolTable != null) {
+                    PoolConfig.MultiplexPoolConfig multiplexPoolConfig = poolConfig.getMultiplex();
+                    multiplexPoolConfig.setPlain(multiplexPoolTable.getBoolean("plain", false));
+                    multiplexPoolConfig.setEncrypt(multiplexPoolTable.getBoolean("encrypted", false));
+                }
+
+                // 读取独立连接池配置
+                Toml directPoolTable = poolTable.getTable("direct");
+                if (directPoolTable != null) {
+                    PoolConfig.DirectPoolConfig directPoolConfig = poolConfig.getDirect();
+                    directPoolConfig.setPlainCount(directPoolTable.getLong("plain_count", 0L).intValue());
+                    directPoolConfig.setEncryptCount(directPoolTable.getLong("encrypt_count", 0L).intValue());
+                }
+
+                connectionConfig.setPoolConfig(poolConfig);
             }
-            
-            builder.connectionPoolConfig(connectionPoolConfig);
+
+            builder.connectionConfig(connectionConfig);
         }
 
         // 读取认证配置
@@ -84,30 +133,7 @@ public class TomlConfigLoader implements ConfigSource {
             String token = authTable.getString("token", "");
             AuthConfig authConfig = new AuthConfig();
             authConfig.setToken(token.trim());
-            Toml retry = authTable.getTable("retry");
-            if (retry != null) {
-                Long initialDelaySecValue = retry.getLong("initial_delay", 0L);
-                Long maxDelaySecValue = retry.getLong("max_delay", 0L);
-                Long maxRetriesValue = retry.getLong("max_retries", 0L);
-                RetryConfig retryConfig = new RetryConfig();
-                retryConfig.setInitialDelay(initialDelaySecValue.intValue());
-                retryConfig.setMaxDelay(maxDelaySecValue.intValue());
-                retryConfig.setMaxRetries(maxRetriesValue.intValue());
-                authConfig.setRetry(retryConfig);
-            }
             builder.authConfig(authConfig);
-        }
-
-        // 读取 TLS 配置
-        Toml tlsTable = root.getTable("tls");
-        if (tlsTable != null) {
-            Boolean enabled = tlsTable.getBoolean("enabled", false);
-            String certFile = tlsTable.getString("cert_file");
-            String keyFile = tlsTable.getString("key_file");
-            String caFile = tlsTable.getString("ca_file");
-            String keyPass = tlsTable.getString("key_pass");
-            boolean testMode = tlsTable.getBoolean("test_mode", false);
-            builder.tlsConfig(new TlsConfig(enabled, certFile, keyFile, caFile, keyPass, testMode));
         }
 
         // 读取代理配置
@@ -242,26 +268,23 @@ public class TomlConfigLoader implements ConfigSource {
 
                 //传输
                 Toml transport = proxyTable.getTable("transport");
-                TransportConfig transportConfig = new TransportConfig();
-                if (transport != null) {
-                    Boolean muxV = transport.getBoolean("multiplex");
-                    Boolean compressV = transport.getBoolean("compress");
-                    Boolean encryptV = transport.getBoolean("encrypt");
-                    if (compressV != null) {
-                        transportConfig.setCompress(compressV);
-                    }
-                    if (encryptV != null) {
-                        transportConfig.setEncrypt(encryptV);
-                    }
-                    if (muxV != null) {
-                        transportConfig.setMultiplex(muxV);
-                    } else if (globalMuxV != null) {
-                        transportConfig.setMultiplex(globalMuxV);
-                    }
-                } else if (globalMuxV != null) {
-                    transportConfig.setMultiplex(globalMuxV);
+                TransportCustomConfig transportCustomConfig = new TransportCustomConfig();
+
+                if (globalTransportConfig != null) {
+                    transportCustomConfig.setMultiplex(globalTransportConfig.getMultiplexConfig().isEnabled());
                 }
-                proxyConfig.setTransport(transportConfig);
+                if (transport != null) {
+                    Boolean multiplex = transport.getBoolean("multiplex");
+                    Boolean compress = transport.getBoolean("compress", true);
+                    Boolean encrypt = transport.getBoolean("encrypt", true);
+                    if (multiplex != null) {
+                        transportCustomConfig.setMultiplex(multiplex);
+                    }
+                    transportCustomConfig.setCompress(compress);
+                    transportCustomConfig.setEncrypt(encrypt);
+                }
+
+                proxyConfig.setTransport(transportCustomConfig);
             }
             builder.addProxies(proxies);
         }

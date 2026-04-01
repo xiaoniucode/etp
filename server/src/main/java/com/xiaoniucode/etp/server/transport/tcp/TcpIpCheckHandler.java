@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.transport.tcp;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.transport.IpCheckHandler;
-import com.xiaoniucode.etp.server.security.AccessControlManager;
+import com.xiaoniucode.etp.server.security.IpAccessChecker;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -25,8 +25,8 @@ public class TcpIpCheckHandler extends IpCheckHandler {
     private ProxyManager proxyManager;
 
     @Autowired
-    public TcpIpCheckHandler(AccessControlManager accessControlManager) {
-        super(accessControlManager);
+    public TcpIpCheckHandler(IpAccessChecker ipAccessChecker) {
+        super(ipAccessChecker);
     }
 
     @Override

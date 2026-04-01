@@ -14,21 +14,13 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.statemachine.agent.command;
+package com.xiaoniucode.etp.server.config.domain;
 
-import io.netty.channel.Channel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-
-
-@Getter
-@Setter
-@AllArgsConstructor
-public final class TunnelCreateCmd {
-    private final Channel tunnel;
-    private final boolean encrypt;
-    private final boolean multiplex;
-    private final String tunnelId;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+@Data
+public class AuthConfig {
+    private  List<TokenConfig> tokens = new CopyOnWriteArrayList<>();
 }

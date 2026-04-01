@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
-import com.xiaoniucode.etp.server.config.domain.AgentInfo;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.loadbalance.LeastConnHooks;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;

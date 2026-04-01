@@ -2,7 +2,6 @@ package com.xiaoniucode.etp.server.statemachine.agent;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.transport.AbstractAgentContext;
-import com.xiaoniucode.etp.server.config.domain.AgentInfo;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

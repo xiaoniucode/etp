@@ -61,7 +61,7 @@ public class ProxyServiceImpl implements ProxyService {
     public void createTcpProxy(TcpProxyCreateRequest request) {
 
         //检查是否开启了 TLS
-        if (request.getEncrypt() && !appConfig.getTlsConfig().getEnabled()) {
+        if (request.getEncrypt() && !appConfig.getTransportConfig().getTlsConfig().isEnabled()) {
             throw new BizException("不支持隧道加密，未配置加密证书");
         }
         String clientId = request.getClientId();
@@ -109,7 +109,7 @@ public class ProxyServiceImpl implements ProxyService {
     @Transactional(rollbackFor = Exception.class)
     public void createHttpProxy(HttpProxyCreateRequest request) {
         //检查是否开启了 TLS
-        if (request.getEncrypt() && !appConfig.getTlsConfig().getEnabled()) {
+        if (request.getEncrypt() && !appConfig.getTransportConfig().getTlsConfig().isEnabled()) {
             throw new BizException("不支持隧道加密，未配置加密证书");
         }
         String clientId = request.getClientId();

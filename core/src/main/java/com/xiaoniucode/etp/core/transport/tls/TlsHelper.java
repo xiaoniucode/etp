@@ -17,9 +17,8 @@ public class TlsHelper {
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(TlsHelper.class);
 
-    public static SslContext buildSslContext(boolean forClient, TlsConfig tlsConfig) throws IOException, CertificateException {
+    public static SslContext buildSslContext(boolean forClient, TlsConfig tlsConfig,boolean isTestMode) throws IOException, CertificateException {
         SslProvider provider = SslProvider.OPENSSL;
-        boolean isTestMode = tlsConfig.isTestMode();
         if (forClient) {
             if (isTestMode) {
                 return SslContextBuilder

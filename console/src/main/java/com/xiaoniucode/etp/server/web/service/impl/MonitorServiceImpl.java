@@ -40,9 +40,9 @@ public class MonitorServiceImpl implements MonitorService {
         sysConfig.put("serverAddr", config.getServerAddr());
         sysConfig.put("serverPort", config.getServerPort());
         sysConfig.put("httpProxyPort",config.getHttpProxyPort());
-        sysConfig.put("port_range_start", config.getPortRange().getStart());
-        sysConfig.put("port_range_end", config.getPortRange().getEnd());
-        sysConfig.put("tls_enabled", config.getTlsConfig().getEnabled()?"开启":"未开启");
+        sysConfig.put("port_range_start", config.getPortPolicy().getStart());
+        sysConfig.put("port_range_end", config.getPortPolicy().getEnd());
+        sysConfig.put("tls_enabled", config.getTransportConfig().getTlsConfig().isEnabled()?"开启":"未开启");
         sysConfig.put("baseDomains", config.getBaseDomains());
 
         response.put("stats", stats);

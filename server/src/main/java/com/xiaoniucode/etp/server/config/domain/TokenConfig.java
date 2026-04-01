@@ -1,12 +1,24 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package com.xiaoniucode.etp.server.config.domain;
+import lombok.Data;
+import org.springframework.util.StringUtils;
 
-import com.xiaoniucode.etp.common.utils.StringUtils;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class TokenInfo {
+@Data
+public class TokenConfig {
     public static final int UNLIMITED_CLIENTS = -1;
     public static final int UNLIMITED_DEVICES = -1;
     public static final int UNLIMITED_CONNECTIONS = -1;
@@ -18,7 +30,7 @@ public class TokenInfo {
     private Integer maxConnections;
     private Integer deviceTimeout;
 
-    public TokenInfo(String name, String token, Integer maxClients, Integer maxDevices, Integer maxConnections, Integer deviceTimeout) {
+    public TokenConfig(String name, String token, Integer maxClients, Integer maxDevices, Integer maxConnections, Integer deviceTimeout) {
         check(name, token, maxClients, maxDevices, maxConnections, deviceTimeout);
         this.name = name;
         this.token = token;
@@ -30,10 +42,10 @@ public class TokenInfo {
 
     private void check(String name, String token, Integer maxClients, Integer maxDevices, Integer maxConnections, Integer deviceTimeout) {
         if (!StringUtils.hasText(name)) {
-            throw new IllegalArgumentException("AccessToken 名称不能为空");
+            throw new IllegalArgumentException("Token 名称不能为空");
         }
         if (!StringUtils.hasText(token)) {
-            throw new IllegalArgumentException("AccessToken 令牌不能为空");
+            throw new IllegalArgumentException("Token 令牌不能为空");
         }
         // null 或 <= 0 都表示不限制
         if (maxClients == null || maxClients <= 0) {

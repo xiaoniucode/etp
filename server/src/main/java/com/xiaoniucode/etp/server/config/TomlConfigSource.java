@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package com.xiaoniucode.etp.server.config;
 
 import com.xiaoniucode.etp.common.config.ConfigSource;
@@ -35,9 +50,9 @@ public class TomlConfigSource implements ConfigSource {
         parseRoot(builder, root);
         parseLogConfig(builder, root);
         parseDashboard(builder, root);
-        parseTls(builder, root);
-        parsePortRange(builder, root);
-        parseAccessTokens(builder, root);
+        parseTransport(builder, root);
+        parsePortPolicy(builder, root);
+        parseAuth(builder, root);
 
         return builder.build();
     }
@@ -85,13 +100,13 @@ public class TomlConfigSource implements ConfigSource {
                 Boolean reset = dash.getBoolean("reset", false);
 
                 if (!StringUtils.hasText(username)) {
-                    throw new IllegalArgumentException("请配置Dashboard用户名");
+                    throw new IllegalArgumentException("请配置 Dashboard 用户名");
                 }
                 if (!StringUtils.hasText(password)) {
-                    throw new IllegalArgumentException("请配置Dashboard密码");
+                    throw new IllegalArgumentException("请配置 Dashboard 密码");
                 }
 
-                Dashboard dashboard = new Dashboard(
+                DashboardConfig dashboard = new DashboardConfig(
                         true, username, password, addr, port.intValue(), reset
                 );
                 builder.dashboard(dashboard);
@@ -99,45 +114,58 @@ public class TomlConfigSource implements ConfigSource {
         }
     }
 
-    private void parseTls(AppConfig.Builder builder, Toml root) {
-        Toml tlsTable = root.getTable("tls");
+    private void parseTransport(AppConfig.Builder builder, Toml root) {
+        Toml transport = root.getTable("transport");
+        if (transport != null) {
+            TransportConfig transportConfig = new TransportConfig();
+            parseTls(transportConfig, transport);
+            builder.transport(transportConfig);
+        }
+    }
+
+    private void parseTls(TransportConfig transportConfig, Toml transport) {
+        Toml tlsTable = transport.getTable("tls");
         if (tlsTable != null) {
-            Boolean enabled = tlsTable.getBoolean("enabled", false);
+            Boolean enabled = tlsTable.getBoolean("enabled", true);
             String certFile = tlsTable.getString("cert_file");
             String keyFile = tlsTable.getString("key_file");
             String caFile = tlsTable.getString("ca_file");
             String keyPass = tlsTable.getString("key_pass");
-            boolean testMode = tlsTable.getBoolean("test_mode", false);
-            TlsConfig tlsConfig = new TlsConfig(enabled, certFile, keyFile, caFile, keyPass, testMode);
-            builder.tls(tlsConfig);
+            TlsConfig tlsConfig = new TlsConfig(enabled, certFile, keyFile, caFile, keyPass);
+            transportConfig.setTlsConfig(tlsConfig);
         }
     }
 
-    private void parsePortRange(AppConfig.Builder builder, Toml root) {
-        Toml range = root.getTable("port_range");
-        if (range != null) {
-            Long start = range.getLong("start", 1024L);
-            Long end = range.getLong("end", 49151L);
-            PortRange portRange = new PortRange(
+    private void parsePortPolicy(AppConfig.Builder builder, Toml root) {
+        Toml policy = root.getTable("port_policy");
+        if (policy != null) {
+            Long start = policy.getLong("start", 1L);
+            Long end = policy.getLong("end", 65535L);
+            PortPolicyConfig portPolicy = new PortPolicyConfig(
                     start.intValue(), end.intValue()
             );
-            builder.portRange(portRange);
-        } else {
-            PortRange portRange = new PortRange(1, 65535);
-            builder.portRange(portRange);
+            builder.portPolicy(portPolicy);
         }
     }
 
-    private void parseAccessTokens(AppConfig.Builder builder, Toml root) {
-        List<Toml> accessTokenTables = root.getTables("access_tokens");
-        if (accessTokenTables == null) {
+    private void parseAuth(AppConfig.Builder builder, Toml root) {
+        Toml authNode = root.getTable("auth");
+        if (authNode != null) {
+            AuthConfig authConfig = new AuthConfig();
+            parseAuthTokens(authConfig, authNode);
+            builder.authConfig(authConfig);
+        }
+    }
+
+    private void parseAuthTokens(AuthConfig authConfig, Toml authNode) {
+        List<Toml> tokenNodes = authNode.getTables("tokens");
+        if (tokenNodes == null) {
             return;
         }
 
-        List<TokenInfo> accessTokens = new CopyOnWriteArrayList<>();
+        List<TokenConfig> tokenConfigs = new CopyOnWriteArrayList<>();
         Set<String> tokenTemp = new HashSet<>();
-
-        for (Toml tokenTable : accessTokenTables) {
+        for (Toml tokenTable : tokenNodes) {
             String name = tokenTable.getString("name");
             String token = tokenTable.getString("token");
             Long maxClients = tokenTable.getLong("max_clients");
@@ -145,21 +173,20 @@ public class TomlConfigSource implements ConfigSource {
             Long maxConnections = tokenTable.getLong("max_connections");
             Long deviceTimeout = tokenTable.getLong("device_timeout");
             if (tokenTemp.contains(token)) {
-                throw new IllegalArgumentException("AccessToken令牌冲突，不能存在重复的令牌！ " + token);
+                throw new IllegalArgumentException("Token令牌冲突，不能存在重复的令牌！ " + token);
             }
-            TokenInfo accessToken = new TokenInfo(
-                    name, 
-                    token, 
-                    maxClients != null ? maxClients.intValue() : null, 
-                    maxDevices != null ? maxDevices.intValue() : null, 
-                    maxConnections != null ? maxConnections.intValue() : null, 
+            TokenConfig accessToken = new TokenConfig(
+                    name,
+                    token,
+                    maxClients != null ? maxClients.intValue() : null,
+                    maxDevices != null ? maxDevices.intValue() : null,
+                    maxConnections != null ? maxConnections.intValue() : null,
                     deviceTimeout != null ? deviceTimeout.intValue() : null
             );
-            accessTokens.add(accessToken);
+            tokenConfigs.add(accessToken);
             tokenTemp.add(token);
         }
-
-        builder.accessTokens(accessTokens);
+        authConfig.setTokens(tokenConfigs);
     }
 
     @Override

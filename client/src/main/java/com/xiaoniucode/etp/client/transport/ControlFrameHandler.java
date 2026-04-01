@@ -132,7 +132,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     public void channelInactive(ChannelHandlerContext ctx) {
         //如果是控制连接断开，需要进行重连
         if (agentContext.getControl() == ctx.channel()) {
-            logger.debug("控制连接断开");
+            logger.debug("与服务器断开连接");
             agentContext.fireEvent(AgentEvent.DISCONNECT);
         } else {
             logger.error("数据连接断开：channel-{}", ctx.channel().id());

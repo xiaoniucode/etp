@@ -64,18 +64,18 @@ public class StaticConfigSync implements EventListener<TunnelServerBindEvent> {
     }
 
     public void syncSystemSettings() {
-        PortRange range = config.getPortRange();
+        PortPolicyConfig range = config.getPortPolicy();
         // 同步端口范围设置
-        Config portRange = configRepository.findByConfigKey("port_range");
-        if (portRange == null) {
+        Config portPolicy = configRepository.findByConfigKey("port_policy");
+        if (portPolicy == null) {
             Config config = new Config();
             config.setConfigValue(range.getStart() + ":" + range.getEnd());
-            config.setConfigKey("port_range");
+            config.setConfigKey("port_policy");
             configRepository.save(config);
             logger.debug("同步端口范围限制到数据库");
         } else {
             //如果数据库存在配置，采用数据库配置作为配置
-            String value = portRange.getConfigValue();
+            String value = portPolicy.getConfigValue();
             String[] split = value.split(":");
             range.setStart(Integer.parseInt(split[0]));
             range.setEnd(Integer.parseInt(split[1]));
@@ -84,7 +84,7 @@ public class StaticConfigSync implements EventListener<TunnelServerBindEvent> {
     }
 
     public void syncDashboardUser() {
-        Dashboard dashboard = config.getDashboard();
+        DashboardConfig dashboard = config.getDashboard();
         Boolean reset = dashboard.getReset();
         String username = dashboard.getUsername();
         String password = dashboard.getPassword();
@@ -105,14 +105,15 @@ public class StaticConfigSync implements EventListener<TunnelServerBindEvent> {
     }
 
     public void syncAccessTokens() {
-        List<TokenInfo> configTokens = config.getAccessTokens();
+        AuthConfig authConfig = config.getAuthConfig();
+        List<TokenConfig> configTokens = authConfig.getTokens();
         if (configTokens == null || configTokens.isEmpty()) {
             return;
         }
 
         // 提取 token 列表
         List<String> tokenValues = configTokens.stream()
-                .map(TokenInfo::getToken)
+                .map(TokenConfig::getToken)
                 .collect(Collectors.toList());
 
         // 批量查询已存在的 token

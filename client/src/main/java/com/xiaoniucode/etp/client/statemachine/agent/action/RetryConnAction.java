@@ -1,8 +1,21 @@
 /*
- * Copyright 2026 xiaoniucode
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package com.xiaoniucode.etp.client.statemachine.agent.action;
 
+import com.xiaoniucode.etp.client.config.domain.ConnectionConfig;
 import com.xiaoniucode.etp.client.config.domain.RetryConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
@@ -18,11 +31,11 @@ public class RetryConnAction extends AgentBaseAction {
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {
-        RetryConfig retryConfig = ctx.getConfig().getAuthConfig().getRetry();
-
+        ConnectionConfig connectionConfig = ctx.getConfig().getConnectionConfig();
+        RetryConfig retryConfig = connectionConfig.getRetryConfig();
         int currentRetry = ctx.getRetryCount().incrementAndGet();
         if (currentRetry > retryConfig.getMaxRetries()) {
-            logger.error("已达到最大重试次数 {}，停止重连", retryConfig.getMaxRetries());
+            logger.warn("已达到最大重试次数 {}，停止重连", retryConfig.getMaxRetries());
             ctx.fireEvent(AgentEvent.STOP);
             return;
         }
@@ -31,7 +44,7 @@ public class RetryConnAction extends AgentBaseAction {
         logger.warn("连接失败，第 {} 次重连将在 {} 秒后执行...", currentRetry, delay);
 
         ctx.getControlWorkerGroup().schedule(() -> {
-            logger.debug("开始执行第 {} 次重连", currentRetry);
+            logger.info("开始执行第 {} 次重连", currentRetry);
             ctx.fireEvent(AgentEvent.RETRY);
         }, delay, TimeUnit.SECONDS);
     }

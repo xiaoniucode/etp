@@ -13,19 +13,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.client.statemachine.agent.action;
 
-import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
+package com.xiaoniucode.etp.server.statemachine.agent.command;
 
-public class DisconnectedAction extends AgentBaseAction {
-    @Override
-    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-         //前置处理
+import io.netty.channel.Channel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 
-        //重新连接
-        context.fireEvent(AgentEvent.RETRY);
-    }
+
+@Getter
+@Setter
+@AllArgsConstructor
+public final class ConnCreateCmd {
+    private final Channel tunnel;
+    private final boolean encrypt;
+    private final boolean multiplex;
+    private final String tunnelId;
 }

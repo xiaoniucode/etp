@@ -13,19 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.client.statemachine.agent.action;
 
-import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
+package com.xiaoniucode.etp.client.config.domain;
 
-public class DisconnectedAction extends AgentBaseAction {
-    @Override
-    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-         //前置处理
+import com.xiaoniucode.etp.core.domain.TlsConfig;
+import lombok.Data;
 
-
-        //重新连接
-        context.fireEvent(AgentEvent.RETRY);
-    }
+@Data
+public class TransportConfig {
+    private TlsConfig tlsConfig;
+    private MultiplexConfig multiplexConfig;
 }

@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server;
 
 import com.alibaba.cola.statemachine.impl.Debugger;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.domain.Dashboard;
+import com.xiaoniucode.etp.server.config.domain.DashboardConfig;
 import com.xiaoniucode.etp.server.config.ConfigParser;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -20,7 +20,7 @@ public class TunnelServerStartup {
         Debugger.enableDebug();
         System.setProperty("io.netty.leakDetection.level", "PARANOID");
         AppConfig config = ConfigParser.parse(args);
-        Dashboard dashboard = config.getDashboard();
+        DashboardConfig dashboard = config.getDashboard();
         SpringApplicationBuilder builder = new SpringApplicationBuilder(TunnelServerStartup.class);
         if (Boolean.TRUE.equals(dashboard.getEnabled())) {
             builder.properties("spring.main.web-application-type=servlet", "server.port=" + dashboard.getPort());

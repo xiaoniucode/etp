@@ -7,8 +7,4 @@ import lombok.Setter;
 @Setter
 public class AuthConfig {
     private String token;
-    /**
-     * 重试配置
-     */
-    private RetryConfig retry = new RetryConfig();
 }

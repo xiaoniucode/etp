@@ -88,7 +88,7 @@ public class ProxyConfig {
      * 传输配置
      */
     @Setter
-    private TransportConfig transport;
+    private TransportCustomConfig transport;
     /**
      * 健康检查
      */

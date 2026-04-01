@@ -1,11 +1,7 @@
 package com.xiaoniucode.etp.client.config;
 
-import com.xiaoniucode.etp.client.config.domain.AuthConfig;
-import com.xiaoniucode.etp.client.config.domain.ConnectionPoolConfig;
-import com.xiaoniucode.etp.client.config.domain.LogConfig;
-import com.xiaoniucode.etp.client.config.domain.MultiplexConfig;
+import com.xiaoniucode.etp.client.config.domain.*;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.core.enums.AgentType;
 
 import java.util.List;
@@ -15,35 +11,32 @@ public class DefaultAppConfig implements AppConfig {
     private final String serverAddr;
     private final int serverPort;
     private final AuthConfig authConfig;
-    private final TlsConfig tlsConfig;
     private final List<ProxyConfig> proxies;
     private final LogConfig logConfig;
-    private final AgentType clientType;
-    private final MultiplexConfig multiplexConfig;
-    private final ConnectionPoolConfig connectionPoolConfig;
+    private final AgentType agentType;
+    private final TransportConfig transportConfig;
+    private final ConnectionConfig connectionConfig;
 
     private DefaultAppConfig(Builder builder) {
         this.serverAddr = builder.serverAddr;
         this.serverPort = builder.serverPort;
         this.authConfig = builder.authConfig;
-        this.tlsConfig = builder.tlsConfig;
         this.proxies = builder.proxies;
         this.logConfig = builder.logConfig;
-        this.clientType = builder.agentType;
-        this.multiplexConfig = builder.muxConfig;
-        this.connectionPoolConfig = builder.connectionPoolConfig;
+        this.agentType = builder.agentType;
+        this.transportConfig = builder.transportConfig;
+        this.connectionConfig = builder.connectionConfig;
     }
 
     public static class Builder {
         private String serverAddr = "127.0.0.1";
         private int serverPort = 9527;
         private AuthConfig authConfig = new AuthConfig();
-        private TlsConfig tlsConfig = new TlsConfig(true, true);
         private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
         private LogConfig logConfig;
         private AgentType agentType = AgentType.BINARY;
-        private MultiplexConfig muxConfig = new MultiplexConfig(true);
-        private ConnectionPoolConfig connectionPoolConfig = new ConnectionPoolConfig();
+        private TransportConfig transportConfig = new TransportConfig();
+        private ConnectionConfig connectionConfig = new ConnectionConfig();
 
         public Builder serverAddr(String serverAddr) {
             this.serverAddr = serverAddr;
@@ -59,19 +52,13 @@ public class DefaultAppConfig implements AppConfig {
             this.authConfig = authConfig;
             return this;
         }
-
-        public Builder tlsConfig(TlsConfig tlsConfig) {
-            this.tlsConfig = tlsConfig;
+        public Builder transportConfig(TransportConfig transportConfig) {
+            this.transportConfig = transportConfig;
             return this;
         }
 
-        public Builder muxConfig(MultiplexConfig muxConfig) {
-            this.muxConfig = muxConfig;
-            return this;
-        }
-
-        public Builder connectionPoolConfig(ConnectionPoolConfig connectionPoolConfig) {
-            this.connectionPoolConfig = connectionPoolConfig;
+        public Builder connectionConfig(ConnectionConfig connectionConfig) {
+            this.connectionConfig = connectionConfig;
             return this;
         }
 
@@ -119,22 +106,7 @@ public class DefaultAppConfig implements AppConfig {
         return authConfig;
     }
 
-    @Override
-    public MultiplexConfig getMultiplexConfig() {
-        return multiplexConfig;
-    }
-
-    @Override
-    public ConnectionPoolConfig getConnectionPoolConfig() {
-        return connectionPoolConfig;
-    }
-
-    @Override
-    public TlsConfig getTlsConfig() {
-        return tlsConfig;
-    }
-
-    @Override
+      @Override
     public List<ProxyConfig> getProxies() {
         return proxies;
     }
@@ -146,7 +118,17 @@ public class DefaultAppConfig implements AppConfig {
 
     @Override
     public AgentType getAgentType() {
-        return clientType;
+        return agentType;
+    }
+
+    @Override
+    public TransportConfig getTransportConfig() {
+        return transportConfig;
+    }
+
+    @Override
+    public ConnectionConfig getConnectionConfig() {
+        return connectionConfig;
     }
 
     public static Builder builder() {

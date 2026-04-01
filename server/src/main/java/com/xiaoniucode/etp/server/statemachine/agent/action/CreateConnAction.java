@@ -8,23 +8,20 @@ import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
-import com.xiaoniucode.etp.server.statemachine.agent.command.TunnelCreateCmd;
+import com.xiaoniucode.etp.server.statemachine.agent.command.ConnCreateCmd;
 import com.xiaoniucode.etp.server.transport.connection.DirectPool;
 import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelPipeline;
-import io.netty.handler.ssl.SslHandler;
-import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CreateTunnelAction extends AgentBaseAction {
-    private final InternalLogger logger = InternalLoggerFactory.getInstance(CreateTunnelAction.class);
+public class CreateConnAction extends AgentBaseAction {
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(CreateConnAction.class);
     @Autowired
     private DirectPool directPool;
     @Autowired
@@ -33,7 +30,7 @@ public class CreateTunnelAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.debug("开始建立隧道");
-        TunnelCreateCmd cmd = context.getAndRemoveAs("tunnelCreateCmd", TunnelCreateCmd.class);
+        ConnCreateCmd cmd = context.getAndRemoveAs("tunnelCreateCmd", ConnCreateCmd.class);
         Channel tunnel = cmd.getTunnel();
         String tunnelId = cmd.getTunnelId();
         boolean multiplex = cmd.isMultiplex();

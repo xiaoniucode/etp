@@ -13,7 +13,7 @@ import com.xiaoniucode.etp.core.domain.HttpUser;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
-import com.xiaoniucode.etp.core.domain.TransportConfig;
+import com.xiaoniucode.etp.core.domain.TransportCustomConfig;
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import org.slf4j.Logger;
@@ -101,12 +101,12 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
         }
 
         // 配置传输
-        TransportConfig transportConfig = new TransportConfig(
+        TransportCustomConfig transportCustomConfig = new TransportCustomConfig(
                 transport.isMultiplex(),
                 transport.isEncrypt(),
                 transport.isCompress()
         );
-        proxyConfig.setTransport(transportConfig);
+        proxyConfig.setTransport(transportCustomConfig);
 
         // 配置TLS
         TlsConfig tlsConfig = new TlsConfig(

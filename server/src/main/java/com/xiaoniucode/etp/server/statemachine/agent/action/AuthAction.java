@@ -6,8 +6,8 @@ import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
-import com.xiaoniucode.etp.server.config.domain.TokenInfo;
-import com.xiaoniucode.etp.server.config.domain.AgentInfo;
+import com.xiaoniucode.etp.server.config.domain.TokenConfig;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.security.TokenManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
@@ -59,12 +59,12 @@ public class AuthAction extends AgentBaseAction {
             context.fireEvent(AgentEvent.AUTH_FAILURE);
             return;
         }
-        TokenInfo tokenInfo = tokenManager.getAccessToken(token);
+        TokenConfig tokenConfig = tokenManager.getAccessToken(token);
         if (!tokenManager.checkConnectionsLimit(token)) {
-            logger.warn("访问令牌 {} 连接数已达上限 {}", token, tokenInfo.getMaxConnections());
+            logger.warn("访问令牌 {} 连接数已达上限 {}", token, tokenConfig.getMaxConnections());
             Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
                     .setCode(1)
-                    .setMessage("访问令牌 " + token + " 连接数已达上限:" + tokenInfo.getMaxConnections()).build();
+                    .setMessage("访问令牌 " + token + " 连接数已达上限:" + tokenConfig.getMaxConnections()).build();
             sendAuthError(control, authResponse);
             context.fireEvent(AgentEvent.AUTH_FAILURE);
             return;
@@ -75,10 +75,10 @@ public class AuthAction extends AgentBaseAction {
         AgentInfo oldAgentInfo = null;
         if (!StringUtils.hasText(agentId)) {
             if (!tokenManager.checkAgentLimit(token)) {
-                logger.warn("访问令牌 {} 客户端注册数已达上限 {}", token, tokenInfo.getMaxClients());
+                logger.warn("访问令牌 {} 客户端注册数已达上限 {}", token, tokenConfig.getMaxClients());
                 Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
                         .setCode(1)
-                        .setMessage("访问令牌 " + token + " 客户端注册数已达上限:" + tokenInfo.getMaxClients()).build();
+                        .setMessage("访问令牌 " + token + " 客户端注册数已达上限:" + tokenConfig.getMaxClients()).build();
                 sendAuthError(control, authResponse);
                 context.fireEvent(AgentEvent.AUTH_FAILURE);
                 return;

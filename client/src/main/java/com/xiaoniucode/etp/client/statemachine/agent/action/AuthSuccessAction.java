@@ -98,7 +98,7 @@ public class AuthSuccessAction extends AgentBaseAction{
         //传输
         if (config.hasTransport()) {
             Message.Transport.Builder builder = Message.Transport.newBuilder();
-            TransportConfig transport = config.getTransport();
+            TransportCustomConfig transport = config.getTransport();
             Boolean encrypt = transport.getEncrypt();
             Boolean compress = transport.getCompress();
             Boolean mux = transport.getMultiplex();

@@ -2,16 +2,11 @@ package com.xiaoniucode.etp.server.config;
 
 import com.xiaoniucode.etp.common.config.Config;
 import com.xiaoniucode.etp.common.log.LogConfig;
-import com.xiaoniucode.etp.core.domain.TlsConfig;
-import com.xiaoniucode.etp.server.config.domain.Dashboard;
-import com.xiaoniucode.etp.server.config.domain.PortRange;
-import com.xiaoniucode.etp.server.config.domain.TokenInfo;
+import com.xiaoniucode.etp.server.config.domain.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 @Setter
@@ -21,11 +16,11 @@ public class AppConfig implements Config {
     private int httpProxyPort;
     private int httpsProxyPort;
     private LogConfig logConfig;
-    private Dashboard dashboard;
-    private PortRange portRange;
+    private DashboardConfig dashboard;
+    private PortPolicyConfig portPolicy;
     private Set<String> baseDomains;
-    private TlsConfig tlsConfig;
-    private List<TokenInfo> accessTokens;
+    private TransportConfig transportConfig;
+    private AuthConfig authConfig;
 
     private AppConfig(Builder builder) {
         this.serverAddr = builder.serverAddr;
@@ -34,10 +29,10 @@ public class AppConfig implements Config {
         this.httpsProxyPort = builder.httpsProxyPort;
         this.logConfig = builder.logConfig;
         this.dashboard = builder.dashboard;
-        this.portRange = builder.portRange;
+        this.portPolicy = builder.portPolicy;
         this.baseDomains = builder.baseDomains;
-        this.tlsConfig = builder.tls;
-        this.accessTokens = builder.accessTokens;
+        this.transportConfig = builder.transportConfig;
+        this.authConfig = builder.authConfig;
     }
 
     public static class Builder {
@@ -45,12 +40,12 @@ public class AppConfig implements Config {
         private int serverPort = 9527;
         private int httpProxyPort = 80;
         private int httpsProxyPort = 443;
-        private TlsConfig tls=new TlsConfig(true,true);
+        private TransportConfig transportConfig = new TransportConfig();
         private Set<String> baseDomains;
         private LogConfig logConfig;
-        private Dashboard dashboard = new Dashboard(false);
-        private PortRange portRange = new PortRange(1, 65535);
-        private List<TokenInfo> accessTokens = new CopyOnWriteArrayList<>();
+        private DashboardConfig dashboard = new DashboardConfig(false);
+        private PortPolicyConfig portPolicy = new PortPolicyConfig(1, 65535);
+        private AuthConfig authConfig = new AuthConfig();
 
         public Builder serverAddr(String serverAddr) {
             this.serverAddr = serverAddr;
@@ -62,8 +57,8 @@ public class AppConfig implements Config {
             return this;
         }
 
-        public Builder tls(TlsConfig tls) {
-            this.tls = tls;
+        public Builder transport(TransportConfig transportConfig) {
+            this.transportConfig = transportConfig;
             return this;
         }
 
@@ -72,18 +67,18 @@ public class AppConfig implements Config {
             return this;
         }
 
-        public Builder dashboard(Dashboard dashboard) {
+        public Builder dashboard(DashboardConfig dashboard) {
             this.dashboard = dashboard;
             return this;
         }
 
-        public Builder portRange(PortRange portRange) {
-            this.portRange = portRange;
+        public Builder portPolicy(PortPolicyConfig portPolicy) {
+            this.portPolicy = portPolicy;
             return this;
         }
 
-        public Builder accessTokens(List<TokenInfo> accessTokens) {
-            this.accessTokens = accessTokens;
+        public Builder authConfig(AuthConfig authConfig) {
+            this.authConfig = authConfig;
             return this;
         }
 

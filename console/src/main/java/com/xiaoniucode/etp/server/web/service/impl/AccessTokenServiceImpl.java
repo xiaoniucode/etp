@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
-import com.xiaoniucode.etp.server.config.domain.TokenInfo;
+import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.security.TokenManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.accesstoken.convert.AccessTokenConvert;
@@ -78,7 +78,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         existingToken.setName(request.getName());
         existingToken.setMaxClient(request.getMaxClient());
 
-        TokenInfo accessToken = accessTokenManager.getAccessToken(existingToken.getToken());
+        TokenConfig accessToken = accessTokenManager.getAccessToken(existingToken.getToken());
         accessToken.setName(request.getName());
         accessToken.setMaxClients(request.getMaxClient());
 

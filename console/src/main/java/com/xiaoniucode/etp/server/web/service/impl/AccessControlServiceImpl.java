@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
-import com.xiaoniucode.etp.server.security.AccessControlManager;
+import com.xiaoniucode.etp.server.security.IpAccessChecker;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.web.common.BizException;
 import com.xiaoniucode.etp.server.web.controller.accesscontrol.convert.AccessControlConvert;
@@ -34,7 +34,7 @@ public class AccessControlServiceImpl implements AccessControlService {
     private final AccessControlRuleRepository accessControlRuleRepository;
 
     @Autowired
-    private AccessControlManager accessControlManager;
+    private IpAccessChecker ipAccessChecker;
     @Autowired
     private ProxyManager proxyManager;
 

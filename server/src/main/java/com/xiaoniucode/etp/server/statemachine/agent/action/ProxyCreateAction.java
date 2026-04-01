@@ -112,18 +112,18 @@ public class ProxyCreateAction extends AgentBaseAction {
             proxyConfig.setDomainInfo(domainConfig);
         }
         if (proxy.hasTransport()) {
-            TransportConfig transportConfig = new TransportConfig();
+            TransportCustomConfig transportCustomConfig = new TransportCustomConfig();
             Message.Transport transport = proxy.getTransport();
             if (transport.hasMux()) {
-                transportConfig.setMultiplex(transport.getMux());
+                transportCustomConfig.setMultiplex(transport.getMux());
             }
             if (transport.hasCompress()) {
-                transportConfig.setCompress(transport.getCompress());
+                transportCustomConfig.setCompress(transport.getCompress());
             }
             if (transport.hasEncrypt()) {
-                transportConfig.setEncrypt(transport.getEncrypt());
+                transportCustomConfig.setEncrypt(transport.getEncrypt());
             }
-            proxyConfig.setTransport(transportConfig);
+            proxyConfig.setTransport(transportCustomConfig);
         }
 
         if (proxy.hasAccessControl()) {

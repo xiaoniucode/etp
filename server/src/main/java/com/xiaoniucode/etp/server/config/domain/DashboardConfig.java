@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Dashboard {
+public class DashboardConfig {
     private Boolean enabled;
     private String username;
     private String password;
@@ -13,11 +13,11 @@ public class Dashboard {
     private Integer port;
     private Boolean reset;
 
-    public Dashboard(Boolean enabled) {
+    public DashboardConfig(Boolean enabled) {
         this.enabled = enabled;
     }
 
-    public Dashboard(Boolean enabled, String username, String password, String addr, Integer port, Boolean reset) {
+    public DashboardConfig(Boolean enabled, String username, String password, String addr, Integer port, Boolean reset) {
         this.enabled = enabled;
         this.username = username;
         this.password = password;
