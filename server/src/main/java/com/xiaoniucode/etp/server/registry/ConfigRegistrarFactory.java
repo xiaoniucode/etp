@@ -7,16 +7,16 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class ProxyOperationDelegateFactory {
-    private final List<ProxyOperationDelegate> delegates;
+public class ConfigRegistrarFactory {
+    private final List<ConfigRegistrar> registrars;
     
     @Autowired
-    public ProxyOperationDelegateFactory(List<ProxyOperationDelegate> delegates) {
-        this.delegates = delegates;
+    public ConfigRegistrarFactory(List<ConfigRegistrar> registrars) {
+        this.registrars = registrars;
     }
     
-    public ProxyOperationDelegate getDelegate(ProxyConfig config) {
-        return delegates.stream()
+    public ConfigRegistrar getRegistrar(ProxyConfig config) {
+        return registrars.stream()
             .filter(delegate -> delegate.supports(config))
             .findFirst()
             .orElseThrow(() -> new UnsupportedOperationException("不支持的代理类型: " + config.getClass()));

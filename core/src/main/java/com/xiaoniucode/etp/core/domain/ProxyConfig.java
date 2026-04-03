@@ -19,26 +19,30 @@ import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 
 import lombok.*;
+import org.javers.core.metamodel.annotation.DiffIgnore;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 @ToString
+@EqualsAndHashCode
 public class ProxyConfig {
     @Setter
-    private String clientId;
+    private String agentId;
     @Setter
-    private AgentType clientType;
+    private AgentType agentType;
     /**
      * 代理ID 唯一标识
      */
     @Setter
+    @DiffIgnore
     private String proxyId;
     /**
      * 代理名称
      */
     @Setter
+    @DiffIgnore
     private String name;
     /**
      * 协议类型
@@ -50,6 +54,12 @@ public class ProxyConfig {
      */
     @Setter
     private Integer remotePort;
+    /**
+     * 如果 remotePort 未指定则自动生成，listenPort为实际端口
+     */
+    @DiffIgnore
+    @Setter
+    private Integer listenPort;
     /**
      * 代理目标服务
      */
@@ -63,7 +73,7 @@ public class ProxyConfig {
      * HTTP(s) 域名配置
      */
     @Setter
-    private DomainConfig domainInfo;
+    private RouteConfig routeConfig;
     /**
      * IP 防火墙
      */

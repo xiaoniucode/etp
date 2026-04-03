@@ -2,16 +2,16 @@ package com.xiaoniucode.etp.server.configuration;
 
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.PortPolicyConfig;
-import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
 import com.xiaoniucode.etp.server.port.PortManager;
+import com.xiaoniucode.etp.server.registry.ConfigChangeDetector;
+import com.xiaoniucode.etp.server.store.DomainStore;
+import com.xiaoniucode.etp.server.vhost.DefaultDomainManager;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
 import com.xiaoniucode.etp.server.vhost.DomainManager;
-import com.xiaoniucode.etp.server.vhost.DomainGenerationStrategy;
 import com.xiaoniucode.etp.server.registry.DefaultProxyManager;
-import com.xiaoniucode.etp.server.registry.ProxyConfigListener;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
-import com.xiaoniucode.etp.server.registry.ProxyOperationDelegateFactory;
+import com.xiaoniucode.etp.server.registry.ConfigRegistrarFactory;
 import com.xiaoniucode.etp.server.store.ProxyStore;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
@@ -25,18 +25,12 @@ public class ManagerConfiguration {
     private AppConfig config;
 
     @Bean
-    public ProxyManager proxyManager(ProxyOperationDelegateFactory proxyRegisterDelegateFactory,
-                                     List<ProxyConfigListener> allCallbacks,
-                                     ProxyStore proxyStore,
-                                     UUIDGenerator uuidGenerator) {
-        return new DefaultProxyManager(allCallbacks,
-                proxyStore,
-                uuidGenerator,
-                proxyRegisterDelegateFactory);
+    public ProxyManager proxyManager(ConfigRegistrarFactory configRegistrarFactory, DomainStore domainStore, ConfigChangeDetector configChangeDetector, ProxyStore proxyStore) {
+        return new DefaultProxyManager(proxyStore, domainStore, configChangeDetector, configRegistrarFactory);
     }
 
     @Bean
-    public PortAcceptor portListenerManager() {
+    public PortAcceptor portAcceptor() {
         return new PortAcceptor();
     }
 
@@ -47,7 +41,12 @@ public class ManagerConfiguration {
     }
 
     @Bean
-    public DomainGenerator domainGenerator(DomainManager domainManager, List<DomainGenerationStrategy> strategies) {
-        return new DomainGenerator(config.getBaseDomains(), domainManager, strategies);
+    public DomainManager domainManager(DomainGenerator domainGenerator, DomainStore domainStore) {
+        return new DefaultDomainManager(domainGenerator, domainStore);
+    }
+
+    @Bean
+    public DomainGenerator domainGenerator() {
+        return new DomainGenerator(config.getBaseDomain());
     }
 }

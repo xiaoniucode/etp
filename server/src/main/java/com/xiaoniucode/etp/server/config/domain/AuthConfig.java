@@ -17,10 +17,12 @@
 package com.xiaoniucode.etp.server.config.domain;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 @Data
+@EqualsAndHashCode
 public class AuthConfig {
     private  List<TokenConfig> tokens = new CopyOnWriteArrayList<>();
 }

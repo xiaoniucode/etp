@@ -143,24 +143,21 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        logger.debug("控制隧道断开");
         agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
-            Channel control = agentContext.getControl();
-            ChannelUtils.closeOnFlush(control);
+            logger.debug("与客户端断开连接");
+            agentContext.fireEvent(AgentEvent.DISCONNECT);
         });
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error("控制连接异常: ", cause);
         agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
-            Channel control = agentContext.getControl();
-            // ChannelUtils.closeOnFlush(control);
+            logger.error("控制连接异常: ", cause);
         });
     }
 
     @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) {
         Channel tunnel = ctx.channel();
         boolean writable = tunnel.isWritable();
         logger.warn("控制隧道可写性变化：{}", writable);

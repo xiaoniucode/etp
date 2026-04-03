@@ -14,25 +14,16 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.client.config.domain;
+package com.xiaoniucode.etp.server.vhost;
 
+import com.xiaoniucode.etp.core.enums.DomainType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-public class PoolConfig {
-    private MultiplexPoolConfig multiplex = new MultiplexPoolConfig();
-    private DirectPoolConfig direct = new DirectPoolConfig();
-
-    @Data
-    public static class MultiplexPoolConfig {
-        private boolean plain;
-        private boolean encrypt;
-    }
-
-    @Data
-    public static class DirectPoolConfig {
-        private int plainCount;
-        private int encryptCount;
-    }
+@AllArgsConstructor
+public class DomainBinding {
+    private String proxyId;
+    private String domain;
+    private DomainType domainType;
 }

@@ -15,9 +15,11 @@
  */
 package com.xiaoniucode.etp.server.config.domain;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.util.StringUtils;
 
 @Data
+@EqualsAndHashCode
 public class TokenConfig {
     public static final int UNLIMITED_CLIENTS = -1;
     public static final int UNLIMITED_DEVICES = -1;

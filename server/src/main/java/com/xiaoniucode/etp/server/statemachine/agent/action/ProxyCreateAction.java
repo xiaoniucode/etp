@@ -13,6 +13,8 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentConstants;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.server.vhost.DomainBinding;
+import com.xiaoniucode.etp.server.vhost.DomainManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -32,6 +34,8 @@ public class ProxyCreateAction extends AgentBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(ProxyCreateAction.class);
     @Autowired
     private ProxyManager proxyManager;
+    @Autowired
+    private DomainManager domainManager;
     @Resource
     private AppConfig appConfig;
 
@@ -41,11 +45,11 @@ public class ProxyCreateAction extends AgentBaseAction {
         Channel control = context.getControl();
         try {
             Message.NewProxy proxy = context.getAndRemoveAs(AgentConstants.NEWA_PROXY, Message.NewProxy.class);
-            String clientId = context.getAgentInfo().getAgentId();
+            String agentId = context.getAgentInfo().getAgentId();
             ProxyConfig config = buildProxyConfig(proxy);
             logger.debug("{}", config);
-            config.setClientId(clientId);
-            config.setClientType(context.getAgentInfo().getAgentType());
+            config.setAgentId(agentId);
+            config.setAgentType(context.getAgentInfo().getAgentType());
 
             ProxyConfig register = proxyManager.register(config);
             Message.NewProxyResp newProxyResp = buildResponse(register);
@@ -97,19 +101,19 @@ public class ProxyCreateAction extends AgentBaseAction {
         }
         if (proxy.hasDomain()) {
             Message.DomainInfo domainInfo = proxy.getDomain();
-            DomainConfig domainConfig = new DomainConfig();
+            RouteConfig routeConfig = new RouteConfig();
             if (domainInfo.hasAutoDomain()) {
-                domainConfig.setAutoDomain(domainInfo.getAutoDomain());
+                routeConfig.setAutoDomain(domainInfo.getAutoDomain());
             }
             ProtocolStringList customDomainsList = domainInfo.getCustomDomainsList();
             if (!customDomainsList.isEmpty()) {
-                domainConfig.getCustomDomains().addAll(customDomainsList);
+                routeConfig.getCustomDomains().addAll(customDomainsList);
             }
             ProtocolStringList subDomainsList = domainInfo.getSubDomainsList();
             if (!subDomainsList.isEmpty()) {
-                domainConfig.getSubDomains().addAll(subDomainsList);
+                routeConfig.getSubDomains().addAll(subDomainsList);
             }
-            proxyConfig.setDomainInfo(domainConfig);
+            proxyConfig.setRouteConfig(routeConfig);
         }
         if (proxy.hasTransport()) {
             TransportCustomConfig transportCustomConfig = new TransportCustomConfig();
@@ -176,13 +180,12 @@ public class ProxyCreateAction extends AgentBaseAction {
         ProtocolType protocol = config.getProtocol();
         StringBuilder remoteAddr = new StringBuilder();
         if (protocol.isHttp()) {
-            DomainConfig domainInfo = config.getDomainInfo();
-            if (domainInfo != null) {
-                Set<String> domains = domainInfo.getFullDomains();
+            List<DomainBinding> domains = domainManager.getBoundDomains(config.getProxyId());
+            if (domains != null) {
                 if (ProtocolType.isHttp(protocol)) {
                     int httpProxyPort = appConfig.getHttpProxyPort();
-                    for (String domain : domains) {
-                        remoteAddr.append("http://").append(domain);
+                    for (DomainBinding domain : domains) {
+                        remoteAddr.append("http://").append(domain.getDomain());
                         if (httpProxyPort != 80) {
                             remoteAddr.append(":").append(httpProxyPort);
                         }
@@ -193,8 +196,8 @@ public class ProxyCreateAction extends AgentBaseAction {
 
         } else if (protocol.isTcp()) {
             String serverAddr = appConfig.getServerAddr();
-            Integer remotePort = config.getRemotePort();
-            remoteAddr.append(serverAddr).append(":").append(remotePort);
+            Integer listenPort = config.getListenPort();
+            remoteAddr.append(serverAddr).append(":").append(listenPort);
         }
         return Message.NewProxyResp.newBuilder()
                 .setProxyId(config.getProxyId())

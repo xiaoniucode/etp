@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.core.domain;
 
 import com.xiaoniucode.etp.core.enums.DomainType;
-import com.xiaoniucode.etp.core.enums.ProtocolType;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,7 +12,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Getter
 @Setter
 @ToString
-public class DomainConfig {
+@EqualsAndHashCode
+public class RouteConfig {
     /**
      * 任意自定义域名
      */
@@ -21,19 +22,11 @@ public class DomainConfig {
      * 根据基础域名生成子域名
      */
     private final Set<String> subDomains = new CopyOnWriteArraySet<>();
-    /**
-     * 最终完整域名列表
-     */
-    private final Set<String> fullDomains = new CopyOnWriteArraySet<>();
+
     /**
      * 是否自动生成域名
      */
     private Boolean autoDomain;
-
-    public void setFullDomains(Set<String>domains){
-        this.fullDomains.clear();
-        this.fullDomains.addAll(domains);
-    }
     /**
      * 是否有自定义域名
      */
@@ -46,13 +39,6 @@ public class DomainConfig {
      */
     public boolean hasSubDomains() {
         return !subDomains.isEmpty();
-    }
-
-    /**
-     * 是否有完整域名
-     */
-    public boolean hasFullDomains() {
-        return !fullDomains.isEmpty();
     }
 
     /**

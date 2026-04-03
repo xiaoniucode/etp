@@ -14,25 +14,23 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.client.config.domain;
+package com.xiaoniucode.etp.server.store;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.xiaoniucode.etp.server.vhost.DomainBinding;
 
-@Data
-public class PoolConfig {
-    private MultiplexPoolConfig multiplex = new MultiplexPoolConfig();
-    private DirectPoolConfig direct = new DirectPoolConfig();
+import java.util.List;
+import java.util.Optional;
 
-    @Data
-    public static class MultiplexPoolConfig {
-        private boolean plain;
-        private boolean encrypt;
-    }
+public interface DomainStore {
+    boolean isOccupied(String domain);
 
-    @Data
-    public static class DirectPoolConfig {
-        private int plainCount;
-        private int encryptCount;
-    }
+    void save(DomainBinding domainBinding);
+
+    Optional<DomainBinding> findByDomain(String domain);
+
+    List<DomainBinding> findByProxyId(String proxyId);
+
+    void delete(String proxyId);
+
+    void delete(String proxyId, String domain);
 }

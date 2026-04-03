@@ -19,7 +19,7 @@ import io.netty.channel.Channel;
 import java.util.List;
 import java.util.Set;
 
-public class AuthSuccessAction extends AgentBaseAction{
+public class AuthSuccessAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         AppConfig configs = ConfigUtils.getConfig();
@@ -34,6 +34,7 @@ public class AuthSuccessAction extends AgentBaseAction{
         control.flush();
         context.fireEvent(AgentEvent.CREATE_TUNNEL_POOL);
     }
+
     private static Message.NewProxy buildNewProxy(ProxyConfig config) {
         ProtocolType protocol = config.getProtocol();
         Message.NewProxy.Builder newProxyBuilder = Message.NewProxy.newBuilder();
@@ -61,12 +62,12 @@ public class AuthSuccessAction extends AgentBaseAction{
 
         switch (protocol) {
             case TCP:
-                if (config.hasRemotePort()) {
+                if (config.getRemotePort()!=null){
                     newProxyBuilder.setRemotePort(config.getRemotePort());
                 }
                 break;
             case HTTP:
-                DomainConfig domainInfo = config.getDomainInfo();
+                RouteConfig domainInfo = config.getRouteConfig();
                 if (domainInfo != null) {
 
                     Set<String> customDomains = domainInfo.getCustomDomains();

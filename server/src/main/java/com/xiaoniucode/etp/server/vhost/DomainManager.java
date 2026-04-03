@@ -1,135 +1,45 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package com.xiaoniucode.etp.server.vhost;
 
-import io.netty.util.internal.logging.InternalLogger;
-import io.netty.util.internal.logging.InternalLoggerFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import com.xiaoniucode.etp.core.domain.RouteConfig;
+import com.xiaoniucode.etp.core.enums.DomainType;
+import com.xiaoniucode.etp.server.exceptions.EtpException;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.Optional;
 
-/**
- * 域名管理器
- */
-@Component
-public class DomainManager {
-    private final InternalLogger logger = InternalLoggerFactory.getInstance(DomainManager.class);
-    /**
-     * proxyId --> DomainInfo
-     */
-    private final Map<String, Set<DomainInfo>> proxyToDomains = new ConcurrentHashMap<>();
-    /**
-     * DomainInfo --> proxyId
-     */
-    private final Map<DomainInfo, String> domainInfoToProxyId = new ConcurrentHashMap<>();
-    /**
-     * Query
-     * domain string --> ProxyId
-     */
-    private final Map<String, String> domainToProxyId = new ConcurrentHashMap<>();
-    /**
-     * Query
-     * domain --> DomainInfo
-     */
-    private final Map<String, DomainInfo> domainToDomainInfo = new ConcurrentHashMap<>();
+public interface DomainManager {
 
-    /**
-     * 添加域名
-     *
-     * @param proxyId    代理ID
-     * @param domainInfo 域名
-     * @return 如果添加成功返回该域名信息
-     */
-    public DomainInfo addDomain(String proxyId, DomainInfo domainInfo) {
-        if (proxyId == null || domainInfo == null) return null;
+    List<DomainBinding> register(String proxyId, RouteConfig routeConfig) throws EtpException;
 
-        String existingProxy = domainInfoToProxyId.get(domainInfo);
-        if (existingProxy != null && !existingProxy.equals(proxyId)) {
-            logger.warn("域名已被占用: {}", domainInfo);
-            return null;
-        }
-        domainInfoToProxyId.put(domainInfo, proxyId);
-        domainToProxyId.put(domainInfo.getFullDomain(), proxyId);
-        domainToDomainInfo.put(domainInfo.getFullDomain(), domainInfo);
-        proxyToDomains.computeIfAbsent(proxyId, k -> ConcurrentHashMap.newKeySet()).add(domainInfo);
-        return domainInfo;
-    }
+    DomainBinding register(String proxyId, String domain, DomainType domainType) throws EtpException;
 
-    public Set<DomainInfo> addDomains(String proxyId, Set<DomainInfo> domainInfos) {
-        Set<DomainInfo> d = new HashSet<>();
-        if (proxyId == null || domainInfos == null) return d;
+    void unregister(String proxyId, String domain);
 
-        for (DomainInfo domain : domainInfos) {
-            if (addDomain(proxyId, domain) != null) {
-                d.add(domain);
-            }
-        }
-        return d;
-    }
+    void unregister(String proxyId, List<String> domains);
 
-    public void removeDomain(String proxyId, DomainInfo domainInfo) {
-        if (proxyId == null || domainInfo == null) return;
+    void unregister(String proxyId);
 
-        String owner = domainInfoToProxyId.get(domainInfo);
-        if (owner == null || !owner.equals(proxyId)) return;
+    List<DomainBinding> getBoundDomains(String proxyId);
 
-        String fullDomain = domainInfo.getFullDomain();
-        domainToProxyId.remove(fullDomain);
-        domainToDomainInfo.remove(fullDomain);
+    Optional<DomainBinding> getDomainBinding(String domain);
 
-        domainInfoToProxyId.remove(domainInfo);
-        Set<DomainInfo> domainsSet = proxyToDomains.get(proxyId);
-        if (domainsSet != null) {
-            domainsSet.remove(domainInfo);
-            if (domainsSet.isEmpty()) {
-                proxyToDomains.remove(proxyId);
-            }
-        }
-    }
+    DomainBinding match(String domain);
 
-    public void clearDomain(String proxyId) {
-        if (proxyId == null) return;
-
-        Set<DomainInfo> domains = proxyToDomains.remove(proxyId);
-        if (domains != null) {
-            for (DomainInfo domainInfo : domains) {
-                domainInfoToProxyId.remove(domainInfo);
-                domainToProxyId.remove(domainInfo.getFullDomain());
-                domainToDomainInfo.remove(domainInfo.getFullDomain());
-            }
-        }
-    }
-
-    public boolean exists(DomainInfo domainInfo) {
-        return domainInfo != null && domainInfoToProxyId.containsKey(domainInfo);
-    }
-
-    public DomainInfo getDomainInfo(String domain) {
-        if (!StringUtils.hasText(domain)) return null;
-        return domainToDomainInfo.get(domain);
-    }
-
-    public boolean exists(String domain) {
-        return domainToDomainInfo.containsKey(domain);
-    }
-
-    public Set<DomainInfo> getDomains(String proxyId) {
-        if (proxyId == null) return Collections.emptySet();
-        Set<DomainInfo> domains = proxyToDomains.get(proxyId);
-        return domains != null ? Collections.unmodifiableSet(domains) : Collections.emptySet();
-    }
-
-    public String getProxyId(DomainInfo domainInfo) {
-        return domainInfo != null ? domainInfoToProxyId.get(domainInfo) : null;
-    }
-
-    public String getProxyId(String domain) {
-        if (domain == null) {
-            return null;
-        }
-        return domainToProxyId.get(domain);
-    }
+    boolean exist(String domain);
 }

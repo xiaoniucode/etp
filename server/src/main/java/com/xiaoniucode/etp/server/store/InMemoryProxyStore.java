@@ -23,10 +23,6 @@ public class InMemoryProxyStore implements ProxyStore {
      */
     private final Map<String, Map<String, ProxyConfig>> clientProxyNameIndex = new ConcurrentHashMap<>();
     /**
-     * domain --> config
-     */
-    private final Map<String, ProxyConfig> domainToConfigIndex = new ConcurrentHashMap<>();
-    /**
      * port --> config
      */
     private final Map<Integer, ProxyConfig> portToConfigIndex = new ConcurrentHashMap<>();
@@ -37,19 +33,21 @@ public class InMemoryProxyStore implements ProxyStore {
         if (existing != null) {
             return existing;
         }
-        String clientId = config.getClientId();
+        String clientId = config.getAgentId();
         clientProxyIndex.computeIfAbsent(clientId, k -> new ConcurrentHashMap<>()).put(config.getProxyId(), config);
-        if (config.isHttp() && config.getDomainInfo() != null && config.getDomainInfo().hasFullDomains()) {
-            for (String domain : config.getDomainInfo().getFullDomains()) {
-                domainToConfigIndex.put(domain, config);
-            }
-        }
 
-        if (config.isTcp() && config.getRemotePort() != null) {
-            portToConfigIndex.put(config.getRemotePort(), config);
+        if (config.isTcp() && config.getListenPort() != null) {
+            portToConfigIndex.put(config.getListenPort(), config);
         }
         clientProxyNameIndex.computeIfAbsent(clientId, k -> new ConcurrentHashMap<>()).put(config.getName(), config);
         return config;
+    }
+
+    @Override
+    public boolean replace(ProxyConfig proxyConfig) {
+        deleteById(proxyConfig.getProxyId());
+        add(proxyConfig);
+        return true;
     }
 
     @Override
@@ -64,11 +62,6 @@ public class InMemoryProxyStore implements ProxyStore {
             return List.of();
         }
         return new ArrayList<>(clientProxies.values());
-    }
-
-    @Override
-    public ProxyConfig findByDomain(String domain) {
-        return domainToConfigIndex.get(domain);
     }
 
     @Override
@@ -109,30 +102,24 @@ public class InMemoryProxyStore implements ProxyStore {
         if (config == null) {
             return;
         }
-        if (config.getClientId() != null) {
-            Map<String, ProxyConfig> clientProxies = clientProxyIndex.get(config.getClientId());
+        if (config.getAgentId() != null) {
+            Map<String, ProxyConfig> clientProxies = clientProxyIndex.get(config.getAgentId());
             if (clientProxies != null) {
                 clientProxies.remove(proxyId);
                 if (clientProxies.isEmpty()) {
-                    clientProxyIndex.remove(config.getClientId());
+                    clientProxyIndex.remove(config.getAgentId());
                 }
             }
-            Map<String, ProxyConfig> clientProxyNameMap = clientProxyNameIndex.get(config.getClientId());
+            Map<String, ProxyConfig> clientProxyNameMap = clientProxyNameIndex.get(config.getAgentId());
             if (clientProxyNameMap != null) {
                 clientProxyNameMap.remove(proxyId);
                 if (clientProxyNameMap.isEmpty()) {
-                    clientProxyNameIndex.remove(config.getClientId());
+                    clientProxyNameIndex.remove(config.getAgentId());
                 }
             }
         }
-        if (config.isHttp() && config.getDomainInfo() != null && config.getDomainInfo().hasFullDomains()) {
-            for (String domain : config.getDomainInfo().getFullDomains()) {
-                domainToConfigIndex.remove(domain);
-            }
-        }
-
-        if (config.isTcp() && config.getRemotePort() != null) {
-            portToConfigIndex.remove(config.getRemotePort());
+        if (config.isTcp() && config.getListenPort() != null) {
+            portToConfigIndex.remove(config.getListenPort());
         }
     }
 
@@ -144,14 +131,8 @@ public class InMemoryProxyStore implements ProxyStore {
         }
         for (ProxyConfig config : clientProxies.values()) {
             proxyStore.remove(config.getProxyId());
-            if (config.isHttp() && config.getDomainInfo() != null && config.getDomainInfo().hasFullDomains()) {
-                for (String domain : config.getDomainInfo().getFullDomains()) {
-                    domainToConfigIndex.remove(domain);
-                }
-            }
-
-            if (config.isTcp() && config.getRemotePort() != null) {
-                portToConfigIndex.remove(config.getRemotePort());
+            if (config.isTcp() && config.getListenPort() != null) {
+                portToConfigIndex.remove(config.getListenPort());
             }
         }
         clientProxyNameIndex.remove(clientId);
@@ -163,8 +144,8 @@ public class InMemoryProxyStore implements ProxyStore {
     }
 
     @Override
-    public ProxyConfig findByClientIdAndName(String clientId, String proxyName) {
-        Map<String, ProxyConfig> clientProxyMap = clientProxyNameIndex.get(clientId);
+    public ProxyConfig findByClientIdAndName(String agentId, String proxyName) {
+        Map<String, ProxyConfig> clientProxyMap = clientProxyNameIndex.get(agentId);
         if (clientProxyMap != null) {
             return clientProxyMap.get(proxyName);
         }

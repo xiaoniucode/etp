@@ -121,7 +121,7 @@ ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 [[proxies]]
 name = "web22"
 protocol = "http"
-custom_domains = ["etp12.domain2.com"]
+custom_domains = ["etp11.domain2.com"]
 targets = [
     { host = "127.0.0.1", port = 3006, weight = 70, name = "web-instance-1" }
     #    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
@@ -167,6 +167,7 @@ strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 limit = "128k" #总带宽限制(可选)
 limit_in = "64k" #入口带宽限制(可选)
 limit_out = "64k" #出口带宽限制(可选)
+
 [[proxies]]
 name = "redis"
 protocol = "tcp"
@@ -182,7 +183,7 @@ strategy = "random" # 策略：roundrobin/weight/random/leastconn
 [[proxies]]
 name = "postgre"
 protocol = "tcp"
-remote_port = 5433
+remote_port = 5432
 enabled = true
 targets = [
     { host = "127.0.0.1", port = 5432, weight = 70, name = "web-instance-1" },
@@ -204,7 +205,7 @@ encrypt = true
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 [proxies.bandwidth] #带宽限制
-limit = "1M" #总带宽限制(可选)
+limit = "2M" #总带宽限制(可选)
 #limit_in = "10M" #入口带宽限制(可选)
 #limit_out = "10M" #出口带宽限制(可选)
 
@@ -225,7 +226,7 @@ encrypt = false
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 [proxies.bandwidth] #带宽限制
-limit = "2M" #总带宽限制(可选)
+limit = "1M" #总带宽限制(可选)
 #limit_in = "10M" #入口带宽限制(可选)
 #limit_out = "10M" #出口带宽限制(可选)
 

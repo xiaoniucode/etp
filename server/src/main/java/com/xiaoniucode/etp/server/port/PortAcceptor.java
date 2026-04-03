@@ -21,15 +21,15 @@ public final class PortAcceptor {
 
     /**
      * 绑定并监听指定端口。
-     * @param port 要监听的端口。不可为null，需合法（0-65535）。
+     * @param listenPort 要监听的端口。不可为null，需合法（0-65535）。
      */
-    public void bindPort(@Nonnull final Integer port) {
-        if (port < 0 || port > 65535) {
-            logger.warn("尝试绑定非法端口: {}", port);
+    public void bindPort(@Nonnull final Integer listenPort) {
+        if (listenPort < 0 || listenPort > 65535) {
+            logger.warn("尝试绑定非法端口: {}", listenPort);
             return;
         }
 
-        portToChannel.computeIfAbsent(port, key -> {
+        portToChannel.computeIfAbsent(listenPort, key -> {
             try {
                 TcpProxyServer tcpProxyServer = SpringContextHolder.getBean(TcpProxyServer.class);
                 if (tcpProxyServer == null) {
@@ -37,12 +37,12 @@ public final class PortAcceptor {
                     return null;
                 }
                 ServerBootstrap serverBootstrap = tcpProxyServer.getServerBootstrap();
-                ChannelFuture future = serverBootstrap.bind(port).sync();
+                ChannelFuture future = serverBootstrap.bind(listenPort).sync();
                 Channel channel = future.channel();
-                logger.debug("成功绑定端口: {}", port);
+                logger.debug("成功绑定端口: {}", listenPort);
                 return channel;
             } catch (Throwable t) {
-                logger.error("绑定端口 {} 失败", port, t);
+                logger.error("绑定端口 {} 失败", listenPort, t);
                 return null;
             }
         });
@@ -50,23 +50,23 @@ public final class PortAcceptor {
 
     /**
      * 停止监听指定端口。
-     * @param port 要释放的端口
+     * @param listenPort 要释放的端口
      */
-    public void stopPortListen(@Nonnull final Integer port) {
-        if (port < 0 || port > 65535) {
-            logger.warn("尝试停止非法端口: {}", port);
+    public void stopPortListen(@Nonnull final Integer listenPort) {
+        if (listenPort < 0 || listenPort > 65535) {
+            logger.warn("尝试停止非法端口: {}", listenPort);
             return;
         }
-        Channel channel = portToChannel.remove(port);
+        Channel channel = portToChannel.remove(listenPort);
         if (channel != null) {
             try {
                 channel.close().sync();
-                logger.debug("停止端口监听成功: {}", port);
+                logger.debug("停止端口监听成功: {}", listenPort);
             } catch (Throwable t) {
-                logger.error("停止服务失败：端口-{}", port, t);
+                logger.error("停止服务失败：端口-{}", listenPort, t);
             }
         } else {
-            logger.debug("要停止的端口{}未被绑定，无需操作。", port);
+            logger.debug("要停止的端口{}未被绑定，无需操作。", listenPort);
         }
     }
 

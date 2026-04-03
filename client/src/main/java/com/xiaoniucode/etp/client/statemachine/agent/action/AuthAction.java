@@ -4,9 +4,11 @@ import com.xiaoniucode.etp.client.common.utils.AppVersionUtil;
 import com.xiaoniucode.etp.client.common.utils.OSUtils;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
+import com.xiaoniucode.etp.client.manager.AgentIdentity;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
@@ -29,16 +31,18 @@ public class AuthAction extends AgentBaseAction {
             AuthConfig authConfig = config.getAuthConfig();
             Channel control = ctx.getControl();
             Message.AgentType agentType = toProto(config.getAgentType());
-
-            Message.AuthInfo authInfo = Message.AuthInfo.newBuilder()
+            AgentIdentity agentIdentity = ctx.getAgentIdentity();
+            String agentId = agentIdentity.getIdentity();
+            Message.AuthInfo.Builder builder = Message.AuthInfo.newBuilder()
                     .setToken(authConfig.getToken())
                     .setVersion(AppVersionUtil.getVersion())
                     .setAgentType(agentType)
                     .setOs(OSUtils.getOS())
-                    .setName(OSUtils.getHostName())
-                    .build();
-
-            ByteBuf buf = ProtobufUtil.toByteBuf(authInfo, control.alloc());
+                    .setName(OSUtils.getHostName());
+            if (StringUtils.hasText(agentId)) {
+                builder.setAgentId(agentId);
+            }
+            ByteBuf buf = ProtobufUtil.toByteBuf(builder.build(), control.alloc());
             TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_AUTH, buf);
             control.writeAndFlush(frame).addListener((ChannelFutureListener) f -> {
                 if (f.isSuccess()) {

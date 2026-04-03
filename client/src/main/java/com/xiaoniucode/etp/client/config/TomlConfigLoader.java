@@ -184,25 +184,25 @@ public class TomlConfigLoader implements ConfigSource {
                     Boolean autoDomain = proxyTable.getBoolean("auto_domain", true);
                     List<String> customDomains = proxyTable.getList("custom_domains");
                     List<String> subDomains = proxyTable.getList("sub_domains");
-                    DomainConfig domainConfig = new DomainConfig();
+                    RouteConfig routeConfig = new RouteConfig();
                     if (autoDomain != null) {
-                        domainConfig.setAutoDomain(autoDomain);
+                        routeConfig.setAutoDomain(autoDomain);
                     }
                     if (customDomains != null && !customDomains.isEmpty()) {
                         for (String domain : customDomains) {
                             if (StringUtils.hasText(domain)) {
-                                domainConfig.getCustomDomains().add(domain.trim());
+                                routeConfig.getCustomDomains().add(domain.trim());
                             }
                         }
                     }
                     if (subDomains != null && !subDomains.isEmpty()) {
                         for (String domain : subDomains) {
                             if (StringUtils.hasText(domain)) {
-                                domainConfig.getSubDomains().add(domain.trim());
+                                routeConfig.getSubDomains().add(domain.trim());
                             }
                         }
                     }
-                    proxyConfig.setDomainInfo(domainConfig);
+                    proxyConfig.setRouteConfig(routeConfig);
                 }
 
                 if (enableV != null) {

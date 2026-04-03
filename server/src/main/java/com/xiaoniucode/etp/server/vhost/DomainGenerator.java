@@ -1,45 +1,107 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package com.xiaoniucode.etp.server.vhost;
 
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.RouteConfig;
+import com.xiaoniucode.etp.core.enums.DomainType;
+import com.xiaoniucode.etp.server.exceptions.DomainConflictException;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import lombok.AllArgsConstructor;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 
+@AllArgsConstructor
 public class DomainGenerator {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(DomainGenerator.class);
-    private final String[] baseDomains;
-    private final DomainManager domainManager;
-    private final List<DomainGenerationStrategy> strategies;
 
-    public DomainGenerator(Set<String> baseDomains, DomainManager domainManager, List<DomainGenerationStrategy> strategies) {
-        this.baseDomains = baseDomains.toArray(new String[0]);
-        this.domainManager = domainManager;
-        // 按优先级排序
-        this.strategies = strategies.stream()
-                .sorted(Comparator.comparingInt(DomainGenerationStrategy::getOrder))
-                .collect(Collectors.toList());
-        logger.debug("基础域名数组已刷新，长度：{}", this.baseDomains.length);
-        logger.debug("已加载域名生成策略：{}",
-                this.strategies.stream().map(s -> s.getClass().getSimpleName()).collect(Collectors.joining(", ")));
-    }
+    private final String baseDomain;
+    private static final int MIN_PREFIX_LENGTH = 2;
+    private static final int MAX_PREFIX_LENGTH = 10;
+    private static final String PREFIX_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-    /**
-     * 优先级：自定义域名--子域名--自动生成域名
-     *
-     * @param config 代理配置信息
-     * @return 可用域名列表
-     */
-    public Set<DomainInfo> generate(ProxyConfig config) {
-        for (DomainGenerationStrategy strategy : strategies) {
-            if (strategy.supports(config)) {
-                Set<DomainInfo> domains = strategy.generate(config, domainManager, baseDomains);
-                if (!domains.isEmpty()) {
-                    return domains;  // 命中第一个支持的策略并返回结果
+    public List<String> generate(RouteConfig routeConfig, Function<String, Boolean> occupiedChecker) {
+        DomainType domainType = routeConfig.getDomainType();
+        List<String> res = new ArrayList<>();
+        if (domainType == DomainType.CUSTOM_DOMAIN) {
+            Set<String> domains = routeConfig.getCustomDomains();
+            for (String domain : domains) {
+                if (occupiedChecker.apply(domain)) {
+                    throw new DomainConflictException("域名[" + domain + "]已被占用");
+                } else {
+                    res.add(domain);
                 }
             }
         }
-        return Collections.emptySet();
+        if (domainType == DomainType.SUBDOMAIN) {
+            Set<String> subDomains = routeConfig.getSubDomains();
+            for (String prefix : subDomains) {
+                String fullDomain = prefix + "." + baseDomain;
+                if (occupiedChecker.apply(fullDomain)) {
+                    throw new DomainConflictException("子域名[" + prefix + "]已被占用");
+                } else {
+                    res.add(fullDomain);
+                }
+            }
+        }
+        if (domainType == DomainType.SUBDOMAIN) {
+            res.add(generateRandomDomain(occupiedChecker));
+        }
+        return res;
+    }
+
+    private String generateRandomDomain(Function<String, Boolean> occupiedChecker) {
+        //最多重试20次
+        for (int i = 0; i < 20; i++) {
+            String prefix = generateRandomPrefix();
+            if (!occupiedChecker.apply(prefix + "." + baseDomain)) {
+                return prefix + "." + baseDomain;
+            }
+        }
+        return null;
+    }
+
+    private String generateRandomPrefix() {
+        int length = ThreadLocalRandom.current().nextInt(MIN_PREFIX_LENGTH, MAX_PREFIX_LENGTH + 1);
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(PREFIX_CHARS.charAt(ThreadLocalRandom.current().nextInt(PREFIX_CHARS.length())));
+        }
+        return sb.toString();
+    }
+
+    public String generate(String domain, DomainType domainType, Function<String, Boolean> isOccupied) {
+        if (domainType == DomainType.CUSTOM_DOMAIN) {
+            if (domain != null && !isOccupied.apply(domain)) {
+                return domain;
+            }
+            throw new DomainConflictException("域名[" + domain + "]已被占用");
+        }
+        if (domainType == DomainType.SUBDOMAIN) {
+            if (domain != null && !domain.isEmpty()) {
+                String fullDomain = domain + "." + baseDomain;
+                if (!isOccupied.apply(fullDomain)) {
+                    return fullDomain;
+                }
+                throw new DomainConflictException("子域名[" + domain + "]已被占用");
+            }
+        }
+        return null;
     }
 }

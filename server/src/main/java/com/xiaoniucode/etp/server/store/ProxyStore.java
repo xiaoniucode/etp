@@ -7,11 +7,11 @@ import java.util.List;
 public interface ProxyStore {
     ProxyConfig add(ProxyConfig config);
 
+    boolean replace(ProxyConfig newProxyConfig);
+
     ProxyConfig findById(String proxyId);
 
     List<ProxyConfig> findByClientId(String clientId);
-
-    ProxyConfig findByDomain(String domain);
 
     ProxyConfig findByRemotePort(Integer remotePort);
 

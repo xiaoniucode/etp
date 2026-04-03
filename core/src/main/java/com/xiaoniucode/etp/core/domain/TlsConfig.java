@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 @Builder
 @NoArgsConstructor
+@EqualsAndHashCode
 public class TlsConfig {
     private boolean enabled;
     private String certFile;

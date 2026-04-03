@@ -8,7 +8,7 @@ import com.xiaoniucode.etp.client.config.domain.RetryConfig;
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.domain.BandwidthConfig;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
-import com.xiaoniucode.etp.core.domain.DomainConfig;
+import com.xiaoniucode.etp.core.domain.RouteConfig;
 import com.xiaoniucode.etp.core.domain.HttpUser;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.Target;
@@ -85,11 +85,11 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
             proxyConfig.setBandwidth(bandwidthConfig);
         }
         // 配置域名信息
-        DomainConfig domainConfig = new DomainConfig();
-        domainConfig.setAutoDomain(proxy.getAutoDomain());
-        domainConfig.getCustomDomains().addAll(proxy.getCustomDomains());
-        domainConfig.getSubDomains().addAll(proxy.getSubDomains());
-        proxyConfig.setDomainInfo(domainConfig);
+        RouteConfig routeConfig = new RouteConfig();
+        routeConfig.setAutoDomain(proxy.getAutoDomain());
+        routeConfig.getCustomDomains().addAll(proxy.getCustomDomains());
+        routeConfig.getSubDomains().addAll(proxy.getSubDomains());
+        proxyConfig.setRouteConfig(routeConfig);
 
         // 配置基础认证
         if (basicAuth.isEnabled() && !basicAuth.getUsers().isEmpty()) {

@@ -3,99 +3,94 @@ package com.xiaoniucode.etp.server.registry;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
-import com.xiaoniucode.etp.server.generator.UUIDGenerator;
+import com.xiaoniucode.etp.server.store.DomainStore;
 import com.xiaoniucode.etp.server.store.ProxyStore;
+import com.xiaoniucode.etp.server.vhost.DomainBinding;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import org.javers.core.diff.Diff;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-public class  DefaultProxyManager implements ProxyManager {
-    private final UUIDGenerator uuidGenerator;
-    private final List<ProxyConfigListener> listeners = new CopyOnWriteArrayList<>();
+public class DefaultProxyManager implements ProxyManager {
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(DefaultProxyManager.class);
+
     private final ProxyStore proxyStore;
-    private final ProxyOperationDelegateFactory proxyRegisterDelegateFactory;
+    private final ConfigRegistrarFactory configRegistrarFactory;
+    private final ConfigChangeDetector configChangeDetector;
+    private final DomainStore domainStore;
 
-    public DefaultProxyManager(List<ProxyConfigListener> allCallbacks,
-                               ProxyStore proxyStore,
-                               UUIDGenerator uuidGenerator,
-                               ProxyOperationDelegateFactory proxyRegisterDelegateFactory) {
-        this.uuidGenerator = uuidGenerator;
+    public DefaultProxyManager(ProxyStore proxyStore, DomainStore domainStore, ConfigChangeDetector configChangeDetector, ConfigRegistrarFactory configRegistrarFactory) {
         this.proxyStore = proxyStore;
-        this.proxyRegisterDelegateFactory = proxyRegisterDelegateFactory;
-        if (allCallbacks != null) {
-            this.listeners.addAll(allCallbacks);
-        }
+        this.domainStore = domainStore;
+        this.configRegistrarFactory = configRegistrarFactory;
+        this.configChangeDetector = configChangeDetector;
     }
+
+    /**
+     *
+     * @param proxyConfig
+     * @return 如果不存在则返回新的，如果存在则更新后返回旧的。
+     * @throws EtpException
+     */
     @Override
-    public synchronized ProxyConfig register(ProxyConfig config) throws EtpException {
-        String clientId = config.getClientId();
-        if (!StringUtils.hasText(clientId)) {
-            throw new EtpException("clientId 不能为空");
+    public synchronized ProxyConfig register(ProxyConfig proxyConfig) throws EtpException {
+        String agentId = proxyConfig.getAgentId();
+        if (!StringUtils.hasText(agentId)) {
+            throw new EtpException("agentId 不能为空");
         }
-        //检查是否已经存在了，如果存在则更新、不存在则创建
-        Optional<ProxyConfig> existing = findByClientIdAndName(clientId, config.getName());
-        ProxyOperationDelegate delegate = proxyRegisterDelegateFactory.getDelegate(config);
+        if (!StringUtils.hasText(proxyConfig.getName())) {
+            throw new EtpException("代理配置名称不能为空");
+        }
+
+        Optional<ProxyConfig> existing = findByAgentIdAndName(agentId, proxyConfig.getName());
+        ConfigRegistrar delegate = configRegistrarFactory.getRegistrar(proxyConfig);
         if (existing.isPresent()) {
             ProxyConfig oldConfig = existing.get();
-            if (ProxyConfigComparator.isChanged(oldConfig, config)) {
-                //如果配置发生了变化
-                return updateProxy(clientId, oldConfig, config, delegate);
+            Diff diff = configChangeDetector.detectChanges(oldConfig, proxyConfig);
+            if (diff.hasChanges()) {
+                logger.debug("客户端 {} 代理配置 {} 信息变更", agentId, oldConfig.getName());
+                return updateProxy(oldConfig, proxyConfig, delegate, diff);
             } else {
                 return oldConfig;
             }
         } else {
-            //新建
-            return createProxy(clientId, config, delegate);
+            return createProxy(proxyConfig, delegate);
         }
     }
 
-    private ProxyConfig updateProxy(String clientId, ProxyConfig oldConfig, ProxyConfig newConfig, ProxyOperationDelegate delegate) throws EtpException {
+    private ProxyConfig updateProxy(ProxyConfig oldConfig, ProxyConfig newConfig, ConfigRegistrar delegate, Diff diff) throws EtpException {
         //参数校验
         delegate.validate(newConfig);
-
-        //执行更新操作
-        newConfig.setProxyId(oldConfig.getProxyId());
-        newConfig.setClientId(clientId);
-
-        delegate.onUpdate(oldConfig,newConfig);
-
-        //触发监听器通知
-        listeners.forEach(listener -> listener.onUpdated(oldConfig, newConfig));
-        return oldConfig;
+        //重新注册
+        delegate.reregister(oldConfig, newConfig, diff);
+        //替换
+        proxyStore.replace(newConfig);
+        return newConfig;
     }
 
-    private ProxyConfig createProxy(String clientId, ProxyConfig newConfig, ProxyOperationDelegate delegate) throws EtpException {
-        String proxyId = uuidGenerator.uuid32();
-
+    private ProxyConfig createProxy(ProxyConfig newConfig, ConfigRegistrar delegate) throws EtpException {
         //参数校验
         delegate.validate(newConfig);
-        //执行创建
-        newConfig.setProxyId(proxyId);
-        newConfig.setClientId(clientId);
-        delegate.onCreate(newConfig);
-
-        //添加到存储
+        //执行注册
+        delegate.register(newConfig);
+        //存储
         proxyStore.add(newConfig);
-
-        //通知
-        listeners.forEach(listener -> listener.onAdded(newConfig));
         return newConfig;
     }
 
 
     @Override
-    public synchronized Optional<ProxyConfig> delete(String proxyId) {
+    public synchronized Optional<ProxyConfig> remove(String proxyId) {
         Optional<ProxyConfig> opt = findById(proxyId);
         if (opt.isPresent()) {
             ProxyConfig proxyConfig = opt.get();
-            ProxyOperationDelegate delegate = proxyRegisterDelegateFactory.getDelegate(proxyConfig);
+            ConfigRegistrar delegate = configRegistrarFactory.getRegistrar(proxyConfig);
             //删除操作
-            delegate.onDelete(proxyConfig);
+            delegate.unregister(proxyConfig);
             //删除存储
             proxyStore.deleteById(proxyId);
-            //通知
-            listeners.forEach(listener -> listener.onDeleted(proxyConfig));
             return Optional.of(proxyConfig);
         }
         return Optional.empty();
@@ -123,7 +118,7 @@ public class  DefaultProxyManager implements ProxyManager {
     }
 
     @Override
-    public List<ProxyConfig> findByClientId(String clientId) {
+    public List<ProxyConfig> findByAgentId(String clientId) {
         return proxyStore.findByClientId(clientId);
     }
 
@@ -134,22 +129,28 @@ public class  DefaultProxyManager implements ProxyManager {
 
     @Override
     public Optional<ProxyConfig> findByDomain(String domain) {
-        return Optional.ofNullable(proxyStore.findByDomain(domain));
+        Optional<DomainBinding> opt = domainStore.findByDomain(domain);
+        if (opt.isEmpty()){
+            return Optional.empty();
+        }
+        DomainBinding domainBinding = opt.get();
+        String proxyId = domainBinding.getProxyId();
+        return Optional.ofNullable(proxyStore.findById(proxyId));
+    }
+
+    public Optional<ProxyConfig> findByAgentIdAndName(String agentId, String proxyName) {
+        return Optional.ofNullable(proxyStore.findByClientIdAndName(agentId, proxyName));
     }
 
     @Override
-    public Optional<ProxyConfig> findByClientIdAndName(String clientId, String proxyName) {
-        return Optional.ofNullable(proxyStore.findByClientIdAndName(clientId, proxyName));
-    }
-
-    @Override
-    public synchronized ProxyConfig changeStatus(String proxyId, boolean enable) {
+    public synchronized ProxyConfig changeStatus(String proxyId, boolean enabled) {
         Optional<ProxyConfig> opt = findById(proxyId);
         if (opt.isPresent()) {
             ProxyConfig proxyConfig = opt.get();
-            if (proxyConfig.isEnabled() != enable) {
-                proxyConfig.setEnabled(enable);
-                listeners.forEach(listener -> listener.onStatusChanged(proxyConfig, enable));
+            if (proxyConfig.isEnabled() != enabled) {
+                proxyConfig.setEnabled(enabled);
+                ConfigRegistrar delegate = configRegistrarFactory.getRegistrar(proxyConfig);
+                delegate.statusChanged(proxyConfig, enabled);
             }
             return proxyConfig;
         }

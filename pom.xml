@@ -67,7 +67,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <!--核心依赖-->
-<!--        <netty.version>4.1.80.Final</netty.version>-->
+        <!--        <netty.version>4.1.80.Final</netty.version>-->
         <netty.version>4.1.131.Final</netty.version>
         <protobuf.version>4.32.1</protobuf.version>
         <maven.compiler>3.8.1</maven.compiler>
@@ -91,6 +91,7 @@
         <cola-statemachine.version>5.0.0</cola-statemachine.version>
         <netty-tcnative.version>2.0.75.Final</netty-tcnative.version>
         <bouncycastle.version>1.78.1</bouncycastle.version>
+        <javers-core.version>7.11.0</javers-core.version>
         <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
     </properties>
     <modules>
@@ -103,8 +104,12 @@
     </modules>
 
     <dependencyManagement>
-
         <dependencies>
+            <dependency>
+                <groupId>org.javers</groupId>
+                <artifactId>javers-core</artifactId>
+                <version>${javers-core.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.alibaba.cola</groupId>
                 <artifactId>cola-component-statemachine</artifactId>

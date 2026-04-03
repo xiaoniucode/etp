@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.core.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Getter
+@EqualsAndHashCode
 public class BasicAuthConfig {
     @Setter
     private boolean enabled;

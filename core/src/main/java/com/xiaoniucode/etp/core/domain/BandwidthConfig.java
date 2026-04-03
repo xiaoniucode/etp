@@ -1,9 +1,11 @@
 package com.xiaoniucode.etp.core.domain;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
+@EqualsAndHashCode
 public class BandwidthConfig {
     /**
      * 总带宽限制

@@ -10,8 +10,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -70,8 +69,9 @@ public class AgentManager {
         connToContext.put(connectionId, agentContext);
         return agentContext;
     }
-    public void addClientContextIndex(String clientId, AgentContext context){
-        clientToContextIndex.put(clientId,context);
+
+    public void addClientContextIndex(String clientId, AgentContext context) {
+        clientToContextIndex.put(clientId, context);
     }
 
     public int getOnlineCount() {
@@ -80,5 +80,11 @@ public class AgentManager {
 
     public void removeProxyContextIndex(String proxyId) {
         clientToContextIndex.remove(proxyId);
+    }
+   public void removeAgentContext(String agentId){
+
+   }
+    public Collection<AgentContext> getAllAgentContext() {
+        return clientToContextIndex.values();
     }
 }

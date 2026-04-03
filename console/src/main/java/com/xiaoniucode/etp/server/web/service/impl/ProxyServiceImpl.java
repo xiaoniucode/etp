@@ -324,7 +324,7 @@ public class ProxyServiceImpl implements ProxyService {
         if (!proxyRepository.existsById(proxyId)) {
             throw new BizException("代理不存在: " + proxyId);
         }
-        proxyManager.delete(proxyId);
+        proxyManager.remove(proxyId);
 //        proxyDomainRepository.deleteAll(proxyDomainRepository.findByProxyId(proxyId));
 //        proxyRepository.deleteById(proxyId);
     }
