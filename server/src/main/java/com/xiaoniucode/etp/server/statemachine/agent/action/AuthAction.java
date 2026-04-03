@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -41,7 +42,7 @@ public class AuthAction extends AgentBaseAction {
     /**
      * 检查 Token 是否存在
      * 检查Token 并发限制
-     * todo 检查AgentId是否已经认证在线，避免重复登录 检查是否是断线重连
+     * 检查AgentId是否已经认证在线，避免重复登录 检查是否是断线重连
      * 检查agentId是否存在，不存在则创建 --> 检查该Token下已注册Agent数是否超过限制
      *
      */
@@ -49,8 +50,34 @@ public class AuthAction extends AgentBaseAction {
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         Channel control = context.getControl();
         Message.AuthInfo authInfo = context.getAndRemoveAs(AgentConstants.AGENT_AUTH_INFO, Message.AuthInfo.class);
+        //是否是重连
+        boolean isReconnect = (event == AgentEvent.RETRY_CONNECT);
+
+        if (isReconnect) {
+            AgentInfo existAgentInfo = context.getAgentInfo();
+            String token = authInfo.getToken();
+            if (!Objects.equals(token, existAgentInfo.getToken())) {
+                logger.warn("断线重连认证失败，令牌不匹配，当前令牌：{}，历史令牌：{}", token, context.getAgentInfo().getToken());
+                Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
+                        .setCode(1)
+                        .setMessage("重连认证失败，令牌不匹配").build();
+                sendAuthError(control, authResponse);
+                context.fireEvent(AgentEvent.AUTH_FAILURE);
+                return;
+            }
+            String agentId = authInfo.getAgentId();
+            if (!StringUtils.hasText(agentId) || !Objects.equals(agentId, existAgentInfo.getAgentId())) {
+                logger.warn("断线重连认证失败，设备ID不匹配，当前设备ID：{}，历史设备ID：{}", agentId, context.getAgentInfo().getAgentId());
+                Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
+                        .setCode(1)
+                        .setMessage("重连认证失败，设备ID不匹配").build();
+                sendAuthError(control, authResponse);
+                context.fireEvent(AgentEvent.AUTH_FAILURE);
+                return;
+            }
+        }
         String token = authInfo.getToken();
-        if (!tokenManager.checkToken(token)) {
+        if (!tokenManager.checkToken(token) && !isReconnect) {
             logger.error("客户端认证失败，无效令牌：{}", token);
             Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
                     .setCode(1)
@@ -60,7 +87,7 @@ public class AuthAction extends AgentBaseAction {
             return;
         }
         TokenConfig tokenConfig = tokenManager.getAccessToken(token);
-        if (!tokenManager.checkConnectionsLimit(token)) {
+        if (!tokenManager.checkConnectionsLimit(token) && !isReconnect) {
             logger.warn("访问令牌 {} 连接数已达上限 {}", token, tokenConfig.getMaxConnections());
             Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
                     .setCode(1)
@@ -107,7 +134,10 @@ public class AuthAction extends AgentBaseAction {
 
         //保存设备信息
         agentStore.save(agentInfo);
-        tokenManager.incrementConnection(token);
+        if (!isReconnect) {
+            tokenManager.incrementConnection(token);
+        }
+
         agentManager.addClientContextIndex(agentId, context);
         Message.AuthResponse authResponse = Message.AuthResponse.newBuilder().setCode(0)
                 .setConnectionId(context.getConnectionId())

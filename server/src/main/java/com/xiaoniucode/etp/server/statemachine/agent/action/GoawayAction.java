@@ -1,9 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
-import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
+import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.transport.connection.DirectPool;
 import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
@@ -27,7 +24,12 @@ public class GoawayAction extends AgentBaseAction {
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-        String clientId = context.getAgentInfo().getAgentId();
+        AgentInfo agentInfo = context.getAgentInfo();
+        if (agentInfo==null){
+            logger.warn("客户端断开，未找到客户端信息，连接ID：{}", context.getConnectionId());
+            return;
+        }
+        String clientId = agentInfo.getAgentId();
         logger.debug("{} 客户端断开，开始清理资源", clientId);
         try {
             // 清理流资源

@@ -30,22 +30,20 @@ public enum AgentEvent {
      * 心跳超时
      */
     HEARTBEAT_TIMEOUT,
-    
     /**
-     * 管理员手动剔除
+     * 断开连接
      */
-    ADMIN_SHUTDOWN,
-    
-    /**
-     * 接收到来自客户端 goaway 指令
-     */
-    GOAWAY_RECEIVED,
+    GOAWAY,
     
     /**
      * 重连窗口超时
      */
     RETRY_TIMEOUT,
-    
+    /**
+     * 重连
+     */
+    RETRY_CONNECT,
+
     /**
      * 接收创建代理请求
      */

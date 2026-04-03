@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.client.statemachine.agent.action;
 
-import com.xiaoniucode.etp.client.common.utils.AppVersionUtil;
-import com.xiaoniucode.etp.client.common.utils.OSUtils;
+import com.xiaoniucode.etp.client.common.AppVersionUtil;
+import com.xiaoniucode.etp.client.common.OSUtils;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.manager.AgentIdentity;

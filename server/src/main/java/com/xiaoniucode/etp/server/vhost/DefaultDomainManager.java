@@ -36,7 +36,6 @@ public class DefaultDomainManager implements DomainManager {
 
     @Override
     public synchronized List<DomainBinding> register(String proxyId, RouteConfig routeConfig) throws EtpException {
-        //生成域名
         List<String> domains = domainGenerator.generate(routeConfig, domainStore::isOccupied);
         if (domains.isEmpty()) {
             throw new EtpException("无法为代理[" + proxyId + "]生成域名");

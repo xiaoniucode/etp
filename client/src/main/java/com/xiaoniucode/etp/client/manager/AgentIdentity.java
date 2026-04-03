@@ -62,17 +62,16 @@ public final class AgentIdentity {
      * 从本地文件加载身份标识
      */
     private String loadFromStorage() {
-        File file = new File(storagePath);
-        if (!file.exists()) {
+        Path path = Paths.get(storagePath);
+        if (!Files.exists(path)) {
             return null;
         }
 
-        try (InputStream in = new FileInputStream(file)) {
+        try (InputStream in = Files.newInputStream(path)) {
             Properties props = new Properties();
             props.load(in);
             return props.getProperty(KEY_IDENTITY);
         } catch (Exception e) {
-            System.err.println("[AgentIdentity] Failed to load agent identity: " + e.getMessage());
             return null;
         }
     }

@@ -60,16 +60,40 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             byte msgType = frame.getMsgType();
             Optional<AgentContext> opt = agentManager.getAgentContext(frame.getStreamId());
             opt.ifPresent(context -> {
+                if (context.getState() != AgentState.CONNECTED) {
+                    return;
+                }
                 context.updateActiveTime();
                 logger.debug("更新客户端 {} 最后激活时间", context.getAgentInfo().getAgentId());
             });
             switch (msgType) {
                 case TMSP.MSG_AUTH -> {
                     ByteBuf payload = frame.getPayload();
-                    AgentContext agentContext = agentManager.createAgent(ctx.channel(), agentStateMachine);
                     Message.AuthInfo authInfo = ProtobufUtil.parseFrom(payload, Message.AuthInfo.parser());
-                    agentContext.setVariable(AgentConstants.AGENT_AUTH_INFO, authInfo);
-                    agentContext.fireEvent(AgentEvent.AUTH_START);
+
+                    String agentId = authInfo.getAgentId();
+                    Optional<AgentContext> contextOpt = agentManager.getAgentContext(agentId);
+                    if (contextOpt.isPresent()) {
+                        AgentContext context = contextOpt.get();
+                        //如果连接是断开状态，说明是断线重连，更新连接并重试连接
+                        if (context.getState() == AgentState.DISCONNECTED) {
+                            Channel oldChannel = context.getControl();
+                            if (oldChannel != null && oldChannel.isActive()) {
+                                ChannelUtils.closeOnFlush(oldChannel);
+                            }
+                            // 再设置新连接
+                            context.setControl(ctx.channel());
+                            context.setVariable(AgentConstants.AGENT_AUTH_INFO, authInfo);
+                            context.fireEvent(AgentEvent.RETRY_CONNECT);
+                        } else {
+                            ChannelUtils.closeOnFlush(ctx.channel());
+                            logger.warn("客户端 {} 重复登录，拒绝连接", agentId);
+                        }
+                    } else {
+                        AgentContext agentContext = agentManager.createAgent(ctx.channel(), agentStateMachine);
+                        agentContext.setVariable(AgentConstants.AGENT_AUTH_INFO, authInfo);
+                        agentContext.fireEvent(AgentEvent.AUTH_START);
+                    }
                 }
 
                 case TMSP.MSG_TUNNEL_CREATE -> {

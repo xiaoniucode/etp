@@ -61,12 +61,6 @@ public class AgentStateMachineConfig {
     private HeartbeatTimeoutAction heartbeatTimeoutAction;
 
     /**
-     * 管理员关闭动作
-     */
-    @Autowired
-    private AdminShutdownAction adminShutdownAction;
-
-    /**
      * 重连超时动作
      */
     @Autowired
@@ -142,18 +136,6 @@ public class AgentStateMachineConfig {
                 .when(ctx -> true)
                 .perform(goawayAction);
 
-        // 管理员关闭
-        builder.externalTransitions()
-                .fromAmong(AgentState.NEW,
-                        AgentState.AUTHENTICATING,
-                        AgentState.CONNECTED,
-                        AgentState.DISCONNECTED,
-                        AgentState.FAILED)
-                .to(AgentState.CLOSED)
-                .on(AgentEvent.ADMIN_SHUTDOWN)
-                .when(ctx -> true)
-                .perform(adminShutdownAction);
-
         // 收到 GoAway 指令
         builder.externalTransitions()
                 .fromAmong(AgentState.NEW,
@@ -161,7 +143,7 @@ public class AgentStateMachineConfig {
                         AgentState.CONNECTED,
                         AgentState.DISCONNECTED)
                 .to(AgentState.CLOSED)
-                .on(AgentEvent.GOAWAY_RECEIVED)
+                .on(AgentEvent.GOAWAY)
                 .when(ctx -> true)
                 .perform(goawayAction);
 
@@ -172,7 +154,13 @@ public class AgentStateMachineConfig {
                 .on(AgentEvent.RETRY_TIMEOUT)
                 .when(ctx -> true)
                 .perform(retryTimeoutAction);
-
+        // 重连
+        builder.externalTransition()
+                .from(AgentState.DISCONNECTED)
+                .to(AgentState.AUTHENTICATING)
+                .on(AgentEvent.RETRY_CONNECT)
+                .when(ctx -> true)
+                .perform(authAction);
         return builder.build("agent-state-machine");
     }
 }
