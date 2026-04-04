@@ -45,6 +45,8 @@
                                 <buildArg>--enable-native-access=ALL-UNNAMED</buildArg>
                                 <buildArg>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</buildArg>
                                 <buildArg>--add-opens=java.base/java.nio=ALL-UNNAMED</buildArg>
+
+                                <arg>-Dio.netty.handler.ssl.noOpenSsl=true</arg>
                             </buildArgs>
                         </configuration>
                     </plugin>

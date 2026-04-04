@@ -22,6 +22,7 @@ public class TunnelClientStartup {
 
     public static void main(String[] args) {
         try {
+            System.setProperty("io.netty.handler.ssl.noOpenSsl", "true");
             AppConfig config = buildConfig(args);
             initLogback(config);
             if (config.getLogConfig().getLevel().equalsIgnoreCase("debug")){

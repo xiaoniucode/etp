@@ -31,6 +31,8 @@
                 <configuration>
                     <buildArgs>
                         <buildArg>--initialize-at-build-time=org.sqlite.util.ProcessRunner</buildArg>
+
+                        <arg>-Dio.netty.handler.ssl.noOpenSsl=true</arg>
                     </buildArgs>
                     <mainClass>com.xiaoniucode.etp.server.TunnelServerStartup</mainClass>
                     <imageName>etps</imageName>

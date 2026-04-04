@@ -89,8 +89,6 @@
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <bucket4j_jdk17-core>8.16.1</bucket4j_jdk17-core>
         <cola-statemachine.version>5.0.0</cola-statemachine.version>
-        <netty-tcnative.version>2.0.75.Final</netty-tcnative.version>
-        <bouncycastle.version>1.78.1</bouncycastle.version>
         <javers-core.version>7.11.0</javers-core.version>
         <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
     </properties>
@@ -115,21 +113,6 @@
                 <artifactId>cola-component-statemachine</artifactId>
                 <version>${cola-statemachine.version}</version>
                 <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-tcnative-boringssl-static</artifactId>
-                <version>${netty-tcnative.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bouncycastle.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.bucket4j</groupId>
