@@ -5,13 +5,13 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import java.util.List;
 
 public interface ProxyStore {
-    ProxyConfig add(ProxyConfig config);
+    ProxyConfig save(ProxyConfig config);
 
     boolean replace(ProxyConfig newProxyConfig);
 
     ProxyConfig findById(String proxyId);
 
-    List<ProxyConfig> findByClientId(String clientId);
+    List<ProxyConfig> findByAgentId(String agentId);
 
     ProxyConfig findByRemotePort(Integer remotePort);
 
@@ -23,9 +23,9 @@ public interface ProxyStore {
 
     void deleteById(String proxyId);
 
-    void deleteByClientId(String clientId);
+    void deleteByAgentId(String agentId);
 
     boolean existsById(String proxyId);
 
-    ProxyConfig findByClientIdAndName(String clientId, String proxyName);
+    ProxyConfig findByAgentIdAndName(String clientId, String proxyName);
 }

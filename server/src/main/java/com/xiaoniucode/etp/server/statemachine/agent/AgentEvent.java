@@ -47,5 +47,6 @@ public enum AgentEvent {
     /**
      * 接收创建代理请求
      */
-    PROXY_CREATE_REQUEST
+    PROXY_CREATE_REQUEST,
+    REBUILD_CONTEXT
 }

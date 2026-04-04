@@ -1,9 +1,9 @@
-package com.xiaoniucode.etptest;
+package com.xiaoniucode.etp.test;
 
-import com.xiaoniucode.etptest.entity.User;
-import com.xiaoniucode.etptest.entity.User2;
-import com.xiaoniucode.etptest.repository.User2Repository;
-import com.xiaoniucode.etptest.repository.UserRepository;
+import com.xiaoniucode.etp.test.entity.User;
+import com.xiaoniucode.etp.test.entity.User2;
+import com.xiaoniucode.etp.test.repository.User2Repository;
+import com.xiaoniucode.etp.test.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;

@@ -14,31 +14,15 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.autoconfigure;
+package com.xiaoniucode.etp.test.repository;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import java.io.Serializable;
+import com.xiaoniucode.etp.test.entity.User2;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
- * 带宽限制配置
+ * @author liuxin
  */
-@Getter
-@Setter
-public class BandwidthProperties implements Serializable {
-    /**
-     * 总带宽限制（可选）
-     */
-    private String limit;
-
-    /**
-     * 入口带宽限制（可选）
-     */
-    private String limitIn;
-
-    /**
-     * 出口带宽限制（可选）
-     */
-    private String limitOut;
+@Repository
+public interface User2Repository extends JpaRepository<User2, String> {
 }

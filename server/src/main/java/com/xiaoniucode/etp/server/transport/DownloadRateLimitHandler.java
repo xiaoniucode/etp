@@ -56,22 +56,22 @@ public class DownloadRateLimitHandler extends SimpleChannelInboundHandler<TMSPFr
             ctx.fireChannelRead(frame.retain());
             return;
         }
-        BandwidthLimiter limiter = streamContext.getBandwidthLimiter();
-        if (limiter == null) {
-            ctx.fireChannelRead(frame.retain());
-            return;
-        }
-        TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
-        Channel tunnel = tunnelEntry.getChannel();
-        Channel visitor = streamContext.getVisitor();
-        int bytes = payload.readableBytes();
-        long waitNanos = limiter.getUploadWaitNanos(bytes);
-        logger.warn("访问速度太快，触发限流：streamId={} bytes={} 等待 {} ms", streamContext.getStreamId(), bytes, waitNanos / 1_000_000);
-
-        visitor.config().setOption(ChannelOption.AUTO_READ, false);
-        tunnel.config().setOption(ChannelOption.AUTO_READ, false);
-        scheduleResume(streamContext, tunnel, visitor, waitNanos);
-        logger.debug("发送限流时从访问流收到的数据包到内网");
+//        BandwidthLimiter limiter = streamContext.getBandwidthLimiter();
+//        if (limiter == null) {
+//            ctx.fireChannelRead(frame.retain());
+//            return;
+//        }
+//        TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
+//        Channel tunnel = tunnelEntry.getChannel();
+//        Channel visitor = streamContext.getVisitor();
+//        int bytes = payload.readableBytes();
+//        long waitNanos = limiter.getUploadWaitNanos(bytes);
+//        logger.warn("访问速度太快，触发限流：streamId={} bytes={} 等待 {} ms", streamContext.getStreamId(), bytes, waitNanos / 1_000_000);
+//
+//        visitor.config().setOption(ChannelOption.AUTO_READ, false);
+//        tunnel.config().setOption(ChannelOption.AUTO_READ, false);
+//        scheduleResume(streamContext, tunnel, visitor, waitNanos);
+//        logger.debug("发送限流时从访问流收到的数据包到内网");
         ctx.fireChannelRead(frame.retain());
     }
 

@@ -31,17 +31,22 @@ public class AuthAction extends AgentBaseAction {
             AuthConfig authConfig = config.getAuthConfig();
             Channel control = ctx.getControl();
             Message.AgentType agentType = toProto(config.getAgentType());
-            AgentIdentity agentIdentity = ctx.getAgentIdentity();
-            String agentId = agentIdentity.getIdentity();
+
             Message.AuthInfo.Builder builder = Message.AuthInfo.newBuilder()
                     .setToken(authConfig.getToken())
                     .setVersion(AppVersionUtil.getVersion())
                     .setAgentType(agentType)
                     .setOs(OSUtils.getOS())
                     .setName(OSUtils.getHostName());
-            if (StringUtils.hasText(agentId)) {
-                builder.setAgentId(agentId);
+
+            if (config.getAgentType() == AgentType.BINARY) {
+                AgentIdentity agentIdentity = ctx.getAgentIdentity();
+                String agentId = agentIdentity.getIdentity();
+                if (StringUtils.hasText(agentId)) {
+                    builder.setAgentId(agentId);
+                }
             }
+
             ByteBuf buf = ProtobufUtil.toByteBuf(builder.build(), control.alloc());
             TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_AUTH, buf);
             control.writeAndFlush(frame).addListener((ChannelFutureListener) f -> {

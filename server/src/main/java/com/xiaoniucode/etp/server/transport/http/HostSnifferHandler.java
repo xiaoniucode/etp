@@ -10,6 +10,7 @@ import io.netty.util.CharsetUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 
 public class HostSnifferHandler extends ByteToMessageDecoder {
@@ -33,6 +34,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
         boolean isHttp = false;
         String domain = null;
         String basicAuth = null;
+        String realClientIp = null;
         try {
             int len = Math.min(in.readableBytes(), 4096);
             byte[] bytes = new byte[len];
@@ -48,6 +50,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                         domain = host;
                     }
                     basicAuth = parseAuthHeader(content);
+                    realClientIp = parseRealClientIp(content);
                 }
                 isHttp = true;
             }
@@ -61,6 +64,14 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             visitor.attr(AttributeKeys.PROTOCOL_TYPE).set(ProtocolType.HTTP);
             visitor.attr(AttributeKeys.VISIT_DOMAIN).set(domain);
             visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).set(basicAuth);
+
+            // 如果没有从 header 中获取到真实 IP，则使用连接来源 IP
+            if (realClientIp == null || realClientIp.isEmpty()) {
+                if (visitor.remoteAddress() instanceof InetSocketAddress) {
+                    realClientIp = ((InetSocketAddress) visitor.remoteAddress()).getAddress().getHostAddress();
+                }
+            }
+            visitor.attr(AttributeKeys.REAL_CLIENT_IP).set(realClientIp);
         }
         ctx.pipeline().remove(this);
     }
@@ -102,5 +113,52 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             }
         }
         return null;
+    }
+
+    /**
+     * 解析 HTTP 请求头中的真实客户端 IP
+     * 优先级: X-Forwarded-For > X-Real-IP
+     *
+     * @param content HTTP 请求内容
+     * @return 真实客户端 IP，如果没有则返回 null
+     */
+    private String parseRealClientIp(String content) {
+        String[] lines = content.split("\\r?\\n");
+        String xForwardedFor = null;
+        String xRealIp = null;
+
+        for (String line : lines) {
+            String trimmedLine = line.trim();
+            if (trimmedLine.isEmpty()) {
+                continue;
+            }
+
+            String lowerLine = trimmedLine.toLowerCase();
+
+            if (lowerLine.startsWith("x-forwarded-for:")) {
+                int colonIndex = trimmedLine.indexOf(':');
+                if (colonIndex != -1) {
+                    String value = trimmedLine.substring(colonIndex + 1).trim();
+                    // X-Forwarded-For 格式: client, proxy1, proxy2
+                    int commaIndex = value.indexOf(',');
+                    if (commaIndex != -1) {
+                        xForwardedFor = value.substring(0, commaIndex).trim();
+                    } else {
+                        xForwardedFor = value;
+                    }
+                }
+            } else if (lowerLine.startsWith("x-real-ip:")) {
+                int colonIndex = trimmedLine.indexOf(':');
+                if (colonIndex != -1) {
+                    xRealIp = trimmedLine.substring(colonIndex + 1).trim();
+                }
+            }
+
+            if (xForwardedFor != null && xRealIp != null) {
+                break;
+            }
+        }
+        // 优先级: X-Forwarded-For > X-Real-IP
+        return xForwardedFor != null ? xForwardedFor : xRealIp;
     }
 }

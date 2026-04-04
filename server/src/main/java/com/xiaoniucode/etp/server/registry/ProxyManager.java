@@ -11,6 +11,8 @@ public interface ProxyManager {
 
     public Optional<ProxyConfig> remove(String proxyId) throws EtpException;
 
+    void clearByAgentId(String agentId);
+
     public Optional<ProxyConfig> findByRemotePort(Integer port);
 
     public List<ProxyConfig> findAll();

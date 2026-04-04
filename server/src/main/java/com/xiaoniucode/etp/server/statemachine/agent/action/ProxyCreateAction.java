@@ -62,6 +62,7 @@ public class ProxyCreateAction extends AgentBaseAction {
                     logger.error("代理配置 {} 创建失败",register.getName(),future.cause());
                 }
             });
+            context.fireEvent(AgentEvent.REBUILD_CONTEXT);
             logger.debug("代理注册成功: {}", register);
         } catch (Exception e) {
             logger.error("代理配置注册失败", e);

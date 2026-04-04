@@ -110,7 +110,7 @@ public class TomlConfigLoader implements ConfigSource {
                 if (multiplexPoolTable != null) {
                     PoolConfig.MultiplexPoolConfig multiplexPoolConfig = poolConfig.getMultiplex();
                     multiplexPoolConfig.setPlain(multiplexPoolTable.getBoolean("plain", false));
-                    multiplexPoolConfig.setEncrypt(multiplexPoolTable.getBoolean("encrypted", false));
+                    multiplexPoolConfig.setEncrypt(multiplexPoolTable.getBoolean("encrypt", false));
                 }
 
                 // 读取独立连接池配置

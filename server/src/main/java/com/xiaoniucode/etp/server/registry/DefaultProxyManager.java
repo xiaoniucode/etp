@@ -76,7 +76,7 @@ public class DefaultProxyManager implements ProxyManager {
         //执行注册
         delegate.register(newConfig);
         //存储
-        proxyStore.add(newConfig);
+        proxyStore.save(newConfig);
         return newConfig;
     }
 
@@ -95,6 +95,16 @@ public class DefaultProxyManager implements ProxyManager {
         }
         return Optional.empty();
 
+    }
+
+    @Override
+    public synchronized void clearByAgentId(String agentId) {
+        List<ProxyConfig> configs = proxyStore.findByAgentId(agentId);
+        for (ProxyConfig config : configs) {
+            String proxyId = config.getProxyId();
+            domainStore.delete(proxyId);
+        }
+        proxyStore.deleteByAgentId(agentId);
     }
 
     @Override
@@ -118,8 +128,8 @@ public class DefaultProxyManager implements ProxyManager {
     }
 
     @Override
-    public List<ProxyConfig> findByAgentId(String clientId) {
-        return proxyStore.findByClientId(clientId);
+    public List<ProxyConfig> findByAgentId(String agentId) {
+        return proxyStore.findByAgentId(agentId);
     }
 
     @Override
@@ -130,7 +140,7 @@ public class DefaultProxyManager implements ProxyManager {
     @Override
     public Optional<ProxyConfig> findByDomain(String domain) {
         Optional<DomainBinding> opt = domainStore.findByDomain(domain);
-        if (opt.isEmpty()){
+        if (opt.isEmpty()) {
             return Optional.empty();
         }
         DomainBinding domainBinding = opt.get();
@@ -139,7 +149,7 @@ public class DefaultProxyManager implements ProxyManager {
     }
 
     public Optional<ProxyConfig> findByAgentIdAndName(String agentId, String proxyName) {
-        return Optional.ofNullable(proxyStore.findByClientIdAndName(agentId, proxyName));
+        return Optional.ofNullable(proxyStore.findByAgentIdAndName(agentId, proxyName));
     }
 
     @Override

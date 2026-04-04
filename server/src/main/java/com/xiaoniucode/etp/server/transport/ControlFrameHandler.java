@@ -86,8 +86,10 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                             context.setVariable(AgentConstants.AGENT_AUTH_INFO, authInfo);
                             context.fireEvent(AgentEvent.RETRY_CONNECT);
                         } else {
-                            ChannelUtils.closeOnFlush(ctx.channel());
-                            logger.warn("客户端 {} 重复登录，拒绝连接", agentId);
+                            //重复登录，断开旧连接，设置新连接
+                            ChannelUtils.closeOnFlush(context.getControl());
+                            context.setControl(ctx.channel());
+                            logger.debug("客户端 {} 重新登录", agentId);
                         }
                     } else {
                         AgentContext agentContext = agentManager.createAgent(ctx.channel(), agentStateMachine);

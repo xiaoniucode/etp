@@ -18,7 +18,7 @@ public class AuthResponseAction extends AgentBaseAction {
         Message.AuthResponse authResponse = context.getAndRemoveAs("authResponse", Message.AuthResponse.class);
         int code = authResponse.getCode();
         if (code == 0) {
-            logger.info("认证成功，客户端类型：[{}] 唯一标识：{}", context.getAgentType().name(), authResponse.getAgentId());
+            logger.info("连接成功");
             String agentId = authResponse.getAgentId();
             context.setConnectionId(authResponse.getConnectionId());
             context.setAuthenticated(true);

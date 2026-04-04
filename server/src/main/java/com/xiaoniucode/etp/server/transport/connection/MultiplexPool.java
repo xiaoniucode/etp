@@ -46,24 +46,28 @@ public class MultiplexPool {
     }
 
     static class Pool {
-        protected TunnelEntry plainChannel;
-        protected TunnelEntry tlsChannel;
+        protected TunnelEntry plainEntry;
+        protected TunnelEntry tlsEntry;
 
         public TunnelEntry acquire(boolean isTls) {
-            return isTls ? tlsChannel : plainChannel;
+            return isTls ? tlsEntry : plainEntry;
         }
 
         public void setChannel(boolean isTls, TunnelEntry entry) {
             if (isTls) {
-                this.tlsChannel = entry;
+                this.tlsEntry = entry;
             } else {
-                this.plainChannel = entry;
+                this.plainEntry = entry;
             }
         }
 
         public void offline() {
-            ChannelUtils.closeOnFlush(plainChannel.getChannel());
-            ChannelUtils.closeOnFlush(tlsChannel.getChannel());
+            if (plainEntry != null) {
+                ChannelUtils.closeOnFlush(plainEntry.getChannel());
+            }
+            if (tlsEntry != null) {
+                ChannelUtils.closeOnFlush(tlsEntry.getChannel());
+            }
         }
     }
 

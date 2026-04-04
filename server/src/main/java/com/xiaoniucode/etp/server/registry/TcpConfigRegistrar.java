@@ -59,7 +59,7 @@ public class TcpConfigRegistrar implements ConfigRegistrar {
 
         AgentType clientType = config.getAgentType();
         String name = config.getName();
-        ProxyConfig exist = proxyStore.findByClientIdAndName(config.getAgentId(), name);
+        ProxyConfig exist = proxyStore.findByAgentIdAndName(config.getAgentId(), name);
         //处理临时客户端名称冲突
         if (exist != null && clientType == AgentType.BINARY) {
             throw new EtpException("代理配置名称不能重复");

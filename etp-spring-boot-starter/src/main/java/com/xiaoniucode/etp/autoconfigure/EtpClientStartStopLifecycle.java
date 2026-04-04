@@ -5,6 +5,8 @@ import com.xiaoniucode.etp.client.config.DefaultAppConfig;
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.TunnelClient;
 import com.xiaoniucode.etp.client.config.domain.RetryConfig;
+import com.xiaoniucode.etp.client.config.domain.TransportConfig;
+import com.xiaoniucode.etp.client.config.domain.ConnectionConfig;
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.domain.BandwidthConfig;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
@@ -45,16 +47,23 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
 
     @Override
     public void start() {
+        // 检查是否启用 ETP 代理
+        if (!properties.isEnabled()) {
+            logger.info("ETP 代理未启用，跳过启动");
+            return;
+        }
+        
         String applicationName = environment.getProperty("spring.application.name");
         int localPort = webServerPortListener.getActualPort();
 
         ProxyProperties proxy = properties.getProxy();
-        AccessControlProperties accessControl = properties.getAccessControl();
-        BandwidthProperties bandwidth = properties.getBandwidth();
-        TransportProperties transport = properties.getTransport();
-        BasicAuthProperties basicAuth = properties.getBasicAuth();
-        TlsProperties tls = properties.getTls();
+        AccessControlProperties accessControl = proxy.getAccessControl();
+        BandwidthProperties bandwidth = proxy.getBandwidth();
+        TransportCustomProperties transport = proxy.getTransport();
+        BasicAuthProperties basicAuth = proxy.getBasicAuth();
+        TransportProperties.TlsProperties tls = properties.getTransport().getTls();
         AuthProperties auth = properties.getAuth();
+        ConnectionProperties.RetryProperties retry = properties.getConnection().getRetry();
 
         // 创建并配置 ProxyConfig
         ProxyConfig proxyConfig = new ProxyConfig();
@@ -104,15 +113,12 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
         TransportCustomConfig transportCustomConfig = new TransportCustomConfig(
                 transport.isMultiplex(),
                 transport.isEncrypt(),
-                transport.isCompress()
+                false
         );
         proxyConfig.setTransport(transportCustomConfig);
 
         // 配置TLS
-        TlsConfig tlsConfig = new TlsConfig(
-                tls.getEnabled(),
-                tls.isTestMode()
-        );
+        TlsConfig tlsConfig = new TlsConfig(tls.getEnabled());
         tlsConfig.setCertFile(getAbsolutePath(tls.getCertFile()));
         tlsConfig.setKeyFile(getAbsolutePath(tls.getKeyFile()));
         tlsConfig.setCaFile(getAbsolutePath(tls.getCaFile()));
@@ -122,17 +128,26 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
         AuthConfig authConfig = new AuthConfig();
         authConfig.setToken(auth.getToken());
         RetryConfig retryConfig = new RetryConfig();
-        retryConfig.setInitialDelay(auth.getRetry().getInitialDelay());
-        retryConfig.setMaxDelay(auth.getRetry().getMaxDelay());
-        retryConfig.setMaxRetries(auth.getRetry().getMaxRetries());
-        authConfig.setRetry(retryConfig);
+        retryConfig.setInitialDelay(retry.getInitialDelay());
+        retryConfig.setMaxDelay(retry.getMaxDelay());
+        retryConfig.setMaxRetries(retry.getMaxRetries());
+
+        // 配置传输
+        TransportConfig transportConfig = new TransportConfig();
+        transportConfig.setTlsConfig(tlsConfig);
+
+        // 配置连接
+        ConnectionConfig connectionConfig = new ConnectionConfig();
+        connectionConfig.setRetryConfig(retryConfig);
+
         // 构建 AppConfig
         AppConfig config = new DefaultAppConfig
                 .Builder()
                 .serverAddr(properties.getServerAddr())
                 .serverPort(properties.getServerPort())
                 .agentType(AgentType.SESSION)
-                .tlsConfig(tlsConfig)
+                .transportConfig(transportConfig)
+                .connectionConfig(connectionConfig)
                 .authConfig(authConfig)
                 .addProxy(proxyConfig)
                 .build();

@@ -14,31 +14,18 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.autoconfigure;
+package com.xiaoniucode.etp.test;
 
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.Serializable;
-
-/**
- * 带宽限制配置
- */
-@Getter
-@Setter
-public class BandwidthProperties implements Serializable {
-    /**
-     * 总带宽限制（可选）
-     */
-    private String limit;
-
-    /**
-     * 入口带宽限制（可选）
-     */
-    private String limitIn;
-
-    /**
-     * 出口带宽限制（可选）
-     */
-    private String limitOut;
+@RestController
+@RequestMapping
+public class TestController {
+    @GetMapping
+    public String test() {
+        System.out.println("success!");
+        return "say hello";
+    }
 }

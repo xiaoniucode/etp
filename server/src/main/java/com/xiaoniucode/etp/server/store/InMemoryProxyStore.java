@@ -15,11 +15,11 @@ public class InMemoryProxyStore implements ProxyStore {
      */
     private final Map<String, ProxyConfig> proxyStore = new ConcurrentHashMap<>();
     /**
-     * clientId -->proxyId:config
+     * agentId -->proxyId:config
      */
     private final Map<String, Map<String, ProxyConfig>> clientProxyIndex = new ConcurrentHashMap<>();
     /**
-     * clientId --> proxyName:config
+     * agentId --> proxyName:config
      */
     private final Map<String, Map<String, ProxyConfig>> clientProxyNameIndex = new ConcurrentHashMap<>();
     /**
@@ -28,25 +28,25 @@ public class InMemoryProxyStore implements ProxyStore {
     private final Map<Integer, ProxyConfig> portToConfigIndex = new ConcurrentHashMap<>();
 
     @Override
-    public ProxyConfig add(ProxyConfig config) {
+    public ProxyConfig save(ProxyConfig config) {
         ProxyConfig existing = proxyStore.putIfAbsent(config.getProxyId(), config);
         if (existing != null) {
             return existing;
         }
-        String clientId = config.getAgentId();
-        clientProxyIndex.computeIfAbsent(clientId, k -> new ConcurrentHashMap<>()).put(config.getProxyId(), config);
+        String agentId = config.getAgentId();
+        clientProxyIndex.computeIfAbsent(agentId, k -> new ConcurrentHashMap<>()).put(config.getProxyId(), config);
 
         if (config.isTcp() && config.getListenPort() != null) {
             portToConfigIndex.put(config.getListenPort(), config);
         }
-        clientProxyNameIndex.computeIfAbsent(clientId, k -> new ConcurrentHashMap<>()).put(config.getName(), config);
+        clientProxyNameIndex.computeIfAbsent(agentId, k -> new ConcurrentHashMap<>()).put(config.getName(), config);
         return config;
     }
 
     @Override
     public boolean replace(ProxyConfig proxyConfig) {
         deleteById(proxyConfig.getProxyId());
-        add(proxyConfig);
+        save(proxyConfig);
         return true;
     }
 
@@ -56,8 +56,8 @@ public class InMemoryProxyStore implements ProxyStore {
     }
 
     @Override
-    public List<ProxyConfig> findByClientId(String clientId) {
-        Map<String, ProxyConfig> clientProxies = clientProxyIndex.get(clientId);
+    public List<ProxyConfig> findByAgentId(String agentId) {
+        Map<String, ProxyConfig> clientProxies = clientProxyIndex.get(agentId);
         if (clientProxies == null) {
             return List.of();
         }
@@ -124,8 +124,8 @@ public class InMemoryProxyStore implements ProxyStore {
     }
 
     @Override
-    public void deleteByClientId(String clientId) {
-        Map<String, ProxyConfig> clientProxies = clientProxyIndex.remove(clientId);
+    public void deleteByAgentId(String agentId) {
+        Map<String, ProxyConfig> clientProxies = clientProxyIndex.remove(agentId);
         if (clientProxies == null) {
             return;
         }
@@ -135,7 +135,7 @@ public class InMemoryProxyStore implements ProxyStore {
                 portToConfigIndex.remove(config.getListenPort());
             }
         }
-        clientProxyNameIndex.remove(clientId);
+        clientProxyNameIndex.remove(agentId);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class InMemoryProxyStore implements ProxyStore {
     }
 
     @Override
-    public ProxyConfig findByClientIdAndName(String agentId, String proxyName) {
+    public ProxyConfig findByAgentIdAndName(String agentId, String proxyName) {
         Map<String, ProxyConfig> clientProxyMap = clientProxyNameIndex.get(agentId);
         if (clientProxyMap != null) {
             return clientProxyMap.get(proxyName);

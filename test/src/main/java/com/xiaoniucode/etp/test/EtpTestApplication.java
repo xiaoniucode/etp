@@ -14,31 +14,19 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.autoconfigure;
+package com.xiaoniucode.etp.test;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import java.io.Serializable;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * 带宽限制配置
+ * @author liuxin
  */
-@Getter
-@Setter
-public class BandwidthProperties implements Serializable {
-    /**
-     * 总带宽限制（可选）
-     */
-    private String limit;
+@SpringBootApplication
+public class EtpTestApplication {
 
-    /**
-     * 入口带宽限制（可选）
-     */
-    private String limitIn;
+    public static void main(String[] args) {
+        SpringApplication.run(EtpTestApplication.class, args);
+    }
 
-    /**
-     * 出口带宽限制（可选）
-     */
-    private String limitOut;
 }

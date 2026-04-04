@@ -89,7 +89,11 @@ public class AgentStateMachineConfig {
                 .on(AgentEvent.AUTH_SUCCESS)
                 .when(ctx -> true)
                 .perform(proxyInitAction);
-
+        builder.internalTransition()
+                .within(AgentState.CONNECTED)
+                .on(AgentEvent.REBUILD_CONTEXT)
+                .when(ctx -> true)
+                .perform(proxyInitAction);
         // 认证失败
         builder.externalTransition()
                 .from(AgentState.AUTHENTICATING)

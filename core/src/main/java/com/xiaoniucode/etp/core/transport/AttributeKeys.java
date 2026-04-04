@@ -14,5 +14,6 @@ public class AttributeKeys {
     public static final AttributeKey<String> BASIC_AUTH_HEADER = AttributeKey.valueOf("etp.token");
     public static final AttributeKey<ProtocolType> PROTOCOL_TYPE = AttributeKey.valueOf("etp.protocol_type");
     public static final AttributeKey<String> VISIT_DOMAIN = AttributeKey.valueOf("etp.visitorDomain");
+    public static final AttributeKey<String> REAL_CLIENT_IP = AttributeKey.valueOf("etp.real_client_ip");
     public static final AttributeKey<ByteBuf> HTTP_FIRST_PACKET = AttributeKey.newInstance("cachedFirstPacket");
 }

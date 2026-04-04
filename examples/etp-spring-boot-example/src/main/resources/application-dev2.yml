@@ -2,26 +2,6 @@ etp:
   client:
     enabled: true
     server-addr: 127.0.0.1 # IP or domain
-    proxy:
-      custom-domains: test.domain1.com
-      basic-auth:
-        enabled: true
-        users:
-          - user: admin
-            pass: 123
-
-        transport:
-          multiplex: true
-          encrypt: true
-          compress: false
-        bandwidth:
-          limit: 100M
-        access-control:
-          enabled: true
-          allow:
-            - 127.0.0.1
-      #      limit-in: 1M
-      #      limit-out: 1M
     auth:
       token: 5E793FAD27AA713D
     connection:
@@ -30,14 +10,28 @@ etp:
         max-delay: 20
         max-retries: 5
     transport:
-      multiplex:
-        enabled: true
       tls:
         enabled: true
         cert-file: classpath:certs/client.crt
         key-file: classpath:certs/client.key
         ca-file: classpath:certs/ca.crt
-        test-mode: false
+    proxy:
+      custom-domains: test.domain1.com
+      basic-auth:
+        enabled: true
+        users:
+          - user: admin
+            pass: 123
+      transport:
+        multiplex: true
+        encrypt: true
+      bandwidth:
+        limit: 2M
+      access-control:
+        enabled: true
+        allow:
+          - 127.0.0.1
+
 
 
 

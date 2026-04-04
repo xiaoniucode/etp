@@ -16,7 +16,7 @@ enabled = false
 
 [connection.pool.multiplex]
 plain = true
-encrypted = true
+encrypt = true
 
 [connection.pool.direct]
 plain_count = 1
@@ -252,7 +252,7 @@ limit = "2M" #总带宽限制(可选)
 
 #文件日志
 [log]
-level = "debug"
+level = "info"
 path = "log"
 name = "etpc.log"
 archive_pattern = "etpc.%d{yyyy-MM-dd}.log"

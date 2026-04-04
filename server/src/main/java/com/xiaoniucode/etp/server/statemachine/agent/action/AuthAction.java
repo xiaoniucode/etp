@@ -119,7 +119,7 @@ public class AuthAction extends AgentBaseAction {
                 logger.warn("设备ID {} 不存在", agentId);
                 Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
                         .setCode(1)
-                        .setMessage("AgentId " + agentId + " 不存在，二进制设备请删除 agent.id 文件").build();
+                        .setMessage("AgentId " + agentId + " 不存在，请删除 agent.id 文件").build();
                 sendAuthError(control, authResponse);
                 context.fireEvent(AgentEvent.AUTH_FAILURE);
                 return;

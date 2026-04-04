@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
+import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.transport.connection.DirectPool;
@@ -21,35 +22,40 @@ public class GoawayAction extends AgentBaseAction {
     private DirectPool directPool;
     @Autowired
     private MultiplexPool multiplexPool;
+    @Autowired
+    private ProxyManager proxyManager;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         AgentInfo agentInfo = context.getAgentInfo();
-        if (agentInfo==null){
+        if (agentInfo == null) {
             logger.warn("客户端断开，未找到客户端信息，连接ID：{}", context.getConnectionId());
             return;
         }
-        String clientId = agentInfo.getAgentId();
-        logger.debug("{} 客户端断开，开始清理资源", clientId);
+        String agentId = agentInfo.getAgentId();
+        logger.debug("{} 客户端断开，开始清理资源", agentId);
         try {
             // 清理流资源
-            // cleanupStreams(clientId);
-            logger.debug("清理客户端 {} 所有连接", clientId);
+            // cleanupStreams(agentId);
+            logger.debug("清理客户端 {} 所有连接", agentId);
             // 清理隧道资源
-            directPool.offline(clientId);
-            multiplexPool.offline(clientId);
+            directPool.offline(agentId);
+            multiplexPool.offline(agentId);
+            if (agentInfo.getAgentType().isSession()) {
+                proxyManager.clearByAgentId(agentId);
+            }
 
             // 清理代理资源
-            //cleanupAgent(clientId);
+            //cleanupAgent(agentId);
 
             // 清理关联的 Channel
             //cleanupChannels(context);
 
             // 清理Context 中的临时数据
             //cleanupContextData(context);
-            logger.info("{} 客户端资源清理完成", clientId);
+            logger.info("{} 客户端资源清理完成", agentId);
         } catch (Exception e) {
-            logger.error("{} 资源清理过程中发生异常", clientId, e);
+            logger.error("{} 资源清理过程中发生异常", agentId, e);
         } finally {
 
         }
