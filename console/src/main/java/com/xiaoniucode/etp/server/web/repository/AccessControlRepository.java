@@ -10,8 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccessControlRepository extends JpaRepository<AccessControl, String> {
     
-    /**
-     * 根据代理ID查询访问控制
-     */
-    AccessControl findByProxyId(String proxyId);
+
 }

@@ -165,14 +165,14 @@ public class ProxyCreateAction extends AgentBaseAction {
         return proxyConfig;
     }
 
-    private LoadBalanceStrategy toJavaType(Message.LoadBalanceStrategy strategy) {
+    private LoadBalanceType toJavaType(Message.LoadBalanceStrategy strategy) {
         if (strategy == null) {
             return LoadBalanceConfig.DEFAULT_STRATEGY;
         }
         return switch (strategy) {
-            case WEIGHT -> LoadBalanceStrategy.WEIGHT;
-            case RANDOM -> LoadBalanceStrategy.RANDOM;
-            case LEAST_CONN -> LoadBalanceStrategy.LEAST_CONN;
+            case WEIGHT -> LoadBalanceType.WEIGHT;
+            case RANDOM -> LoadBalanceType.RANDOM;
+            case LEAST_CONN -> LoadBalanceType.LEAST_CONN;
             default -> LoadBalanceConfig.DEFAULT_STRATEGY;
         };
     }

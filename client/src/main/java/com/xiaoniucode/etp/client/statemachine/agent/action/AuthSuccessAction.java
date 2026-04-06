@@ -7,7 +7,7 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.*;
-import com.xiaoniucode.etp.core.enums.LoadBalanceStrategy;
+import com.xiaoniucode.etp.core.enums.LoadBalanceType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
@@ -160,7 +160,7 @@ public class AuthSuccessAction extends AgentBaseAction {
         return newProxyBuilder.build();
     }
 
-    private static Message.LoadBalanceStrategy toProtoType(LoadBalanceStrategy strategy) {
+    private static Message.LoadBalanceStrategy toProtoType(LoadBalanceType strategy) {
         switch (strategy) {
             case ROUND_ROBIN:
                 return Message.LoadBalanceStrategy.ROUND_ROBIN;

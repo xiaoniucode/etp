@@ -29,8 +29,4 @@ etp.iml
 etp.mv.db
 etp.trace.db
 /cli-cli-1.0.4/
-/arthas-bin/
-/console-ui
 /skills
-
-/netty-demo

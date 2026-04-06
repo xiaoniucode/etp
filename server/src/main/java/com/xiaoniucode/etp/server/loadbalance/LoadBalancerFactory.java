@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.loadbalance;
 
 import com.xiaoniucode.etp.core.domain.LoadBalanceConfig;
-import com.xiaoniucode.etp.core.enums.LoadBalanceStrategy;
+import com.xiaoniucode.etp.core.enums.LoadBalanceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +23,7 @@ public class LoadBalancerFactory {
      * 获取负载均衡器，如果为空返回一个默认的
      */
     public LoadBalancer getLoadBalancer(LoadBalanceConfig config) {
-        LoadBalanceStrategy strategy;
+        LoadBalanceType strategy;
         if (config == null || !config.hasStrategy()) {
             strategy = LoadBalanceConfig.DEFAULT_STRATEGY;
         } else {

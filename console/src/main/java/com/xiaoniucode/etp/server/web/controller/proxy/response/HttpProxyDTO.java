@@ -6,19 +6,17 @@ import java.util.List;
 
 public record HttpProxyDTO(
         String id,
-        String clientId,
+        String gentId,
         String name,
         Integer protocol,
-        String localIp,
-        Integer localPort,
-        Integer status,
+        Boolean enabled,
         Integer domainType,
-        Integer clientType,
+        Integer agentType,
         Boolean encrypt,
-        Boolean compress,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        List<DomainWithBaseDomain> domains,
+        List<String> domains,
+        BandwidthDTO bandwidth,
         Integer httpProxyPort
 ) implements Serializable {
 }

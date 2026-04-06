@@ -11,7 +11,5 @@ import java.util.List;
  */
 @Repository
 public interface AccessControlRuleRepository extends JpaRepository<AccessControlRule, Integer> {
-    List<AccessControlRule> findByProxyId(String acId);
-    
-    void deleteByProxyId(String proxyId);
+
 }

@@ -9,7 +9,7 @@ import com.xiaoniucode.etp.common.config.ConfigSourceType;
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.domain.TransportCustomConfig;
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
-import com.xiaoniucode.etp.core.enums.LoadBalanceStrategy;
+import com.xiaoniucode.etp.core.enums.LoadBalanceType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import lombok.Getter;
 
@@ -260,7 +260,7 @@ public class TomlConfigLoader implements ConfigSource {
                     LoadBalanceConfig loadBalanceConfig = new LoadBalanceConfig();
                     String strategy = loadBalance.getString("strategy");
                     if (StringUtils.hasText(strategy)) {
-                        LoadBalanceStrategy strategyType = LoadBalanceStrategy.fromCode(strategy);
+                        LoadBalanceType strategyType = LoadBalanceType.fromName(strategy);
                         loadBalanceConfig.setStrategy(strategyType);
                     }
                     proxyConfig.setLoadBalance(loadBalanceConfig);

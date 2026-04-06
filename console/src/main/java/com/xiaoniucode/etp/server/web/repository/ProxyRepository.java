@@ -13,23 +13,5 @@ import java.util.List;
 @Repository
 public interface ProxyRepository extends JpaRepository<Proxy, String> {
     
-    /**
-     * 根据客户端ID查询代理
-     */
-    List<Proxy> findByClientId(String clientId);
-    
-    /**
-     * 根据客户端ID和名称查询代理
-     */
-    Proxy findByClientIdAndName(String clientId, String name);
-    
-    /**
-     * 根据类型查询代理
-     */
-    List<Proxy> findByProtocol(ProtocolType protocol);
-    
-    /**
-     * 根据状态查询代理
-     */
-    List<Proxy> findByStatus(Integer status);
+
 }

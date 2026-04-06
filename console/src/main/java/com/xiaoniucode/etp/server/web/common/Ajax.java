@@ -1,7 +1,9 @@
 package com.xiaoniucode.etp.server.web.common;
 
+import java.io.Serial;
 import java.util.HashMap;
 public class Ajax extends HashMap<String, Object> {
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final int CODE_SUCCESS = 0;
     public static final int CODE_ERROR = 1;

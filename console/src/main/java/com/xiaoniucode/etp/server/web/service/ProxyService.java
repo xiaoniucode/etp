@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.web.service;
 import com.xiaoniucode.etp.server.web.controller.proxy.request.*;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.HttpProxyDTO;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.TcpProxyDTO;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public interface ProxyService {
     /**
      * 删除代理
      */
-    void deleteProxy(String id) throws Exception;
+    void deleteProxy(String id);
 
     /**
      * 根据 ID 查询tcp代理
@@ -40,15 +41,13 @@ public interface ProxyService {
 
     HttpProxyDTO getHttpProxyById(String id);
 
-    /**
-     * 根据 ID 查询http代理
-     */
-    List<TcpProxyDTO> getTcpProxies();
-
-    List<HttpProxyDTO> getHttpProxies();
-
     void batchDeleteProxies(BatchDeleteRequest request);
 
     void switchProxyStatus(String id);
 
+    void setProxyStatus(String id, @NotNull Boolean enabled);
+
+    List<TcpProxyDTO> getTcpProxies(String keyword, int page, int size);
+
+    List<HttpProxyDTO> getHttpProxies(String keyword, int page, int size);
 }

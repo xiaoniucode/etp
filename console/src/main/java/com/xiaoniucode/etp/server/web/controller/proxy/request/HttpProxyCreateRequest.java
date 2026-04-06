@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,9 +18,6 @@ public class HttpProxyCreateRequest {
     private String clientId;
     @NotEmpty(message = "name 不能为空")
     private String name;
-    @NotEmpty(message = "localIp 不能为空")
-    private String localIp;
-    @NotNull(message = "localPort 不能为空")
     private Integer localPort;
     @NotNull(message = "status 不能为空")
     private Integer status;
@@ -29,6 +27,8 @@ public class HttpProxyCreateRequest {
     private Set<String> domains;
     @NotNull(message = "encrypt 不能为空")
     private Boolean encrypt;
-    @NotNull(message = "compress 不能为空")
-    private Boolean compress;
+    @NotNull(message = "targets 不能为空")
+    private List<TargetRequest> targets;
+    @NotNull(message = "tunnelType 不能为空")
+    private Integer tunnelType;
 }

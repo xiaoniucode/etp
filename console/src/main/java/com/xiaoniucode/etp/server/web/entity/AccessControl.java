@@ -1,27 +1,50 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package com.xiaoniucode.etp.server.web.entity;
 
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.server.web.entity.converter.AccessControlModeConverter;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 /**
  * 访问控制实体类
  */
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "access_control")
 public class AccessControl {
+    /**
+     * 代理ID
+     */
     @Id
-    @Column(name = "proxy_id", nullable = false, unique = true)
     private String proxyId;
-    
-    @Column(name = "enable", nullable = false)
-    private Boolean enable;
-    
-    @Column(name = "mode", nullable = false)
+
+    /**
+     * 是否启用
+     */
+    private Boolean enabled;
+
+    /**
+     * 访问控制模式
+     */
     @Convert(converter = AccessControlModeConverter.class)
     private AccessControlMode mode;
 }

@@ -1,42 +1,75 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package com.xiaoniucode.etp.server.web.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 /**
- * 用于客户端连接代理服务器访问认证
+ * 访问令牌实体类
  */
+@Data
 @Entity
 @Table(name = "access_token")
-@Getter
-@Setter
 public class AccessToken {
+    /**
+     * 主键ID
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    /**
+     * 令牌名称
+     */
     @Column(name = "name", nullable = false)
     private String name;
 
+    /**
+     * 访问令牌
+     */
     @Column(name = "token", nullable = false)
     private String token;
 
-    @Column(name = "max_client", nullable = false)
-    private Integer maxClient = 0;
+    /**
+     * 最大设备数
+     */
+    @Column(name = "max_device", nullable = false)
+    private Integer max_device;
+
+    /**
+     * 设备超时时间
+     */
+    @Column(name = "device_timeout", nullable = false)
+    private Integer device_timeout;
+
+    /**
+     * 最大连接数
+     */
+    @Column(name = "max_connection", nullable = false)
+    private Integer max_connection;
+
+    /**
+     * 创建时间
+     */
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-
-    public AccessToken() {
-    }
-
-    public AccessToken(String name, String token, Integer maxClient) {
-        this.name = name;
-        this.token = token;
-        this.maxClient = maxClient;
-    }
 }

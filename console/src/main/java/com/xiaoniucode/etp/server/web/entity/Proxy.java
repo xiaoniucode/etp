@@ -1,74 +1,96 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package com.xiaoniucode.etp.server.web.entity;
 
-import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.enums.DomainType;
-import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.core.enums.ProxyStatus;
-import com.xiaoniucode.etp.server.web.entity.converter.ClientTypeConverter;
 import com.xiaoniucode.etp.server.web.entity.converter.DomainTypeConverter;
-import com.xiaoniucode.etp.server.web.entity.converter.ProtocolTypeConverter;
-import com.xiaoniucode.etp.server.web.entity.converter.ProxyStatusConverter;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
 /**
  * 代理实体类
  */
+@Data
 @Entity
-@Table(name = "proxy")
-@Getter
-@Setter
+@Table(name = "proxies")
 public class Proxy {
+    /**
+     * 代理ID
+     */
     @Id
     private String id;
 
-    @Column(name = "client_id", nullable = false)
-    private String clientId;
-
-    @Column(name = "name", nullable = false)
+    /**
+     * 代理名称
+     */
+    @Column(unique = true, nullable = false, length = 100)
     private String name;
 
-    @Convert(converter = ProtocolTypeConverter.class)
-    @Column(name = "protocol", nullable = false)
-    private ProtocolType protocol;
+    /**
+     * 协议类型
+     */
+    @Column(nullable = false)
+    private String protocol;
 
-    @Column(name = "clientType", nullable = false)
-    @Convert(converter = ClientTypeConverter.class)
-    private AgentType clientType;
+    /**
+     * 是否启用
+     */
+    @Column(nullable = false)
+    private Boolean enabled;
 
-    @Column(name = "local_ip", nullable = false)
-    private String localIp;
-
-    @Column(name = "local_port", nullable = false)
-    private Integer localPort;
-
-    @Column(name = "remote_port")
+    /**
+     * 远程端口
+     */
     private Integer remotePort;
 
-    @Column(name = "status", nullable = false)
-    @Convert(converter = ProxyStatusConverter.class)
-    private ProxyStatus status;
-
+    /**
+     * 域名类型
+     */
     @Convert(converter = DomainTypeConverter.class)
     @Column(name = "domain_type")
     private DomainType domainType;
 
-    @Column(name = "encrypt", nullable = false)
-    private Boolean encrypt;
-
-    @Column(name = "compress", nullable = false)
-    private Boolean compress;
-
-    @Column(name = "created_at", nullable = false)
-    @CreationTimestamp
+    /**
+     * 创建时间
+     */
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    @UpdateTimestamp
+    /**
+     * 更新时间
+     */
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    /**
+     * 持久化前操作
+     */
+    @PrePersist
+    protected void onCreate() {
+        createdAt = updatedAt = LocalDateTime.now();
+    }
+
+    /**
+     * 更新前操作
+     */
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

@@ -3,8 +3,7 @@ package com.xiaoniucode.etp.server.web.listener;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.AgentAuthEvent;
-import com.xiaoniucode.etp.server.web.controller.client.request.ClientSaveRequest;
-import com.xiaoniucode.etp.server.web.service.ClientService;
+import com.xiaoniucode.etp.server.web.service.AgentService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +21,7 @@ public class AgentPersistenceListener implements EventListener<AgentAuthEvent> {
     @Autowired
     private EventBus eventBus;
     @Autowired
-    private ClientService clientService;
+    private AgentService clientService;
 
     @PostConstruct
     public void init() {

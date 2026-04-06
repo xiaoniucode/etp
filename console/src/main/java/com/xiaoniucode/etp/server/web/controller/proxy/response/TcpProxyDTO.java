@@ -5,16 +5,14 @@ import java.time.LocalDateTime;
 
 public record TcpProxyDTO(
         String id,
-        String clientId,
+        String agentId,
         String name,
         Integer protocol,
-        String localIp,
-        Integer localPort,
         Integer remotePort,
-        Integer clientType,
-        Integer status,
+        Integer agentType,
+        Boolean enabled,
         Boolean encrypt,
-        Boolean compress,
+        BandwidthDTO bandwidth,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) implements Serializable {
