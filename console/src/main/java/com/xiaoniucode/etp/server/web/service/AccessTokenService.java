@@ -17,7 +17,7 @@ public interface AccessTokenService {
     /**
      * 查询所有访问令牌
      */
-    List<AccessTokenDTO> findAll();
+    List<AccessTokenDTO> findAll(String keyword, int page, int size);
 
     /**
      * 根据 ID 查询访问令牌

@@ -251,13 +251,6 @@
       "forbidden": "403",
       "notFound": "404",
       "serverError": "500"
-    },
-    "system": {
-      "title": "系统管理",
-      "user": "用户管理",
-      "role": "角色管理",
-      "userCenter": "个人中心",
-      "menu": "菜单管理"
     }
   },
   "table": {

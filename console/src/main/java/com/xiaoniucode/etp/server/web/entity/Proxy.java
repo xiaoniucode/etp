@@ -17,9 +17,13 @@
 package com.xiaoniucode.etp.server.web.entity;
 
 import com.xiaoniucode.etp.core.enums.DomainType;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.web.entity.converter.DomainTypeConverter;
+import com.xiaoniucode.etp.server.web.entity.converter.ProxyStatusConverter;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -47,50 +51,34 @@ public class Proxy {
      */
     @Column(nullable = false)
     private String protocol;
-
-    /**
-     * 是否启用
-     */
-    @Column(nullable = false)
-    private Boolean enabled;
-
     /**
      * 远程端口
      */
     private Integer remotePort;
-
     /**
      * 域名类型
      */
     @Convert(converter = DomainTypeConverter.class)
     @Column(name = "domain_type")
     private DomainType domainType;
-
+    /**
+     * 是否启用
+     *
+     */
+    @Column(nullable = false)
+    @Convert(converter = ProxyStatusConverter.class)
+    private ProxyStatus status;
     /**
      * 创建时间
      */
     @Column(name = "created_at")
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     /**
      * 更新时间
      */
     @Column(name = "updated_at")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    /**
-     * 持久化前操作
-     */
-    @PrePersist
-    protected void onCreate() {
-        createdAt = updatedAt = LocalDateTime.now();
-    }
-
-    /**
-     * 更新前操作
-     */
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 }

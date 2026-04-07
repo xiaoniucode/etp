@@ -22,5 +22,5 @@ import lombok.Data;
 @Data
 public class StatusUpdateRequest {
     @NotNull
-    private Boolean enabled;
+    private Integer status;
 }

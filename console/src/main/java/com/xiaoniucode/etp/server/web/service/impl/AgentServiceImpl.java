@@ -8,6 +8,9 @@ import com.xiaoniucode.etp.server.web.entity.Agent;
 import com.xiaoniucode.etp.server.web.repository.AgentRepository;
 import com.xiaoniucode.etp.server.web.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,21 +23,17 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public List<AgentDTO> findAll(String keyword, int page, int size) {
-        List<Agent> agents;
+        Pageable pageable = PageRequest.of(page - 1, size);
+        
+        Page<Agent> agentPage;
         if (keyword != null && !keyword.isEmpty()) {
-            agents = clientRepository.findByKeyword(keyword);
+            agentPage = clientRepository.findByKeyword(keyword, pageable);
         } else {
-            agents = clientRepository.findAll();
+            agentPage = clientRepository.findAll(pageable);
         }
-        // 简单的内存分页
-        int start = (page - 1) * size;
-        int end = Math.min(start + size, agents.size());
-        if (start >= agents.size()) {
-            return List.of();
-        }
-        agents = agents.subList(start, end);
+        
+        List<Agent> agents = agentPage.getContent();
         List<AgentDTO> dtos = ClientConvert.INSTANCE.toDTOList(agents);
-        // 设置默认值
         dtos.forEach(dto -> {
             dto.setIsOnline(false);
             dto.setToken("token_fefefewfwefddsdfrferfefregrggergregregregrr" + dto.getId());
@@ -43,21 +42,21 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public AgentDTO findById(String clientId) {
-        Agent agent = clientRepository.findById(clientId).orElse(null);
+    public AgentDTO findById(String agentId) {
+        Agent agent = clientRepository.findById(agentId).orElse(null);
         if (agent == null) {
             return null;
         }
         AgentDTO dto = ClientConvert.INSTANCE.toDTO(agent);
         // 设置默认值
-        dto.setIsOnline(false); // TODO: 从内核获取真实在线状态
-        dto.setToken("token_" + dto.getId()); // TODO: 从内核获取真实token
+        dto.setIsOnline(false);
+        dto.setToken("token_" + dto.getId());
         return dto;
     }
 
     @Override
-    public void delete(String clientId) {
-        clientRepository.deleteById(clientId);
+    public void delete(String agentId) {
+        clientRepository.deleteById(agentId);
         // TODO: 通知内核删除客户端
     }
 
@@ -71,7 +70,7 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public void kickout(String clientId) {
+    public void kickout(String agentId) {
         // TODO: 通知内核剔除在线客户端
     }
 

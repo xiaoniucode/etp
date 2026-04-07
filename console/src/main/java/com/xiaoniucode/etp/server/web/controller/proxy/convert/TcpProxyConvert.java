@@ -3,7 +3,6 @@ package com.xiaoniucode.etp.server.web.controller.proxy.convert;
 import com.xiaoniucode.etp.server.web.controller.proxy.response.TcpProxyDTO;
 import com.xiaoniucode.etp.server.web.entity.Proxy;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;

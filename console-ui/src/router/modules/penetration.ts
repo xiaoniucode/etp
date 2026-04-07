@@ -22,9 +22,9 @@ export const penetrationRoutes: AppRouteRecord[] = [
     }
   },
   {
-    name: 'Client',
-    path: '/client',
-    component: '/penetration/client',
+    name: 'Agent',
+    path: '/agent',
+    component: '/penetration/agent',
     meta: {
       title: '客户端',
       icon: 'ri:computer-line',
@@ -38,6 +38,16 @@ export const penetrationRoutes: AppRouteRecord[] = [
     meta: {
       title: '访问令牌',
       icon: 'ri:key-line',
+      roles: ['R_SUPER', 'R_ADMIN']
+    }
+  },
+  {
+    name: 'Stats',
+    path: '/stats',
+    component: '/penetration/stats',
+    meta: {
+      title: '统计',
+      icon: 'ri:bar-chart-line',
       roles: ['R_SUPER', 'R_ADMIN']
     }
   }

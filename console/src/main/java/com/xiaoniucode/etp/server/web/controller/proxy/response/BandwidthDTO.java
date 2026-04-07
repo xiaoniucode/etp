@@ -23,7 +23,7 @@ public class BandwidthDTO {
     /**
      * 总带宽限制
      */
-    private String limit;
+    private String limitTotal;
 
     /**
      * 入站带宽限制

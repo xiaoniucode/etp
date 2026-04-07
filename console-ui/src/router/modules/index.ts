@@ -1,6 +1,5 @@
 import { AppRouteRecord } from '@/types/router'
 import { dashboardRoutes } from './dashboard'
-import { systemRoutes } from './system'
 import { exceptionRoutes } from './exception'
 import { penetrationRoutes } from './penetration'
 
@@ -10,6 +9,5 @@ import { penetrationRoutes } from './penetration'
 export const routeModules: AppRouteRecord[] = [
   dashboardRoutes,
   ...penetrationRoutes,
-  systemRoutes,
   exceptionRoutes
 ]

@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.web.controller.proxy.response;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record TcpProxyDTO(
         String id,
@@ -10,9 +11,10 @@ public record TcpProxyDTO(
         Integer protocol,
         Integer remotePort,
         Integer agentType,
-        Boolean enabled,
+        Integer status,
         Boolean encrypt,
         BandwidthDTO bandwidth,
+        List<TargetDTO>targets,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) implements Serializable {

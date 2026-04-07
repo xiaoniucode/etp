@@ -1,11 +1,11 @@
 <template>
   <div class="client-page art-full-height">
     <!-- 搜索栏 -->
-    <ClientSearch
+    <AgentSearch
       v-model="searchForm"
       @search="handleSearch"
       @reset="resetSearchParams"
-    ></ClientSearch>
+    ></AgentSearch>
 
     <ElCard class="art-table-card">
       <!-- 表格头部 -->
@@ -32,10 +32,7 @@
       </ArtTable>
 
       <!-- 客户端详情弹窗 -->
-      <ClientDetailDialog
-        v-model:visible="detailDialogVisible"
-        :client-data="selectedClient"
-      />
+      <AgentDialog v-model:visible="detailDialogVisible" :client-data="selectedClient" />
     </ElCard>
   </div>
 </template>
@@ -50,8 +47,8 @@
     fetchDeleteBatchClients,
     fetchKickoutClient
   } from '@/api/agent'
-  import ClientSearch from './modules/client-search.vue'
-  import ClientDetailDialog from './modules/client-detail-dialog.vue'
+  import AgentSearch from './modules/agent-search.vue'
+  import AgentDialog from './modules/agent-dialog.vue'
   import { ElTag, ElMessageBox, ElMessage } from 'element-plus'
 
   defineOptions({ name: 'ClientManagement' })
@@ -79,7 +76,7 @@
 
   // 详情弹窗状态
   const detailDialogVisible = ref(false)
-  
+
   // 选中的客户端
   const selectedClient = ref<ClientItem | null>(null)
 

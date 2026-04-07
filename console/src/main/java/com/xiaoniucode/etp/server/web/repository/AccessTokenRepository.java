@@ -1,7 +1,11 @@
 package com.xiaoniucode.etp.server.web.repository;
 
 import com.xiaoniucode.etp.server.web.entity.AccessToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,6 +15,9 @@ import java.util.List;
  */
 @Repository
 public interface AccessTokenRepository extends JpaRepository<AccessToken, Integer> {
-    
-
+    /**
+     * 根据关键词搜索访问令牌（分页）
+     */
+    @Query("SELECT a FROM AccessToken a WHERE a.name LIKE %:keyword% OR a.token LIKE %:keyword%")
+    Page<AccessToken> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

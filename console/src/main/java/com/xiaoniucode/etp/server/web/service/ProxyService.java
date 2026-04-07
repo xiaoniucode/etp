@@ -43,9 +43,7 @@ public interface ProxyService {
 
     void batchDeleteProxies(BatchDeleteRequest request);
 
-    void switchProxyStatus(String id);
-
-    void setProxyStatus(String id, @NotNull Boolean enabled);
+    void setProxyStatus(String id,Integer status);
 
     List<TcpProxyDTO> getTcpProxies(String keyword, int page, int size);
 

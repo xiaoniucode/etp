@@ -85,51 +85,69 @@ declare namespace Api {
     }
   }
 
-  /** 系统管理类型 */
-  namespace SystemManage {
-    /** 用户列表 */
-    type UserList = Api.Common.PaginatedResponse<UserListItem>
 
-    /** 用户列表项 */
-    interface UserListItem {
+
+  /** 访问令牌类型 */
+  namespace AccessToken {
+    /** 访问令牌列表项 */
+    interface AccessTokenDTO {
       id: number
-      avatar: string
-      status: string
-      userName: string
-      userGender: string
-      nickName: string
-      userPhone: string
-      userEmail: string
-      userRoles: string[]
-      createBy: string
-      createTime: string
-      updateBy: string
-      updateTime: string
+      name: string
+      token: string
+      max_device: number
+      device_timeout: number
+      max_connection: number
+      createdAt: string
+      updatedAt: string
     }
 
-    /** 用户搜索参数 */
-    type UserSearchParams = Partial<
-      Pick<UserListItem, 'id' | 'userName' | 'userGender' | 'userPhone' | 'userEmail' | 'status'> &
-        Api.Common.CommonSearchParams
-    >
+    /** 访问令牌搜索参数 */
+    interface TokenSearchParams {
+      keyword?: string
+      page: number
+      size: number
+    }
+  }
 
-    /** 角色列表 */
-    type RoleList = Api.Common.PaginatedResponse<RoleListItem>
-
-    /** 角色列表项 */
-    interface RoleListItem {
-      roleId: number
-      roleName: string
-      roleCode: string
-      description: string
-      enabled: boolean
-      createTime: string
+  /** HTTP 代理类型 */
+  namespace HttpProxy {
+    /** 目标地址DTO */
+    interface TargetDTO {
+      id: string
+      targetHost: string
+      targetPort: number
+      targetPath: string
     }
 
-    /** 角色搜索参数 */
-    type RoleSearchParams = Partial<
-      Pick<RoleListItem, 'roleId' | 'roleName' | 'roleCode' | 'description' | 'enabled'> &
-        Api.Common.CommonSearchParams
-    >
+    /** 带宽DTO */
+    interface BandwidthDTO {
+      uploadLimit: number
+      downloadLimit: number
+    }
+
+    /** HTTP 代理列表项 */
+    interface HttpProxyDTO {
+      id: string
+      agentId: string
+      name: string
+      protocol: number
+      status: number
+      domainType: number
+      agentType: number
+      encrypt: boolean
+      createdAt: string
+      updatedAt: string
+      domains: string[]
+      targets: TargetDTO[]
+      bandwidth: BandwidthDTO
+      httpProxyPort: number
+    }
+
+    /** HTTP 代理搜索参数 */
+    interface HttpProxySearchParams {
+      keyword?: string
+      page: number
+      size: number
+    }
   }
 }

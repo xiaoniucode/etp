@@ -19,6 +19,7 @@ package com.xiaoniucode.etp.server.web.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -52,19 +53,19 @@ public class AccessToken {
      * 最大设备数
      */
     @Column(name = "max_device", nullable = false)
-    private Integer max_device;
+    private Integer maxDevice;
 
     /**
      * 设备超时时间
      */
     @Column(name = "device_timeout", nullable = false)
-    private Integer device_timeout;
+    private Integer deviceTimeout;
 
     /**
      * 最大连接数
      */
     @Column(name = "max_connection", nullable = false)
-    private Integer max_connection;
+    private Integer maxConnection;
 
     /**
      * 创建时间
@@ -72,4 +73,8 @@ public class AccessToken {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = true)
+    private LocalDateTime updatedAt;
 }

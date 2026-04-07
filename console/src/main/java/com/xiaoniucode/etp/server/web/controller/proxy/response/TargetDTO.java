@@ -19,7 +19,7 @@ package com.xiaoniucode.etp.server.web.controller.proxy.response;
 import lombok.Data;
 
 @Data
-public class ProxyTargetDTO {
+public class TargetDTO {
     private Long id;
 
     /**
