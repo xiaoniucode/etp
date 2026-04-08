@@ -10,13 +10,6 @@
     <ElCard class="art-table-card">
       <!-- 表格头部 -->
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
-        <template #left>
-          <ElSpace wrap>
-            <ElButton @click="handleBatchDelete" :disabled="selectedRows.length === 0" v-ripple
-              >批量删除</ElButton
-            >
-          </ElSpace>
-        </template>
       </ArtTableHeader>
 
       <!-- 表格 -->
@@ -25,7 +18,6 @@
         :data="data"
         :columns="columns"
         :pagination="pagination"
-        @selection-change="handleSelectionChange"
         @pagination:size-change="handleSizeChange"
         @pagination:current-change="handleCurrentChange"
       >
@@ -42,10 +34,8 @@
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import {
-    fetchGetClientList,
-    fetchDeleteClient,
-    fetchDeleteBatchClients,
-    fetchKickoutClient
+    fetchGetAgentListByPage,
+    fetchKickoutAgent
   } from '@/api/agent'
   import AgentSearch from './modules/agent-search.vue'
   import AgentDialog from './modules/agent-dialog.vue'
@@ -53,21 +43,7 @@
 
   defineOptions({ name: 'ClientManagement' })
 
-  interface ClientItem {
-    id: string
-    token: string
-    isOnline: boolean
-    name: string
-    os: string
-    arch: string
-    version: string
-    agentType: number
-    createdAt: string
-    updatedAt: string
-  }
-
-  // 选中行
-  const selectedRows = ref<ClientItem[]>([])
+  type ClientItem = Api.Agent.AgentDTO
 
   // 搜索表单
   const searchForm = ref({
@@ -104,14 +80,13 @@
   } = useTable({
     // 核心配置
     core: {
-      apiFn: fetchGetClientList,
+      apiFn: fetchGetAgentListByPage,
       apiParams: {
         keyword: undefined,
         page: 1,
         size: 20
       },
       columnsFactory: () => [
-        { type: 'selection' },
         { type: 'index', width: 60, label: '序号' },
         {
           prop: 'name',
@@ -175,10 +150,6 @@
                 text: '剔除',
                 onClick: () => kickoutClient(row),
                 disabled: !row.isOnline
-              }),
-              h(ArtButtonTable, {
-                type: 'delete',
-                onClick: () => deleteClient(row)
               })
             ])
         }
@@ -211,48 +182,6 @@
   }
 
   /**
-   * 删除客户端
-   */
-  const deleteClient = (row: ClientItem): void => {
-    console.log('删除客户端:', row)
-    ElMessageBox.confirm(`确定要删除该客户端吗？`, '删除客户端', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'error'
-    }).then(async () => {
-      try {
-        await fetchDeleteClient(row.id)
-        ElMessage.success('删除成功')
-        refreshData()
-      } catch (error) {
-        ElMessage.error('删除失败')
-      }
-    })
-  }
-
-  /**
-   * 批量删除客户端
-   */
-  const handleBatchDelete = (): void => {
-    if (selectedRows.value.length === 0) return
-
-    ElMessageBox.confirm(`确定要删除选中的 ${selectedRows.value.length} 个客户端吗？`, '批量删除', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'error'
-    }).then(async () => {
-      try {
-        const ids = selectedRows.value.map((row) => row.id)
-        await fetchDeleteBatchClients(ids)
-        ElMessage.success('批量删除成功')
-        refreshData()
-      } catch (error) {
-        ElMessage.error('批量删除失败')
-      }
-    })
-  }
-
-  /**
    * 剔除在线客户端
    */
   const kickoutClient = (row: ClientItem): void => {
@@ -270,14 +199,6 @@
         ElMessage.error('剔除失败')
       }
     })
-  }
-
-  /**
-   * 处理表格行选择变化
-   */
-  const handleSelectionChange = (selection: ClientItem[]): void => {
-    selectedRows.value = selection
-    console.log('选中行数据:', selectedRows.value)
   }
 
   /**

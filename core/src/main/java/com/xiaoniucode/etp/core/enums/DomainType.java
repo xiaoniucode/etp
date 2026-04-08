@@ -1,5 +1,8 @@
 package com.xiaoniucode.etp.core.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum DomainType {
     AUTO(0, "自动生成"),
     SUBDOMAIN(1, "子域名"),
@@ -12,20 +15,13 @@ public enum DomainType {
 
     private final Integer code;
     private final String description;
-    public static DomainType fromType(Integer type) {
+
+    public static DomainType fromCode(Integer code) {
         for (DomainType domainType : values()) {
-            if (domainType.getCode().equals(type)) {
+            if (domainType.getCode().equals(code)) {
                 return domainType;
             }
         }
-        throw new IllegalArgumentException("Unknown domain type: " + type);
-    }
-
-    public Integer getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
+        return null;
     }
 }

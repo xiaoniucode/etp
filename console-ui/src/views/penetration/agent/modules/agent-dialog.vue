@@ -35,25 +35,13 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, watch, nextTick } from 'vue'
-  import { ElTag, ElDescriptions, ElSkeleton, ElButton } from 'element-plus'
-
-  interface ClientData {
-    id: string
-    token: string
-    isOnline: boolean
-    name: string
-    os: string
-    arch: string
-    version: string
-    agentType: number
-    createdAt: string
-    updatedAt: string
-  }
+  import { ref, computed, watch, nextTick } from 'vue'
+  import { ElTag, ElDescriptions, ElSkeleton, ElButton, ElMessage } from 'element-plus'
+  import { fetchGetAgentById } from '@/api/agent'
 
   interface Props {
     visible: boolean
-    clientData?: ClientData
+    clientData?: Api.Agent.AgentDTO
   }
 
   interface Emits {
@@ -70,7 +58,26 @@
   })
 
   // 客户端数据
-  const clientData = computed(() => props.clientData)
+  const clientData = ref<Api.Agent.AgentDTO | null>(null)
+  const loading = ref(false)
+
+  /**
+   * 获取客户端详情
+   */
+  const fetchClientDetail = async () => {
+    if (!props.clientData?.id) return
+    
+    loading.value = true
+    try {
+      const data = await fetchGetAgentById(props.clientData.id)
+      clientData.value = data
+    } catch (error) {
+      console.error('获取客户端详情失败:', error)
+      ElMessage.error('获取客户端详情失败')
+    } finally {
+      loading.value = false
+    }
+  }
 
   /**
    * 获取状态类型
@@ -103,8 +110,20 @@
     (visible) => {
       if (visible) {
         nextTick(() => {
-          // 可以在这里添加初始化逻辑
+          fetchClientDetail()
         })
+      }
+    }
+  )
+
+  /**
+   * 监听客户端数据变化
+   */
+  watch(
+    () => props.clientData,
+    () => {
+      if (props.visible) {
+        fetchClientDetail()
       }
     }
   )

@@ -1,5 +1,4 @@
 package com.xiaoniucode.etp.server.web.listener;
-
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
@@ -12,9 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.Collection;
-
 /**
  * 系统首次启动时候执行，当TCP代理服务初始化成功后，将所有代理端口（remotePort）进行监听
  */
@@ -27,15 +24,12 @@ public class PortInitializer implements EventListener<TunnelServerBindEvent> {
     private PortManager portManager;
     @Autowired
     private PortAcceptor portAcceptor;
-
     @Autowired
     private ProxyManager proxyManager;
-
     @PostConstruct
     public void init() {
         eventBus.register(this);
     }
-
     @Override
     public void onEvent(TunnelServerBindEvent event) {
         try {
@@ -47,7 +41,6 @@ public class PortInitializer implements EventListener<TunnelServerBindEvent> {
                 Integer remotePort = proxy.getListenPort();
                 if (portManager.isAvailable(remotePort)) {
                     portAcceptor.bindPort(remotePort);
-
                     logger.info("成功绑定端口: {}", remotePort);
                 } else {
                     logger.warn("端口不可用，跳过绑定: {}", remotePort);

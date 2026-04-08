@@ -107,7 +107,7 @@
         },
         {
           prop: 'targets',
-          label: '服务数量',
+          label: '服务列表',
           width: 100,
           formatter: (row: HttpProxyItem) => {
             return row.targets.length
@@ -203,8 +203,4 @@
   }
 </script>
 
-<style lang="scss" scoped>
-  .http-page {
-    padding: 20px;
-  }
-</style>
+<style lang="scss" scoped></style>

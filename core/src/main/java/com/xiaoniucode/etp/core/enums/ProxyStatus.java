@@ -15,13 +15,13 @@ public enum ProxyStatus {
         this.description = description;
     }
 
-    public static ProxyStatus fromStatus(Integer code) {
+    public static ProxyStatus fromCode(Integer code) {
         for (ProxyStatus proxyStatus : values()) {
             if (proxyStatus.getCode().equals(code)) {
                 return proxyStatus;
             }
         }
-        throw new IllegalArgumentException("未知代理状态: " + code);
+        return null;
     }
 
     public boolean isOpen() {

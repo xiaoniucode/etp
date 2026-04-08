@@ -5,10 +5,20 @@ import request from '@/utils/http'
  * @param params 查询参数
  * @returns 客户端列表
  */
-export function fetchGetClientList(params: { keyword?: string; page: number; size: number }) {
-  return request.get({
-    url: '/api/agents',
+export function fetchGetAgentListByPage(params: Api.Agent.AgentSearchParams) {
+  return request.get<Api.Agent.AgentDTO[]>({
+    url: '/api/agents/list-by-page',
     params
+  })
+}
+
+/**
+ * 获取所有客户端列表
+ * @returns 客户端列表
+ */
+export function fetchGetAgentListAll() {
+  return request.get<Api.Agent.AgentDTO[]>({
+    url: '/api/agents/list'
   })
 }
 
@@ -17,32 +27,9 @@ export function fetchGetClientList(params: { keyword?: string; page: number; siz
  * @param id 客户端ID
  * @returns 客户端详情
  */
-export function fetchGetClientById(id: string) {
-  return request.get({
+export function fetchGetAgentById(id: string) {
+  return request.get<Api.Agent.AgentDTO>({
     url: `/api/agents/${id}`
-  })
-}
-
-/**
- * 删除客户端
- * @param id 客户端ID
- * @returns 删除结果
- */
-export function fetchDeleteClient(id: string) {
-  return request.del({
-    url: `/api/agents/${id}`
-  })
-}
-
-/**
- * 批量删除客户端
- * @param ids 客户端ID列表
- * @returns 删除结果
- */
-export function fetchDeleteBatchClients(ids: string[]) {
-  return request.del({
-    url: '/api/agents',
-    data: { ids }
   })
 }
 
@@ -51,8 +38,8 @@ export function fetchDeleteBatchClients(ids: string[]) {
  * @param id 客户端ID
  * @returns 剔除结果
  */
-export function fetchKickoutClient(id: string) {
+export function fetchKickoutAgent(id: string) {
   return request.put({
-    url: `/api/agents/${id}/kickout`
+    url: `/api/agents/kickout/${id}`
   })
 }

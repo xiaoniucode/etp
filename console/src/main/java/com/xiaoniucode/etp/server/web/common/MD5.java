@@ -1,20 +1,15 @@
 package com.xiaoniucode.etp.server.web.common;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-
 /**
  * MD5 工具类
  * @author liuxin
  */
 public final class MD5 {
-
     private MD5() {
     }
-
     private static final MessageDigest MD;
     private static final char[] HEX = "0123456789abcdef".toCharArray();
-
     static {
         try {
             MD = MessageDigest.getInstance("MD5");
@@ -22,7 +17,6 @@ public final class MD5 {
             throw new RuntimeException("MD5 not supported", e);
         }
     }
-
     /**
      * 带盐 MD5
      * 用户ID + 固定全局盐（防止彩虹表）
@@ -37,7 +31,6 @@ public final class MD5 {
         String raw = salt + password + salt;
         return of(raw.getBytes(StandardCharsets.UTF_8));
     }
-
     /**
      * 只在后面加盐
      */
@@ -50,7 +43,6 @@ public final class MD5 {
         }
         return of((password + salt).getBytes(StandardCharsets.UTF_8));
     }
-
     /**
      * 无盐
      */
@@ -60,7 +52,6 @@ public final class MD5 {
         }
         return of(text.getBytes(StandardCharsets.UTF_8));
     }
-
     /**
      * byte[] → 32位小写 hex
      */
@@ -71,7 +62,6 @@ public final class MD5 {
         } catch (Exception e) {
             digest = MD;
         }
-
         byte[] hash = digest.digest(data);
         char[] result = new char[32];
         for (int i = 0; i < 16; i++) {

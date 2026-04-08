@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *        http:
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,11 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 package com.xiaoniucode.etp.server.web.service.impl;
-
-import com.xiaoniucode.etp.server.web.controller.auth.request.LoginRequest;
-import com.xiaoniucode.etp.server.web.controller.auth.response.LoginResponse;
+import com.xiaoniucode.etp.server.web.dto.auth.LoginDTO;
+import com.xiaoniucode.etp.server.web.param.auth.LoginParam;
 import com.xiaoniucode.etp.server.web.security.TokenUtil;
 import com.xiaoniucode.etp.server.web.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,21 +24,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 @Service
 public class AuthServiceImpl implements AuthService {
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
     private TokenUtil tokenUtil;
-
-
     @Override
-    public LoginResponse login(LoginRequest request) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword());
+    public LoginDTO login(LoginParam param) {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(param.getUserName(), param.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = tokenUtil.generateToken(request.getUserName());
-        return new LoginResponse(token);
+        String token = tokenUtil.generateToken(param.getUserName());
+        return new LoginDTO(token);
     }
 }

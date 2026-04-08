@@ -1,7 +1,5 @@
 package com.xiaoniucode.etp.server.web.common;
-
 import java.util.Random;
-
 /**
  * 验证码code生成工具类
  *
@@ -13,13 +11,10 @@ public class CaptchaGenerator {
      * 字符集（排除易混淆字符）
      */
     private static final String CHAR_SET = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
-
     private final Random random = new Random();
-
     public String generateCaptcha() {
         return generateRandomCode();
     }
-
     /**
      * 生成随机验证码字符串
      */

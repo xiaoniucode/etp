@@ -1,0 +1,104 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http:
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package com.xiaoniucode.etp.server.web.controller;
+
+import com.xiaoniucode.etp.server.web.common.Ajax;
+import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDTO;
+import com.xiaoniucode.etp.server.web.param.proxy.*;
+import com.xiaoniucode.etp.server.web.service.ProxyService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/proxies")
+public class ProxyController {
+    @Autowired
+    private ProxyService proxyService;
+
+    @DeleteMapping
+    public Ajax batchDelete(@RequestBody BatchDeleteParam param) {
+        proxyService.batchDeleteProxies(param);
+        return Ajax.success();
+    }
+
+    @PostMapping("tcp")
+    public Ajax createTcpProxy(@RequestBody TcpProxyCreateParam param) {
+        proxyService.createTcpProxy(param);
+        return Ajax.success();
+    }
+
+    @PostMapping("http")
+    public Ajax createHttpProxy(@RequestBody HttpProxyCreateParam param) {
+        proxyService.createHttpProxy(param);
+        return Ajax.success();
+    }
+
+    @PutMapping("tcp")
+    public Ajax updateTcpProxy(@RequestBody TcpProxyUpdateParam param) {
+        proxyService.updateTcpProxy(param);
+        return Ajax.success();
+    }
+
+    @PutMapping("http")
+    public Ajax updateHttpProxy(@RequestBody HttpProxyUpdateParam param) {
+        proxyService.updateHttpProxy(param);
+        return Ajax.success();
+    }
+
+    @DeleteMapping("{id}")
+    public Ajax deleteProxy(@PathVariable String id) {
+        proxyService.deleteProxy(id);
+        return Ajax.success();
+    }
+
+    @GetMapping("tcp/{id}")
+    public Ajax getTcpProxyById(@PathVariable String id) {
+        TcpProxyDTO proxy = proxyService.getTcpProxyById(id);
+        return Ajax.success(proxy);
+    }
+
+    @GetMapping("http/{id}")
+    public Ajax getHttpProxyById(@PathVariable String id) {
+        HttpProxyDTO proxy = proxyService.getHttpProxyById(id);
+        return Ajax.success(proxy);
+    }
+
+    @GetMapping("tcp")
+    public Ajax findTcpProxies(@RequestParam(required = false) String keyword,
+                               @RequestParam(defaultValue = "1") int page,
+                               @RequestParam(defaultValue = "10") int size) {
+        List<TcpProxyDTO> proxies = proxyService.getTcpProxies(keyword, page, size);
+        return Ajax.success(proxies);
+    }
+
+    @GetMapping("http")
+    public Ajax getHttpProxies(@RequestParam(required = false) String keyword,
+                               @RequestParam(defaultValue = "1") int page,
+                               @RequestParam(defaultValue = "10") int size) {
+        List<HttpProxyDTO> proxies = proxyService.getHttpProxies(keyword, page, size);
+        return Ajax.success(proxies);
+    }
+
+    @PutMapping("status/{id}")
+    public Ajax setStatus(@PathVariable String id, @Valid @RequestBody ProxyStatusUpdateParam param) {
+        proxyService.setProxyStatus(id, param.getStatus());
+        return Ajax.success();
+    }
+}

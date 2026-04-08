@@ -85,8 +85,6 @@ declare namespace Api {
     }
   }
 
-
-
   /** 访问令牌类型 */
   namespace AccessToken {
     /** 访问令牌列表项 */
@@ -145,6 +143,30 @@ declare namespace Api {
 
     /** HTTP 代理搜索参数 */
     interface HttpProxySearchParams {
+      keyword?: string
+      page: number
+      size: number
+    }
+  }
+
+  /** 客户端类型 */
+  namespace Agent {
+    /** 客户端列表项 */
+    interface AgentDTO {
+      id: string
+      name: string
+      token: string
+      isOnline: boolean
+      os: string
+      arch: string
+      version: string
+      agentType: number
+      createdAt: string
+      updatedAt: string
+    }
+
+    /** 客户端搜索参数 */
+    interface AgentSearchParams {
       keyword?: string
       page: number
       size: number

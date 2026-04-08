@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *        http:
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,14 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 package com.xiaoniucode.etp.server.web.service.impl;
 
-import com.xiaoniucode.etp.server.web.controller.proxy.request.*;
-import com.xiaoniucode.etp.server.web.controller.proxy.response.HttpProxyDTO;
-import com.xiaoniucode.etp.server.web.controller.proxy.response.TcpProxyDTO;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDTO;
+import com.xiaoniucode.etp.server.web.entity.ProxyDO;
+import com.xiaoniucode.etp.server.web.param.proxy.*;
+import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
+import com.xiaoniucode.etp.server.web.repository.ProxyTargetRepository;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
+import com.xiaoniucode.etp.server.web.service.converter.ProxyConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,29 +35,38 @@ import java.util.List;
 public class ProxyServiceImpl implements ProxyService {
     @Autowired
     private ProxyRepository proxyRepository;
-    @Override
-    public void createTcpProxy(TcpProxyCreateRequest proxy) {
+    @Autowired
+    private ProxyDomainRepository proxyDomainRepository;
+    @Autowired
+    private ProxyTargetRepository proxyTargetRepository;
+    @Autowired
+    private ProxyConvert proxyConvert;
+    @Autowired
+    private ProxyManager proxyManager;
 
+    @Override
+    public void createTcpProxy(TcpProxyCreateParam param) {
     }
 
     @Override
-    public void createHttpProxy(HttpProxyCreateRequest proxy) {
-
+    public void createHttpProxy(HttpProxyCreateParam param) {
+        ProxyDO proxyDO = proxyConvert.httpToEntity(param);
+        proxyDO.setProtocol(ProtocolType.HTTP);
+       proxyDO.setId("test");
+        proxyRepository.save(proxyDO);
+        System.out.println(proxyDO);
     }
 
     @Override
-    public void updateTcpProxy(TcpProxyUpdateRequest request) {
-
+    public void updateTcpProxy(TcpProxyUpdateParam param) {
     }
 
     @Override
-    public void updateHttpProxy(HttpProxyUpdateRequest request) {
-
+    public void updateHttpProxy(HttpProxyUpdateParam param) {
     }
 
     @Override
     public void deleteProxy(String id) {
-
     }
 
     @Override
@@ -66,13 +80,11 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     @Override
-    public void batchDeleteProxies(BatchDeleteRequest request) {
-
+    public void batchDeleteProxies(BatchDeleteParam param) {
     }
 
     @Override
     public void setProxyStatus(String id, Integer status) {
-
     }
 
     @Override
