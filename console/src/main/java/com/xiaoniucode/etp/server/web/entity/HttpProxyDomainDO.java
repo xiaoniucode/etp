@@ -23,9 +23,6 @@ import lombok.NoArgsConstructor;
  * 代理域名实体类
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "http_proxy_domain")
 public class HttpProxyDomainDO {

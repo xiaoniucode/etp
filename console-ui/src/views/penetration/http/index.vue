@@ -1,7 +1,11 @@
 <template>
   <div class="http-page art-full-height">
     <!-- 搜索栏 -->
-    <HttpSearch v-model="searchForm" @search="handleSearch" @reset="resetSearchParams"></HttpSearch>
+    <HttpSearch
+      v-model="searchForm"
+      @search="handleSearch"
+      @reset="resetSearchParams"
+    ></HttpSearch>
 
     <ElCard class="art-table-card">
       <!-- 表格头部 -->
@@ -48,7 +52,16 @@
 
   defineOptions({ name: 'HttpPenetration' })
 
-  type HttpProxyItem = Api.HttpProxy.HttpProxyDTO
+  type HttpProxyItem = {
+    id: string
+    agentId: string
+    name: string
+    protocol: number
+    agentType: number
+    status: number
+    domains: string[]
+    httpProxyPort: number
+  }
 
   // 选中行
   const selectedRows = ref<HttpProxyItem[]>([])
@@ -67,6 +80,12 @@
     return status === 1
       ? { type: 'success' as const, text: '运行中' }
       : { type: 'info' as const, text: '已停止' }
+  }
+
+  const getAgentTypeConfig = (agentType: number) => {
+    return agentType === 0
+      ? { type: 'primary' as const, text: 'Session' }
+      : { type: 'warning' as const, text: 'Binary' }
   }
 
   const {
@@ -102,31 +121,34 @@
           label: '域名',
           minWidth: 200,
           formatter: (row: HttpProxyItem) => {
-            return row.domains.join(', ')
+            if (!row.domains || row.domains.length === 0) {
+              return ''
+            }
+            return row.domains.map(domain => {
+              if (row.httpProxyPort && row.httpProxyPort !== 80) {
+                return `${domain}:${row.httpProxyPort}`
+              }
+              return domain
+            }).join(', ')
           }
         },
         {
-          prop: 'targets',
-          label: '服务列表',
-          width: 100,
+          prop: 'agentType',
+          label: '客户端类型',
+          width: 120,
           formatter: (row: HttpProxyItem) => {
-            return row.targets.length
+            const agentTypeConfig = getAgentTypeConfig(row.agentType)
+            return h(ElTag, { type: agentTypeConfig.type }, () => agentTypeConfig.text)
           }
         },
-
         {
           prop: 'status',
           label: '状态',
-          width: 80,
+          width: 100,
           formatter: (row: HttpProxyItem) => {
             const statusConfig = getProxyStatusConfig(row.status)
             return h(ElTag, { type: statusConfig.type }, () => statusConfig.text)
           }
-        },
-        {
-          prop: 'createdAt',
-          label: '创建时间',
-          width: 180
         },
         {
           prop: 'operation',

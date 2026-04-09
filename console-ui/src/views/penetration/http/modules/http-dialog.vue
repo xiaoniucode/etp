@@ -400,6 +400,7 @@
               status: parseInt(formData.status),
               domainType: parseInt(formData.domainType),
               domains: domainsArray,
+              deploymentMode: formData.deployMode === 'single' ? 1 : 0, // 1: STANDALONE, 0: CLUSTER
               targets: targets,
               bandwidth: {
                 limitTotal: formData.limitTotal,
@@ -441,7 +442,6 @@
           emit('submit')
         } catch (error) {
           console.error('提交失败:', error)
-          ElMessage.error('提交失败')
         }
       }
     })

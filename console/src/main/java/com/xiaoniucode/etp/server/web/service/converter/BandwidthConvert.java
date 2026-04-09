@@ -14,24 +14,19 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.entity;
+package com.xiaoniucode.etp.server.web.service.converter;
 
-import com.xiaoniucode.etp.core.enums.DomainType;
-import com.xiaoniucode.etp.server.web.entity.converter.DomainTypeConverter;
-import jakarta.persistence.*;
-import lombok.Data;
+import com.xiaoniucode.etp.server.web.entity.BandwidthDO;
+import com.xiaoniucode.etp.server.web.param.bandwidth.BandwidthSaveParam;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-@Data
-@Entity
-@Table(name = "http_proxies")
-public class HttpProxyDO {
-    @Id
-    @Column(name = "proxy_id",nullable = false)
-    private String proxyId;
-    /**
-     * 域名类型
-     */
-    @Convert(converter = DomainTypeConverter.class)
-    @Column(name = "domain_type")
-    private DomainType domainType;
+@Mapper(componentModel = "spring")
+public interface BandwidthConvert {
+    BandwidthConvert INSTANCE = Mappers.getMapper(BandwidthConvert.class);
+
+    @Mapping(target = "proxyId", source = "proxyId")
+    BandwidthDO toDO(BandwidthSaveParam param, String proxyId);
 }
+

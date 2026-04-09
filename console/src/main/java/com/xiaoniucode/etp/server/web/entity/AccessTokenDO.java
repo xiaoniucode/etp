@@ -14,11 +14,14 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.entity;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
+
 /**
  * 访问令牌实体类
  */
@@ -52,6 +55,8 @@ public class AccessTokenDO {
      */
     @Column(name = "device_timeout", nullable = false)
     private Integer deviceTimeout;
+    @Column(name = "expire_time"/*, nullable = true*/)
+    private LocalDateTime expireTime;
     /**
      * 最大连接数
      */
@@ -66,4 +71,9 @@ public class AccessTokenDO {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
+
+    public boolean isExpired() {
+        if (expireTime == null) return false;
+        return LocalDateTime.now().isAfter(expireTime);
+    }
 }

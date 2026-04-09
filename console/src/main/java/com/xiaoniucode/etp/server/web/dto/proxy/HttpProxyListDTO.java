@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http:
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,29 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.entity;
+package com.xiaoniucode.etp.server.web.dto.proxy;
 
-import com.xiaoniucode.etp.core.enums.LoadBalanceType;
-import com.xiaoniucode.etp.server.web.entity.converter.LoadBalanceConverter;
-import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-/**
- * 负载均衡实体类
- */
+import java.io.Serializable;
+import java.util.List;
+
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Entity
-@Table(name = "load_balance")
-public class LoadBalanceDO {
-    /**
-     * 代理ID
-     */
-    @Id
-    @Column(nullable = false)
-    private String proxyId;
-    /**
-     * 负载均衡类型
-     */
-    @Convert(converter = LoadBalanceConverter.class)
-    private LoadBalanceType type;
+public class HttpProxyListDTO extends ProxyListDTO implements Serializable {
+    private List<String> domains;
+    private Integer httpProxyPort;
 }

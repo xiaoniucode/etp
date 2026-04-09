@@ -22,4 +22,6 @@ public interface AgentRepository extends JpaRepository<AgentDO, String> {
      */
     @Query("SELECT a FROM AgentDO a WHERE a.name LIKE %:keyword% OR a.id LIKE %:keyword%")
     Page<AgentDO> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    List<AgentDO> findByIdIn(List<String> agentIds);
 }

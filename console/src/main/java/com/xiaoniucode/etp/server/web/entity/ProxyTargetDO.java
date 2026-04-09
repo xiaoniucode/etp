@@ -23,9 +23,6 @@ import lombok.NoArgsConstructor;
  * 代理目标实体类
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "proxy_target")
 public class ProxyTargetDO {

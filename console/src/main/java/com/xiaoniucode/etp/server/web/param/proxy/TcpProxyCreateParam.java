@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.param.proxy;
+import com.xiaoniucode.etp.server.web.param.proxytarget.ProxyTargetAddParam;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

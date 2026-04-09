@@ -15,25 +15,50 @@
  */
 package com.xiaoniucode.etp.server.web.service.converter;
 
-import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDTO;
-import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDTO;
+import com.xiaoniucode.etp.core.enums.DomainType;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
+import com.xiaoniucode.etp.server.web.entity.HttpProxyDO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
+import com.xiaoniucode.etp.server.web.entity.TcpProxyDO;
 import com.xiaoniucode.etp.server.web.param.proxy.HttpProxyCreateParam;
+import com.xiaoniucode.etp.server.web.param.proxy.HttpProxyUpdateParam;
+import com.xiaoniucode.etp.server.web.param.proxy.TcpProxyCreateParam;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", imports = {ProtocolType.class, DomainType.class})
 public interface ProxyConvert {
     ProxyConvert INSTANCE = Mappers.getMapper(ProxyConvert.class);
 
-    HttpProxyDTO toHttpDTO(ProxyDO proxy, int httpProxyPort);
+    @Mapping(target = "protocol", expression = "java(ProtocolType.HTTP)")
+    @Mapping(source = "proxyId", target = "id")
+    ProxyDO toDO(HttpProxyCreateParam request, String proxyId);
 
-    List<HttpProxyDTO> toHttpDTOList(List<ProxyDO> proxies);
-    ProxyDO httpToEntity(HttpProxyCreateParam request);
+    @Mapping(target = "id", ignore = true)
+    void updateDO(HttpProxyUpdateParam param, @MappingTarget ProxyDO proxyDO);
 
-    TcpProxyDTO toTcpDTO(ProxyDO proxy);
+    @Mapping(target = "domainType", expression = "java(DomainType.fromCode(param.getDomainType()))")
+    HttpProxyDO toHttpDO(HttpProxyCreateParam param, String proxyId);
 
-    List<TcpProxyDTO> toTcpDTOList(List<ProxyDO> proxies);
+    @Mapping(target = "domainType", expression = "java(DomainType.fromCode(param.getDomainType()))")
+    void updateHttpDO(HttpProxyUpdateParam param, @MappingTarget HttpProxyDO httpProxyDO);
+
+
+    List<HttpProxyListDTO> toHttpDTOList(List<ProxyDO> proxies);
+
+    HttpProxyListDTO toHttpDTO(ProxyDO proxy, int httpProxyPort);
+
+    TcpProxyDO toTcpDO(TcpProxyCreateParam param);
+
+    TcpProxyListDTO toTcpDTO(ProxyDO proxy);
+
+    List<TcpProxyListDTO> toTcpDTOList(List<ProxyDO> proxies);
+
+
 }

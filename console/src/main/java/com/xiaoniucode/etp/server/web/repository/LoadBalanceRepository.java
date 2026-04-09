@@ -14,24 +14,12 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.entity;
+package com.xiaoniucode.etp.server.web.repository;
 
-import com.xiaoniucode.etp.core.enums.DomainType;
-import com.xiaoniucode.etp.server.web.entity.converter.DomainTypeConverter;
-import jakarta.persistence.*;
-import lombok.Data;
+import com.xiaoniucode.etp.server.web.entity.LoadBalanceDO;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-@Data
-@Entity
-@Table(name = "http_proxies")
-public class HttpProxyDO {
-    @Id
-    @Column(name = "proxy_id",nullable = false)
-    private String proxyId;
-    /**
-     * 域名类型
-     */
-    @Convert(converter = DomainTypeConverter.class)
-    @Column(name = "domain_type")
-    private DomainType domainType;
+@Repository
+public interface LoadBalanceRepository extends JpaRepository<LoadBalanceDO, String> {
 }

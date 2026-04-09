@@ -14,13 +14,18 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.controller.proxy.request;
+package com.xiaoniucode.etp.server.web.dto.proxy;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class StatusUpdateRequest {
-    @NotNull
+public class ProxyListDTO implements Serializable {
+    private String id;
+    private String agentId;
+    private String name;
+    private Integer protocol;
+    private Integer agentType;
     private Integer status;
 }

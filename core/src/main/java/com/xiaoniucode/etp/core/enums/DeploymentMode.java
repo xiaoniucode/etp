@@ -39,4 +39,10 @@ public enum DeploymentMode {
         }
         return null;
     }
+    public boolean isCluster(){
+       return this==CLUSTER;
+    }
+    public boolean isStandalone(){
+        return this==STANDALONE;
+    }
 }

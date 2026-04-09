@@ -15,8 +15,10 @@
  */
 package com.xiaoniucode.etp.server.web.service;
 
-import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDTO;
-import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
 
 import java.util.List;
@@ -50,15 +52,15 @@ public interface ProxyService {
     /**
      * 根据 ID 查询tcp代理
      */
-    TcpProxyDTO getTcpProxyById(String id);
+    TcpProxyDetailDTO getTcpProxyById(String id);
 
-    HttpProxyDTO getHttpProxyById(String id);
+    HttpProxyDetailDTO  getHttpProxyById(String id);
 
-    void batchDeleteProxies(BatchDeleteParam param);
+    void batchDeleteProxies(ProxyBatchDeleteParam param);
 
     void setProxyStatus(String id, Integer status);
 
-    List<TcpProxyDTO> getTcpProxies(String keyword, int page, int size);
+    List<TcpProxyListDTO> getTcpProxies(String keyword, int page, int size);
 
-    List<HttpProxyDTO> getHttpProxies(String keyword, int page, int size);
+    List<HttpProxyListDTO> getHttpProxies(String keyword, int page, int size);
 }

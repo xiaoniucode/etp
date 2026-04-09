@@ -15,7 +15,11 @@
  */
 package com.xiaoniucode.etp.server.web.param.proxy;
 
+import com.xiaoniucode.etp.core.enums.DeploymentMode;
+import com.xiaoniucode.etp.server.web.param.bandwidth.BandwidthSaveParam;
 import com.xiaoniucode.etp.server.web.param.loadbalance.LoadBalanceParam;
+import com.xiaoniucode.etp.server.web.param.proxytarget.ProxyTargetAddParam;
+import com.xiaoniucode.etp.server.web.param.transport.TransportSaveParam;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -39,10 +43,12 @@ public class HttpProxyCreateParam {
     @NotNull(message = "domainType 不能为空")
     private Integer domainType;
     private Set<String> domains;
+    @NotNull(message = "部署模式不能为空")
+    private DeploymentMode deploymentMode;
     @NotNull(message = "targets 不能为空")
     private List<ProxyTargetAddParam> targets;
-    private BandwidthAddParam bandwidth;
+    private BandwidthSaveParam bandwidth;
     private LoadBalanceParam loadBalance;
     @NotNull(message = "transport 不能为空")
-    private TransportAddParam transport;
+    private TransportSaveParam transport;
 }

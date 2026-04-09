@@ -13,29 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.entity;
-
-import com.xiaoniucode.etp.core.enums.LoadBalanceType;
-import com.xiaoniucode.etp.server.web.entity.converter.LoadBalanceConverter;
-import jakarta.persistence.*;
-import lombok.Data;
-
-/**
- * 负载均衡实体类
- */
-@Data
-@Entity
-@Table(name = "load_balance")
-public class LoadBalanceDO {
-    /**
-     * 代理ID
-     */
-    @Id
-    @Column(nullable = false)
-    private String proxyId;
-    /**
-     * 负载均衡类型
-     */
-    @Convert(converter = LoadBalanceConverter.class)
-    private LoadBalanceType type;
+package com.xiaoniucode.etp.server.web.param.proxy;
+public class ProxyBatchDeleteParam {
 }

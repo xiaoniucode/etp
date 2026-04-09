@@ -16,8 +16,10 @@
 package com.xiaoniucode.etp.server.web.controller;
 
 import com.xiaoniucode.etp.server.web.common.Ajax;
-import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDTO;
-import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import jakarta.validation.Valid;
@@ -33,7 +35,7 @@ public class ProxyController {
     private ProxyService proxyService;
 
     @DeleteMapping
-    public Ajax batchDelete(@RequestBody BatchDeleteParam param) {
+    public Ajax batchDelete(@RequestBody ProxyBatchDeleteParam param) {
         proxyService.batchDeleteProxies(param);
         return Ajax.success();
     }
@@ -69,14 +71,14 @@ public class ProxyController {
     }
 
     @GetMapping("tcp/{id}")
-    public Ajax getTcpProxyById(@PathVariable String id) {
-        TcpProxyDTO proxy = proxyService.getTcpProxyById(id);
+    public Ajax getTcpProxyDetailById(@PathVariable String id) {
+        TcpProxyDetailDTO proxy = proxyService.getTcpProxyById(id);
         return Ajax.success(proxy);
     }
 
     @GetMapping("http/{id}")
-    public Ajax getHttpProxyById(@PathVariable String id) {
-        HttpProxyDTO proxy = proxyService.getHttpProxyById(id);
+    public Ajax getHttpProxyDetailById(@PathVariable String id) {
+        HttpProxyDetailDTO proxy = proxyService.getHttpProxyById(id);
         return Ajax.success(proxy);
     }
 
@@ -84,7 +86,7 @@ public class ProxyController {
     public Ajax findTcpProxies(@RequestParam(required = false) String keyword,
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int size) {
-        List<TcpProxyDTO> proxies = proxyService.getTcpProxies(keyword, page, size);
+        List<TcpProxyListDTO> proxies = proxyService.getTcpProxies(keyword, page, size);
         return Ajax.success(proxies);
     }
 
@@ -92,7 +94,7 @@ public class ProxyController {
     public Ajax getHttpProxies(@RequestParam(required = false) String keyword,
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int size) {
-        List<HttpProxyDTO> proxies = proxyService.getHttpProxies(keyword, page, size);
+        List<HttpProxyListDTO> proxies = proxyService.getHttpProxies(keyword, page, size);
         return Ajax.success(proxies);
     }
 
