@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.service.converter;
 
+import com.xiaoniucode.etp.server.web.dto.bandwidth.BandwidthDTO;
 import com.xiaoniucode.etp.server.web.entity.BandwidthDO;
 import com.xiaoniucode.etp.server.web.param.bandwidth.BandwidthSaveParam;
 import org.mapstruct.Mapper;
@@ -28,5 +29,7 @@ public interface BandwidthConvert {
 
     @Mapping(target = "proxyId", source = "proxyId")
     BandwidthDO toDO(BandwidthSaveParam param, String proxyId);
+
+    BandwidthDTO toDTO(BandwidthDO bandwidthDO);
 }
 

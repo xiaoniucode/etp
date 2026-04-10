@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service.impl;
-import com.xiaoniucode.etp.server.web.common.BizException;
+import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.entity.SysUserDO;
 import com.xiaoniucode.etp.server.web.param.user.UserPasswordUpdateParam;
 import com.xiaoniucode.etp.server.web.repository.UserRepository;

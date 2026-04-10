@@ -14,8 +14,12 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.param.loadbalance;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
 @Data
 public class LoadBalanceParam {
+    @NotNull(message = "负载均衡策略不能为空")
     private Integer strategy;
 }

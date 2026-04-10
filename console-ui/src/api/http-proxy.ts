@@ -37,3 +37,14 @@ export function fetchUpdateHttpProxy(data: any) {
     showSuccessMessage: true
   })
 }
+
+/**
+ * 获取 HTTP 代理详情
+ * @param id 代理ID
+ * @returns HTTP 代理详情
+ */
+export function fetchGetHttpProxyById(id: string) {
+  return request.get({
+    url: `/api/proxies/http/${id}`
+  })
+}

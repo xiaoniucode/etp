@@ -13,16 +13,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.dto.proxy;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import java.util.List;
-
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class HttpProxyDetailDTO extends ProxyDetailDTO {
-   private List<String> domains;
-   private Integer domainType;
+package com.xiaoniucode.etp.server.web.common.utils;
+/**
+ * @author liuxin
+ */
+public final class DigestUtil {
+    private static final String GLOBAL_SALT = "XILIO-ETP-2025!@#";
+    private DigestUtil() {
+    }
+    public static String encode(String password, String salt) {
+        return MD5.of(password, GLOBAL_SALT + salt);
+    }
 }

@@ -181,7 +181,11 @@
   import type { FormInstance, FormRules } from 'element-plus'
   import { ElMessage } from 'element-plus'
   import { fetchGetAgentListAll } from '@/api/agent'
-  import { fetchCreateHttpProxy, fetchUpdateHttpProxy } from '@/api/http-proxy'
+  import {
+    fetchCreateHttpProxy,
+    fetchUpdateHttpProxy,
+    fetchGetHttpProxyById
+  } from '@/api/http-proxy'
 
   interface Props {
     visible: boolean
@@ -298,33 +302,102 @@
     formData.targets.splice(index, 1)
   }
 
-  const initFormData = () => {
-    const isEdit = props.type === 'edit' && props.proxyData
-    const row = props.proxyData
+  const initFormData = async () => {
+    const isEdit = props.type === 'edit' && props.proxyData && props.proxyData.id
 
-    Object.assign(formData, {
-      agentId: isEdit && row ? row.agentId || '' : '',
-      name: isEdit && row ? row.name || '' : '',
-      status: isEdit && row ? row.status?.toString() || '1' : '1',
-      domainType: isEdit && row ? row.domainType?.toString() || '0' : '0',
-      domains: isEdit && row && row.domains ? row.domains.join('\n') : '',
-      encrypt: isEdit && row ? row.encrypt || false : false,
-      tunnelType: isEdit && row ? row.tunnelType?.toString() || '1' : '1',
-      targets:
-        isEdit && row && row.targets
-          ? row.targets.map((t) => ({
-              id: t.id || '',
-              host: t.host || '',
-              port: t.port || 80,
-              weight: t.weight || 1,
-              name: t.name || ''
-            }))
-          : [],
-      limitTotal: isEdit && row && row.bandwidth ? row.bandwidth.uploadLimit?.toString() || '' : '',
-      limitIn: isEdit && row && row.bandwidth ? row.bandwidth.downloadLimit?.toString() || '' : '',
-      limitOut: '',
-      loadBalanceStrategy: '1'
-    })
+    if (isEdit) {
+      try {
+        // 从服务端获取真实的代理详情数据
+        const proxyDetail = await fetchGetHttpProxyById(props.proxyData!.id!)
+
+        Object.assign(formData, {
+          agentId: proxyDetail.agentId || '',
+          name: proxyDetail.name || '',
+          status: proxyDetail.status?.toString() || '1',
+          domainType: proxyDetail.domainType?.toString() || '0',
+          domains: proxyDetail.domain ? proxyDetail.domain.join('\n') : '',
+          encrypt: proxyDetail.transport?.encrypt || false,
+          tunnelType: proxyDetail.tunnelType?.toString() || '1',
+          deployMode: proxyDetail.deploymentMode === 1 ? 'single' : 'cluster',
+          singleHost:
+            proxyDetail.targets && proxyDetail.targets.length > 0
+              ? proxyDetail.targets[0].host || '127.0.0.1'
+              : '127.0.0.1',
+          singlePort:
+            proxyDetail.targets && proxyDetail.targets.length > 0
+              ? proxyDetail.targets[0].port || 80
+              : 80,
+          targets: proxyDetail.targets
+            ? proxyDetail.targets.map((t: any) => ({
+                id: t.id || '',
+                host: t.host || '',
+                port: t.port || 80,
+                weight: t.weight || 1,
+                name: t.name || ''
+              }))
+            : [],
+          limitTotal: proxyDetail.bandwidth
+            ? proxyDetail.bandwidth.uploadLimit?.toString() || ''
+            : '',
+          limitIn: proxyDetail.bandwidth
+            ? proxyDetail.bandwidth.downloadLimit?.toString() || ''
+            : '',
+          limitOut: '',
+          loadBalanceStrategy: proxyDetail.loadBalance?.strategy?.toString() || '1'
+        })
+      } catch (error) {
+        console.error('获取代理详情失败:', error)
+        ElMessage.error('获取代理详情失败，请稍后重试')
+
+        // 失败时使用props.proxyData作为 fallback
+        const row = props.proxyData
+        Object.assign(formData, {
+          agentId: row ? row.agentId || '' : '',
+          name: row ? row.name || '' : '',
+          status: row ? row.status?.toString() || '1' : '1',
+          domainType: row ? row.domainType?.toString() || '0' : '0',
+          domains: row && row.domains ? row.domains.join('\n') : '',
+          encrypt: row ? row.encrypt || false : false,
+          tunnelType: row ? row.tunnelType?.toString() || '1' : '1',
+          deployMode: 'single',
+          singleHost: '127.0.0.1',
+          singlePort: 80,
+          targets:
+            row && row.targets
+              ? row.targets.map((t: any) => ({
+                  id: t.id || '',
+                  host: t.host || '',
+                  port: t.port || 80,
+                  weight: t.weight || 1,
+                  name: t.name || ''
+                }))
+              : [],
+          limitTotal: row && row.bandwidth ? row.bandwidth.uploadLimit?.toString() || '' : '',
+          limitIn: row && row.bandwidth ? row.bandwidth.downloadLimit?.toString() || '' : '',
+          limitOut: '',
+          loadBalanceStrategy: '1'
+        })
+      }
+    } else {
+      // 新增模式，使用默认值
+      Object.assign(formData, {
+        agentId: '',
+        name: '',
+        status: '1',
+        domainType: '0',
+        domains: '',
+        encrypt: false,
+        tunnelType: '1',
+        deployMode: 'single',
+        singleHost: '127.0.0.1',
+        singlePort: 80,
+        targets: [],
+        limitTotal: '',
+        limitIn: '',
+        limitOut: '',
+        loadBalanceStrategy: '1'
+      })
+    }
 
     // 如果没有目标地址，添加一个默认的
     if (formData.targets.length === 0) {
@@ -334,10 +407,10 @@
 
   watch(
     () => [props.visible, props.type, props.proxyData],
-    ([visible]) => {
+    async ([visible]) => {
       if (visible) {
-        fetchAgents()
-        initFormData()
+        await fetchAgents()
+        await initFormData()
         nextTick(() => {
           formRef.value?.clearValidate()
         })

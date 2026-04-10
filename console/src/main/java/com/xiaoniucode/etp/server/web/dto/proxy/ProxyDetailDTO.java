@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.web.dto.proxy;
 
 import com.xiaoniucode.etp.server.web.dto.bandwidth.BandwidthDTO;
+import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
 import com.xiaoniucode.etp.server.web.dto.transport.TransportDTO;
 import lombok.Data;
 
@@ -31,9 +32,11 @@ public class ProxyDetailDTO implements Serializable {
     private String name;
     private Integer protocol;
     private Integer agentType;
+    private Integer deploymentMode;
     private Integer status;
     private TransportDTO transport;
     private BandwidthDTO bandwidth;
+    private LoadBalanceDTO loadBalance;
     private List<TargetDTO> targets;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

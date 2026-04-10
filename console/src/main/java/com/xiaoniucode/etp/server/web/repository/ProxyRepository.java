@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * 代理 Repository
  */
@@ -24,4 +26,18 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String> {
             ORDER BY p.updatedAt DESC
             """)
     Page<ProxyDO> findHttpProxiesByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+
+
+    @Query("""
+            SELECT hp,a, t, b, lb
+            FROM ProxyDO p
+            LEFT JOIN HttpProxyDO hp ON hp.proxyId = p.id
+            LEFT JOIN AgentDO a ON p.agentId = a.id
+            LEFT JOIN TransportDO t ON t.proxyId = p.id
+            LEFT JOIN BandwidthDO b ON b.proxyId = p.id
+            LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
+            WHERE p.id = :id
+            """)
+    Optional<Object[]> findHttpProxyDetailWithAssociations(@Param("id") String id);
 }

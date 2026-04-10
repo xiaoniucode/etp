@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.service.converter;
 
+import com.xiaoniucode.etp.server.web.dto.proxy.TargetDTO;
 import com.xiaoniucode.etp.server.web.entity.ProxyTargetDO;
 import com.xiaoniucode.etp.server.web.param.proxytarget.ProxyTargetAddParam;
 import org.mapstruct.Mapper;
@@ -38,5 +39,7 @@ public interface ProxyTargetConvert {
                 .map(param -> toDO(param, proxyId))
                 .collect(java.util.stream.Collectors.toList());
     }
+
+    List<TargetDTO> toDTOList(List<ProxyTargetDO> proxyTargetDos);
 }
 

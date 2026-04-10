@@ -18,17 +18,19 @@ package com.xiaoniucode.etp.server.web.service.impl;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
-import com.xiaoniucode.etp.server.web.common.BizException;
-import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
-import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
-import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
-import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;
+import com.xiaoniucode.etp.server.web.common.exception.BizException;
+import com.xiaoniucode.etp.server.web.dto.bandwidth.BandwidthDTO;
+import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.*;
+import com.xiaoniucode.etp.server.web.dto.transport.TransportDTO;
 import com.xiaoniucode.etp.server.web.entity.*;
 import com.xiaoniucode.etp.server.web.param.loadbalance.LoadBalanceParam;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
 import com.xiaoniucode.etp.server.web.repository.*;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import com.xiaoniucode.etp.server.web.service.converter.*;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,6 +85,25 @@ public class ProxyServiceImpl implements ProxyService {
     private ProxyManager proxyManager;
     @Resource
     private AppConfig appConfig;
+    private ExecutorService executorService;
+
+    @PostConstruct
+    public void init() {
+        executorService = Executors.newVirtualThreadPerTaskExecutor();
+    }
+
+    @PreDestroy
+    public void destroy() {
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -235,15 +257,13 @@ public class ProxyServiceImpl implements ProxyService {
 
         return proxyList.stream()
                 .map(proxyDO -> {
-                    HttpProxyListDTO httpDTO = proxyConvert.toHttpDTO(proxyDO, httpProxyPort);
-
+                    HttpProxyListDTO httpDTO = proxyConvert.toHttpListDTO(proxyDO, httpProxyPort);
                     AgentDO agentDO = agentMap.get(proxyDO.getAgentId());
                     if (agentDO != null && agentDO.getAgentType() != null) {
                         httpDTO.setAgentType(agentDO.getAgentType().getCode());
                     }
-
                     httpDTO.setDomains(domainsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
-
+                    httpDTO.setHttpProxyPort(httpProxyPort);
                     return httpDTO;
                 })
                 .collect(Collectors.toList());
@@ -251,7 +271,66 @@ public class ProxyServiceImpl implements ProxyService {
 
     @Override
     public HttpProxyDetailDTO getHttpProxyById(String id) {
-        return null;
+        // 1. 查主表
+        ProxyDO proxyDO = proxyRepository.findById(id)
+                .orElseThrow(() -> new BizException("HTTP 代理不存在"));
+
+        // 2. 并发查询关联数据
+        try {
+            Future<Object[]> httpDetailFuture = executorService.submit(() ->
+                    proxyRepository.findHttpProxyDetailWithAssociations(id).orElse(new Object[5])
+            );
+
+            Future<List<ProxyTargetDO>> proxyTargetsFuture = executorService.submit(() ->
+                    proxyTargetRepository.findByProxyId(id)
+            );
+
+            Future<List<HttpProxyDomainDO>> domainsFuture = executorService.submit(() ->
+                    proxyDomainRepository.findByProxyId(id)
+            );
+
+            Object[] result = httpDetailFuture.get();
+            Object[] entities = (Object[]) result[0];
+
+            HttpProxyDO httpProxyDO = (HttpProxyDO) entities[0];
+            AgentDO agentDO = (AgentDO) entities[1];
+            TransportDO transportDO = (TransportDO) entities[2];
+            BandwidthDO bandwidthDO = (BandwidthDO) entities[3];
+            LoadBalanceDO loadBalanceDO = (LoadBalanceDO) entities[4];
+
+            List<ProxyTargetDO> proxyTargetDos = proxyTargetsFuture.get();
+            List<HttpProxyDomainDO> httpProxyDomainDOs = domainsFuture.get();
+
+            HttpProxyDetailDTO httpProxyDetailDTO = proxyConvert.toHttpDetailDTO(proxyDO, httpProxyDO, agentDO.getAgentType().getCode());
+            TransportDTO transportDTO = transportConvert.toDTO(transportDO);
+            BandwidthDTO bandwidthDTO = bandwidthConvert.toDTO(bandwidthDO);
+
+            List<TargetDTO> targetDTOList = proxyTargetConvert.toDTOList(proxyTargetDos);
+            httpProxyDetailDTO.setTransport(transportDTO);
+            httpProxyDetailDTO.setBandwidth(bandwidthDTO);
+
+            if (proxyDO.getDeploymentMode().isCluster()) {
+                LoadBalanceDTO loadBalanceDTO = loadBalanceConvert.toDTO(loadBalanceDO);
+                httpProxyDetailDTO.setLoadBalance(loadBalanceDTO);
+            }
+
+            httpProxyDetailDTO.setTargets(targetDTOList);
+            List<String> domains = httpProxyDomainDOs.stream().map(HttpProxyDomainDO::getDomain).toList();
+            httpProxyDetailDTO.setDomains(domains);
+            return httpProxyDetailDTO;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.warn("查询被中断, proxyId: {}", id, e);
+            throw new BizException("查询被中断");
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            logger.error("HTTP 代理配置详情获取失败, proxyId: {}", id, cause);
+
+            if (cause instanceof BizException) {
+                throw (BizException) cause;
+            }
+            throw new BizException("HTTP 代理配置详情获取失败: " + (cause != null ? cause.getMessage() : e.getMessage()));
+        }
     }
 
     @Override

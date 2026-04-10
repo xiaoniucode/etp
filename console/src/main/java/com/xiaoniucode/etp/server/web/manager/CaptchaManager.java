@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.server.web.manager;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
-import com.xiaoniucode.etp.server.web.common.BizException;
+import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

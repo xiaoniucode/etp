@@ -13,16 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.dto.proxy;
+
+package com.xiaoniucode.etp.server.web.dto.loadbalance;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import java.util.List;
+import java.io.Serializable;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class HttpProxyDetailDTO extends ProxyDetailDTO {
-   private List<String> domains;
-   private Integer domainType;
+public class LoadBalanceDTO implements Serializable {
+    private Integer strategy;
 }

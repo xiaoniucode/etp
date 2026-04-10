@@ -17,10 +17,15 @@ package com.xiaoniucode.etp.server.web.repository;
 import com.xiaoniucode.etp.server.web.entity.ProxyTargetDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
 /**
  * 代理目标 Repository
  */
 @Repository
 public interface ProxyTargetRepository extends JpaRepository<ProxyTargetDO, Integer> {
     void deleteByProxyId(String proxyId);
+
+    List<ProxyTargetDO> findByProxyId(String id);
 }

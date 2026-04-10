@@ -17,6 +17,8 @@ package com.xiaoniucode.etp.server.web.service.converter;
 
 import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.enums.TunnelType;
+import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
 import com.xiaoniucode.etp.server.web.entity.HttpProxyDO;
@@ -28,6 +30,7 @@ import com.xiaoniucode.etp.server.web.param.proxy.TcpProxyCreateParam;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -49,10 +52,11 @@ public interface ProxyConvert {
     @Mapping(target = "domainType", expression = "java(DomainType.fromCode(param.getDomainType()))")
     void updateHttpDO(HttpProxyUpdateParam param, @MappingTarget HttpProxyDO httpProxyDO);
 
+    @Mapping(source = "agentType", target = "agentType")
+    @Mapping(source = "httpProxyDO.domainType", target = "domainType", qualifiedByName = "domainTypeToCode")
+    HttpProxyDetailDTO toHttpDetailDTO(ProxyDO proxyDO, HttpProxyDO httpProxyDO, Integer agentType);
 
     List<HttpProxyListDTO> toHttpDTOList(List<ProxyDO> proxies);
-
-    HttpProxyListDTO toHttpDTO(ProxyDO proxy, int httpProxyPort);
 
     TcpProxyDO toTcpDO(TcpProxyCreateParam param);
 
@@ -60,5 +64,11 @@ public interface ProxyConvert {
 
     List<TcpProxyListDTO> toTcpDTOList(List<ProxyDO> proxies);
 
+    @Named("domainTypeToCode")
+    static Integer domainTypeToCode(DomainType domainType) {
+        return domainType != null ? domainType.getCode() : null;
+    }
 
+    @Mapping(source = "httpProxyPort", target = "httpProxyPort")
+    HttpProxyListDTO toHttpListDTO(ProxyDO proxyDO, int httpProxyPort);
 }

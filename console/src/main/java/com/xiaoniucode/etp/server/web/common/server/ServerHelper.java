@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.server.web.common.server.domain.CpuInfo;
 import com.xiaoniucode.etp.server.web.common.server.domain.JvmMemoryInfo;
 import com.xiaoniucode.etp.server.web.common.server.domain.OsMemoryInfo;
 import com.xiaoniucode.etp.server.web.common.server.domain.ServerInfo;
-import com.xiaoniucode.etp.server.web.common.ByteUtils;
+import com.xiaoniucode.etp.server.web.common.utils.ByteUtils;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;

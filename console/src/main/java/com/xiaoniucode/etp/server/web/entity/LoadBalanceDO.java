@@ -37,5 +37,5 @@ public class LoadBalanceDO {
      * 负载均衡类型
      */
     @Convert(converter = LoadBalanceConverter.class)
-    private LoadBalanceType type;
+    private LoadBalanceType strategy;
 }

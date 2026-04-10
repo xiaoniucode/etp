@@ -44,7 +44,7 @@
   import { ref, h, nextTick } from 'vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { fetchGetHttpProxyList } from '@/api/http-proxy'
+  import { fetchGetHttpProxyList, fetchGetHttpProxyById } from '@/api/http-proxy'
   import HttpSearch from './modules/http-search.vue'
   import HttpDialog from './modules/http-dialog.vue'
   import { ElTag, ElMessage } from 'element-plus'
@@ -201,6 +201,7 @@
     console.log('打开弹窗:', { type, row })
     dialogType.value = type
     currentProxyData.value = row || {}
+    
     nextTick(() => {
       dialogVisible.value = true
     })

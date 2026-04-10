@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.web.service.converter;
 
 import com.xiaoniucode.etp.core.enums.TunnelType;
+import com.xiaoniucode.etp.server.web.dto.transport.TransportDTO;
 import com.xiaoniucode.etp.server.web.entity.TransportDO;
 import com.xiaoniucode.etp.server.web.param.transport.TransportSaveParam;
 import org.mapstruct.Mapper;
@@ -30,5 +31,7 @@ public interface TransportConvert {
     @Mapping(target = "proxyId", source = "proxyId")
     @Mapping(target = "tunnelType", expression = "java(TunnelType.fromCode(param.getTunnelType()))")
     TransportDO toDO(TransportSaveParam param, String proxyId);
+    @Mapping(target = "tunnelType", expression = "java(transportDO.getTunnelType().getCode())")
+    TransportDTO toDTO(TransportDO transportDO);
 }
 

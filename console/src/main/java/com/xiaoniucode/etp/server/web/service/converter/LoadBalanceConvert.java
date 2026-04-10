@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.web.service.converter;
 
 import com.xiaoniucode.etp.core.enums.LoadBalanceType;
+import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
 import com.xiaoniucode.etp.server.web.entity.LoadBalanceDO;
 import com.xiaoniucode.etp.server.web.param.loadbalance.LoadBalanceParam;
 import org.mapstruct.Mapper;
@@ -29,10 +30,13 @@ public interface LoadBalanceConvert {
     LoadBalanceConvert INSTANCE = Mappers.getMapper(LoadBalanceConvert.class);
 
     @Mapping(target = "proxyId", source = "proxyId")
-    @Mapping(target = "type", expression = "java(LoadBalanceType.fromCode(param.getStrategy()))")
+    @Mapping(target = "strategy", expression = "java(LoadBalanceType.fromCode(param.getStrategy()))")
     LoadBalanceDO toDO(LoadBalanceParam param, String proxyId);
 
-    @Mapping(target = "type", expression = "java(LoadBalanceType.fromCode(param.getStrategy()))")
+    @Mapping(target = "strategy", expression = "java(LoadBalanceType.fromCode(param.getStrategy()))")
     void updateDO(LoadBalanceParam param, @MappingTarget LoadBalanceDO loadBalanceDO);
+
+    @Mapping(target = "strategy", expression = "java(loadBalanceDO.getStrategy().getCode())")
+    LoadBalanceDTO toDTO(LoadBalanceDO loadBalanceDO);
 }
 
