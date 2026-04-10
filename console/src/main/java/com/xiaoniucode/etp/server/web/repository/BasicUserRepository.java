@@ -9,8 +9,10 @@ import java.util.List;
  * HttpUser Repository
  */
 @Repository
-public interface BasicUserRepository extends JpaRepository<BasicUserDO, Integer> {
+public interface BasicUserRepository extends JpaRepository<BasicUserDO, Long> {
     void deleteByProxyId(String id);
 
     void deleteByProxyIdIn(List<String> ids);
+
+    List<BasicUserDO> findByProxyId(String proxyId);
 }

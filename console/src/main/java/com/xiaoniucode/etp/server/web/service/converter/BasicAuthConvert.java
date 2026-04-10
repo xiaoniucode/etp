@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http:
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,26 +14,31 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service.converter;
-import com.xiaoniucode.etp.server.web.dto.auth.BasicAuthDTO;
-import com.xiaoniucode.etp.server.web.dto.proxyuser.HttpUserDTO;
+
+import com.xiaoniucode.etp.server.web.dto.basicauth.BasicAuthDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.basicauth.BasicUserDTO;
 import com.xiaoniucode.etp.server.web.entity.BasicAuthDO;
 import com.xiaoniucode.etp.server.web.entity.BasicUserDO;
 import com.xiaoniucode.etp.server.web.param.basicauth.httpuser.HttpUserAddParam;
 import com.xiaoniucode.etp.server.web.param.basicauth.httpuser.HttpUserUpdateParam;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
-@Mapper
+import java.util.List;
+
+@Mapper(componentModel = "spring")
 public interface BasicAuthConvert {
-    BasicAuthConvert INSTANCE = Mappers.getMapper(BasicAuthConvert.class);
-    
-    BasicAuthDTO toBasicAuthDTO(BasicAuthDO basicAuth);
-    
-    HttpUserDTO toHttpUserDTO(BasicUserDO httpUser);
-    
-    BasicUserDO toHttpUser(HttpUserDTO dto);
-    
-    BasicUserDO toHttpUser(HttpUserAddParam request);
-    
-    BasicAuthDO toBasicAuth(HttpUserUpdateParam request);
+    @Mapping(expression = "java(toUserDTOList(basicUserDOS))", target = "users")
+    BasicAuthDetailDTO toDetailDTO(BasicAuthDO basicAuthDO, List<BasicUserDO> basicUserDOS);
+
+    BasicUserDTO toUserDTO(BasicUserDO basicUserDO);
+
+    List<BasicUserDTO> toUserDTOList(List<BasicUserDO> basicUserDOS);
+
+    BasicUserDO toUserDO(HttpUserAddParam param);
+
+    void updateUserDO(@MappingTarget BasicUserDO basicUserDO, HttpUserUpdateParam param);
 }
+
+

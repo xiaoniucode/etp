@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http:
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,22 +13,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.param.basicauth;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+package com.xiaoniucode.etp.server.web.dto.basicauth;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
+
 /**
- * 更新 BasicAuth 请求
+ * BasicAuth DTO
  */
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class BasicAuthAddParam {
-    @NotNull(message = "代理 ID 不能为空")
+public class BasicAuthDetailDTO {
     private String proxyId;
-    @NotNull(message = "启用状态不能为空")
-    private Boolean enable;
+    private Boolean enabled;
+    private List<BasicUserDTO> users;
 }

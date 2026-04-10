@@ -44,6 +44,13 @@
         :proxy-id="currentAccessControlProxyId"
         @close="handleAccessControlClose"
       />
+
+      <!-- Basic Auth 弹窗 -->
+      <BasicAuthDialog
+        v-model:visible="basicAuthDialogVisible"
+        :proxy-id="currentBasicAuthProxyId"
+        @close="handleBasicAuthClose"
+      />
     </ElCard>
   </div>
 </template>
@@ -56,6 +63,7 @@
   import HttpSearch from './modules/http-search.vue'
   import HttpDialog from './modules/http-dialog.vue'
   import AccessControlDialog from '../modules/access-control-dialog.vue'
+  import BasicAuthDialog from './modules/basic-auth-dialog.vue'
   import { ElTag, ElMessage, ElMessageBox } from 'element-plus'
   import { DialogType } from '@/types'
 
@@ -88,6 +96,10 @@
   // 访问控制弹窗相关
   const accessControlDialogVisible = ref(false)
   const currentAccessControlProxyId = ref('')
+
+  // Basic Auth 弹窗相关
+  const basicAuthDialogVisible = ref(false)
+  const currentBasicAuthProxyId = ref('')
 
   const getProxyStatusConfig = (status: number) => {
     return status === 1
@@ -245,7 +257,12 @@
   }
 
   const handleBasicAuth = (proxy: HttpProxyItem) => {
-    ElMessage.info(`BasicAuth: ${proxy.name}`)
+    currentBasicAuthProxyId.value = proxy.id
+    basicAuthDialogVisible.value = true
+  }
+
+  const handleBasicAuthClose = () => {
+    currentBasicAuthProxyId.value = ''
   }
 
   const handleBatchDelete = async () => {

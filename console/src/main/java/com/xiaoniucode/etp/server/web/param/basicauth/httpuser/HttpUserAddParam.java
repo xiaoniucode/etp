@@ -31,7 +31,7 @@ public class HttpUserAddParam {
     @NotNull(message = "代理 ID 不能为空")
     private String proxyId;
     @NotBlank(message = "用户名不能为空")
-    private String user;
+    private String username;
     @NotBlank(message = "密码不能为空")
-    private String pass;
+    private String password;
 }

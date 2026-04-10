@@ -148,11 +148,17 @@ public class ProxyServiceImpl implements ProxyService {
         //7.HTTP域名信息
         List<HttpProxyDomainDO> httpProxyDomainList = proxyDomainConvert.toDOList(param.getDomains(), proxyId);
         proxyDomainRepository.saveAll(httpProxyDomainList);
+        //init access control
         AccessControlDO  accessControlDO=   new AccessControlDO();
         accessControlDO.setProxyId(proxyId);
         accessControlDO.setMode(AccessControlMode.DENY);
         accessControlDO.setEnabled(false);
         accessControlRepository.save(accessControlDO);
+        //init http basic auth
+        BasicAuthDO basicAuthDO = new BasicAuthDO();
+        basicAuthDO.setEnabled(false);
+        basicAuthDO.setProxyId(proxyId);
+        basicAuthRepository.save(basicAuthDO);
         logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
     }
 

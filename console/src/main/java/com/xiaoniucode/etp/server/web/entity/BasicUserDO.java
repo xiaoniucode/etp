@@ -27,7 +27,7 @@ public class BasicUserDO {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     /**
      * 代理ID
      */

@@ -26,5 +26,5 @@ public class BasicAuthUpdateParam {
     @NotNull(message = "代理 ID 不能为空")
     private String proxyId;
     @NotNull(message = "启用状态不能为空")
-    private Boolean enable;
+    private Boolean enabled;
 }

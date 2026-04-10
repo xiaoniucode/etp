@@ -25,9 +25,9 @@ import lombok.Setter;
 @Setter
 public class HttpUserUpdateParam {
     @NotNull(message = "ID 不能为空")
-    private Integer id;
+    private Long id;
     @NotBlank(message = "用户名不能为空")
-    private String user;
+    private String username;
     @NotBlank(message = "密码不能为空")
-    private String pass;
+    private String password;
 }
