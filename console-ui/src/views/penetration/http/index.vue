@@ -13,6 +13,7 @@
         <template #left>
           <ElSpace wrap>
             <ElButton type="primary" @click="showDialog('add')" v-ripple>新增</ElButton>
+            <ElButton type="danger" @click="handleBatchDelete" v-ripple :disabled="selectedRows.length === 0">批量删除</ElButton>
           </ElSpace>
         </template>
       </ArtTableHeader>
@@ -36,6 +37,13 @@
         :proxy-data="currentProxyData"
         @submit="handleDialogSubmit"
       />
+
+      <!-- 访问控制弹窗 -->
+      <AccessControlDialog
+        v-model:visible="accessControlDialogVisible"
+        :proxy-id="currentAccessControlProxyId"
+        @close="handleAccessControlClose"
+      />
     </ElCard>
   </div>
 </template>
@@ -44,10 +52,11 @@
   import { ref, h, nextTick } from 'vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { fetchGetHttpProxyList, fetchGetHttpProxyById } from '@/api/http-proxy'
+  import { fetchGetHttpProxyList, fetchGetHttpProxyById, fetchBatchDeleteHttpProxy } from '@/api/http-proxy'
   import HttpSearch from './modules/http-search.vue'
   import HttpDialog from './modules/http-dialog.vue'
-  import { ElTag, ElMessage } from 'element-plus'
+  import AccessControlDialog from '../modules/access-control-dialog.vue'
+  import { ElTag, ElMessage, ElMessageBox } from 'element-plus'
   import { DialogType } from '@/types'
 
   defineOptions({ name: 'HttpPenetration' })
@@ -75,6 +84,10 @@
   const dialogType = ref<DialogType>('add')
   const dialogVisible = ref(false)
   const currentProxyData = ref<Partial<HttpProxyItem>>({})
+
+  // 访问控制弹窗相关
+  const accessControlDialogVisible = ref(false)
+  const currentAccessControlProxyId = ref('')
 
   const getProxyStatusConfig = (status: number) => {
     return status === 1
@@ -153,7 +166,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 280,
+          width: 360,
           fixed: 'right',
           formatter: (row: HttpProxyItem) =>
             h('div', [
@@ -170,6 +183,11 @@
               h(ArtButtonTable, {
                 type: 'edit',
                 onClick: () => showDialog('edit', row)
+              }),
+              h(ArtButtonTable, {
+                type: 'danger',
+                text: '删除',
+                onClick: () => handleSingleDelete(row)
               })
             ])
         }
@@ -218,11 +236,56 @@
   }
 
   const handleIpControl = (proxy: HttpProxyItem) => {
-    ElMessage.info(`IP访问控制: ${proxy.name}`)
+    currentAccessControlProxyId.value = proxy.id
+    accessControlDialogVisible.value = true
+  }
+
+  const handleAccessControlClose = () => {
+    currentAccessControlProxyId.value = ''
   }
 
   const handleBasicAuth = (proxy: HttpProxyItem) => {
     ElMessage.info(`BasicAuth: ${proxy.name}`)
+  }
+
+  const handleBatchDelete = async () => {
+    if (selectedRows.value.length === 0) {
+      ElMessage.warning('请选择要删除的代理')
+      return
+    }
+
+    try {
+      await ElMessageBox.confirm('确定要删除选中的代理吗？', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+
+      const ids = selectedRows.value.map(item => item.id)
+      await fetchBatchDeleteHttpProxy({ ids })
+      refreshData()
+    } catch (error) {
+      if (error !== 'cancel') {
+        console.error('删除失败:', error)
+      }
+    }
+  }
+
+  const handleSingleDelete = async (proxy: HttpProxyItem) => {
+    try {
+      await ElMessageBox.confirm(`确定要删除代理「${proxy.name}」吗？`, '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+
+      await fetchBatchDeleteHttpProxy({ ids: [proxy.id] })
+      refreshData()
+    } catch (error) {
+      if (error !== 'cancel') {
+        console.error('删除失败:', error)
+      }
+    }
   }
 </script>
 

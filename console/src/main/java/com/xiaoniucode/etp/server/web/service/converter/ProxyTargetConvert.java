@@ -28,8 +28,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ProxyTargetConvert {
-    ProxyTargetConvert INSTANCE = Mappers.getMapper(ProxyTargetConvert.class);
-
     @Mapping(target = "proxyId", source = "proxyId")
     ProxyTargetDO toDO(ProxyTargetAddParam param, String proxyId);
 

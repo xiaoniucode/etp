@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.param.proxy;
-import com.xiaoniucode.etp.core.enums.DeploymentMode;
 import com.xiaoniucode.etp.server.web.param.bandwidth.BandwidthSaveParam;
 import com.xiaoniucode.etp.server.web.param.loadbalance.LoadBalanceParam;
 import com.xiaoniucode.etp.server.web.param.proxytarget.ProxyTargetAddParam;
@@ -41,7 +40,7 @@ public class HttpProxyUpdateParam {
     private Integer domainType;
     private Set<String> domains;
     @NotNull(message = "部署模式不能为空")
-    private DeploymentMode deploymentMode;
+    private Integer deploymentMode;
     @NotNull(message = "targets 不能为空")
     private List<ProxyTargetAddParam> targets;
     private BandwidthSaveParam bandwidth;

@@ -48,3 +48,16 @@ export function fetchGetHttpProxyById(id: string) {
     url: `/api/proxies/http/${id}`
   })
 }
+
+/**
+ * 批量删除 HTTP 代理
+ * @param data 删除参数
+ * @returns 响应结果
+ */
+export function fetchBatchDeleteHttpProxy(data: { ids: string[] }) {
+  return request.del({
+    url: '/api/proxies',
+    data,
+    showSuccessMessage: true
+  })
+}

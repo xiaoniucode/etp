@@ -502,9 +502,23 @@
               status: parseInt(formData.status),
               domainType: parseInt(formData.domainType),
               domains: domainsArray,
-              encrypt: formData.encrypt,
+              deploymentMode: formData.deployMode === 'single' ? 1 : 0, // 1: STANDALONE, 0: CLUSTER
               targets: targets,
-              tunnelType: parseInt(formData.tunnelType)
+              bandwidth: {
+                limitTotal: formData.limitTotal,
+                limitIn: formData.limitIn,
+                limitOut: formData.limitOut
+              },
+              loadBalance:
+                formData.deployMode === 'cluster'
+                  ? {
+                      strategy: parseInt(formData.loadBalanceStrategy)
+                    }
+                  : undefined,
+              transport: {
+                tunnelType: parseInt(formData.tunnelType),
+                encrypt: formData.encrypt
+              }
             }
 
             console.log('更新HTTP代理数据:', requestData)

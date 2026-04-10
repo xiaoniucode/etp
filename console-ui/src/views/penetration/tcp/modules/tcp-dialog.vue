@@ -133,11 +133,16 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, watch, nextTick } from 'vue'
+  import { ref, reactive, watch, nextTick, computed } from 'vue'
   import { ElMessage } from 'element-plus'
   import type { FormInstance, FormRules } from 'element-plus'
   import { DialogType } from '@/types'
   import { fetchGetAgentListAll } from '@/api/agent'
+  import {
+    fetchCreateTcpProxy,
+    fetchUpdateTcpProxy,
+    fetchGetTcpProxyById
+  } from '@/api/tcp-proxy'
 
   defineOptions({ name: 'TcpDialog' })
 
@@ -149,10 +154,11 @@
     name: string
   }
 
-  const props = defineProps<{
+  interface Props {
     visible: boolean
     type: DialogType
     proxyData?: Partial<{
+      id: string
       agentId: string
       name: string
       status: number
@@ -165,16 +171,28 @@
         downloadLimit: number
       }
       loadBalanceStrategy: number
+      transport: {
+        encrypt: boolean
+        tunnelType: number
+      }
+      deploymentMode: number
     }>
-  }>()
+  }
 
-  const emit = defineEmits<{
+  interface Emits {
     (e: 'update:visible', value: boolean): void
-    (e: 'submit', value: any): void
-  }>()
+    (e: 'submit'): void
+  }
 
-  const dialogVisible = ref(props.visible)
-  const dialogType = ref<DialogType>(props.type)
+  const props = defineProps<Props>()
+  const emit = defineEmits<Emits>()
+
+  const dialogVisible = computed({
+    get: () => props.visible,
+    set: (value) => emit('update:visible', value)
+  })
+
+  const dialogType = computed(() => props.type)
   const formRef = ref<FormInstance>()
   const agents = ref([])
 
@@ -190,7 +208,7 @@
     agentId: '',
     name: '',
     status: '1',
-    remotePort: 0,
+    remotePort: 80,
     encrypt: false,
     tunnelType: '1',
     deployMode: 'single',
@@ -215,8 +233,19 @@
     ],
     remotePort: [
       { required: true, message: '请输入远程端口', trigger: 'blur' },
-      { type: 'number', message: '远程端口必须是数字', trigger: 'blur' },
-      { min: 1, max: 65535, message: '远程端口必须在 1-65535 之间', trigger: 'blur' }
+      {
+        validator: (rule: any, value: any, callback: any) => {
+          const numValue = parseInt(value)
+          if (isNaN(numValue)) {
+            callback(new Error('远程端口必须是数字'))
+          } else if (numValue < 1 || numValue > 65535) {
+            callback(new Error('远程端口必须在 1-65535 之间'))
+          } else {
+            callback()
+          }
+        },
+        trigger: 'blur'
+      }
     ],
     encrypt: [
       { required: true, message: '请选择是否开启TLS加密', trigger: 'change' }
@@ -282,29 +311,99 @@
     formData.targets.splice(index, 1)
   }
 
-  const initFormData = () => {
-    const isEdit = props.type === 'edit' && props.proxyData
-    const row = props.proxyData
+  const initFormData = async () => {
+    const isEdit = props.type === 'edit' && props.proxyData && props.proxyData.id
 
-    Object.assign(formData, {
-      agentId: isEdit && row ? row.agentId || '' : '',
-      name: isEdit && row ? row.name || '' : '',
-      status: isEdit && row ? row.status?.toString() || '1' : '1',
-      remotePort: isEdit && row ? row.remotePort || 0 : 0,
-      encrypt: isEdit && row ? row.encrypt || false : false,
-      tunnelType: isEdit && row ? row.tunnelType?.toString() || '1' : '1',
-      targets: isEdit && row && row.targets ? row.targets.map(t => ({ 
-        id: t.id || '',
-        host: t.host || '', 
-        port: t.port || 80, 
-        weight: t.weight || 1, 
-        name: t.name || '' 
-      })) : [],
-      limitTotal: isEdit && row && row.bandwidth ? row.bandwidth.uploadLimit?.toString() || '' : '',
-      limitIn: isEdit && row && row.bandwidth ? row.bandwidth.downloadLimit?.toString() || '' : '',
-      limitOut: '',
-      loadBalanceStrategy: '1'
-    })
+    if (isEdit) {
+      try {
+        // 从服务端获取真实的代理详情数据
+        const proxyDetail = await fetchGetTcpProxyById(props.proxyData!.id!)
+
+        Object.assign(formData, {
+          agentId: proxyDetail.agentId || '',
+          name: proxyDetail.name || '',
+          status: proxyDetail.status?.toString() || '1',
+          remotePort: proxyDetail.remotePort || 0,
+          encrypt: proxyDetail.transport?.encrypt || false,
+          tunnelType: proxyDetail.tunnelType?.toString() || '1',
+          deployMode: proxyDetail.deploymentMode === 1 ? 'single' : 'cluster',
+          singleHost:
+            proxyDetail.targets && proxyDetail.targets.length > 0
+              ? proxyDetail.targets[0].host || '127.0.0.1'
+              : '127.0.0.1',
+          singlePort:
+            proxyDetail.targets && proxyDetail.targets.length > 0
+              ? proxyDetail.targets[0].port || 80
+              : 80,
+          targets: proxyDetail.targets
+            ? proxyDetail.targets.map((t: any) => ({
+                id: t.id || '',
+                host: t.host || '',
+                port: t.port || 80,
+                weight: t.weight || 1,
+                name: t.name || ''
+              }))
+            : [],
+          limitTotal: proxyDetail.bandwidth
+            ? proxyDetail.bandwidth.uploadLimit?.toString() || ''
+            : '',
+          limitIn: proxyDetail.bandwidth
+            ? proxyDetail.bandwidth.downloadLimit?.toString() || ''
+            : '',
+          limitOut: '',
+          loadBalanceStrategy: proxyDetail.loadBalance?.strategy?.toString() || '1'
+        })
+      } catch (error) {
+        console.error('获取代理详情失败:', error)
+        ElMessage.error('获取代理详情失败，请稍后重试')
+
+        // 失败时使用props.proxyData作为 fallback
+        const row = props.proxyData
+        Object.assign(formData, {
+          agentId: row ? row.agentId || '' : '',
+          name: row ? row.name || '' : '',
+          status: row ? row.status?.toString() || '1' : '1',
+          remotePort: row ? row.remotePort || 0 : 0,
+          encrypt: row ? row.encrypt || false : false,
+          tunnelType: row ? row.tunnelType?.toString() || '1' : '1',
+          deployMode: 'single',
+          singleHost: '127.0.0.1',
+          singlePort: 80,
+          targets:
+            row && row.targets
+              ? row.targets.map((t: any) => ({
+                  id: t.id || '',
+                  host: t.host || '',
+                  port: t.port || 80,
+                  weight: t.weight || 1,
+                  name: t.name || ''
+                }))
+              : [],
+          limitTotal: row && row.bandwidth ? row.bandwidth.uploadLimit?.toString() || '' : '',
+          limitIn: row && row.bandwidth ? row.bandwidth.downloadLimit?.toString() || '' : '',
+          limitOut: '',
+          loadBalanceStrategy: '1'
+        })
+      }
+    } else {
+      // 新增模式，使用默认值
+      Object.assign(formData, {
+        agentId: '',
+        name: '',
+        status: '1',
+        remotePort: 80,
+        encrypt: false,
+        tunnelType: '1',
+        deployMode: 'single',
+        singleHost: '127.0.0.1',
+        singlePort: 80,
+        targets: [],
+        limitTotal: '',
+        limitIn: '',
+        limitOut: '',
+        loadBalanceStrategy: '1'
+      })
+    }
 
     // 如果没有目标地址，添加一个默认的
     if (formData.targets.length === 0) {
@@ -314,10 +413,10 @@
 
   watch(
     () => [props.visible, props.type, props.proxyData],
-    ([visible]) => {
+    async ([visible]) => {
       if (visible) {
-        fetchAgents()
-        initFormData()
+        await fetchAgents()
+        await initFormData()
         nextTick(() => {
           formRef.value?.clearValidate()
         })
@@ -353,34 +452,81 @@
   const handleSubmit = async () => {
     if (!formRef.value) return
 
-    await formRef.value.validate(async (valid, fields) => {
+    // 确保remotePort是数字类型
+    const remotePortNum = parseInt(formData.remotePort as any)
+    formData.remotePort = remotePortNum
+
+    console.log('远程端口值:', formData.remotePort, '类型:', typeof formData.remotePort)
+
+    await formRef.value.validate(async (valid) => {
       if (valid) {
-        // 根据部署模式生成targets数据
-        let targets = []
-        if (formData.deployMode === 'single') {
-          // 单节点模式，生成一个目标服务
-          targets = [{
-            name: formData.name, // 服务名称与代理名称保持一致
-            host: formData.singleHost,
-            port: formData.singlePort,
-            weight: 1 // 权重默认为1
-          }]
-        } else {
-          // 集群模式，使用现有targets数据
-          targets = formData.targets
+        try {
+          // 根据部署模式生成targets数据
+          let targets = []
+          if (formData.deployMode === 'single') {
+            // 单节点模式，生成一个目标服务
+            targets = [
+              {
+                name: formData.name, // 服务名称与代理名称保持一致
+                host: formData.singleHost,
+                port: formData.singlePort,
+                weight: 1 // 权重默认为1
+              }
+            ]
+          } else {
+            // 集群模式，使用现有targets数据
+            targets = formData.targets
+          }
+
+          // 构建通用的请求数据
+          const commonData = {
+            name: formData.name,
+            status: parseInt(formData.status),
+            remotePort: formData.remotePort,
+            deploymentMode: formData.deployMode === 'single' ? 1 : 0, // 1: STANDALONE, 0: CLUSTER
+            targets: targets,
+            bandwidth: {
+              limitTotal: formData.limitTotal,
+              limitIn: formData.limitIn,
+              limitOut: formData.limitOut
+            },
+            loadBalance:
+              formData.deployMode === 'cluster'
+                ? {
+                    strategy: parseInt(formData.loadBalanceStrategy)
+                  }
+                : undefined,
+            transport: {
+              tunnelType: parseInt(formData.tunnelType),
+              encrypt: formData.encrypt
+            }
+          }
+
+          if (dialogType.value === 'add') {
+            // 构建创建请求数据
+            const requestData = {
+              agentId: formData.agentId,
+              ...commonData
+            }
+
+            console.log('创建TCP代理数据:', requestData)
+            await fetchCreateTcpProxy(requestData)
+          } else {
+            // 构建更新请求数据
+            const requestData = {
+              id: props.proxyData?.id,
+              ...commonData
+            }
+
+            console.log('更新TCP代理数据:', requestData)
+            await fetchUpdateTcpProxy(requestData)
+          }
+
+          dialogVisible.value = false
+          emit('submit')
+        } catch (error) {
+          console.error('提交失败:', error)
         }
-        
-        // 构建提交数据
-        const submitData = {
-          ...formData,
-          targets: targets,
-          loadBalanceStrategy: formData.deployMode === 'cluster' ? parseInt(formData.loadBalanceStrategy) : undefined
-        }
-        
-        emit('submit', submitData)
-        dialogVisible.value = false
-      } else {
-        console.log('表单验证失败:', fields)
       }
     })
   }

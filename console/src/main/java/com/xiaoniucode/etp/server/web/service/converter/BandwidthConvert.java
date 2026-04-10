@@ -25,8 +25,6 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface BandwidthConvert {
-    BandwidthConvert INSTANCE = Mappers.getMapper(BandwidthConvert.class);
-
     @Mapping(target = "proxyId", source = "proxyId")
     BandwidthDO toDO(BandwidthSaveParam param, String proxyId);
 

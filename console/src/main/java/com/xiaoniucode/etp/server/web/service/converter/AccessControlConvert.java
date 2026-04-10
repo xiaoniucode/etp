@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http:
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,11 +14,44 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service.converter;
-import com.xiaoniucode.etp.core.enums.AccessControlMode;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = AccessControlMode.class)
+import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlRuleDTO;
+import com.xiaoniucode.etp.server.web.entity.AccessControlDO;
+import com.xiaoniucode.etp.server.web.entity.AccessControlRuleDO;
+import com.xiaoniucode.etp.server.web.param.accesscontrol.AccessControlRuleAddParam;
+import com.xiaoniucode.etp.server.web.param.accesscontrol.AccessControlRuleUpdateParam;
+import com.xiaoniucode.etp.server.web.param.accesscontrol.AccessControlUpdateParam;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
+import java.util.List;
+
+@Mapper(componentModel = "spring",imports = {AccessControlMode.class})
 public interface AccessControlConvert {
-    AccessControlConvert INSTANCE = Mappers.getMapper(AccessControlConvert.class);
+
+    @Mapping(expression = "java(AccessControlMode.fromCode(param.getRuleType()))", target = "mode")
+    AccessControlRuleDO toRuleDO(AccessControlRuleAddParam param);
+
+    @Mapping(expression = "java(AccessControlMode.fromCode(param.getMode()))", target = "mode")
+    @Mapping(target = "proxyId",ignore = true)
+    void updateDO(@MappingTarget AccessControlDO accessControlDO, AccessControlUpdateParam param);
+
+    @Mapping(expression = "java(AccessControlMode.fromCode(param.getRuleType()))", target = "mode")
+    void updateRuleDO(@MappingTarget AccessControlRuleDO accessControlRuleDO, AccessControlRuleUpdateParam param);
+
+    @Mapping(expression = "java(accessControlDO.getMode().getCode())", target = "mode")
+    @Mapping(expression = "java(toRuleDTOList(rules))", target = "rules")
+    AccessControlDetailDTO toDetailDTO(AccessControlDO accessControlDO, List<AccessControlRuleDO> rules);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "proxyId", target = "proxyId")
+    @Mapping(source = "cidr", target = "cidr")
+    @Mapping(expression = "java(ruleDO.getMode().getCode())", target = "ruleType")
+    AccessControlRuleDTO toRuleDTO(AccessControlRuleDO ruleDO);
+
+    List<AccessControlRuleDTO> toRuleDTOList(List<AccessControlRuleDO> rules);
 }
+

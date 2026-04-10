@@ -167,4 +167,11 @@ public class DefaultProxyManager implements ProxyManager {
 
         return null;
     }
+
+    @Override
+    public void batchRemove(List<String> ids) {
+        for (String proxyId : ids) {
+            remove(proxyId);
+        }
+    }
 }

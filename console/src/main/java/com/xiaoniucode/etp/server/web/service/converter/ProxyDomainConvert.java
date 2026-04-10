@@ -28,8 +28,6 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ProxyDomainConvert {
-    ProxyDomainConvert INSTANCE = Mappers.getMapper(ProxyDomainConvert.class);
-
     @Mapping(target = "domain", source = "domain")
     @Mapping(target = "proxyId", source = "proxyId")
     HttpProxyDomainDO toDO(String domain, String proxyId);

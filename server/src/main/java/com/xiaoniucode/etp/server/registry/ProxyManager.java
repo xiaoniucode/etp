@@ -29,5 +29,7 @@ public interface ProxyManager {
 
     Optional<ProxyConfig> findByAgentIdAndName(String clientId, String proxyName);
 
-    public ProxyConfig changeStatus(String proxyId, boolean enable) throws Exception;
+    public ProxyConfig changeStatus(String proxyId, boolean enable) throws EtpException;
+
+    void batchRemove(List<String> ids);
 }

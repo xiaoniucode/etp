@@ -26,7 +26,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccessControlRuleAddParam {
-    @NotEmpty(message = "代理proxyId 不能为空")
+    @NotEmpty(message = "proxyId 不能为空")
     private String proxyId;
     @NotBlank(message = "cidr 不能为空")
     private String cidr;

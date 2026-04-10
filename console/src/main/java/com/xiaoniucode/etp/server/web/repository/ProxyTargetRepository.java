@@ -28,4 +28,6 @@ public interface ProxyTargetRepository extends JpaRepository<ProxyTargetDO, Inte
     void deleteByProxyId(String proxyId);
 
     List<ProxyTargetDO> findByProxyId(String id);
+
+    void deleteByProxyIdIn(List<String> ids);
 }

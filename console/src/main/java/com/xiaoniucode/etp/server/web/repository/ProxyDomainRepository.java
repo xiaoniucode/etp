@@ -15,4 +15,6 @@ public interface ProxyDomainRepository extends JpaRepository<HttpProxyDomainDO, 
     List<HttpProxyDomainDO> findByProxyIdIn(List<String> proxyIds);
 
     List<HttpProxyDomainDO> findByProxyId(String id);
+
+    void deleteByProxyIdIn(List<String> ids);
 }

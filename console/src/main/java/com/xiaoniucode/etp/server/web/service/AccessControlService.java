@@ -14,15 +14,18 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service;
-import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDTO;
+import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;
 import com.xiaoniucode.etp.server.web.param.accesscontrol.AccessControlRuleAddParam;
 import com.xiaoniucode.etp.server.web.param.accesscontrol.AccessControlRuleUpdateParam;
+import com.xiaoniucode.etp.server.web.param.accesscontrol.AccessControlUpdateParam;
+
 /**
  * 访问控制服务
  */
 public interface AccessControlService {
-    AccessControlDTO getByProxyId(String proxyId);
-    void deleteRuleById(Integer ruleId);
-    void addRule(AccessControlRuleAddParam request);
-    void updateRule(AccessControlRuleUpdateParam request);
+    AccessControlDetailDTO getByProxyId(String proxyId);
+    void updateAccessControl(AccessControlUpdateParam param);
+    void deleteRuleById(Long id);
+    void addRule(AccessControlRuleAddParam param);
+    void updateRule(AccessControlRuleUpdateParam param);
 }

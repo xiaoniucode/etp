@@ -14,14 +14,18 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.param.accesscontrol;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 @Getter
 @Setter
 public class AccessControlRuleUpdateParam {
-    @NotNull(message = "代理 ID 不能为空")
-    private Integer proxyId;
+    @NotNull(message = "id 不能为空")
+    private Long id;
+    @NotBlank(message = "cidr 不能为空")
+    private String cidr;
     @NotNull(message = "规则类型不能为空")
     private Integer ruleType;
 }

@@ -26,8 +26,6 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring", imports = {TunnelType.class})
 public interface TransportConvert {
-    TransportConvert INSTANCE = Mappers.getMapper(TransportConvert.class);
-
     @Mapping(target = "proxyId", source = "proxyId")
     @Mapping(target = "tunnelType", expression = "java(TunnelType.fromCode(param.getTunnelType()))")
     TransportDO toDO(TransportSaveParam param, String proxyId);

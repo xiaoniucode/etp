@@ -14,10 +14,12 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.entity;
+
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.server.web.entity.converter.AccessControlModeConverter;
 import jakarta.persistence.*;
 import lombok.Data;
+
 /**
  * 访问控制规则实体类
  */
@@ -34,7 +36,7 @@ public class AccessControlRuleDO {
     /**
      * 访问控制ID
      */
-    private Long acId;
+    private String proxyId;
     /**
      * CIDR 地址段
      */

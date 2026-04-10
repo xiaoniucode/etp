@@ -56,6 +56,17 @@ public class ProxyDO {
     @Convert(converter = ProxyStatusConverter.class)
     private ProxyStatus status;
     /**
+     * 域名类型
+     */
+    @Convert(converter = DomainTypeConverter.class)
+    @Column(name = "domain_type")
+    private DomainType domainType;
+    /**
+     * 远程端口
+     */
+    @Column(name = "remote_port")
+    private Integer remotePort;
+    /**
      * 部署模式
      */
     @Column(name = "deployment_mode", nullable = false)

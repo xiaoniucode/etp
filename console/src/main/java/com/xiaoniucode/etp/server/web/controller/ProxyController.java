@@ -16,6 +16,7 @@
 package com.xiaoniucode.etp.server.web.controller;
 
 import com.xiaoniucode.etp.server.web.common.Ajax;
+import com.xiaoniucode.etp.server.web.common.PageResult;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;
@@ -25,8 +26,6 @@ import com.xiaoniucode.etp.server.web.service.ProxyService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/proxies")
@@ -64,12 +63,6 @@ public class ProxyController {
         return Ajax.success();
     }
 
-    @DeleteMapping("{id}")
-    public Ajax deleteProxy(@PathVariable String id) {
-        proxyService.deleteProxy(id);
-        return Ajax.success();
-    }
-
     @GetMapping("tcp/{id}")
     public Ajax getTcpProxyDetailById(@PathVariable String id) {
         TcpProxyDetailDTO proxy = proxyService.getTcpProxyById(id);
@@ -86,7 +79,7 @@ public class ProxyController {
     public Ajax findTcpProxies(@RequestParam(required = false) String keyword,
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int size) {
-        List<TcpProxyListDTO> proxies = proxyService.getTcpProxies(keyword, page, size);
+        PageResult<TcpProxyListDTO> proxies = proxyService.getTcpProxies(keyword, page, size);
         return Ajax.success(proxies);
     }
 
@@ -94,7 +87,7 @@ public class ProxyController {
     public Ajax getHttpProxies(@RequestParam(required = false) String keyword,
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int size) {
-        List<HttpProxyListDTO> proxies = proxyService.getHttpProxies(keyword, page, size);
+        PageResult<HttpProxyListDTO> proxies = proxyService.getHttpProxies(keyword, page, size);
         return Ajax.success(proxies);
     }
 

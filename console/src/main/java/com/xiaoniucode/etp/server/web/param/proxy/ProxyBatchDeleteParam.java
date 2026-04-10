@@ -14,5 +14,13 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.param.proxy;
-public class ProxyBatchDeleteParam {
+
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.List;
+
+@Data
+public class ProxyBatchDeleteParam implements Serializable {
+    private List<String> ids;
 }

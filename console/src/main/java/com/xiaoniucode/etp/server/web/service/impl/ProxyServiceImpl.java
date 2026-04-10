@@ -15,9 +15,13 @@
  */
 package com.xiaoniucode.etp.server.web.service.impl;
 
-import com.xiaoniucode.etp.common.utils.StringUtils;
+import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.core.enums.DeploymentMode;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.web.common.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.bandwidth.BandwidthDTO;
 import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
@@ -38,15 +42,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -60,15 +63,20 @@ public class ProxyServiceImpl implements ProxyService {
     @Autowired
     private ProxyTargetRepository proxyTargetRepository;
     @Autowired
-    private HttpProxyRepository httpProxyRepository;
-    @Autowired
     private BandwidthRepository bandwidthRepository;
     @Autowired
     private LoadBalanceRepository loadBalanceRepository;
     @Autowired
     private TransportRepository transportRepository;
     @Autowired
-    private AgentRepository agentRepository;
+    private BasicAuthRepository basicAuthRepository;
+    @Autowired
+    private BasicUserRepository basicUserRepository;
+    @Autowired
+    private AccessControlRepository accessControlRepository;
+    @Autowired
+    private AccessControlRuleRepository accessControlRuleRepository;
+
     @Autowired
     private ProxyConvert proxyConvert;
     @Autowired
@@ -81,10 +89,13 @@ public class ProxyServiceImpl implements ProxyService {
     private LoadBalanceConvert loadBalanceConvert;
     @Autowired
     private BandwidthConvert bandwidthConvert;
+
     @Autowired
     private ProxyManager proxyManager;
+
     @Resource
     private AppConfig appConfig;
+
     private ExecutorService executorService;
 
     @PostConstruct
@@ -116,18 +127,15 @@ public class ProxyServiceImpl implements ProxyService {
         }
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
         proxyRepository.save(proxyDO);
-        //2.HTTP特有
-        HttpProxyDO httpDO = proxyConvert.toHttpDO(param, proxyId);
-        httpProxyRepository.save(httpDO);
         //3.服务列表
-        if (param.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
+        if (proxyDO.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
             throw new BizException("单机服务只能配置一个目标节点");
         }
         List<ProxyTargetDO> proxyTargetDOList = proxyTargetConvert.toDOList(param.getTargets(), proxyId);
         proxyTargetRepository.saveAll(proxyTargetDOList);
         //4.负载均衡
         //如果目标服务是集群部署，需要保存负载均衡相关配置
-        if (param.getDeploymentMode().isCluster()) {
+        if (proxyDO.getDeploymentMode().isCluster()) {
             LoadBalanceDO loadBalanceDO = loadBalanceConvert.toDO(param.getLoadBalance(), proxyId);
             loadBalanceRepository.save(loadBalanceDO);
         }
@@ -140,6 +148,11 @@ public class ProxyServiceImpl implements ProxyService {
         //7.HTTP域名信息
         List<HttpProxyDomainDO> httpProxyDomainList = proxyDomainConvert.toDOList(param.getDomains(), proxyId);
         proxyDomainRepository.saveAll(httpProxyDomainList);
+        AccessControlDO  accessControlDO=   new AccessControlDO();
+        accessControlDO.setProxyId(proxyId);
+        accessControlDO.setMode(AccessControlMode.DENY);
+        accessControlDO.setEnabled(false);
+        accessControlRepository.save(accessControlDO);
         logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
     }
 
@@ -156,17 +169,8 @@ public class ProxyServiceImpl implements ProxyService {
         proxyConvert.updateDO(param, proxyDO);
         proxyRepository.save(proxyDO);
 
-        //2.HTTP特有
-        HttpProxyDO httpProxyDO = httpProxyRepository.findById(proxyId)
-                .orElseGet(() -> {
-                    HttpProxyDO newHttp = new HttpProxyDO();
-                    newHttp.setProxyId(proxyId);
-                    return newHttp;
-                });
-        proxyConvert.updateHttpDO(param, httpProxyDO);
-        httpProxyRepository.save(httpProxyDO);
         //3.服务列表
-        if (param.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
+        if (proxyDO.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
             throw new BizException("单机服务只能配置一个目标节点");
         }
         // 先删除旧的 Targets
@@ -177,7 +181,7 @@ public class ProxyServiceImpl implements ProxyService {
             proxyTargetRepository.saveAll(targetList);
         }
         //4.负载均衡
-        if (param.getDeploymentMode().isCluster()) {
+        if (proxyDO.getDeploymentMode().isCluster()) {
             LoadBalanceParam loadBalanceParam = param.getLoadBalance();
 
             LoadBalanceDO loadBalanceDO = loadBalanceRepository.findById(proxyId)
@@ -213,60 +217,48 @@ public class ProxyServiceImpl implements ProxyService {
     /**
      * 查询 HTTP 代理列表
      *
-     * @param keyword 关键字 按名称模糊查询
+     * @param keyword 关键字
      * @param page    当前页（从 0 开始）
      * @param size    每页大小
      * @return HTTP 代理列表
      */
     @Override
-    public List<HttpProxyListDTO> getHttpProxies(String keyword, int page, int size) {
+    public PageResult<HttpProxyListDTO> getHttpProxies(String keyword, int page, int size) {
         int currentPage = Math.max(0, page - 1);
-        Pageable pageable = PageRequest.of(currentPage, size, Sort.by(Sort.Direction.DESC, "updatedAt"));
+        Pageable pageable = PageRequest.of(currentPage, size);
+        String kw = StringUtils.hasText(keyword) ? "%" + keyword.trim() + "%" : null;
+        Page<Object[]> resultPage = proxyRepository.findProxiesWithAssociations(kw, ProtocolType.HTTP, pageable);
 
-        Page<ProxyDO> proxyPage;
-        if (!StringUtils.hasText(keyword)) {
-            proxyPage = proxyRepository.findAll(pageable);
-        } else {
-            proxyPage = proxyRepository.findHttpProxiesByKeyword(keyword.trim(), pageable);
+        if (resultPage.isEmpty()) {
+            return PageResult.empty(page, size);
         }
+        int httpProxyPort = appConfig.getHttpProxyPort();
+        List<Object[]> content = resultPage.getContent();
 
-        if (proxyPage.isEmpty()) {
-            return List.of();
-        }
-
-        List<ProxyDO> proxyList = proxyPage.getContent();
-        List<String> proxyIds = proxyList.stream().map(ProxyDO::getId).toList();
-        List<String> agentIds = proxyList.stream().map(ProxyDO::getAgentId).toList();
-
-        Map<String, AgentDO> agentMap = agentRepository.findByIdIn(agentIds)
-                .stream()
-                .collect(Collectors.toMap(
-                        AgentDO::getId,
-                        agent -> agent,
-                        (existing, replacement) -> existing
-                ));
-
+        List<String> proxyIds = content.stream()
+                .map(row -> (ProxyDO) row[0])
+                .map(ProxyDO::getId)
+                .collect(Collectors.toList());
         Map<String, List<String>> domainsMap = proxyDomainRepository.findByProxyIdIn(proxyIds)
                 .stream()
                 .collect(Collectors.groupingBy(
                         HttpProxyDomainDO::getProxyId,
                         Collectors.mapping(HttpProxyDomainDO::getDomain, Collectors.toList())
                 ));
+        List<HttpProxyListDTO> res = new ArrayList<>();
+        for (Object[] objects : content) {
+            ProxyDO proxyDO = (ProxyDO) objects[0];
+            AgentDO agentDO = (AgentDO) objects[1];
+            HttpProxyListDTO httpDTO = proxyConvert.toHttpListDTO(proxyDO, httpProxyPort);
 
-        int httpProxyPort = appConfig.getHttpProxyPort();
-
-        return proxyList.stream()
-                .map(proxyDO -> {
-                    HttpProxyListDTO httpDTO = proxyConvert.toHttpListDTO(proxyDO, httpProxyPort);
-                    AgentDO agentDO = agentMap.get(proxyDO.getAgentId());
-                    if (agentDO != null && agentDO.getAgentType() != null) {
-                        httpDTO.setAgentType(agentDO.getAgentType().getCode());
-                    }
-                    httpDTO.setDomains(domainsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
-                    httpDTO.setHttpProxyPort(httpProxyPort);
-                    return httpDTO;
-                })
-                .collect(Collectors.toList());
+            if (agentDO != null && agentDO.getAgentType() != null) {
+                httpDTO.setAgentType(agentDO.getAgentType().getCode());
+            }
+            httpDTO.setDomains(domainsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
+            httpDTO.setHttpProxyPort(httpProxyPort);
+            res.add(httpDTO);
+        }
+        return PageResult.wrap(resultPage, res);
     }
 
     @Override
@@ -278,7 +270,7 @@ public class ProxyServiceImpl implements ProxyService {
         // 2. 并发查询关联数据
         try {
             Future<Object[]> httpDetailFuture = executorService.submit(() ->
-                    proxyRepository.findHttpProxyDetailWithAssociations(id).orElse(new Object[5])
+                    proxyRepository.findProxyDetailWithAssociations(id).orElse(new Object[5])
             );
 
             Future<List<ProxyTargetDO>> proxyTargetsFuture = executorService.submit(() ->
@@ -292,16 +284,15 @@ public class ProxyServiceImpl implements ProxyService {
             Object[] result = httpDetailFuture.get();
             Object[] entities = (Object[]) result[0];
 
-            HttpProxyDO httpProxyDO = (HttpProxyDO) entities[0];
-            AgentDO agentDO = (AgentDO) entities[1];
-            TransportDO transportDO = (TransportDO) entities[2];
-            BandwidthDO bandwidthDO = (BandwidthDO) entities[3];
-            LoadBalanceDO loadBalanceDO = (LoadBalanceDO) entities[4];
+            AgentDO agentDO = (AgentDO) entities[0];
+            TransportDO transportDO = (TransportDO) entities[1];
+            BandwidthDO bandwidthDO = (BandwidthDO) entities[2];
+            LoadBalanceDO loadBalanceDO = (LoadBalanceDO) entities[3];
 
             List<ProxyTargetDO> proxyTargetDos = proxyTargetsFuture.get();
             List<HttpProxyDomainDO> httpProxyDomainDOs = domainsFuture.get();
 
-            HttpProxyDetailDTO httpProxyDetailDTO = proxyConvert.toHttpDetailDTO(proxyDO, httpProxyDO, agentDO.getAgentType().getCode());
+            HttpProxyDetailDTO httpProxyDetailDTO = proxyConvert.toHttpDetailDTO(proxyDO, agentDO.getAgentType().getCode());
             TransportDTO transportDTO = transportConvert.toDTO(transportDO);
             BandwidthDTO bandwidthDTO = bandwidthConvert.toDTO(bandwidthDO);
 
@@ -334,53 +325,243 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void createTcpProxy(TcpProxyCreateParam param) {
+
+        String proxyId = UUID.randomUUID().toString();
+        //1.基础信息
+        if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
+            throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
+        }
+        ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
+        proxyRepository.save(proxyDO);
+
+
+        //3.服务列表
+        if (proxyDO.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
+            throw new BizException("单机服务只能配置一个目标节点");
+        }
+        List<ProxyTargetDO> proxyTargetDOList = proxyTargetConvert.toDOList(param.getTargets(), proxyId);
+        proxyTargetRepository.saveAll(proxyTargetDOList);
+        //4.负载均衡
+        //如果目标服务是集群部署，需要保存负载均衡相关配置
+        if (proxyDO.getDeploymentMode().isCluster()) {
+            LoadBalanceDO loadBalanceDO = loadBalanceConvert.toDO(param.getLoadBalance(), proxyId);
+            loadBalanceRepository.save(loadBalanceDO);
+        }
+        //5.带宽
+        BandwidthDO bandwidthDO = bandwidthConvert.toDO(param.getBandwidth(), proxyId);
+        bandwidthRepository.save(bandwidthDO);
+        //6.传输
+        TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
+        transportRepository.save(transportDO);
+
+        AccessControlDO  accessControlDO=   new AccessControlDO();
+        accessControlDO.setProxyId(proxyId);
+        accessControlDO.setMode(AccessControlMode.DENY);
+        accessControlDO.setEnabled(false);
+        accessControlRepository.save(accessControlDO);
+        logger.debug("TCP 代理创建成功：{}", proxyDO.getName());
     }
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateTcpProxy(TcpProxyUpdateParam param) {
+        String proxyId = param.getId();
+        ProxyDO proxyDO = proxyRepository.findById(proxyId).orElseThrow(() -> new BizException("代理配置不存在"));
+        if (proxyRepository.existsByAgentIdAndNameAndIdNot(
+                proxyDO.getAgentId(), param.getName(), proxyId)) {
+            throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
+        }
+        //1.基本信息
+        proxyConvert.updateDO(param, proxyDO);
+        proxyRepository.save(proxyDO);
+
+        //3.服务列表
+        if (proxyDO.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
+            throw new BizException("单机服务只能配置一个目标节点");
+        }
+        // 先删除旧的 Targets
+        proxyTargetRepository.deleteByProxyId(proxyId);
+        // 再插入新的
+        if (!CollectionUtils.isEmpty(param.getTargets())) {
+            List<ProxyTargetDO> targetList = proxyTargetConvert.toDOList(param.getTargets(), proxyId);
+            proxyTargetRepository.saveAll(targetList);
+        }
+        //4.负载均衡
+        if (proxyDO.getDeploymentMode().isCluster()) {
+            LoadBalanceParam loadBalanceParam = param.getLoadBalance();
+
+            LoadBalanceDO loadBalanceDO = loadBalanceRepository.findById(proxyId)
+                    .orElseGet(() -> {
+                        LoadBalanceDO newLB = new LoadBalanceDO();
+                        newLB.setProxyId(proxyId);
+                        return newLB;
+                    });
+            loadBalanceConvert.updateDO(loadBalanceParam, loadBalanceDO);
+            loadBalanceRepository.save(loadBalanceDO);
+        } else {
+            //单机服务 尝试删除负载均衡配置
+            loadBalanceRepository.deleteById(proxyId);
+        }
+
+        //5.带宽
+        bandwidthRepository.deleteById(proxyId);
+        BandwidthDO bandwidthDO = bandwidthConvert.toDO(param.getBandwidth(), proxyId);
+        bandwidthRepository.save(bandwidthDO);
+        //6.传输
+        transportRepository.deleteById(proxyId);
+        TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
+        transportRepository.save(transportDO);
+        logger.debug("TCP 代理更新成功：{}", proxyDO.getName());
     }
 
     @Override
     public TcpProxyDetailDTO getTcpProxyById(String id) {
-        return null;
+        ProxyDO proxyDO = proxyRepository.findById(id)
+                .orElseThrow(() -> new BizException("HTTP 代理不存在"));
+        try {
+            Future<Object[]> httpDetailFuture = executorService.submit(() ->
+                    proxyRepository.findProxyDetailWithAssociations(id).orElse(new Object[5])
+            );
+
+            Future<List<ProxyTargetDO>> proxyTargetsFuture = executorService.submit(() ->
+                    proxyTargetRepository.findByProxyId(id)
+            );
+
+            Object[] result = httpDetailFuture.get();
+            Object[] entities = (Object[]) result[0];
+
+            AgentDO agentDO = (AgentDO) entities[0];
+            TransportDO transportDO = (TransportDO) entities[1];
+            BandwidthDO bandwidthDO = (BandwidthDO) entities[2];
+            LoadBalanceDO loadBalanceDO = (LoadBalanceDO) entities[3];
+
+            List<ProxyTargetDO> proxyTargetDos = proxyTargetsFuture.get();
+
+            TcpProxyDetailDTO tcpProxyDetailDTO = proxyConvert.toTcpDetailDTO(proxyDO, agentDO.getAgentType().getCode());
+            TransportDTO transportDTO = transportConvert.toDTO(transportDO);
+            BandwidthDTO bandwidthDTO = bandwidthConvert.toDTO(bandwidthDO);
+
+            List<TargetDTO> targetDTOList = proxyTargetConvert.toDTOList(proxyTargetDos);
+            tcpProxyDetailDTO.setTransport(transportDTO);
+            tcpProxyDetailDTO.setBandwidth(bandwidthDTO);
+
+            if (proxyDO.getDeploymentMode().isCluster()) {
+                LoadBalanceDTO loadBalanceDTO = loadBalanceConvert.toDTO(loadBalanceDO);
+                tcpProxyDetailDTO.setLoadBalance(loadBalanceDTO);
+            }
+            tcpProxyDetailDTO.setTargets(targetDTOList);
+            return tcpProxyDetailDTO;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.warn("查询被中断, proxyId: {}", id, e);
+            throw new BizException("查询被中断");
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            logger.error("TCP 代理配置详情获取失败, proxyId: {}", id, cause);
+
+            if (cause instanceof BizException) {
+                throw (BizException) cause;
+            }
+            throw new BizException("TCP 代理配置详情获取失败: " + (cause != null ? cause.getMessage() : e.getMessage()));
+        }
     }
 
     @Override
-    public List<TcpProxyListDTO> getTcpProxies(String keyword, int page, int size) {
-        return List.of();
+    public PageResult<TcpProxyListDTO> getTcpProxies(String keyword, int page, int size) {
+        int currentPage = Math.max(0, page - 1);
+        Pageable pageable = PageRequest.of(currentPage, size);
+        String kw = StringUtils.hasText(keyword) ? "%" + keyword.trim() + "%" : null;
+        Page<Object[]> resultPage = proxyRepository.findProxiesWithAssociations(kw, ProtocolType.TCP, pageable);
+        if (resultPage.isEmpty()) {
+            return PageResult.empty(page, size);
+        }
+        List<Object[]> content = resultPage.getContent();
+        List<TcpProxyListDTO> res = new ArrayList<>();
+        for (Object[] objects : content) {
+            ProxyDO proxyDO = (ProxyDO) objects[0];
+            AgentDO agentDO = (AgentDO) objects[1];
+
+            TcpProxyListDTO tcpListDTO = proxyConvert.toTcpListDTO(proxyDO);
+            if (agentDO != null && agentDO.getAgentType() != null) {
+                tcpListDTO.setAgentType(agentDO.getAgentType().getCode());
+            }
+            res.add(tcpListDTO);
+        }
+        return PageResult.wrap(resultPage, res);
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDeleteProxies(ProxyBatchDeleteParam param) {
+        List<String> ids = param.getIds();
+        if (CollectionUtils.isEmpty(ids)) {
+            return;
+        }
+
+        // 批量验证是否存在
+        List<String> existingIds = proxyRepository.findAllById(ids)
+                .stream()
+                .map(ProxyDO::getId)
+                .toList();
+
+        List<String> notFoundIds = ids.stream()
+                .filter(id -> !existingIds.contains(id))
+                .toList();
+
+        if (!notFoundIds.isEmpty()) {
+            throw new BizException("以下代理不存在: " + notFoundIds);
+        }
+        //Common
+        proxyTargetRepository.deleteByProxyIdIn(ids);
+        loadBalanceRepository.deleteByProxyIdIn(ids);
+        bandwidthRepository.deleteByProxyIdIn(ids);
+        transportRepository.deleteByProxyIdIn(ids);
+        //IP CIDR
+        accessControlRepository.deleteByProxyIdIn(ids);
+        accessControlRuleRepository.deleteByProxyIdIn(ids);
+        //HTTP
+        proxyDomainRepository.deleteByProxyIdIn(ids);
+        basicAuthRepository.deleteByProxyIdIn(ids);
+        basicUserRepository.deleteByProxyIdIn(ids);
+        // Base
+        proxyRepository.deleteByIdIn(ids);
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        proxyManager.batchRemove(ids);
+                    }
+                }
+        );
+
+        logger.debug("批量删除代理成功，数量: {}", ids.size());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteProxy(String id) {
-        // 验证代理是否存在
-        ProxyDO proxyDO = proxyRepository.findById(id).orElseThrow(() -> new BizException("代理配置不存在"));
-        //todo kernel
-        proxyTargetRepository.deleteByProxyId(id);
-        loadBalanceRepository.deleteById(id);
-        bandwidthRepository.deleteById(id);
-        transportRepository.deleteById(id);
-        proxyDomainRepository.deleteByProxyId(id);
-        httpProxyRepository.deleteById(id);
-        proxyRepository.deleteById(id);
-
-        //todo BasicAuth
-
-        //todo IP CIDR
-
-        logger.debug("代理删除成功：{}", proxyDO.getName());
-    }
-
-    @Override
-    public void batchDeleteProxies(ProxyBatchDeleteParam param) {
-    }
-
-    @Override
     public void setProxyStatus(String id, Integer status) {
-
+        ProxyDO proxyDO = proxyRepository.findById(id).orElseThrow(() -> new BizException("代理配置信息不存在"));
+        if (proxyDO.getStatus().getCode().equals(status)) {
+            return;
+        }
+        proxyDO.setStatus(ProxyStatus.fromCode(status));
+        proxyRepository.save(proxyDO);
+        //更新内存状态
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        try {
+                            proxyManager.changeStatus(id, Objects.equals(status, ProxyStatus.OPEN.getCode()));
+                        } catch (Exception e) {
+                            logger.error("更新内存状态失败，id: {}, status: {}", id, status, e);
+                        }
+                    }
+                }
+        );
     }
-
-
 }

@@ -20,6 +20,9 @@ import com.xiaoniucode.etp.server.web.entity.LoadBalanceDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface LoadBalanceRepository extends JpaRepository<LoadBalanceDO, String> {
+    void deleteByProxyIdIn(List<String> ids);
 }
