@@ -33,10 +33,7 @@
   import { ref, h, nextTick } from 'vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import {
-    fetchGetAgentListByPage,
-    fetchKickoutAgent
-  } from '@/api/agent'
+  import { fetchGetAgentListByPage, fetchKickoutAgent } from '@/api/agent'
   import AgentSearch from './modules/agent-search.vue'
   import AgentDialog from './modules/agent-dialog.vue'
   import { ElTag, ElMessageBox, ElMessage } from 'element-plus'
@@ -192,7 +189,7 @@
       type: 'warning'
     }).then(async () => {
       try {
-        await fetchKickoutClient(row.id)
+        await fetchKickoutAgent(row.id)
         ElMessage.success('剔除成功')
         refreshData()
       } catch (error) {

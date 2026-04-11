@@ -7,37 +7,47 @@
   >
     <ElForm ref="formRef" :model="formData" :rules="rules" label-width="140px">
       <ElFormItem label="客户端" prop="agentId">
-        <ElSelect v-model="formData.agentId" placeholder="请选择客户端" :disabled="dialogType === 'edit'" style="width: 200px">
+        <ElSelect
+          v-model="formData.agentId"
+          placeholder="请选择客户端"
+          :disabled="dialogType === 'edit'"
+          style="width: 200px"
+        >
           <ElOption v-for="agent in agents" :key="agent.id" :label="agent.name" :value="agent.id" />
         </ElSelect>
       </ElFormItem>
-      
+
       <ElFormItem label="代理名称" prop="name">
         <ElInput v-model="formData.name" placeholder="请输入代理名称" />
       </ElFormItem>
-      
+
       <ElFormItem label="状态" prop="status">
         <ElRadioGroup v-model="formData.status">
           <ElRadio label="1">开启</ElRadio>
           <ElRadio label="0">关闭</ElRadio>
         </ElRadioGroup>
       </ElFormItem>
-      
+
       <ElFormItem label="远程端口" prop="remotePort">
-        <ElInput v-model.number="formData.remotePort" type="number" placeholder="请输入远程端口" style="width: 200px" />
+        <ElInput
+          v-model.number="formData.remotePort"
+          type="number"
+          placeholder="请输入远程端口"
+          style="width: 200px"
+        />
       </ElFormItem>
-      
+
       <ElFormItem label="TLS加密" prop="encrypt">
         <ElSwitch v-model="formData.encrypt" />
       </ElFormItem>
-      
+
       <ElFormItem label="隧道类型" prop="tunnelType">
         <ElRadioGroup v-model="formData.tunnelType">
           <ElRadio label="1">多路复用</ElRadio>
           <ElRadio label="0">独立隧道</ElRadio>
         </ElRadioGroup>
       </ElFormItem>
-      
+
       <ElRow :gutter="20">
         <ElCol :span="8">
           <ElFormItem label="总带宽限制" prop="limitTotal">
@@ -55,14 +65,14 @@
           </ElFormItem>
         </ElCol>
       </ElRow>
-      
+
       <ElFormItem label="部署模式" prop="deployMode">
         <ElRadioGroup v-model="formData.deployMode">
           <ElRadio label="single">单节点</ElRadio>
           <ElRadio label="cluster">集群</ElRadio>
         </ElRadioGroup>
       </ElFormItem>
-      
+
       <!-- 单节点模式 -->
       <ElFormItem v-if="formData.deployMode === 'single'" label="服务地址" :required="true">
         <ElRow :gutter="20">
@@ -74,17 +84,26 @@
           </ElCol>
         </ElRow>
       </ElFormItem>
-      
+
       <!-- 集群模式 -->
-      <ElFormItem v-if="formData.deployMode === 'cluster'" label="负载均衡策略" prop="loadBalanceStrategy" :required="formData.deployMode === 'cluster'">
-        <ElSelect v-model="formData.loadBalanceStrategy" placeholder="请选择负载均衡策略" style="width: 220px">
+      <ElFormItem
+        v-if="formData.deployMode === 'cluster'"
+        label="负载均衡策略"
+        prop="loadBalanceStrategy"
+        :required="formData.deployMode === 'cluster'"
+      >
+        <ElSelect
+          v-model="formData.loadBalanceStrategy"
+          placeholder="请选择负载均衡策略"
+          style="width: 220px"
+        >
           <ElOption label="轮询 (roundrobin)" value="1" />
           <ElOption label="权重 (weight)" value="2" />
           <ElOption label="随机 (random)" value="3" />
           <ElOption label="最少连接 (leastconn)" value="4" />
         </ElSelect>
       </ElFormItem>
-      
+
       <ElFormItem v-if="formData.deployMode === 'cluster'" label="服务列表" prop="targets">
         <div class="targets-table">
           <ElTable :data="formData.targets" style="width: 100%">
@@ -95,7 +114,11 @@
             </ElTableColumn>
             <ElTableColumn prop="name" label="服务名称" min-width="150">
               <template #default="scope">
-                <ElInput v-model="scope.row.name" placeholder="请输入服务名称" style="width: 100%" />
+                <ElInput
+                  v-model="scope.row.name"
+                  placeholder="请输入服务名称"
+                  style="width: 100%"
+                />
               </template>
             </ElTableColumn>
             <ElTableColumn prop="host" label="主机" min-width="180">
@@ -105,21 +128,35 @@
             </ElTableColumn>
             <ElTableColumn prop="port" label="端口" width="100">
               <template #default="scope">
-                <ElInput v-model.number="scope.row.port" type="number" placeholder="请输入端口" style="width: 100%" />
+                <ElInput
+                  v-model.number="scope.row.port"
+                  type="number"
+                  placeholder="请输入端口"
+                  style="width: 100%"
+                />
               </template>
             </ElTableColumn>
             <ElTableColumn prop="weight" label="权重" width="100">
               <template #default="scope">
-                <ElInput v-model.number="scope.row.weight" type="number" placeholder="请输入权重" style="width: 100%" />
+                <ElInput
+                  v-model.number="scope.row.weight"
+                  type="number"
+                  placeholder="请输入权重"
+                  style="width: 100%"
+                />
               </template>
             </ElTableColumn>
             <ElTableColumn label="操作" width="80" align="center">
               <template #default="scope">
-                <ElButton type="danger" size="small" @click="removeTarget(scope.$index)">删除</ElButton>
+                <ElButton type="danger" size="small" @click="removeTarget(scope.$index)"
+                  >删除</ElButton
+                >
               </template>
             </ElTableColumn>
           </ElTable>
-          <ElButton type="primary" size="small" @click="addTarget" style="margin-top: 10px">添加服务</ElButton>
+          <ElButton type="primary" size="small" @click="addTarget" style="margin-top: 10px"
+            >添加服务</ElButton
+          >
         </div>
       </ElFormItem>
     </ElForm>
@@ -138,11 +175,7 @@
   import type { FormInstance, FormRules } from 'element-plus'
   import { DialogType } from '@/types'
   import { fetchGetAgentListAll } from '@/api/agent'
-  import {
-    fetchCreateTcpProxy,
-    fetchUpdateTcpProxy,
-    fetchGetTcpProxyById
-  } from '@/api/tcp-proxy'
+  import { fetchCreateTcpProxy, fetchUpdateTcpProxy, fetchGetTcpProxyById } from '@/api/tcp-proxy'
 
   defineOptions({ name: 'TcpDialog' })
 
@@ -222,15 +255,9 @@
   })
 
   const rules: FormRules = {
-    agentId: [
-      { required: true, message: '请选择客户端', trigger: 'change' }
-    ],
-    name: [
-      { required: true, message: '请输入代理名称', trigger: 'blur' }
-    ],
-    status: [
-      { required: true, message: '请选择状态', trigger: 'change' }
-    ],
+    agentId: [{ required: true, message: '请选择客户端', trigger: 'change' }],
+    name: [{ required: true, message: '请输入代理名称', trigger: 'blur' }],
+    status: [{ required: true, message: '请选择状态', trigger: 'change' }],
     remotePort: [
       { required: true, message: '请输入远程端口', trigger: 'blur' },
       {
@@ -247,15 +274,9 @@
         trigger: 'blur'
       }
     ],
-    encrypt: [
-      { required: true, message: '请选择是否开启TLS加密', trigger: 'change' }
-    ],
-    tunnelType: [
-      { required: true, message: '请选择隧道类型', trigger: 'change' }
-    ],
-    deployMode: [
-      { required: true, message: '请选择部署模式', trigger: 'change' }
-    ],
+    encrypt: [{ required: true, message: '请选择是否开启TLS加密', trigger: 'change' }],
+    tunnelType: [{ required: true, message: '请选择隧道类型', trigger: 'change' }],
+    deployMode: [{ required: true, message: '请选择部署模式', trigger: 'change' }],
     singleHost: [
       { required: true, message: '请输入主机', trigger: 'blur' },
       { required: formData.deployMode === 'single', message: '请输入主机', trigger: 'blur' }

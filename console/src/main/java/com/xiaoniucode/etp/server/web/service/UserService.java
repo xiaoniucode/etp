@@ -14,11 +14,11 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service;
+import com.xiaoniucode.etp.server.web.dto.user.UserInfoDTO;
 import com.xiaoniucode.etp.server.web.entity.SysUserDO;
 import com.xiaoniucode.etp.server.web.param.user.UserPasswordUpdateParam;
 public interface UserService {
-    SysUserDO getByUsername(String username);
+    UserInfoDTO getByUsername(String username);
     void register(SysUserDO user);
-    void deleteAll();
-    void updatePassword(Integer userId, UserPasswordUpdateParam req);
+    void updatePassword(String username, UserPasswordUpdateParam req);
 }

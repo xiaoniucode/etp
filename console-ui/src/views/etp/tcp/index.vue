@@ -1,11 +1,7 @@
 <template>
   <div class="tcp-page art-full-height">
     <!-- 搜索栏 -->
-    <TcpSearch
-      v-model="searchForm"
-      @search="handleSearch"
-      @reset="resetSearchParams"
-    ></TcpSearch>
+    <TcpSearch v-model="searchForm" @search="handleSearch" @reset="resetSearchParams"></TcpSearch>
 
     <ElCard class="art-table-card">
       <!-- 表格头部 -->
@@ -13,7 +9,13 @@
         <template #left>
           <ElSpace wrap>
             <ElButton type="primary" @click="showDialog('add')" v-ripple>新增</ElButton>
-            <ElButton type="danger" @click="handleBatchDelete" v-ripple :disabled="selectedRows.length === 0">批量删除</ElButton>
+            <ElButton
+              type="danger"
+              @click="handleBatchDelete"
+              v-ripple
+              :disabled="selectedRows.length === 0"
+              >批量删除</ElButton
+            >
           </ElSpace>
         </template>
       </ArtTableHeader>
@@ -158,7 +160,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 240,
+          width: 220,
           fixed: 'right',
           formatter: (row: TcpProxyItem) =>
             h('div', [
@@ -169,8 +171,7 @@
               }),
               h(ArtButtonTable, { type: 'edit', onClick: () => showDialog('edit', row) }),
               h(ArtButtonTable, {
-                type: 'danger',
-                text: '删除',
+                type: 'delete',
                 onClick: () => handleSingleDelete(row)
               })
             ])

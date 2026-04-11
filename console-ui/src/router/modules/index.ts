@@ -1,7 +1,8 @@
 import { AppRouteRecord } from '@/types/router'
 import { dashboardRoutes } from './dashboard'
 import { exceptionRoutes } from './exception'
-import { penetrationRoutes } from './penetration'
+import { penetrationRoutes } from './etp'
+import { systemRoutes } from './system'
 
 /**
  * 导出所有模块化路由
@@ -9,5 +10,6 @@ import { penetrationRoutes } from './penetration'
 export const routeModules: AppRouteRecord[] = [
   dashboardRoutes,
   ...penetrationRoutes,
+  systemRoutes,
   exceptionRoutes
 ]

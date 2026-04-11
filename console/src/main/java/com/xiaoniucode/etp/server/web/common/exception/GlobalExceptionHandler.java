@@ -15,25 +15,138 @@
  */
 
 package com.xiaoniucode.etp.server.web.common.exception;
+
 import com.xiaoniucode.etp.server.web.common.Ajax;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * 全局异常处理器
+ * <p>
+ * 处理系统中各类异常，包括业务异常、系统异常、参数校验异常等
+ * </p>
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**
+     * 日志记录器
+     */
     private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    /**
+     * 处理业务异常
+     *
+     * @param e 业务异常
+     * @return 错误响应
+     */
     @ExceptionHandler(BizException.class)
     public Ajax handleBusinessException(BizException e) {
+        logger.error("业务异常", e);
         return Ajax.error(e.getCode(), e.getMessage());
     }
+
+    /**
+     * 处理系统异常
+     *
+     * @param e 系统异常
+     * @return 错误响应
+     */
     @ExceptionHandler(SystemException.class)
     public Ajax handleSystemException(SystemException e) {
+        logger.error("系统异常", e);
         return Ajax.error(e.getCode(), e.getMessage());
     }
-    @ExceptionHandler(Exception.class)
-    public Ajax handleException(Exception e) {
-        logger.error(e.getMessage());
+
+    /**
+     * 处理通用异常
+     *
+     * @param e 异常
+     * @return 错误响应
+     */
+    @ExceptionHandler(Throwable.class)
+    public Ajax handleException(Throwable e) {
+        logger.error("错误", e);
         return Ajax.error(e.getMessage());
     }
+
+    /**
+     * 处理 @Valid 注解校验 @RequestBody 参数时的异常
+     *
+     * @param e 参数校验异常
+     * @return 错误响应
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Ajax handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        logger.error("参数校验异常", e);
+        BindingResult bindingResult = e.getBindingResult();
+        String errorMessage = formatBindingResult(bindingResult);
+        return Ajax.error(400, "参数校验失败: " + errorMessage);
+    }
+
+    /**
+     * 处理 @Valid 注解校验普通参数时的异常
+     *
+     * @param e 参数绑定异常
+     * @return 错误响应
+     */
+    @ExceptionHandler(BindException.class)
+    public Ajax handleBindException(BindException e) {
+        logger.error("参数绑定异常", e);
+        BindingResult bindingResult = e.getBindingResult();
+        String errorMessage = formatBindingResult(bindingResult);
+        return Ajax.error(400, "参数绑定失败: " + errorMessage);
+    }
+
+    /**
+     * 处理 @Validated 注解校验单个参数时的异常
+     *
+     * @param e 约束违反异常
+     * @return 错误响应
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public Ajax handleConstraintViolationException(ConstraintViolationException e) {
+        logger.error("参数校验异常", e);
+        Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
+        String errorMessage = violations.stream()
+                .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                .collect(Collectors.joining("; "));
+        return Ajax.error(400, "参数校验失败: " + errorMessage);
+    }
+
+    /**
+     * 格式化 BindingResult 中的错误信息
+     *
+     * @param bindingResult 绑定结果
+     * @return 格式化后的错误信息
+     */
+    private String formatBindingResult(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<ObjectError> errors = bindingResult.getAllErrors();
+            return errors.stream()
+                    .map(error -> {
+                        if (error instanceof FieldError fieldError) {
+                            return fieldError.getField() + ": " + fieldError.getDefaultMessage();
+                        } else {
+                            return error.getDefaultMessage();
+                        }
+                    })
+                    .collect(Collectors.joining("; "));
+        }
+        return "未知错误";
+    }
 }
+

@@ -17,7 +17,9 @@ package com.xiaoniucode.etp.server.web.controller;
 import com.xiaoniucode.etp.server.web.common.Ajax;
 import com.xiaoniucode.etp.server.web.dto.auth.LoginDTO;
 import com.xiaoniucode.etp.server.web.param.auth.LoginParam;
+import com.xiaoniucode.etp.server.web.security.SecurityUtils;
 import com.xiaoniucode.etp.server.web.service.AuthService;
+import com.xiaoniucode.etp.server.web.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +29,16 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     @Autowired
     private AuthService authService;
+    @Autowired
+    private UserService userService;
     @PostMapping("login")
     public Ajax login(@Valid @RequestBody LoginParam param) {
         LoginDTO response = authService.login(param);
         return Ajax.success(response);
+    }
+    @GetMapping("info")
+    public Ajax info() {
+        String username = SecurityUtils.getCurrentUsername();
+        return Ajax.success(userService.getByUsername(username));
     }
 }

@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package com.xiaoniucode.etp.server.web.common;
 import java.io.Serial;
 import java.util.HashMap;
@@ -32,8 +47,8 @@ public class Ajax extends HashMap<String, Object> {
     public static Ajax success(Object data) {
         return new Ajax(CODE_SUCCESS, "操作成功", data);
     }
-    public static Ajax success(String msg, Object data) {
-        return new Ajax(CODE_SUCCESS, msg, data);
+    public static Ajax success(String message) {
+        return new Ajax(CODE_SUCCESS, message, null);
     }
     public static Ajax error() {
         return new Ajax(CODE_ERROR, "操作失败", null);

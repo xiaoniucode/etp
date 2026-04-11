@@ -48,14 +48,5 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String> {
             """)
     Optional<Object[]> findProxyDetailWithAssociations(@Param("id") String id);
 
-    @Query("""
-            SELECT a, t, b, lb
-            FROM ProxyDO p
-            LEFT JOIN AgentDO a ON p.agentId = a.id
-            LEFT JOIN TransportDO t ON t.proxyId = p.id
-            LEFT JOIN BandwidthDO b ON b.proxyId = p.id
-            LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
-            WHERE p.id = :id
-            """)
     void deleteByIdIn(List<String> ids);
 }

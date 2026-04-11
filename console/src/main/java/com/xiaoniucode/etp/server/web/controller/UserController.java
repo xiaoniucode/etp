@@ -14,22 +14,25 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.controller;
+
 import com.xiaoniucode.etp.server.web.common.Ajax;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import java.util.HashMap;
-import java.util.Map;
+import com.xiaoniucode.etp.server.web.param.user.UserPasswordUpdateParam;
+import com.xiaoniucode.etp.server.web.security.SecurityUtils;
+import com.xiaoniucode.etp.server.web.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-    @GetMapping("info")
-    public Ajax info() {
-        Map<String, Object> userInfo = new HashMap<>();
-        userInfo.put("userId", 1);
-        userInfo.put("username", "admin");
-        userInfo.put("avatar", "");
-        userInfo.put("roles", new String[]{"R_SUPER"});
-        return Ajax.success(userInfo);
+    @Autowired
+    private UserService userService;
+
+    @PutMapping("update-password")
+    public Ajax updatePassword(@RequestBody UserPasswordUpdateParam param) {
+        String username = SecurityUtils.getCurrentUsername();
+        userService.updatePassword(username, param);
+        return Ajax.success("密码修改成功");
     }
 }

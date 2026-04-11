@@ -25,8 +25,9 @@ import com.xiaoniucode.etp.server.web.param.proxy.*;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
+@Validated
 @RestController
 @RequestMapping("/api/proxies")
 public class ProxyController {
@@ -34,7 +35,7 @@ public class ProxyController {
     private ProxyService proxyService;
 
     @DeleteMapping
-    public Ajax batchDelete(@RequestBody ProxyBatchDeleteParam param) {
+    public Ajax batchDelete(@RequestBody @Validated ProxyBatchDeleteParam param) {
         proxyService.batchDeleteProxies(param);
         return Ajax.success();
     }

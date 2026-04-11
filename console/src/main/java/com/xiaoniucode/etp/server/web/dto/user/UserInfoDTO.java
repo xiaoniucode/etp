@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http:
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,17 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.param.user;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-@Getter
-@Setter
-public class UserPasswordUpdateParam {
-    @NotBlank(message = "旧密码不能为空")
-    private String password;
-    @NotBlank(message = "新密码不能为空")
-    private String newPassword;
-    @NotBlank(message = "确认密码不能为空")
-    private String confirmPassword;
+
+package com.xiaoniucode.etp.server.web.dto.user;
+
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.List;
+
+@Data
+public class UserInfoDTO implements Serializable {
+    private Integer userId;
+    private String username;
+    private String avatar;
+    private List<String> roles;
 }

@@ -1,11 +1,7 @@
 <template>
   <div class="http-page art-full-height">
     <!-- 搜索栏 -->
-    <HttpSearch
-      v-model="searchForm"
-      @search="handleSearch"
-      @reset="resetSearchParams"
-    ></HttpSearch>
+    <HttpSearch v-model="searchForm" @search="handleSearch" @reset="resetSearchParams"></HttpSearch>
 
     <ElCard class="art-table-card">
       <!-- 表格头部 -->
@@ -13,7 +9,13 @@
         <template #left>
           <ElSpace wrap>
             <ElButton type="primary" @click="showDialog('add')" v-ripple>新增</ElButton>
-            <ElButton type="danger" @click="handleBatchDelete" v-ripple :disabled="selectedRows.length === 0">批量删除</ElButton>
+            <ElButton
+              type="danger"
+              @click="handleBatchDelete"
+              v-ripple
+              :disabled="selectedRows.length === 0"
+              >批量删除</ElButton
+            >
           </ElSpace>
         </template>
       </ArtTableHeader>
@@ -59,7 +61,7 @@
   import { ref, h, nextTick } from 'vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { fetchGetHttpProxyList, fetchGetHttpProxyById, fetchBatchDeleteHttpProxy } from '@/api/http-proxy'
+  import { fetchGetHttpProxyList, fetchBatchDeleteHttpProxy } from '@/api/http-proxy'
   import HttpSearch from './modules/http-search.vue'
   import HttpDialog from './modules/http-dialog.vue'
   import AccessControlDialog from '../modules/access-control-dialog.vue'
@@ -149,12 +151,14 @@
             if (!row.domains || row.domains.length === 0) {
               return ''
             }
-            return row.domains.map(domain => {
-              if (row.httpProxyPort && row.httpProxyPort !== 80) {
-                return `${domain}:${row.httpProxyPort}`
-              }
-              return domain
-            }).join(', ')
+            return row.domains
+              .map((domain) => {
+                if (row.httpProxyPort && row.httpProxyPort !== 80) {
+                  return `${domain}:${row.httpProxyPort}`
+                }
+                return domain
+              })
+              .join(', ')
           }
         },
         {
@@ -178,7 +182,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 360,
+          width: 300,
           fixed: 'right',
           formatter: (row: HttpProxyItem) =>
             h('div', [
@@ -189,7 +193,7 @@
               }),
               h(ArtButtonTable, {
                 type: 'text',
-                text: 'BasicAuth',
+                text: '鉴权认证',
                 onClick: () => handleBasicAuth(row)
               }),
               h(ArtButtonTable, {
@@ -197,8 +201,7 @@
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
-                type: 'danger',
-                text: '删除',
+                type: 'delete',
                 onClick: () => handleSingleDelete(row)
               })
             ])
@@ -231,7 +234,7 @@
     console.log('打开弹窗:', { type, row })
     dialogType.value = type
     currentProxyData.value = row || {}
-    
+
     nextTick(() => {
       dialogVisible.value = true
     })
@@ -278,7 +281,7 @@
         type: 'warning'
       })
 
-      const ids = selectedRows.value.map(item => item.id)
+      const ids = selectedRows.value.map((item) => item.id)
       await fetchBatchDeleteHttpProxy({ ids })
       refreshData()
     } catch (error) {
