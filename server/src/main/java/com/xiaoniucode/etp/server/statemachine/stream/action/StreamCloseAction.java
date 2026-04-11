@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
+import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.loadbalance.LeastConnHooks;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
@@ -30,12 +31,15 @@ public class StreamCloseAction extends StreamBaseAction {
     private DirectPool directPool;
     @Autowired
     private MultiplexPool multiplexPool;
-
+    @Autowired
+    private MetricsCollector metricsCollector;
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         int streamId = context.getStreamId();
         Channel visitor = context.getVisitor();
         leastConnHooks.onStreamClosed(context);
+        metricsCollector.onChannelInactive(context.getProxyId());
+
         ChannelUtils.closeOnFlush(visitor);
         AgentContext agentContext = context.getAgentContext();
         TunnelEntry tunnelEntry = context.getTunnelEntry();

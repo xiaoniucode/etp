@@ -108,13 +108,6 @@
       ? { type: 'success' as const, text: '运行中' }
       : { type: 'info' as const, text: '已停止' }
   }
-
-  const getAgentTypeConfig = (agentType: number) => {
-    return agentType === 0
-      ? { type: 'primary' as const, text: 'Session' }
-      : { type: 'warning' as const, text: 'Binary' }
-  }
-
   const {
     columns,
     columnChecks,
@@ -166,8 +159,9 @@
           label: '客户端类型',
           width: 120,
           formatter: (row: HttpProxyItem) => {
-            const agentTypeConfig = getAgentTypeConfig(row.agentType)
-            return h(ElTag, { type: agentTypeConfig.type }, () => agentTypeConfig.text)
+            return h(ElTag, { type: row.agentType === 1 ? 'primary' : 'warning' }, () =>
+              row.agentType === 1 ? 'BINARY' : 'SESSION'
+            )
           }
         },
         {

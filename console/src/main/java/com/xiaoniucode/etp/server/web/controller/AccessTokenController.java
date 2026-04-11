@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.controller;
-import com.xiaoniucode.etp.server.web.common.Ajax;
-import com.xiaoniucode.etp.server.web.dto.auth.AccessTokenDTO;
+import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.dto.accesstoken.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenCreateParam;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenUpdateParam;

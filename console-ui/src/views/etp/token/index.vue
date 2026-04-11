@@ -36,7 +36,7 @@
       <TokenDialog
         v-model:visible="dialogVisible"
         :type="dialogType"
-        :token-data="currentTokenData"
+        :token-id="currentTokenId"
         @submit="handleDialogSubmit"
       />
     </ElCard>
@@ -47,14 +47,10 @@
   import { ref, h, nextTick } from 'vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import {
-    fetchGetTokenList,
-    fetchDeleteToken,
-    fetchDeleteBatchTokens
-  } from '@/api/token'
+  import { fetchGetTokenList, fetchDeleteToken, fetchDeleteBatchTokens } from '@/api/token'
   import TokenSearch from './modules/token-search.vue'
   import TokenDialog from './modules/token-dialog.vue'
-  import { ElTag, ElMessageBox, ElMessage } from 'element-plus'
+  import { ElMessageBox, ElMessage } from 'element-plus'
   import { DialogType } from '@/types'
 
   defineOptions({ name: 'TokenManagement' })
@@ -64,7 +60,6 @@
     name: string
     token: string
     maxDevice: number
-    deviceTimeout: number
     maxConnection: number
     createdAt: string
     updatedAt: string
@@ -81,7 +76,7 @@
   // 弹窗相关
   const dialogType = ref<DialogType>('add')
   const dialogVisible = ref(false)
-  const currentTokenData = ref<Partial<TokenItem>>({})
+  const currentTokenId = ref<number | undefined>()
 
   const {
     columns,
@@ -110,28 +105,17 @@
         {
           prop: 'name',
           label: '令牌名称',
-          minWidth: 120
+          minWidth: 50
         },
         {
           prop: 'token',
           label: '令牌',
-          minWidth: 200,
-          formatter: (row: TokenItem) => {
-            return row.token.substring(0, 32) + '...'
-          }
+          minWidth: 200
         },
         {
           prop: 'maxDevice',
           label: '最大设备数',
           width: 120
-        },
-        {
-          prop: 'deviceTimeout',
-          label: '设备超时时间',
-          width: 120,
-          formatter: (row: TokenItem) => {
-            return row.deviceTimeout + ' 天'
-          }
         },
         {
           prop: 'maxConnection',
@@ -141,8 +125,8 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 180,
-          fixed: 'right', // 固定列
+          width: 120,
+          fixed: 'right',
           formatter: (row: TokenItem) =>
             h('div', [
               h(ArtButtonTable, {
@@ -193,13 +177,9 @@
       cancelButtonText: '取消',
       type: 'error'
     }).then(async () => {
-      try {
-        await fetchDeleteToken(row.id)
-        ElMessage.success('删除成功')
-        refreshData()
-      } catch (error) {
-        ElMessage.error('删除失败')
-      }
+      await fetchDeleteToken(row.id)
+      ElMessage.success('删除成功')
+      refreshData()
     })
   }
 
@@ -209,19 +189,19 @@
   const handleBatchDelete = (): void => {
     if (selectedRows.value.length === 0) return
 
-    ElMessageBox.confirm(`确定要删除选中的 ${selectedRows.value.length} 个访问令牌吗？`, '批量删除', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'error'
-    }).then(async () => {
-      try {
-        const ids = selectedRows.value.map((row) => row.id)
-        await fetchDeleteBatchTokens(ids)
-        ElMessage.success('批量删除成功')
-        refreshData()
-      } catch (error) {
-        ElMessage.error('批量删除失败')
+    ElMessageBox.confirm(
+      `确定要删除选中的 ${selectedRows.value.length} 个访问令牌吗？`,
+      '批量删除',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'error'
       }
+    ).then(async () => {
+      const ids = selectedRows.value.map((row) => row.id)
+      await fetchDeleteBatchTokens(ids)
+      ElMessage.success('批量删除成功')
+      refreshData()
     })
   }
 
@@ -239,7 +219,7 @@
   const showDialog = (type: DialogType, row?: TokenItem): void => {
     console.log('打开对话框:', { type, row })
     dialogType.value = type
-    currentTokenData.value = row || {}
+    currentTokenId.value = row?.id
     nextTick(() => {
       dialogVisible.value = true
     })
@@ -249,13 +229,9 @@
    * 处理对话框提交
    */
   const handleDialogSubmit = async () => {
-    try {
-      dialogVisible.value = false
-      currentTokenData.value = {}
-      refreshData()
-    } catch (error) {
-      console.error('提交失败:', error)
-    }
+    dialogVisible.value = false
+    currentTokenId.value = undefined
+    refreshData()
   }
 </script>
 

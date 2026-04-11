@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.configuration;
 
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.PortPolicyConfig;
+import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.registry.ConfigChangeDetector;
@@ -25,8 +26,8 @@ public class ManagerConfiguration {
     private AppConfig config;
 
     @Bean
-    public ProxyManager proxyManager(ConfigRegistrarFactory configRegistrarFactory, DomainStore domainStore, ConfigChangeDetector configChangeDetector, ProxyStore proxyStore) {
-        return new DefaultProxyManager(proxyStore, domainStore, configChangeDetector, configRegistrarFactory);
+    public ProxyManager proxyManager(MetricsCollector metricsCollector,ConfigRegistrarFactory configRegistrarFactory, DomainStore domainStore, ConfigChangeDetector configChangeDetector, ProxyStore proxyStore) {
+        return new DefaultProxyManager(metricsCollector,proxyStore, domainStore, configChangeDetector, configRegistrarFactory);
     }
 
     @Bean

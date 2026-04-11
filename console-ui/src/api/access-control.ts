@@ -34,7 +34,7 @@ export function fetchGetAccessControl(proxyId: string) {
  */
 export function fetchUpdateAccessControl(params: {
   proxyId: string
-  enable: boolean
+  enabled: boolean
   mode: number
 }) {
   return request.put<any>({

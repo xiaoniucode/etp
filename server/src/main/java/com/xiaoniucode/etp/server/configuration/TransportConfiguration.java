@@ -3,7 +3,6 @@ package com.xiaoniucode.etp.server.configuration;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.TunnelServer;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import com.xiaoniucode.etp.server.transport.http.HttpProxyServer;
 import com.xiaoniucode.etp.server.transport.tcp.TcpProxyServer;
 import com.xiaoniucode.etp.server.transport.ControlFrameHandler;
@@ -22,10 +21,12 @@ import org.springframework.context.annotation.Import;
 public class TransportConfiguration {
     @Resource
     private AppConfig config;
+
     @Bean
     public TunnelServer tunnelServer(EventBus eventBus, ControlFrameHandler controlFrameHandler) {
         return new TunnelServer(config, eventBus, controlFrameHandler);
     }
+
     @Bean
     public TcpProxyServer tcpProxyServer(TcpVisitorHandler tcpVisitorHandler, TcpIpCheckHandler tcpIpCheckHandler, EventBus eventBus) {
         return new TcpProxyServer(tcpVisitorHandler, tcpIpCheckHandler, eventBus);
@@ -35,13 +36,11 @@ public class TransportConfiguration {
     public HttpProxyServer httpProxyServer(HttpVisitorHandler httpVisitorHandler,
                                            HttpIpCheckHandler httpIpCheckHandler,
                                            BasicAuthHandler basicAuthHandler,
-                                           EventBus eventBus,
-                                           TrafficMetricsHandler trafficMetricsHandler) {
+                                           EventBus eventBus) {
         return new HttpProxyServer(config,
                 httpVisitorHandler,
                 httpIpCheckHandler,
                 basicAuthHandler,
-                eventBus,
-                trafficMetricsHandler);
+                eventBus);
     }
 }

@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.web.security;
 import com.google.gson.Gson;
-import com.xiaoniucode.etp.server.web.common.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

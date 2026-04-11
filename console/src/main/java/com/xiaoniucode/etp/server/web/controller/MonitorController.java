@@ -14,9 +14,21 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.controller;
+
+import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.common.monitor.ServerMonitor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @RequestMapping("/api/monitor")
 public class MonitorController {
+    /**
+     * 获取服务器信息，用于监控
+     */
+    @GetMapping("server-info")
+    public Ajax getServerInfo() {
+        return Ajax.success(ServerMonitor.getServerInfo());
+    }
 }

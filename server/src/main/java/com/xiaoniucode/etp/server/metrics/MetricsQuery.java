@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http:
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,20 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.service;
-import com.xiaoniucode.etp.server.web.common.monitor.ServerDTO;
-import java.util.Map;
-public interface MonitorService {
-    /**
-     * 获取监控概览数据
-     */
-    Map<String, Object> getMonitorOverview();
-    /**
-     * 获取服务器监控数据
-     */
-    ServerDTO getServerMonitorData();
-    /**
-     * 获取流量数据
-     */
-    Map<String, Object> getTrafficData();
+
+package com.xiaoniucode.etp.server.metrics;
+
+import lombok.Data;
+
+@Data
+public class MetricsQuery {
+    private String proxyId;
+    private Long minTraffic;
+    private int page = 0;
+    private int size = 10;
 }

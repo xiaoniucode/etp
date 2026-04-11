@@ -32,9 +32,10 @@ public class StreamContext extends AbstractStreamContext {
         this.stateMachine = streamStateMachine;
     }
 
-    public boolean hasBandwidthLimiter() {
-        return bandwidthLimiter != null;
+    public String getProxyId() {
+        return proxyConfig.getProxyId();
     }
+
 
     public void fireEvent(StreamEvent event) {
         stateMachine.fireEvent(state, event, this);

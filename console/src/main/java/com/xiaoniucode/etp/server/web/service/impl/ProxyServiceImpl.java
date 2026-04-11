@@ -16,12 +16,11 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
-import com.xiaoniucode.etp.core.enums.DeploymentMode;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
-import com.xiaoniucode.etp.server.web.common.PageResult;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.bandwidth.BandwidthDTO;
 import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;

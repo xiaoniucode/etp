@@ -18,10 +18,7 @@
         <div class="config-section">
           <div class="config-item">
             <span class="label">启用状态：</span>
-            <ElSwitch
-              v-model="formData.enabled"
-              @change="handleEnableChange"
-            />
+            <ElSwitch v-model="formData.enabled" @change="handleEnableChange" />
           </div>
           <div class="config-item">
             <span class="label">控制模式：</span>
@@ -41,16 +38,8 @@
           </div>
         </template>
         <div class="rules-table">
-          <ElTable
-            :data="formData.rules"
-            style="width: 100%"
-            border
-          >
-            <ElTableColumn
-              prop="cidr"
-              label="IP地址段"
-              width="300"
-            >
+          <ElTable :data="formData.rules" style="width: 100%" border>
+            <ElTableColumn prop="cidr" label="IP地址段" width="300">
               <template #default="scope">
                 <ElInput
                   v-if="editingRuleId === scope.row.id"
@@ -61,11 +50,7 @@
                 <span v-else>{{ scope.row.cidr }}</span>
               </template>
             </ElTableColumn>
-            <ElTableColumn
-              prop="ruleType"
-              label="规则类型"
-              width="150"
-            >
+            <ElTableColumn prop="ruleType" label="规则类型" width="150">
               <template #default="scope">
                 <ElRadioGroup v-if="editingRuleId === scope.row.id" v-model="scope.row.ruleType">
                   <ElRadio :label="1">允许</ElRadio>
@@ -76,11 +61,7 @@
                 </ElTag>
               </template>
             </ElTableColumn>
-            <ElTableColumn
-              label="操作"
-              width="240"
-              fixed="right"
-            >
+            <ElTableColumn label="操作" width="240" fixed="right">
               <template #default="scope">
                 <ElSpace size="small">
                   <ElButton
@@ -91,22 +72,13 @@
                   >
                     保存
                   </ElButton>
-                  <ElButton
-                    v-else
-                    type="primary"
-                    size="small"
-                    @click="handleEditRule(scope.row)"
-                  >
+                  <ElButton v-else type="primary" size="small" @click="handleEditRule(scope.row)">
                     <template #icon>
                       <Edit />
                     </template>
                     编辑
                   </ElButton>
-                  <ElButton
-                    type="danger"
-                    size="small"
-                    @click="handleDeleteRule(scope.row.id)"
-                  >
+                  <ElButton type="danger" size="small" @click="handleDeleteRule(scope.row.id)">
                     <template #icon>
                       <Delete />
                     </template>
@@ -128,8 +100,6 @@
         </div>
       </ElCard>
     </div>
-
-
   </ElDialog>
 </template>
 
@@ -159,10 +129,8 @@
     }
   })
 
-  // Emits
   const emit = defineEmits(['update:visible', 'close'])
 
-  // 表单数据
   const formData = reactive({
     enabled: false,
     mode: 1,
@@ -174,22 +142,23 @@
     }>
   })
 
-  // 弹窗状态
   const dialogVisible = ref(false)
-  
-  // 编辑状态
+
   const editingRuleId = ref<number | null>(null)
-  
+
   // 临时存储编辑前的规则数据，用于取消编辑
   const editingRuleBackup = ref<any>(null)
 
   // 监听 props.visible 变化，同步到本地变量并获取数据
-  watch(() => props.visible, async (newVal) => {
-    dialogVisible.value = newVal
-    if (newVal && props.proxyId) {
-      await fetchAccessControlData()
+  watch(
+    () => props.visible,
+    async (newVal) => {
+      dialogVisible.value = newVal
+      if (newVal && props.proxyId) {
+        await fetchAccessControlData()
+      }
     }
-  })
+  )
 
   // 监听本地 dialogVisible 变化，通知父组件
   watch(dialogVisible, (newVal) => {
@@ -205,16 +174,11 @@
 
   // 获取访问控制详情
   const fetchAccessControlData = async () => {
-    try {
-      const response = await fetchGetAccessControl(props.proxyId)
-      if (response) {
-        formData.enabled = response.enabled || false
-        formData.mode = response.mode !== undefined ? response.mode : 1
-        formData.rules = response.rules || []
-      }
-    } catch (error) {
-      console.error('获取访问控制详情失败:', error)
-      ElMessage.error('获取访问控制详情失败')
+    const response = await fetchGetAccessControl(props.proxyId)
+    if (response) {
+      formData.enabled = response.enabled || false
+      formData.mode = response.mode !== undefined ? response.mode : 1
+      formData.rules = response.rules || []
     }
   }
 
@@ -230,22 +194,15 @@
 
   // 更新访问控制配置
   const updateAccessControlConfig = async () => {
-    try {
-      await fetchUpdateAccessControl({
-        proxyId: props.proxyId,
-        enabled: formData.enabled,
-        mode: formData.mode
-      })
-    } catch (error) {
-      console.error('更新访问控制状态失败:', error)
-      ElMessage.error('更新访问控制状态失败')
-      // 恢复原状态（这里简化处理，实际项目中可能需要更复杂的状态管理）
-    }
+    await fetchUpdateAccessControl({
+      proxyId: props.proxyId,
+      enabled: formData.enabled,
+      mode: formData.mode
+    })
   }
 
   // 添加规则
   const addRule = () => {
-    // 添加一行新规则
     formData.rules.push({
       id: 0, // 临时ID，后端会生成真实ID
       proxyId: props.proxyId,
@@ -265,14 +222,13 @@
     editingRuleId.value = rule.id
   }
 
-  // 保存规则
   const handleSaveRule = async (rule: any) => {
     // 验证规则
     if (!rule.cidr) {
       ElMessage.error('请输入IP地址段')
       return
     }
-    
+
     try {
       if (rule.id > 0) {
         // 更新现有规则
@@ -314,7 +270,7 @@
         cancelButtonText: '取消',
         type: 'warning'
       })
-      
+
       if (id > 0) {
         // 删除已保存的规则
         await fetchDeleteAccessControlRule(id)
@@ -322,7 +278,7 @@
         await fetchAccessControlData()
       } else {
         // 删除未保存的规则（直接从列表中移除）
-        const index = formData.rules.findIndex(rule => rule.id === id)
+        const index = formData.rules.findIndex((rule) => rule.id === id)
         if (index > -1) {
           formData.rules.splice(index, 1)
           // 退出编辑状态
@@ -354,25 +310,25 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      
+
       .config-item {
         display: flex;
         align-items: center;
         gap: 12px;
-        
+
         .label {
           width: 80px;
           font-weight: 500;
         }
       }
     }
-    
+
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    
+
     .empty-rules {
       padding: 40px 0;
       text-align: center;

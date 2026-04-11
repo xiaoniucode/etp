@@ -15,8 +15,8 @@
  */
 package com.xiaoniucode.etp.server.web.controller;
 
-import com.xiaoniucode.etp.server.web.common.Ajax;
-import com.xiaoniucode.etp.server.web.common.PageResult;
+import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;

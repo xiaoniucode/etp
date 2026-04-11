@@ -64,8 +64,8 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        streamManager.getStreamContext(ctx.channel()).ifPresent(streamContext -> {
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+        streamManager.getStreamContext(ctx.channel()).ifPresent(context -> {
+            context.fireEvent(StreamEvent.STREAM_CLOSE);
         });
         super.channelInactive(ctx);
     }

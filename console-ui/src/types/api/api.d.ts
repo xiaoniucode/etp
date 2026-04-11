@@ -92,18 +92,10 @@ declare namespace Api {
       id: number
       name: string
       token: string
-      max_device: number
-      device_timeout: number
-      max_connection: number
+      maxDevice: number
+      maxConnection: number
       createdAt: string
       updatedAt: string
-    }
-
-    /** 访问令牌搜索参数 */
-    interface TokenSearchParams {
-      keyword?: string
-      page: number
-      size: number
     }
   }
 
@@ -139,13 +131,6 @@ declare namespace Api {
       targets: TargetDTO[]
       bandwidth: BandwidthDTO
       httpProxyPort: number
-    }
-
-    /** HTTP 代理搜索参数 */
-    interface HttpProxySearchParams {
-      keyword?: string
-      page: number
-      size: number
     }
   }
 

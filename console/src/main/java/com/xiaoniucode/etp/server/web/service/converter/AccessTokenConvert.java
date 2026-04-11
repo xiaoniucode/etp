@@ -14,33 +14,25 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service.converter;
-import com.xiaoniucode.etp.server.web.dto.auth.AccessTokenDTO;
+
+import com.xiaoniucode.etp.server.web.dto.accesstoken.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.entity.AccessTokenDO;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenCreateParam;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenUpdateParam;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.MappingTarget;
+
 import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface AccessTokenConvert {
-    AccessTokenConvert INSTANCE = Mappers.getMapper(AccessTokenConvert.class);
-    
     AccessTokenDTO toDTO(AccessTokenDO entity);
-    
-    AccessTokenDO toEntity(AccessTokenDTO dto);
-    
-    List<AccessTokenDTO> toDTOList(List<AccessTokenDO> entities);
-    
+
+    List<AccessTokenDTO> toDTOList(List<AccessTokenDO> accessTokenDOS);
+
+    AccessTokenDO toDO(AccessTokenCreateParam param);
+
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    AccessTokenDO toEntity(AccessTokenCreateParam request);
-    
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "token", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    AccessTokenDO toEntity(AccessTokenUpdateParam request);
+    void updateDO(@MappingTarget AccessTokenDO accessTokenDO, AccessTokenUpdateParam request);
 }

@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.Collection;
+import java.util.List;
+
 /**
  * 系统首次启动时候执行，当TCP代理服务初始化成功后，将所有代理端口（remotePort）进行监听
  */
@@ -33,7 +35,7 @@ public class PortInitializer implements EventListener<TunnelServerBindEvent> {
     @Override
     public void onEvent(TunnelServerBindEvent event) {
         try {
-            Collection<ProxyConfig> configs = proxyManager.findAllTcpProxies();
+            List<ProxyConfig> configs = proxyManager.findAllTcpProxies();
             for (ProxyConfig proxy : configs) {
                 if (!proxy.isEnabled()) {
                     continue;

@@ -119,7 +119,6 @@ public class TcpConfigRegistrar implements ConfigRegistrar {
     private void closeCacheByPort(int listenPort) {
         logger.debug("释放端口 {} ", listenPort);
         portManager.release(listenPort);
-        MetricsCollector.removeCollector(listenPort + "");
         portAcceptor.stopPortListen(listenPort);
         streamManager.closeStreams(listenPort);
     }

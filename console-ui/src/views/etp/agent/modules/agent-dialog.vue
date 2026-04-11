@@ -1,25 +1,25 @@
 <template>
   <ElDialog v-model="dialogVisible" title="客户端详情" width="60%" align-center>
-    <div v-if="clientData" class="client-detail">
+    <div v-if="localClientData" class="client-detail">
       <ElDescriptions :column="2" border>
-        <ElDescriptionsItem label="客户端名称">{{ clientData.name }}</ElDescriptionsItem>
-        <ElDescriptionsItem label="访问令牌">{{ clientData.token }}</ElDescriptionsItem>
+        <ElDescriptionsItem label="客户端名称">{{ localClientData.name }}</ElDescriptionsItem>
+        <ElDescriptionsItem label="访问令牌">{{ localClientData.token }}</ElDescriptionsItem>
         <ElDescriptionsItem label="状态">
-          <ElTag :type="getStatusType(clientData.isOnline)">
-            {{ getStatusText(clientData.isOnline) }}
+          <ElTag :type="getStatusType(localClientData.isOnline)">
+            {{ getStatusText(localClientData.isOnline) }}
           </ElTag>
         </ElDescriptionsItem>
         <ElDescriptionsItem label="类型">{{
-          clientData.agentType === 1 ? 'BINARY' : 'SESSION'
+          localClientData.agentType === 1 ? 'BINARY' : 'SESSION'
         }}</ElDescriptionsItem>
-        <ElDescriptionsItem label="操作系统">{{ clientData.os }}</ElDescriptionsItem>
-        <ElDescriptionsItem label="架构">{{ clientData.arch }}</ElDescriptionsItem>
-        <ElDescriptionsItem label="版本">{{ clientData.version }}</ElDescriptionsItem>
+        <ElDescriptionsItem label="操作系统">{{ localClientData.os }}</ElDescriptionsItem>
+        <ElDescriptionsItem label="架构">{{ localClientData.arch }}</ElDescriptionsItem>
+        <ElDescriptionsItem label="版本">{{ localClientData.version }}</ElDescriptionsItem>
         <ElDescriptionsItem label="创建时间">{{
-          formatDate(clientData.createdAt)
+          formatDate(localClientData.createdAt)
         }}</ElDescriptionsItem>
         <ElDescriptionsItem label="更新时间">{{
-          formatDate(clientData.updatedAt)
+          formatDate(localClientData.updatedAt)
         }}</ElDescriptionsItem>
       </ElDescriptions>
     </div>
@@ -58,7 +58,7 @@
   })
 
   // 客户端数据
-  const clientData = ref<Api.Agent.AgentDTO | null>(null)
+  const localClientData = ref<Api.Agent.AgentDTO | null>(null)
   const loading = ref(false)
 
   /**
@@ -66,11 +66,11 @@
    */
   const fetchClientDetail = async () => {
     if (!props.clientData?.id) return
-    
+
     loading.value = true
     try {
       const data = await fetchGetAgentById(props.clientData.id)
-      clientData.value = data
+      localClientData.value = data
     } catch (error) {
       console.error('获取客户端详情失败:', error)
       ElMessage.error('获取客户端详情失败')

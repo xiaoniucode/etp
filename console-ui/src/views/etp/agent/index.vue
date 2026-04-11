@@ -93,10 +93,7 @@
         {
           prop: 'token',
           label: '访问令牌',
-          minWidth: 240,
-          formatter: (row: ClientItem) => {
-            return row.token.substring(0, 10) + '...'
-          }
+          minWidth: 240
         },
         {
           prop: 'isOnline',
@@ -114,27 +111,29 @@
         },
         {
           prop: 'arch',
-          label: '架构',
-          width: 80
+          label: '系统架构',
+          width: 100
         },
         {
           prop: 'version',
-          label: '版本',
+          label: '客户端版本',
           width: 100
         },
         {
           prop: 'agentType',
-          label: '类型',
-          width: 80,
+          label: '客户端类型',
+          width: 100,
           formatter: (row: ClientItem) => {
-            return row.agentType === 1 ? 'BINARY' : 'SESSION'
+            return h(ElTag, { type: row.agentType === 1 ? 'primary' : 'warning' }, () =>
+              row.agentType === 1 ? 'BINARY' : 'SESSION'
+            )
           }
         },
         {
           prop: 'operation',
           label: '操作',
-          width: 240,
-          fixed: 'right', // 固定列
+          width: 150,
+          fixed: 'right',
           formatter: (row: ClientItem) =>
             h('div', [
               h(ArtButtonTable, {

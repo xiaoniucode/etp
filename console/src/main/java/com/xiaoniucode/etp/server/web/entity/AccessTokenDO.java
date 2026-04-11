@@ -51,13 +51,6 @@ public class AccessTokenDO {
     @Column(name = "max_device", nullable = false)
     private Integer maxDevice;
     /**
-     * 设备超时时间
-     */
-    @Column(name = "device_timeout", nullable = false)
-    private Integer deviceTimeout;
-    @Column(name = "expire_time"/*, nullable = true*/)
-    private LocalDateTime expireTime;
-    /**
      * 最大连接数
      */
     @Column(name = "max_connection", nullable = false)
@@ -71,9 +64,4 @@ public class AccessTokenDO {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
-
-    public boolean isExpired() {
-        if (expireTime == null) return false;
-        return LocalDateTime.now().isAfter(expireTime);
-    }
 }

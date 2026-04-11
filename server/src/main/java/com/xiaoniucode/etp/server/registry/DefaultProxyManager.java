@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.registry;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
+import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.store.DomainStore;
 import com.xiaoniucode.etp.server.store.ProxyStore;
 import com.xiaoniucode.etp.server.vhost.DomainBinding;
@@ -20,8 +21,10 @@ public class DefaultProxyManager implements ProxyManager {
     private final ConfigRegistrarFactory configRegistrarFactory;
     private final ConfigChangeDetector configChangeDetector;
     private final DomainStore domainStore;
+    private final MetricsCollector metricsCollector;
 
-    public DefaultProxyManager(ProxyStore proxyStore, DomainStore domainStore, ConfigChangeDetector configChangeDetector, ConfigRegistrarFactory configRegistrarFactory) {
+    public DefaultProxyManager(MetricsCollector metricsCollector, ProxyStore proxyStore, DomainStore domainStore, ConfigChangeDetector configChangeDetector, ConfigRegistrarFactory configRegistrarFactory) {
+        this.metricsCollector = metricsCollector;
         this.proxyStore = proxyStore;
         this.domainStore = domainStore;
         this.configRegistrarFactory = configRegistrarFactory;
@@ -87,8 +90,10 @@ public class DefaultProxyManager implements ProxyManager {
         if (opt.isPresent()) {
             ProxyConfig proxyConfig = opt.get();
             ConfigRegistrar delegate = configRegistrarFactory.getRegistrar(proxyConfig);
-            //删除操作
+            //释放代理相关资源信息
             delegate.unregister(proxyConfig);
+            //删除代理流量统计记录
+            metricsCollector.removeByProxyId(proxyId);
             //删除存储
             proxyStore.deleteById(proxyId);
             return Optional.of(proxyConfig);

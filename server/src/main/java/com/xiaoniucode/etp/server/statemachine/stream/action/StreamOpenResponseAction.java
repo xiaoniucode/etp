@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.statemachine.stream.action;
 
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
+import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.loadbalance.LeastConnHooks;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
@@ -30,7 +31,8 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     private MultiplexPool multiplexPool;
     @Autowired
     private LeastConnHooks leastConnHooks;
-
+    @Autowired
+    private MetricsCollector metricsCollector;
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         logger.debug("收到流 {} 打开通知", context.getStreamId());
@@ -60,10 +62,13 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         }
         tunnelBridge.open();
         context.setTunnelBridge(tunnelBridge);
+        //负载均衡 最少连接数
         leastConnHooks.onStreamOpened(context);
+        //增加连接数量，用于监控统计
+        metricsCollector.onChannelActive(context.getProxyId());
         //如果是 HTTP协议需要发送首次建立建立的时候读取到的第一个包
         if (context.getCurrentProtocol().isHttp()) {
-            relayHttpFirstPackage(visitor, tunnelBridge);
+            relayHttpFirstPackage(context,visitor, tunnelBridge);
         }
         visitor.config().setOption(ChannelOption.AUTO_READ, true);
         logger.debug("流 {} 打开成功，可以从访问者读数据", context.getStreamId());
@@ -72,7 +77,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     /**
      * 发送HTTP 协议首次缓存的第一个数据包
      */
-    public void relayHttpFirstPackage(Channel visitor, TunnelBridge tunnelBridge) {
+    public void relayHttpFirstPackage(StreamContext context,Channel visitor, TunnelBridge tunnelBridge) {
         ByteBuf cached = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).get();
         tunnelBridge.forwardToLocal(cached);
         visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(null);

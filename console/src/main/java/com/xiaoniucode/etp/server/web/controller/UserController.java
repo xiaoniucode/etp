@@ -15,7 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.controller;
 
-import com.xiaoniucode.etp.server.web.common.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.param.user.UserPasswordUpdateParam;
 import com.xiaoniucode.etp.server.web.security.SecurityUtils;
 import com.xiaoniucode.etp.server.web.service.UserService;

@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service.impl;
+
+import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
 import com.xiaoniucode.etp.server.web.repository.AgentRepository;
@@ -24,11 +26,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+
 @Service
 public class AgentServiceImpl implements AgentService {
     @Autowired
     private AgentRepository agentRepository;
+    @Autowired
+    private AgentConvert agentConvert;
+
     @Override
     public List<AgentDTO> findAll(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -39,30 +46,29 @@ public class AgentServiceImpl implements AgentService {
             agentPage = agentRepository.findAll(pageable);
         }
         List<AgentDO> agents = agentPage.getContent();
-        List<AgentDTO> dtos = AgentConvert.INSTANCE.toDTOList(agents);
-        dtos.forEach(dto -> {
+        List<AgentDTO> agentDTOList = agentConvert.toDTOList(agents);
+        agentDTOList.forEach(dto -> {
+            //todo 获取在线状态
             dto.setIsOnline(false);
-            dto.setToken("token_fefefewfwefddsdfrferfefregrggergregregregrr" + dto.getId());
         });
-        return dtos;
+        return agentDTOList;
     }
+
     @Override
     public AgentDTO findById(String agentId) {
-        AgentDO agent = agentRepository.findById(agentId).orElse(null);
-        if (agent == null) {
-            return null;
-        }
-        AgentDTO dto = AgentConvert.INSTANCE.toDTO(agent);
+        AgentDO agent = agentRepository.findById(agentId).orElseThrow(() -> new BizException("客户端不存在"));
+        AgentDTO dto = agentConvert.toDTO(agent);
         dto.setIsOnline(false);
-        dto.setToken("token_" + dto.getId());
         return dto;
     }
+
     @Override
     public void kickout(String agentId) {
     }
+
     @Override
     public List<AgentDTO> findAll() {
         List<AgentDO> all = agentRepository.findAll();
-        return AgentConvert.INSTANCE.toDTOList(all);
+        return agentConvert.toDTOList(all);
     }
 }

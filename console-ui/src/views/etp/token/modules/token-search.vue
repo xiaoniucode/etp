@@ -22,13 +22,13 @@
       keyword?: string
     }
   }
-  
+
   interface Emits {
     (e: 'update:modelValue', value: { keyword?: string }): void
     (e: 'search', params: { keyword?: string }): void
     (e: 'reset'): void
   }
-  
+
   const props = defineProps<Props>()
   const emit = defineEmits<Emits>()
 

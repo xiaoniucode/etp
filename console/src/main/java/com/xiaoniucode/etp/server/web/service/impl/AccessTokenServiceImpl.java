@@ -14,8 +14,10 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service.impl;
+
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
-import com.xiaoniucode.etp.server.web.dto.auth.AccessTokenDTO;
+import com.xiaoniucode.etp.server.web.common.exception.BizException;
+import com.xiaoniucode.etp.server.web.dto.accesstoken.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenCreateParam;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenUpdateParam;
@@ -28,21 +30,31 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+
 @Service
 public class AccessTokenServiceImpl implements AccessTokenService {
     @Autowired
     private AccessTokenRepository accessTokenRepository;
     @Autowired
     private UUIDGenerator uuidGenerator;
+    @Autowired
+    private AccessTokenConvert accessTokenConvert;
+
     @Override
     public AccessTokenDTO create(AccessTokenCreateParam request) {
-        AccessTokenDO accessToken = AccessTokenConvert.INSTANCE.toEntity(request);
+        if (accessTokenRepository.existsByName(request.getName())) {
+            throw new BizException("令牌名称已存在");
+        }
+        
+        AccessTokenDO accessToken = accessTokenConvert.toDO(request);
         String token = uuidGenerator.uuid32().toUpperCase();
         accessToken.setToken(token);
         AccessTokenDO save = accessTokenRepository.save(accessToken);
-        return AccessTokenConvert.INSTANCE.toDTO(save);
+        return accessTokenConvert.toDTO(save);
     }
+
     @Override
     public List<AccessTokenDTO> findAll(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -53,31 +65,35 @@ public class AccessTokenServiceImpl implements AccessTokenService {
             tokenPage = accessTokenRepository.findAll(pageable);
         }
         List<AccessTokenDO> tokens = tokenPage.getContent();
-        return AccessTokenConvert.INSTANCE.toDTOList(tokens);
+        return accessTokenConvert.toDTOList(tokens);
     }
+
     @Override
     public AccessTokenDTO findById(Integer id) {
         AccessTokenDO token = accessTokenRepository.findById(id).orElse(null);
         if (token == null) {
             return null;
         }
-        return AccessTokenConvert.INSTANCE.toDTO(token);
+        return accessTokenConvert.toDTO(token);
     }
+
     @Override
     public void update(AccessTokenUpdateParam request) {
-        AccessTokenDO existingToken = accessTokenRepository.findById(request.getId()).orElse(null);
-        if (existingToken != null) {
-            AccessTokenDO updatedToken = AccessTokenConvert.INSTANCE.toEntity(request);
-            updatedToken.setId(request.getId());
-            updatedToken.setToken(existingToken.getToken());
-            updatedToken.setCreatedAt(existingToken.getCreatedAt());
-            accessTokenRepository.save(updatedToken);
+        AccessTokenDO accessTokenDO = accessTokenRepository.findById(request.getId()).orElse(null);
+        if (accessTokenDO != null) {
+            if (accessTokenRepository.existsByNameAndIdNot(request.getName(), request.getId())) {
+                throw new BizException("令牌名称已存在");
+            }
+            accessTokenConvert.updateDO(accessTokenDO,request);
+            accessTokenRepository.save(accessTokenDO);
         }
     }
+
     @Override
     public void delete(Integer id) {
         accessTokenRepository.deleteById(id);
     }
+
     @Override
     public void deleteBatch(AccessTokenBatchDeleteParam request) {
         List<Integer> ids = request.getIds();

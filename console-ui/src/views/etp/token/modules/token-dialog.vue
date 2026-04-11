@@ -5,7 +5,10 @@
     width="500px"
     align-center
   >
-    <ElForm ref="formRef" :model="formData" :rules="rules" label-width="120px">
+    <div v-if="loading" class="loading-state">
+      <ElSkeleton :rows="5" animated />
+    </div>
+    <ElForm v-else ref="formRef" :model="formData" :rules="rules" label-width="120px">
       <ElFormItem v-if="dialogType === 'edit'" label="令牌值">
         <ElInput v-model="formData.token" disabled />
       </ElFormItem>
@@ -15,10 +18,6 @@
       <ElFormItem label="最大设备数" prop="maxDevice">
         <ElInputNumber v-model="formData.maxDevice" :min="1" :max="1000" />
       </ElFormItem>
-      <ElFormItem label="设备超时时间" prop="deviceTimeout">
-        <ElInputNumber v-model="formData.deviceTimeout" :min="1" :max="365" />
-        <span class="ml-2 text-xs text-gray-500">天</span>
-      </ElFormItem>
       <ElFormItem label="最大连接数" prop="maxConnection">
         <ElInputNumber v-model="formData.maxConnection" :min="1" :max="10000" />
       </ElFormItem>
@@ -26,21 +25,22 @@
     <template #footer>
       <div class="dialog-footer">
         <ElButton @click="dialogVisible = false">取消</ElButton>
-        <ElButton type="primary" @click="handleSubmit">提交</ElButton>
+        <ElButton type="primary" @click="handleSubmit" :loading="loading">提交</ElButton>
       </div>
     </template>
   </ElDialog>
 </template>
 
 <script setup lang="ts">
+  import { ref, reactive, computed, watch, nextTick } from 'vue'
   import type { FormInstance, FormRules } from 'element-plus'
-  import { fetchCreateToken, fetchUpdateToken } from '@/api/token'
+  import { fetchCreateToken, fetchUpdateToken, fetchGetTokenById } from '@/api/token'
   import { ElMessage } from 'element-plus'
 
   interface Props {
     visible: boolean
     type: string
-    tokenData?: Partial<Api.AccessToken.AccessTokenDTO>
+    tokenId?: number
   }
 
   interface Emits {
@@ -57,6 +57,7 @@
   })
 
   const dialogType = computed(() => props.type)
+  const loading = ref(false)
 
   const formRef = ref<FormInstance>()
 
@@ -65,41 +66,48 @@
     token: '',
     name: '',
     maxDevice: 3,
-    deviceTimeout: 30,
     maxConnection: 3
   })
 
   const rules: FormRules = {
-    name: [
-      { required: true, message: '请输入令牌名称', trigger: 'blur' }
-    ],
-    maxDevice: [
-      { required: true, message: '请输入最大设备数', trigger: 'blur' }
-    ],
-    deviceTimeout: [
-      { required: true, message: '请输入设备超时时间', trigger: 'blur' }
-    ],
-    maxConnection: [
-      { required: true, message: '请输入最大连接数', trigger: 'blur' }
-    ]
+    name: [{ required: true, message: '请输入令牌名称', trigger: 'blur' }],
+    maxDevice: [{ required: true, message: '请输入最大设备数', trigger: 'blur' }],
+    maxConnection: [{ required: true, message: '请输入最大连接数', trigger: 'blur' }]
   }
 
-  const initFormData = () => {
-    const isEdit = props.type === 'edit' && props.tokenData
-    const row = props.tokenData
-
-    Object.assign(formData, {
-      id: isEdit && row ? row.id : undefined,
-      token: isEdit && row ? row.token || '' : '',
-      name: isEdit && row ? row.name || '' : '',
-      maxDevice: isEdit && row ? row.max_device || 3 : 3,
-      deviceTimeout: isEdit && row ? row.device_timeout || 30 : 30,
-      maxConnection: isEdit && row ? row.max_connection || 3 : 3
-    })
+  const initFormData = async () => {
+    if (props.type === 'add') {
+      // 重置表单
+      Object.assign(formData, {
+        id: undefined,
+        token: '',
+        name: '',
+        maxDevice: 3,
+        maxConnection: 3
+      })
+    } else if (props.type === 'edit' && props.tokenId) {
+      // 根据 ID 获取详情
+      loading.value = true
+      try {
+        const data = await fetchGetTokenById(props.tokenId)
+        Object.assign(formData, {
+          id: data.id,
+          token: data.token || '',
+          name: data.name || '',
+          maxDevice: data.maxDevice || 3,
+          maxConnection: data.maxConnection || 3
+        })
+      } catch (error) {
+        console.error('获取令牌详情失败:', error)
+        ElMessage.error('获取令牌详情失败')
+      } finally {
+        loading.value = false
+      }
+    }
   }
 
   watch(
-    () => [props.visible, props.type, props.tokenData],
+    () => [props.visible, props.type, props.tokenId],
     ([visible]) => {
       if (visible) {
         initFormData()
@@ -121,7 +129,6 @@
             await fetchCreateToken({
               name: formData.name,
               maxDevice: formData.maxDevice,
-              deviceTimeout: formData.deviceTimeout,
               maxConnection: formData.maxConnection
             })
             ElMessage.success('创建成功')
@@ -130,7 +137,6 @@
               await fetchUpdateToken(formData.id, {
                 name: formData.name,
                 maxDevice: formData.maxDevice,
-                deviceTimeout: formData.deviceTimeout,
                 maxConnection: formData.maxConnection
               })
               ElMessage.success('更新成功')

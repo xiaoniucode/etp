@@ -21,7 +21,6 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.metrics.TrafficMetricsHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -45,15 +44,13 @@ public class HttpProxyServer implements Lifecycle {
     private final HttpVisitorHandler httpVisitorHandler;
     private final AppConfig appConfig;
     private final EventBus eventBus;
-    private final TrafficMetricsHandler trafficMetricsHandler;
     private final HttpIpCheckHandler httpIpCheckHandler;
     private final BasicAuthHandler basicAuthHandler;
 
-    public HttpProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, EventBus eventBus, TrafficMetricsHandler trafficMetricsHandler) {
+    public HttpProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, EventBus eventBus) {
         this.appConfig = config;
         this.httpVisitorHandler = httpVisitorHandler;
         this.eventBus = eventBus;
-        this.trafficMetricsHandler = trafficMetricsHandler;
         this.httpIpCheckHandler = httpIpCheckHandler;
         this.basicAuthHandler = basicAuthHandler;
     }
@@ -76,7 +73,6 @@ public class HttpProxyServer implements Lifecycle {
                             sc.pipeline().addLast(new HostSnifferHandler());
                             sc.pipeline().addLast(httpIpCheckHandler);
                             sc.pipeline().addLast(basicAuthHandler);
-                            //  sc.pipeline().addLast(trafficMetricsHandler);
                             sc.pipeline().addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);
                         }
                     });

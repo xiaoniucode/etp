@@ -1,10 +1,21 @@
-package com.xiaoniucode.etp.server.web.common.server;
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package com.xiaoniucode.etp.server.web.common.monitor;
 import com.sun.management.OperatingSystemMXBean;
-import com.xiaoniucode.etp.server.web.common.server.domain.CpuInfo;
-import com.xiaoniucode.etp.server.web.common.server.domain.JvmMemoryInfo;
-import com.xiaoniucode.etp.server.web.common.server.domain.OsMemoryInfo;
-import com.xiaoniucode.etp.server.web.common.server.domain.ServerInfo;
-import com.xiaoniucode.etp.server.web.common.utils.ByteUtils;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
@@ -13,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * 获取物理内存利用率、JVM内存利用率以及CPU利用率等信息
  */
-public class ServerHelper {
+public class ServerMonitor {
     /**
      * 获取物理内存信息
      */
@@ -38,8 +49,8 @@ public class ServerHelper {
     /**
      * 获取JVM内存信息
      */
-    public static JvmMemoryInfo getJvmMemory() {
-        JvmMemoryInfo jvmMemory = new JvmMemoryInfo();
+    public static JvmMemoryDTO getJvmMemory() {
+        JvmMemoryDTO jvmMemory = new JvmMemoryDTO();
         MemoryUsage heap = memoryBean.getHeapMemoryUsage();
         long total = heap.getMax() > 0 ? heap.getMax() : heap.getCommitted();
         long used = heap.getUsed();
@@ -64,8 +75,8 @@ public class ServerHelper {
     /**
      * 获取物理内存信息
      */
-    public static OsMemoryInfo getOsMemory() {
-        OsMemoryInfo osMemory = new OsMemoryInfo();
+    public static OsMemoryDTO getOsMemory() {
+        OsMemoryDTO osMemory = new OsMemoryDTO();
         long total = osBean.getTotalMemorySize();
         long free = osBean.getFreeMemorySize();
         long used = total - free;
@@ -87,8 +98,8 @@ public class ServerHelper {
         osMemory.setUsage(usageValue);
         return osMemory;
     }
-    public static CpuInfo getCpu() {
-        CpuInfo cpu = new CpuInfo();
+    public static CpuDTO getCpu() {
+        CpuDTO cpu = new CpuDTO();
         int cores = runtime.availableProcessors();
         long currentCpuTimeNs = osBean.getProcessCpuTime();
         long currentUptimeMs = runtimeMxBean.getUptime();
@@ -122,11 +133,11 @@ public class ServerHelper {
         cpu.setUsage(usageValue);
         return cpu;
     }
-    public static ServerInfo getServerInfo() {
-        ServerInfo serverInfo = new ServerInfo();
-        serverInfo.setCpu(getCpu());
-        serverInfo.setJvmMem(getJvmMemory());
-        serverInfo.setOsMem(getOsMemory());
-        return serverInfo;
+    public static ServerDTO getServerInfo() {
+        ServerDTO serverDTO = new ServerDTO();
+        serverDTO.setCpu(getCpu());
+        serverDTO.setJvmMem(getJvmMemory());
+        serverDTO.setOsMem(getOsMemory());
+        return serverDTO;
     }
 }

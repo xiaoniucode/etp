@@ -23,10 +23,8 @@ import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface AgentConvert {
-    AgentConvert INSTANCE = Mappers.getMapper(AgentConvert.class);
-    
     @Mapping(target = "agentType", expression = "java(agent.getAgentType().getCode())")
     @Mappings({@Mapping(target = "isOnline", ignore = true), @Mapping(target = "token", ignore = true)})
     AgentDTO toDTO(AgentDO agent);

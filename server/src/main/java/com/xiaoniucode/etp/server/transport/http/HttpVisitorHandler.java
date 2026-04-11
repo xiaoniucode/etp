@@ -60,9 +60,9 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         Channel visitor = ctx.channel();
-        streamManager.getStreamContext(visitor).ifPresent(streamContext -> {
-            logger.debug("[HTTP]访问者连接断开，关闭流: streamId={}", streamContext.getStreamId());
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+        streamManager.getStreamContext(visitor).ifPresent(context -> {
+            logger.debug("[HTTP]访问者连接断开，关闭流: streamId={}", context.getStreamId());
+            context.fireEvent(StreamEvent.STREAM_CLOSE);
         });
     }
 

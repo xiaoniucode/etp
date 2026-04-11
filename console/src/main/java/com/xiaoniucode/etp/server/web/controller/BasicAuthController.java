@@ -15,7 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.controller;
 
-import com.xiaoniucode.etp.server.web.common.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.dto.basicauth.BasicAuthDetailDTO;
 import com.xiaoniucode.etp.server.web.param.basicauth.BasicAuthUpdateParam;
 import com.xiaoniucode.etp.server.web.param.basicauth.httpuser.HttpUserAddParam;

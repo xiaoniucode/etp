@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.common.utils;
+package com.xiaoniucode.etp.server.web.common.monitor;
 /**
  * 字节格式化
  */

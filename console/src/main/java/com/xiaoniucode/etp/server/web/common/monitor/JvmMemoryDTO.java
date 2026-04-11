@@ -14,15 +14,13 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.common.utils;
-/**
- * @author liuxin
- */
-public final class DigestUtil {
-    private static final String GLOBAL_SALT = "XILIO-ETP-2025!@#";
-    private DigestUtil() {
-    }
-    public static String encode(String password, String salt) {
-        return MD5.of(password, GLOBAL_SALT + salt);
-    }
+package com.xiaoniucode.etp.server.web.common.monitor;
+
+import lombok.Data;
+
+@Data
+public class JvmMemoryDTO {
+    private String total;
+    private String used;
+    private Object usage;
 }

@@ -16,4 +16,14 @@ public interface AccessTokenRepository extends JpaRepository<AccessTokenDO, Inte
      */
     @Query("SELECT a FROM AccessTokenDO a WHERE a.name LIKE %:keyword% OR a.token LIKE %:keyword%")
     Page<AccessTokenDO> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
+    
+    /**
+     * 检查是否存在指定名称的访问令牌
+     */
+    boolean existsByName(String name);
+    
+    /**
+     * 检查是否存在指定名称但排除指定 ID 的访问令牌
+     */
+    boolean existsByNameAndIdNot(String name, Integer id);
 }

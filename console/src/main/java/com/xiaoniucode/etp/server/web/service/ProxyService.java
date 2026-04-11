@@ -15,14 +15,12 @@
  */
 package com.xiaoniucode.etp.server.web.service;
 
-import com.xiaoniucode.etp.server.web.common.PageResult;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
-
-import java.util.List;
 
 public interface ProxyService {
     /**

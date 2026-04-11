@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.common;
+package com.xiaoniucode.etp.server.web.common.message;
 import java.io.Serial;
 import java.util.HashMap;
 public class Ajax extends HashMap<String, Object> {

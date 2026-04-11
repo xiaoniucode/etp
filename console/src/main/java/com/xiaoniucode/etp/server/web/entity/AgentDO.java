@@ -40,6 +40,11 @@ public class AgentDO {
     @Column(name = "name", nullable = false)
     private String name;
     /**
+     * 登陆令牌
+     */
+    @Column(name = "token", nullable = false)
+    private String token;
+    /**
      * 代理类型
      */
     @Column(name = "agentType", nullable = false)

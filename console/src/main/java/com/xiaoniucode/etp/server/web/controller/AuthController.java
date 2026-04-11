@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.controller;
-import com.xiaoniucode.etp.server.web.common.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.dto.auth.LoginDTO;
 import com.xiaoniucode.etp.server.web.param.auth.LoginParam;
 import com.xiaoniucode.etp.server.web.security.SecurityUtils;

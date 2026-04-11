@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.common;
+package com.xiaoniucode.etp.server.web.common.message;
 
 import lombok.Data;
 import org.springframework.data.domain.Page;

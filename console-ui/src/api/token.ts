@@ -58,7 +58,6 @@ export function fetchDeleteBatchTokens(ids: number[]) {
 export function fetchCreateToken(params: {
   name: string
   maxDevice: number
-  deviceTimeout: number
   maxConnection: number
 }) {
   return request.post({
@@ -78,7 +77,6 @@ export function fetchUpdateToken(
   params: {
     name: string
     maxDevice: number
-    deviceTimeout: number
     maxConnection: number
   }
 ) {

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.controller;
-import com.xiaoniucode.etp.server.web.common.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
 import com.xiaoniucode.etp.server.web.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;

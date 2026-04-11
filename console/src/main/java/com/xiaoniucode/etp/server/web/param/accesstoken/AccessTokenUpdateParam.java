@@ -35,10 +35,6 @@ public class AccessTokenUpdateParam {
      */
     private Integer maxDevice;
     /**
-     * 设备超时时间
-     */
-    private Integer deviceTimeout;
-    /**
      * 最大连接数
      */
     private Integer maxConnection;

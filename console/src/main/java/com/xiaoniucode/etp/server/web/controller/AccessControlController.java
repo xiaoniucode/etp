@@ -15,7 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.controller;
 
-import com.xiaoniucode.etp.server.web.common.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;
 import com.xiaoniucode.etp.server.web.param.accesscontrol.AccessControlRuleAddParam;
 import com.xiaoniucode.etp.server.web.param.accesscontrol.AccessControlRuleUpdateParam;
