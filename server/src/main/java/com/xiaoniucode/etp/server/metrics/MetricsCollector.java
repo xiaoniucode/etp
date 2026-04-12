@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.metrics;
 
+import com.xiaoniucode.etp.common.message.PageResult;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
@@ -33,56 +34,37 @@ import java.util.function.Consumer;
  */
 @Component
 public class MetricsCollector {
+
     private final InternalLogger logger = InternalLoggerFactory.getInstance(MetricsCollector.class);
+
     private static final Map<String, ProxyMetrics> PROXY_METRICS = new ConcurrentHashMap<>(256);
 
     public ProxyMetrics getOrCreate(String proxyId) {
-        if (proxyId == null || proxyId.isBlank()) {
-            return null;
-        }
+        if (proxyId == null || proxyId.isBlank()) return null;
         return PROXY_METRICS.computeIfAbsent(proxyId, ProxyMetrics::new);
     }
 
-    /**
-     * 连接建立时调用
-     */
     public void onChannelActive(String proxyId) {
-        ProxyMetrics metrics = getOrCreate(proxyId);
-        if (metrics != null) {
-            metrics.incChannels();
-        }
+        ProxyMetrics m = getOrCreate(proxyId);
+        if (m != null) m.incChannels();
     }
 
-    /**
-     * 连接断开时调用
-     */
     public void onChannelInactive(String proxyId) {
-        ProxyMetrics metrics = PROXY_METRICS.get(proxyId);
-        if (metrics != null) {
-            metrics.decChannels();
-        }
+        ProxyMetrics m = PROXY_METRICS.get(proxyId);
+        if (m != null) m.decChannels();
     }
 
-    /**
-     * 实际流量发生时调用
-     */
     public void collect(String proxyId, Consumer<ProxyMetrics> action) {
         if (proxyId == null || proxyId.isBlank()) return;
-        ProxyMetrics metrics = PROXY_METRICS.get(proxyId);
-        if (metrics != null) {
-            action.accept(metrics);
-        }
+        ProxyMetrics m = PROXY_METRICS.get(proxyId);
+        if (m != null) action.accept(m);
     }
 
-    /**
-     * 删除 proxy 时必须调用
-     */
     public boolean removeByProxyId(String proxyId) {
         if (proxyId == null || proxyId.isBlank()) return false;
-
-        ProxyMetrics metrics = PROXY_METRICS.remove(proxyId);
-        if (metrics != null) {
-            metrics.clearHistory();
+        ProxyMetrics m = PROXY_METRICS.remove(proxyId);
+        if (m != null) {
+            m.clearHistory();
             logger.debug("为代理ID {} 移除流量指标统计记录", proxyId);
             return true;
         }
@@ -90,24 +72,37 @@ public class MetricsCollector {
     }
 
     public void removeByProxyIds(Set<String> proxyIds) {
-        if (proxyIds != null) {
-            proxyIds.forEach(this::removeByProxyId);
-        }
+        if (proxyIds != null) proxyIds.forEach(this::removeByProxyId);
     }
 
-    public List<Metrics> listMetrics(MetricsQuery query) {
-        return PROXY_METRICS.values().stream()
-                .filter(m -> matchesQuery(m, query))
+    /**
+     * 获取单个代理的流量详情
+     */
+    public Metrics getProxyMetrics(String proxyId) {
+        ProxyMetrics pm = PROXY_METRICS.get(proxyId);
+        return pm != null ? pm.toMetrics() : null;
+    }
+
+    /**
+     * 分页获取所有代理的流量列表
+     */
+    public PageResult<Metrics> listAllMetrics(int page, int size) {
+        List<ProxyMetrics> allMetrics = PROXY_METRICS.values().stream()
                 .sorted(Comparator.comparingLong(m -> -(m.getReadBytes().sum() + m.getWriteBytes().sum())))
-                .skip((long) query.getPage() * query.getSize())
-                .limit(query.getSize())
+                .toList();
+
+        long total = allMetrics.size();
+
+        int currentPage = Math.max(0, page);
+        int pageSize = Math.max(1, Math.min(size, 100));
+
+        List<Metrics> pageData = allMetrics.stream()
+                .skip((long) currentPage * pageSize)
+                .limit(pageSize)
                 .map(ProxyMetrics::toMetrics)
                 .toList();
-    }
 
-    private boolean matchesQuery(ProxyMetrics m, MetricsQuery q) {
-        if (q.getProxyId() != null && !m.getProxyId().contains(q.getProxyId())) return false;
-        return q.getMinTraffic() == null || (m.getReadBytes().sum() + m.getWriteBytes().sum()) >= q.getMinTraffic();
+        return new PageResult<>(pageData, total, currentPage, pageSize);
     }
 
     public Count totalCount() {
@@ -126,33 +121,18 @@ public class MetricsCollector {
         PROXY_METRICS.values().forEach(ProxyMetrics::takeSnapshot);
     }
 
-    /**
-     * 清理不活跃的代理流量指标
-     * <p>
-     * 该方法会清理指定分钟数内不活跃且没有活动连接的代理流量指标，
-     * 以防止内存泄漏和资源浪费。
-     * </p>
-     * @param inactiveMinutes 不活跃分钟数阈值，超过该阈值的代理会被清理
-     */
     public void cleanupInactive(long inactiveMinutes) {
-        // 计算不活跃阈值时间
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(inactiveMinutes);
         int removed = 0;
-
-        // 遍历所有代理流量指标
         var iterator = PROXY_METRICS.entrySet().iterator();
         while (iterator.hasNext()) {
             ProxyMetrics m = iterator.next().getValue();
-            // 检查是否满足清理条件：最后活动时间早于阈值且没有活动连接
             if (m.getLastActiveTime().isBefore(threshold) && m.getActiveChannels().get() == 0) {
-                // 清除历史数据
                 m.clearHistory();
-                // 从映射中移除
                 iterator.remove();
                 removed++;
             }
         }
-
         if (removed > 0) {
             logger.info("清理了 {} 个不活跃的代理流量指标", removed);
         }

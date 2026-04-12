@@ -14,9 +14,29 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.controller;
+
+import com.xiaoniucode.etp.common.message.PageResult;
+import com.xiaoniucode.etp.server.metrics.Metrics;
+import com.xiaoniucode.etp.server.metrics.MetricsCollector;
+import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/metrics")
 public class MetricsController {
+    @Autowired
+    private MetricsCollector metricsCollector;
+
+    @GetMapping("/{proxyId}")
+    public Ajax get(@PathVariable String proxyId) {
+        Metrics proxyMetrics = metricsCollector.getProxyMetrics(proxyId);
+        return Ajax.success(proxyMetrics);
+    }
+
+    @GetMapping("list")
+    public Ajax list(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        PageResult<Metrics> res = metricsCollector.listAllMetrics(page, size);
+        return Ajax.success(res);
+    }
 }

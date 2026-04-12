@@ -14,14 +14,31 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.metrics;
+import request from '@/utils/http'
 
-import lombok.Data;
+/**
+ * 获取流量统计数据
+ * @param proxyId 代理ID
+ * @returns 流量统计数据
+ */
+export function fetchGetMetrics(proxyId: string) {
+  return request.get({
+    url: `/api/metrics/${proxyId}`
+  })
+}
 
-@Data
-public class MetricsQuery {
-    private String proxyId;
-    private Long minTraffic;
-    private int page = 0;
-    private int size = 10;
+/**
+ * 获取所有代理的流量统计数据
+ * @param page 页码
+ * @param size 每页条数
+ * @returns 流量统计数据列表
+ */
+export function fetchGetMetricsList(page: number = 0, size: number = 10) {
+  return request.get({
+    url: '/api/metrics/list',
+    params: {
+      page,
+      size
+    }
+  })
 }

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/monitor")
 public class MonitorController {
+
     /**
      * 获取服务器信息，用于监控
      */
@@ -31,4 +32,6 @@ public class MonitorController {
     public Ajax getServerInfo() {
         return Ajax.success(ServerMonitor.getServerInfo());
     }
+
+
 }

@@ -53,6 +53,13 @@
         :proxy-id="currentBasicAuthProxyId"
         @close="handleBasicAuthClose"
       />
+
+      <!-- 流量统计弹窗 -->
+      <MetricsDialog
+        v-model:visible="metricsDialogVisible"
+        :proxy-id="currentMetricsProxyId"
+        @close="handleMetricsClose"
+      />
     </ElCard>
   </div>
 </template>
@@ -66,6 +73,7 @@
   import HttpDialog from './modules/http-dialog.vue'
   import AccessControlDialog from '../modules/access-control-dialog.vue'
   import BasicAuthDialog from './modules/basic-auth-dialog.vue'
+  import MetricsDialog from '../modules/metrics-dialog.vue'
   import { ElTag, ElMessage, ElMessageBox } from 'element-plus'
   import { DialogType } from '@/types'
 
@@ -102,6 +110,10 @@
   // Basic Auth 弹窗相关
   const basicAuthDialogVisible = ref(false)
   const currentBasicAuthProxyId = ref('')
+
+  // 流量统计弹窗相关
+  const metricsDialogVisible = ref(false)
+  const currentMetricsProxyId = ref('')
 
   const getProxyStatusConfig = (status: number) => {
     return status === 1
@@ -176,7 +188,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 300,
+          width: 400,
           fixed: 'right',
           formatter: (row: HttpProxyItem) =>
             h('div', [
@@ -189,6 +201,11 @@
                 type: 'text',
                 text: '鉴权认证',
                 onClick: () => handleBasicAuth(row)
+              }),
+              h(ArtButtonTable, {
+                type: 'text',
+                text: '流量统计',
+                onClick: () => handleMetrics(row)
               }),
               h(ArtButtonTable, {
                 type: 'edit',
@@ -260,6 +277,15 @@
 
   const handleBasicAuthClose = () => {
     currentBasicAuthProxyId.value = ''
+  }
+
+  const handleMetrics = (proxy: HttpProxyItem) => {
+    currentMetricsProxyId.value = proxy.id
+    metricsDialogVisible.value = true
+  }
+
+  const handleMetricsClose = () => {
+    currentMetricsProxyId.value = ''
   }
 
   const handleBatchDelete = async () => {

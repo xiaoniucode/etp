@@ -187,13 +187,9 @@
       cancelButtonText: '取消',
       type: 'warning'
     }).then(async () => {
-      try {
-        await fetchKickoutAgent(row.id)
-        ElMessage.success('剔除成功')
-        refreshData()
-      } catch (error) {
-        ElMessage.error('剔除失败')
-      }
+      await fetchKickoutAgent(row.id)
+      ElMessage.success('剔除成功')
+      refreshData()
     })
   }
 

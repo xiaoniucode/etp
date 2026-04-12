@@ -43,18 +43,7 @@ public class PageResult<T> {
      * 数据列表
      */
     private List<T> records;
-    
-    /**
-     * 成功构建分页结果
-     */
-    public static <T> PageResult<T> wrap(Page<T> page ) {
-        PageResult<T> result = new PageResult<>();
-        result.setPage(page.getNumber() + 1);
-        result.setSize(page.getSize());
-        result.setTotal(page.getTotalElements());
-        result.setRecords(page.getContent());
-        return result;
-    }
+
 
     public static <T> PageResult<T> empty(int page, int size) {
         PageResult<T> result = new PageResult<>();

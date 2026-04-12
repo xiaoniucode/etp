@@ -32,7 +32,8 @@ public class MetricsTask {
     /**
      * 快照任务，每分钟执行一次
      */
-    @Scheduled(fixedRate = 60000)
+   // todo @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 10000)
     public void snapshot() {
         logger.debug("执行流量指标快照任务");
         metricsCollector.takeAllSnapshots();

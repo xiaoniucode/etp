@@ -16,10 +16,11 @@
 
 package com.xiaoniucode.etp.server.metrics;
 
-import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
-@Data
+
+@Getter
 public class MetricsSnapshot {
     private final long readBytes;
     private final long writeBytes;

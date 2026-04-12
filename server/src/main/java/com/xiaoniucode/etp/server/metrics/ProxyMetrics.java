@@ -24,9 +24,6 @@ import java.util.Deque;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 
-/**
- * 内网穿透 - 单个 Proxy 指标采集器
- */
 @Getter
 public class ProxyMetrics {
 
@@ -41,7 +38,6 @@ public class ProxyMetrics {
     private volatile LocalDateTime lastActiveTime = LocalDateTime.now();
 
     private final Deque<MetricsSnapshot> history = new ArrayDeque<>(180);
-    private static final int MAX_HISTORY = 180;
 
     public ProxyMetrics(String proxyId) {
         this.proxyId = proxyId;
@@ -49,26 +45,20 @@ public class ProxyMetrics {
 
     public void incChannels() {
         activeChannels.incrementAndGet();
-        updateActiveTime();
+        lastActiveTime = LocalDateTime.now();
     }
 
     public void decChannels() {
         activeChannels.decrementAndGet();
-        updateActiveTime();
+        lastActiveTime = LocalDateTime.now();
     }
 
     public void incReadBytes(long bytes) {
-        if (bytes > 0) {
-            readBytes.add(bytes);
-            updateActiveTime();
-        }
+        if (bytes > 0) readBytes.add(bytes);
     }
 
     public void incWriteBytes(long bytes) {
-        if (bytes > 0) {
-            writeBytes.add(bytes);
-            updateActiveTime();
-        }
+        if (bytes > 0) writeBytes.add(bytes);
     }
 
     public void incReadMessages(long count) {
@@ -79,11 +69,6 @@ public class ProxyMetrics {
         if (count > 0) writeMessages.add(count);
     }
 
-    private void updateActiveTime() {
-        this.lastActiveTime = LocalDateTime.now();
-    }
-
-    // ==================== 快照 & 速率 ====================
     public void takeSnapshot() {
         MetricsSnapshot snapshot = new MetricsSnapshot(
                 readBytes.sum(), writeBytes.sum(),
@@ -92,18 +77,14 @@ public class ProxyMetrics {
         );
         synchronized (history) {
             history.addLast(snapshot);
-            if (history.size() > MAX_HISTORY) {
-                history.removeFirst();
-            }
+            if (history.size() > 180) history.removeFirst();
         }
     }
 
-    public double getReadBytesRate(int intervalSeconds) {
-        return history.size() < 2 ? 0.0 : readBytes.sum() * 1.0 / Math.max(intervalSeconds, 1);
-    }
-
-    public double getWriteBytesRate(int intervalSeconds) {
-        return history.size() < 2 ? 0.0 : writeBytes.sum() * 1.0 / Math.max(intervalSeconds, 1);
+    public void clearHistory() {
+        synchronized (history) {
+            history.clear();
+        }
     }
 
     public Metrics toMetrics() {
@@ -120,12 +101,11 @@ public class ProxyMetrics {
         return m;
     }
 
-    /**
-     * proxy 被删除时彻底清理历史数据，防止内存泄漏
-     */
-    public void clearHistory() {
-        synchronized (history) {
-            history.clear();
-        }
+    private double getReadBytesRate(int intervalSeconds) {
+        return history.size() < 2 ? 0.0 : readBytes.sum() * 1.0 / intervalSeconds;
+    }
+
+    private double getWriteBytesRate(int intervalSeconds) {
+        return history.size() < 2 ? 0.0 : writeBytes.sum() * 1.0 / intervalSeconds;
     }
 }

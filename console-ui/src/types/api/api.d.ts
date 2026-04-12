@@ -157,4 +157,20 @@ declare namespace Api {
       size: number
     }
   }
+
+  /** 流量统计类型 */
+  namespace Metrics {
+    /** 流量统计数据 */
+    interface MetricsDTO {
+      proxyId: string
+      activeChannels: number
+      readBytes: number
+      writeBytes: number
+      readMessages: number
+      writeMessages: number
+      readRate: number
+      writeRate: number
+      lastActiveTime: string
+    }
+  }
 }

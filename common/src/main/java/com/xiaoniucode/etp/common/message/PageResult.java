@@ -14,12 +14,38 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.metrics;
+package com.xiaoniucode.etp.common.message;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class Count {
-    private long in;
-    private long out;
+public class PageResult<T> {
+    /**
+     * 当前页码
+     */
+    private Integer page;
+    
+    /**
+     * 每页大小
+     */
+    private Integer size;
+    
+    /**
+     * 总记录数
+     */
+    private Long total;
+    
+    /**
+     * 数据列表
+     */
+    private List<T> records;
+
+    public PageResult(List<T> records, long total, int page, int size) {
+        this.records = records;
+        this.total = total;
+        this.page = page;
+        this.size = size;
+    }
 }

@@ -46,6 +46,13 @@
         :proxy-id="currentAccessControlProxyId"
         @close="handleAccessControlClose"
       />
+
+      <!-- 流量统计弹窗 -->
+      <MetricsDialog
+        v-model:visible="metricsDialogVisible"
+        :proxy-id="currentMetricsProxyId"
+        @close="handleMetricsClose"
+      />
     </ElCard>
   </div>
 </template>
@@ -58,6 +65,7 @@
   import TcpSearch from './modules/tcp-search.vue'
   import TcpDialog from './modules/tcp-dialog.vue'
   import AccessControlDialog from '../modules/access-control-dialog.vue'
+  import MetricsDialog from '../modules/metrics-dialog.vue'
   import { ElTag, ElMessage, ElMessageBox } from 'element-plus'
   import { DialogType } from '@/types'
 
@@ -89,6 +97,10 @@
   // 访问控制弹窗相关
   const accessControlDialogVisible = ref(false)
   const currentAccessControlProxyId = ref('')
+
+  // 流量统计弹窗相关
+  const metricsDialogVisible = ref(false)
+  const currentMetricsProxyId = ref('')
 
   const getProxyStatusConfig = (status: number) => {
     return status === 1
@@ -155,7 +167,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 220,
+          width: 300,
           fixed: 'right',
           formatter: (row: TcpProxyItem) =>
             h('div', [
@@ -163,6 +175,11 @@
                 type: 'text',
                 text: 'IP访问控制',
                 onClick: () => handleIpControl(row)
+              }),
+              h(ArtButtonTable, {
+                type: 'text',
+                text: '流量统计',
+                onClick: () => handleMetrics(row)
               }),
               h(ArtButtonTable, { type: 'edit', onClick: () => showDialog('edit', row) }),
               h(ArtButtonTable, {
@@ -261,6 +278,15 @@
 
   const handleAccessControlClose = () => {
     currentAccessControlProxyId.value = ''
+  }
+
+  const handleMetrics = (proxy: TcpProxyItem) => {
+    currentMetricsProxyId.value = proxy.id
+    metricsDialogVisible.value = true
+  }
+
+  const handleMetricsClose = () => {
+    currentMetricsProxyId.value = ''
   }
 </script>
 

@@ -16,8 +16,11 @@
 
 package com.xiaoniucode.etp.server.metrics;
 
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
+@Data
 public class Metrics {
     private String proxyId;
     private int activeChannels;
@@ -28,31 +31,4 @@ public class Metrics {
     private double readRate;
     private double writeRate;
     private LocalDateTime lastActiveTime;
-
-    public String getProxyId() { return proxyId; }
-    public void setProxyId(String proxyId) { this.proxyId = proxyId; }
-
-    public int getActiveChannels() { return activeChannels; }
-    public void setActiveChannels(int activeChannels) { this.activeChannels = activeChannels; }
-
-    public long getReadBytes() { return readBytes; }
-    public void setReadBytes(long readBytes) { this.readBytes = readBytes; }
-
-    public long getWriteBytes() { return writeBytes; }
-    public void setWriteBytes(long writeBytes) { this.writeBytes = writeBytes; }
-
-    public long getReadMessages() { return readMessages; }
-    public void setReadMessages(long readMessages) { this.readMessages = readMessages; }
-
-    public long getWriteMessages() { return writeMessages; }
-    public void setWriteMessages(long writeMessages) { this.writeMessages = writeMessages; }
-
-    public double getReadRate() { return readRate; }
-    public void setReadRate(double readRate) { this.readRate = readRate; }
-
-    public double getWriteRate() { return writeRate; }
-    public void setWriteRate(double writeRate) { this.writeRate = writeRate; }
-
-    public LocalDateTime getLastActiveTime() { return lastActiveTime; }
-    public void setLastActiveTime(LocalDateTime lastActiveTime) { this.lastActiveTime = lastActiveTime; }
 }
