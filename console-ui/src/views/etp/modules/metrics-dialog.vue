@@ -14,23 +14,23 @@
         </ElButton>
       </div>
       <div class="metrics-overview">
-        <div class="overview-item">
+        <div class="art-card-sm overview-item">
           <h3>活动连接数</h3>
           <div class="overview-value">{{ metricsData.activeChannels || 0 }}</div>
         </div>
-        <div class="overview-item">
+        <div class="art-card-sm overview-item">
           <h3>上行流量</h3>
           <div class="overview-value">{{ ByteUtils.formatBytes(metricsData.readBytes || 0) }}</div>
         </div>
-        <div class="overview-item">
+        <div class="art-card-sm overview-item">
           <h3>下行流量</h3>
           <div class="overview-value">{{ ByteUtils.formatBytes(metricsData.writeBytes || 0) }}</div>
         </div>
-        <div class="overview-item">
+        <div class="art-card-sm overview-item">
           <h3>上行速率</h3>
           <div class="overview-value">{{ ByteUtils.formatBytes(parseFloat((metricsData.readRate || 0).toFixed(2))) }}/s</div>
         </div>
-        <div class="overview-item">
+        <div class="art-card-sm overview-item">
           <h3>下行速率</h3>
           <div class="overview-value"
             >{{ ByteUtils.formatBytes(parseFloat((metricsData.writeRate || 0).toFixed(2))) }}/s</div
@@ -39,7 +39,7 @@
       </div>
       <div class="chart-container">
         <div class="chart-row">
-          <div class="chart-item">
+          <div class="art-card-sm chart-item">
             <h3>流量对比</h3>
             <ArtRingChart
               :data="[
@@ -54,7 +54,7 @@
               height="300px"
             />
           </div>
-          <div class="chart-item">
+          <div class="art-card-sm chart-item">
             <h3>速率对比</h3>
             <ArtHBarChart
               :data="[
@@ -158,7 +158,7 @@
     margin: 0;
     font-size: 18px;
     font-weight: 600;
-    color: #333;
+    color: var(--el-text-color-primary);
   }
 
   .metrics-overview {
@@ -171,24 +171,21 @@
   .overview-item {
     flex: 1;
     min-width: 180px;
-    background: #f9f9f9;
-    border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
-  }
 
-  .overview-item h3 {
-    margin: 0 0 10px 0;
-    font-size: 14px;
-    font-weight: 500;
-    color: #666;
+    h3 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--el-text-color-secondary);
+    }
   }
 
   .overview-value {
     font-size: 24px;
     font-weight: 600;
-    color: #333;
+    color: var(--el-text-color-primary);
   }
 
   .chart-container {
@@ -203,16 +200,13 @@
 
   .chart-item {
     flex: 1;
-    background: #f9f9f9;
-    border-radius: 8px;
     padding: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
 
-  .chart-item h3 {
-    margin: 0 0 15px 0;
-    font-size: 16px;
-    font-weight: 500;
-    color: #333;
+    h3 {
+      margin: 0 0 15px 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--el-text-color-primary);
+    }
   }
 </style>

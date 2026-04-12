@@ -173,4 +173,35 @@ declare namespace Api {
       lastActiveTime: string
     }
   }
+
+  /** 监控类型 */
+  namespace Monitor {
+    /** CPU 信息 */
+    interface CpuInfo {
+      total: number
+      used: number
+      usage: number
+    }
+
+    /** JVM 内存信息 */
+    interface JvmMemoryInfo {
+      total: string
+      used: string
+      usage: number
+    }
+
+    /** 操作系统内存信息 */
+    interface OsMemoryInfo {
+      total: string
+      used: string
+      usage: number
+    }
+
+    /** 服务器信息 */
+    interface ServerInfo {
+      cpu: CpuInfo
+      jvmMem: JvmMemoryInfo
+      osMem: OsMemoryInfo
+    }
+  }
 }

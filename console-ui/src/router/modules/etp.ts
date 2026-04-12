@@ -46,8 +46,18 @@ export const penetrationRoutes: AppRouteRecord[] = [
     path: '/stats',
     component: '/etp/stats',
     meta: {
-      title: '统计',
+      title: '流量统计',
       icon: 'ri:bar-chart-line',
+      roles: ['R_SUPER']
+    }
+  },
+  {
+    name: 'Monitor',
+    path: '/monitor',
+    component: '/etp/monitor',
+    meta: {
+      title: '服务监控',
+      icon: 'ri:server-line',
       roles: ['R_SUPER']
     }
   }
