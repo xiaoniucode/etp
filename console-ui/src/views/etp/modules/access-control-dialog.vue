@@ -11,17 +11,17 @@
       <!-- 基本配置 -->
       <ElCard class="art-card mb-4">
         <template #header>
-          <div class="card-header">
+          <div class="flex justify-between items-center">
             <span>基本配置</span>
           </div>
         </template>
-        <div class="config-section">
-          <div class="config-item">
-            <span class="label">启用状态：</span>
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center gap-3">
+            <span class="w-20 font-medium">启用状态：</span>
             <ElSwitch v-model="formData.enabled" @change="handleEnableChange" />
           </div>
-          <div class="config-item">
-            <span class="label">控制模式：</span>
+          <div class="flex items-center gap-3">
+            <span class="w-20 font-medium">控制模式：</span>
             <ElRadioGroup v-model="formData.mode" @change="handleModeChange">
               <ElRadio :label="1">白名单（只允许指定IP访问）</ElRadio>
               <ElRadio :label="0">黑名单（拒绝指定IP访问）</ElRadio>
@@ -33,11 +33,11 @@
       <!-- 规则列表 -->
       <ElCard class="art-card">
         <template #header>
-          <div class="card-header">
+          <div class="flex justify-between items-center">
             <span>访问规则</span>
           </div>
         </template>
-        <div class="rules-table">
+        <div class="border border-gray-200 rounded p-4">
           <ElTable :data="formData.rules" style="width: 100%" border>
             <ElTableColumn prop="cidr" label="IP地址段" width="300">
               <template #default="scope">
@@ -88,14 +88,14 @@
               </template>
             </ElTableColumn>
           </ElTable>
-          <ElButton type="primary" size="small" @click="addRule" style="margin-top: 10px">
+          <ElButton type="primary" size="small" @click="addRule" class="mt-3">
             <template #icon>
               <Plus />
             </template>
             新增规则
           </ElButton>
         </div>
-        <div v-if="formData.rules.length === 0" class="empty-rules">
+        <div v-if="formData.rules.length === 0" class="py-10 text-center">
           <ElEmpty description="暂无规则" />
         </div>
       </ElCard>
@@ -304,34 +304,4 @@
   }
 </script>
 
-<style lang="scss" scoped>
-  .access-control-dialog {
-    .config-section {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
 
-      .config-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-
-        .label {
-          width: 80px;
-          font-weight: 500;
-        }
-      }
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .empty-rules {
-      padding: 40px 0;
-      text-align: center;
-    }
-  }
-</style>

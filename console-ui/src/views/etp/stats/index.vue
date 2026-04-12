@@ -1,11 +1,9 @@
 <template>
   <div class="stats-page art-full-height">
     <ElCard class="art-table-card">
-      <!-- 表格头部 -->
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
       </ArtTableHeader>
 
-      <!-- 表格 -->
       <ArtTable
         :loading="loading"
         :data="data"
@@ -16,7 +14,6 @@
       >
       </ArtTable>
 
-      <!-- 流量统计弹窗 -->
       <MetricsDialog
         v-model:visible="metricsDialogVisible"
         :proxy-id="currentMetricsProxyId"
@@ -50,7 +47,6 @@
     lastActiveTime: string
   }
 
-  // 流量统计弹窗相关
   const metricsDialogVisible = ref(false)
   const currentMetricsProxyId = ref('')
 
@@ -165,13 +161,11 @@
     }
   })
 
-  // 查看流量统计详情
   const handleViewMetrics = (metrics: MetricsItem) => {
     currentMetricsProxyId.value = metrics.proxyId
     metricsDialogVisible.value = true
   }
 
-  // 关闭流量统计弹窗
   const handleMetricsClose = () => {
     currentMetricsProxyId.value = ''
   }

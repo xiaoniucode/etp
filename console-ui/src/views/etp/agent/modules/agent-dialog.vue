@@ -1,6 +1,6 @@
 <template>
   <ElDialog v-model="dialogVisible" title="客户端详情" width="60%" align-center>
-    <div v-if="localClientData" class="client-detail">
+    <div v-if="localClientData" class="mt-5">
       <ElDescriptions :column="2" border>
         <ElDescriptionsItem label="客户端名称">{{ localClientData.name }}</ElDescriptionsItem>
         <ElDescriptionsItem label="访问令牌">{{ localClientData.token }}</ElDescriptionsItem>
@@ -23,7 +23,7 @@
         }}</ElDescriptionsItem>
       </ElDescriptions>
     </div>
-    <div v-else class="loading-state">
+    <div v-else class="mt-5">
       <ElSkeleton :rows="10" animated />
     </div>
     <template #footer>
@@ -129,12 +129,4 @@
   )
 </script>
 
-<style scoped>
-  .client-detail {
-    margin-top: 20px;
-  }
 
-  .loading-state {
-    margin-top: 20px;
-  }
-</style>

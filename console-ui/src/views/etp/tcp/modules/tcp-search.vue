@@ -1,70 +1,61 @@
 <template>
-  <ElCard class="art-search-card">
-    <ElForm
-      :model="searchForm"
-      :inline="true"
-      @keyup.enter="handleSearch"
-    >
-      <ElFormItem label="关键词">
-        <ElInput
-          v-model="searchForm.keyword"
-          placeholder="请输入代理名称"
-          clearable
-          style="width: 200px"
-        />
-      </ElFormItem>
-      
-      <ElFormItem>
-        <ElSpace>
-          <ElButton type="primary" @click="handleSearch">搜索</ElButton>
-          <ElButton @click="handleReset">重置</ElButton>
-        </ElSpace>
-      </ElFormItem>
-    </ElForm>
-  </ElCard>
+  <ArtSearchBar
+    ref="searchBarRef"
+    v-model="formData"
+    :items="formItems"
+    :rules="rules"
+    @reset="handleReset"
+    @search="handleSearch"
+  >
+  </ArtSearchBar>
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { ref, computed } from 'vue'
 
-  defineOptions({ name: 'TcpSearch' })
-
-  const props = defineProps<{
+  interface Props {
     modelValue: {
       keyword?: string
     }
-  }>()
-
-  const emit = defineEmits<{
-    (e: 'update:modelValue', value: { keyword?: string }): void
-    (e: 'search', value: { keyword?: string }): void
-    (e: 'reset'): void
-  }>()
-
-  const searchForm = ref({ ...props.modelValue })
-
-  watch(
-    () => props.modelValue,
-    (newValue) => {
-      searchForm.value = { ...newValue }
-    },
-    { deep: true }
-  )
-
-  const handleSearch = () => {
-    emit('update:modelValue', searchForm.value)
-    emit('search', searchForm.value)
   }
+  interface Emits {
+    (e: 'update:modelValue', value: { keyword?: string }): void
+    (e: 'search', params: { keyword?: string }): void
+    (e: 'reset'): void
+  }
+  const props = defineProps<Props>()
+  const emit = defineEmits<Emits>()
 
-  const handleReset = () => {
-    searchForm.value = {}
-    emit('update:modelValue', searchForm.value)
+  // 表单数据双向绑定
+  const searchBarRef = ref()
+  const formData = computed({
+    get: () => props.modelValue,
+    set: (val) => emit('update:modelValue', val)
+  })
+
+  // 校验规则
+  const rules = {}
+
+  // 表单配置
+  const formItems = computed(() => [
+    {
+      label: '关键词',
+      key: 'keyword',
+      type: 'input',
+      placeholder: '请输入代理名称',
+      clearable: true
+    }
+  ])
+
+  // 事件
+  function handleReset() {
+    console.log('重置表单')
     emit('reset')
   }
-</script>
 
-<style lang="scss" scoped>
-  .art-search-card {
-    margin-bottom: 20px;
+  async function handleSearch(params: { keyword?: string }) {
+    await searchBarRef.value.validate()
+    emit('search', params)
+    console.log('表单数据', params)
   }
-</style>
+</script>

@@ -1,11 +1,11 @@
 <template>
   <ElDialog v-model="dialogVisible" title="流量统计" width="1200px" height="800px" align-center>
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="my-5">
       <ElSkeleton :rows="10" animated />
     </div>
     <div v-else>
-      <div class="dialog-header">
-        <h2>流量统计概览</h2>
+      <div class="flex justify-between items-center mb-5">
+        <h2 class="text-xl font-semibold m-0 text-g-900">流量统计概览</h2>
         <ElButton type="primary" @click="getData" v-ripple>
           <template #icon>
             <ElIcon><Refresh /></ElIcon>
@@ -13,34 +13,34 @@
           刷新
         </ElButton>
       </div>
-      <div class="metrics-overview">
-        <div class="art-card-sm overview-item">
-          <h3>活动连接数</h3>
-          <div class="overview-value">{{ metricsData.activeChannels || 0 }}</div>
+      <div class="flex flex-wrap gap-5 mb-8">
+        <div class="art-card-sm p-5 text-center min-w-[180px]">
+          <h3 class="text-sm font-medium m-0 mb-2 text-g-500">活动连接数</h3>
+          <div class="text-2xl font-semibold text-g-900">{{ metricsData.activeChannels || 0 }}</div>
         </div>
-        <div class="art-card-sm overview-item">
-          <h3>上行流量</h3>
-          <div class="overview-value">{{ ByteUtils.formatBytes(metricsData.readBytes || 0) }}</div>
+        <div class="art-card-sm p-5 text-center min-w-[180px]">
+          <h3 class="text-sm font-medium m-0 mb-2 text-g-500">上行流量</h3>
+          <div class="text-2xl font-semibold text-g-900">{{ ByteUtils.formatBytes(metricsData.readBytes || 0) }}</div>
         </div>
-        <div class="art-card-sm overview-item">
-          <h3>下行流量</h3>
-          <div class="overview-value">{{ ByteUtils.formatBytes(metricsData.writeBytes || 0) }}</div>
+        <div class="art-card-sm p-5 text-center min-w-[180px]">
+          <h3 class="text-sm font-medium m-0 mb-2 text-g-500">下行流量</h3>
+          <div class="text-2xl font-semibold text-g-900">{{ ByteUtils.formatBytes(metricsData.writeBytes || 0) }}</div>
         </div>
-        <div class="art-card-sm overview-item">
-          <h3>上行速率</h3>
-          <div class="overview-value">{{ ByteUtils.formatBytes(parseFloat((metricsData.readRate || 0).toFixed(2))) }}/s</div>
+        <div class="art-card-sm p-5 text-center min-w-[180px]">
+          <h3 class="text-sm font-medium m-0 mb-2 text-g-500">上行速率</h3>
+          <div class="text-2xl font-semibold text-g-900">{{ ByteUtils.formatBytes(parseFloat((metricsData.readRate || 0).toFixed(2))) }}/s</div>
         </div>
-        <div class="art-card-sm overview-item">
-          <h3>下行速率</h3>
-          <div class="overview-value"
+        <div class="art-card-sm p-5 text-center min-w-[180px]">
+          <h3 class="text-sm font-medium m-0 mb-2 text-g-500">下行速率</h3>
+          <div class="text-2xl font-semibold text-g-900"
             >{{ ByteUtils.formatBytes(parseFloat((metricsData.writeRate || 0).toFixed(2))) }}/s</div
           >
         </div>
       </div>
-      <div class="chart-container">
-        <div class="chart-row">
-          <div class="art-card-sm chart-item">
-            <h3>流量对比</h3>
+      <div class="pt-5">
+        <div class="flex gap-5 mb-5">
+          <div class="art-card-sm p-4 flex-1">
+            <h3 class="text-lg font-medium m-0 mb-4 text-g-900">流量对比</h3>
             <ArtRingChart
               :data="[
                 { name: '上行流量', value: metricsData.readBytes || 0 },
@@ -54,8 +54,8 @@
               height="300px"
             />
           </div>
-          <div class="art-card-sm chart-item">
-            <h3>速率对比</h3>
+          <div class="art-card-sm p-4 flex-1">
+            <h3 class="text-lg font-medium m-0 mb-4 text-g-900">速率对比</h3>
             <ArtHBarChart
               :data="[
                 { name: '上行速率', data: [parseFloat((metricsData.readRate || 0).toFixed(2))] },
@@ -142,71 +142,4 @@
   )
 </script>
 
-<style scoped>
-  .loading-state {
-    margin: 20px 0;
-  }
 
-  .dialog-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-
-  .dialog-header h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--el-text-color-primary);
-  }
-
-  .metrics-overview {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-  }
-
-  .overview-item {
-    flex: 1;
-    min-width: 180px;
-    padding: 20px;
-    text-align: center;
-
-    h3 {
-      margin: 0 0 10px 0;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--el-text-color-secondary);
-    }
-  }
-
-  .overview-value {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--el-text-color-primary);
-  }
-
-  .chart-container {
-    padding: 20px 0;
-  }
-
-  .chart-row {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-  }
-
-  .chart-item {
-    flex: 1;
-    padding: 15px;
-
-    h3 {
-      margin: 0 0 15px 0;
-      font-size: 16px;
-      font-weight: 500;
-      color: var(--el-text-color-primary);
-    }
-  }
-</style>

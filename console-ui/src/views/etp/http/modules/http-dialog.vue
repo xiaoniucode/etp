@@ -112,7 +112,7 @@
       </ElFormItem>
 
       <ElFormItem v-if="formData.deployMode === 'cluster'" label="服务列表" prop="targets">
-        <div class="targets-table">
+        <div class="border border-gray-200 rounded p-4">
           <ElTable :data="formData.targets" style="width: 100%">
             <ElTableColumn v-if="dialogType === 'edit'" prop="id" label="ID" width="100">
               <template #default="scope">
@@ -161,7 +161,7 @@
               </template>
             </ElTableColumn>
           </ElTable>
-          <ElButton type="primary" size="small" @click="addTarget" style="margin-top: 10px"
+          <ElButton type="primary" size="small" @click="addTarget" class="mt-3"
             >添加服务</ElButton
           >
         </div>
@@ -535,10 +535,4 @@
   }
 </script>
 
-<style scoped>
-  .targets-table {
-    border: 1px solid #e4e7ed;
-    border-radius: 4px;
-    padding: 10px;
-  }
-</style>
+

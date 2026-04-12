@@ -11,6 +11,8 @@
         <SalesOverview />
       </ElCol>
     </ElRow>
+
+    <AppConfig />
   </div>
 </template>
 
@@ -18,5 +20,6 @@
   import CardList from './modules/card-list.vue'
   import ActiveUser from './modules/active-user.vue'
   import SalesOverview from './modules/sales-overview.vue'
+  import AppConfig from './modules/app-config.vue'
   defineOptions({ name: 'Console' })
 </script>

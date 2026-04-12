@@ -174,6 +174,19 @@ declare namespace Api {
     }
   }
 
+  /** 应用配置类型 */
+  namespace App {
+    /** 应用配置信息 */
+    interface AppConfigInfo {
+      serverAddr: string
+      serverPort: number
+      httpProxyPort: number
+      baseDomain: string
+      portStart: number
+      portEnd: number
+    }
+  }
+
   /** 监控类型 */
   namespace Monitor {
     /** CPU 信息 */

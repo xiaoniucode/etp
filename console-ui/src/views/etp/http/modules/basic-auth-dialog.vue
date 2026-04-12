@@ -11,13 +11,13 @@
       <!-- 基本配置 -->
       <ElCard class="art-card mb-4">
         <template #header>
-          <div class="card-header">
+          <div class="flex justify-between items-center">
             <span>基本配置</span>
           </div>
         </template>
-        <div class="config-section">
-          <div class="config-item">
-            <span class="label">启用状态：</span>
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center gap-3">
+            <span class="w-20 font-medium">启用状态：</span>
             <ElSwitch
               v-model="formData.enabled"
               @change="handleEnableChange"
@@ -29,11 +29,11 @@
       <!-- 用户列表 -->
       <ElCard class="art-card">
         <template #header>
-          <div class="card-header">
+          <div class="flex justify-between items-center">
             <span>用户列表</span>
           </div>
         </template>
-        <div class="users-table">
+        <div class="border border-gray-200 rounded p-4">
           <ElTable
             :data="formData.users"
             style="width: 100%"
@@ -110,14 +110,14 @@
               </template>
             </ElTableColumn>
           </ElTable>
-          <ElButton type="primary" size="small" @click="addUser" style="margin-top: 10px">
+          <ElButton type="primary" size="small" @click="addUser" class="mt-3">
             <template #icon>
               <Plus />
             </template>
             新增用户
           </ElButton>
         </div>
-        <div v-if="formData.users.length === 0" class="empty-users">
+        <div v-if="formData.users.length === 0" class="py-10 text-center">
           <ElEmpty description="暂无用户" />
         </div>
       </ElCard>
@@ -332,34 +332,4 @@
   }
 </script>
 
-<style lang="scss" scoped>
-  .basic-auth-dialog {
-    .config-section {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      
-      .config-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        
-        .label {
-          width: 80px;
-          font-weight: 500;
-        }
-      }
-    }
-    
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .empty-users {
-      padding: 40px 0;
-      text-align: center;
-    }
-  }
-</style>
+
