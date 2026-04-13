@@ -13,24 +13,24 @@
           刷新
         </ElButton>
       </div>
-      <div class="flex flex-wrap gap-5 mb-8">
-        <div class="art-card-sm p-5 text-center min-w-[180px]">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-8">
+        <div class="art-card-sm p-5 text-center">
           <h3 class="text-sm font-medium m-0 mb-2 text-g-500">活动连接数</h3>
           <div class="text-2xl font-semibold text-g-900">{{ metricsData.activeChannels || 0 }}</div>
         </div>
-        <div class="art-card-sm p-5 text-center min-w-[180px]">
+        <div class="art-card-sm p-5 text-center">
           <h3 class="text-sm font-medium m-0 mb-2 text-g-500">上行流量</h3>
           <div class="text-2xl font-semibold text-g-900">{{ ByteUtils.formatBytes(metricsData.readBytes || 0) }}</div>
         </div>
-        <div class="art-card-sm p-5 text-center min-w-[180px]">
+        <div class="art-card-sm p-5 text-center">
           <h3 class="text-sm font-medium m-0 mb-2 text-g-500">下行流量</h3>
           <div class="text-2xl font-semibold text-g-900">{{ ByteUtils.formatBytes(metricsData.writeBytes || 0) }}</div>
         </div>
-        <div class="art-card-sm p-5 text-center min-w-[180px]">
+        <div class="art-card-sm p-5 text-center">
           <h3 class="text-sm font-medium m-0 mb-2 text-g-500">上行速率</h3>
           <div class="text-2xl font-semibold text-g-900">{{ ByteUtils.formatBytes(parseFloat((metricsData.readRate || 0).toFixed(2))) }}/s</div>
         </div>
-        <div class="art-card-sm p-5 text-center min-w-[180px]">
+        <div class="art-card-sm p-5 text-center">
           <h3 class="text-sm font-medium m-0 mb-2 text-g-500">下行速率</h3>
           <div class="text-2xl font-semibold text-g-900"
             >{{ ByteUtils.formatBytes(parseFloat((metricsData.writeRate || 0).toFixed(2))) }}/s</div
@@ -105,7 +105,9 @@
   })
 
   const loading = ref(false)
-  const metricsData = ref({
+  
+  // 初始数据
+  const initialMetricsData = {
     activeChannels: 0,
     readBytes: 0,
     writeBytes: 0,
@@ -114,7 +116,9 @@
     readRate: 0,
     writeRate: 0,
     lastActiveTime: ''
-  })
+  }
+  
+  const metricsData = ref({ ...initialMetricsData })
 
   // 获取流量统计数据
   const getData = async () => {
@@ -135,6 +139,8 @@
     () => [props.visible, props.proxyId],
     ([visible]) => {
       if (visible) {
+        // 清空之前的数据，避免数据残留
+        metricsData.value = { ...initialMetricsData }
         getData()
       }
     },

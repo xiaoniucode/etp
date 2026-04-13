@@ -29,14 +29,14 @@ public class CreateConnAction extends AgentBaseAction {
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-        logger.debug("开始建立隧道");
+        logger.debug("开始建立连接隧道");
         ConnCreateCmd cmd = context.getAndRemoveAs("tunnelCreateCmd", ConnCreateCmd.class);
         Channel tunnel = cmd.getTunnel();
         String tunnelId = cmd.getTunnelId();
         boolean multiplex = cmd.isMultiplex();
         boolean encrypt = cmd.isEncrypt();
-        String clientId = context.getAgentInfo().getAgentId();
-        createPool(clientId, tunnelId, multiplex, encrypt, tunnel);
+        String agentId = context.getAgentInfo().getAgentId();
+        createPool(agentId, tunnelId, multiplex, encrypt, tunnel);
         Channel control = context.getControl();
         Message.TunnelCreateResponse resp = Message.TunnelCreateResponse.newBuilder()
                 .setTunnelId(tunnelId)
@@ -59,26 +59,26 @@ public class CreateConnAction extends AgentBaseAction {
         });
     }
 
-    public void createPool(String clientId, String tunnelId, boolean isMultiplex, boolean isEncrypt, Channel tunnel) {
+    public void createPool(String agentId, String tunnelId, boolean isMultiplex, boolean isEncrypt, Channel tunnel) {
         if (tunnel == null) {
             throw new IllegalArgumentException("tunnel 不能为空");
         }
-        if (clientId == null) {
-            throw new IllegalArgumentException("clientId 不能为空");
+        if (agentId == null) {
+            throw new IllegalArgumentException("agentId 不能为空");
         }
         if (tunnelId == null) {
             throw new IllegalArgumentException("tunnelId 不能为空");
         }
-        logger.debug("创建隧道 客户端ID={} 隧道ID={} 加密={} 多路复用={}", clientId, tunnelId, isEncrypt, isMultiplex);
+        logger.debug("创建隧道 客户端ID={} 隧道ID={} 加密={} 多路复用={}", agentId, tunnelId, isEncrypt, isMultiplex);
         NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
         TunnelEntry poolEntry = new TunnelEntry(tunnelId, isEncrypt, tunnel, writeQueue);
         poolEntry.setActive(true);
         if (isMultiplex) {
             PipelineConfigure.removeControlIdleCheckHandler(tunnel);
             PipelineConfigure.addDataIdleCheckHandler(tunnel);
-            multiplexPool.setChannel(clientId, isEncrypt, poolEntry);
+            multiplexPool.setChannel(agentId, isEncrypt, poolEntry);
         } else {
-            directPool.register(clientId, poolEntry);
+            directPool.register(agentId, poolEntry);
         }
     }
 }

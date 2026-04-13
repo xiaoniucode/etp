@@ -35,18 +35,19 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     private MetricsCollector metricsCollector;
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
-        logger.debug("收到流 {} 打开通知", context.getStreamId());
+        logger.debug("收到流 {} 打开响应", context.getStreamId());
         String tunnelId = context.getAndRemoveAs(StreamConstants.TUNNEL_ID, String.class);
         AgentContext agentContext = context.getAgentContext();
         AgentInfo agentInfo = agentContext.getAgentInfo();
-        String clientId = agentInfo.getAgentId();
+        String agentId = agentInfo.getAgentId();
         TunnelEntry tunnelEntry;
         if (context.isMultiplex()) {
-            tunnelEntry = multiplexPool.acquire(clientId, context.isEncrypt());
+            tunnelEntry = multiplexPool.acquire(agentId, context.isEncrypt());
         } else {
-            tunnelEntry = directPool.borrow(clientId, tunnelId, context.isEncrypt());
+            tunnelEntry = directPool.borrow(agentId, tunnelId, context.isEncrypt());
         }
         if (tunnelEntry == null) {
+            logger.warn("连接池没有可用连接，关闭流");
             context.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }

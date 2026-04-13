@@ -34,9 +34,6 @@ public class StreamOpenAction extends StreamBaseAction {
             context.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
-        if (!control.isWritable()) {
-            logger.warn("客户端 {} 控制隧道不可写", agentContext.getAgentInfo().getAgentId());
-        }
         Target target = context.getCurrentTarget();
         ByteBuf payload = control.alloc().buffer();
         NewStreamCodec.encode(payload, target.getHost(), target.getPort());
