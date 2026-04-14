@@ -64,6 +64,7 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public void kickout(String agentId) {
+        
     }
 
     @Override

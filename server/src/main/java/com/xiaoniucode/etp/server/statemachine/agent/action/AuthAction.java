@@ -7,6 +7,7 @@ import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.domain.TokenConfig;
+import com.xiaoniucode.etp.server.event.AgentAuthEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.security.TokenManager;
@@ -149,6 +150,9 @@ public class AuthAction extends AgentBaseAction {
         ByteBuf payload = ProtobufUtil.toByteBuf(authResponse, control.alloc());
         authFrame.setPayload(payload);
 
+        //发布客户端认证异步事件
+        eventBus.publishAsync(new AgentAuthEvent(agentInfo,isReconnect));
+        //发布状态机 认证成功事件
         context.fireEvent(AgentEvent.AUTH_SUCCESS);
         control.writeAndFlush(authFrame).addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {

@@ -65,11 +65,11 @@ public class AdminInitializer implements ApplicationRunner {
 
             Optional<SysUserDO> existOpt = userRepository.findByUsername(username);
             if (existOpt.isPresent()) {
-                logger.info("管理员用户已存在于数据库中，跳过初始化");
+                logger.debug("管理员用户已存在于数据库中，跳过初始化");
                 return;
             }
             if (!StringUtils.hasText(username) || !StringUtils.hasText(password)) {
-                logger.warn("管理员用户名未配置，数据库中没有管理员用户");
+                logger.warn("Dashboard 管理员用户名或密码未配置，跳过管理员初始化");
                 return;
             }
             SysUserDO sysUserDO = new SysUserDO();
@@ -77,7 +77,7 @@ public class AdminInitializer implements ApplicationRunner {
             sysUserDO.setPassword(passwordEncoder.encode(password));
             sysUserDO.setRole(DEFAULT_ROLE);
             userRepository.save(sysUserDO);
-            logger.info("管理员用户 {} 已成功初始化", username);
+            logger.debug("管理员用户 {} 已成功初始化", username);
         } catch (Exception e) {
             logger.error("初始化管理员用户失败", e);
             throw e;

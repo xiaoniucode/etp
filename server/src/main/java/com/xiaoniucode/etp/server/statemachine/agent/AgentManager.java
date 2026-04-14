@@ -27,7 +27,7 @@ public class AgentManager {
     /**
      * agentId --> context
      */
-    private final Map<String, AgentContext> clientToContextIndex = new ConcurrentHashMap<>();
+    private final Map<String, AgentContext> agentToContextIndex = new ConcurrentHashMap<>();
 
     @Autowired
     private ConnectionIdGenerator connectionIdGenerator;
@@ -45,8 +45,8 @@ public class AgentManager {
         return Optional.ofNullable(connToContext.get(connectionId));
     }
 
-    public Optional<AgentContext> getAgentContext(String clientId) {
-        return Optional.ofNullable(clientToContextIndex.get(clientId));
+    public Optional<AgentContext> getAgentContext(String agentId) {
+        return Optional.ofNullable(agentToContextIndex.get(agentId));
     }
 
     public Optional<AgentContext> getAgentContextByProxyId(String proxyId) {
@@ -71,7 +71,7 @@ public class AgentManager {
     }
 
     public void addClientContextIndex(String clientId, AgentContext context) {
-        clientToContextIndex.put(clientId, context);
+        agentToContextIndex.put(clientId, context);
     }
 
     public int getOnlineCount() {
@@ -79,12 +79,13 @@ public class AgentManager {
     }
 
     public void removeProxyContextIndex(String proxyId) {
-        clientToContextIndex.remove(proxyId);
+        agentToContextIndex.remove(proxyId);
     }
    public void removeAgentContext(String agentId){
+        //todo
 
    }
     public Collection<AgentContext> getAllAgentContext() {
-        return clientToContextIndex.values();
+        return agentToContextIndex.values();
     }
 }

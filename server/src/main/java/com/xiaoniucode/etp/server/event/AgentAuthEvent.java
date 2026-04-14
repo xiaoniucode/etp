@@ -1,20 +1,20 @@
 package com.xiaoniucode.etp.server.event;
 
 import com.xiaoniucode.etp.core.notify.Event;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class AgentAuthEvent extends Event {
-//    private final String clientId;
-//    private final String name;
-//    private final ClientType clientType;
-//    private final String token;
-//    private final String arch;
-//    private final String os;
-//    private final String version;
+    /**
+     * 客户端认证信息
+     */
+    private final AgentInfo agentInfo;
+    /**
+     * 是否是重连
+     */
+    private final boolean isReconnect;
 
-    public AgentAuthEvent(AgentContext context) {
-
-    }
 }

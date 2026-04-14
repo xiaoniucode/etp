@@ -26,5 +26,11 @@ public class AgentPersistenceListener implements EventListener<AgentAuthEvent> {
     @Override
     @Transactional
     public void onEvent(AgentAuthEvent event) {
+
+        boolean reconnect = event.isReconnect();
+        if (reconnect){
+            return;
+        }
+        System.out.println(event);
     }
 }
