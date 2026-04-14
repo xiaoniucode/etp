@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -41,6 +40,9 @@ public class TokenManager {
     @Autowired
     private TokenStore tokenStore;
 
+    /**
+     * 初始化静态配置文件的令牌
+     */
     @PostConstruct
     public void init() {
         AuthConfig authConfig = appConfig.getAuthConfig();
@@ -48,20 +50,70 @@ public class TokenManager {
 
         if (tokens != null && !tokens.isEmpty()) {
             for (TokenConfig tokenConfig : tokens) {
-                if (tokenStore.existsByToken(tokenConfig.getToken())) {
-                    logger.warn("Token 令牌已经存在: {}", tokenConfig.getToken());
-                    continue;
-                }
-                tokenStore.save(tokenConfig);
-                connectionCountMap.putIfAbsent(tokenConfig.getToken(), new AtomicInteger(0));
-                agentIdMap.putIfAbsent(tokenConfig.getToken(), ConcurrentHashMap.newKeySet());
-
-                logger.debug("添加访问令牌: {}, 最大设备数: {}, 最大连接数: {}",
-                        tokenConfig.getName(),
-                        tokenConfig.getMaxDevices() == TokenConfig.UNLIMITED_DEVICES ? "无限制" : tokenConfig.getMaxDevices(),
-                        tokenConfig.getMaxConnections() == TokenConfig.UNLIMITED_CONNECTIONS ? "无限制" : tokenConfig.getMaxConnections());
+                addToken(tokenConfig);
             }
             logger.debug("初始化访问令牌完成，共加载 {} 个令牌", tokens.size());
+        }
+    }
+
+    public boolean addToken(TokenConfig tokenConfig) {
+        try {
+            tokenStore.add(tokenConfig);
+        } catch (Exception e) {
+            logger.error("Token 令牌添加失败: {}", e);
+            return false;
+        }
+        connectionCountMap.putIfAbsent(tokenConfig.getToken(), new AtomicInteger(0));
+        agentIdMap.putIfAbsent(tokenConfig.getToken(), ConcurrentHashMap.newKeySet());
+        logger.debug("添加访问令牌成功: {}", tokenConfig.getName());
+        return true;
+    }
+
+    public void updateToken(TokenConfig tokenConfig) {
+        tokenStore.update(tokenConfig);
+    }
+
+    /**
+     * 获取令牌信息
+     *
+     * @param token 令牌
+     * @return 令牌信息
+     */
+    public TokenConfig getByToken(String token) {
+        return tokenStore.getByToken(token);
+    }
+
+    public boolean existsByName(String name) {
+        return tokenStore.existsByName(name);
+    }
+
+    /**
+     * 检查令牌是否存在
+     *
+     * @param token 令牌
+     * @return 是否存在
+     */
+    public boolean existsByToken(String token) {
+        return tokenStore.existsByToken(token);
+    }
+
+    /**
+     * 移除访问令牌
+     *
+     * @param token 令牌
+     */
+    public void removeByToken(String token) {
+        TokenConfig removedToken = tokenStore.deleteByToken(token);
+        if (removedToken != null) {
+            connectionCountMap.remove(token);
+            agentIdMap.remove(token);
+            logger.info("移除访问令牌: {}", token);
+        }
+    }
+
+    public void removeByTokens(List<String> tokenList) {
+        if (tokenList != null) {
+            tokenList.forEach(this::removeByToken);
         }
     }
 
@@ -99,44 +151,8 @@ public class TokenManager {
         return agentIds;
     }
 
-    /**
-     * 获取令牌信息
-     *
-     * @param token 令牌
-     * @return 令牌信息
-     */
-    public TokenConfig getAccessToken(String token) {
-        return tokenStore.getByToken(token);
-    }
-
-    /**
-     * 检查令牌是否存在
-     *
-     * @param token 令牌
-     * @return 是否存在
-     */
-    public boolean checkToken(String token) {
-        return tokenStore.existsByToken(token);
-    }
-
-    /**
-     * 移除访问令牌
-     *
-     * @param token 令牌
-     * @return 被移除的令牌信息
-     */
-    public Optional<TokenConfig> removeToken(String token) {
-        TokenConfig removedToken = tokenStore.deleteByToken(token);
-        if (removedToken != null) {
-            connectionCountMap.remove(token);
-            agentIdMap.remove(token);
-            logger.info("移除访问令牌: {}", token);
-        }
-        return Optional.ofNullable(removedToken);
-    }
-
     public boolean checkAgentLimit(String token) {
-        TokenConfig tokenConfig = getAccessToken(token);
+        TokenConfig tokenConfig = getByToken(token);
         if (tokenConfig == null) {
             return false;
         }
@@ -155,7 +171,7 @@ public class TokenManager {
      * @return 是否允许连接
      */
     public boolean checkConnectionsLimit(String token) {
-        TokenConfig tokenConfig = getAccessToken(token);
+        TokenConfig tokenConfig = getByToken(token);
         if (tokenConfig == null) {
             return false;
         }
@@ -186,7 +202,7 @@ public class TokenManager {
     public void decrementConnection(String token) {
         AtomicInteger count = connectionCountMap.get(token);
         if (count != null) {
-            int newValue = count.decrementAndGet();
+            int newValue = count.updateAndGet(v -> Math.max(0, v - 1));
             logger.debug("令牌 {} 连接数减少到: {}", token, newValue);
         }
     }
@@ -197,21 +213,9 @@ public class TokenManager {
      * @param token 令牌
      * @return 当前连接数
      */
-    public int getCurrentConnectionCount(String token) {
+    public int getOnlineConnectionCount(String token) {
         AtomicInteger count = connectionCountMap.get(token);
         return count != null ? count.get() : 0;
     }
-
-    /**
-     * 获取当前代理ID数量
-     *
-     * @param token 令牌
-     * @return 当前代理 ID数量
-     */
-    public int getAgentIdCount(String token) {
-        Set<String> agentIds = agentIdMap.get(token);
-        return agentIds != null ? agentIds.size() : 0;
-    }
-
 }
 

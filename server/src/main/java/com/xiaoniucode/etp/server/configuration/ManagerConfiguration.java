@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.configuration;
 
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.PortPolicyConfig;
+import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
 import com.xiaoniucode.etp.server.port.PortManager;
@@ -18,16 +19,16 @@ import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
 @Configuration
 public class ManagerConfiguration {
     @Resource
     private AppConfig config;
 
     @Bean
-    public ProxyManager proxyManager(MetricsCollector metricsCollector,ConfigRegistrarFactory configRegistrarFactory, DomainStore domainStore, ConfigChangeDetector configChangeDetector, ProxyStore proxyStore) {
-        return new DefaultProxyManager(metricsCollector,proxyStore, domainStore, configChangeDetector, configRegistrarFactory);
+    public ProxyManager proxyManager(MetricsCollector metricsCollector, ConfigRegistrarFactory configRegistrarFactory,
+                                     DomainStore domainStore,
+                                     ConfigChangeDetector configChangeDetector, ProxyStore proxyStore, UUIDGenerator uuidGenerator) {
+        return new DefaultProxyManager(metricsCollector,proxyStore, domainStore, configChangeDetector, configRegistrarFactory,uuidGenerator);
     }
 
     @Bean

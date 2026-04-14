@@ -1,19 +1,25 @@
 package com.xiaoniucode.etp.server.store;
 
 import com.xiaoniucode.etp.server.config.domain.TokenConfig;
+import com.xiaoniucode.etp.server.exceptions.EtpException;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface TokenStore {
     Optional<TokenConfig> findByToken(String token);
-   TokenConfig getByToken(String token);
+
+    TokenConfig getByToken(String token);
 
     List<TokenConfig> findAll();
 
     boolean existsByToken(String token);
 
-    TokenConfig save(TokenConfig token);
+    boolean existsByName(String name);
+
+    TokenConfig add(TokenConfig token) throws EtpException;
+
+    TokenConfig update(TokenConfig tokenConfig) throws EtpException;
 
     TokenConfig deleteByToken(String token);
 }

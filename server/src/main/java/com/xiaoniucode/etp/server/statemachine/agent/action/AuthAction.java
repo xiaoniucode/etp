@@ -77,7 +77,7 @@ public class AuthAction extends AgentBaseAction {
             }
         }
         String token = authInfo.getToken();
-        if (!tokenManager.checkToken(token) && !isReconnect) {
+        if (!tokenManager.existsByToken(token) && !isReconnect) {
             logger.error("客户端认证失败，无效令牌：{}", token);
             Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
                     .setCode(1)
@@ -86,7 +86,7 @@ public class AuthAction extends AgentBaseAction {
             context.fireEvent(AgentEvent.AUTH_FAILURE);
             return;
         }
-        TokenConfig tokenConfig = tokenManager.getAccessToken(token);
+        TokenConfig tokenConfig = tokenManager.getByToken(token);
         if (!tokenManager.checkConnectionsLimit(token) && !isReconnect) {
             logger.warn("访问令牌 {} 连接数已达上限 {}", token, tokenConfig.getMaxConnections());
             Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
@@ -102,10 +102,10 @@ public class AuthAction extends AgentBaseAction {
         AgentInfo oldAgentInfo = null;
         if (!StringUtils.hasText(agentId)) {
             if (!tokenManager.checkAgentLimit(token)) {
-                logger.warn("访问令牌 {} 客户端注册数已达上限 {}", token, tokenConfig.getMaxClients());
+                logger.warn("访问令牌 {} 客户端注册数已达上限 {}", token, tokenConfig.getMaxDevices());
                 Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
                         .setCode(1)
-                        .setMessage("访问令牌 " + token + " 客户端注册数已达上限:" + tokenConfig.getMaxClients()).build();
+                        .setMessage("访问令牌 " + token + " 客户端注册数已达上限:" + tokenConfig.getMaxDevices()).build();
                 sendAuthError(control, authResponse);
                 context.fireEvent(AgentEvent.AUTH_FAILURE);
                 return;

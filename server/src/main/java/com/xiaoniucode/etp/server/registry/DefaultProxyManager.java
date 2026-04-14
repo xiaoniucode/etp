@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.registry;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
+import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.store.DomainStore;
 import com.xiaoniucode.etp.server.store.ProxyStore;
@@ -22,13 +23,17 @@ public class DefaultProxyManager implements ProxyManager {
     private final ConfigChangeDetector configChangeDetector;
     private final DomainStore domainStore;
     private final MetricsCollector metricsCollector;
-
-    public DefaultProxyManager(MetricsCollector metricsCollector, ProxyStore proxyStore, DomainStore domainStore, ConfigChangeDetector configChangeDetector, ConfigRegistrarFactory configRegistrarFactory) {
+    private final UUIDGenerator uuidGenerator;
+    public DefaultProxyManager(MetricsCollector metricsCollector, ProxyStore proxyStore,
+                               DomainStore domainStore, ConfigChangeDetector configChangeDetector,
+                               ConfigRegistrarFactory configRegistrarFactory,
+    UUIDGenerator uuidGenerator) {
         this.metricsCollector = metricsCollector;
         this.proxyStore = proxyStore;
         this.domainStore = domainStore;
         this.configRegistrarFactory = configRegistrarFactory;
         this.configChangeDetector = configChangeDetector;
+        this.uuidGenerator=uuidGenerator;
     }
 
     /**
@@ -59,6 +64,8 @@ public class DefaultProxyManager implements ProxyManager {
                 return oldConfig;
             }
         } else {
+            String proxyId = uuidGenerator.uuid32();
+            proxyConfig.setProxyId(proxyId);
             return createProxy(proxyConfig, delegate);
         }
     }

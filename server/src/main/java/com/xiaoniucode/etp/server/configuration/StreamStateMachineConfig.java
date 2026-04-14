@@ -81,15 +81,6 @@ public class StreamStateMachineConfig {
                 .on(StreamEvent.STREAM_OPEN_FAILURE)
                 .when(ctx -> true)
                 .perform(streamCloseAction);
-
-        // 处理流数据
-        builder.internalTransition()
-                .within(StreamState.OPENED)
-                .on(StreamEvent.STREAM_DATA)
-                .when(ctx -> true)
-                .perform((from, to, event, context) ->
-                        context.setState(to));
-
         // 关闭流
         builder.externalTransitions()
                 .fromAmong(StreamState.OPENED, StreamState.FAILED, StreamState.OPENING)

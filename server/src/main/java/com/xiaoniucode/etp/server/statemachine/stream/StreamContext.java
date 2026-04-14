@@ -33,6 +33,9 @@ public class StreamContext extends AbstractStreamContext {
     }
 
     public String getProxyId() {
+        if (proxyConfig==null){
+            return null;
+        }
         return proxyConfig.getProxyId();
     }
 

@@ -25,12 +25,7 @@ public enum StreamEvent {
      * 收到重置流请求
      */
     STREAM_RESET,
-    
-    /**
-     * 收到流数据
-     */
-    STREAM_DATA,
-    
+
     /**
      * 创建一个新的连接
      */

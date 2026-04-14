@@ -15,11 +15,13 @@
  */
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.web.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.bandwidth.BandwidthDTO;
@@ -32,6 +34,7 @@ import com.xiaoniucode.etp.server.web.param.proxy.*;
 import com.xiaoniucode.etp.server.web.repository.*;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import com.xiaoniucode.etp.server.web.service.converter.*;
+import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
@@ -43,8 +46,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -88,10 +89,12 @@ public class ProxyServiceImpl implements ProxyService {
     private LoadBalanceConvert loadBalanceConvert;
     @Autowired
     private BandwidthConvert bandwidthConvert;
-
+    @Autowired
+    private ProxyConfigAssembler proxyConfigAssembler;
     @Autowired
     private ProxyManager proxyManager;
-
+    @Autowired
+    private TransactionHelper transactionHelper;
     @Resource
     private AppConfig appConfig;
 
@@ -118,8 +121,8 @@ public class ProxyServiceImpl implements ProxyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createHttpProxy(HttpProxyCreateParam param) {
-
-        String proxyId = UUID.randomUUID().toString();
+        ProxyConfig proxyConfig = proxyManager.register(proxyConfigAssembler.toDomain(param));
+        String proxyId = proxyConfig.getProxyId();
         //1.基础信息
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
@@ -148,7 +151,7 @@ public class ProxyServiceImpl implements ProxyService {
         List<HttpProxyDomainDO> httpProxyDomainList = proxyDomainConvert.toDOList(param.getDomains(), proxyId);
         proxyDomainRepository.saveAll(httpProxyDomainList);
         //init access control
-        AccessControlDO  accessControlDO=   new AccessControlDO();
+        AccessControlDO accessControlDO = new AccessControlDO();
         accessControlDO.setProxyId(proxyId);
         accessControlDO.setMode(AccessControlMode.DENY);
         accessControlDO.setEnabled(false);
@@ -158,6 +161,8 @@ public class ProxyServiceImpl implements ProxyService {
         basicAuthDO.setEnabled(false);
         basicAuthDO.setProxyId(proxyId);
         basicAuthRepository.save(basicAuthDO);
+
+
         logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
     }
 
@@ -361,7 +366,7 @@ public class ProxyServiceImpl implements ProxyService {
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
         transportRepository.save(transportDO);
 
-        AccessControlDO  accessControlDO=   new AccessControlDO();
+        AccessControlDO accessControlDO = new AccessControlDO();
         accessControlDO.setProxyId(proxyId);
         accessControlDO.setMode(AccessControlMode.DENY);
         accessControlDO.setEnabled(false);
@@ -534,15 +539,7 @@ public class ProxyServiceImpl implements ProxyService {
         basicUserRepository.deleteByProxyIdIn(ids);
         // Base
         proxyRepository.deleteByIdIn(ids);
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCommit() {
-                        proxyManager.batchRemove(ids);
-                    }
-                }
-        );
-
+        transactionHelper.afterCommit(() -> proxyManager.batchRemove(ids));
         logger.debug("批量删除代理成功，数量: {}", ids.size());
     }
 
@@ -556,17 +553,7 @@ public class ProxyServiceImpl implements ProxyService {
         proxyDO.setStatus(ProxyStatus.fromCode(status));
         proxyRepository.save(proxyDO);
         //更新内存状态
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCommit() {
-                        try {
-                            proxyManager.changeStatus(id, Objects.equals(status, ProxyStatus.OPEN.getCode()));
-                        } catch (Exception e) {
-                            logger.error("更新内存状态失败，id: {}, status: {}", id, status, e);
-                        }
-                    }
-                }
-        );
+        transactionHelper.afterCommit(() ->
+                proxyManager.changeStatus(id, Objects.equals(status, ProxyStatus.OPEN.getCode())));
     }
 }

@@ -15,7 +15,10 @@
  */
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
+import com.xiaoniucode.etp.server.security.TokenManager;
+import com.xiaoniucode.etp.server.web.assembler.TokenAssembler;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.accesstoken.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenBatchDeleteParam;
@@ -25,13 +28,16 @@ import com.xiaoniucode.etp.server.web.service.converter.AccessTokenConvert;
 import com.xiaoniucode.etp.server.web.entity.AccessTokenDO;
 import com.xiaoniucode.etp.server.web.repository.AccessTokenRepository;
 import com.xiaoniucode.etp.server.web.service.AccessTokenService;
+import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccessTokenServiceImpl implements AccessTokenService {
@@ -41,17 +47,29 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     private UUIDGenerator uuidGenerator;
     @Autowired
     private AccessTokenConvert accessTokenConvert;
+    @Autowired
+    private TokenAssembler tokenAssembler;
+    @Autowired
+    private TokenManager tokenManager;
+    @Autowired
+    private TransactionHelper transactionHelper;
 
     @Override
-    public AccessTokenDTO create(AccessTokenCreateParam request) {
-        if (accessTokenRepository.existsByName(request.getName())) {
+    @Transactional(rollbackFor = Exception.class)
+    public AccessTokenDTO create(AccessTokenCreateParam param) {
+        if (accessTokenRepository.existsByName(param.getName()) || tokenManager.existsByName(param.getName())) {
             throw new BizException("令牌名称已存在");
         }
-        
-        AccessTokenDO accessToken = accessTokenConvert.toDO(request);
+
+        AccessTokenDO accessToken = accessTokenConvert.toDO(param);
         String token = uuidGenerator.uuid32().toUpperCase();
         accessToken.setToken(token);
         AccessTokenDO save = accessTokenRepository.save(accessToken);
+
+        TokenConfig tokenConfig = tokenAssembler.toDomain(param);
+        tokenConfig.setToken(token);
+        transactionHelper.afterCommit(() -> tokenManager.addToken(tokenConfig));
+
         return accessTokenConvert.toDTO(save);
     }
 
@@ -70,35 +88,48 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 
     @Override
     public AccessTokenDTO findById(Integer id) {
-        AccessTokenDO token = accessTokenRepository.findById(id).orElse(null);
-        if (token == null) {
-            return null;
-        }
-        return accessTokenConvert.toDTO(token);
+        AccessTokenDO accessTokenDO = accessTokenRepository.findById(id).orElseThrow(() ->
+                new BizException("令牌不存在"));
+        return accessTokenConvert.toDTO(accessTokenDO);
     }
 
     @Override
-    public void update(AccessTokenUpdateParam request) {
-        AccessTokenDO accessTokenDO = accessTokenRepository.findById(request.getId()).orElse(null);
+    @Transactional(rollbackFor = Exception.class)
+    public void update(AccessTokenUpdateParam param) {
+        AccessTokenDO accessTokenDO = accessTokenRepository.findById(param.getId()).orElse(null);
         if (accessTokenDO != null) {
-            if (accessTokenRepository.existsByNameAndIdNot(request.getName(), request.getId())) {
+            if (accessTokenRepository.existsByNameAndIdNot(param.getName(), param.getId())) {
                 throw new BizException("令牌名称已存在");
             }
-            accessTokenConvert.updateDO(accessTokenDO,request);
+            accessTokenConvert.updateDO(accessTokenDO, param);
             accessTokenRepository.save(accessTokenDO);
+            TokenConfig tokenConfig = tokenAssembler.toDomain(param);
+            transactionHelper.afterCommit(() -> tokenManager.updateToken(tokenConfig));
         }
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Integer id) {
-        accessTokenRepository.deleteById(id);
+        Optional<AccessTokenDO> tokenOpt = accessTokenRepository.findById(id);
+        if (tokenOpt.isPresent()) {
+            accessTokenRepository.deleteById(id);
+            AccessTokenDO accessTokenDO = tokenOpt.get();
+            transactionHelper.afterCommit(() -> tokenManager.removeByToken(accessTokenDO.getToken()));
+        }
     }
 
     @Override
-    public void deleteBatch(AccessTokenBatchDeleteParam request) {
-        List<Integer> ids = request.getIds();
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBatch(AccessTokenBatchDeleteParam param) {
+        List<Integer> ids = param.getIds();
         if (ids != null && !ids.isEmpty()) {
+            List<AccessTokenDO> tokens = accessTokenRepository.findAllById(ids);
+            List<String> tokenList = tokens.stream()
+                    .map(AccessTokenDO::getToken)
+                    .toList();
             accessTokenRepository.deleteAllById(ids);
+            transactionHelper.afterCommit(() -> tokenManager.removeByTokens(tokenList));
         }
     }
 }

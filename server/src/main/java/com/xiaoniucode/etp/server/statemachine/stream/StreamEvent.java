@@ -35,9 +35,4 @@ public enum StreamEvent {
      * 收到重置流通知
      */
     STREAM_RESET,
-    
-    /**
-     * 发送/接收流数据
-     */
-    STREAM_DATA
 }

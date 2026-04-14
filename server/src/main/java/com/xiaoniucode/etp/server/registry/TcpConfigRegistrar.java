@@ -5,8 +5,6 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.exceptions.PortConflictException;
-import com.xiaoniucode.etp.server.generator.UUIDGenerator;
-import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
@@ -33,8 +31,6 @@ public class TcpConfigRegistrar implements ConfigRegistrar {
     private PortAcceptor portAcceptor;
     @Autowired
     private StreamManager streamManager;
-    @Autowired
-    private  UUIDGenerator uuidGenerator;
     @Override
     public boolean supports(ProxyConfig config) {
         return config.isTcp();
@@ -49,7 +45,7 @@ public class TcpConfigRegistrar implements ConfigRegistrar {
 
     @Override
     public void register(ProxyConfig config) throws EtpException {
-        String proxyId = uuidGenerator.uuid32();
+        String proxyId = config.getProxyId();
         config.setProxyId(proxyId);
         Integer listenPort = config.getRemotePort();
         if (listenPort != null && !portManager.isAvailable(listenPort)) {

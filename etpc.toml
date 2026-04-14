@@ -2,7 +2,7 @@ server_addr = "localhost"
 server_port = 9527
 
 [auth]
-token = "token2"
+token = "AC7FD5AC836216F5AF9CCD9449139B63"
 
 [connection]
 [connection.retry]

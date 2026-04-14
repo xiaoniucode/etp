@@ -24,8 +24,6 @@ public class HttpConfigRegistrar implements ConfigRegistrar {
     private StreamManager streamManager;
     @Autowired
     private AgentManager agentManager;
-    @Autowired
-    private UUIDGenerator uuidGenerator;
 
     @Override
     public boolean supports(ProxyConfig config) {
@@ -38,6 +36,9 @@ public class HttpConfigRegistrar implements ConfigRegistrar {
         if (routeConfig == null) {
             throw new EtpException("HTTP(s)协议必须配置域名");
         }
+        if (config.getProxyId()==null){
+            throw new EtpException("proxyId 不能为空");
+        }
         if (!StringUtils.hasText(config.getName())) {
             throw new EtpException("代理名不能为空！");
         }
@@ -45,10 +46,13 @@ public class HttpConfigRegistrar implements ConfigRegistrar {
 
     @Override
     public void register(ProxyConfig config) throws EtpException {
-        String proxyId = uuidGenerator.uuid32();
+        String proxyId = config.getProxyId();
         config.setProxyId(proxyId);
         RouteConfig routeConfig = config.getRouteConfig();
         domainManager.register(proxyId, routeConfig);
+        agentManager.getAgentContext(config.getAgentId()).ifPresent(agentContext -> {
+            agentManager.addProxyContextIndex(config.getProxyId(), agentContext);
+        });
     }
 
     @Override

@@ -168,20 +168,16 @@ public class TomlConfigSource implements ConfigSource {
         for (Toml tokenTable : tokenNodes) {
             String name = tokenTable.getString("name");
             String token = tokenTable.getString("token");
-            Long maxClients = tokenTable.getLong("max_clients");
             Long maxDevices = tokenTable.getLong("max_devices");
             Long maxConnections = tokenTable.getLong("max_connections");
-            Long deviceTimeout = tokenTable.getLong("device_timeout");
             if (tokenTemp.contains(token)) {
                 throw new IllegalArgumentException("Token令牌冲突，不能存在重复的令牌！ " + token);
             }
             TokenConfig accessToken = new TokenConfig(
                     name,
                     token,
-                    maxClients != null ? maxClients.intValue() : null,
                     maxDevices != null ? maxDevices.intValue() : null,
-                    maxConnections != null ? maxConnections.intValue() : null,
-                    deviceTimeout != null ? deviceTimeout.intValue() : null
+                    maxConnections != null ? maxConnections.intValue() : null
             );
             tokenConfigs.add(accessToken);
             tokenTemp.add(token);

@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
 import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.security.TokenManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.transport.connection.DirectPool;
@@ -24,6 +25,8 @@ public class GoawayAction extends AgentBaseAction {
     private MultiplexPool multiplexPool;
     @Autowired
     private ProxyManager proxyManager;
+    @Autowired
+    private TokenManager tokenManager;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -44,7 +47,8 @@ public class GoawayAction extends AgentBaseAction {
             if (agentInfo.getAgentType().isSession()) {
                 proxyManager.clearByAgentId(agentId);
             }
-
+            //减少Token 当前连接数
+            tokenManager.decrementConnection(agentInfo.getToken());
             // 清理代理资源
             //cleanupAgent(agentId);
 
