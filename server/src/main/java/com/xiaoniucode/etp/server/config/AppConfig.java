@@ -43,7 +43,7 @@ public class AppConfig implements Config {
         private TransportConfig transportConfig = new TransportConfig();
         private String baseDomain;
         private LogConfig logConfig;
-        private DashboardConfig dashboard = new DashboardConfig(false);
+        private DashboardConfig dashboard = new DashboardConfig(true);
         private PortPolicyConfig portPolicy = new PortPolicyConfig(1, 65535);
         private AuthConfig authConfig = new AuthConfig();
 

@@ -11,18 +11,16 @@ public class DashboardConfig {
     private String password;
     private String addr;
     private Integer port;
-    private Boolean reset;
 
     public DashboardConfig(Boolean enabled) {
         this.enabled = enabled;
     }
 
-    public DashboardConfig(Boolean enabled, String username, String password, String addr, Integer port, Boolean reset) {
+    public DashboardConfig(Boolean enabled, String username, String password, String addr, Integer port) {
         this.enabled = enabled;
         this.username = username;
         this.password = password;
         this.addr = addr;
         this.port = port;
-        this.reset = reset;
     }
 }

@@ -15,10 +15,8 @@
  */
 package com.xiaoniucode.etp.server.web.service;
 import com.xiaoniucode.etp.server.web.dto.user.UserInfoDTO;
-import com.xiaoniucode.etp.server.web.entity.SysUserDO;
 import com.xiaoniucode.etp.server.web.param.user.UserPasswordUpdateParam;
 public interface UserService {
     UserInfoDTO getByUsername(String username);
-    void register(SysUserDO user);
     void updatePassword(String username, UserPasswordUpdateParam req);
 }

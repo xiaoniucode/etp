@@ -19,6 +19,7 @@ public class TunnelServerStartup {
     public static void main(String[] args) {
         Debugger.enableDebug();
         System.setProperty("io.netty.leakDetection.level", "PARANOID");
+
         AppConfig config = ConfigParser.parse(args);
         DashboardConfig dashboard = config.getDashboard();
         SpringApplicationBuilder builder = new SpringApplicationBuilder(TunnelServerStartup.class);

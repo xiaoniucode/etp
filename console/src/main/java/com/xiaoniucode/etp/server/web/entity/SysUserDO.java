@@ -14,11 +14,14 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.entity;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
+
 /**
  * 系统用户实体类
  */
@@ -42,6 +45,11 @@ public class SysUserDO {
      */
     @Column(name = "password", nullable = false)
     private String password;
+    /**
+     * 角色
+     */
+    @Column(name = "role", nullable = false)
+    private String role;
     /**
      * 创建时间
      */

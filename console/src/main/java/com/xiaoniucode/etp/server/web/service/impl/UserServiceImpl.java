@@ -45,42 +45,33 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private SysUserConvert sysUserConvert;
-    /**
-     * 默认角色，当前系统只有一个用户角色
-     */
-    private final static List<String> DEFAULT_ROLES = List.of("R_SUPER");
 
     @Override
     public UserInfoDTO getByUsername(String username) {
         SysUserDO sysUserDO = userRepository.findByUsername(username).orElseThrow(() -> new BizException("用户不存在"));
-        UserInfoDTO userInfoDTO = sysUserConvert.toInfoDTO(sysUserDO);
-        userInfoDTO.setRoles(DEFAULT_ROLES);
-        return userInfoDTO;
-    }
-
-    @Override
-    public void register(SysUserDO user) {
-        userRepository.save(user);
+        UserInfoDTO infoDTO = sysUserConvert.toInfoDTO(sysUserDO);
+        infoDTO.setRoles(List.of(sysUserDO.getRole()));
+        return infoDTO;
     }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
     public void updatePassword(String username, UserPasswordUpdateParam req) {
         SysUserDO user = userRepository.findByUsername(username).orElseThrow(() -> new BizException(401, "用户不存在"));
-        
+
         // 检查旧密码是否正确
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
             throw new BizException(400, "旧密码错误");
         }
-        
+
         // 检查新密码和确认密码是否一致
         if (!req.getNewPassword().equals(req.getConfirmPassword())) {
             throw new BizException(400, "新密码和确认密码不一致");
         }
-        
+
         // 对新密码进行加密
         String encodedPassword = passwordEncoder.encode(req.getNewPassword());
-        
+
         // 更新用户密码
         user.setPassword(encodedPassword);
         userRepository.save(user);

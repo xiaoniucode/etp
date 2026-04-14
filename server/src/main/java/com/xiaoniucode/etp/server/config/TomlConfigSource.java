@@ -97,18 +97,13 @@ public class TomlConfigSource implements ConfigSource {
                 Long port = dash.getLong("port", (long) DEFAULT_DASHBOARD_PORT);
                 String username = dash.getString("username");
                 String password = dash.getString("password");
-                Boolean reset = dash.getBoolean("reset", false);
-
                 if (!StringUtils.hasText(username)) {
                     throw new IllegalArgumentException("请配置 Dashboard 用户名");
                 }
                 if (!StringUtils.hasText(password)) {
                     throw new IllegalArgumentException("请配置 Dashboard 密码");
                 }
-
-                DashboardConfig dashboard = new DashboardConfig(
-                        true, username, password, addr, port.intValue(), reset
-                );
+                DashboardConfig dashboard = new DashboardConfig(true, username, password, addr, port.intValue());
                 builder.dashboard(dashboard);
             }
         }
