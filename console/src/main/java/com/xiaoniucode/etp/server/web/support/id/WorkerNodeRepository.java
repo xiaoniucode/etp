@@ -24,8 +24,8 @@ import org.springframework.stereotype.Repository;
  *
  * @author yutianbao
  */
-@Repository
-public interface WorkerNodeRepository extends JpaRepository<WorkerNodeEntity, Long> {
-
-
-}
+//@Repository
+//public interface WorkerNodeRepository extends JpaRepository<WorkerNodeEntity, Long> {
+//
+//
+//}

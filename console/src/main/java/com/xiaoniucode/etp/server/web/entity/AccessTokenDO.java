@@ -38,7 +38,7 @@ public class AccessTokenDO {
     /**
      * 令牌名称
      */
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false,unique = true)
     private String name;
     /**
      * 访问令牌

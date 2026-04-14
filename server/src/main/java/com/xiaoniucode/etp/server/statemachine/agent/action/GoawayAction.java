@@ -1,11 +1,16 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
+import com.xiaoniucode.etp.core.message.TMSP;
+import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.security.TokenManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.transport.connection.DirectPool;
 import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +49,7 @@ public class GoawayAction extends AgentBaseAction {
             // 清理隧道资源
             directPool.offline(agentId);
             multiplexPool.offline(agentId);
-            if (agentInfo.getAgentType().isSession()) {
-                proxyManager.clearByAgentId(agentId);
-            }
+            proxyManager.clearByAgentId(agentId);
             //减少Token 当前连接数
             tokenManager.decrementConnection(agentInfo.getToken());
             // 清理代理资源
@@ -57,11 +60,12 @@ public class GoawayAction extends AgentBaseAction {
 
             // 清理Context 中的临时数据
             //cleanupContextData(context);
+            Channel control = context.getControl();
+            control.writeAndFlush(new TMSPFrame(0, TMSP.MSG_GOAWAY))
+                    .addListener((ChannelFutureListener) future -> ChannelUtils.closeOnFlush(control));
             logger.info("{} 客户端资源清理完成", agentId);
         } catch (Exception e) {
             logger.error("{} 资源清理过程中发生异常", agentId, e);
-        } finally {
-
         }
 
     }

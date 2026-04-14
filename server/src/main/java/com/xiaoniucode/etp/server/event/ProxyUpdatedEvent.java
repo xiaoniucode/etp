@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ProxyUpdatedEvent extends Event {
-    private final String clientId;
+    private final String agentId;
     private final AgentType clientType;
     private final ProxyConfig proxyConfig;
 }

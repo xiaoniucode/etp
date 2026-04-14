@@ -35,12 +35,12 @@ public class DirectPool {
     private final AtomicInteger encryptConnections = new AtomicInteger(0);
 
     /**
-     * clientId --> Pool
+     * agentId --> Pool
      */
     private final ConcurrentHashMap<String, Pool> clientPools = new ConcurrentHashMap<>();
 
-    public TunnelEntry borrow(String clientId, String tunnelId, boolean isEncrypt) {
-        Pool pool = clientPools.get(clientId);
+    public TunnelEntry borrow(String agentId, String tunnelId, boolean isEncrypt) {
+        Pool pool = clientPools.get(agentId);
         if (pool == null) {
             return null;
         }
@@ -56,26 +56,26 @@ public class DirectPool {
         return entry;
     }
 
-    public void release(String clientId, TunnelEntry tunnelEntry) {
+    public void release(String agentId, TunnelEntry tunnelEntry) {
         if (tunnelEntry == null || tunnelEntry.getTunnelId() == null) {
             return;
         }
-        Pool pool = clientPools.get(clientId);
+        Pool pool = clientPools.get(agentId);
         if (pool == null) {
             return;
         }
         pool.release(tunnelEntry.getTunnelId(), tunnelEntry);
     }
 
-    public void remove(String clientId, String tunnelId) {
-        Pool pool = clientPools.get(clientId);
+    public void remove(String agentId, String tunnelId) {
+        Pool pool = clientPools.get(agentId);
         if (pool != null) {
             pool.remove(tunnelId);
         }
     }
 
-    public boolean register(String clientId, TunnelEntry tunnelEntry) {
-        if (clientId == null || tunnelEntry == null || tunnelEntry.getTunnelId() == null) {
+    public boolean register(String agentId, TunnelEntry tunnelEntry) {
+        if (agentId == null || tunnelEntry == null || tunnelEntry.getTunnelId() == null) {
             return false;
         }
         totalConnections.incrementAndGet();
@@ -85,13 +85,13 @@ public class DirectPool {
             plainConnections.incrementAndGet();
         }
 
-        Pool pool = clientPools.computeIfAbsent(clientId, k -> new Pool());
+        Pool pool = clientPools.computeIfAbsent(agentId, k -> new Pool());
         pool.register(tunnelEntry.getTunnelId(), tunnelEntry);
         return true;
     }
 
-    public void offline(String clientId) {
-        Pool pool = clientPools.remove(clientId);
+    public void offline(String agentId) {
+        Pool pool = clientPools.remove(agentId);
         if (pool != null) {
             int plainCount = pool.plainPools.size();
             int encryptCount = pool.encryptPools.size();

@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.registry;
 
+import com.baidu.fsg.uid.UidGenerator;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
@@ -23,17 +24,18 @@ public class DefaultProxyManager implements ProxyManager {
     private final ConfigChangeDetector configChangeDetector;
     private final DomainStore domainStore;
     private final MetricsCollector metricsCollector;
-    private final UUIDGenerator uuidGenerator;
+    private final UidGenerator uidGenerator;
+
     public DefaultProxyManager(MetricsCollector metricsCollector, ProxyStore proxyStore,
                                DomainStore domainStore, ConfigChangeDetector configChangeDetector,
                                ConfigRegistrarFactory configRegistrarFactory,
-    UUIDGenerator uuidGenerator) {
+                               UidGenerator uidGenerator) {
         this.metricsCollector = metricsCollector;
         this.proxyStore = proxyStore;
         this.domainStore = domainStore;
         this.configRegistrarFactory = configRegistrarFactory;
         this.configChangeDetector = configChangeDetector;
-        this.uuidGenerator=uuidGenerator;
+        this.uidGenerator = uidGenerator;
     }
 
     /**
@@ -64,7 +66,7 @@ public class DefaultProxyManager implements ProxyManager {
                 return oldConfig;
             }
         } else {
-            String proxyId = uuidGenerator.uuid32();
+            String proxyId = uidGenerator.getUIDAsString();
             proxyConfig.setProxyId(proxyId);
             return createProxy(proxyConfig, delegate);
         }

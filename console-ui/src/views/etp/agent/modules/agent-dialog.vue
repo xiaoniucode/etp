@@ -15,6 +15,9 @@
         <ElDescriptionsItem label="操作系统">{{ localClientData.os }}</ElDescriptionsItem>
         <ElDescriptionsItem label="架构">{{ localClientData.arch }}</ElDescriptionsItem>
         <ElDescriptionsItem label="版本">{{ localClientData.version }}</ElDescriptionsItem>
+        <ElDescriptionsItem label="最后在线时间">{{
+          formatDate(localClientData.lastActiveTime)
+        }}</ElDescriptionsItem>
         <ElDescriptionsItem label="创建时间">{{
           formatDate(localClientData.createdAt)
         }}</ElDescriptionsItem>
@@ -128,5 +131,3 @@
     }
   )
 </script>
-
-

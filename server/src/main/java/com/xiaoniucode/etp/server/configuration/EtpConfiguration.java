@@ -36,19 +36,18 @@ public class EtpConfiguration {
     }
 
     /**
-     * 19位雪花算法生成
+     * 19位雪花算法生成，单机模式
+     *
      * @return ID
      */
     @Bean
     @ConditionalOnMissingBean(UidGenerator.class)
     public UidGenerator uidGenerator() {
         CachedUidGenerator generator = new CachedUidGenerator();
-        generator.setTimeBits(29);      // 时间差（秒）
-        generator.setWorkerBits(21);    // workerId
-        generator.setSeqBits(13);       // 序列号
-        // 自定义起始时间
-        generator.setEpochStr("2026-04-15");
-        // 工作节点ID
+        generator.setTimeBits(29);
+        generator.setWorkerBits(21);
+        generator.setSeqBits(13);
+        generator.setEpochStr("2026-04-14");
         generator.setWorkerIdAssigner(() -> 1L);
         return generator;
     }

@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 @Component
@@ -15,16 +17,23 @@ public class InMemoryAgentStore implements AgentStore {
     private final Map<String, AgentInfo> store = new ConcurrentHashMap<>();
 
     private final Map<String, Set<String>> tokenIndex = new ConcurrentHashMap<>();
+    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private final Lock writeLock = rwLock.writeLock();
 
     @Override
     public void save(AgentInfo agentInfo) {
-        String agentId = agentInfo.getAgentId();
-        String token = agentInfo.getToken();
+        writeLock.lock();
+        try {
+            String agentId = agentInfo.getAgentId();
+            String token = agentInfo.getToken();
 
-        store.put(agentId, agentInfo);
+            store.put(agentId, agentInfo);
 
-        tokenIndex.computeIfAbsent(token, k -> ConcurrentHashMap.newKeySet())
-                .add(agentId);
+            tokenIndex.computeIfAbsent(token, k -> ConcurrentHashMap.newKeySet())
+                    .add(agentId);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     @Override
@@ -53,15 +62,20 @@ public class InMemoryAgentStore implements AgentStore {
 
     @Override
     public void delete(String agentId) {
-        AgentInfo agent = store.remove(agentId);
-        if (agent != null) {
-            Set<String> agentIds = tokenIndex.get(agent.getToken());
-            if (agentIds != null) {
-                agentIds.remove(agentId);
-                if (agentIds.isEmpty()) {
-                    tokenIndex.remove(agent.getToken());
+        writeLock.lock();
+        try {
+            AgentInfo agent = store.remove(agentId);
+            if (agent != null) {
+                Set<String> agentIds = tokenIndex.get(agent.getToken());
+                if (agentIds != null) {
+                    agentIds.remove(agentId);
+                    if (agentIds.isEmpty()) {
+                        tokenIndex.remove(agent.getToken());
+                    }
                 }
             }
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -75,42 +89,57 @@ public class InMemoryAgentStore implements AgentStore {
      */
     @Override
     public int deleteExpiredOffline(String token, long timeout, ChronoUnit unit) {
-        Set<String> agentIds = tokenIndex.get(token);
-        if (agentIds == null || agentIds.isEmpty()) {
-            return 0;
-        }
-
-        int deletedCount = 0;
-        Iterator<String> iterator = agentIds.iterator();
-        while (iterator.hasNext()) {
-            String agentId = iterator.next();
-            AgentInfo agent = store.get(agentId);
-
-            if (agent != null
-                    && !Boolean.TRUE.equals(agent.getOnline())
-                    && agent.isExpired(timeout, unit)) {
-                store.remove(agentId);
-                iterator.remove();
-                deletedCount++;
+        writeLock.lock();
+        try {
+            Set<String> agentIds = tokenIndex.get(token);
+            if (agentIds == null || agentIds.isEmpty()) {
+                return 0;
             }
-        }
 
-        if (agentIds.isEmpty()) {
-            tokenIndex.remove(token);
-        }
+            int deletedCount = 0;
+            Iterator<String> iterator = agentIds.iterator();
+            while (iterator.hasNext()) {
+                String agentId = iterator.next();
+                AgentInfo agent = store.get(agentId);
 
-        return deletedCount;
+                if (agent != null
+                        && !Boolean.TRUE.equals(agent.getOnline())
+                        && agent.isExpired(timeout, unit)) {
+                    store.remove(agentId);
+                    iterator.remove();
+                    deletedCount++;
+                }
+            }
+
+            if (agentIds.isEmpty()) {
+                tokenIndex.remove(token);
+            }
+
+            return deletedCount;
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     @Override
     public void updateLastActiveTime(String agentId, LocalDateTime lastActiveTime) {
-        Optional.ofNullable(store.get(agentId))
-                .ifPresent(agent -> agent.setLastActiveTime(lastActiveTime));
+        writeLock.lock();
+        try {
+            Optional.ofNullable(store.get(agentId))
+                    .ifPresent(agent -> agent.setLastActiveTime(lastActiveTime));
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     @Override
     public void updateOnlineStatus(String agentId, boolean online) {
-        Optional.ofNullable(store.get(agentId))
-                .ifPresent(agent -> agent.setOnline(online));
+        writeLock.lock();
+        try {
+            Optional.ofNullable(store.get(agentId))
+                    .ifPresent(agent -> agent.setOnline(online));
+        } finally {
+            writeLock.unlock();
+        }
     }
 }

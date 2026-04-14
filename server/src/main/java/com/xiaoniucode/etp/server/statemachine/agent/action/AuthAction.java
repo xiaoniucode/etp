@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
+import com.baidu.fsg.uid.UidGenerator;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
@@ -9,10 +10,8 @@ import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.event.AgentAuthEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
-import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.security.TokenManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
-import com.xiaoniucode.etp.server.store.AgentStore;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -34,11 +33,9 @@ public class AuthAction extends AgentBaseAction {
     @Autowired
     private TokenManager tokenManager;
     @Autowired
-    private UUIDGenerator uuidGenerator;
+    private UidGenerator uuidGenerator;
     @Autowired
     private EventBus eventBus;
-    @Autowired
-    private AgentStore agentStore;
 
     /**
      * 检查 Token 是否存在
@@ -111,11 +108,11 @@ public class AuthAction extends AgentBaseAction {
                 context.fireEvent(AgentEvent.AUTH_FAILURE);
                 return;
             } else {
-                agentId = uuidGenerator.uuid16(true);
+                agentId = uuidGenerator.getUIDAsString();
             }
         } else {
             //如果携带了 agentId 需要检查是否合法
-            Optional<AgentInfo> agentInfoOpt = agentStore.findById(agentId);
+            Optional<AgentInfo> agentInfoOpt =  agentManager.findById(agentId);
             if (agentInfoOpt.isEmpty()) {
                 logger.warn("设备ID {} 不存在", agentId);
                 Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
@@ -133,12 +130,10 @@ public class AuthAction extends AgentBaseAction {
         context.setControl(control);
         context.setAgentInfo(agentInfo);
 
-        //保存设备信息
-        agentStore.save(agentInfo);
         if (!isReconnect) {
             tokenManager.incrementConnection(token);
+            agentManager.saveAgentInfo(agentInfo);
         }
-
         agentManager.addClientContextIndex(agentId, context);
         Message.AuthResponse authResponse = Message.AuthResponse.newBuilder().setCode(0)
                 .setConnectionId(context.getConnectionId())
@@ -164,18 +159,20 @@ public class AuthAction extends AgentBaseAction {
 
     private AgentInfo createOrUpdateAgentInfo(String agentId, AgentInfo oldAgentInfo, Message.AuthInfo authInfo) {
         AgentInfo agentInfo = oldAgentInfo == null ? new AgentInfo() : oldAgentInfo;
+        agentInfo.setName(authInfo.getName());
         agentInfo.setToken(authInfo.getToken());
         agentInfo.setAgentId(agentId);
         agentInfo.setAgentType(getAgentType(authInfo));
         agentInfo.setVersion(authInfo.getVersion());
         agentInfo.setOs(authInfo.getOs());
         agentInfo.setArch(authInfo.getArch());
+        agentInfo.setToken(authInfo.getToken());
 
         if (oldAgentInfo == null) {
             agentInfo.setCreatedAt(LocalDateTime.now());
         }
         agentInfo.setLastActiveTime(LocalDateTime.now());
-        agentInfo.setOnline(false);
+        agentInfo.setOnline(true);
 
         return agentInfo;
     }

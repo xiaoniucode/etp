@@ -58,11 +58,12 @@ public class InMemoryTokenStore implements TokenStore {
     public TokenConfig add(TokenConfig tokenConfig) {
         writeLock.lock();
         try {
-            if (nameMap.containsKey(tokenConfig.getName())) {
-                throw new EtpException("令牌名称已存在");
+            String name = tokenConfig.getName();
+            if (nameMap.containsKey(name)) {
+                throw new EtpException("令牌名称已存在: " + name);
             }
             if (tokenMap.containsKey(tokenConfig.getToken())) {
-                throw new EtpException("令牌已存在");
+                throw new EtpException("令牌已存在: "+tokenConfig.getToken());
             }
             tokenMap.put(tokenConfig.getToken(), tokenConfig);
             nameMap.put(tokenConfig.getName(), tokenConfig);

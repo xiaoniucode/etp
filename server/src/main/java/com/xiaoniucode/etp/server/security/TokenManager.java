@@ -60,7 +60,7 @@ public class TokenManager {
         try {
             tokenStore.add(tokenConfig);
         } catch (Exception e) {
-            logger.error("Token 令牌添加失败: {}", e);
+            logger.warn("Token 令牌添加失败: {}", e.getMessage());
             return false;
         }
         connectionCountMap.putIfAbsent(tokenConfig.getToken(), new AtomicInteger(0));

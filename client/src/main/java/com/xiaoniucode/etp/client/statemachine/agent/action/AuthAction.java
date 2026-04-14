@@ -37,6 +37,7 @@ public class AuthAction extends AgentBaseAction {
                     .setVersion(AppVersionUtil.getVersion())
                     .setAgentType(agentType)
                     .setOs(OSUtils.getOS())
+                    .setArch(OSUtils.getOSArch())
                     .setName(OSUtils.getHostName());
 
             if (config.getAgentType() == AgentType.BINARY) {

@@ -4,6 +4,7 @@ import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.server.generator.ConnectionIdGenerator;
+import com.xiaoniucode.etp.server.store.AgentStore;
 import io.netty.channel.Channel;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
 public class AgentManager {
@@ -28,7 +31,10 @@ public class AgentManager {
      * agentId --> context
      */
     private final Map<String, AgentContext> agentToContextIndex = new ConcurrentHashMap<>();
-
+    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private final Lock writeLock = rwLock.writeLock();
+    @Autowired
+    private AgentStore agentStore;
     @Autowired
     private ConnectionIdGenerator connectionIdGenerator;
 
@@ -70,8 +76,8 @@ public class AgentManager {
         return agentContext;
     }
 
-    public void addClientContextIndex(String clientId, AgentContext context) {
-        agentToContextIndex.put(clientId, context);
+    public void addClientContextIndex(String agentId, AgentContext context) {
+        agentToContextIndex.put(agentId, context);
     }
 
     public int getOnlineCount() {
@@ -79,13 +85,58 @@ public class AgentManager {
     }
 
     public void removeProxyContextIndex(String proxyId) {
-        agentToContextIndex.remove(proxyId);
+        proxyToContextIndex.remove(proxyId);
     }
-   public void removeAgentContext(String agentId){
-        //todo
 
-   }
+    public void removeAgentContext(String agentId) {
+        writeLock.lock();
+        try {
+            AgentContext agentContext = agentToContextIndex.remove(agentId);
+            if (agentContext != null) {
+                Integer connectionId = agentContext.getConnectionId();
+                connToContext.remove(connectionId);
+                List<String> proxyIdsToRemove = new ArrayList<>();
+                for (Map.Entry<String, AgentContext> entry : proxyToContextIndex.entrySet()) {
+                    String proxyId = entry.getKey();
+                    AgentContext value = entry.getValue();
+                    if (value.getAgentInfo() != null && value.getAgentInfo().getAgentId().equals(agentId)) {
+                        proxyIdsToRemove.add(proxyId);
+                    }
+                }
+                for (String proxyId : proxyIdsToRemove) {
+                    proxyToContextIndex.remove(proxyId);
+                }
+            }
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public boolean isOnline(String agentId) {
+        AgentContext agentContext = agentToContextIndex.get(agentId);
+        if (agentContext == null) {
+            return false;
+        }
+        AgentState state = agentContext.getState();
+        return state == AgentState.CONNECTED;
+    }
+
+    public void kickout(String agentId) {
+        AgentContext agentContext = agentToContextIndex.get(agentId);
+        if (agentContext != null) {
+            agentContext.fireEvent(AgentEvent.GOAWAY);
+        }
+    }
+
     public Collection<AgentContext> getAllAgentContext() {
         return agentToContextIndex.values();
+    }
+
+    public void saveAgentInfo(AgentInfo agentInfo) {
+        agentStore.save(agentInfo);
+    }
+
+    public Optional<AgentInfo> findById(String agentId) {
+        return agentStore.findById(agentId);
     }
 }

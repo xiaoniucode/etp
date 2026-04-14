@@ -22,23 +22,23 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
-public class UidGeneratorConfig {
-    /**
-     * 生成 16位ID
-     *
-     * @return ID
-     */
-    @Bean
-    @ConditionalOnMissingBean(UidGenerator.class)
-    public UidGenerator uidGenerator(WorkerNodeRepository workerNodeRepository) {
-        DefaultUidGenerator generator = new DefaultUidGenerator();
-        generator.setTimeBits(29);    // 时间差（秒）
-        generator.setWorkerBits(21);   // workerId
-        generator.setSeqBits(13);     // 序列号
-        generator.setEpochStr("2026-04-15");
-        generator.setWorkerIdAssigner(new DisposableWorkerIdAssigner(workerNodeRepository));
-        return generator;
-    }
-
-}
+//@Configuration
+//public class UidGeneratorConfig {
+//    /**
+//     * 生成 19位ID
+//     *
+//     * @return ID
+//     */
+//    @Bean
+//    @ConditionalOnMissingBean(UidGenerator.class)
+//    public UidGenerator uidGenerator(WorkerNodeRepository workerNodeRepository) {
+//        DefaultUidGenerator generator = new DefaultUidGenerator();
+//        generator.setTimeBits(29);
+//        generator.setWorkerBits(21);
+//        generator.setSeqBits(13);
+//        generator.setEpochStr("2026-04-14");
+//        generator.setWorkerIdAssigner(new DisposableWorkerIdAssigner(workerNodeRepository));
+//        return generator;
+//    }
+//
+//}

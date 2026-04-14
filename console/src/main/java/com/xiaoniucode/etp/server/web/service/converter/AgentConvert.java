@@ -14,20 +14,18 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service.converter;
+
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
-import com.xiaoniucode.etp.server.web.param.agent.AgentAddParam;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
-import org.mapstruct.factory.Mappers;
+
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface AgentConvert {
     @Mapping(target = "agentType", expression = "java(agent.getAgentType().getCode())")
-    @Mappings({@Mapping(target = "isOnline", ignore = true), @Mapping(target = "token", ignore = true)})
     AgentDTO toDTO(AgentDO agent);
-    
+
     List<AgentDTO> toDTOList(List<AgentDO> agents);
 }

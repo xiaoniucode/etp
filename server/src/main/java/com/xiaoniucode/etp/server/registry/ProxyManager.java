@@ -21,13 +21,13 @@ public interface ProxyManager {
 
     List<ProxyConfig> findAllHttpProxies();
 
-    public List<ProxyConfig> findByAgentId(String clientId);
+    public List<ProxyConfig> findByAgentId(String agentId);
 
     public Optional<ProxyConfig> findById(String proxyId);
 
     public Optional<ProxyConfig> findByDomain(String domain);
 
-    Optional<ProxyConfig> findByAgentIdAndName(String clientId, String proxyName);
+    Optional<ProxyConfig> findByAgentIdAndName(String agentId, String proxyName);
 
     public ProxyConfig changeStatus(String proxyId, boolean enable) throws EtpException;
 

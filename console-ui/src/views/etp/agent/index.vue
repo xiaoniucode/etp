@@ -132,7 +132,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 150,
+          width: 180,
           fixed: 'right',
           formatter: (row: ClientItem) =>
             h('div', [
@@ -143,7 +143,7 @@
               }),
               h(ArtButtonTable, {
                 type: 'delete',
-                text: '剔除',
+                text: '强制下线',
                 onClick: () => kickoutClient(row),
                 disabled: !row.isOnline
               })

@@ -105,6 +105,11 @@ public class DefaultUidGenerator implements UidGenerator, InitializingBean {
     }
 
     @Override
+    public String getUIDAsString() throws UidGenerateException {
+        return String.valueOf(getUID());
+    }
+
+    @Override
     public String parseUID(long uid) {
         long totalBits = BitsAllocator.TOTAL_BITS;
         long signBits = bitsAllocator.getSignBits();

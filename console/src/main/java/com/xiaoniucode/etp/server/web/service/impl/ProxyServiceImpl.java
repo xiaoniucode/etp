@@ -236,8 +236,18 @@ public class ProxyServiceImpl implements ProxyService {
     public PageResult<HttpProxyListDTO> getHttpProxies(String keyword, int page, int size) {
         int currentPage = Math.max(0, page - 1);
         Pageable pageable = PageRequest.of(currentPage, size);
-        String kw = StringUtils.hasText(keyword) ? "%" + keyword.trim() + "%" : null;
-        Page<Object[]> resultPage = proxyRepository.findProxiesWithAssociations(kw, ProtocolType.HTTP, pageable);
+
+        String queryKey = null;
+        if (StringUtils.hasText(keyword)) {
+            if (keyword.matches("\\d{19}")) {
+                queryKey = keyword.trim();
+            }
+            else {
+                queryKey = "%" + keyword.trim() + "%";
+            }
+        }
+
+        Page<Object[]> resultPage = proxyRepository.findProxiesWithAssociations(queryKey, ProtocolType.HTTP, pageable);
 
         if (resultPage.isEmpty()) {
             return PageResult.empty(page, size);
@@ -483,8 +493,16 @@ public class ProxyServiceImpl implements ProxyService {
     public PageResult<TcpProxyListDTO> getTcpProxies(String keyword, int page, int size) {
         int currentPage = Math.max(0, page - 1);
         Pageable pageable = PageRequest.of(currentPage, size);
-        String kw = StringUtils.hasText(keyword) ? "%" + keyword.trim() + "%" : null;
-        Page<Object[]> resultPage = proxyRepository.findProxiesWithAssociations(kw, ProtocolType.TCP, pageable);
+        String queryKey = null;
+        if (StringUtils.hasText(keyword)) {
+            if (keyword.matches("\\d{19}")) {
+                queryKey = keyword.trim();
+            }
+            else {
+                queryKey = "%" + keyword.trim() + "%";
+            }
+        }
+        Page<Object[]> resultPage = proxyRepository.findProxiesWithAssociations(queryKey, ProtocolType.TCP, pageable);
         if (resultPage.isEmpty()) {
             return PageResult.empty(page, size);
         }

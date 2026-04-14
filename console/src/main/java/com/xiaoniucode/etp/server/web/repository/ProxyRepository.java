@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,20 +17,23 @@ import java.util.Optional;
  * 代理 Repository
  */
 @Repository
-public interface ProxyRepository extends JpaRepository<ProxyDO, String> {
+public interface ProxyRepository extends JpaRepository<ProxyDO, String> , JpaSpecificationExecutor<ProxyDO> {
     boolean existsByAgentIdAndName(String agentId, String name);
 
     boolean existsByAgentIdAndNameAndIdNot(String agentId, String name, String id);
 
     @Query("""
-                SELECT p, a
-                FROM ProxyDO p
-                LEFT JOIN AgentDO a ON a.id = p.agentId
-                WHERE (:keyword IS NULL OR
-                       p.name LIKE :keyword OR
-                       p.agentId LIKE :keyword)
-                  AND p.protocol = :protocolType
-                ORDER BY p.updatedAt DESC
+            SELECT p, a
+            FROM ProxyDO p
+            LEFT JOIN AgentDO a ON a.id = p.agentId
+            WHERE p.protocol = :protocolType
+              AND (
+                :keyword IS NULL
+                OR p.id = :keyword
+                OR LOWER(p.name) LIKE LOWER(:keyword)
+                OR p.agentId = :keyword
+              )
+            ORDER BY p.updatedAt DESC
             """)
     Page<Object[]> findProxiesWithAssociations(
             @Param("keyword") String keyword,

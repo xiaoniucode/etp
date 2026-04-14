@@ -24,10 +24,10 @@ public interface AgentService {
     /**
      * 根据 ID 查询客户端
      */
-    AgentDTO findById(String clientId);
+    AgentDTO findById(String agentId);
     /**
      * 剔除在线客户端
      */
-    void kickout(String clientId);
+    void kickout(String agentId);
     List<AgentDTO> findAll();
 }

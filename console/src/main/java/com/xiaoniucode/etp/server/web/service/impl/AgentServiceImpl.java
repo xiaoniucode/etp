@@ -15,12 +15,15 @@
  */
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
 import com.xiaoniucode.etp.server.web.repository.AgentRepository;
 import com.xiaoniucode.etp.server.web.service.AgentService;
 import com.xiaoniucode.etp.server.web.service.converter.AgentConvert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,10 +34,13 @@ import java.util.List;
 
 @Service
 public class AgentServiceImpl implements AgentService {
+    private final Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
     @Autowired
     private AgentRepository agentRepository;
     @Autowired
     private AgentConvert agentConvert;
+    @Autowired
+    private AgentManager agentManager;
 
     @Override
     public List<AgentDTO> findAll(String keyword, int page, int size) {
@@ -47,10 +53,7 @@ public class AgentServiceImpl implements AgentService {
         }
         List<AgentDO> agents = agentPage.getContent();
         List<AgentDTO> agentDTOList = agentConvert.toDTOList(agents);
-        agentDTOList.forEach(dto -> {
-            //todo 获取在线状态
-            dto.setIsOnline(false);
-        });
+        agentDTOList.forEach(dto -> dto.setIsOnline(agentManager.isOnline(dto.getId())));
         return agentDTOList;
     }
 
@@ -64,7 +67,8 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public void kickout(String agentId) {
-        
+        logger.debug("强制客户端下线：{}", agentId);
+        agentManager.kickout(agentId);
     }
 
     @Override

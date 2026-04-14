@@ -14,13 +14,16 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.entity;
+
 import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.server.web.entity.converter.AgentTypeConverter;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
+
 /**
  * 代理节点实体类
  */
@@ -29,7 +32,7 @@ import java.time.LocalDateTime;
 @Table(name = "agent")
 public class AgentDO {
     /**
-     * 代理节点ID
+     * agentId
      */
     @Id
     @Column(name = "id", nullable = false)
@@ -65,6 +68,9 @@ public class AgentDO {
      */
     @Column(name = "version", nullable = false)
     private String version;
+
+    @Column(name = "last_active_time",nullable = false)
+    private LocalDateTime lastActiveTime;
     /**
      * 创建时间
      */

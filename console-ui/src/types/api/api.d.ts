@@ -148,6 +148,7 @@ declare namespace Api {
       agentType: number
       createdAt: string
       updatedAt: string
+      lastActiveTime: string
     }
 
     /** 客户端搜索参数 */

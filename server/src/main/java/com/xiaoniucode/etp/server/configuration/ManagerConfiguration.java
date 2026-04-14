@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.configuration;
 
+import com.baidu.fsg.uid.UidGenerator;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.PortPolicyConfig;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
@@ -27,8 +28,8 @@ public class ManagerConfiguration {
     @Bean
     public ProxyManager proxyManager(MetricsCollector metricsCollector, ConfigRegistrarFactory configRegistrarFactory,
                                      DomainStore domainStore,
-                                     ConfigChangeDetector configChangeDetector, ProxyStore proxyStore, UUIDGenerator uuidGenerator) {
-        return new DefaultProxyManager(metricsCollector,proxyStore, domainStore, configChangeDetector, configRegistrarFactory,uuidGenerator);
+                                     ConfigChangeDetector configChangeDetector, ProxyStore proxyStore, UidGenerator uidGenerator) {
+        return new DefaultProxyManager(metricsCollector, proxyStore, domainStore, configChangeDetector, configRegistrarFactory, uidGenerator);
     }
 
     @Bean

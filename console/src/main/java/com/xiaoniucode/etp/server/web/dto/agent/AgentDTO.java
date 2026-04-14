@@ -31,6 +31,7 @@ public class AgentDTO implements Serializable {
     private String arch;
     private String version;
     private Integer agentType;
+    private LocalDateTime lastActiveTime;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

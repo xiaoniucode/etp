@@ -27,5 +27,5 @@ public interface ProxyStore {
 
     boolean existsById(String proxyId);
 
-    ProxyConfig findByAgentIdAndName(String clientId, String proxyName);
+    ProxyConfig findByAgentIdAndName(String agentId, String proxyName);
 }
