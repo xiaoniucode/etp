@@ -103,7 +103,7 @@ public final class TunnelClient implements Lifecycle {
                                 .addLast(loggingHandler)
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                 .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER,new ControlIdleCheckHandler(agentContext,60,0,0, TimeUnit.SECONDS))
-                                .addLast(new HeartbeatHandler(10))
+                                .addLast(new HeartbeatHandler(60))
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);
                     }
                 });

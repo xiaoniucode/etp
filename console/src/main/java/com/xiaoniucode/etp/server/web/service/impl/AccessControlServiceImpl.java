@@ -16,6 +16,8 @@
 
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.core.domain.AccessControlConfig;
+import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;
 import com.xiaoniucode.etp.server.web.entity.AccessControlDO;
@@ -27,6 +29,7 @@ import com.xiaoniucode.etp.server.web.repository.AccessControlRepository;
 import com.xiaoniucode.etp.server.web.repository.AccessControlRuleRepository;
 import com.xiaoniucode.etp.server.web.service.AccessControlService;
 import com.xiaoniucode.etp.server.web.service.converter.AccessControlConvert;
+import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +44,10 @@ public class AccessControlServiceImpl implements AccessControlService {
     private AccessControlRuleRepository accessControlRuleRepository;
     @Autowired
     private AccessControlConvert accessControlConvert;
+    @Autowired
+    private ProxyManager proxyManager;
+    @Autowired
+    private TransactionHelper transactionHelper;
 
     @Override
     public AccessControlDetailDTO getByProxyId(String proxyId) {
@@ -58,6 +65,15 @@ public class AccessControlServiceImpl implements AccessControlService {
                 .orElseThrow(() -> new BizException("访问控制配置不存在"));
         accessControlConvert.updateDO(accessControlDO, param);
         accessControlRepository.save(accessControlDO);
+        //数据库事务提交以后更新缓存
+        transactionHelper.afterCommit(() -> {
+            proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
+                AccessControlConfig accessControl = proxyConfig.getOrCreateAccessControlConfig();
+                accessControl.setMode(accessControlDO.getMode());
+                accessControl.setEnabled(accessControlDO.getEnabled());
+                proxyConfig.setAccessControl(accessControl);
+            });
+        });
     }
 
     @Override
@@ -69,7 +85,7 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addRule(AccessControlRuleAddParam param) {
-        AccessControlDO accessControlDO = accessControlRepository.findById(param.getProxyId()).orElseThrow(()
+        accessControlRepository.findById(param.getProxyId()).orElseThrow(()
                 -> new BizException("访问控制配置不出在"));
         AccessControlRuleDO accessControlRuleDO = accessControlConvert.toRuleDO(param);
         accessControlRuleRepository.save(accessControlRuleDO);

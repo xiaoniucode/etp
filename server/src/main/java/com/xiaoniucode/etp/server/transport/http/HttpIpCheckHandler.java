@@ -9,9 +9,11 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @ChannelHandler.Sharable
 public class HttpIpCheckHandler extends IpCheckHandler {
@@ -26,13 +28,10 @@ public class HttpIpCheckHandler extends IpCheckHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        logger.debug("IP访问控制检查");
         Channel visitor = ctx.channel();
         String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
-        proxyManager.findByDomain(domain).ifPresent(config->{
-            String proxyId = config.getProxyId();
-            doCheckAccess(visitor, proxyId);
-        });
-
+        proxyManager.findByDomain(domain).ifPresent(config-> doCheckAccess(visitor, config));
         ctx.fireChannelRead(msg);
     }
 }

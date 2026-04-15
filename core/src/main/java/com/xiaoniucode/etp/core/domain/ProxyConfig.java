@@ -188,6 +188,13 @@ public class ProxyConfig {
         return addedCount;
     }
 
+    public AccessControlConfig getOrCreateAccessControlConfig() {
+        if (accessControl == null) {
+            return new AccessControlConfig();
+        }
+        return accessControl;
+    }
+
     public boolean isMuxTunnel() {
         return transport != null && transport.getMultiplex();
     }

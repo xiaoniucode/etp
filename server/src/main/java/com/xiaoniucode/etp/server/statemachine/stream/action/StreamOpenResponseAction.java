@@ -51,6 +51,11 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             context.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
+        if (!tunnelEntry.isActive()){
+            logger.warn("连接不可用 {} 关闭流",tunnelEntry.getTunnelId());
+            context.fireEvent(StreamEvent.STREAM_CLOSE);
+            return;
+        }
         context.setTunnelEntry(tunnelEntry);
         Channel visitor = context.getVisitor();
         TunnelBridge tunnelBridge;

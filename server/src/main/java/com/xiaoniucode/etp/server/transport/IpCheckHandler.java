@@ -1,5 +1,8 @@
 package com.xiaoniucode.etp.server.transport;
 
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
 import io.netty.channel.Channel;
@@ -45,12 +48,17 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
         return sa.getPort();
     }
 
-    protected void doCheckAccess(Channel visitor, String proxyId) {
+    protected void doCheckAccess(Channel visitor, ProxyConfig proxyConfig) {
         String visitorIp = getVisitorIp(visitor);
-        boolean checkAccess = ipAccessChecker.checkAccess(proxyId, visitorIp);
+        boolean checkAccess = ipAccessChecker.checkAccess(proxyConfig, visitorIp);
         if (!checkAccess) {
-            logger.debug("来源IP {} 无访问权限",visitorIp);
-            NettyHttpUtils.sendHttp403(visitor);
+            logger.debug("来源IP {} 无访问权限", visitorIp);
+            ProtocolType protocol = proxyConfig.getProtocol();
+            if (protocol.isHttp()) {
+                NettyHttpUtils.sendHttp403(visitor);
+            } else if (protocol.isTcp()){
+                ChannelUtils.closeOnFlush(visitor);
+            }
         }
     }
 }

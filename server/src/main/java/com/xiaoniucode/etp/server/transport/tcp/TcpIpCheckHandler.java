@@ -30,17 +30,15 @@ public class TcpIpCheckHandler extends IpCheckHandler {
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
+        logger.debug("IP访问控制检查");
         Channel visitor = ctx.channel();
         int remotePort = getListenerPort(visitor);
         Optional<ProxyConfig> opt = proxyManager.findByRemotePort(remotePort);
-        if (opt.isEmpty()) {
-            visitor.close();
+        if (opt.isPresent()) {
+            doCheckAccess(visitor, opt.get());
             return;
         }
-        ProxyConfig config = opt.get();
-        doCheckAccess(visitor, config.getProxyId());
-        //检查通过，继续传播
-        super.channelActive(ctx);
+        ctx.fireChannelActive();
     }
 }

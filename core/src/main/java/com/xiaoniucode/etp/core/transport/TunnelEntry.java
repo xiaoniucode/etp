@@ -23,15 +23,19 @@ import lombok.Setter;
 @Setter
 public class TunnelEntry {
     private String tunnelId;
-    private boolean active=false;
+    private boolean active;
     private boolean encrypt;
     private Channel channel;
     private NettyBatchWriteQueue writeQueue;
 
-    public TunnelEntry(String tunnelId,boolean encrypt, Channel channel, NettyBatchWriteQueue writeQueue) {
-        this.tunnelId=tunnelId;
+    public TunnelEntry(String tunnelId, boolean encrypt, Channel channel, NettyBatchWriteQueue writeQueue) {
+        this.tunnelId = tunnelId;
         this.channel = channel;
-        this.encrypt=encrypt;
-        this.writeQueue=writeQueue;
+        this.encrypt = encrypt;
+        this.writeQueue = writeQueue;
+    }
+
+    public boolean isActive() {
+        return channel != null && channel.isActive();
     }
 }

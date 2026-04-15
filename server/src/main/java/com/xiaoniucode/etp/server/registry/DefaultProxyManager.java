@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
+import com.xiaoniucode.etp.server.security.IpAccessChecker;
 import com.xiaoniucode.etp.server.store.DomainStore;
 import com.xiaoniucode.etp.server.store.ProxyStore;
 import com.xiaoniucode.etp.server.vhost.DomainBinding;
@@ -22,16 +23,17 @@ public class DefaultProxyManager implements ProxyManager {
     private final ConfigChangeDetector configChangeDetector;
     private final DomainStore domainStore;
     private final MetricsCollector metricsCollector;
+    private final IpAccessChecker ipAccessChecker;
 
     public DefaultProxyManager(MetricsCollector metricsCollector, ProxyStore proxyStore,
                                DomainStore domainStore, ConfigChangeDetector configChangeDetector,
-                               ConfigRegistrarFactory configRegistrarFactory) {
+                               ConfigRegistrarFactory configRegistrarFactory, IpAccessChecker ipAccessChecker) {
         this.metricsCollector = metricsCollector;
         this.proxyStore = proxyStore;
         this.domainStore = domainStore;
         this.configRegistrarFactory = configRegistrarFactory;
         this.configChangeDetector = configChangeDetector;
-
+        this.ipAccessChecker = ipAccessChecker;
     }
 
     /**
@@ -93,6 +95,8 @@ public class DefaultProxyManager implements ProxyManager {
         if (opt.isPresent()) {
             ProxyConfig proxyConfig = opt.get();
             ConfigRegistrar delegate = configRegistrarFactory.getRegistrar(proxyConfig);
+            //删除IP访问控制
+            ipAccessChecker.remove(proxyId);
             //释放代理相关资源信息
             delegate.unregister(proxyConfig);
             //删除代理流量统计记录
@@ -109,7 +113,7 @@ public class DefaultProxyManager implements ProxyManager {
     public synchronized void clearByAgentId(String agentId) {
         List<ProxyConfig> configs = proxyStore.findByAgentId(agentId);
         for (ProxyConfig config : configs) {
-          remove(config.getProxyId());
+            remove(config.getProxyId());
         }
     }
 

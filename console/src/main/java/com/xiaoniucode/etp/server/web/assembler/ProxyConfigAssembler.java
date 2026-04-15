@@ -58,7 +58,6 @@ public class ProxyConfigAssembler {
         // 转换路由配置
         DomainType domainType = DomainType.fromCode(param.getDomainType());
         setRouteConfig(proxyConfig, domainType, param.getDomains());
-
         return proxyConfig;
     }
 
@@ -107,7 +106,6 @@ public class ProxyConfigAssembler {
         // 转换路由配置
         DomainType domainType = DomainType.fromCode(param.getDomainType());
         setRouteConfig(proxyConfig, domainType, param.getDomains());
-
         return proxyConfig;
     }
 

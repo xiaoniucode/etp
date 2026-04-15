@@ -70,6 +70,9 @@ public class CreateConnAction extends AgentBaseAction {
         if (tunnelId == null) {
             throw new IllegalArgumentException("tunnelId 不能为空");
         }
+        if (!tunnel.isActive()){
+            throw new IllegalArgumentException("连接不可用，连接池创建失败");
+        }
         logger.debug("创建隧道 客户端ID={} 隧道ID={} 加密={} 多路复用={}", agentId, tunnelId, isEncrypt, isMultiplex);
         NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
         TunnelEntry poolEntry = new TunnelEntry(tunnelId, isEncrypt, tunnel, writeQueue);

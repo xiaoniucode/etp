@@ -33,7 +33,7 @@ public class CIDRMatcher {
         Set<String> targetList = isAllowMode ? allowList : denyList;
         if (targetList != null) {
             for (String cidr : targetList) {
-                // 忽略空字符串和无效 CIDR，保证构建过程健壮
+                // 忽略空字符串和无效 CIDR
                 if (cidr == null || cidr.trim().isEmpty()) {
                     continue;
                 }

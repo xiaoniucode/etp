@@ -19,12 +19,9 @@ import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.ip.cidr.CIDRMatcher;
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
-import com.xiaoniucode.etp.server.registry.ProxyManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,18 +31,12 @@ public class IpAccessChecker {
      * proxyId --> CIDRMatcher
      */
     private final Map<String, CIDRMatcher> matcherMap = new ConcurrentHashMap<>();
-    @Autowired
-    private ProxyManager proxyManager;
 
-    public boolean checkAccess(String proxyId, String visitorIp) {
-        if (proxyId == null || visitorIp == null) {
-            return true;
+    public boolean checkAccess(ProxyConfig proxyConfig, String visitorIp) {
+        if (proxyConfig == null || visitorIp == null) {
+            return false;
         }
-        Optional<ProxyConfig> opt = proxyManager.findById(proxyId);
-          if (opt.isEmpty()){
-              return false;
-          }
-        ProxyConfig proxyConfig = opt.get();
+        String proxyId = proxyConfig.getProxyId();
         AccessControlConfig accessControl = proxyConfig.getAccessControl();
         if (accessControl == null || !accessControl.isEnabled()) {
             matcherMap.remove(proxyId);
