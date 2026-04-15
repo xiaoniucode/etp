@@ -18,10 +18,17 @@ import io.netty.channel.Channel;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AuthSuccessAction extends AgentBaseAction {
+    private final AtomicBoolean init = new AtomicBoolean(false);
+
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
+        if (init.get()) {
+            return;
+        }
+        init.set(true);
         AppConfig configs = ConfigUtils.getConfig();
         List<ProxyConfig> proxies = configs.getProxies();
         Channel control = context.getControl();
@@ -62,7 +69,7 @@ public class AuthSuccessAction extends AgentBaseAction {
 
         switch (protocol) {
             case TCP:
-                if (config.getRemotePort()!=null){
+                if (config.getRemotePort() != null) {
                     newProxyBuilder.setRemotePort(config.getRemotePort());
                 }
                 break;

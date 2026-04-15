@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
 import com.xiaoniucode.etp.client.manager.AgentIdentity;
 import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.client.transport.ControlIdleCheckHandler;
+import com.xiaoniucode.etp.client.transport.HeartbeatHandler;
 import com.xiaoniucode.etp.client.transport.RealServerHandler;
 import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
 import com.xiaoniucode.etp.client.manager.EventBusManager;
@@ -26,6 +27,8 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 代理客户端服务容器
@@ -97,9 +100,10 @@ public final class TunnelClient implements Lifecycle {
                             sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
                         }
                         sc.pipeline()
-                                .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER,new ControlIdleCheckHandler(agentContext))
                                 .addLast(loggingHandler)
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
+                                .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER,new ControlIdleCheckHandler(agentContext,60,0,0, TimeUnit.SECONDS))
+                                .addLast(new HeartbeatHandler(10))
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);
                     }
                 });

@@ -1,15 +1,11 @@
 package com.xiaoniucode.etp.server.transport.bridge;
 
-import com.xiaoniucode.etp.core.transport.IntSet;
-import com.xiaoniucode.etp.core.transport.NettyConstants;
-import com.xiaoniucode.etp.core.transport.PipelineConfigure;
-import com.xiaoniucode.etp.core.transport.TunnelBridge;
+import com.xiaoniucode.etp.core.transport.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
-import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -31,7 +27,9 @@ public class DirectTunnelBridge implements TunnelBridge {
     public void open() {
         ChannelPipeline pipeline = tunnel.pipeline();
         PipelineConfigure.removeControlHandler(tunnel);
-        PipelineConfigure.addDataIdleCheckHandler(tunnel);
+        if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER) == null) {
+            pipeline.addLast(NettyConstants.IDLE_CHECK_HANDLER,new IdleCheckHandler());
+        }
         pipeline.addLast(new SimpleChannelInboundHandler<ByteBuf>() {
 
             @Override

@@ -15,9 +15,9 @@
  */
 package com.xiaoniucode.etp.client.transport;
 
-import com.xiaoniucode.etp.core.message.TMSP;
-import com.xiaoniucode.etp.core.message.TMSPFrame;
-import com.xiaoniucode.etp.core.transport.AbstractAgentContext;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -30,25 +30,23 @@ import java.util.concurrent.TimeUnit;
 public class ControlIdleCheckHandler extends IdleStateHandler {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(ControlIdleCheckHandler.class);
     private static final int MAX_MISSED = 3;
-    private final AbstractAgentContext context;
+    private final AgentContext context;
 
-    public ControlIdleCheckHandler(AbstractAgentContext context) {
-        super(150, 30, 0, TimeUnit.SECONDS);
+    public ControlIdleCheckHandler(AgentContext context, long readerIdleTime, long writerIdleTime, long allIdleTime,
+                                   TimeUnit unit) {
+        super(readerIdleTime, writerIdleTime, allIdleTime, unit);
         this.context = context;
     }
 
     @Override
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) {
-        if (evt.state() == IdleState.WRITER_IDLE) {
-            ctx.writeAndFlush(new TMSPFrame(0, TMSP.MSG_PING));
-            logger.debug("客户端发送 PING");
-        } else if (evt.state() == IdleState.READER_IDLE) {
+        if (evt.state() == IdleState.READER_IDLE) {
             int missed = context.getMissedHeartbeats().incrementAndGet();
-
             if (missed >= MAX_MISSED) {
                 logger.warn("客户端控制连接检测到连续 {} 次读超时，准备关闭并重连", missed);
                 context.getMissedHeartbeats().set(0);
-                ctx.close();
+                ChannelUtils.closeOnFlush(ctx.channel());
+                context.fireEvent(AgentEvent.DISCONNECT);
             } else {
                 logger.debug("客户端控制连接读空闲第 {} 次（容忍中）", missed);
             }

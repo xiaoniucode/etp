@@ -194,8 +194,8 @@ public class ProxyConfigAssembler {
      * 设置路由配置
      */
     private void setRouteConfig(ProxyConfig proxyConfig, DomainType domainType, Set<String> domains) {
+        RouteConfig routeConfig = new RouteConfig();
         if (domains != null && !domains.isEmpty()) {
-            RouteConfig routeConfig = new RouteConfig();
             if (domainType == DomainType.AUTO) {
                 routeConfig.setAutoDomain(true);
             } else if (domainType == DomainType.CUSTOM_DOMAIN) {
@@ -203,7 +203,7 @@ public class ProxyConfigAssembler {
             } else if (domainType == DomainType.SUBDOMAIN) {
                 routeConfig.getSubDomains().addAll(domains);
             }
-            proxyConfig.setRouteConfig(routeConfig);
         }
+        proxyConfig.setRouteConfig(routeConfig);
     }
 }

@@ -14,28 +14,41 @@
         </ElButton>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-8">
-        <div class="art-card-sm p-5 text-center">
-          <h3 class="text-sm font-medium m-0 mb-2 text-g-500">活动连接数</h3>
-          <div class="text-2xl font-semibold text-g-900">{{ metricsData.activeChannels || 0 }}</div>
-        </div>
-        <div class="art-card-sm p-5 text-center">
-          <h3 class="text-sm font-medium m-0 mb-2 text-g-500">上行流量</h3>
-          <div class="text-2xl font-semibold text-g-900">{{ ByteUtils.formatBytes(metricsData.readBytes || 0) }}</div>
-        </div>
-        <div class="art-card-sm p-5 text-center">
-          <h3 class="text-sm font-medium m-0 mb-2 text-g-500">下行流量</h3>
-          <div class="text-2xl font-semibold text-g-900">{{ ByteUtils.formatBytes(metricsData.writeBytes || 0) }}</div>
-        </div>
-        <div class="art-card-sm p-5 text-center">
-          <h3 class="text-sm font-medium m-0 mb-2 text-g-500">上行速率</h3>
-          <div class="text-2xl font-semibold text-g-900">{{ ByteUtils.formatBytes(parseFloat((metricsData.readRate || 0).toFixed(2))) }}/s</div>
-        </div>
-        <div class="art-card-sm p-5 text-center">
-          <h3 class="text-sm font-medium m-0 mb-2 text-g-500">下行速率</h3>
-          <div class="text-2xl font-semibold text-g-900"
-            >{{ ByteUtils.formatBytes(parseFloat((metricsData.writeRate || 0).toFixed(2))) }}/s</div
-          >
-        </div>
+        <ArtStatsCard
+          title="活动连接数"
+          :count="metricsData.activeChannels || 0"
+          description="当前活跃连接"
+          icon="ic:baseline-connect-without-contact"
+          iconStyle="bg-blue-500"
+        />
+        <ArtStatsCard
+          title="上行流量"
+          :count="metricsData.readBytes || 0"
+          :description="ByteUtils.formatBytes(metricsData.readBytes || 0)"
+          icon="ri:arrow-up-line"
+          iconStyle="bg-green-500"
+        />
+        <ArtStatsCard
+          title="下行流量"
+          :count="metricsData.writeBytes || 0"
+          :description="ByteUtils.formatBytes(metricsData.writeBytes || 0)"
+          icon="ri:arrow-down-line"
+          iconStyle="bg-orange-500"
+        />
+        <ArtStatsCard
+          title="上行速率"
+          :count="parseFloat((metricsData.readRate || 0).toFixed(2))"
+          :description="ByteUtils.formatBytes(parseFloat((metricsData.readRate || 0).toFixed(2))) + '/s'"
+          icon="ri:arrow-up-circle-line"
+          iconStyle="bg-indigo-500"
+        />
+        <ArtStatsCard
+          title="下行速率"
+          :count="parseFloat((metricsData.writeRate || 0).toFixed(2))"
+          :description="ByteUtils.formatBytes(parseFloat((metricsData.writeRate || 0).toFixed(2))) + '/s'"
+          icon="ri:arrow-down-circle-line"
+          iconStyle="bg-purple-500"
+        />
       </div>
       <div class="pt-5">
         <div class="flex gap-5 mb-5">
@@ -79,9 +92,10 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import ArtHBarChart from '@/components/core/charts/art-h-bar-chart/index.vue'
   import ArtRingChart from '@/components/core/charts/art-ring-chart/index.vue'
+  import ArtStatsCard from '@/components/core/cards/art-stats-card/index.vue'
   import { fetchGetMetrics } from '@/api/metrics'
   import { ByteUtils } from '@/utils/format/byteFormatter'
   import { ElButton, ElIcon } from 'element-plus'

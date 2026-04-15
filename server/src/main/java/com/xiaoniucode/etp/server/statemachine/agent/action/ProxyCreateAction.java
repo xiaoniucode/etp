@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
+import com.baidu.fsg.uid.UidGenerator;
 import com.google.protobuf.ProtocolStringList;
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.*;
@@ -38,7 +39,8 @@ public class ProxyCreateAction extends AgentBaseAction {
     private DomainManager domainManager;
     @Resource
     private AppConfig appConfig;
-
+    @Autowired
+    private UidGenerator uidGenerator;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -49,6 +51,7 @@ public class ProxyCreateAction extends AgentBaseAction {
             ProxyConfig config = buildProxyConfig(proxy);
             logger.debug("{}", config);
             config.setAgentId(agentId);
+            config.setProxyId(uidGenerator.getUIDAsString());
             config.setAgentType(context.getAgentInfo().getAgentType());
 
             ProxyConfig register = proxyManager.register(config);
@@ -56,10 +59,10 @@ public class ProxyCreateAction extends AgentBaseAction {
             ByteBuf payload = ProtobufUtil.toByteBuf(newProxyResp, control.alloc());
             TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, payload);
             control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
-                if (future.isSuccess()){
-                    logger.debug("代理配置 {} 创建结果发送成功",register.getName());
-                }else {
-                    logger.error("代理配置 {} 创建失败",register.getName(),future.cause());
+                if (future.isSuccess()) {
+                    logger.debug("代理配置 {} 创建结果发送成功", register.getName());
+                } else {
+                    logger.error("代理配置 {} 创建失败", register.getName(), future.cause());
                 }
             });
             context.fireEvent(AgentEvent.REBUILD_CONTEXT);

@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.stream.action;
 
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
@@ -37,6 +38,10 @@ public class StreamCloseAction extends StreamBaseAction {
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         int streamId = context.getStreamId();
         Channel visitor = context.getVisitor();
+        ProxyConfig proxyConfig = context.getProxyConfig();
+        if (proxyConfig!=null){
+            streamManager.decrementStreamCount(proxyConfig.getProxyId());
+        }
         leastConnHooks.onStreamClosed(context);
         metricsCollector.onChannelInactive(context.getProxyId());
 
@@ -53,9 +58,6 @@ public class StreamCloseAction extends StreamBaseAction {
             logger.debug("回收客户端 {} 独立连接 {}", agentInfo.getAgentId(), tunnelEntry.getTunnelId());
             directPool.release(agentInfo.getAgentId(), tunnelEntry);
         }
-
-        streamManager.decrementStreamCount(context.getProxyConfig().getProxyId());
-
         streamManager.removeStreamContext(streamId);
         if (agentContext != null) {
             Channel control = agentContext.getControl();

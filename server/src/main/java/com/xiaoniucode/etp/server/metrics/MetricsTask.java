@@ -25,28 +25,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class MetricsTask {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(MetricsTask.class);
-    
+
     @Autowired
     private MetricsCollector metricsCollector;
 
-    /**
-     * 快照任务，每分钟执行一次
-     */
-   // todo @Scheduled(fixedRate = 60000)
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 1000)
     public void snapshot() {
-        logger.debug("执行流量指标快照任务");
+        if (logger.isTraceEnabled()) {
+            logger.trace("metrics snapshot tick");
+        }
         metricsCollector.takeAllSnapshots();
-        logger.debug("流量指标快照任务执行完成");
     }
 
     /**
-     * 清理任务，每5分钟执行一次
+     * 清理任务，每天凌晨 0 点执行一次
+     * 将当天的所有流量统计指标清理掉
      */
-    @Scheduled(fixedRate = 300000)
-    public void cleanup() {
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void clearDailyTrafficMetrics() {
         logger.debug("执行流量指标清理任务");
-        metricsCollector.cleanupInactive(30);
-        logger.debug("流量指标清理任务执行完成");
+        metricsCollector.cleanupInactive();
+        logger.debug("今日流量指标清理任务执行完成");
     }
 }

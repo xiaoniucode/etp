@@ -15,8 +15,7 @@
  */
 package com.xiaoniucode.etp.core.transport;
 
-import com.xiaoniucode.etp.core.message.TMSP;
-import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -34,22 +33,22 @@ import java.util.concurrent.TimeUnit;
 public class IdleCheckHandler extends IdleStateHandler {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(IdleCheckHandler.class);
 
-    public IdleCheckHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
-        super(readerIdleTime, writerIdleTime, allIdleTime, unit);
+    public IdleCheckHandler() {
+        super(90, 60, 0, TimeUnit.SECONDS);
     }
 
     @Override
-    protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
+    protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) {
         Channel channel = ctx.channel();
         switch (evt.state()) {
             case WRITER_IDLE:
-                channel.writeAndFlush(new TMSPFrame(0, TMSP.MSG_PING));
-                logger.debug("发送心跳包给 {}", channel.remoteAddress());
+                logger.debug("写超时，关闭连接 {}", channel.remoteAddress());
+                ChannelUtils.closeOnFlush(channel);
                 break;
 
             case READER_IDLE:
                 logger.debug("读空闲超时，关闭连接 {}", channel.remoteAddress());
-                channel.close();
+                ChannelUtils.closeOnFlush(channel);
                 break;
         }
         ctx.fireUserEventTriggered(evt);

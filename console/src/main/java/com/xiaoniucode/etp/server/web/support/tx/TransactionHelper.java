@@ -43,6 +43,7 @@ public class TransactionHelper {
                     @Override
                     public void afterCommit() {
                         try {
+                            logger.debug("数据库事务执行成功，开始执行异步任务");
                             task.run();
                         } catch (Exception e) {
                             logger.error("afterCommit 任务错误", e);
@@ -53,6 +54,28 @@ public class TransactionHelper {
                     public void afterCompletion(int status) {
                         if (status == STATUS_ROLLED_BACK) {
                             logger.debug("事务回滚，提交任务后跳过");
+                        }
+                    }
+                }
+        );
+    }
+
+
+    /**
+     * 事务回滚时执行异步任务
+     */
+    public void afterRollback(Runnable task) {
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCompletion(int status) {
+                        if (status == STATUS_ROLLED_BACK) {
+                            try {
+                                logger.debug("数据库事务执行失败，开始执行异步任务");
+                                task.run();
+                            } catch (Exception e) {
+                                logger.error("afterRollback 任务错误", e);
+                            }
                         }
                     }
                 }

@@ -31,25 +31,4 @@ public class PipelineConfigure {
             pipeline.remove(NettyConstants.CONTROL_IDLE_CHECK_HANDLER);
         }
     }
-
-    public static void addDataIdleCheckHandler(Channel channel) {
-        addDataIdleCheckHandler(channel, 90, 60, TimeUnit.SECONDS);
-    }
-
-    public static void addDataIdleCheckHandler(Channel channel, int readerIdle, int writerIdle, TimeUnit timeUnit) {
-        if (channel == null || !channel.isActive()) {
-            return;
-        }
-
-        ChannelPipeline pipeline = channel.pipeline();
-        if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER) == null) {
-            IdleStateHandler idleHandler = new IdleStateHandler(
-                    readerIdle,
-                    writerIdle,
-                    0,
-                    timeUnit
-            );
-            pipeline.addFirst(NettyConstants.IDLE_CHECK_HANDLER, idleHandler);
-        }
-    }
 }

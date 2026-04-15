@@ -16,6 +16,8 @@
 
 package com.xiaoniucode.etp.server.statemachine.agent;
 
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -25,21 +27,26 @@ import java.time.temporal.ChronoUnit;
 
 @Component
 public class AgentContextCleanupTask {
-
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(AgentContextCleanupTask.class);
     @Autowired
     private AgentManager agentManager;
 
-    @Scheduled(fixedDelay = 30000)
+    /**
+     * 任务3分钟执行一次
+     * 如果连接断开两分钟没有重连成功，则直接执行Goaway状态机事件清理所有资源
+     */
+    @Scheduled(fixedDelay = 180_000)
     public void cleanupInactiveContexts() {
         LocalDateTime now = LocalDateTime.now();
+        int total = 0;
+        int cleaned = 0;
         for (AgentContext context : agentManager.getAllAgentContext()) {
-            //todo 待完善
-            if (ChronoUnit.MINUTES.between(context.getLastActiveTime(), now) >= 1) {
-                agentManager.removeAgentContext(context.getAgentInfo().getAgentId());
-                if (context.getControl() != null) {
-                    context.getControl().close();
-                }
+            total++;
+            if (context.getState() == AgentState.DISCONNECTED && ChronoUnit.MINUTES.between(context.getLastActiveTime(), now) >= 2) {
+                cleaned++;
+                context.fireEvent(AgentEvent.GOAWAY);
             }
         }
+        logger.debug("AgentContext cleanup executed: total={}, cleaned={}", total, cleaned);
     }
 }

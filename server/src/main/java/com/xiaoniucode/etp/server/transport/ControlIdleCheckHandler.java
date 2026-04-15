@@ -15,6 +15,8 @@
  */
 package com.xiaoniucode.etp.server.transport;
 
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,8 +33,8 @@ public class ControlIdleCheckHandler extends IdleStateHandler {
     private static final int MAX_MISSED = 3;
     private final AgentManager agentManager;
 
-    public ControlIdleCheckHandler(AgentManager agentManager) {
-        super(120, 0, 0, TimeUnit.SECONDS);
+    public ControlIdleCheckHandler(AgentManager agentManager, long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
+        super(readerIdleTime, writerIdleTime, allIdleTime, unit);
         this.agentManager = agentManager;
     }
 
@@ -43,11 +45,11 @@ public class ControlIdleCheckHandler extends IdleStateHandler {
             agentManager.getAgentContext(control).ifPresent(context -> {
                 int missed = context.getMissedHeartbeats().incrementAndGet();
                 if (missed >= MAX_MISSED) {
-                    logger.warn("服务端控制连接检测到连续 {} 次读空闲超时，关闭控制连接 {} connectionId={}",
+                    logger.warn("服务端控制连接检测到连续 {} 次读空闲超时，关闭客户端 {} connectionId={}",
                             missed, ctx.channel().remoteAddress(), context.getConnectionId());
                     context.getMissedHeartbeats().set(0);
-                    ctx.close();
-                    //
+                    ChannelUtils.closeOnFlush(control);
+                    context.fireEvent(AgentEvent.DISCONNECT);
                 } else {
                     logger.debug("服务端控制连接读空闲第 {} 次（容忍范围内）", missed);
                 }

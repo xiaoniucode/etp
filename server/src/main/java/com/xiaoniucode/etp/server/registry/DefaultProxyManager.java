@@ -1,10 +1,8 @@
 package com.xiaoniucode.etp.server.registry;
 
-import com.baidu.fsg.uid.UidGenerator;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
-import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.store.DomainStore;
 import com.xiaoniucode.etp.server.store.ProxyStore;
@@ -24,18 +22,16 @@ public class DefaultProxyManager implements ProxyManager {
     private final ConfigChangeDetector configChangeDetector;
     private final DomainStore domainStore;
     private final MetricsCollector metricsCollector;
-    private final UidGenerator uidGenerator;
 
     public DefaultProxyManager(MetricsCollector metricsCollector, ProxyStore proxyStore,
                                DomainStore domainStore, ConfigChangeDetector configChangeDetector,
-                               ConfigRegistrarFactory configRegistrarFactory,
-                               UidGenerator uidGenerator) {
+                               ConfigRegistrarFactory configRegistrarFactory) {
         this.metricsCollector = metricsCollector;
         this.proxyStore = proxyStore;
         this.domainStore = domainStore;
         this.configRegistrarFactory = configRegistrarFactory;
         this.configChangeDetector = configChangeDetector;
-        this.uidGenerator = uidGenerator;
+
     }
 
     /**
@@ -66,8 +62,6 @@ public class DefaultProxyManager implements ProxyManager {
                 return oldConfig;
             }
         } else {
-            String proxyId = uidGenerator.getUIDAsString();
-            proxyConfig.setProxyId(proxyId);
             return createProxy(proxyConfig, delegate);
         }
     }
@@ -115,10 +109,8 @@ public class DefaultProxyManager implements ProxyManager {
     public synchronized void clearByAgentId(String agentId) {
         List<ProxyConfig> configs = proxyStore.findByAgentId(agentId);
         for (ProxyConfig config : configs) {
-            String proxyId = config.getProxyId();
-            domainStore.delete(proxyId);
+          remove(config.getProxyId());
         }
-        proxyStore.deleteByAgentId(agentId);
     }
 
     @Override

@@ -26,7 +26,8 @@ public class RouteConfig {
     /**
      * 是否自动生成域名
      */
-    private Boolean autoDomain;
+    private Boolean autoDomain = true;
+
     /**
      * 是否有自定义域名
      */

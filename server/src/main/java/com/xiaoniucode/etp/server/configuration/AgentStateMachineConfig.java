@@ -122,7 +122,7 @@ public class AgentStateMachineConfig {
                 .to(AgentState.DISCONNECTED)
                 .on(AgentEvent.DISCONNECT)
                 .when(ctx -> true)
-                .perform(goawayAction);
+                .perform((from, to, event, context) -> context.setState(to));
 
         // 心跳超时
         builder.externalTransition()
@@ -138,7 +138,7 @@ public class AgentStateMachineConfig {
                 .to(AgentState.DISCONNECTED)
                 .on(AgentEvent.DISCONNECT)
                 .when(ctx -> true)
-                .perform(goawayAction);
+                .perform((from, to, event, context) -> context.setState(to));
 
         // 收到 GoAway 指令
         builder.externalTransitions()

@@ -22,6 +22,4 @@ public interface AgentStore {
     int deleteExpiredOffline(String token, long timeout, ChronoUnit unit);
 
     void updateLastActiveTime(String agentId, LocalDateTime lastActiveTime);
-
-    void updateOnlineStatus(String agentId, boolean online);
 }

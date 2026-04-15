@@ -80,7 +80,7 @@ public class InMemoryAgentStore implements AgentStore {
     }
 
     /**
-     * 删除指定 token 下过期的离线设备
+     * 删除指定 token 下过期设备
      *
      * @param token   token
      * @param timeout 超时数值
@@ -102,9 +102,7 @@ public class InMemoryAgentStore implements AgentStore {
                 String agentId = iterator.next();
                 AgentInfo agent = store.get(agentId);
 
-                if (agent != null
-                        && !Boolean.TRUE.equals(agent.getOnline())
-                        && agent.isExpired(timeout, unit)) {
+                if (agent != null && agent.isExpired(timeout, unit)) {
                     store.remove(agentId);
                     iterator.remove();
                     deletedCount++;
@@ -127,17 +125,6 @@ public class InMemoryAgentStore implements AgentStore {
         try {
             Optional.ofNullable(store.get(agentId))
                     .ifPresent(agent -> agent.setLastActiveTime(lastActiveTime));
-        } finally {
-            writeLock.unlock();
-        }
-    }
-
-    @Override
-    public void updateOnlineStatus(String agentId, boolean online) {
-        writeLock.lock();
-        try {
-            Optional.ofNullable(store.get(agentId))
-                    .ifPresent(agent -> agent.setOnline(online));
         } finally {
             writeLock.unlock();
         }

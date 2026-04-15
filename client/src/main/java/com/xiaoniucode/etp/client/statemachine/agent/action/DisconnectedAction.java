@@ -18,13 +18,13 @@ package com.xiaoniucode.etp.client.statemachine.agent.action;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 
 public class DisconnectedAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
          //前置处理
-
-
+        ChannelUtils.closeOnFlush(context.getControl());
         //重新连接
         context.fireEvent(AgentEvent.RETRY);
     }

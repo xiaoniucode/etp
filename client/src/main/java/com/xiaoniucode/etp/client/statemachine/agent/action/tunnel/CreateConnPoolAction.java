@@ -17,11 +17,11 @@ public class CreateConnPoolAction extends AgentBaseAction {
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         AppConfig config = context.getConfig();
         ConnectionConfig connectionConfig = config.getConnectionConfig();
+        boolean enabled = connectionConfig.getPoolConfig().isEnabled();
         boolean hasTls = context.getTlsContext() != null;
-        if (!connectionConfig.isEnabled()) {
+        if (!enabled) {
             return;
         }
-
         // 创建多路复用隧道
        PoolConfig.MultiplexPoolConfig multiplexPoolConfig = connectionConfig.getPoolConfig().getMultiplex();
         if (multiplexPoolConfig.isPlain()) {

@@ -54,6 +54,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
         byte msgType = frame.getMsgType();
         agentContext.updateActiveTime();
+        agentContext.getMissedHeartbeats().set(0);
         switch (msgType) {
             //********************Agent***********************//
             case TMSP.MSG_AUTH_RESP: {

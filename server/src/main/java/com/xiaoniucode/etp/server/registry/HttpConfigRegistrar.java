@@ -36,7 +36,7 @@ public class HttpConfigRegistrar implements ConfigRegistrar {
         if (routeConfig == null) {
             throw new EtpException("HTTP(s)协议必须配置域名");
         }
-        if (config.getProxyId()==null){
+        if (config.getProxyId() == null) {
             throw new EtpException("proxyId 不能为空");
         }
         if (!StringUtils.hasText(config.getName())) {
@@ -58,9 +58,10 @@ public class HttpConfigRegistrar implements ConfigRegistrar {
     @Override
     public void reregister(ProxyConfig oldConfig, ProxyConfig newConfig, Diff diff) throws EtpException {
         newConfig.setProxyId(oldConfig.getProxyId());
-        //todo 如果域名配置发生变化 重建域名
-        domainManager.unregister(oldConfig.getProxyId());
-        domainManager.register(oldConfig.getProxyId(), newConfig.getRouteConfig());
+        if (oldConfig.getRouteConfig().getDomainType() != newConfig.getRouteConfig().getDomainType()) {
+            domainManager.unregister(oldConfig.getProxyId());
+            domainManager.register(oldConfig.getProxyId(), newConfig.getRouteConfig());
+        }
     }
 
     @Override

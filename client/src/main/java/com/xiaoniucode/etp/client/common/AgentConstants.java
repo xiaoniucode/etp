@@ -14,25 +14,8 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.client.config.domain;
+package com.xiaoniucode.etp.client.common;
 
-import lombok.Data;
-
-@Data
-public class PoolConfig {
-    private boolean enabled=false;
-    private MultiplexPoolConfig multiplex = new MultiplexPoolConfig();
-    private DirectPoolConfig direct = new DirectPoolConfig();
-
-    @Data
-    public static class MultiplexPoolConfig {
-        private boolean plain;
-        private boolean encrypt;
-    }
-
-    @Data
-    public static class DirectPoolConfig {
-        private int plainCount;
-        private int encryptCount;
-    }
+public interface AgentConstants {
+    String AGENT_VERSION = "0.10.0";
 }

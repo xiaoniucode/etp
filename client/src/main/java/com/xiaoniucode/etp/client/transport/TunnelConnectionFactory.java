@@ -51,7 +51,7 @@ public class TunnelConnectionFactory {
                         }
                         sc.pipeline()
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
-                                .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler(90, 60, 0, TimeUnit.SECONDS))
+                                .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler())
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, agentContext.getControlFrameHandler());
                     }
                 });

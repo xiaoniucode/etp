@@ -10,8 +10,4 @@ public interface NettyConstants {
     String TCP_VISITOR_HANDLER = "tcpVisitorHandler";
     String HTTP_VISITOR_HANDLER = "httpVisitorHandler";
 
-
-    String SNAPPY_ENCODER = "SnappyEncoder";
-    String SNAPPY_DECODER = "SnappyDecoder";
-
 }

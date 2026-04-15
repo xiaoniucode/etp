@@ -58,12 +58,13 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
         try {
             byte msgType = frame.getMsgType();
-            Optional<AgentContext> opt = agentManager.getAgentContext(frame.getStreamId());
+            Optional<AgentContext> opt = agentManager.getAgentContext(ctx.channel());
             opt.ifPresent(context -> {
                 if (context.getState() != AgentState.CONNECTED) {
                     return;
                 }
                 context.updateActiveTime();
+                context.getMissedHeartbeats().set(0);
                 logger.debug("更新客户端 {} 最后激活时间", context.getAgentInfo().getAgentId());
             });
             switch (msgType) {
@@ -72,15 +73,14 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     Message.AuthInfo authInfo = ProtobufUtil.parseFrom(payload, Message.AuthInfo.parser());
 
                     String agentId = authInfo.getAgentId();
-                    Optional<AgentContext> contextOpt = agentManager.getAgentContext(agentId);
+                    Optional<AgentContext> contextOpt = agentManager.getAgentContext(ctx.channel());
                     if (contextOpt.isPresent()) {
                         AgentContext context = contextOpt.get();
                         //如果连接是断开状态，说明是断线重连，更新连接并重试连接
                         if (context.getState() == AgentState.DISCONNECTED) {
+                            logger.debug("断线重连：{}",context.getAgentId());
                             Channel oldChannel = context.getControl();
-                            if (oldChannel != null && oldChannel.isActive()) {
-                                ChannelUtils.closeOnFlush(oldChannel);
-                            }
+                            ChannelUtils.closeOnFlush(oldChannel);
                             // 再设置新连接
                             context.setControl(ctx.channel());
                             context.setVariable(AgentConstants.AGENT_AUTH_INFO, authInfo);
@@ -99,6 +99,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 }
 
                 case TMSP.MSG_TUNNEL_CREATE -> {
+                    logger.debug("收到连接池创建消息");
                     Optional<AgentContext> ag = agentManager.getAgentContext(frame.getStreamId());
                     if (ag.isPresent()) {
                         AgentContext agentContext = ag.get();
@@ -120,13 +121,14 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     }
                 }
                 case TMSP.MSG_PING -> {
-                    Optional<AgentContext> ag = agentManager.getAgentContext(frame.getStreamId());
+                    logger.debug("收到来自客户端PING消息");
+                    Optional<AgentContext> ag = agentManager.getAgentContext(ctx.channel());
                     if (ag.isPresent()) {
                         AgentContext agentContext = ag.get();
-                        logger.debug("收到来自客户端 {} 的PING消息", agentContext.getAgentInfo().getAgentId());
                         TMSPFrame pong = new TMSPFrame(0, TMSP.MSG_PONG);
                         Channel control = agentContext.getControl();
                         control.writeAndFlush(pong);
+                        logger.debug("回复客户端 {} PONG 消息",agentContext.getAgentId());
                     }
                 }
 

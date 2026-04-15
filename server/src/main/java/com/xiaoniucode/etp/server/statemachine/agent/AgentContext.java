@@ -19,6 +19,13 @@ public class AgentContext extends AbstractAgentContext {
         updateActiveTime();
     }
 
+    public String getAgentId() {
+        if (agentInfo != null) {
+            return agentInfo.getAgentId();
+        }
+        return null;
+    }
+
     public void fireEvent(AgentEvent event) {
         stateMachine.fireEvent(state, event, this);
     }

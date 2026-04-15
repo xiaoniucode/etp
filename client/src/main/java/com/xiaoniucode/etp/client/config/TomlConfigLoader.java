@@ -80,7 +80,6 @@ public class TomlConfigLoader implements ConfigSource {
         Toml connectionTable = root.getTable("connection");
         if (connectionTable != null) {
             ConnectionConfig connectionConfig = new ConnectionConfig();
-
             // 读取重试配置
             Toml retryTable = connectionTable.getTable("retry");
             if (retryTable != null) {
@@ -104,7 +103,8 @@ public class TomlConfigLoader implements ConfigSource {
             Toml poolTable = connectionTable.getTable("pool");
             if (poolTable != null) {
                 PoolConfig poolConfig = new PoolConfig();
-
+                Boolean enabled = poolTable.getBoolean("enabled", false);
+                poolConfig.setEnabled(enabled);
                 // 读取多路复用连接池配置
                 Toml multiplexPoolTable = poolTable.getTable("multiplex");
                 if (multiplexPoolTable != null) {

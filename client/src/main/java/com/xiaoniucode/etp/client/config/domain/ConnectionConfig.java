@@ -20,7 +20,6 @@ import lombok.Data;
 
 @Data
 public class ConnectionConfig {
-    private boolean enabled=false;
     private PoolConfig poolConfig = new PoolConfig();
     private RetryConfig retryConfig = new RetryConfig();
 }

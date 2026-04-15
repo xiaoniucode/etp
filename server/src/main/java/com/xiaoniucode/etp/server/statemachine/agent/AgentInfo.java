@@ -34,7 +34,6 @@ public class AgentInfo implements Serializable {
     private String arch;
     private LocalDateTime createdAt;
     private LocalDateTime lastActiveTime;
-    private Boolean online;
 
     /**
      * 判断设备是否过期

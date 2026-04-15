@@ -79,7 +79,6 @@ public class AgentInitializer implements ApplicationRunner {
         agentInfo.setVersion(agentDO.getVersion());
         agentInfo.setLastActiveTime(agentDO.getLastActiveTime());
         agentInfo.setCreatedAt(agentDO.getCreatedAt());
-        agentInfo.setOnline(false);
         return agentInfo;
     }
 }

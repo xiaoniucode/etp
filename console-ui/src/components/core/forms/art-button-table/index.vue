@@ -3,7 +3,8 @@
   <div
     :class="[
       'inline-flex items-center justify-center min-w-8 h-8 px-2.5 mr-2.5 text-sm c-p rounded-md align-middle',
-      buttonClass
+      buttonClass,
+      { 'opacity-50 cursor-not-allowed': disabled }
     ]"
     :style="{ backgroundColor: buttonBgColor, color: iconColor }"
     @click="handleClick"
@@ -29,6 +30,8 @@
     buttonBgColor?: string
     /** 按钮文本 */
     text?: string
+    /** 是否禁用 */
+    disabled?: boolean
   }
 
   const props = withDefaults(defineProps<Props>(), {})
@@ -58,6 +61,8 @@
   })
 
   const handleClick = () => {
-    emit('click')
+    if (!props.disabled) {
+      emit('click')
+    }
   }
 </script>

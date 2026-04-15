@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.client.statemachine.agent.action;
 
-import com.xiaoniucode.etp.client.common.AppVersionUtil;
+import com.xiaoniucode.etp.client.common.AgentConstants;
 import com.xiaoniucode.etp.client.common.OSUtils;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
@@ -34,7 +34,7 @@ public class AuthAction extends AgentBaseAction {
 
             Message.AuthInfo.Builder builder = Message.AuthInfo.newBuilder()
                     .setToken(authConfig.getToken())
-                    .setVersion(AppVersionUtil.getVersion())
+                    .setVersion(AgentConstants.AGENT_VERSION)
                     .setAgentType(agentType)
                     .setOs(OSUtils.getOS())
                     .setArch(OSUtils.getOSArch())

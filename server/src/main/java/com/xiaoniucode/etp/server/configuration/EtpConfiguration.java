@@ -28,10 +28,10 @@ public class EtpConfiguration {
     public HashedWheelTimer hashedWheelTimer() {
         return new HashedWheelTimer(
                 new DefaultThreadFactory("wheel-timer"),
-                100, // tick 时长
-                TimeUnit.MILLISECONDS,// 时间单位
-                512,  // 槽位数
-                true  // 内存泄漏检测
+                100,
+                TimeUnit.MILLISECONDS,
+                512,
+                true
         );
     }
 

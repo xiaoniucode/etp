@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.metrics;
 
 import com.xiaoniucode.etp.common.message.PageResult;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
@@ -50,6 +51,9 @@ public class MetricsCollector {
     }
 
     public void onChannelInactive(String proxyId) {
+        if (!StringUtils.hasText(proxyId)){
+            return;
+        }
         ProxyMetrics m = PROXY_METRICS.get(proxyId);
         if (m != null) m.decChannels();
     }
@@ -121,13 +125,12 @@ public class MetricsCollector {
         PROXY_METRICS.values().forEach(ProxyMetrics::takeSnapshot);
     }
 
-    public void cleanupInactive(long inactiveMinutes) {
-        LocalDateTime threshold = LocalDateTime.now().minusMinutes(inactiveMinutes);
+    public void cleanupInactive() {
         int removed = 0;
         var iterator = PROXY_METRICS.entrySet().iterator();
         while (iterator.hasNext()) {
             ProxyMetrics m = iterator.next().getValue();
-            if (m.getLastActiveTime().isBefore(threshold) && m.getActiveChannels().get() == 0) {
+            if (m.getActiveChannels().get() == 0) {
                 m.clearHistory();
                 iterator.remove();
                 removed++;

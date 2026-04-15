@@ -15,12 +15,15 @@
  */
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.baidu.fsg.uid.UidGenerator;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.vhost.DomainBinding;
+import com.xiaoniucode.etp.server.vhost.DomainManager;
 import com.xiaoniucode.etp.server.web.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
@@ -97,8 +100,11 @@ public class ProxyServiceImpl implements ProxyService {
     private TransactionHelper transactionHelper;
     @Resource
     private AppConfig appConfig;
-
+    @Autowired
+    private DomainManager domainManager;
     private ExecutorService executorService;
+    @Autowired
+    private UidGenerator uidGenerator;
 
     @PostConstruct
     public void init() {
@@ -121,12 +127,18 @@ public class ProxyServiceImpl implements ProxyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createHttpProxy(HttpProxyCreateParam param) {
-        ProxyConfig proxyConfig = proxyManager.register(proxyConfigAssembler.toDomain(param));
-        String proxyId = proxyConfig.getProxyId();
         //1.基础信息
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
         }
+        //生成代理配置信息
+        String proxyId = uidGenerator.getUIDAsString();
+        ProxyConfig proxyConfig = proxyConfigAssembler.toDomain(param);
+        proxyConfig.setProxyId(proxyId);
+        proxyManager.register(proxyConfig);
+        //如果数据库事务执行失败，清理缓存
+        transactionHelper.afterRollback(() -> proxyManager.remove(proxyId));
+
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
         proxyRepository.save(proxyDO);
         //3.服务列表
@@ -148,7 +160,9 @@ public class ProxyServiceImpl implements ProxyService {
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
         transportRepository.save(transportDO);
         //7.HTTP域名信息
-        List<HttpProxyDomainDO> httpProxyDomainList = proxyDomainConvert.toDOList(param.getDomains(), proxyId);
+        List<DomainBinding> boundDomains = domainManager.getBoundDomains(proxyId);
+        List<String> domains = boundDomains.stream().map(DomainBinding::getDomain).toList();
+        List<HttpProxyDomainDO> httpProxyDomainList = proxyDomainConvert.toDOList(domains, proxyId);
         proxyDomainRepository.saveAll(httpProxyDomainList);
         //init access control
         AccessControlDO accessControlDO = new AccessControlDO();
@@ -161,7 +175,6 @@ public class ProxyServiceImpl implements ProxyService {
         basicAuthDO.setEnabled(false);
         basicAuthDO.setProxyId(proxyId);
         basicAuthRepository.save(basicAuthDO);
-
 
         logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
     }
@@ -217,8 +230,10 @@ public class ProxyServiceImpl implements ProxyService {
         transportRepository.save(transportDO);
         //7.HTTP域名信息
         proxyDomainRepository.deleteByProxyId(proxyId);
-        if (!CollectionUtils.isEmpty(param.getDomains())) {
-            List<HttpProxyDomainDO> domainList = proxyDomainConvert.toDOList(param.getDomains(), proxyId);
+        List<DomainBinding> boundDomains = domainManager.getBoundDomains(proxyId);
+        List<String> domains = boundDomains.stream().map(DomainBinding::getDomain).toList();
+        if (!CollectionUtils.isEmpty(domains)) {
+            List<HttpProxyDomainDO> domainList = proxyDomainConvert.toDOList(domains, proxyId);
             proxyDomainRepository.saveAll(domainList);
         }
         logger.debug("HTTP代理更新成功：{}", proxyDO.getName());
@@ -241,8 +256,7 @@ public class ProxyServiceImpl implements ProxyService {
         if (StringUtils.hasText(keyword)) {
             if (keyword.matches("\\d{19}")) {
                 queryKey = keyword.trim();
-            }
-            else {
+            } else {
                 queryKey = "%" + keyword.trim() + "%";
             }
         }
@@ -497,8 +511,7 @@ public class ProxyServiceImpl implements ProxyService {
         if (StringUtils.hasText(keyword)) {
             if (keyword.matches("\\d{19}")) {
                 queryKey = keyword.trim();
-            }
-            else {
+            } else {
                 queryKey = "%" + keyword.trim() + "%";
             }
         }

@@ -60,7 +60,7 @@ public class DomainGenerator {
                 }
             }
         }
-        if (domainType == DomainType.SUBDOMAIN) {
+        if (domainType == DomainType.AUTO) {
             res.add(generateRandomDomain(occupiedChecker));
         }
         return res;

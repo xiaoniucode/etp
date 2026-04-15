@@ -19,11 +19,9 @@ package com.xiaoniucode.etp.server.web.service.converter;
 import com.xiaoniucode.etp.server.web.entity.HttpProxyDomainDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -32,7 +30,7 @@ public interface ProxyDomainConvert {
     @Mapping(target = "proxyId", source = "proxyId")
     HttpProxyDomainDO toDO(String domain, String proxyId);
 
-    default List<HttpProxyDomainDO> toDOList(Set<String> domains, String proxyId) {
+    default List<HttpProxyDomainDO> toDOList(List<String> domains, String proxyId) {
         if (domains == null) return Collections.emptyList();
         return domains.stream()
                 .map(domain -> toDO(domain, proxyId))

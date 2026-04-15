@@ -15,6 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AgentServiceImpl implements AgentService {
@@ -53,7 +55,12 @@ public class AgentServiceImpl implements AgentService {
         }
         List<AgentDO> agents = agentPage.getContent();
         List<AgentDTO> agentDTOList = agentConvert.toDTOList(agents);
-        agentDTOList.forEach(dto -> dto.setIsOnline(agentManager.isOnline(dto.getId())));
+        agentDTOList.forEach(dto -> {
+            String agentId = dto.getId();
+            dto.setIsOnline(agentManager.isOnline(agentId));
+            Optional<AgentInfo> agentInfoOpt = agentManager.getAgentInfo(agentId);
+            agentInfoOpt.ifPresent(agentInfo -> dto.setLastActiveTime(agentInfo.getLastActiveTime()));
+        });
         return agentDTOList;
     }
 
@@ -61,7 +68,9 @@ public class AgentServiceImpl implements AgentService {
     public AgentDTO findById(String agentId) {
         AgentDO agent = agentRepository.findById(agentId).orElseThrow(() -> new BizException("客户端不存在"));
         AgentDTO dto = agentConvert.toDTO(agent);
-        dto.setIsOnline(false);
+        dto.setIsOnline(agentManager.isOnline(dto.getId()));
+        Optional<AgentInfo> agentInfoOpt = agentManager.getAgentInfo(agentId);
+        agentInfoOpt.ifPresent(agentInfo -> dto.setLastActiveTime(agentInfo.getLastActiveTime()));
         return dto;
     }
 

@@ -14,6 +14,7 @@ import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelPipeline;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +76,10 @@ public class CreateConnAction extends AgentBaseAction {
         poolEntry.setActive(true);
         if (isMultiplex) {
             PipelineConfigure.removeControlIdleCheckHandler(tunnel);
-            PipelineConfigure.addDataIdleCheckHandler(tunnel);
+            ChannelPipeline pipeline = tunnel.pipeline();
+            if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER)==null){
+                pipeline.addBefore(NettyConstants.CONTROL_FRAME_HANDLER,NettyConstants.IDLE_CHECK_HANDLER,new IdleCheckHandler());
+            }
             multiplexPool.setChannel(agentId, isEncrypt, poolEntry);
         } else {
             directPool.register(agentId, poolEntry);

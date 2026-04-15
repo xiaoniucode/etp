@@ -172,8 +172,6 @@ public class AuthAction extends AgentBaseAction {
             agentInfo.setCreatedAt(LocalDateTime.now());
         }
         agentInfo.setLastActiveTime(LocalDateTime.now());
-        agentInfo.setOnline(true);
-
         return agentInfo;
     }
 

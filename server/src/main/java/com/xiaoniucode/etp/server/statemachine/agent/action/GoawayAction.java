@@ -52,6 +52,7 @@ public class GoawayAction extends AgentBaseAction {
             proxyManager.clearByAgentId(agentId);
             //减少Token 当前连接数
             tokenManager.decrementConnection(agentInfo.getToken());
+            agentManager.removeAgentContext(agentId);
             // 清理代理资源
             //cleanupAgent(agentId);
 
@@ -61,8 +62,13 @@ public class GoawayAction extends AgentBaseAction {
             // 清理Context 中的临时数据
             //cleanupContextData(context);
             Channel control = context.getControl();
-            control.writeAndFlush(new TMSPFrame(0, TMSP.MSG_GOAWAY))
-                    .addListener((ChannelFutureListener) future -> ChannelUtils.closeOnFlush(control));
+            //尝试通知客户端
+            control.writeAndFlush(new TMSPFrame(0, TMSP.MSG_GOAWAY)).addListener((ChannelFutureListener) future -> {
+                if (!future.isSuccess()) {
+                    logger.debug("{} GOAWAY 发送失败（可能连接已断）", agentId);
+                }
+                ChannelUtils.closeOnFlush(control);
+            });
             logger.info("{} 客户端资源清理完成", agentId);
         } catch (Exception e) {
             logger.error("{} 资源清理过程中发生异常", agentId, e);
