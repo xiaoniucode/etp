@@ -36,9 +36,10 @@ public class TcpIpCheckHandler extends IpCheckHandler {
         int remotePort = getListenerPort(visitor);
         Optional<ProxyConfig> opt = proxyManager.findByRemotePort(remotePort);
         if (opt.isPresent()) {
-            doCheckAccess(visitor, opt.get());
-            return;
+            if (doCheckAccess(visitor, opt.get())) {
+                logger.debug("访问权限检查通过，放行");
+                ctx.fireChannelActive();
+            }
         }
-        ctx.fireChannelActive();
     }
 }

@@ -59,11 +59,11 @@ public class IpAccessChecker {
         return matcher.isAllowed(visitorIp);
     }
 
-    public void remove(String proxyId) {
+    public void invalidate(String proxyId) {
         matcherMap.remove(proxyId);
     }
 
-    public void clearAll() {
+    public void invalidateAll() {
         matcherMap.clear();
     }
 }

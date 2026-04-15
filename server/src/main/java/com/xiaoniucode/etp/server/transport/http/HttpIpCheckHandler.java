@@ -31,7 +31,12 @@ public class HttpIpCheckHandler extends IpCheckHandler {
         logger.debug("IP访问控制检查");
         Channel visitor = ctx.channel();
         String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
-        proxyManager.findByDomain(domain).ifPresent(config-> doCheckAccess(visitor, config));
-        ctx.fireChannelRead(msg);
+        proxyManager.findByDomain(domain)
+                .ifPresent(config -> {
+                    if (doCheckAccess(visitor, config)) {
+                        logger.debug("访问权限检查通过，放行");
+                        ctx.fireChannelRead(msg);
+                    }
+                });
     }
 }

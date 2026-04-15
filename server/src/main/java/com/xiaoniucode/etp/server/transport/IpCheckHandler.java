@@ -48,7 +48,7 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
         return sa.getPort();
     }
 
-    protected void doCheckAccess(Channel visitor, ProxyConfig proxyConfig) {
+    protected boolean doCheckAccess( Channel visitor, ProxyConfig proxyConfig) {
         String visitorIp = getVisitorIp(visitor);
         boolean checkAccess = ipAccessChecker.checkAccess(proxyConfig, visitorIp);
         if (!checkAccess) {
@@ -59,6 +59,8 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
             } else if (protocol.isTcp()){
                 ChannelUtils.closeOnFlush(visitor);
             }
+            return false;
         }
+        return true;
     }
 }

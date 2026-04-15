@@ -73,6 +73,8 @@ public class DefaultProxyManager implements ProxyManager {
         delegate.validate(newConfig);
         //重新注册
         delegate.reregister(oldConfig, newConfig, diff);
+        //删除IP访问控制
+        ipAccessChecker.invalidate(oldConfig.getProxyId());
         //替换
         proxyStore.replace(newConfig);
         return newConfig;
@@ -96,7 +98,7 @@ public class DefaultProxyManager implements ProxyManager {
             ProxyConfig proxyConfig = opt.get();
             ConfigRegistrar delegate = configRegistrarFactory.getRegistrar(proxyConfig);
             //删除IP访问控制
-            ipAccessChecker.remove(proxyId);
+            ipAccessChecker.invalidate(proxyId);
             //释放代理相关资源信息
             delegate.unregister(proxyConfig);
             //删除代理流量统计记录

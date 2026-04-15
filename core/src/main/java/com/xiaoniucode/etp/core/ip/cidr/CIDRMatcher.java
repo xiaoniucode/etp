@@ -1,76 +1,113 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package com.xiaoniucode.etp.core.ip.cidr;
+
 
 import com.xiaoniucode.etp.core.enums.AccessControlMode;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
- * 基于区间+二分的CIDR IP地址匹配器
+ * 基于区间 + 二分查找的 CIDR 匹配器
  */
 public class CIDRMatcher {
 
     @Getter
     private final List<CIDRRange> ranges;
-    private final boolean isAllowMode;
+    private final boolean allowMode;
 
-    /**
-     * 构建区间列表
-     *
-     * @param mode      匹配模式
-     * @param allowList 白名单模式下的允许 IP 列表
-     * @param denyList  黑名单模式下的拒绝 IP 列表
-     */
     public CIDRMatcher(AccessControlMode mode, Set<String> allowList, Set<String> denyList) {
-        this.isAllowMode = AccessControlMode.ALLOW.equals(mode);
-        List<CIDRRange> tempRanges = new ArrayList<>();
+        this.allowMode = AccessControlMode.ALLOW.equals(mode);
 
-        Set<String> targetList = isAllowMode ? allowList : denyList;
-        if (targetList != null) {
-            for (String cidr : targetList) {
-                // 忽略空字符串和无效 CIDR
-                if (cidr == null || cidr.trim().isEmpty()) {
+        List<CIDRRange> temp = new ArrayList<>();
+        Set<String> source = allowMode ? allowList : denyList;
+
+        if (source != null && !source.isEmpty()) {
+            for (String cidr : source) {
+                if (cidr == null || cidr.isEmpty()) {
                     continue;
                 }
                 try {
-                    addCIDR(cidr.trim(), tempRanges);
-                } catch (IllegalArgumentException ex) {
-                    // 无效 CIDR 条目直接忽略，避免影响整体匹配
+                    parseCIDR(cidr, temp);
+                } catch (Exception ignore) {
                 }
             }
 
-            // 按起始IP排序，用于二分查找
-            tempRanges.sort(Comparator.comparingLong(CIDRRange::getStartIp));
-
-            // 合并重叠或相邻的区间，确保区间互不重叠，便于纯二分匹配
-            tempRanges = mergeRanges(tempRanges);
+            if (!temp.isEmpty()) {
+                temp.sort(Comparator.comparingLong(CIDRRange::getStartIp));
+                temp = merge(temp);
+            }
         }
 
-        this.ranges = Collections.unmodifiableList(tempRanges);
+        this.ranges = Collections.unmodifiableList(temp);
     }
 
     /**
-     * 合并重叠或相邻的 CIDR 区间
+     * CIDR 转区间
      */
-    private List<CIDRRange> mergeRanges(List<CIDRRange> sortedRanges) {
-        if (sortedRanges.isEmpty()) {
-            return sortedRanges;
+    private void parseCIDR(String cidr, List<CIDRRange> out) {
+        int slash = cidr.indexOf('/');
+
+        String ipPart;
+        int prefix;
+
+        if (slash > 0) {
+            ipPart = cidr.substring(0, slash);
+            prefix = parseIntSafe(cidr, slash + 1);
+        } else {
+            ipPart = cidr;
+            prefix = 32;
         }
 
-        List<CIDRRange> merged = new ArrayList<>();
-        CIDRRange current = sortedRanges.get(0);
+        if (prefix < 0 || prefix > 32) {
+            return;
+        }
 
-        for (int i = 1; i < sortedRanges.size(); i++) {
-            CIDRRange next = sortedRanges.get(i);
+        String ip = normalizeIp(ipPart);
+        if (ip == null) {
+            return;
+        }
 
+        long ipLong = ipToLong(ip);
+
+        long mask = prefix == 0 ? 0 : (0xFFFFFFFFL << (32 - prefix)) & 0xFFFFFFFFL;
+        long start = ipLong & mask;
+        long end = start | (~mask & 0xFFFFFFFFL);
+
+        out.add(new CIDRRange(start, end));
+    }
+
+    /**
+     * 合并区间
+     */
+    private List<CIDRRange> merge(List<CIDRRange> list) {
+        int size = list.size();
+        if (size <= 1) {
+            return list;
+        }
+
+        List<CIDRRange> merged = new ArrayList<>(size);
+        CIDRRange current = list.getFirst();
+
+        for (int i = 1; i < size; i++) {
+            CIDRRange next = list.get(i);
             if (next.getStartIp() <= current.getEndIp() + 1) {
-                long newEnd = Math.max(current.getEndIp(), next.getEndIp());
-                current = new CIDRRange(current.getStartIp(), newEnd);
+                long end = Math.max(current.getEndIp(), next.getEndIp());
+                current = new CIDRRange(current.getStartIp(), end);
             } else {
                 merged.add(current);
                 current = next;
@@ -82,80 +119,52 @@ public class CIDRMatcher {
     }
 
     /**
-     * 添加 CIDR 并转换为区间
-     */
-    private void addCIDR(String cidr, List<CIDRRange> tempRanges) {
-        String[] parts = cidr.split("/");
-        String ipStr = normalizeIp(parts[0]);
-        if (ipStr == null) {
-            throw new IllegalArgumentException("Invalid CIDR ip part: " + cidr);
-        }
-
-        int prefixLength;
-        if (parts.length > 1) {
-            try {
-                prefixLength = Integer.parseInt(parts[1]);
-            } catch (NumberFormatException ex) {
-                throw new IllegalArgumentException("Invalid CIDR prefix: " + cidr, ex);
-            }
-        } else {
-            // 纯 IP（无前缀）视为单个 IP，即 /32
-            prefixLength = 32;
-        }
-
-        if (prefixLength < 0 || prefixLength > 32) {
-            throw new IllegalArgumentException("CIDR prefix out of range: " + cidr);
-        }
-
-        long ip = ipToLong(ipStr);
-        long mask = prefixLength == 0 ? 0 : 0xFFFFFFFFL << (32 - prefixLength);
-        long startIp = ip & mask;
-        long endIp = startIp | (~mask & 0xFFFFFFFFL);
-
-        tempRanges.add(new CIDRRange(startIp, endIp));
-    }
-
-    /**
-     * 检查 IP 地址是否允许访问
-     *
-     * @param ip IP 地址字符串
-     * @return 是否允许访问
+     * 是否允许访问
      */
     public boolean isAllowed(String ip) {
-        boolean matches = matches(ip);
-        return isAllowMode ? matches : !matches;
+        boolean match = matches(ip);
+        return allowMode ? match : !match;
     }
 
     /**
-     * 匹配IP地址是否在任何 CIDR 范围内
+     * 是否命中 CIDR
      */
     public boolean matches(String ip) {
+        List<CIDRRange> local = this.ranges;
+        // 快速失败
+        if (local.isEmpty()) {
+            return false;
+        }
+
         String normalized = normalizeIp(ip);
         if (normalized == null) {
-            // 非法 IP 文本在这里统一视为“不匹配”
             return false;
         }
 
         long ipLong;
         try {
             ipLong = ipToLong(normalized);
-        } catch (IllegalArgumentException ex) {
+        } catch (Exception e) {
             return false;
         }
 
-        return binarySearchMatch(ipLong);
+        return binarySearch(local, ipLong);
     }
-    private boolean binarySearchMatch(long ip) {
+
+    /**
+     * 二分查找
+     */
+    private boolean binarySearch(List<CIDRRange> ranges, long ip) {
         int left = 0;
         int right = ranges.size() - 1;
 
         while (left <= right) {
-            int mid = left + (right - left) / 2;
-            CIDRRange range = ranges.get(mid);
+            int mid = (left + right) >>> 1;
+            CIDRRange r = ranges.get(mid);
 
-            if (ip < range.getStartIp()) {
+            if (ip < r.getStartIp()) {
                 right = mid - 1;
-            } else if (ip > range.getEndIp()) {
+            } else if (ip > r.getEndIp()) {
                 left = mid + 1;
             } else {
                 return true;
@@ -166,55 +175,78 @@ public class CIDRMatcher {
     }
 
     /**
-     * 将 IP 地址转换为长整型
+     * IP 转 long
      */
     private long ipToLong(String ip) {
-        Objects.requireNonNull(ip, "ip must not be null");
-
-        String[] octets = ip.split("\\.");
-        if (octets.length != 4) {
-            throw new IllegalArgumentException("Invalid IPv4 format: " + ip);
-        }
-
         long result = 0;
-        for (String octet : octets) {
-            int v;
-            try {
-                v = Integer.parseInt(octet);
-            } catch (NumberFormatException ex) {
-                throw new IllegalArgumentException("Invalid IPv4 octet: " + ip, ex);
-            }
+        int part = 0;
+        int shift = 24;
 
-            if (v < 0 || v > 255) {
-                throw new IllegalArgumentException("IPv4 octet out of range: " + ip);
+        for (int i = 0; i < ip.length(); i++) {
+            char c = ip.charAt(i);
+            if (c == '.') {
+                result |= ((long) part << shift);
+                shift -= 8;
+                part = 0;
+            } else {
+                int d = c - '0';
+                if (d < 0 || d > 9) {
+                    throw new IllegalArgumentException();
+                }
+                part = part * 10 + d;
             }
-
-            result = (result << 8) | v;
         }
 
+        result |= part;
         return result & 0xFFFFFFFFL;
     }
 
     /**
-     * 规范化 IP 文本，例如：
-     * - "localhost" -> "127.0.0.1"
-     * - 去掉首尾空白
-     * - 非法 / 空字符串返回 null
+     * 安全 parse int（避免 substring + trim）
+     */
+    private int parseIntSafe(String s, int start) {
+        int val = 0;
+        for (int i = start; i < s.length(); i++) {
+            char c = s.charAt(i);
+            int d = c - '0';
+            if (d < 0 || d > 9) {
+                return -1;
+            }
+            val = val * 10 + d;
+        }
+        return val;
+    }
+
+    /**
+     * IP 规范化
      */
     private String normalizeIp(String ip) {
         if (ip == null) {
             return null;
         }
 
-        String trimmed = ip.trim();
-        if (trimmed.isEmpty()) {
+        int len = ip.length();
+        if (len == 0) {
             return null;
         }
 
-        if ("localhost".equalsIgnoreCase(trimmed)) {
+        // 去首尾空格（避免 trim 产生新对象）
+        int start = 0;
+        int end = len - 1;
+
+        while (start <= end && ip.charAt(start) <= ' ') start++;
+        while (end >= start && ip.charAt(end) <= ' ') end--;
+
+        if (start > end) {
+            return null;
+        }
+
+        String result = (start == 0 && end == len - 1) ? ip : ip.substring(start, end + 1);
+
+        if ("localhost".equalsIgnoreCase(result)) {
             return "127.0.0.1";
         }
 
-        return trimmed;
+        return result;
     }
 }
