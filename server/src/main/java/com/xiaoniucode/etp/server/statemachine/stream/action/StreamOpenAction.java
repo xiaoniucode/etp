@@ -12,7 +12,6 @@ import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,7 @@ public class StreamOpenAction extends StreamBaseAction {
         ProxyConfig config = context.getProxyConfig();
         if (!control.isActive()) {
             logger.warn("客户端 {} 控制通道未激活，关闭流 streamId={}", agentContext.getAgentInfo().getAgentId(), streamId);
-            context.fireEvent(StreamEvent.STREAM_CLOSE);
+            context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
         Target target = context.getCurrentTarget();
@@ -47,12 +46,12 @@ public class StreamOpenAction extends StreamBaseAction {
             logger.debug("打开流请求引用计数：{}", payload.refCnt());
             if (!future.isSuccess()) {
                 logger.error("打开流消息发送失败，关闭流：streamId={} error={}", streamId, future.cause().getMessage());
-                context.fireEvent(StreamEvent.STREAM_CLOSE);
+                context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             } else {
                 control.eventLoop().schedule(() -> {
                     if (context.getState() == StreamState.OPENING) {
                         logger.warn("打开流超时，关闭流 stream={}", streamId);
-                        context.fireEvent(StreamEvent.STREAM_CLOSE);
+                        context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
                     }
                 }, 10, TimeUnit.SECONDS); // 如果10秒状态未改变，超时处理
                 logger.debug("流 {} 打开请求发送成功 代理名: {} 访问目标：{}", streamId, config.getName(), target);

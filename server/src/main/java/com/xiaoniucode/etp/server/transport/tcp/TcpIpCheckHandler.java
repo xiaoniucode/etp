@@ -38,8 +38,8 @@ public class TcpIpCheckHandler extends IpCheckHandler {
         if (opt.isPresent()) {
             if (doCheckAccess(visitor, opt.get())) {
                 logger.debug("访问权限检查通过，放行");
-                ctx.fireChannelActive();
             }
         }
+        ctx.fireChannelActive();
     }
 }

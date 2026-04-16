@@ -60,7 +60,7 @@ public class StreamOpenAction extends StreamBaseAction {
 
                     if (tunnelEntry == null) {
                         logger.error("获取隧道失败，关闭流：streamId={}", streamId);
-                        context.fireEvent(StreamEvent.STREAM_CLOSE);
+                        context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
                         return;
                     }
 

@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.transport.http;
 import com.xiaoniucode.etp.core.domain.HttpUser;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
 import io.netty.channel.Channel;
@@ -36,7 +37,7 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
             BasicAuthConfig basicAuth = config.getBasicAuth();
             if (basicAuth != null && basicAuth.isEnabled()) {
                 if (basicAuthHeader == null || !basicAuthHeader.toLowerCase().startsWith("basic ")) {
-                    NettyHttpUtils.sendBasicAuth(visitor);
+                    sendBasicAuth(visitor);
                     return;
                 }
                 try {
@@ -48,18 +49,24 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
                         String username = parts[0];
                         String password = parts[1];
                         if (!check(username, password, basicAuth)) {
-                            NettyHttpUtils.sendBasicAuth(visitor);
+                            sendBasicAuth(visitor);
                         }
                     } else {
-                        NettyHttpUtils.sendBasicAuth(visitor);
+                        sendBasicAuth(visitor);
                     }
                 } catch (Exception e) {
                     logger.debug("Basic Auth 解码失败: {}", e.getMessage());
-                    NettyHttpUtils.sendBasicAuth(visitor);
+                    sendBasicAuth(visitor);
                 }
             }
         });
         ctx.fireChannelRead(msg);
+    }
+
+    private void sendBasicAuth(Channel visitor) {
+        NettyHttpUtils.sendBasicAuth(visitor).addListener(future -> {
+            ChannelUtils.closeOnFlush(visitor);
+        });
     }
 
     private boolean check(String username, String password, BasicAuthConfig basicAuth) {

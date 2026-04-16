@@ -4,12 +4,10 @@ import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.core.transport.IntSet;
-import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.PipelineConfigure;
 import com.xiaoniucode.etp.core.transport.TunnelBridge;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
-import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -77,7 +75,7 @@ public class DirectTunnelBridge implements TunnelBridge {
     public void forwardToLocal(ByteBuf payload) {
         if (streamContext.isChannelClosed(server)) {
             logger.error("真实服务连接没有激活，关闭流：streamId={}", streamContext.getStreamId());
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
         server.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) f -> {
@@ -86,7 +84,7 @@ public class DirectTunnelBridge implements TunnelBridge {
                 logger.debug("数据成功转发给真实服务成功");
             } else {
                 logger.debug("数据转发给真实服务失败",f.cause());
-                streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             }
         });
     }
@@ -95,7 +93,7 @@ public class DirectTunnelBridge implements TunnelBridge {
     public void forwardToRemote(ByteBuf payload) {
         if (streamContext.isChannelClosed(tunnel)) {
             logger.error("隧道没有激活，关闭流：streamId={}", streamContext.getStreamId());
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
         tunnel.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) f -> {

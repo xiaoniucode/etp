@@ -33,12 +33,15 @@ public class StreamContext extends AbstractStreamContext {
     }
 
     public String getProxyId() {
-        if (proxyConfig==null){
+        if (proxyConfig == null) {
             return null;
         }
         return proxyConfig.getProxyId();
     }
 
+    public Channel getControl() {
+        return agentContext.getControl();
+    }
 
     public void fireEvent(StreamEvent event) {
         stateMachine.fireEvent(state, event, this);

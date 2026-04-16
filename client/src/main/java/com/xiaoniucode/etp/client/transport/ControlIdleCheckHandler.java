@@ -51,5 +51,6 @@ public class ControlIdleCheckHandler extends IdleStateHandler {
                 logger.debug("客户端控制连接读空闲第 {} 次（容忍中）", missed);
             }
         }
+        ctx.fireUserEventTriggered(evt);
     }
 }

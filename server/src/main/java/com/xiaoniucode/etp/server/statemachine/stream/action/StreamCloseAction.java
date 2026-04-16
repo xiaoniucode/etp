@@ -34,12 +34,13 @@ public class StreamCloseAction extends StreamBaseAction {
     private MultiplexPool multiplexPool;
     @Autowired
     private MetricsCollector metricsCollector;
+
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         int streamId = context.getStreamId();
         Channel visitor = context.getVisitor();
         ProxyConfig proxyConfig = context.getProxyConfig();
-        if (proxyConfig!=null){
+        if (proxyConfig != null) {
             streamManager.decrementStreamCount(proxyConfig.getProxyId());
         }
         leastConnHooks.onStreamClosed(context);
@@ -48,18 +49,15 @@ public class StreamCloseAction extends StreamBaseAction {
         ChannelUtils.closeOnFlush(visitor);
         AgentContext agentContext = context.getAgentContext();
         TunnelEntry tunnelEntry = context.getTunnelEntry();
-        if (tunnelEntry != null) {
-            Channel tunnel = tunnelEntry.getChannel();
-            logger.debug("隧道 {} 激活状态：{}，隧道可写状态：{}", tunnelEntry.getTunnelId(), tunnel.isActive(), tunnel.isWritable());
-            tunnel.config().setAutoRead(true);
-        }
-        if (!context.isMultiplex() && tunnelEntry != null) {
+
+        if (context.isDirectConnection() && tunnelEntry != null) {
             AgentInfo agentInfo = agentContext.getAgentInfo();
             logger.debug("回收客户端 {} 独立连接 {}", agentInfo.getAgentId(), tunnelEntry.getTunnelId());
             directPool.release(agentInfo.getAgentId(), tunnelEntry);
         }
         streamManager.removeStreamContext(streamId);
-        if (agentContext != null) {
+        if (event == StreamEvent.STREAM_LOCAL_CLOSE) {
+            logger.debug("通知对端关闭流");
             Channel control = agentContext.getControl();
             TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_CLOSE);
             control.writeAndFlush(frame);

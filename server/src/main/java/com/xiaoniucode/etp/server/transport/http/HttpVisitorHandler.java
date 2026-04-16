@@ -62,8 +62,9 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Channel visitor = ctx.channel();
         streamManager.getStreamContext(visitor).ifPresent(context -> {
             logger.debug("[HTTP]访问者连接断开，关闭流: streamId={}", context.getStreamId());
-            context.fireEvent(StreamEvent.STREAM_CLOSE);
+            context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
+        ctx.fireChannelInactive();
     }
 
     @Override
@@ -71,8 +72,9 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         logger.error(cause.getMessage(), cause);
         streamManager.getStreamContext(ctx.channel()).ifPresent(streamContext -> {
             logger.warn("[HTTP] 访问者连接发生异常，关闭流: streamId={}", streamContext.getStreamId());
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
+        ctx.fireExceptionCaught(cause);
     }
 
     @Override
@@ -90,6 +92,6 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 }
             }
         });
-        super.channelWritabilityChanged(ctx);
+        ctx.fireChannelWritabilityChanged();
     }
 }

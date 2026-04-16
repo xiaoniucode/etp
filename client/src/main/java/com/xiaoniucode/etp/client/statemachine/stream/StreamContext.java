@@ -30,6 +30,10 @@ public class StreamContext extends AbstractStreamContext {
         this.agentContext = agentContext;
     }
 
+    public Channel getControl() {
+        return agentContext.getControl();
+    }
+
     public void fireEvent(StreamEvent event) {
         stateMachine.fireEvent(state, event, this);
     }

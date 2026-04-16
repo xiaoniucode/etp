@@ -46,12 +46,13 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Channel server = ctx.channel();
         Optional<StreamContext> streamCtx = StreamManager.getStreamContext(server);
         streamCtx.ifPresent(streamContext -> {
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
+        ctx.fireChannelInactive();
     }
 
     @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) {
         logger.warn("服务端可写状态发生变化，当前状态：{}", ctx.channel().isWritable());
         Channel server = ctx.channel();
         StreamManager.getStreamContext(server).ifPresent(streamContext -> {
@@ -62,11 +63,13 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 tunnel.config().setOption(ChannelOption.AUTO_READ, shouldRead);
             }
         });
+        ctx.fireChannelWritabilityChanged();
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error(cause.getMessage(), cause);
+        ctx.fireExceptionCaught(cause);
     }
 
 }

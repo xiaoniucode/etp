@@ -32,7 +32,7 @@ public class MultiplexTunnelBridge implements TunnelBridge {
         int streamId = streamContext.getStreamId();
         if (streamContext.isChannelClosed(server)) {
             logger.debug("通道未激活，数据转发到内网失败，关闭流：streamId={}", streamId);
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
         server.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) future -> {
@@ -49,7 +49,7 @@ public class MultiplexTunnelBridge implements TunnelBridge {
     public void forwardToRemote(ByteBuf payload) {
         if (streamContext.isChannelClosed(tunnel)) {
             logger.debug("通道未激活，数据转发到远程失败，关闭流：streamId={}", streamContext.getStreamId());
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
         TMSPFrame frame = new TMSPFrame(streamContext.getStreamId(), TMSP.MSG_STREAM_DATA, payload);

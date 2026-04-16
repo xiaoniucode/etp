@@ -51,15 +51,23 @@ public class StreamStateMachineBuilder {
                     .when(ctx -> true)
                     .perform((from, to, event, context) -> context.setState(to));
 
-            // 关闭流
+            // 本地关闭流
             builder.externalTransitions()
                     .fromAmong(StreamState.OPENED, StreamState.OPENING, StreamState.FAILED)
                     .to(StreamState.CLOSED)
-                    .on(StreamEvent.STREAM_CLOSE)
+                    .on(StreamEvent.STREAM_LOCAL_CLOSE)
                     .when(ctx -> true)
                     .perform(new StreamCloseAction());
 
+            // 来自远程关闭流
+            builder.externalTransitions()
+                    .fromAmong(StreamState.OPENED, StreamState.OPENING, StreamState.FAILED)
+                    .to(StreamState.CLOSED)
+                    .on(StreamEvent.STREAM_REMOTE_CLOSE)
+                    .when(ctx -> true)
+                    .perform(new StreamCloseAction());
             builder.build(MACHINE_ID);
+
             return StateMachineFactory.get(MACHINE_ID);
         }
     }

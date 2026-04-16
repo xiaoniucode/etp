@@ -46,7 +46,7 @@ public class TargetResolverAction extends StreamBaseAction {
         ProxyConfig config = resolveProxyConfig(context);
         if (config == null || !config.isEnabled()) {
             logger.debug("代理不可用，关闭流：streamId={}", context.getStreamId());
-            context.fireEvent(StreamEvent.STREAM_CLOSE);
+            context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
 
@@ -58,7 +58,7 @@ public class TargetResolverAction extends StreamBaseAction {
             Target selectedTarget = selectTarget(config, context);
             if (selectedTarget == null) {
                 logger.warn("无可用 proxyId={} 后端目标，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
-                context.fireEvent(StreamEvent.STREAM_CLOSE);
+                context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
                 return;
             }
             BandwidthConfig bandwidth = config.getBandwidth();
@@ -75,7 +75,7 @@ public class TargetResolverAction extends StreamBaseAction {
         } else {
             logger.debug("代理 {} 客户端不可用，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
             //客户端不可用
-            context.fireEvent(StreamEvent.STREAM_CLOSE);
+            context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         }
     }
 

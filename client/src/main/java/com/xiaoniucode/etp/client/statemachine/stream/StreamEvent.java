@@ -15,12 +15,17 @@ public enum StreamEvent {
      * 打开流失败
      */
     STREAM_OPEN_FAILURE,
-    
+
     /**
-     * 收到关闭流请求
+     * 本地关闭流
      */
-    STREAM_CLOSE,
-    
+    STREAM_LOCAL_CLOSE,
+
+    /**
+     * 来自远程的关闭流
+     */
+    STREAM_REMOTE_CLOSE,
+
     /**
      * 收到重置流请求
      */

@@ -35,8 +35,8 @@ public class HttpIpCheckHandler extends IpCheckHandler {
                 .ifPresent(config -> {
                     if (doCheckAccess(visitor, config)) {
                         logger.debug("访问权限检查通过，放行");
-                        ctx.fireChannelRead(msg);
                     }
                 });
+        ctx.fireChannelRead(msg);
     }
 }

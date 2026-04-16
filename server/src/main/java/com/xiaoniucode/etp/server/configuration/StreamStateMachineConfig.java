@@ -81,14 +81,22 @@ public class StreamStateMachineConfig {
                 .on(StreamEvent.STREAM_OPEN_FAILURE)
                 .when(ctx -> true)
                 .perform(streamCloseAction);
-        // 关闭流
+
+        // 本地关闭流事件
         builder.externalTransitions()
                 .fromAmong(StreamState.OPENED, StreamState.FAILED, StreamState.OPENING)
                 .to(StreamState.CLOSED)
-                .on(StreamEvent.STREAM_CLOSE)
+                .on(StreamEvent.STREAM_LOCAL_CLOSE)
                 .when(ctx -> true)
                 .perform(streamCloseAction);
 
+        // 来自远程的关闭流事件
+        builder.externalTransitions()
+                .fromAmong(StreamState.OPENED, StreamState.FAILED, StreamState.OPENING)
+                .to(StreamState.CLOSED)
+                .on(StreamEvent.STREAM_REMOTE_CLOSE)
+                .when(ctx -> true)
+                .perform(streamCloseAction);
         return builder.build("stream-state-machine");
     }
 }

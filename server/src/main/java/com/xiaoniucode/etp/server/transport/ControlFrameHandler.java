@@ -78,7 +78,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         AgentContext context = contextOpt.get();
                         //如果连接是断开状态，说明是断线重连，更新连接并重试连接
                         if (context.getState() == AgentState.DISCONNECTED) {
-                            logger.debug("断线重连：{}",context.getAgentId());
+                            logger.debug("断线重连：{}", context.getAgentId());
                             Channel oldChannel = context.getControl();
                             ChannelUtils.closeOnFlush(oldChannel);
                             // 再设置新连接
@@ -128,11 +128,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         TMSPFrame pong = new TMSPFrame(0, TMSP.MSG_PONG);
                         Channel control = agentContext.getControl();
                         control.writeAndFlush(pong);
-                        logger.debug("回复客户端 {} PONG 消息",agentContext.getAgentId());
+                        logger.debug("回复客户端 {} PONG 消息", agentContext.getAgentId());
                     }
                 }
 
-                //----------------------------------------------------------------------------------------//
+                //---------------------------------------Stream-------------------------------------------------//
                 case TMSP.MSG_STREAM_OPEN_RESP -> {
                     int streamId = frame.getStreamId();
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
@@ -154,6 +154,14 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
                     if (streamContext != null) {
                         streamContext.forwardToRemote(frame.getPayload());
+                    }
+                }
+                case TMSP.MSG_STREAM_CLOSE -> {
+                    logger.debug("收到来自远程关闭流消息");
+                    int streamId = frame.getStreamId();
+                    StreamContext streamContext = streamManager.getStreamContext(streamId);
+                    if (streamContext != null) {
+                        streamContext.fireEvent(StreamEvent.STREAM_REMOTE_CLOSE);
                     }
                 }
                 case TMSP.MSG_PROXY_CREATE -> {

@@ -14,6 +14,7 @@ public class MultiplexPool {
 
     /**
      * agentId --> Pool
+     * 存储每个客户端的连接池
      */
     private final ConcurrentHashMap<String, Pool> agentPools = new ConcurrentHashMap<>();
 

@@ -50,12 +50,12 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         }
         if (tunnelEntry == null) {
             logger.warn("连接池没有可用连接，关闭流");
-            context.fireEvent(StreamEvent.STREAM_CLOSE);
+            context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
         if (!tunnelEntry.isActive()){
             logger.warn("连接不可用 {} 关闭流",tunnelEntry.getTunnelId());
-            context.fireEvent(StreamEvent.STREAM_CLOSE);
+            context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
         context.setTunnelEntry(tunnelEntry);

@@ -26,7 +26,6 @@ import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.transport.IntSet;
-import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -121,8 +120,10 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 break;
             }
             case TMSP.MSG_STREAM_CLOSE: {
-                StreamManager.getStreamContext(frame.getStreamId()).ifPresent(streamContext -> {
-                    streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+                logger.debug("收到来自远程关闭流消息");
+                StreamManager.getStreamContext(frame.getStreamId())
+                        .ifPresent(streamContext -> {
+                    streamContext.fireEvent(StreamEvent.STREAM_REMOTE_CLOSE);
                 });
                 break;
             }

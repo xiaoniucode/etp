@@ -80,7 +80,7 @@ public class DirectTunnelBridge implements TunnelBridge {
     public void forwardToLocal(ByteBuf payload) {
         if (streamContext.isChannelClosed(tunnel)) {
             logger.error("隧道没有激活：streamId={}", streamContext.getStreamId());
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
         payload.retain();
@@ -90,7 +90,7 @@ public class DirectTunnelBridge implements TunnelBridge {
                 logger.debug("数据转发到内网成功：streamId={}", streamContext.getStreamId());
             } else {
                 logger.debug("数据转发到内网失败：streamId={}", streamContext.getStreamId(),f.cause());
-                streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             }
         });
     }
@@ -99,7 +99,7 @@ public class DirectTunnelBridge implements TunnelBridge {
     public void forwardToRemote(ByteBuf payload) {
         if (streamContext.isChannelClosed(visitor)) {
             logger.error("访问者通道没有激活：streamId={}", streamContext.getStreamId());
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
         visitor.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) f -> {
@@ -108,7 +108,7 @@ public class DirectTunnelBridge implements TunnelBridge {
                 logger.debug("数据转发给访问者成功：streamId={}", streamContext.getStreamId());
             } else {
                 logger.debug("数据转发给访问者失败：streamId={}", streamContext.getStreamId(), f.cause());
-                streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             }
         });
     }

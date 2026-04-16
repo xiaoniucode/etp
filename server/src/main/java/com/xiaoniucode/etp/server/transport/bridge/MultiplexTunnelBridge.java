@@ -34,7 +34,7 @@ public class MultiplexTunnelBridge implements TunnelBridge {
         int streamId = streamContext.getStreamId();
         if (streamContext.isChannelClosed(tunnel)) {
             logger.debug("数据通道未激活，数据转发失败：streamId={}", streamId);
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
         TMSPFrame frame = new TMSPFrame(streamContext.getStreamId(), TMSP.MSG_STREAM_DATA, payload);
@@ -55,7 +55,7 @@ public class MultiplexTunnelBridge implements TunnelBridge {
         int streamId = streamContext.getStreamId();
         if (streamContext.isChannelClosed(visitor)) {
             logger.debug("通道未激活，数据转发失败：streamId={}", streamId);
-            streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
+            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
         payload.retain();

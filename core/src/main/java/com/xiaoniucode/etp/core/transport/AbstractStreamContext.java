@@ -48,7 +48,11 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
         tunnelBridge.forwardToLocal(payload);
     }
 
+    public boolean isDirectConnection() {
+        return !multiplex;
+    }
+
     public boolean isChannelClosed(Channel channel) {
-        return channel == null ||! channel.isActive() && !channel.isWritable() ;
+        return channel == null || !channel.isActive() && !channel.isWritable();
     }
 }

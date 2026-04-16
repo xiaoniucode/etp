@@ -38,6 +38,7 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         streamContext.setCurrentProtocol(ProtocolType.TCP);
         streamContext.setStreamManager(streamManager);
         streamContext.fireEvent(StreamEvent.STREAM_OPEN);
+        ctx.fireChannelActive();
     }
 
     @Override
@@ -65,9 +66,9 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         streamManager.getStreamContext(ctx.channel()).ifPresent(context -> {
-            context.fireEvent(StreamEvent.STREAM_CLOSE);
+            context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
-        super.channelInactive(ctx);
+        ctx.fireChannelInactive();
     }
 
     @Override
@@ -84,6 +85,6 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 }
             }
         });
-        super.channelWritabilityChanged(ctx);
+        ctx.fireChannelWritabilityChanged();
     }
 }
