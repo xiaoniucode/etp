@@ -1,10 +1,13 @@
 package com.xiaoniucode.etp.core.enums;
 
+import lombok.Getter;
+
 /**
  * IP 访问控制模式
  * @author xiaoniucode
  */
-public enum AccessControlMode {
+@Getter
+public enum AccessControl {
     /**
      * 白名单模式：只允许指定 IP 访问
      */
@@ -18,7 +21,7 @@ public enum AccessControlMode {
     private final Integer code;
     private final String description;
 
-    AccessControlMode(Integer code, String description) {
+    AccessControl(Integer code, String description) {
         this.code = code;
         this.description = description;
     }
@@ -30,8 +33,8 @@ public enum AccessControlMode {
      * @return 对应的枚举实例
      * @throws IllegalArgumentException 当代码值不存在对应的枚举实例时
      */
-    public static AccessControlMode fromCode(Integer code) {
-        for (AccessControlMode mode : values()) {
+    public static AccessControl fromCode(Integer code) {
+        for (AccessControl mode : values()) {
             if (mode.code.equals(code)) {
                 return mode;
             }
@@ -46,21 +49,13 @@ public enum AccessControlMode {
      * @return 对应的枚举实例
      * @throws IllegalArgumentException 当字符串值不存在对应的枚举实例时
      */
-    public static AccessControlMode fromValue(String value) {
-        for (AccessControlMode mode : values()) {
+    public static AccessControl fromValue(String value) {
+        for (AccessControl mode : values()) {
             if (mode.name().equalsIgnoreCase(value)) {
                 return mode;
             }
         }
         throw new IllegalArgumentException("无效的访问控制模式: " + value);
-    }
-
-    public Integer getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public boolean isAllowMode() {

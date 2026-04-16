@@ -14,14 +14,14 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.entity.converter;
-import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.core.enums.AccessControl;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 /**
  * 访问控制模式转换器
  */
 @Converter
-public class AccessControlModeConverter implements AttributeConverter<AccessControlMode, Integer> {
+public class AccessControlModeConverter implements AttributeConverter<AccessControl, Integer> {
     /**
      * 将访问控制模式转换为数据库列值
      * 
@@ -29,7 +29,7 @@ public class AccessControlModeConverter implements AttributeConverter<AccessCont
      * @return 数据库列值
      */
     @Override
-    public Integer convertToDatabaseColumn(AccessControlMode accessControlMode) {
+    public Integer convertToDatabaseColumn(AccessControl accessControlMode) {
         if (accessControlMode == null) {
             return null;
         }
@@ -42,10 +42,10 @@ public class AccessControlModeConverter implements AttributeConverter<AccessCont
      * @return 访问控制模式
      */
     @Override
-    public AccessControlMode convertToEntityAttribute(Integer code) {
+    public AccessControl convertToEntityAttribute(Integer code) {
         if (code == null) {
             return null;
         }
-        return AccessControlMode.fromCode(code);
+        return AccessControl.fromCode(code);
     }
 }

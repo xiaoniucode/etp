@@ -17,7 +17,7 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
-import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.core.enums.AccessControl;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AccessControlServiceImpl implements AccessControlService {
@@ -72,10 +73,10 @@ public class AccessControlServiceImpl implements AccessControlService {
         //数据库事务提交以后更新缓存
         transactionHelper.afterCommit(() -> {
             proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
-                AccessControlConfig accessControl = proxyConfig.getOrCreateAccessControlConfig();
-                accessControl.setMode(accessControlDO.getMode());
-                accessControl.setEnabled(accessControlDO.getEnabled());
-                proxyConfig.setAccessControl(accessControl);
+                AccessControlConfig ac = proxyConfig.getOrCreateAccessControlConfig();
+                ac.setMode(accessControlDO.getMode());
+                ac.setEnabled(accessControlDO.getEnabled());
+                proxyConfig.setAccessControl(ac);
                 ipAccessChecker.invalidate(proxyId);
             });
         });
@@ -86,8 +87,10 @@ public class AccessControlServiceImpl implements AccessControlService {
     public void deleteRuleById(Long id) {
         AccessControlRuleDO accessControlRuleDO = accessControlRuleRepository.findById(id)
                 .orElseThrow(() -> new BizException("规则不存在"));
+
         String proxyId = accessControlRuleDO.getProxyId();
         accessControlRuleRepository.deleteById(id);
+
         transactionHelper.afterCommit(() -> {
             proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
                 AccessControlConfig ac = proxyConfig.getOrCreateAccessControlConfig();
@@ -95,6 +98,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                     case ALLOW -> ac.removeAllow(accessControlRuleDO.getCidr());
                     case DENY -> ac.removeDeny(accessControlRuleDO.getCidr());
                 }
+                proxyConfig.setAccessControl(ac);
                 ipAccessChecker.invalidate(proxyId);
             });
         });
@@ -104,10 +108,14 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Transactional(rollbackFor = Exception.class)
     public void addRule(AccessControlRuleAddParam param) {
         String proxyId = param.getProxyId();
-        accessControlRepository.findById(proxyId).orElseThrow(()
-                -> new BizException("访问控制配置不出在"));
+        accessControlRepository.findById(proxyId).orElseThrow(() -> new BizException("访问控制配置不出在"));
+        if (accessControlRuleRepository.existsByProxyIdAndCidr(proxyId, param.getCidr())) {
+            throw new BizException("已存在相同CIDR规则");
+        }
+
         AccessControlRuleDO accessControlRuleDO = accessControlConvert.toRuleDO(param);
         accessControlRuleRepository.save(accessControlRuleDO);
+        //更新缓存
         transactionHelper.afterCommit(() -> {
             proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
                 AccessControlConfig ac = proxyConfig.getOrCreateAccessControlConfig();
@@ -115,6 +123,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                     case ALLOW -> ac.addAllow(accessControlRuleDO.getCidr());
                     case DENY -> ac.addDeny(accessControlRuleDO.getCidr());
                 }
+                proxyConfig.setAccessControl(ac);
                 ipAccessChecker.invalidate(proxyId);
             });
         });
@@ -123,24 +132,35 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateRule(AccessControlRuleUpdateParam param) {
-        AccessControlRuleDO accessControlRuleDO = accessControlRuleRepository.findById(param.getId()).orElseThrow(() -> new BizException("规则不存在"));
-        String proxyId = accessControlRuleDO.getProxyId();
-        String oldCidr = accessControlRuleDO.getCidr();
-        AccessControlMode oldRule = accessControlRuleDO.getMode();
-        accessControlConvert.updateRuleDO(accessControlRuleDO, param);
-        accessControlRuleRepository.save(accessControlRuleDO);
-        AccessControlMode newRule = accessControlRuleDO.getMode();
+        AccessControlRuleDO ruleDO = accessControlRuleRepository.findById(param.getId()).orElseThrow(() -> new BizException("规则不存在"));
+        //如果没有变化直接返回
+        if (Objects.equals(ruleDO.getMode().getCode(), param.getRuleType())
+                && Objects.equals(param.getCidr(), ruleDO.getCidr())) {
+            return;
+        }
+        String proxyId = ruleDO.getProxyId();
+        //旧配置
+        String oldCidr = ruleDO.getCidr();
+        AccessControl oldRule = ruleDO.getMode();
+        //更新数据库
+        accessControlConvert.updateRuleDO(ruleDO, param);
+        accessControlRuleRepository.save(ruleDO);
+
+        AccessControl newRule = ruleDO.getMode();
+        //更新缓存
         transactionHelper.afterCommit(() -> {
             proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
                 AccessControlConfig ac = proxyConfig.getOrCreateAccessControlConfig();
+                //删除旧的
                 switch (oldRule) {
                     case ALLOW -> ac.removeAllow(oldCidr);
                     case DENY -> ac.removeDeny(oldCidr);
                 }
                 switch (newRule) {
-                    case ALLOW -> ac.addAllow(accessControlRuleDO.getCidr());
-                    case DENY -> ac.addDeny(accessControlRuleDO.getCidr());
+                    case ALLOW -> ac.addAllow(ruleDO.getCidr());
+                    case DENY -> ac.addDeny(ruleDO.getCidr());
                 }
+                proxyConfig.setAccessControl(ac);
                 ipAccessChecker.invalidate(proxyId);
             });
         });

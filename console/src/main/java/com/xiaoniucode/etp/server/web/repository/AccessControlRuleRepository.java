@@ -1,5 +1,7 @@
 package com.xiaoniucode.etp.server.web.repository;
+
 import com.xiaoniucode.etp.server.web.entity.AccessControlRuleDO;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +16,6 @@ public interface AccessControlRuleRepository extends JpaRepository<AccessControl
     void deleteByProxyIdIn(List<String> ids);
 
     List<AccessControlRuleDO> findByProxyId(String proxyId);
+
+    boolean existsByProxyIdAndCidr(String proxyId, String cidr);
 }

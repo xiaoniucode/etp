@@ -16,7 +16,7 @@
 package com.xiaoniucode.etp.core.ip.cidr;
 
 
-import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.core.enums.AccessControl;
 import lombok.Getter;
 
 import java.util.*;
@@ -30,8 +30,8 @@ public class CIDRMatcher {
     private final List<CIDRRange> ranges;
     private final boolean allowMode;
 
-    public CIDRMatcher(AccessControlMode mode, Set<String> allowList, Set<String> denyList) {
-        this.allowMode = AccessControlMode.ALLOW.equals(mode);
+    public CIDRMatcher(AccessControl mode, Set<String> allowList, Set<String> denyList) {
+        this.allowMode = AccessControl.ALLOW.equals(mode);
 
         List<CIDRRange> temp = new ArrayList<>();
         Set<String> source = allowMode ? allowList : denyList;

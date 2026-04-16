@@ -18,7 +18,7 @@ package com.xiaoniucode.etp.server.security;
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.ip.cidr.CIDRMatcher;
-import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.core.enums.AccessControl;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -43,7 +43,7 @@ public class IpAccessChecker {
             return true;
         }
 
-        AccessControlMode mode = accessControl.getMode();
+        AccessControl mode = accessControl.getMode();
         Set<String> allow = accessControl.getAllow();
         if (mode.isAllowMode() && allow.isEmpty()) {
             //白名单模式 + 空列表 = 拒绝所有

@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.core.domain;
 
-import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.core.enums.AccessControl;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,11 +18,11 @@ public class AccessControlConfig implements Serializable {
     @Setter
     private boolean enabled;
     @Setter
-    private AccessControlMode mode;
+    private AccessControl mode;
     private final Set<String> allow = new CopyOnWriteArraySet<>();
     private final Set<String> deny = new CopyOnWriteArraySet<>();
 
-    public AccessControlConfig(Boolean enabled, AccessControlMode mode,
+    public AccessControlConfig(Boolean enabled, AccessControl mode,
                                Set<String> allow, Set<String> deny) {
         this.enabled = enabled != null && enabled;
         this.mode = mode;

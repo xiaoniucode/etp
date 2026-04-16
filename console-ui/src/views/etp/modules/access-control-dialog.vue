@@ -250,8 +250,6 @@
       // 重新获取数据
       await fetchAccessControlData()
     } catch (error) {
-      console.error('保存规则失败:', error)
-      ElMessage.error('保存规则失败')
       // 恢复编辑前的数据
       if (editingRuleBackup.value) {
         Object.assign(rule, editingRuleBackup.value)
@@ -303,5 +301,3 @@
     emit('close')
   }
 </script>
-
-

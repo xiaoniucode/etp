@@ -16,7 +16,7 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.core.domain.TransportCustomConfig;
-import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.core.enums.AccessControl;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +76,7 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
         // 配置访问控制
         AccessControlConfig accessControlConfig = new AccessControlConfig(
                 accessControl.isEnabled(),
-                AccessControlMode.valueOf(accessControl.getMode().name()),
+                AccessControl.valueOf(accessControl.getMode().name()),
                 accessControl.getAllow(),
                 accessControl.getDeny()
         );

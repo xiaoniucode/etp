@@ -15,7 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.entity;
 
-import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.core.enums.AccessControl;
 import com.xiaoniucode.etp.server.web.entity.converter.AccessControlModeConverter;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -45,5 +45,5 @@ public class AccessControlRuleDO {
      * 访问控制模式
      */
     @Convert(converter = AccessControlModeConverter.class)
-    private AccessControlMode mode;
+    private AccessControl mode;
 }

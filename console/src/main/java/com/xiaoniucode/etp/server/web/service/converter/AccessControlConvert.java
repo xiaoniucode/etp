@@ -15,7 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.service.converter;
 
-import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.core.enums.AccessControl;
 import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlRuleDTO;
 import com.xiaoniucode.etp.server.web.entity.AccessControlDO;
@@ -29,17 +29,17 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring",imports = {AccessControlMode.class})
+@Mapper(componentModel = "spring",imports = {AccessControl.class})
 public interface AccessControlConvert {
 
-    @Mapping(expression = "java(AccessControlMode.fromCode(param.getRuleType()))", target = "mode")
+    @Mapping(expression = "java(AccessControl.fromCode(param.getRuleType()))", target = "mode")
     AccessControlRuleDO toRuleDO(AccessControlRuleAddParam param);
 
-    @Mapping(expression = "java(AccessControlMode.fromCode(param.getMode()))", target = "mode")
+    @Mapping(expression = "java(AccessControl.fromCode(param.getMode()))", target = "mode")
     @Mapping(target = "proxyId",ignore = true)
     void updateDO(@MappingTarget AccessControlDO accessControlDO, AccessControlUpdateParam param);
 
-    @Mapping(expression = "java(AccessControlMode.fromCode(param.getRuleType()))", target = "mode")
+    @Mapping(expression = "java(AccessControl.fromCode(param.getRuleType()))", target = "mode")
     void updateRuleDO(@MappingTarget AccessControlRuleDO accessControlRuleDO, AccessControlRuleUpdateParam param);
 
     @Mapping(expression = "java(accessControlDO.getMode().getCode())", target = "mode")

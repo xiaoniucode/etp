@@ -17,7 +17,7 @@ package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.baidu.fsg.uid.UidGenerator;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.enums.AccessControlMode;
+import com.xiaoniucode.etp.core.enums.AccessControl;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
@@ -167,7 +167,7 @@ public class ProxyServiceImpl implements ProxyService {
         //init access control
         AccessControlDO accessControlDO = new AccessControlDO();
         accessControlDO.setProxyId(proxyId);
-        accessControlDO.setMode(AccessControlMode.DENY);
+        accessControlDO.setMode(AccessControl.DENY);
         accessControlDO.setEnabled(false);
         accessControlRepository.save(accessControlDO);
         //init http basic auth
@@ -392,7 +392,7 @@ public class ProxyServiceImpl implements ProxyService {
 
         AccessControlDO accessControlDO = new AccessControlDO();
         accessControlDO.setProxyId(proxyId);
-        accessControlDO.setMode(AccessControlMode.DENY);
+        accessControlDO.setMode(AccessControl.DENY);
         accessControlDO.setEnabled(false);
         accessControlRepository.save(accessControlDO);
         logger.debug("TCP 代理创建成功：{}", proxyDO.getName());

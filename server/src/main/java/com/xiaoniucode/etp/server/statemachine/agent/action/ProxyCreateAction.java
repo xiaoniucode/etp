@@ -137,7 +137,7 @@ public class ProxyCreateAction extends AgentBaseAction {
         if (proxy.hasAccessControl()) {
             Message.AccessControl accessControl = proxy.getAccessControl();
             boolean enable = accessControl.getEnable();
-            AccessControlMode accessControlMode = AccessControlMode.fromValue(accessControl.getMode().name());
+            AccessControl accessControlMode = AccessControl.fromValue(accessControl.getMode().name());
             Set<String> allow = new HashSet<>(accessControl.getAllowList());
             Set<String> deny = new HashSet<>(accessControl.getDenyList());
             proxyConfig.setAccessControl(new AccessControlConfig(enable, accessControlMode, allow, deny));
