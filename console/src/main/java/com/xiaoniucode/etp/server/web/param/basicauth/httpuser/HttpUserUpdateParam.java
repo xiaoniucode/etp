@@ -24,8 +24,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class HttpUserUpdateParam {
-    @NotNull(message = "ID 不能为空")
+    @NotNull(message = "id 不能为空")
     private Long id;
+    @NotNull(message = "proxyId 不能为空")
+    private String proxyId;
     @NotBlank(message = "用户名不能为空")
     private String username;
     @NotBlank(message = "密码不能为空")

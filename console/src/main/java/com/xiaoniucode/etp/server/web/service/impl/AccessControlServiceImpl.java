@@ -132,11 +132,24 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateRule(AccessControlRuleUpdateParam param) {
-        AccessControlRuleDO ruleDO = accessControlRuleRepository.findById(param.getId()).orElseThrow(() -> new BizException("规则不存在"));
+        AccessControlRuleDO ruleDO = accessControlRuleRepository.findById(param.getId())
+                .orElseThrow(() -> new BizException("规则不存在"));
         //如果没有变化直接返回
         if (Objects.equals(ruleDO.getMode().getCode(), param.getRuleType())
                 && Objects.equals(param.getCidr(), ruleDO.getCidr())) {
             return;
+        }
+        //如果cidr变化需要检查当前代理下是否存在相同的，但排除自己
+        if (!Objects.equals(ruleDO.getCidr(), param.getCidr())) {
+            boolean exists = accessControlRuleRepository
+                    .existsByProxyIdAndCidrAndIdNot(
+                            ruleDO.getProxyId(),
+                            param.getCidr(),
+                            param.getId()
+                    );
+            if (exists) {
+                throw new BizException("该规则已存在");
+            }
         }
         String proxyId = ruleDO.getProxyId();
         //旧配置

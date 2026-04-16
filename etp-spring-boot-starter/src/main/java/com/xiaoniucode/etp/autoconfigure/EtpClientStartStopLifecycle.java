@@ -105,7 +105,11 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
             Set<HttpUser> users = basicAuth.getUsers().stream()
                     .map(user -> new HttpUser(user.getUser(), user.getPass()))
                     .collect(Collectors.toSet());
-            BasicAuthConfig basicAuthConfig = new BasicAuthConfig(basicAuth.isEnabled(), users);
+
+            BasicAuthConfig basicAuthConfig = new BasicAuthConfig();
+            basicAuthConfig.setEnabled(basicAuth.isEnabled());
+            basicAuthConfig.addUsers(users);
+
             proxyConfig.setBasicAuth(basicAuthConfig);
         }
 

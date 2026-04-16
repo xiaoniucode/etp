@@ -1,5 +1,7 @@
 package com.xiaoniucode.etp.server.web.security;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -21,6 +24,7 @@ public class SecurityConfig {
     private final SecurityProperties securityProperties;
     private final JsonAuthenticationEntryPoint jsonAuthenticationEntryPoint;
     private final JsonAccessDeniedHandler jsonAccessDeniedHandler;
+
     @Autowired
     public SecurityConfig(@Lazy JwtAuthenticationFilter jwtAuthenticationFilter, SecurityProperties securityProperties, JsonAuthenticationEntryPoint jsonAuthenticationEntryPoint, JsonAccessDeniedHandler jsonAccessDeniedHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
@@ -28,16 +32,20 @@ public class SecurityConfig {
         this.jsonAuthenticationEntryPoint = jsonAuthenticationEntryPoint;
         this.jsonAccessDeniedHandler = jsonAccessDeniedHandler;
     }
+
     @Bean
+    @ConditionalOnMissingBean(PasswordEncoder.class)
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

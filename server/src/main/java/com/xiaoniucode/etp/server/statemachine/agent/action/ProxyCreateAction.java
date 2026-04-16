@@ -23,6 +23,7 @@ import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -41,6 +42,8 @@ public class ProxyCreateAction extends AgentBaseAction {
     private AppConfig appConfig;
     @Autowired
     private UidGenerator uidGenerator;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -145,9 +148,12 @@ public class ProxyCreateAction extends AgentBaseAction {
         if (proxyConfig.getProtocol().isHttp() && proxy.hasBasicAuth()) {
             Message.BasicAuth basicAuth = proxy.getBasicAuth();
             Set<HttpUser> users = basicAuth.getHttpUsersList().stream()
-                    .map(httpUser -> new HttpUser(httpUser.getUser(), httpUser.getPass()))
+                    .map(httpUser -> new HttpUser(httpUser.getUser(), passwordEncoder.encode(httpUser.getPass())))
                     .collect(Collectors.toSet());
-            BasicAuthConfig basicAuthConfig = new BasicAuthConfig(basicAuth.getEnable(), users);
+
+            BasicAuthConfig basicAuthConfig = proxyConfig.getOrCreateBasicAuthConfig();
+            basicAuthConfig.setEnabled(basicAuth.getEnable());
+            basicAuthConfig.addUsers(users);
             proxyConfig.setBasicAuth(basicAuthConfig);
         }
         if (proxy.hasBandwidth()) {

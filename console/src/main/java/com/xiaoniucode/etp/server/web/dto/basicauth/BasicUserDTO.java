@@ -25,5 +25,4 @@ public class BasicUserDTO implements Serializable {
     private Long id;
     private String proxyId;
     private String username;
-    private String password;
 }

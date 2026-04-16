@@ -32,10 +32,7 @@ export function fetchGetBasicAuth(proxyId: string) {
  * @param data 更新数据
  * @returns 操作结果
  */
-export function fetchUpdateBasicAuth(data: {
-  proxyId: string
-  enabled: boolean
-}) {
+export function fetchUpdateBasicAuth(data: { proxyId: string; enabled: boolean }) {
   return request.put({
     url: '/api/basic-auth',
     params: data,
@@ -65,11 +62,7 @@ export function fetchAddBasicAuthUser(data: {
  * @param data 用户数据
  * @returns 操作结果
  */
-export function fetchUpdateBasicAuthUser(data: {
-  id: number
-  username: string
-  password: string
-}) {
+export function fetchUpdateBasicAuthUser(data: { id: number; username: string; password: string }) {
   return request.put({
     url: '/api/basic-auth/user',
     params: data,

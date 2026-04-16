@@ -83,7 +83,8 @@ public class DirectTunnelBridge implements TunnelBridge {
             streamContext.fireEvent(StreamEvent.STREAM_CLOSE);
             return;
         }
-        tunnel.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) f -> {
+        payload.retain();
+        tunnel.writeAndFlush(payload).addListener((ChannelFutureListener) f -> {
             logger.debug("流 {} 引用计数为：{}", streamContext.getStreamId(), payload.refCnt());
             if (f.isSuccess()) {
                 logger.debug("数据转发到内网成功：streamId={}", streamContext.getStreamId());

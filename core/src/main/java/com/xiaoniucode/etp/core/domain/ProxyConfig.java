@@ -188,15 +188,22 @@ public class ProxyConfig {
         return addedCount;
     }
 
-    public AccessControlConfig getOrCreateAccessControlConfig() {
-        if (accessControl == null) {
-            return new AccessControlConfig();
+    public BasicAuthConfig getOrCreateBasicAuthConfig(){
+        if (basicAuth==null){
+            return new BasicAuthConfig();
         }
-        return accessControl;
+        return basicAuth;
     }
 
     public boolean isMuxTunnel() {
         return transport != null && transport.getMultiplex();
+    }
+
+    public AccessControlConfig getOrCreateAccessControlConfig() {
+        if (accessControl==null){
+            return new AccessControlConfig();
+        }
+        return accessControl;
     }
 }
 

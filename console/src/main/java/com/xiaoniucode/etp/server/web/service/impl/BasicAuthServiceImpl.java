@@ -16,6 +16,9 @@
 
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
+import com.xiaoniucode.etp.core.domain.HttpUser;
+import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.basicauth.BasicAuthDetailDTO;
 import com.xiaoniucode.etp.server.web.entity.BasicAuthDO;
@@ -27,11 +30,14 @@ import com.xiaoniucode.etp.server.web.repository.BasicAuthRepository;
 import com.xiaoniucode.etp.server.web.repository.BasicUserRepository;
 import com.xiaoniucode.etp.server.web.service.BasicAuthService;
 import com.xiaoniucode.etp.server.web.service.converter.BasicAuthConvert;
+import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class BasicAuthServiceImpl implements BasicAuthService {
@@ -41,6 +47,12 @@ public class BasicAuthServiceImpl implements BasicAuthService {
     private BasicUserRepository basicUserRepository;
     @Autowired
     private BasicAuthConvert basicAuthConvert;
+    @Autowired
+    private ProxyManager proxyManager;
+    @Autowired
+    private TransactionHelper transactionHelper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public BasicAuthDetailDTO getByProxyId(String proxyId) {
@@ -58,6 +70,14 @@ public class BasicAuthServiceImpl implements BasicAuthService {
                 .orElseThrow(() -> new BizException("Basic Auth 配置不存在"));
         basicAuthDO.setEnabled(request.getEnabled());
         basicAuthRepository.save(basicAuthDO);
+
+        transactionHelper.afterCommit(() -> {
+            proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
+                BasicAuthConfig ba = proxyConfig.getOrCreateBasicAuthConfig();
+                ba.setEnabled(basicAuthDO.getEnabled());
+                proxyConfig.setBasicAuth(ba);
+            });
+        });
     }
 
     @Override
@@ -65,23 +85,75 @@ public class BasicAuthServiceImpl implements BasicAuthService {
     public void addUser(HttpUserAddParam request) {
         BasicAuthDO basicAuthDO = basicAuthRepository.findById(request.getProxyId())
                 .orElseThrow(() -> new BizException("Basic Auth 配置不存在"));
+        boolean exists = basicUserRepository.existsByUsername(request.getUsername());
+        if (exists) {
+            throw new BizException("用户名已存在");
+        }
         BasicUserDO basicUserDO = basicAuthConvert.toUserDO(request);
+        String encode = passwordEncoder.encode(request.getPassword());
+        basicUserDO.setPassword(encode);
         basicUserRepository.save(basicUserDO);
+        transactionHelper.afterCommit(() -> {
+            proxyManager.findById(basicAuthDO.getProxyId()).ifPresent(proxyConfig -> {
+                BasicAuthConfig ba = proxyConfig.getOrCreateBasicAuthConfig();
+                HttpUser httpUser = HttpUser.of(basicUserDO.getUsername(), encode);
+                ba.addUser(httpUser);
+            });
+        });
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateUser(HttpUserUpdateParam request) {
-        BasicUserDO basicUserDO = basicUserRepository.findById(request.getId())
+    public void updateUser(HttpUserUpdateParam param) {
+        String proxyId = param.getProxyId();
+        BasicUserDO basicUserDO = basicUserRepository.findById(param.getId())
                 .orElseThrow(() -> new BizException("用户不存在"));
-        basicAuthConvert.updateUserDO(basicUserDO, request);
+
+        String oldUsername = basicUserDO.getUsername();
+        String encode = passwordEncoder.encode(param.getPassword());
+        boolean usernameChanged = !Objects.equals(param.getUsername(), basicUserDO.getUsername());
+        if (!usernameChanged && param.getPassword() == null) {
+            return;
+        }
+
+        if (usernameChanged) {
+            boolean exists = basicUserRepository
+                    .existsByProxyIdAndUsernameAndIdNot(
+                            proxyId,
+                            param.getUsername(),
+                            param.getId()
+                    );
+            if (exists) {
+                throw new BizException("用户名已存在");
+            }
+        }
+
+        basicUserDO.setPassword(encode);
+        basicAuthConvert.updateUserDO(basicUserDO, param);
         basicUserRepository.save(basicUserDO);
+
+        transactionHelper.afterCommit(() -> {
+            proxyManager.findById(basicUserDO.getProxyId()).ifPresent(proxyConfig -> {
+                BasicAuthConfig ba = proxyConfig.getOrCreateBasicAuthConfig();
+                HttpUser httpUser = HttpUser.of(basicUserDO.getUsername(), encode);
+                ba.removeUser(oldUsername);
+                ba.addUser(httpUser);
+            });
+        });
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Long id) {
+        BasicUserDO basicUserDO = basicUserRepository.findById(id).orElseThrow(() -> new BizException("用户不存在"));
+        String proxyId = basicUserDO.getProxyId();
         basicUserRepository.deleteById(id);
+        transactionHelper.afterCommit(() -> {
+            proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
+                BasicAuthConfig ba = proxyConfig.getOrCreateBasicAuthConfig();
+                ba.removeUser(basicUserDO.getUsername());
+            });
+        });
     }
 }
 

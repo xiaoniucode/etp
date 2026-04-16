@@ -34,7 +34,7 @@ public class IdleCheckHandler extends IdleStateHandler {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(IdleCheckHandler.class);
 
     public IdleCheckHandler() {
-        super(90, 60, 0, TimeUnit.SECONDS);
+        super(300, 180, 0, TimeUnit.SECONDS);
     }
 
     @Override

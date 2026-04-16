@@ -231,16 +231,19 @@ public class TomlConfigLoader implements ConfigSource {
                     Toml basicAuth = proxyTable.getTable("basic_auth");
                     if (basicAuth != null) {
                         Boolean enabled = basicAuth.getBoolean("enabled", false);
-                        HashSet<HttpUser> sets = new HashSet<>();
+                        HashSet<HttpUser> httpUsers = new HashSet<>();
                         List<HashMap> users = basicAuth.getList("users");
                         if (users != null && !users.isEmpty()) {
                             for (HashMap map : users) {
                                 String user = (String) map.getOrDefault("user", "");
                                 String pass = (String) map.getOrDefault("pass", "");
-                                sets.add(new HttpUser(user, pass));
+                                httpUsers.add(new HttpUser(user, pass));
                             }
                         }
-                        proxyConfig.setBasicAuth(new BasicAuthConfig(enabled, sets));
+                        BasicAuthConfig basicAuthConfig = new BasicAuthConfig();
+                        basicAuthConfig.setEnabled(enabled);
+                        basicAuthConfig.addUsers(httpUsers);
+                        proxyConfig.setBasicAuth(basicAuthConfig);
                     }
                 }
                 //带宽限制

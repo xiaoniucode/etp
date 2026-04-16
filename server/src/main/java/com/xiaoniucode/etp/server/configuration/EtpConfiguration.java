@@ -2,13 +2,14 @@ package com.xiaoniucode.etp.server.configuration;
 
 import com.baidu.fsg.uid.UidGenerator;
 import com.baidu.fsg.uid.impl.CachedUidGenerator;
-import com.baidu.fsg.uid.impl.DefaultUidGenerator;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +34,12 @@ public class EtpConfiguration {
                 512,
                 true
         );
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(PasswordEncoder.class)
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     /**

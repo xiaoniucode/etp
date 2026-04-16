@@ -1,11 +1,10 @@
 package com.xiaoniucode.etp.server.transport.http;
 
+import com.xiaoniucode.etp.core.domain.HttpUser;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
-import com.xiaoniucode.etp.server.vhost.DomainManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,6 +13,7 @@ import io.netty.util.CharsetUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
@@ -24,6 +24,8 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(BasicAuthHandler.class);
     @Autowired
     private ProxyManager proxyManager;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -45,7 +47,7 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
                     if (parts.length == 2) {
                         String username = parts[0];
                         String password = parts[1];
-                        if (!basicAuth.check(username, password)) {
+                        if (!check(username, password, basicAuth)) {
                             NettyHttpUtils.sendBasicAuth(visitor);
                         }
                     } else {
@@ -58,6 +60,14 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
             }
         });
         ctx.fireChannelRead(msg);
+    }
+
+    private boolean check(String username, String password, BasicAuthConfig basicAuth) {
+        HttpUser user = basicAuth.getUser(username);
+        if (user == null) {
+            return false;
+        }
+        return passwordEncoder.matches(password, user.getPassword());
     }
 
 }

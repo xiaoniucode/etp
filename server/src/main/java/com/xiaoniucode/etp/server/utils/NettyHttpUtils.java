@@ -1,25 +1,33 @@
 package com.xiaoniucode.etp.server.utils;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.util.CharsetUtil;
 
-import java.util.function.Consumer;
+
+import io.netty.channel.*;
 
 /**
  * HTTP 工具类
- * 提供常见的 HTTP 响应发送方法
  */
 public class NettyHttpUtils {
 
-    /**
-     * 发送 HTTP 403 Forbidden 响应
-     *
-     * @param channel 通道
-     */
+    private static ChannelFuture writeAndFlush(Channel channel, ByteBuf buf) {
+        return channel.writeAndFlush(buf).addListener((ChannelFutureListener) future -> {
+            if (!future.isSuccess()) {
+                buf.release();
+            }
+        });
+    }
+
+    private static ByteBuf buildResponse(Channel channel, String response) {
+        ByteBuf buf = channel.alloc().buffer(response.length());
+        buf.writeCharSequence(response, CharsetUtil.UTF_8);
+        return buf;
+    }
+
     public static ChannelFuture sendHttp403(Channel channel) {
         String response = """
                 HTTP/1.1 403 Forbidden\r
@@ -27,22 +35,21 @@ public class NettyHttpUtils {
                 Content-Length: 15\r
                 \r
                 Access Denied""";
-        return channel.writeAndFlush(Unpooled.copiedBuffer(response, CharsetUtil.UTF_8));
+        return writeAndFlush(channel, buildResponse(channel, response));
     }
 
     public static ChannelFuture sendHttpTooManyRequests(Channel channel) {
-        ByteBuf buf = channel.alloc().buffer();
-        buf.writeCharSequence("""
+        String response = """
                 HTTP/1.1 429 Too Many Requests\r
                 Content-Length: 0\r
                 Retry-After: 1\r
                 \r
-                """, CharsetUtil.UTF_8);
-        return channel.writeAndFlush(buf);
+                """;
+        return writeAndFlush(channel, buildResponse(channel, response));
     }
 
     /**
-     * 发送认证
+     * 401 Basic Auth
      */
     public static ChannelFuture sendBasicAuth(Channel channel) {
         String response = """
@@ -53,31 +60,22 @@ public class NettyHttpUtils {
                 Connection: close\r
                 \r
                 """;
-        return channel.writeAndFlush(io.netty.buffer.Unpooled.copiedBuffer(response, CharsetUtil.UTF_8));
+        return writeAndFlush(channel, buildResponse(channel, response));
     }
 
-    /**
-     * 发送 HTTP 200 OK 响应
-     *
-     * @param channel 通道
-     * @param content 响应内容
-     */
     public static ChannelFuture sendHttp200(Channel channel, String content) {
-        int contentLength = content.getBytes(CharsetUtil.UTF_8).length;
+        int contentLength = content.length();
+
         String response = String.format("""
                 HTTP/1.1 200 OK\r
                 Content-Type: text/plain\r
                 Content-Length: %d\r
                 \r
                 %s""", contentLength, content);
-        return channel.writeAndFlush(Unpooled.copiedBuffer(response, CharsetUtil.UTF_8));
+
+        return writeAndFlush(channel, buildResponse(channel, response));
     }
 
-    /**
-     * 发送 HTTP 404 Not Found 响应
-     *
-     * @param channel 通道
-     */
     public static ChannelFuture sendHttp404(Channel channel) {
         String response = """
                 HTTP/1.1 404 Not Found\r
@@ -85,14 +83,9 @@ public class NettyHttpUtils {
                 Content-Length: 13\r
                 \r
                 Not Found""";
-        return channel.writeAndFlush(Unpooled.copiedBuffer(response, CharsetUtil.UTF_8));
+        return writeAndFlush(channel, buildResponse(channel, response));
     }
 
-    /**
-     * 发送 HTTP 500 Internal Server Error 响应
-     *
-     * @param channel 通道
-     */
     public static ChannelFuture sendHttp500(Channel channel) {
         String response = """
                 HTTP/1.1 500 Internal Server Error\r
@@ -100,14 +93,9 @@ public class NettyHttpUtils {
                 Content-Length: 21\r
                 \r
                 Internal Server Error""";
-        return channel.writeAndFlush(Unpooled.copiedBuffer(response, CharsetUtil.UTF_8));
+        return writeAndFlush(channel, buildResponse(channel, response));
     }
 
-    /**
-     * 发送 HTTP 400 Bad Request 响应
-     *
-     * @param channel 通道
-     */
     public static ChannelFuture sendHttp400(Channel channel) {
         String response = """
                 HTTP/1.1 400 Bad Request\r
@@ -115,26 +103,25 @@ public class NettyHttpUtils {
                 Content-Length: 11\r
                 \r
                 Bad Request""";
-        return channel.writeAndFlush(Unpooled.copiedBuffer(response, CharsetUtil.UTF_8));
+        return writeAndFlush(channel, buildResponse(channel, response));
     }
 
-    /**
-     * 发送自定义 HTTP 响应
-     *
-     * @param channel       通道
-     * @param statusCode    状态码
-     * @param statusMessage 状态消息
-     * @param contentType   内容类型
-     * @param content       响应内容
-     */
-    public static ChannelFuture sendHttpResponse(Channel channel, int statusCode, String statusMessage, String contentType, String content) {
-        int contentLength = content.getBytes(CharsetUtil.UTF_8).length;
+    public static ChannelFuture sendHttpResponse(
+            Channel channel,
+            int statusCode,
+            String statusMessage,
+            String contentType,
+            String content
+    ) {
+        int contentLength = content.length();
+
         String response = String.format("""
                 HTTP/1.1 %d %s\r
                 Content-Type: %s\r
                 Content-Length: %d\r
                 \r
                 %s""", statusCode, statusMessage, contentType, contentLength, content);
-        return channel.writeAndFlush(Unpooled.copiedBuffer(response, CharsetUtil.UTF_8));
+
+        return writeAndFlush(channel, buildResponse(channel, response));
     }
 }

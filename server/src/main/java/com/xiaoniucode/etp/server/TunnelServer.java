@@ -89,7 +89,7 @@ public class TunnelServer implements Lifecycle {
                                     .addLast(loggingHandler)
                                     .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                     .addLast(downloadRateLimitHandler)
-                                    .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentManager,60,0,0, TimeUnit.SECONDS))
+                                    .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentManager,90,0,0, TimeUnit.SECONDS))
                                     .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
                         }
                     });

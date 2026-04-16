@@ -18,10 +18,7 @@
         <div class="flex flex-col gap-4">
           <div class="flex items-center gap-3">
             <span class="w-20 font-medium">启用状态：</span>
-            <ElSwitch
-              v-model="formData.enabled"
-              @change="handleEnableChange"
-            />
+            <ElSwitch v-model="formData.enabled" @change="handleEnableChange" />
           </div>
         </div>
       </ElCard>
@@ -34,16 +31,8 @@
           </div>
         </template>
         <div class="border border-gray-200 rounded p-4">
-          <ElTable
-            :data="formData.users"
-            style="width: 100%"
-            border
-          >
-            <ElTableColumn
-              prop="username"
-              label="用户名"
-              width="200"
-            >
+          <ElTable :data="formData.users" style="width: 100%" border>
+            <ElTableColumn prop="username" label="用户名" width="200">
               <template #default="scope">
                 <ElInput
                   v-if="editingUserId === scope.row.id"
@@ -54,11 +43,7 @@
                 <span v-else>{{ scope.row.username }}</span>
               </template>
             </ElTableColumn>
-            <ElTableColumn
-              prop="password"
-              label="密码"
-              width="200"
-            >
+            <ElTableColumn prop="password" label="密码" width="200">
               <template #default="scope">
                 <ElInput
                   v-if="editingUserId === scope.row.id"
@@ -70,11 +55,7 @@
                 <span v-else>{{ '••••••••' }}</span>
               </template>
             </ElTableColumn>
-            <ElTableColumn
-              label="操作"
-              width="200"
-              fixed="right"
-            >
+            <ElTableColumn label="操作" width="200" fixed="right">
               <template #default="scope">
                 <ElSpace size="small">
                   <ElButton
@@ -85,22 +66,13 @@
                   >
                     保存
                   </ElButton>
-                  <ElButton
-                    v-else
-                    type="primary"
-                    size="small"
-                    @click="handleEditUser(scope.row)"
-                  >
+                  <ElButton v-else type="primary" size="small" @click="handleEditUser(scope.row)">
                     <template #icon>
                       <Edit />
                     </template>
                     编辑
                   </ElButton>
-                  <ElButton
-                    type="danger"
-                    size="small"
-                    @click="handleDeleteUser(scope.row.id)"
-                  >
+                  <ElButton type="danger" size="small" @click="handleDeleteUser(scope.row.id)">
                     <template #icon>
                       <Delete />
                     </template>
@@ -139,7 +111,6 @@
 
   defineOptions({ name: 'BasicAuthDialog' })
 
-  // Props
   const props = defineProps({
     visible: {
       type: Boolean,
@@ -151,10 +122,8 @@
     }
   })
 
-  // Emits
   const emit = defineEmits(['update:visible', 'close'])
 
-  // 表单数据
   const formData = reactive({
     enabled: false,
     users: [] as Array<{
@@ -165,89 +134,63 @@
     }>
   })
 
-  // 弹窗状态
   const dialogVisible = ref(false)
-  
-  // 编辑状态
   const editingUserId = ref<number | null>(null)
-  
-  // 临时存储编辑前的用户数据，用于取消编辑
   const editingUserBackup = ref<any>(null)
 
-  // 监听 props.visible 变化，同步到本地变量并获取数据
-  watch(() => props.visible, async (newVal) => {
-    dialogVisible.value = newVal
-    if (newVal && props.proxyId) {
-      await fetchBasicAuthData()
+  watch(
+    () => props.visible,
+    async (newVal) => {
+      dialogVisible.value = newVal
+      if (newVal && props.proxyId) {
+        await fetchBasicAuthData()
+      }
     }
-  })
+  )
 
-  // 监听本地 dialogVisible 变化，通知父组件
   watch(dialogVisible, (newVal) => {
     emit('update:visible', newVal)
   })
 
-  // 组件挂载时获取数据
   onMounted(async () => {
     if (props.visible && props.proxyId) {
       await fetchBasicAuthData()
     }
   })
 
-  // 获取 Basic Auth 详情
   const fetchBasicAuthData = async () => {
-    try {
-      const response = await fetchGetBasicAuth(props.proxyId)
-      if (response) {
-        formData.enabled = response.enabled || false
-        formData.users = response.users || []
-      }
-    } catch (error) {
-      console.error('获取 Basic Auth 详情失败:', error)
-      ElMessage.error('获取 Basic Auth 详情失败')
+    const response = await fetchGetBasicAuth(props.proxyId)
+    if (response) {
+      formData.enabled = response.enabled || false
+      formData.users = response.users || []
     }
   }
 
   // 处理启用状态变化
   const handleEnableChange = async () => {
-    try {
-      await fetchUpdateBasicAuth({
-        proxyId: props.proxyId,
-        enabled: formData.enabled
-      })
-    } catch (error) {
-      console.error('更新 Basic Auth 状态失败:', error)
-      ElMessage.error('更新 Basic Auth 状态失败')
-      // 恢复原状态
-      formData.enabled = !formData.enabled
-    }
+    await fetchUpdateBasicAuth({
+      proxyId: props.proxyId,
+      enabled: formData.enabled
+    })
   }
 
-  // 添加用户
   const addUser = () => {
-    // 添加一行新用户
     formData.users.push({
       id: 0, // 临时ID，后端会生成真实ID
       proxyId: props.proxyId,
       username: '',
       password: ''
     })
-    // 自动进入编辑状态
     const newUser = formData.users[formData.users.length - 1]
     handleEditUser(newUser)
   }
 
-  // 开始编辑用户
   const handleEditUser = (user: any) => {
-    // 存储编辑前的数据，用于取消编辑
     editingUserBackup.value = { ...user }
-    // 设置编辑状态
     editingUserId.value = user.id
   }
 
-  // 保存用户
   const handleSaveUser = async (user: any) => {
-    // 验证用户
     if (!user.username) {
       ElMessage.error('请输入用户名')
       return
@@ -257,40 +200,25 @@
       return
     }
     
-    try {
-      if (user.id > 0) {
-        // 更新现有用户
-        await fetchUpdateBasicAuthUser({
-          id: user.id,
-          username: user.username,
-          password: user.password
-        })
-      } else {
-        // 添加新用户
-        await fetchAddBasicAuthUser({
-          proxyId: props.proxyId,
-          username: user.username,
-          password: user.password
-        })
-      }
-      // 退出编辑状态
-      editingUserId.value = null
-      // 重新获取数据
-      await fetchBasicAuthData()
-    } catch (error) {
-      console.error('保存用户失败:', error)
-      ElMessage.error('保存用户失败')
-      // 恢复编辑前的数据
-      if (editingUserBackup.value) {
-        Object.assign(user, editingUserBackup.value)
-      }
-    } finally {
-      // 清理备份
-      editingUserBackup.value = null
+    if (user.id > 0) {
+      await fetchUpdateBasicAuthUser({
+        id: user.id,
+        proxyId: props.proxyId,
+        username: user.username,
+        password: user.password
+      })
+    } else {
+      await fetchAddBasicAuthUser({
+        proxyId: props.proxyId,
+        username: user.username,
+        password: user.password
+      })
     }
+    editingUserId.value = null
+    await fetchBasicAuthData()
+    editingUserBackup.value = null
   }
 
-  // 处理删除用户
   const handleDeleteUser = async (id: number) => {
     try {
       await ElMessageBox.confirm('确定要删除此用户吗？', '警告', {
@@ -298,31 +226,26 @@
         cancelButtonText: '取消',
         type: 'warning'
       })
-      
+
       if (id > 0) {
-        // 删除已保存的用户
         await fetchDeleteBasicAuthUser(id)
-        // 重新获取数据
         await fetchBasicAuthData()
       } else {
-        // 删除未保存的用户（直接从列表中移除）
-        const index = formData.users.findIndex(user => user.id === id)
+        const index = formData.users.findIndex((user) => user.id === id)
         if (index > -1) {
           formData.users.splice(index, 1)
-          // 退出编辑状态
           editingUserId.value = null
         }
       }
     } catch (error) {
+      // 忽略用户取消操作的错误
       if (error !== 'cancel') {
-        console.error('删除用户失败:', error)
+        throw error
       }
     }
   }
 
-  // 处理弹窗关闭
   const handleClose = () => {
-    // 取消编辑状态
     if (editingUserId.value !== null) {
       editingUserId.value = null
       editingUserBackup.value = null
@@ -331,5 +254,3 @@
     emit('close')
   }
 </script>
-
-

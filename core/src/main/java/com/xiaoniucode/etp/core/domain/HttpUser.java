@@ -1,15 +1,21 @@
 package com.xiaoniucode.etp.core.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
 public class HttpUser {
     private String username;
     private String password;
+
+    public HttpUser(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public static HttpUser of(String username, String password) {
+        return new HttpUser(username, password);
+    }
 }
