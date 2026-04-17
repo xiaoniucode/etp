@@ -116,7 +116,7 @@ public class TcpConfigRegistrar implements ConfigRegistrar {
         logger.debug("释放端口 {} ", listenPort);
         portManager.release(listenPort);
         portAcceptor.stopPortListen(listenPort);
-        streamManager.closeStreams(listenPort);
+        streamManager.fireCloseByPort(listenPort);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class TcpConfigRegistrar implements ConfigRegistrar {
         } else {
             logger.debug("停止客户端 {} 代理 {} 端口 {}",agentId, name, listenPort);
             portAcceptor.stopPortListen(listenPort);
-            streamManager.closeStreams(listenPort);
+            streamManager.fireCloseByPort(listenPort);
         }
     }
 }

@@ -17,7 +17,7 @@ public enum AgentEvent {
     AUTH_FAILURE,
 
     /**
-     * 标记连接断开
+     * 标记连接断开，并不会清理资源
      */
     DISCONNECT,
 
@@ -31,9 +31,14 @@ public enum AgentEvent {
      */
     HEARTBEAT_TIMEOUT,
     /**
-     * 断开连接
+     * 本地断开连接，清理本地客户端所有资源，通知对端断开
      */
-    GOAWAY,
+    LOCAL_GOAWAY,
+    /**
+     * 来自远程的断开
+     * 清理客户端所有资源
+     */
+    REMOTE_GOAWAY,
 
     /**
      * 重连窗口超时

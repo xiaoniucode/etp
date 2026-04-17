@@ -2,7 +2,6 @@ package com.xiaoniucode.etp.server.statemachine.stream.action;
 
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancerFactory;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
@@ -22,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,7 +53,7 @@ public class TargetResolverAction extends StreamBaseAction {
             context.setAgentContext(gentContextOpt.get());
             context.setProxyConfig(config);
             context.setAgentContext(gentContextOpt.get());
-            Target selectedTarget = selectTarget(config, context);
+            Target selectedTarget = selectTarget(config);
             if (selectedTarget == null) {
                 logger.warn("无可用 proxyId={} 后端目标，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
                 context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
@@ -79,7 +77,7 @@ public class TargetResolverAction extends StreamBaseAction {
         }
     }
 
-    private Target selectTarget(ProxyConfig config, StreamContext context) {
+    private Target selectTarget(ProxyConfig config) {
         List<Target> targets = config.getTargets();
         if (CollectionUtils.isEmpty(targets)) {
             return null;
@@ -112,20 +110,14 @@ public class TargetResolverAction extends StreamBaseAction {
     }
 
     private ProxyConfig resolveProxyConfig(StreamContext context) {
-        Channel visitor = context.getVisitor();
         if (context.getCurrentProtocol() == ProtocolType.HTTP) {
-            String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
+            String domain = context.getVisitorDomain();
             return proxyManager.findByDomain(domain).orElse(null);
 
         } else if (context.getCurrentProtocol() == ProtocolType.TCP) {
-            int remotePort = getListenerPort(visitor);
+            int remotePort = context.getListenerPort();
             return proxyManager.findByRemotePort(remotePort).orElse(null);
         }
         return null;
-    }
-
-    private int getListenerPort(Channel visitor) {
-        InetSocketAddress sa = (InetSocketAddress) visitor.localAddress();
-        return sa.getPort();
     }
 }

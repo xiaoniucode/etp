@@ -3,6 +3,14 @@ package com.xiaoniucode.etp.server.configuration;
 import com.baidu.fsg.uid.UidGenerator;
 import com.baidu.fsg.uid.impl.CachedUidGenerator;
 import com.xiaoniucode.etp.core.notify.EventBus;
+import com.xiaoniucode.etp.server.store.AgentStore;
+import com.xiaoniucode.etp.server.store.DomainStore;
+import com.xiaoniucode.etp.server.store.InMemoryAgentStore;
+import com.xiaoniucode.etp.server.store.InMemoryDomainStore;
+import com.xiaoniucode.etp.server.store.InMemoryProxyStore;
+import com.xiaoniucode.etp.server.store.InMemoryTokenStore;
+import com.xiaoniucode.etp.server.store.ProxyStore;
+import com.xiaoniucode.etp.server.store.TokenStore;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -57,5 +65,29 @@ public class EtpConfiguration {
         generator.setEpochStr("2026-04-14");
         generator.setWorkerIdAssigner(() -> 1L);
         return generator;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(AgentStore.class)
+    public AgentStore agentStore() {
+        return new InMemoryAgentStore();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(TokenStore.class)
+    public TokenStore tokenStore() {
+        return new InMemoryTokenStore();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(ProxyStore.class)
+    public ProxyStore proxyStore() {
+        return new InMemoryProxyStore();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(DomainStore.class)
+    public DomainStore domainStore() {
+        return new InMemoryDomainStore();
     }
 }

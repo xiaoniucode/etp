@@ -1,14 +1,12 @@
 package com.xiaoniucode.etp.server.store;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Repository
 public class InMemoryProxyStore implements ProxyStore {
     /**
      * proxyId -->

@@ -140,14 +140,25 @@ public class AgentStateMachineConfig {
                 .when(ctx -> true)
                 .perform((from, to, event, context) -> context.setState(to));
 
-        // 收到 GoAway 指令
+        // 本地停止客户端
         builder.externalTransitions()
                 .fromAmong(AgentState.NEW,
                         AgentState.AUTHENTICATING,
                         AgentState.CONNECTED,
                         AgentState.DISCONNECTED)
                 .to(AgentState.CLOSED)
-                .on(AgentEvent.GOAWAY)
+                .on(AgentEvent.LOCAL_GOAWAY)
+                .when(ctx -> true)
+                .perform(goawayAction);
+
+        // 来自远程主动停止
+        builder.externalTransitions()
+                .fromAmong(AgentState.NEW,
+                        AgentState.AUTHENTICATING,
+                        AgentState.CONNECTED,
+                        AgentState.DISCONNECTED)
+                .to(AgentState.CLOSED)
+                .on(AgentEvent.REMOTE_GOAWAY)
                 .when(ctx -> true)
                 .perform(goawayAction);
 

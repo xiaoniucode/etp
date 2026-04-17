@@ -44,6 +44,7 @@ public class GoawayAction extends AgentBaseAction {
         logger.debug("{} 客户端断开，开始清理资源", agentId);
         try {
             // 清理流资源
+            streamManager.fireCloseByAgent(context.getAgentId());
             // cleanupStreams(agentId);
             logger.debug("清理客户端 {} 所有连接", agentId);
             // 清理隧道资源
@@ -61,14 +62,16 @@ public class GoawayAction extends AgentBaseAction {
 
             // 清理Context 中的临时数据
             //cleanupContextData(context);
-            Channel control = context.getControl();
-            //尝试通知客户端
-            control.writeAndFlush(new TMSPFrame(0, TMSP.MSG_GOAWAY)).addListener((ChannelFutureListener) future -> {
-                if (!future.isSuccess()) {
-                    logger.debug("{} GOAWAY 发送失败（可能连接已断）", agentId);
-                }
-                ChannelUtils.closeOnFlush(control);
-            });
+            if (event==AgentEvent.LOCAL_GOAWAY){
+                Channel control = context.getControl();
+                control.writeAndFlush(new TMSPFrame(0, TMSP.MSG_GOAWAY)).addListener((ChannelFutureListener) future -> {
+                    if (!future.isSuccess()) {
+                        logger.debug("{} GOAWAY 发送失败（可能连接已断）", agentId);
+                    }
+                    ChannelUtils.closeOnFlush(control);
+                });
+            }
+
             logger.info("{} 客户端资源清理完成", agentId);
         } catch (Exception e) {
             logger.error("{} 资源清理过程中发生异常", agentId, e);

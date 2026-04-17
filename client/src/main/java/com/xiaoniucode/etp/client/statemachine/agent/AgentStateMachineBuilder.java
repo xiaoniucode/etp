@@ -167,13 +167,20 @@ public class AgentStateMachineBuilder {
                     .on(AgentEvent.ERROR)
                     .perform(errorAction);
 
-            // 停止客户端
+            // 本地停止客户端
             builder.externalTransitions()
                     .fromAmong(AgentState.IDLE, AgentState.CONNECTING,
                             AgentState.CONNECTED, AgentState.DISCONNECTED,
                             AgentState.FAILED)
                     .to(AgentState.SHUTDOWN)
-                    .on(AgentEvent.STOP)
+                    .on(AgentEvent.LOCAL_GOAWAY)
+                    .perform(goawayAction);
+
+            // 来自远程停止客户端
+            builder.externalTransitions()
+                    .fromAmong(AgentState.CONNECTED, AgentState.DISCONNECTED, AgentState.FAILED)
+                    .to(AgentState.SHUTDOWN)
+                    .on(AgentEvent.REMOTE_GOAWAY)
                     .perform(goawayAction);
 
             builder.build(MACHINE_ID);

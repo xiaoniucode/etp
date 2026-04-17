@@ -9,27 +9,19 @@
   >
     <div class="basic-auth-dialog">
       <!-- 基本配置 -->
-      <ElCard class="art-card mb-4">
-        <template #header>
-          <div class="flex justify-between items-center">
-            <span>基本配置</span>
-          </div>
-        </template>
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold mb-4">基本配置</h3>
         <div class="flex flex-col gap-4">
           <div class="flex items-center gap-3">
             <span class="w-20 font-medium">启用状态：</span>
             <ElSwitch v-model="formData.enabled" @change="handleEnableChange" />
           </div>
         </div>
-      </ElCard>
+      </div>
 
       <!-- 用户列表 -->
-      <ElCard class="art-card">
-        <template #header>
-          <div class="flex justify-between items-center">
-            <span>用户列表</span>
-          </div>
-        </template>
+      <div>
+        <h3 class="text-lg font-semibold mb-4">用户列表</h3>
         <div class="border border-gray-200 rounded p-4">
           <ElTable :data="formData.users" style="width: 100%" border>
             <ElTableColumn prop="username" label="用户名" width="200">
@@ -89,17 +81,14 @@
             新增用户
           </ElButton>
         </div>
-        <div v-if="formData.users.length === 0" class="py-10 text-center">
-          <ElEmpty description="暂无用户" />
-        </div>
-      </ElCard>
+      </div>
     </div>
   </ElDialog>
 </template>
 
 <script setup lang="ts">
   import { ref, reactive, watch, onMounted } from 'vue'
-  import { ElMessage, ElMessageBox, ElEmpty } from 'element-plus'
+  import { ElMessage, ElMessageBox } from 'element-plus'
   import { Plus, Edit, Delete } from '@element-plus/icons-vue'
   import {
     fetchGetBasicAuth,

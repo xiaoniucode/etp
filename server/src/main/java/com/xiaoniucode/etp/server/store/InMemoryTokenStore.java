@@ -15,7 +15,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * 本地内存存储，可外部存储，如Redis
  */
-@Component
 public class InMemoryTokenStore implements TokenStore {
     /**
      * token --> TokenConfig

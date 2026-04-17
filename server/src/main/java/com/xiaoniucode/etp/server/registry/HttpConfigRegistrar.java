@@ -4,12 +4,13 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.RouteConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
-import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 
 import com.xiaoniucode.etp.server.vhost.DomainBinding;
 import com.xiaoniucode.etp.server.vhost.DomainManager;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.javers.core.diff.Diff;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @Component
 public class HttpConfigRegistrar implements ConfigRegistrar {
+    private final InternalLogger logger= InternalLoggerFactory.getInstance(HttpConfigRegistrar.class);
     @Autowired
     private DomainManager domainManager;
     @Autowired
@@ -66,11 +68,13 @@ public class HttpConfigRegistrar implements ConfigRegistrar {
 
     @Override
     public void unregister(ProxyConfig config) throws EtpException {
-        domainManager.unregister(config.getProxyId());
+        logger.debug("HTTP代理配置删除，清理关联资源");
         List<DomainBinding> boundDomains = domainManager.getBoundDomains(config.getProxyId());
         for (DomainBinding domainBinding : boundDomains) {
-            streamManager.closeStreams(domainBinding.getDomain());
+            streamManager.fireCloseByDomain(domainBinding.getDomain());
         }
+        domainManager.unregister(config.getProxyId());
+        //todo
         agentManager.getAgentContext(config.getAgentId()).ifPresent(agentContext -> {
             agentManager.removeProxyContextIndex(config.getProxyId());
         });

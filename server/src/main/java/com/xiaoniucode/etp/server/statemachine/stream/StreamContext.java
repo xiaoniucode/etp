@@ -5,12 +5,15 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.transport.AbstractStreamContext;
+import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.transport.BandwidthLimiter;
 import io.netty.channel.Channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.net.InetSocketAddress;
 
 @Getter
 @Setter
@@ -39,6 +42,24 @@ public class StreamContext extends AbstractStreamContext {
         return proxyConfig.getProxyId();
     }
 
+    public String getVisitorDomain() {
+        if (visitor == null) {
+            return null;
+        }
+        return visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
+    }
+
+    public Integer getListenerPort() {
+        if (visitor == null) {
+            return null;
+        }
+        InetSocketAddress sa = (InetSocketAddress) visitor.localAddress();
+        return sa.getPort();
+    }
+
+    public String getAgentId(){
+        return agentContext.getAgentId();
+    }
     public Channel getControl() {
         return agentContext.getControl();
     }

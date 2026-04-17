@@ -64,4 +64,13 @@ public class MultiplexPool {
             this.plainTunnelEntry = null;
         }
     }
+
+    public void closeAll() {
+        if (tlsTunnelEntry != null) {
+            ChannelUtils.closeOnFlush(tlsTunnelEntry.getChannel());
+        }
+        if (plainTunnelEntry != null) {
+            ChannelUtils.closeOnFlush(plainTunnelEntry.getChannel());
+        }
+    }
 }

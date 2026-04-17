@@ -3,7 +3,6 @@ package com.xiaoniucode.etp.client.statemachine.agent.action;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
-import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.message.Message;
 import io.netty.util.internal.logging.InternalLogger;
@@ -27,7 +26,7 @@ public class AuthResponseAction extends AgentBaseAction {
             context.fireEvent(AgentEvent.AUTH_SUCCESS);
         } else {
             logger.error("{}", authResponse.getMessage());
-            context.fireEvent(AgentEvent.STOP);
+            context.fireEvent(AgentEvent.LOCAL_GOAWAY);
         }
     }
 }

@@ -69,8 +69,8 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 break;
             }
             case TMSP.MSG_GOAWAY: {
-                logger.debug("收到停止信号，准备停止客户端");
-                agentContext.fireEvent(AgentEvent.STOP);
+                logger.debug("收到停止消息，准备停止客户端");
+                agentContext.fireEvent(AgentEvent.LOCAL_GOAWAY);
                 break;
             }
             case TMSP.MSG_ERROR: {

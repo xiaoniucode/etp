@@ -44,7 +44,7 @@ public class AgentContextCleanupTask {
             total++;
             if (context.getState() == AgentState.DISCONNECTED && ChronoUnit.MINUTES.between(context.getLastActiveTime(), now) >= 2) {
                 cleaned++;
-                context.fireEvent(AgentEvent.GOAWAY);
+                context.fireEvent(AgentEvent.LOCAL_GOAWAY);
             }
         }
         logger.debug("AgentContext cleanup executed: total={}, cleaned={}", total, cleaned);

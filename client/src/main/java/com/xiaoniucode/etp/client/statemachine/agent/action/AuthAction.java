@@ -55,12 +55,12 @@ public class AuthAction extends AgentBaseAction {
                     logger.debug("认证消息发送成功");
                 } else {
                     logger.error("认证失败", f.cause());
-                    ctx.fireEvent(AgentEvent.STOP);
+                    ctx.fireEvent(AgentEvent.LOCAL_GOAWAY);
                 }
             });
         } catch (Exception e) {
             logger.error("认证失败", e);
-            ctx.fireEvent(AgentEvent.STOP);
+            ctx.fireEvent(AgentEvent.LOCAL_GOAWAY);
         }
     }
 

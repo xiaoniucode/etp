@@ -7,6 +7,7 @@ import com.xiaoniucode.etp.core.transport.IntSet;
 import com.xiaoniucode.etp.core.transport.PausedStreamRegistry;
 import io.netty.channel.Channel;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,5 +53,8 @@ public class StreamManager {
 
     public static void removePausedStream(Channel tunnel, int streamId) {
         pausedStreamRegistry.removePausedStream(tunnel, streamId);
+    }
+    public static Collection<StreamContext> getStreamContexts(){
+       return streams.values();
     }
 }

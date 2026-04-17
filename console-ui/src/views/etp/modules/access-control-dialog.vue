@@ -9,12 +9,8 @@
   >
     <div class="access-control-dialog">
       <!-- 基本配置 -->
-      <ElCard class="art-card mb-4">
-        <template #header>
-          <div class="flex justify-between items-center">
-            <span>基本配置</span>
-          </div>
-        </template>
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold mb-4">基本配置</h3>
         <div class="flex flex-col gap-4">
           <div class="flex items-center gap-3">
             <span class="w-20 font-medium">启用状态：</span>
@@ -28,23 +24,19 @@
             </ElRadioGroup>
           </div>
         </div>
-      </ElCard>
+      </div>
 
       <!-- 规则列表 -->
-      <ElCard class="art-card">
-        <template #header>
-          <div class="flex justify-between items-center">
-            <span>访问规则</span>
-          </div>
-        </template>
+      <div>
+        <h3 class="text-lg font-semibold mb-4">访问规则</h3>
         <div class="border border-gray-200 rounded p-4">
           <ElTable :data="formData.rules" style="width: 100%" border>
-            <ElTableColumn prop="cidr" label="IP地址段" width="300">
+            <ElTableColumn prop="cidr" label="IP地址段 (例如：192.168.1.0/24)" width="300">
               <template #default="scope">
                 <ElInput
                   v-if="editingRuleId === scope.row.id"
                   v-model="scope.row.cidr"
-                  placeholder="请输入IP地址段"
+                  placeholder="请输入IP地址段，例如：192.168.1.0/24"
                   style="width: 100%"
                 />
                 <span v-else>{{ scope.row.cidr }}</span>
@@ -95,10 +87,7 @@
             新增规则
           </ElButton>
         </div>
-        <div v-if="formData.rules.length === 0" class="py-10 text-center">
-          <ElEmpty description="暂无规则" />
-        </div>
-      </ElCard>
+      </div>
     </div>
   </ElDialog>
 </template>

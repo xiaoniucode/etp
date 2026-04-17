@@ -39,10 +39,7 @@ public class StreamCloseAction extends StreamBaseAction {
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         int streamId = context.getStreamId();
         Channel visitor = context.getVisitor();
-        ProxyConfig proxyConfig = context.getProxyConfig();
-        if (proxyConfig != null) {
-            streamManager.decrementStreamCount(proxyConfig.getProxyId());
-        }
+
         leastConnHooks.onStreamClosed(context);
         metricsCollector.onChannelInactive(context.getProxyId());
 

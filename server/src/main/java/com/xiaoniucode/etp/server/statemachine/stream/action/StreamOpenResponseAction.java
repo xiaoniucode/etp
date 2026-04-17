@@ -70,6 +70,10 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         }
         tunnelBridge.open();
         context.setTunnelBridge(tunnelBridge);
+
+        StreamManager streamManager = context.getStreamManager();
+        //初始化索引映射关系
+        streamManager.initStreamIndexes(context);
         //负载均衡 最少连接数
         leastConnHooks.onStreamOpened(context);
         //增加连接数量，用于监控统计

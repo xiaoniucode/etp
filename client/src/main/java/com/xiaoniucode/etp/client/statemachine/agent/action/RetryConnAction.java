@@ -36,7 +36,7 @@ public class RetryConnAction extends AgentBaseAction {
         int currentRetry = ctx.getRetryCount().incrementAndGet();
         if (currentRetry > retryConfig.getMaxRetries()) {
             logger.warn("已达到最大重试次数 {}，停止重连", retryConfig.getMaxRetries());
-            ctx.fireEvent(AgentEvent.STOP);
+            ctx.fireEvent(AgentEvent.LOCAL_GOAWAY);
             return;
         }
 

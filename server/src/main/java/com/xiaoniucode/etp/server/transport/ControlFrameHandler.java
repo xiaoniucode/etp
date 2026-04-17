@@ -97,6 +97,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         agentContext.fireEvent(AgentEvent.AUTH_START);
                     }
                 }
+                case TMSP.MSG_GOAWAY -> {
+                    logger.debug("收到停止客户端消息");
+                    Optional<AgentContext> ag = agentManager.getAgentContext(frame.getStreamId());
+                    ag.ifPresent(agentContext -> agentContext.fireEvent(AgentEvent.REMOTE_GOAWAY));
+                }
 
                 case TMSP.MSG_TUNNEL_CREATE -> {
                     logger.debug("收到连接池创建消息");

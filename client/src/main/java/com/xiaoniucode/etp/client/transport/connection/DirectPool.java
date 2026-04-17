@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.client.transport.connection;
 import com.xiaoniucode.etp.client.common.UUIDGenerator;
 import com.xiaoniucode.etp.core.transport.NettyBatchWriteQueue;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.util.internal.logging.InternalLogger;
@@ -10,6 +11,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,17 +26,17 @@ public class DirectPool {
      * 日志记录器
      */
     private final InternalLogger logger = InternalLoggerFactory.getInstance(DirectPool.class);
-    
+
     /**
      * 最大隧道池大小
      */
     private static final int MAX_TUNNEL_POOL_SIZE = 100;
-    
+
     /**
      * 明文隧道映射
      */
     private final Map<String, TunnelEntry> plainTunnels = new ConcurrentHashMap<>(5);
-    
+
     /**
      * 加密隧道映射
      */
@@ -42,6 +44,7 @@ public class DirectPool {
 
     /**
      * 借用指定类型的隧道
+     *
      * @param isEncrypt 是否为加密隧道
      * @return 可用的隧道入口，如果没有可用隧道则返回null
      */
@@ -59,9 +62,11 @@ public class DirectPool {
         logger.warn("池中没有可用的活跃{}隧道", isEncrypt ? "加密" : "明文");
         return null;
     }
+
     /**
      * 创建指定类型的隧道
-     * @param channel 通道
+     *
+     * @param channel   通道
      * @param isEncrypt 是否为加密隧道
      * @return 隧道入口，如果池已满则返回null
      */
@@ -82,6 +87,7 @@ public class DirectPool {
 
     /**
      * 激活隧道
+     *
      * @param tunnelId 隧道ID
      * @return 激活后的隧道入口，如果隧道不存在则返回null
      */
@@ -99,6 +105,7 @@ public class DirectPool {
 
     /**
      * 释放隧道
+     *
      * @param entry 隧道入口
      */
     public void release(TunnelEntry entry) {
@@ -122,6 +129,7 @@ public class DirectPool {
 
     /**
      * 移除隧道
+     *
      * @param tunnelId 隧道ID
      */
     public void removeTunnel(String tunnelId) {
@@ -136,28 +144,38 @@ public class DirectPool {
             }
         }
     }
-    
+
     /**
      * 获取明文隧道数量
+     *
      * @return 明文隧道数量
      */
     public int getPlainTunnelCount() {
         return plainTunnels.size();
     }
-    
+
     /**
      * 获取加密隧道数量
+     *
      * @return 加密隧道数量
      */
     public int getEncryptTunnelCount() {
         return encryptTunnels.size();
     }
-    
+
     /**
      * 获取总隧道数量
+     *
      * @return 总隧道数量
      */
     public int getTotalTunnelCount() {
         return plainTunnels.size() + encryptTunnels.size();
+    }
+
+    public void closeAll() {
+        plainTunnels.values().forEach(tunnelEntry ->
+                ChannelUtils.closeOnFlush(tunnelEntry.getChannel()));
+        encryptTunnels.values().forEach(tunnelEntry ->
+                ChannelUtils.closeOnFlush(tunnelEntry.getChannel()));
     }
 }

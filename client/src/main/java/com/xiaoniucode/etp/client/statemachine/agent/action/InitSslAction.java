@@ -16,22 +16,22 @@ public class InitSslAction extends AgentBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(InitSslAction.class);
 
     @Override
-    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {
+    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.debug("检查是否有必要初始化 TLS证书");
         try {
-            AppConfig config = ctx.getConfig();
+            AppConfig config = context.getConfig();
             TransportConfig transportConfig = config.getTransportConfig();
             TlsConfig tlsConfig = transportConfig.getTlsConfig();
-            if (tlsConfig == null || (tlsConfig != null && tlsConfig.isEnabled())) {
+            if (tlsConfig == null || tlsConfig.isEnabled()) {
                 logger.debug("初始化 SSL上下文");
                 SslContext sslContext = TlsHelper.buildSslContext(true, tlsConfig, tlsConfig == null);
                 TlsContextHolder.initialize(sslContext);
-                ctx.setTlsContext(sslContext);
+                context.setTlsContext(sslContext);
             }
-            ctx.getStateMachine().fireEvent(ctx.getState(), AgentEvent.SSL_INITIALIZED, ctx);
+            context.getStateMachine().fireEvent(context.getState(), AgentEvent.SSL_INITIALIZED, context);
         } catch (Exception e) {
             logger.error("SSL 初始化失败", e);
-            ctx.getStateMachine().fireEvent(ctx.getState(), AgentEvent.STOP, ctx);
+            context.fireEvent(AgentEvent.LOCAL_GOAWAY);
         }
     }
 }

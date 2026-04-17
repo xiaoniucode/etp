@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 内存实现的域名存储，用于管理域名与代理的绑定关系
  */
-@Component
 public class InMemoryDomainStore implements DomainStore {
 
     /**

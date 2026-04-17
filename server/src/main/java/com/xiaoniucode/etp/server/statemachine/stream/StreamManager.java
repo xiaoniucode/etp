@@ -1,7 +1,9 @@
 package com.xiaoniucode.etp.server.statemachine.stream;
 
 import com.alibaba.cola.statemachine.StateMachine;
+import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.BandwidthConfig;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.transport.IntSet;
 import com.xiaoniucode.etp.core.transport.PausedStreamRegistry;
@@ -13,9 +15,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,9 +32,29 @@ public class StreamManager {
      */
     private final Map<String, BandwidthLimiter> proxyLimiters = new ConcurrentHashMap<>();
     /**
+     * proxyId ->
      * 存储每个代理的活跃流计数
      */
     private final Map<String, AtomicInteger> proxyStreamCount = new ConcurrentHashMap<>();
+
+    /**
+     * remotePort -> Set<streamId>
+     * 用于快速按端口批量关闭流
+     */
+    private final Map<Integer, Set<Integer>> portToStreams = new ConcurrentHashMap<>();
+
+    /**
+     * domain -> Set<streamId>
+     * 用于快速按域名批量关闭流
+     */
+    private final Map<String, Set<Integer>> domainToStreams = new ConcurrentHashMap<>();
+
+    /**
+     * agentId -> Set<streamId>
+     * 用于快速按客户端清理所有流
+     */
+    private final Map<String, Set<Integer>> agentToStreams = new ConcurrentHashMap<>();
+
     @Autowired
     private StreamIdGenerator streamIdGenerator;
 
@@ -51,11 +71,208 @@ public class StreamManager {
         return streamContext;
     }
 
-    public boolean removeStreamContext(int streamId) {
-        StreamContext remove = visitors.remove(streamId);
-        return remove != null;
+    public void removeStreamContext(int streamId) {
+        StreamContext streamContext = visitors.remove(streamId);
+        String proxyId = streamContext.getProxyId();
+        //关闭代理连接计数
+        if (StringUtils.hasText(proxyId)) {
+            decrementStreamCount(proxyId);
+        }
+        //清理所有索引映射
+        cleanupIndexes(streamContext);
     }
 
+    /**
+     * 清理所有索引映射（与 initStreamRelations 对应）
+     */
+    private void cleanupIndexes(StreamContext context) {
+        if (context == null) {
+            return;
+        }
+
+        int streamId = context.getStreamId();
+        ProtocolType protocol = context.getCurrentProtocol();
+        // 清理端口索引
+        if (protocol.isTcp()) {
+            Integer listenerPort = context.getListenerPort();
+            if (listenerPort != null) {
+                Set<Integer> portSet = portToStreams.get(listenerPort);
+                if (portSet != null) {
+                    portSet.remove(streamId);
+                    if (portSet.isEmpty()) {
+                        portToStreams.remove(listenerPort);
+                    }
+                }
+            }
+        }
+
+        // 清理域名索引
+        if (protocol.isHttp()) {
+            String domain = context.getVisitorDomain();
+            if (StringUtils.hasText(domain)) {
+                String normalizedDomain = domain.trim().toLowerCase(Locale.ROOT);
+                Set<Integer> domainSet = domainToStreams.get(normalizedDomain);
+                if (domainSet != null) {
+                    domainSet.remove(streamId);
+                    if (domainSet.isEmpty()) {
+                        domainToStreams.remove(normalizedDomain);
+                    }
+                }
+            }
+        }
+
+        // 清理 Agent 索引
+        String agentId = context.getAgentId();
+        if (StringUtils.hasText(agentId)) {
+            Set<Integer> agentSet = agentToStreams.get(agentId);
+            if (agentSet != null) {
+                agentSet.remove(streamId);
+                if (agentSet.isEmpty()) {
+                    agentToStreams.remove(agentId);
+                }
+            }
+        }
+    }
+
+    public Optional<StreamContext> getStreamContext(Channel visitor) {
+        Integer streamId = visitor.attr(AttributeKeys.STREAM_ID).get();
+        if (streamId == null) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(visitors.get(streamId));
+    }
+
+    /**
+     * 初始化索引，在流完全打开成功以后调用
+     *
+     * @param context 流上下文
+     */
+    public void initStreamIndexes(StreamContext context) {
+        if (context == null) {
+            return;
+        }
+        int streamId = context.getStreamId();
+        ProtocolType protocol = context.getCurrentProtocol();
+        if (protocol.isHttp()) {
+            //处理域名映射 仅限HTTP 代理
+            String domain = context.getVisitorDomain();
+            if (StringUtils.hasText(domain)) {
+                String normalizedDomain = domain.trim().toLowerCase(Locale.ROOT);
+                domainToStreams.computeIfAbsent(normalizedDomain,
+                        k -> ConcurrentHashMap.newKeySet()).add(streamId);
+            }
+        }
+        if (protocol.isTcp()) {
+            //处理端口映射 仅限TCP 代理
+            Integer listenerPort = context.getListenerPort();
+            if (listenerPort != null) {
+                portToStreams.computeIfAbsent(listenerPort,
+                        k -> ConcurrentHashMap.newKeySet()).add(streamId);
+            }
+        }
+        //处理客户端映射
+        String agentId = context.getAgentId();
+        if (StringUtils.hasText(agentId)) {
+            agentToStreams.computeIfAbsent(agentId,
+                    k -> ConcurrentHashMap.newKeySet()).add(streamId);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("流索引映射初始化完成 streamId={}, agentId={}", streamId, agentId);
+        }
+    }
+
+    public Set<Integer> getStreamIdsByPort(Integer remotePort) {
+        return portToStreams.get(remotePort);
+    }
+
+
+    public Set<Integer> getStreamIdsByDomain(String domain) {
+        return domainToStreams.get(domain);
+    }
+
+
+    public Set<Integer> getStreamIdsByAgent(String agentId) {
+        return agentToStreams.get(agentId);
+    }
+
+    /**
+     * 按端口触发关闭
+     */
+    public void fireCloseByPort(Integer remotePort) {
+        fireCloseBy(portToStreams.get(remotePort));
+    }
+
+    /**
+     * 按域名触发关闭
+     */
+    public void fireCloseByDomain(String domain) {
+        fireCloseBy(domainToStreams.get(domain));
+    }
+
+    /**
+     * 按 Agent 触发关闭
+     */
+    public void fireCloseByAgent(String agentId) {
+        fireCloseBy(agentToStreams.get(agentId));
+    }
+
+    private void fireCloseBy(Set<Integer> streamIds) {
+        if (streamIds == null || streamIds.isEmpty()) {
+            return;
+        }
+
+        for (Integer streamId : new ArrayList<>(streamIds)) {
+            if (streamId == null) continue;
+            StreamContext ctx = getStreamContext(streamId);
+            if (ctx != null) {
+                ctx.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+            }
+        }
+    }
+
+    public void addPausedStreamId(Channel tunnel, int streamId) {
+        pausedStreamRegistry.addPausedStreamId(tunnel, streamId);
+    }
+
+    public IntSet getPausedStreamIds(Channel tunnel) {
+        return pausedStreamRegistry.getPausedStreamIds(tunnel);
+    }
+
+    public void removePausedStream(Channel tunnel, int streamId) {
+        pausedStreamRegistry.removePausedStream(tunnel, streamId);
+    }
+
+    /**
+     * 每一个代理 一个限流器
+     *
+     * @param proxyId         代理ID
+     * @param bandwidthConfig 限流配置
+     * @return 限流器
+     */
+    public BandwidthLimiter getOrCreateProxyLimiter(String proxyId, BandwidthConfig bandwidthConfig) {
+        return proxyLimiters.computeIfAbsent(proxyId, id -> {
+            proxyStreamCount.put(proxyId, new AtomicInteger(0));
+            logger.debug("创建代理限流器：proxyId={}", proxyId);
+            return new BandwidthLimiter(bandwidthConfig);
+        });
+    }
+
+    public void incrementStreamCount(String proxyId) {
+        AtomicInteger count = proxyStreamCount.get(proxyId);
+        if (count != null) {
+            count.incrementAndGet();
+        }
+    }
+
+    private void decrementStreamCount(String proxyId) {
+        AtomicInteger count = proxyStreamCount.get(proxyId);
+        if (count != null && count.decrementAndGet() == 0) {
+            // 最后一个流关闭，释放限流器
+            proxyLimiters.remove(proxyId);
+            proxyStreamCount.remove(proxyId);
+            logger.debug("释放代理限流器：proxyId={}", proxyId);
+        }
+    }
 
     /**
      * 获取客户端远程地址
@@ -86,63 +303,5 @@ public class StreamManager {
         return visitors.size();
     }
 
-    public Optional<StreamContext> getStreamContext(Channel visitor) {
-        Integer streamId = visitor.attr(AttributeKeys.STREAM_ID).get();
-        if (streamId == null) {
-            return Optional.empty();
-        }
-        return Optional.ofNullable(visitors.get(streamId));
-    }
 
-    public void closeStreams(Integer remotePort) {
-
-    }
-
-    public void closeStreams(Set<String> domains) {
-
-    }
-
-    public void closeStreams(String domain) {
-
-    }
-
-    public void addPausedStreamId(Channel tunnel, int streamId) {
-        pausedStreamRegistry.addPausedStreamId(tunnel, streamId);
-    }
-
-    public IntSet getPausedStreamIds(Channel tunnel) {
-        return pausedStreamRegistry.getPausedStreamIds(tunnel);
-    }
-
-    public void removePausedStream(Channel tunnel, int streamId) {
-        pausedStreamRegistry.removePausedStream(tunnel, streamId);
-    }
-
-    public BandwidthLimiter getOrCreateProxyLimiter(String proxyId, BandwidthConfig bandwidthConfig) {
-        return proxyLimiters.computeIfAbsent(proxyId, id -> {
-            proxyStreamCount.put(proxyId, new AtomicInteger(0));
-            logger.debug("创建代理限流器：proxyId={}", proxyId);
-            return new BandwidthLimiter(bandwidthConfig);
-        });
-    }
-
-    public void incrementStreamCount(String proxyId) {
-        AtomicInteger count = proxyStreamCount.get(proxyId);
-        if (count != null) {
-            count.incrementAndGet();
-        }
-    }
-
-    public void decrementStreamCount(String proxyId) {
-        AtomicInteger count = proxyStreamCount.get(proxyId);
-        if (count != null && count.decrementAndGet() == 0) {
-            // 最后一个流关闭，释放限流器
-            proxyLimiters.remove(proxyId);
-            proxyStreamCount.remove(proxyId);
-            logger.debug("释放代理限流器：proxyId={}", proxyId);
-        }
-    }
-    public BandwidthLimiter getProxyLimiter(String proxyId) {
-        return proxyLimiters.get(proxyId);
-    }
 }

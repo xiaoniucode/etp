@@ -125,7 +125,7 @@ public class AgentManager {
     public void kickout(String agentId) {
         AgentContext agentContext = agentToContextIndex.get(agentId);
         if (agentContext != null) {
-            agentContext.fireEvent(AgentEvent.GOAWAY);
+            agentContext.fireEvent(AgentEvent.LOCAL_GOAWAY);
         }
     }
 
