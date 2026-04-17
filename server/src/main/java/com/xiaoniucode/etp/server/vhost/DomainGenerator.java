@@ -36,16 +36,23 @@ public class DomainGenerator {
     private static final int MAX_PREFIX_LENGTH = 10;
     private static final String PREFIX_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-    public List<String> generate(RouteConfig routeConfig, Function<String, Boolean> occupiedChecker) {
+    /**
+     *
+     * @param routeConfig
+     * @param occupiedChecker
+     * @return 返回完整域名列表 子域名格式为 subdomain.baseDomain
+     */
+    public List<DomainBinding> generate(String proxyId, RouteConfig routeConfig, Function<String, Boolean> occupiedChecker) {
         DomainType domainType = routeConfig.getDomainType();
-        List<String> res = new ArrayList<>();
+        List<DomainBinding> res = new ArrayList<>();
         if (domainType == DomainType.CUSTOM_DOMAIN) {
             Set<String> domains = routeConfig.getCustomDomains();
             for (String domain : domains) {
                 if (occupiedChecker.apply(domain)) {
                     throw new DomainConflictException("域名[" + domain + "]已被占用");
                 } else {
-                    res.add(domain);
+                    DomainBinding domainBinding = new DomainBinding(proxyId, null, domain, routeConfig.getDomainType());
+                    res.add(domainBinding);
                 }
             }
         }
@@ -56,22 +63,26 @@ public class DomainGenerator {
                 if (occupiedChecker.apply(fullDomain)) {
                     throw new DomainConflictException("子域名[" + prefix + "]已被占用");
                 } else {
-                    res.add(fullDomain);
+                    DomainBinding domainBinding = new DomainBinding(proxyId, baseDomain, prefix, routeConfig.getDomainType());
+                    res.add(domainBinding);
                 }
             }
         }
         if (domainType == DomainType.AUTO) {
-            res.add(generateRandomDomain(occupiedChecker));
+            String prefix = generateRandomDomainPrefix(occupiedChecker);
+            String fullDomain = prefix + "." + baseDomain;
+            DomainBinding domainBinding = new DomainBinding(proxyId, baseDomain, prefix, routeConfig.getDomainType());
+            res.add(domainBinding);
         }
         return res;
     }
 
-    private String generateRandomDomain(Function<String, Boolean> occupiedChecker) {
+    private String generateRandomDomainPrefix(Function<String, Boolean> occupiedChecker) {
         //最多重试20次
         for (int i = 0; i < 20; i++) {
             String prefix = generateRandomPrefix();
             if (!occupiedChecker.apply(prefix + "." + baseDomain)) {
-                return prefix + "." + baseDomain;
+                return prefix;
             }
         }
         return null;
@@ -86,10 +97,10 @@ public class DomainGenerator {
         return sb.toString();
     }
 
-    public String generate(String domain, DomainType domainType, Function<String, Boolean> isOccupied) {
+    public DomainBinding generate(String proxyId, String domain, DomainType domainType, Function<String, Boolean> isOccupied) {
         if (domainType == DomainType.CUSTOM_DOMAIN) {
             if (domain != null && !isOccupied.apply(domain)) {
-                return domain;
+                return new DomainBinding(proxyId, null, domain, domainType);
             }
             throw new DomainConflictException("域名[" + domain + "]已被占用");
         }
@@ -97,7 +108,8 @@ public class DomainGenerator {
             if (domain != null && !domain.isEmpty()) {
                 String fullDomain = domain + "." + baseDomain;
                 if (!isOccupied.apply(fullDomain)) {
-                    return fullDomain;
+                    return new DomainBinding(proxyId, baseDomain, domain, domainType);
+
                 }
                 throw new DomainConflictException("子域名[" + domain + "]已被占用");
             }

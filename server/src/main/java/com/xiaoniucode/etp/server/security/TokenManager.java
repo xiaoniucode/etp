@@ -26,12 +26,12 @@ public class TokenManager {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(TokenManager.class);
 
     /**
-     * token --> 当前连接数
+     * todo token --> 当前连接数
      */
     private final ConcurrentMap<String, AtomicInteger> connectionCountMap = new ConcurrentHashMap<>();
 
     /**
-     * token --> 代理ID集合
+     * todo token --> 代理ID集合
      */
     private final ConcurrentMap<String, Set<String>> agentIdMap = new ConcurrentHashMap<>();
 

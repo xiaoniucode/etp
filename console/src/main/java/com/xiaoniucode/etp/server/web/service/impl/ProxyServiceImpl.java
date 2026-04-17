@@ -22,6 +22,7 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.registry.RegisterResult;
 import com.xiaoniucode.etp.server.vhost.DomainBinding;
 import com.xiaoniucode.etp.server.vhost.DomainManager;
 import com.xiaoniucode.etp.server.web.assembler.ProxyConfigAssembler;
@@ -135,7 +136,7 @@ public class ProxyServiceImpl implements ProxyService {
         String proxyId = uidGenerator.getUIDAsString();
         ProxyConfig proxyConfig = proxyConfigAssembler.toDomain(param);
         proxyConfig.setProxyId(proxyId);
-        proxyManager.register(proxyConfig);
+        RegisterResult registerResult = proxyManager.register(proxyConfig);
         //如果数据库事务执行失败，清理缓存
         transactionHelper.afterRollback(() -> proxyManager.remove(proxyId));
 
@@ -160,9 +161,8 @@ public class ProxyServiceImpl implements ProxyService {
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
         transportRepository.save(transportDO);
         //7.HTTP域名信息
-        List<DomainBinding> boundDomains = domainManager.getBoundDomains(proxyId);
-        List<String> domains = boundDomains.stream().map(DomainBinding::getDomain).toList();
-        List<HttpProxyDomainDO> httpProxyDomainList = proxyDomainConvert.toDOList(domains, proxyId);
+        List<DomainBinding> domainBindings = registerResult.getDomainBindings();
+        List<HttpProxyDomainDO> httpProxyDomainList = proxyDomainConvert.toDOList(domainBindings, proxyId);
         proxyDomainRepository.saveAll(httpProxyDomainList);
         //init access control
         AccessControlDO accessControlDO = new AccessControlDO();
@@ -228,12 +228,11 @@ public class ProxyServiceImpl implements ProxyService {
         transportRepository.deleteById(proxyId);
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
         transportRepository.save(transportDO);
-        //7.HTTP域名信息
+        //todo 7.HTTP域名信息
         proxyDomainRepository.deleteByProxyId(proxyId);
         List<DomainBinding> boundDomains = domainManager.getBoundDomains(proxyId);
-        List<String> domains = boundDomains.stream().map(DomainBinding::getDomain).toList();
-        if (!CollectionUtils.isEmpty(domains)) {
-            List<HttpProxyDomainDO> domainList = proxyDomainConvert.toDOList(domains, proxyId);
+        if (!CollectionUtils.isEmpty(boundDomains)) {
+            List<HttpProxyDomainDO> domainList = proxyDomainConvert.toDOList(boundDomains, proxyId);
             proxyDomainRepository.saveAll(domainList);
         }
         logger.debug("HTTP代理更新成功：{}", proxyDO.getName());
@@ -277,7 +276,7 @@ public class ProxyServiceImpl implements ProxyService {
                 .stream()
                 .collect(Collectors.groupingBy(
                         HttpProxyDomainDO::getProxyId,
-                        Collectors.mapping(HttpProxyDomainDO::getDomain, Collectors.toList())
+                        Collectors.mapping(HttpProxyDomainDO::getFullDomain, Collectors.toList())
                 ));
         List<HttpProxyListDTO> res = new ArrayList<>();
         for (Object[] objects : content) {

@@ -9,9 +9,9 @@ public interface ConfigRegistrar {
 
     void validate(ProxyConfig config) throws EtpException;
 
-    void register(ProxyConfig config) throws EtpException;
+    RegisterResult register(ProxyConfig config) throws EtpException;
 
-    void reregister(ProxyConfig oldConfig, ProxyConfig newConfig, Diff diff) throws EtpException;
+    RegisterResult reregister(ProxyConfig oldConfig, ProxyConfig newConfig, Diff diff) throws EtpException;
 
     void unregister(ProxyConfig proxyConfig) throws EtpException;
 

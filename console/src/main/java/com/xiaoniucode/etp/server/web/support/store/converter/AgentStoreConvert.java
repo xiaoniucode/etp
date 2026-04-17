@@ -13,19 +13,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.support.id;
 
+package com.xiaoniucode.etp.server.web.support.store.converter;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
+import com.xiaoniucode.etp.server.web.entity.AgentDO;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-/**
- * DAO for M_WORKER_NODE
- *
- * @author yutianbao
- */
-//@Repository
-public interface WorkerNodeRepository extends JpaRepository<WorkerNodeEntity, Long> {
+import java.util.List;
 
+@Mapper(componentModel = "spring")
+public interface AgentStoreConvert {
+    @Mapping(target = "agentId", source = "id")
+    AgentInfo toAgentInfo(AgentDO agentDO);
 
+    List<AgentInfo> toAgentInfoList(List<AgentDO> agentDOs);
 }

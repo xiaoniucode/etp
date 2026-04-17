@@ -14,10 +14,12 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.support.id;
+package com.xiaoniucode.etp.server.web.configuration;
 
 import com.baidu.fsg.uid.UidGenerator;
 import com.baidu.fsg.uid.impl.DefaultUidGenerator;
+import com.xiaoniucode.etp.server.web.support.id.DisposableWorkerIdAssigner;
+import com.xiaoniucode.etp.server.web.support.id.WorkerNodeRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,5 +42,4 @@ import org.springframework.context.annotation.Configuration;
 //        generator.setWorkerIdAssigner(new DisposableWorkerIdAssigner(workerNodeRepository));
 //        return generator;
 //    }
-//
 //}

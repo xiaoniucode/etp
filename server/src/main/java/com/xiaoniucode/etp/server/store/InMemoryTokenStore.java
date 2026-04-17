@@ -28,8 +28,8 @@ public class InMemoryTokenStore implements TokenStore {
     private final Lock writeLock = rwLock.writeLock();
 
     @Override
-    public Optional<TokenConfig> findByToken(String token) {
-        return Optional.ofNullable(tokenMap.get(token));
+    public TokenConfig findByToken(String token) {
+        return tokenMap.get(token);
     }
 
     @Override

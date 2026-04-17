@@ -47,23 +47,27 @@ public class HttpConfigRegistrar implements ConfigRegistrar {
     }
 
     @Override
-    public void register(ProxyConfig config) throws EtpException {
+    public RegisterResult register(ProxyConfig config) throws EtpException {
         String proxyId = config.getProxyId();
         config.setProxyId(proxyId);
         RouteConfig routeConfig = config.getRouteConfig();
-        domainManager.register(proxyId, routeConfig);
+        List<DomainBinding> domains = domainManager.register(proxyId, routeConfig);
         agentManager.getAgentContext(config.getAgentId()).ifPresent(agentContext -> {
             agentManager.addProxyContextIndex(config.getProxyId(), agentContext);
         });
+       return RegisterResult.of(config,domains);
     }
 
     @Override
-    public void reregister(ProxyConfig oldConfig, ProxyConfig newConfig, Diff diff) throws EtpException {
+    public RegisterResult reregister(ProxyConfig oldConfig, ProxyConfig newConfig, Diff diff) throws EtpException {
         newConfig.setProxyId(oldConfig.getProxyId());
         if (oldConfig.getRouteConfig().getDomainType() != newConfig.getRouteConfig().getDomainType()) {
             domainManager.unregister(oldConfig.getProxyId());
-            domainManager.register(oldConfig.getProxyId(), newConfig.getRouteConfig());
+            List<DomainBinding> domains = domainManager.register(oldConfig.getProxyId(), newConfig.getRouteConfig());
+            return RegisterResult.of(newConfig,domains);
         }
+        List<DomainBinding> domains = domainManager.getBoundDomains(oldConfig.getProxyId());
+        return RegisterResult.of(newConfig,domains);
     }
 
     @Override

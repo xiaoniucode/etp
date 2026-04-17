@@ -17,11 +17,12 @@ package com.xiaoniucode.etp.server.config.domain;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.util.StringUtils;
+
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode
-public class TokenConfig {
+public class TokenConfig implements Serializable {
     public static final int UNLIMITED_DEVICES = 0;
     public static final int UNLIMITED_CONNECTIONS = 0;
     private String name;

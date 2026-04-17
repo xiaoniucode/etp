@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.entity;
+
+import com.xiaoniucode.etp.core.enums.DomainType;
+import com.xiaoniucode.etp.server.web.entity.converter.DomainTypeConverter;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
 /**
  * 代理域名实体类
  */
@@ -38,8 +39,24 @@ public class HttpProxyDomainDO {
     @Column(name = "proxy_id", nullable = false)
     private String proxyId;
     /**
-     * 域名
+     * 原始域名 子域名/自定义域名(完整域名)
      */
     @Column(nullable = false)
     private String domain;
+
+    @Column(name = "base_domain")
+    private String baseDomain;
+    /**
+     * 域名类型
+     */
+    @Convert(converter = DomainTypeConverter.class)
+    @Column(name = "domain_type")
+    private DomainType domainType;
+
+    public String getFullDomain() {
+        if (domainType == DomainType.CUSTOM_DOMAIN) {
+            return domain;
+        }
+        return domain + "." + baseDomain;
+    }
 }

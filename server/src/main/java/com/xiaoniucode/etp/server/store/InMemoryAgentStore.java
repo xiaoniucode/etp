@@ -36,8 +36,8 @@ public class InMemoryAgentStore implements AgentStore {
     }
 
     @Override
-    public Optional<AgentInfo> findById(String agentId) {
-        return Optional.ofNullable(store.get(agentId));
+    public AgentInfo findById(String agentId) {
+        return store.get(agentId);
     }
 
     @Override

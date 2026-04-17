@@ -6,13 +6,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 /**
  * 访问令牌 Repository
  */
 @Repository
 public interface AccessTokenRepository extends JpaRepository<AccessTokenDO, Integer> {
     /**
-     * 根据关键词搜索访问令牌（分页）
+     * 根据关键词搜索访问令牌
      */
     @Query("SELECT a FROM AccessTokenDO a WHERE a.name LIKE %:keyword% OR a.token LIKE %:keyword%")
     Page<AccessTokenDO> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
@@ -26,4 +27,14 @@ public interface AccessTokenRepository extends JpaRepository<AccessTokenDO, Inte
      * 检查是否存在指定名称但排除指定 ID 的访问令牌
      */
     boolean existsByNameAndIdNot(String name, Integer id);
+    
+    /**
+     * 根据 token 查询访问令牌
+     */
+  AccessTokenDO findByToken(String token);
+    
+    /**
+     * 检查是否存在指定 token 的访问令牌
+     */
+    boolean existsByToken(String token);
 }

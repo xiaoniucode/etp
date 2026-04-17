@@ -44,7 +44,7 @@ public class TcpConfigRegistrar implements ConfigRegistrar {
     }
 
     @Override
-    public void register(ProxyConfig config) throws EtpException {
+    public RegisterResult register(ProxyConfig config) throws EtpException {
         String proxyId = config.getProxyId();
         config.setProxyId(proxyId);
         Integer listenPort = config.getRemotePort();
@@ -76,10 +76,11 @@ public class TcpConfigRegistrar implements ConfigRegistrar {
             agentManager.addProxyContextIndex(config.getProxyId(), agentContext);
         });
         portAcceptor.bindPort(listenPort);
+       return RegisterResult.of(config,listenPort);
     }
 
     @Override
-    public void reregister(ProxyConfig oldConfig, ProxyConfig newConfig, Diff diff) throws EtpException {
+    public RegisterResult reregister(ProxyConfig oldConfig, ProxyConfig newConfig, Diff diff) throws EtpException {
         newConfig.setProxyId(oldConfig.getProxyId());
         Integer oldRemotePort = oldConfig.getRemotePort();
         Integer newRemotePort = newConfig.getRemotePort();
@@ -94,6 +95,7 @@ public class TcpConfigRegistrar implements ConfigRegistrar {
                 oldConfig.setListenPort(newListenPort);
                 //监听新的端口
                 portAcceptor.bindPort(newListenPort);
+                return RegisterResult.of(newConfig,newListenPort);
             } else if (!portManager.isAvailable(newRemotePort)) {
                 throw new PortConflictException(newRemotePort);
             }
@@ -102,6 +104,7 @@ public class TcpConfigRegistrar implements ConfigRegistrar {
                 closeCacheByPort(oldListenPort);
             }
         }
+        return RegisterResult.of(newConfig,oldListenPort);
     }
 
     @Override

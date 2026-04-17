@@ -28,12 +28,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InMemoryDomainStore implements DomainStore {
 
     /**
-     * 域名到 DomainBinding 的映射，
+     * 完整域名到 DomainBinding 的映射，
      */
     private final Map<String, DomainBinding> domainMap = new ConcurrentHashMap<>();
 
     /**
-     * 代理 ID 到域名集合的映射
+     * 代理 ID 到完整域名集合的映射
      */
     private final Map<String, Set<String>> proxyToDomains = new ConcurrentHashMap<>();
 
@@ -60,17 +60,17 @@ public class InMemoryDomainStore implements DomainStore {
      */
     @Override
     public void save(DomainBinding binding) {
-        if (binding == null || binding.getDomain() == null || binding.getProxyId() == null) {
+        if (binding == null || binding.getFullDomain() == null || binding.getProxyId() == null) {
             return;
         }
 
-        String domain = binding.getDomain();
+        String fullDomain = binding.getFullDomain();
         String proxyId = binding.getProxyId();
 
-        domainMap.put(domain, binding);
+        domainMap.put(fullDomain, binding);
 
         Set<String> domains = proxyToDomains.computeIfAbsent(proxyId, k -> ConcurrentHashMap.newKeySet());
-        domains.add(domain);
+        domains.add(fullDomain);
 
         // 重新构建 List
         rebuildProxyCache(proxyId);
@@ -83,11 +83,8 @@ public class InMemoryDomainStore implements DomainStore {
      * @return 域名绑定对象的 Optional，若不存在则返回空 Optional
      */
     @Override
-    public Optional<DomainBinding> findByDomain(String domain) {
-        if (domain == null) {
-            return Optional.empty();
-        }
-        return Optional.ofNullable(domainMap.get(domain));
+    public DomainBinding findByDomain(String domain) {
+        return domainMap.get(domain);
     }
 
     /**

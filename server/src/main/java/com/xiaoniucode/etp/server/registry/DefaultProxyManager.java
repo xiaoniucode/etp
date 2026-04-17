@@ -43,7 +43,7 @@ public class DefaultProxyManager implements ProxyManager {
      * @throws EtpException
      */
     @Override
-    public synchronized ProxyConfig register(ProxyConfig proxyConfig) throws EtpException {
+    public synchronized RegisterResult register(ProxyConfig proxyConfig) throws EtpException {
         String agentId = proxyConfig.getAgentId();
         if (!StringUtils.hasText(agentId)) {
             throw new EtpException("agentId 不能为空");
@@ -61,33 +61,37 @@ public class DefaultProxyManager implements ProxyManager {
                 logger.debug("客户端 {} 代理配置 {} 信息变更", agentId, oldConfig.getName());
                 return updateProxy(oldConfig, proxyConfig, delegate, diff);
             } else {
-                return oldConfig;
+                RegisterResult registerResult = new RegisterResult();
+                registerResult.setProxyConfig(oldConfig);
+                registerResult.setListenPort(oldConfig.getListenPort());
+                registerResult.setDomainBindings(domainStore.findByProxyId(oldConfig.getProxyId()));
+                return registerResult;
             }
         } else {
             return createProxy(proxyConfig, delegate);
         }
     }
 
-    private ProxyConfig updateProxy(ProxyConfig oldConfig, ProxyConfig newConfig, ConfigRegistrar delegate, Diff diff) throws EtpException {
+    private RegisterResult updateProxy(ProxyConfig oldConfig, ProxyConfig newConfig, ConfigRegistrar delegate, Diff diff) throws EtpException {
         //参数校验
         delegate.validate(newConfig);
         //重新注册
-        delegate.reregister(oldConfig, newConfig, diff);
+        RegisterResult registerResult = delegate.reregister(oldConfig, newConfig, diff);
         //删除IP访问控制
         ipAccessChecker.invalidate(oldConfig.getProxyId());
         //替换
         proxyStore.replace(newConfig);
-        return newConfig;
+        return registerResult;
     }
 
-    private ProxyConfig createProxy(ProxyConfig newConfig, ConfigRegistrar delegate) throws EtpException {
+    private RegisterResult createProxy(ProxyConfig newConfig, ConfigRegistrar delegate) throws EtpException {
         //参数校验
         delegate.validate(newConfig);
         //执行注册
-        delegate.register(newConfig);
+        RegisterResult registerResult = delegate.register(newConfig);
         //存储
         proxyStore.save(newConfig);
-        return newConfig;
+        return registerResult;
     }
 
 
@@ -151,11 +155,10 @@ public class DefaultProxyManager implements ProxyManager {
 
     @Override
     public Optional<ProxyConfig> findByDomain(String domain) {
-        Optional<DomainBinding> opt = domainStore.findByDomain(domain);
-        if (opt.isEmpty()) {
+        DomainBinding domainBinding = domainStore.findByDomain(domain);
+        if (domainBinding == null) {
             return Optional.empty();
         }
-        DomainBinding domainBinding = opt.get();
         String proxyId = domainBinding.getProxyId();
         return Optional.ofNullable(proxyStore.findById(proxyId));
     }

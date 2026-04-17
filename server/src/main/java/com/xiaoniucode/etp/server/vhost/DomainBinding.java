@@ -24,6 +24,25 @@ import lombok.Data;
 @AllArgsConstructor
 public class DomainBinding {
     private String proxyId;
+    /**
+     * 子域名/自动域名 的基础域名
+     */
+    private String baseDomain;
+    /**
+     * 如果是子域名，此处是前缀，如果域名类型，此处是完整域名
+     */
     private String domain;
+    /**
+     * 当前域名类型
+     */
     private DomainType domainType;
+
+
+    public String getFullDomain() {
+        if (domainType == DomainType.CUSTOM_DOMAIN) {
+            return domain;
+        }
+        return domain + "." + baseDomain;
+    }
+
 }

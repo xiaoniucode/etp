@@ -15,11 +15,11 @@
       <ElFormItem label="令牌名称" prop="name">
         <ElInput v-model="formData.name" placeholder="请输入令牌名称" />
       </ElFormItem>
-      <ElFormItem label="最大设备数" prop="maxDevice">
-        <ElInputNumber v-model="formData.maxDevice" :min="1" :max="1000" />
+      <ElFormItem label="最大设备数" prop="maxDevices">
+        <ElInputNumber v-model="formData.maxDevices" :min="1" :max="1000" />
       </ElFormItem>
-      <ElFormItem label="最大连接数" prop="maxConnection">
-        <ElInputNumber v-model="formData.maxConnection" :min="1" :max="10000" />
+      <ElFormItem label="最大连接数" prop="maxConnections">
+        <ElInputNumber v-model="formData.maxConnections" :min="1" :max="10000" />
       </ElFormItem>
     </ElForm>
     <template #footer>
@@ -65,14 +65,14 @@
     id: undefined as number | undefined,
     token: '',
     name: '',
-    maxDevice: 3,
-    maxConnection: 3
+    maxDevices: 3,
+    maxConnections: 3
   })
 
   const rules: FormRules = {
     name: [{ required: true, message: '请输入令牌名称', trigger: 'blur' }],
-    maxDevice: [{ required: true, message: '请输入最大设备数', trigger: 'blur' }],
-    maxConnection: [{ required: true, message: '请输入最大连接数', trigger: 'blur' }]
+    maxDevices: [{ required: true, message: '请输入最大设备数', trigger: 'blur' }],
+    maxConnections: [{ required: true, message: '请输入最大连接数', trigger: 'blur' }]
   }
 
   const initFormData = async () => {
@@ -82,8 +82,8 @@
         id: undefined,
         token: '',
         name: '',
-        maxDevice: 3,
-        maxConnection: 3
+        maxDevices: 3,
+        maxConnections: 3
       })
     } else if (props.type === 'edit' && props.tokenId) {
       // 根据 ID 获取详情
@@ -94,8 +94,8 @@
           id: data.id,
           token: data.token || '',
           name: data.name || '',
-          maxDevice: data.maxDevice || 3,
-          maxConnection: data.maxConnection || 3
+          maxDevices: data.maxDevices || 3,
+          maxConnections: data.maxConnections || 3
         })
       } catch (error) {
         console.error('获取令牌详情失败:', error)
@@ -128,16 +128,16 @@
           if (dialogType.value === 'add') {
             await fetchCreateToken({
               name: formData.name,
-              maxDevice: formData.maxDevice,
-              maxConnection: formData.maxConnection
+              maxDevices: formData.maxDevices,
+              maxConnections: formData.maxConnections
             })
             ElMessage.success('创建成功')
           } else {
             if (formData.id) {
               await fetchUpdateToken(formData.id, {
                 name: formData.name,
-                maxDevice: formData.maxDevice,
-                maxConnection: formData.maxConnection
+                maxDevices: formData.maxDevices,
+                maxConnections: formData.maxConnections
               })
               ElMessage.success('更新成功')
             }

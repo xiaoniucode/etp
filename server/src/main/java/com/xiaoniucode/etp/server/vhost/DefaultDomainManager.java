@@ -24,7 +24,6 @@ import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.AllArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,18 +35,15 @@ public class DefaultDomainManager implements DomainManager {
 
     @Override
     public synchronized List<DomainBinding> register(String proxyId, RouteConfig routeConfig) throws EtpException {
-        List<String> domains = domainGenerator.generate(routeConfig, domainStore::isOccupied);
+        List<DomainBinding> domains = domainGenerator.generate(proxyId, routeConfig, domainStore::isOccupied);
         if (domains.isEmpty()) {
             throw new EtpException("无法为代理[" + proxyId + "]生成域名");
         }
-        List<DomainBinding> bindings = new ArrayList<>();
-        for (String domain : domains) {
-            DomainBinding domainBinding = new DomainBinding(proxyId, domain, routeConfig.getDomainType());
+        for (DomainBinding domainBinding : domains) {
             domainStore.save(domainBinding);
-            bindings.add(domainBinding);
         }
-        logger.debug("为代理[{}]注册域名: {}", proxyId, bindings);
-        return bindings;
+        logger.debug("为代理[{}]注册域名: {}", proxyId, domains);
+        return domains;
     }
 
     @Override
@@ -55,8 +51,7 @@ public class DefaultDomainManager implements DomainManager {
         if (domainType == DomainType.AUTO) {
             throw new EtpException("域名类型不能为 AUTO");
         }
-        String domainE = domainGenerator.generate(domain, domainType, domainStore::isOccupied);
-        DomainBinding domainBinding = new DomainBinding(proxyId, domainE, domainType);
+        DomainBinding domainBinding = domainGenerator.generate(proxyId, domain, domainType, domainStore::isOccupied);
         domainStore.save(domainBinding);
         logger.debug("为代理[{}]注册域名: {}", proxyId, domainBinding);
         return domainBinding;
@@ -86,13 +81,12 @@ public class DefaultDomainManager implements DomainManager {
 
     @Override
     public Optional<DomainBinding> getDomainBinding(String domain) {
-        return domainStore.findByDomain(domain);
+        return Optional.ofNullable(domainStore.findByDomain(domain));
     }
 
     @Override
     public DomainBinding match(String domain) {
-        Optional<DomainBinding> opt = domainStore.findByDomain(domain);
-        return opt.orElse(null);
+        return domainStore.findByDomain(domain);
     }
 
     @Override

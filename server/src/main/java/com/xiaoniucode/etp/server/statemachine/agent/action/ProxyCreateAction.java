@@ -10,12 +10,12 @@ import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.registry.RegisterResult;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentConstants;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.vhost.DomainBinding;
-import com.xiaoniucode.etp.server.vhost.DomainManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -36,8 +36,6 @@ public class ProxyCreateAction extends AgentBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(ProxyCreateAction.class);
     @Autowired
     private ProxyManager proxyManager;
-    @Autowired
-    private DomainManager domainManager;
     @Resource
     private AppConfig appConfig;
     @Autowired
@@ -57,8 +55,9 @@ public class ProxyCreateAction extends AgentBaseAction {
             config.setProxyId(uidGenerator.getUIDAsString());
             config.setAgentType(context.getAgentInfo().getAgentType());
 
-            ProxyConfig register = proxyManager.register(config);
-            Message.NewProxyResp newProxyResp = buildResponse(register);
+            RegisterResult registerResult = proxyManager.register(config);
+            ProxyConfig register = registerResult.getProxyConfig();
+            Message.NewProxyResp newProxyResp = buildResponse(registerResult);
             ByteBuf payload = ProtobufUtil.toByteBuf(newProxyResp, control.alloc());
             TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, payload);
             control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
@@ -186,11 +185,12 @@ public class ProxyCreateAction extends AgentBaseAction {
         };
     }
 
-    private Message.NewProxyResp buildResponse(ProxyConfig config) {
+    private Message.NewProxyResp buildResponse( RegisterResult registerResult) {
+        ProxyConfig config = registerResult.getProxyConfig();
         ProtocolType protocol = config.getProtocol();
         StringBuilder remoteAddr = new StringBuilder();
         if (protocol.isHttp()) {
-            List<DomainBinding> domains = domainManager.getBoundDomains(config.getProxyId());
+            List<DomainBinding> domains = registerResult.getDomainBindings();
             if (domains != null) {
                 if (ProtocolType.isHttp(protocol)) {
                     int httpProxyPort = appConfig.getHttpProxyPort();

@@ -29,9 +29,9 @@ public class AccessTokenCreateParam {
     /**
      * 最大设备数
      */
-    private Integer maxDevice;
+    private Integer maxDevices;
     /**
      * 最大连接数
      */
-    private Integer maxConnection;
+    private Integer maxConnections;
 }

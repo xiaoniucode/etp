@@ -88,12 +88,12 @@ public class AccessTokenInitializer implements ApplicationRunner {
         AccessTokenDO accessTokenDO = new AccessTokenDO();
         accessTokenDO.setName(info.getName());
         accessTokenDO.setToken(info.getToken());
-        accessTokenDO.setMaxDevice(info.getMaxDevices());
-        accessTokenDO.setMaxConnection(info.getMaxConnections());
+        accessTokenDO.setMaxDevices(info.getMaxDevices());
+        accessTokenDO.setMaxConnections(info.getMaxConnections());
         return accessTokenDO;
     }
 
-    private TokenConfig toDomain(AccessTokenDO info) {
-        return new TokenConfig(info.getName(), info.getToken(), info.getMaxDevice(), info.getMaxConnection());
+    private TokenConfig toDomain(AccessTokenDO at) {
+        return new TokenConfig(at.getName(), at.getToken(), at.getMaxDevices(), at.getMaxConnections());
     }
 }

@@ -18,7 +18,6 @@ package com.xiaoniucode.etp.server.web.listener;
 
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
-import com.xiaoniucode.etp.server.store.AgentStore;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
 import com.xiaoniucode.etp.server.web.repository.AgentRepository;
 import org.slf4j.Logger;
@@ -57,7 +56,7 @@ public class AgentInitializer implements ApplicationRunner {
             logger.info("处理第 {} 页，每页 {} 条，共 {} 条记录", page + 1, size, pageResult.getTotalElements());
             
             for (AgentDO agentDO : pageResult.getContent()) {
-                agentManager.saveAgentInfo(toDomain(agentDO));
+                agentManager.save(toDomain(agentDO));
                 totalProcessed++;
             }
             

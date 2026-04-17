@@ -48,13 +48,13 @@ public class AccessTokenDO {
     /**
      * 最大设备数
      */
-    @Column(name = "max_device", nullable = false)
-    private Integer maxDevice;
+    @Column(name = "max_devices", nullable = false)
+    private Integer maxDevices;
     /**
      * 最大连接数
      */
-    @Column(name = "max_connection", nullable = false)
-    private Integer maxConnection;
+    @Column(name = "max_connections", nullable = false)
+    private Integer maxConnections;
     /**
      * 创建时间
      */

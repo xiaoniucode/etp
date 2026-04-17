@@ -132,7 +132,7 @@ public class AuthAction extends AgentBaseAction {
 
         if (!isReconnect) {
             tokenManager.incrementConnection(token);
-            agentManager.saveAgentInfo(agentInfo);
+            agentManager.save(agentInfo);
         }
         agentManager.addClientContextIndex(agentId, context);
         Message.AuthResponse authResponse = Message.AuthResponse.newBuilder().setCode(0)

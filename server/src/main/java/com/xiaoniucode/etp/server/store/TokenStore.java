@@ -4,10 +4,9 @@ import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface TokenStore {
-    Optional<TokenConfig> findByToken(String token);
+    TokenConfig findByToken(String token);
 
     TokenConfig getByToken(String token);
 

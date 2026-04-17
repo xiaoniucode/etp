@@ -19,14 +19,13 @@ package com.xiaoniucode.etp.server.store;
 import com.xiaoniucode.etp.server.vhost.DomainBinding;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface DomainStore {
-    boolean isOccupied(String domain);
+    boolean isOccupied(String fullDomain);
 
     void save(DomainBinding domainBinding);
 
-    Optional<DomainBinding> findByDomain(String domain);
+    DomainBinding findByDomain(String fullDomain);
 
     List<DomainBinding> findByProxyId(String proxyId);
 

@@ -21,13 +21,14 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import lombok.*;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 @ToString
 @EqualsAndHashCode
-public class ProxyConfig {
+public class ProxyConfig implements Serializable {
     @Setter
     private String agentId;
     @Setter

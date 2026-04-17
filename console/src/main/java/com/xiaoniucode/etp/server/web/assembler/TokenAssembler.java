@@ -28,8 +28,8 @@ public class TokenAssembler {
         return new TokenConfig(
                 param.getName(),
                 null,
-                param.getMaxDevice(),
-                param.getMaxConnection()
+                param.getMaxDevices(),
+                param.getMaxConnections()
         );
     }
 
@@ -37,8 +37,8 @@ public class TokenAssembler {
         return new TokenConfig(
                 param.getName(),
                 null,
-                param.getMaxDevice(),
-                param.getMaxConnection()
+                param.getMaxDevices(),
+                param.getMaxConnections()
         );
     }
 }

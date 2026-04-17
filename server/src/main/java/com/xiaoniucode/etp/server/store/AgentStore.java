@@ -5,13 +5,12 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 public interface AgentStore {
 
     void save(AgentInfo agentInfo);
 
-    Optional<AgentInfo> findById(String agentId);
+    AgentInfo findById(String agentId);
 
     List<AgentInfo> findByToken(String token);
 

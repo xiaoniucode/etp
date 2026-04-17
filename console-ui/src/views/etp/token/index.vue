@@ -59,8 +59,8 @@
     id: number
     name: string
     token: string
-    maxDevice: number
-    maxConnection: number
+    maxDevices: number
+    maxConnections: number
     createdAt: string
     updatedAt: string
   }
@@ -113,12 +113,12 @@
           minWidth: 200
         },
         {
-          prop: 'maxDevice',
+          prop: 'maxDevices',
           label: '最大设备数',
           width: 120
         },
         {
-          prop: 'maxConnection',
+          prop: 'maxConnections',
           label: '最大连接数',
           width: 120
         },

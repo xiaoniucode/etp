@@ -16,13 +16,12 @@
 
 package com.xiaoniucode.etp.server.web.service.converter;
 
+import com.xiaoniucode.etp.server.vhost.DomainBinding;
 import com.xiaoniucode.etp.server.web.entity.HttpProxyDomainDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ProxyDomainConvert {
@@ -30,10 +29,15 @@ public interface ProxyDomainConvert {
     @Mapping(target = "proxyId", source = "proxyId")
     HttpProxyDomainDO toDO(String domain, String proxyId);
 
-    default List<HttpProxyDomainDO> toDOList(List<String> domains, String proxyId) {
-        if (domains == null) return Collections.emptyList();
-        return domains.stream()
-                .map(domain -> toDO(domain, proxyId))
-                .collect(Collectors.toList());
+    @Mapping(target = "proxyId", source = "proxyId")
+    HttpProxyDomainDO toDO(DomainBinding domainBinding, String proxyId);
+
+    default List<HttpProxyDomainDO> toDOList(List<DomainBinding> list, String proxyId) {
+        if (list == null || list.isEmpty()) {
+            return List.of();
+        }
+        return list.stream()
+                .map(d -> toDO(d, proxyId))
+                .toList();
     }
 }

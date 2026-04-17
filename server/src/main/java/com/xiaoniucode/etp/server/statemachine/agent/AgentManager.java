@@ -119,7 +119,7 @@ public class AgentManager {
     }
 
     public Optional<AgentInfo> getAgentInfo(String agentId) {
-        return agentStore.findById(agentId);
+        return Optional.ofNullable(agentStore.findById(agentId));
     }
 
     public void kickout(String agentId) {
@@ -133,11 +133,11 @@ public class AgentManager {
         return agentToContextIndex.values();
     }
 
-    public void saveAgentInfo(AgentInfo agentInfo) {
+    public void save(AgentInfo agentInfo) {
         agentStore.save(agentInfo);
     }
 
     public Optional<AgentInfo> findById(String agentId) {
-        return agentStore.findById(agentId);
+        return Optional.ofNullable(agentStore.findById(agentId));
     }
 }
