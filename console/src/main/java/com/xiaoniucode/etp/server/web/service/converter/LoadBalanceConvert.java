@@ -23,12 +23,9 @@ import com.xiaoniucode.etp.server.web.param.loadbalance.LoadBalanceParam;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring", imports = {LoadBalanceType.class})
 public interface LoadBalanceConvert {
-    LoadBalanceConvert INSTANCE = Mappers.getMapper(LoadBalanceConvert.class);
-
     @Mapping(target = "proxyId", source = "proxyId")
     @Mapping(target = "strategy", expression = "java(LoadBalanceType.fromCode(param.getStrategy()))")
     LoadBalanceDO toDO(LoadBalanceParam param, String proxyId);

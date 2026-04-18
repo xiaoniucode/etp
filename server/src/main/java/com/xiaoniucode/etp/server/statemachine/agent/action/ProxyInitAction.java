@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
@@ -23,10 +22,10 @@ public class ProxyInitAction extends AgentBaseAction{
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.debug("初始化客户端配置信息");
-        //如果有代理配置信息则添加索引
-        List<ProxyConfig> configs = proxyManager.findByAgentId(context.getAgentInfo().getAgentId());
-        configs.forEach(config -> {
-            agentManager.addProxyContextIndex(config.getProxyId(),context);
+        //todo 如果有代理配置信息则添加索引
+        List<String> proxyIds = proxyManager.findProxyIdsByAgentId(context.getAgentInfo().getAgentId());
+        proxyIds.forEach(proxyId-> {
+            agentManager.addProxyContextIndex(proxyId,context);
         });
     }
 }

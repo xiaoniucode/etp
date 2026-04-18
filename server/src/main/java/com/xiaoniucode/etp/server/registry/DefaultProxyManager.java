@@ -117,9 +117,9 @@ public class DefaultProxyManager implements ProxyManager {
 
     @Override
     public synchronized void clearByAgentId(String agentId) {
-        List<ProxyConfig> configs = proxyStore.findByAgentId(agentId);
-        for (ProxyConfig config : configs) {
-            remove(config.getProxyId());
+        List<String> proxyIds = proxyStore.findProxyIdsByAgentId(agentId);
+        for (String proxyId : proxyIds) {
+            remove(proxyId);
         }
     }
 
@@ -129,23 +129,8 @@ public class DefaultProxyManager implements ProxyManager {
     }
 
     @Override
-    public List<ProxyConfig> findAll() {
-        return proxyStore.findAll();
-    }
-
-    @Override
-    public List<ProxyConfig> findAllTcpProxies() {
-        return proxyStore.findAllTcpProxies();
-    }
-
-    @Override
-    public List<ProxyConfig> findAllHttpProxies() {
-        return proxyStore.findAllHttpProxies();
-    }
-
-    @Override
-    public List<ProxyConfig> findByAgentId(String agentId) {
-        return proxyStore.findByAgentId(agentId);
+    public List<String> findProxyIdsByAgentId(String agentId) {
+        return proxyStore.findProxyIdsByAgentId(agentId);
     }
 
     @Override

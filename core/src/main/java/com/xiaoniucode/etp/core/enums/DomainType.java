@@ -24,4 +24,13 @@ public enum DomainType {
         }
         return null;
     }
+    public boolean isAuto(){
+       return this==AUTO;
+    }
+    public boolean isSubdomain(){
+        return this==SUBDOMAIN;
+    }
+    public boolean isCustomDomain(){
+        return this==CUSTOM_DOMAIN;
+    }
 }

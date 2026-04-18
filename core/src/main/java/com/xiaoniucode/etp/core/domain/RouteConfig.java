@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -27,6 +28,22 @@ public class RouteConfig {
      * 是否自动生成域名
      */
     private Boolean autoDomain = true;
+
+    public void addCustomDomains(List<String> domains) {
+        this.customDomains.addAll(domains);
+    }
+
+    public void addSubDomains(List<String> domains) {
+        this.subDomains.addAll(domains);
+    }
+
+    public void addCustomDomain(String domain) {
+        this.customDomains.add(domain);
+    }
+
+    public void addSubDomain(String domain) {
+        this.subDomains.add(domain);
+    }
 
     /**
      * 是否有自定义域名

@@ -7,19 +7,13 @@ import java.util.List;
 public interface ProxyStore {
     ProxyConfig save(ProxyConfig config);
 
-    boolean replace(ProxyConfig newProxyConfig);
+    void replace(ProxyConfig newProxyConfig);
 
     ProxyConfig findById(String proxyId);
 
-    List<ProxyConfig> findByAgentId(String agentId);
+    List<String> findProxyIdsByAgentId(String agentId);
 
     ProxyConfig findByRemotePort(Integer remotePort);
-
-    List<ProxyConfig> findAll();
-
-    List<ProxyConfig> findAllHttpProxies();
-
-    List<ProxyConfig> findAllTcpProxies();
 
     void deleteById(String proxyId);
 

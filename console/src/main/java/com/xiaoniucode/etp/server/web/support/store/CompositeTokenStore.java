@@ -46,7 +46,7 @@ public class CompositeTokenStore implements TokenStore {
     public TokenConfig findByToken(String token) {
         logger.debug("根据 token 查询令牌配置，token: {}", token);
         String cacheKey = "token:" + token;
-        return multiLevelCache.get(CACHE_NAME, cacheKey, () -> {
+        return multiLevelCache.getAndPut(CACHE_NAME, cacheKey, () -> {
                     AccessTokenDO accessTokenDO = accessTokenRepository.findByToken(token);
                     if (accessTokenDO != null) {
                         return tokenStoreConvert.toTokenConfig(accessTokenDO);
@@ -66,7 +66,7 @@ public class CompositeTokenStore implements TokenStore {
     public List<TokenConfig> findAll() {
         logger.debug("查询所有令牌配置");
         String cacheKey = "all";
-        return multiLevelCache.get(CACHE_NAME, cacheKey, () -> {
+        return multiLevelCache.getAndPut(CACHE_NAME, cacheKey, () -> {
             List<AccessTokenDO> accessTokenDOs = accessTokenRepository.findAll();
             return tokenStoreConvert.toTokenConfigList(accessTokenDOs);
         });
@@ -76,7 +76,7 @@ public class CompositeTokenStore implements TokenStore {
     public boolean existsByToken(String token) {
         logger.debug("检查 token 是否存在，token: {}", token);
         String cacheKey = "exists:token:" + token;
-        return multiLevelCache.get(CACHE_NAME, cacheKey, () ->
+        return multiLevelCache.getAndPut(CACHE_NAME, cacheKey, () ->
                 accessTokenRepository.existsByToken(token)
         );
     }
@@ -85,7 +85,7 @@ public class CompositeTokenStore implements TokenStore {
     public boolean existsByName(String name) {
         logger.debug("检查名称是否存在，name: {}", name);
         String cacheKey = "exists:name:" + name;
-        return multiLevelCache.get(CACHE_NAME, cacheKey, () ->
+        return multiLevelCache.getAndPut(CACHE_NAME, cacheKey, () ->
                 accessTokenRepository.existsByName(name)
         );
     }

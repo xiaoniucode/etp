@@ -84,7 +84,7 @@ public class TargetResolverAction extends StreamBaseAction {
         }
         List<Target> availableTargets = targets;
         HealthCheckConfig healthCheck = config.getHealthCheck();
-        //获取健康目标服务列表
+        //如果配置了健康检查 则获取健康目标服务列表
         if (healthCheck != null && healthCheck.isEnabled()) {
             availableTargets = healthManager.getAvailableTargets(config.getProxyId(), targets);
         }

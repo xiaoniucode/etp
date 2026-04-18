@@ -53,7 +53,7 @@ public class CompositeAgentStore implements AgentStore {
     @Override
     public AgentInfo findById(String agentId) {
         logger.debug("根据 agentId 查询代理信息，agentId: {}", agentId);
-        return multiLevelCache.get(CACHE_NAME, "id:" + agentId, () -> {
+        return multiLevelCache.getAndPut(CACHE_NAME, "id:" + agentId, () -> {
             Optional<AgentDO> opt = agentRepository.findById(agentId);
             if (opt.isEmpty()) {
                 return null;
@@ -66,7 +66,7 @@ public class CompositeAgentStore implements AgentStore {
     public List<AgentInfo> findByToken(String token) {
         logger.debug("根据 token 查询代理列表，token: {}", token);
         String cacheKey = "token:" + token;
-        return multiLevelCache.get(CACHE_NAME, cacheKey, () -> {
+        return multiLevelCache.getAndPut(CACHE_NAME, cacheKey, () -> {
             List<AgentDO> agentDOs = agentRepository.findByToken(token);
             return agentStoreConvert.toAgentInfoList(agentDOs);
         });
@@ -76,7 +76,7 @@ public class CompositeAgentStore implements AgentStore {
     public long countByToken(String token) {
         logger.debug("根据 token 统计代理数量，token: {}", token);
         String cacheKey = "token:count:" + token;
-        return multiLevelCache.get(CACHE_NAME, cacheKey, () ->
+        return multiLevelCache.getAndPut(CACHE_NAME, cacheKey, () ->
                 agentRepository.countByToken(token)
         );
     }
@@ -117,7 +117,7 @@ public class CompositeAgentStore implements AgentStore {
         logger.debug("更新代理最后活跃时间，agentId: {}, 时间: {}", agentId, lastActiveTime);
         multiLevelCache.evict(CACHE_NAME, "id:" + agentId);
 
-        multiLevelCache.get(CACHE_NAME, "id:" + agentId, () -> {
+        multiLevelCache.getAndPut(CACHE_NAME, "id:" + agentId, () -> {
                     Optional<AgentDO> opt = agentRepository.findById(agentId);
                     if (opt.isEmpty()) {
                         return null;

@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.web.repository;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,7 @@ import java.util.Optional;
  * 代理 Repository
  */
 @Repository
-public interface ProxyRepository extends JpaRepository<ProxyDO, String> , JpaSpecificationExecutor<ProxyDO> {
+public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpecificationExecutor<ProxyDO> {
     boolean existsByAgentIdAndName(String agentId, String name);
 
     boolean existsByAgentIdAndNameAndIdNot(String agentId, String name, String id);
@@ -42,15 +43,42 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String> , JpaSpe
     );
 
     @Query("""
-            SELECT a, t, b, lb
+            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(
+                                       a, p, t, b, lb,ba,ac)
             FROM ProxyDO p
             LEFT JOIN AgentDO a ON p.agentId = a.id
             LEFT JOIN TransportDO t ON t.proxyId = p.id
             LEFT JOIN BandwidthDO b ON b.proxyId = p.id
             LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
+            LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
+            LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
             WHERE p.id = :id
             """)
-    Optional<Object[]> findProxyDetailWithAssociations(@Param("id") String id);
+    ProxyDetailQueryResult findProxyDetailByProxyId(@Param("id") String id);
+
+
+    @Query("""
+            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(
+                                       a, p, t, b, lb,ba,ac)
+            FROM ProxyDO p
+            LEFT JOIN AgentDO a ON p.agentId = a.id
+            LEFT JOIN TransportDO t ON t.proxyId = p.id
+            LEFT JOIN BandwidthDO b ON b.proxyId = p.id
+            LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
+            LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
+            LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
+            WHERE p.remotePort = :remotePort
+            """)
+    ProxyDetailQueryResult findProxyDetailByRemotePort(@Param("remotePort") Integer remotePort);
+
 
     void deleteByIdIn(List<String> ids);
+
+
+    @Query("SELECT p.id FROM ProxyDO p WHERE p.agentId = :agentId")
+    List<String> findProxyIdsByAgentId(@Param("agentId") String agentId);
+
+    Optional<ProxyDO> findByRemotePort(Integer remotePort);
+
+    Optional<ProxyDO> findByAgentIdAndName(String agentId, String proxyName);
 }

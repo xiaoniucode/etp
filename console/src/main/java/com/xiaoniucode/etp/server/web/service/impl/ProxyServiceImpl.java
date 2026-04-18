@@ -39,8 +39,6 @@ import com.xiaoniucode.etp.server.web.repository.*;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import com.xiaoniucode.etp.server.web.service.converter.*;
 import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,27 +101,9 @@ public class ProxyServiceImpl implements ProxyService {
     private AppConfig appConfig;
     @Autowired
     private DomainManager domainManager;
-    private ExecutorService executorService;
     @Autowired
     private UidGenerator uidGenerator;
 
-    @PostConstruct
-    public void init() {
-        executorService = Executors.newVirtualThreadPerTaskExecutor();
-    }
-
-    @PreDestroy
-    public void destroy() {
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
-                executorService.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
-    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -296,65 +276,33 @@ public class ProxyServiceImpl implements ProxyService {
 
     @Override
     public HttpProxyDetailDTO getHttpProxyById(String id) {
-        // 1. 查主表
-        ProxyDO proxyDO = proxyRepository.findById(id)
-                .orElseThrow(() -> new BizException("HTTP 代理不存在"));
+        ProxyDetailQueryResult detail = proxyRepository.findProxyDetailByProxyId(id);
+        AgentDO agentDO = detail.getAgentDO();
+        ProxyDO proxyDO = detail.getProxyDO();
+        TransportDO transportDO = detail.getTransportDO();
+        BandwidthDO bandwidthDO = detail.getBandwidthDO();
+        LoadBalanceDO loadBalanceDO = detail.getLoadBalanceDO();
 
-        // 2. 并发查询关联数据
-        try {
-            Future<Object[]> httpDetailFuture = executorService.submit(() ->
-                    proxyRepository.findProxyDetailWithAssociations(id).orElse(new Object[5])
-            );
+        List<ProxyTargetDO> proxyTargetDos = proxyTargetRepository.findByProxyId(id);
+        List<HttpProxyDomainDO> httpProxyDomainDOs = proxyDomainRepository.findByProxyId(id);
 
-            Future<List<ProxyTargetDO>> proxyTargetsFuture = executorService.submit(() ->
-                    proxyTargetRepository.findByProxyId(id)
-            );
+        HttpProxyDetailDTO httpProxyDetailDTO = proxyConvert.toHttpDetailDTO(proxyDO, agentDO.getAgentType().getCode());
+        TransportDTO transportDTO = transportConvert.toDTO(transportDO);
+        BandwidthDTO bandwidthDTO = bandwidthConvert.toDTO(bandwidthDO);
 
-            Future<List<HttpProxyDomainDO>> domainsFuture = executorService.submit(() ->
-                    proxyDomainRepository.findByProxyId(id)
-            );
+        List<TargetDTO> targetDTOList = proxyTargetConvert.toDTOList(proxyTargetDos);
+        httpProxyDetailDTO.setTransport(transportDTO);
+        httpProxyDetailDTO.setBandwidth(bandwidthDTO);
 
-            Object[] result = httpDetailFuture.get();
-            Object[] entities = (Object[]) result[0];
-
-            AgentDO agentDO = (AgentDO) entities[0];
-            TransportDO transportDO = (TransportDO) entities[1];
-            BandwidthDO bandwidthDO = (BandwidthDO) entities[2];
-            LoadBalanceDO loadBalanceDO = (LoadBalanceDO) entities[3];
-
-            List<ProxyTargetDO> proxyTargetDos = proxyTargetsFuture.get();
-            List<HttpProxyDomainDO> httpProxyDomainDOs = domainsFuture.get();
-
-            HttpProxyDetailDTO httpProxyDetailDTO = proxyConvert.toHttpDetailDTO(proxyDO, agentDO.getAgentType().getCode());
-            TransportDTO transportDTO = transportConvert.toDTO(transportDO);
-            BandwidthDTO bandwidthDTO = bandwidthConvert.toDTO(bandwidthDO);
-
-            List<TargetDTO> targetDTOList = proxyTargetConvert.toDTOList(proxyTargetDos);
-            httpProxyDetailDTO.setTransport(transportDTO);
-            httpProxyDetailDTO.setBandwidth(bandwidthDTO);
-
-            if (proxyDO.getDeploymentMode().isCluster()) {
-                LoadBalanceDTO loadBalanceDTO = loadBalanceConvert.toDTO(loadBalanceDO);
-                httpProxyDetailDTO.setLoadBalance(loadBalanceDTO);
-            }
-
-            httpProxyDetailDTO.setTargets(targetDTOList);
-            List<String> domains = httpProxyDomainDOs.stream().map(HttpProxyDomainDO::getDomain).toList();
-            httpProxyDetailDTO.setDomains(domains);
-            return httpProxyDetailDTO;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.warn("查询被中断, proxyId: {}", id, e);
-            throw new BizException("查询被中断");
-        } catch (ExecutionException e) {
-            Throwable cause = e.getCause();
-            logger.error("HTTP 代理配置详情获取失败, proxyId: {}", id, cause);
-
-            if (cause instanceof BizException) {
-                throw (BizException) cause;
-            }
-            throw new BizException("HTTP 代理配置详情获取失败: " + (cause != null ? cause.getMessage() : e.getMessage()));
+        if (proxyDO.getDeploymentMode().isCluster()) {
+            LoadBalanceDTO loadBalanceDTO = loadBalanceConvert.toDTO(loadBalanceDO);
+            httpProxyDetailDTO.setLoadBalance(loadBalanceDTO);
         }
+
+        httpProxyDetailDTO.setTargets(targetDTOList);
+        List<String> domains = httpProxyDomainDOs.stream().map(HttpProxyDomainDO::getDomain).toList();
+        httpProxyDetailDTO.setDomains(domains);
+        return httpProxyDetailDTO;
     }
 
     @Override
@@ -452,54 +400,29 @@ public class ProxyServiceImpl implements ProxyService {
 
     @Override
     public TcpProxyDetailDTO getTcpProxyById(String id) {
-        ProxyDO proxyDO = proxyRepository.findById(id)
-                .orElseThrow(() -> new BizException("HTTP 代理不存在"));
-        try {
-            Future<Object[]> httpDetailFuture = executorService.submit(() ->
-                    proxyRepository.findProxyDetailWithAssociations(id).orElse(new Object[5])
-            );
+        ProxyDetailQueryResult detail = proxyRepository.findProxyDetailByProxyId(id);
+        AgentDO agentDO = detail.getAgentDO();
+        ProxyDO proxyDO = detail.getProxyDO();
+        TransportDO transportDO = detail.getTransportDO();
+        BandwidthDO bandwidthDO = detail.getBandwidthDO();
+        LoadBalanceDO loadBalanceDO = detail.getLoadBalanceDO();
 
-            Future<List<ProxyTargetDO>> proxyTargetsFuture = executorService.submit(() ->
-                    proxyTargetRepository.findByProxyId(id)
-            );
+        List<ProxyTargetDO> proxyTargetDos = proxyTargetRepository.findByProxyId(id);
 
-            Object[] result = httpDetailFuture.get();
-            Object[] entities = (Object[]) result[0];
+        TcpProxyDetailDTO tcpProxyDetailDTO = proxyConvert.toTcpDetailDTO(proxyDO, agentDO.getAgentType().getCode());
+        TransportDTO transportDTO = transportConvert.toDTO(transportDO);
+        BandwidthDTO bandwidthDTO = bandwidthConvert.toDTO(bandwidthDO);
 
-            AgentDO agentDO = (AgentDO) entities[0];
-            TransportDO transportDO = (TransportDO) entities[1];
-            BandwidthDO bandwidthDO = (BandwidthDO) entities[2];
-            LoadBalanceDO loadBalanceDO = (LoadBalanceDO) entities[3];
+        List<TargetDTO> targetDTOList = proxyTargetConvert.toDTOList(proxyTargetDos);
+        tcpProxyDetailDTO.setTransport(transportDTO);
+        tcpProxyDetailDTO.setBandwidth(bandwidthDTO);
 
-            List<ProxyTargetDO> proxyTargetDos = proxyTargetsFuture.get();
-
-            TcpProxyDetailDTO tcpProxyDetailDTO = proxyConvert.toTcpDetailDTO(proxyDO, agentDO.getAgentType().getCode());
-            TransportDTO transportDTO = transportConvert.toDTO(transportDO);
-            BandwidthDTO bandwidthDTO = bandwidthConvert.toDTO(bandwidthDO);
-
-            List<TargetDTO> targetDTOList = proxyTargetConvert.toDTOList(proxyTargetDos);
-            tcpProxyDetailDTO.setTransport(transportDTO);
-            tcpProxyDetailDTO.setBandwidth(bandwidthDTO);
-
-            if (proxyDO.getDeploymentMode().isCluster()) {
-                LoadBalanceDTO loadBalanceDTO = loadBalanceConvert.toDTO(loadBalanceDO);
-                tcpProxyDetailDTO.setLoadBalance(loadBalanceDTO);
-            }
-            tcpProxyDetailDTO.setTargets(targetDTOList);
-            return tcpProxyDetailDTO;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.warn("查询被中断, proxyId: {}", id, e);
-            throw new BizException("查询被中断");
-        } catch (ExecutionException e) {
-            Throwable cause = e.getCause();
-            logger.error("TCP 代理配置详情获取失败, proxyId: {}", id, cause);
-
-            if (cause instanceof BizException) {
-                throw (BizException) cause;
-            }
-            throw new BizException("TCP 代理配置详情获取失败: " + (cause != null ? cause.getMessage() : e.getMessage()));
+        if (proxyDO.getDeploymentMode().isCluster()) {
+            LoadBalanceDTO loadBalanceDTO = loadBalanceConvert.toDTO(loadBalanceDO);
+            tcpProxyDetailDTO.setLoadBalance(loadBalanceDTO);
         }
+        tcpProxyDetailDTO.setTargets(targetDTOList);
+        return tcpProxyDetailDTO;
     }
 
     @Override

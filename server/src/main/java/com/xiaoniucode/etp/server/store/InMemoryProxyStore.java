@@ -42,10 +42,9 @@ public class InMemoryProxyStore implements ProxyStore {
     }
 
     @Override
-    public boolean replace(ProxyConfig proxyConfig) {
+    public void replace(ProxyConfig proxyConfig) {
         deleteById(proxyConfig.getProxyId());
         save(proxyConfig);
-        return true;
     }
 
     @Override
@@ -54,44 +53,17 @@ public class InMemoryProxyStore implements ProxyStore {
     }
 
     @Override
-    public List<ProxyConfig> findByAgentId(String agentId) {
+    public List<String> findProxyIdsByAgentId(String agentId) {
         Map<String, ProxyConfig> clientProxies = clientProxyIndex.get(agentId);
         if (clientProxies == null) {
             return List.of();
         }
-        return new ArrayList<>(clientProxies.values());
+        return clientProxies.values().stream().map(ProxyConfig::getProxyId).toList();
     }
 
     @Override
     public ProxyConfig findByRemotePort(Integer remotePort) {
         return portToConfigIndex.get(remotePort);
-    }
-
-    @Override
-    public List<ProxyConfig> findAll() {
-        return new ArrayList<>(proxyStore.values());
-    }
-
-    @Override
-    public List<ProxyConfig> findAllHttpProxies() {
-        List<ProxyConfig> httpProxies = new ArrayList<>();
-        for (ProxyConfig config : proxyStore.values()) {
-            if (config.isHttp()) {
-                httpProxies.add(config);
-            }
-        }
-        return httpProxies;
-    }
-
-    @Override
-    public List<ProxyConfig> findAllTcpProxies() {
-        List<ProxyConfig> tcpProxies = new ArrayList<>();
-        for (ProxyConfig config : proxyStore.values()) {
-            if (config.isTcp()) {
-                tcpProxies.add(config);
-            }
-        }
-        return tcpProxies;
     }
 
     @Override

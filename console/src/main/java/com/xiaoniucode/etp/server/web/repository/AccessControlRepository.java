@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 访问控制 Repository
@@ -11,4 +12,6 @@ import java.util.List;
 @Repository
 public interface AccessControlRepository extends JpaRepository<AccessControlDO, String> {
     void deleteByProxyIdIn(List<String> ids);
+
+    Optional<AccessControlDO> findByProxyId(String proxyId);
 }

@@ -13,15 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.param.transport;
 
-import jakarta.validation.constraints.NotNull;
+package com.xiaoniucode.etp.server.web.configuration;
+
 import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.time.Duration;
 
 @Data
-public class TransportSaveParam {
-    @NotNull(message = "encrypt 不能为空")
-    private Boolean encrypt;
-    @NotNull(message = "tunnelType 不能为空")
-    private Integer tunnelType;
+@ConfigurationProperties(prefix = "cache.redis")
+public class RedisCacheProperties {
+
+    private boolean enabled = true;
+    private Duration defaultTtl = Duration.ofHours(1);
+    private boolean disableNullValues = true;
 }

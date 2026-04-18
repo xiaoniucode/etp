@@ -35,6 +35,13 @@ public class StreamContext extends AbstractStreamContext {
         this.stateMachine = streamStateMachine;
     }
 
+    /**
+     * Agent可能为空
+     */
+    public boolean hasAgent() {
+        return agentContext != null;
+    }
+
     public String getProxyId() {
         if (proxyConfig == null) {
             return null;
@@ -57,9 +64,10 @@ public class StreamContext extends AbstractStreamContext {
         return sa.getPort();
     }
 
-    public String getAgentId(){
+    public String getAgentId() {
         return agentContext.getAgentId();
     }
+
     public Channel getControl() {
         return agentContext.getControl();
     }

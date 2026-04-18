@@ -21,13 +21,7 @@ import org.springframework.cache.CacheManager;
 
 import java.util.function.Supplier;
 
-/**
- * 多级缓存
- */
 
-/**
- * 多级缓存（L1 + L2，可选）
- */
 public class MultiLevelCache {
 
     private final CacheManager l1CacheManager;
@@ -42,10 +36,9 @@ public class MultiLevelCache {
      * 查询流程：L1 -> L2 -> DB，并自动回填缓存
      */
     @SuppressWarnings("unchecked")
-    public <T> T get(String cacheName, String key, Supplier<T> dbLoader) {
-
-        Cache l1 = l1CacheManager.getCache(cacheName);
-        Cache l2 = (l2CacheManager != null) ? l2CacheManager.getCache(cacheName) : null;
+    public <T> T getAndPut(String cacheName, String key, Supplier<T> dbLoader) {
+        Cache l1 = getL1Cache(cacheName);
+        Cache l2 = getL2Cache(cacheName);
 
         // 查 L1
         if (l1 != null) {
@@ -65,7 +58,6 @@ public class MultiLevelCache {
                 if (value != null && l1 != null) {
                     l1.put(key, value);
                 }
-
                 return value;
             }
         }
@@ -74,33 +66,96 @@ public class MultiLevelCache {
         T value = dbLoader.get();
 
         // 写入 L1 + L2
-        if (value != null) {
-            if (l1 != null) {
-                l1.put(key, value);
-            }
-            if (l2 != null) {
-                l2.put(key, value);
+        putInternal(l1, l2, key, value);
+
+        return value;
+    }
+
+
+    @SuppressWarnings("all")
+    public <T> T getCache(String cacheName, String key) {
+        return getCache(cacheName, key, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getCache(String cacheName, String key, Class<T> clazz) {
+        Cache l1 = getL1Cache(cacheName);
+        Cache l2 = getL2Cache(cacheName);
+
+        Object value = null;
+
+        // 优先查 L1
+        if (l1 != null) {
+            Cache.ValueWrapper wrapper = l1.get(key);
+            if (wrapper != null) {
+                value = wrapper.get();
             }
         }
 
-        return value;
+        // L1 未命中则查 L2
+        if (value == null && l2 != null) {
+            Cache.ValueWrapper wrapper = l2.get(key);
+            if (wrapper != null) {
+                value = wrapper.get();
+            }
+        }
+
+        if (value == null) {
+            return null;
+        }
+
+        if (clazz != null && !clazz.isInstance(value)) {
+            return null;
+        }
+
+        return (T) value;
+    }
+
+    /**
+     * 手动写入缓存（同时写入 L1 + L2）
+     */
+    public void putCache(String cacheName, String key, Object value) {
+        if (value == null) {
+            return;
+        }
+
+        Cache l1 = getL1Cache(cacheName);
+        Cache l2 = getL2Cache(cacheName);
+
+        putInternal(l1, l2, key, value);
+    }
+
+    private void putInternal(Cache l1, Cache l2, String key, Object value) {
+        if (value == null) return;
+
+        if (l1 != null) {
+            l1.put(key, value);
+        }
+        if (l2 != null) {
+            l2.put(key, value);
+        }
+    }
+
+    private Cache getL1Cache(String cacheName) {
+        return l1CacheManager.getCache(cacheName);
+    }
+
+    private Cache getL2Cache(String cacheName) {
+        return (l2CacheManager != null) ? l2CacheManager.getCache(cacheName) : null;
     }
 
     /**
      * 删除缓存（L1 + L2）
      */
     public void evict(String cacheName, String key) {
-
-        Cache l1 = l1CacheManager.getCache(cacheName);
+        Cache l1 = getL1Cache(cacheName);
         if (l1 != null) {
             l1.evict(key);
         }
 
-        if (l2CacheManager != null) {
-            Cache l2 = l2CacheManager.getCache(cacheName);
-            if (l2 != null) {
-                l2.evict(key);
-            }
+        Cache l2 = getL2Cache(cacheName);
+        if (l2 != null) {
+            l2.evict(key);
         }
     }
 
@@ -108,17 +163,14 @@ public class MultiLevelCache {
      * 清空缓存（L1 + L2）
      */
     public void evictAll(String cacheName) {
-
-        Cache l1 = l1CacheManager.getCache(cacheName);
+        Cache l1 = getL1Cache(cacheName);
         if (l1 != null) {
             l1.clear();
         }
 
-        if (l2CacheManager != null) {
-            Cache l2 = l2CacheManager.getCache(cacheName);
-            if (l2 != null) {
-                l2.clear();
-            }
+        Cache l2 = getL2Cache(cacheName);
+        if (l2 != null) {
+            l2.clear();
         }
     }
 }

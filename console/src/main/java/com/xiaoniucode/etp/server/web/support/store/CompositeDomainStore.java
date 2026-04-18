@@ -67,7 +67,7 @@ public class CompositeDomainStore implements DomainStore {
         }
         
         String cacheKey = "domain:" + fullDomain;
-        DomainBinding result = multiLevelCache.get(CACHE_NAME, cacheKey, () -> {
+        DomainBinding result = multiLevelCache.getAndPut(CACHE_NAME, cacheKey, () -> {
             String baseDomain = appConfig.getBaseDomain();
             boolean isSubDomain = fullDomain.endsWith("." + baseDomain);
             logger.debug("完整域名: {}, 基础域名: {}, 是否为子域名: {}", fullDomain, baseDomain, isSubDomain);
@@ -90,7 +90,7 @@ public class CompositeDomainStore implements DomainStore {
     @Override
     public List<DomainBinding> findByProxyId(String proxyId) {
         String cacheKey = "proxy:" + proxyId;
-        List<DomainBinding> result = multiLevelCache.get(CACHE_NAME, cacheKey, () -> {
+        List<DomainBinding> result = multiLevelCache.getAndPut(CACHE_NAME, cacheKey, () -> {
             List<HttpProxyDomainDO> domainDOs = proxyDomainRepository.findByProxyId(proxyId);
             logger.debug("查询到代理ID: {} 的域名绑定数量: {}", proxyId, domainDOs.size());
             return domainStoreConvert.toDomainBindingList(domainDOs);

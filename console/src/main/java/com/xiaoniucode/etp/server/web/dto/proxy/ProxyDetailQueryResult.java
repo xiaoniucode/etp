@@ -13,15 +13,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.param.transport;
 
-import jakarta.validation.constraints.NotNull;
+package com.xiaoniucode.etp.server.web.dto.proxy;
+
+import com.xiaoniucode.etp.server.web.entity.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class TransportSaveParam {
-    @NotNull(message = "encrypt 不能为空")
-    private Boolean encrypt;
-    @NotNull(message = "tunnelType 不能为空")
-    private Integer tunnelType;
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProxyDetailQueryResult {
+    private AgentDO agentDO;
+    private ProxyDO proxyDO;
+    private TransportDO transportDO;
+    private BandwidthDO bandwidthDO;
+    private LoadBalanceDO loadBalanceDO;
+    private BasicAuthDO basicAuthDO;
+    private AccessControlDO accessControlDO;
 }

@@ -19,6 +19,7 @@ spring:
           max-idle: 50         # 最大空闲连接
           min-idle: 10         # 最小空闲连接
           max-wait: 3s         # 获取连接最大等待时间
+
 logging:
   level:
     com.xiaoniucode.etp: debug
@@ -34,8 +35,9 @@ security:
     paths:
       - /api/auth/login
       - /api/captcha
-
 cache:
-  redis:
-    enabled: true
+  caffeine:
+    initial-capacity: 10000
+    maximum-size: 150000
+    expire-after-access: 30m
 

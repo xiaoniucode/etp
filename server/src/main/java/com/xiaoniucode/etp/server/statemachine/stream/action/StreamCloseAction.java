@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.statemachine.stream.action;
 
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
@@ -53,7 +52,8 @@ public class StreamCloseAction extends StreamBaseAction {
             directPool.release(agentInfo.getAgentId(), tunnelEntry);
         }
         streamManager.removeStreamContext(streamId);
-        if (event == StreamEvent.STREAM_LOCAL_CLOSE) {
+        //流可能是半打开状态，Agent可能为空
+        if (event == StreamEvent.STREAM_LOCAL_CLOSE && context.hasAgent()) {
             logger.debug("通知对端关闭流");
             Channel control = agentContext.getControl();
             TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_CLOSE);

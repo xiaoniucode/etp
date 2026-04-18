@@ -122,8 +122,8 @@ public class StreamManager {
         }
 
         // 清理 Agent 索引
-        String agentId = context.getAgentId();
-        if (StringUtils.hasText(agentId)) {
+        if (context.hasAgent()) {
+            String agentId = context.getAgentId();
             Set<Integer> agentSet = agentToStreams.get(agentId);
             if (agentSet != null) {
                 agentSet.remove(streamId);
