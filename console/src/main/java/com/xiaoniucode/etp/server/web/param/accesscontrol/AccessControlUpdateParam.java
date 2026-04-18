@@ -14,10 +14,14 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.param.accesscontrol;
+
+import com.xiaoniucode.etp.core.enums.AccessControl;
+import com.xiaoniucode.etp.server.web.support.validation.EnumValue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+
 /**
  * 更新访问控制请求
  */
@@ -29,5 +33,6 @@ public class AccessControlUpdateParam {
     @NotNull(message = "启用状态不能为空")
     private Boolean enabled;
     @NotNull(message = "访问控制模式不能为空")
+    @EnumValue(enumClass = AccessControl.class, message = "访问控制模式值无效")
     private Integer mode;
 }

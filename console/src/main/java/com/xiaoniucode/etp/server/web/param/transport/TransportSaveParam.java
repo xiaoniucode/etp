@@ -15,6 +15,8 @@
  */
 package com.xiaoniucode.etp.server.web.param.transport;
 
+import com.xiaoniucode.etp.core.enums.TunnelType;
+import com.xiaoniucode.etp.server.web.support.validation.EnumValue;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -23,5 +25,6 @@ public class TransportSaveParam {
     @NotNull(message = "encrypt 不能为空")
     private Boolean encrypt;
     @NotNull(message = "tunnelType 不能为空")
+    @EnumValue(enumClass = TunnelType.class)
     private Integer tunnelType;
 }

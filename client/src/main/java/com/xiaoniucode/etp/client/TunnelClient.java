@@ -61,7 +61,7 @@ public final class TunnelClient implements Lifecycle {
     }
 
     private void initializeStateMachine() {
-        agentContext = new AgentContext(config,AgentStateMachineBuilder.getStateMachine());
+        agentContext = new AgentContext(config, AgentStateMachineBuilder.getStateMachine());
         agentContext.setTunnelClient(this);
         agentContext.setDirectPool(new DirectPool());
         agentContext.setMultiplexPool(new MultiplexPool());
@@ -78,7 +78,7 @@ public final class TunnelClient implements Lifecycle {
                     @Override
                     protected void initChannel(SocketChannel ch) {
                         ChannelPipeline p = ch.pipeline();
-                        p.addLast(NettyConstants.REAL_SERVER_HANDLER, new RealServerHandler(agentContext));
+                        p.addLast(NettyConstants.REAL_SERVER_HANDLER, new RealServerHandler());
                     }
                 });
         Bootstrap controlBootstrap = new Bootstrap();
@@ -102,7 +102,7 @@ public final class TunnelClient implements Lifecycle {
                         sc.pipeline()
                                 .addLast(loggingHandler)
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
-                                .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER,new ControlIdleCheckHandler(agentContext,90,0,0, TimeUnit.SECONDS))
+                                .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentContext, 90, 0, 0, TimeUnit.SECONDS))
                                 .addLast(new HeartbeatHandler(30))
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlTunnelHandler);
                     }

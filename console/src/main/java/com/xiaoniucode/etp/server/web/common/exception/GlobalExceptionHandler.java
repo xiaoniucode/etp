@@ -94,7 +94,7 @@ public class GlobalExceptionHandler {
         logger.error("参数校验异常", e);
         BindingResult bindingResult = e.getBindingResult();
         String errorMessage = formatBindingResult(bindingResult);
-        return Ajax.error(400, "参数校验失败: " + errorMessage);
+        return Ajax.error(400, errorMessage);
     }
 
     /**
@@ -108,7 +108,7 @@ public class GlobalExceptionHandler {
         logger.error("参数绑定异常", e);
         BindingResult bindingResult = e.getBindingResult();
         String errorMessage = formatBindingResult(bindingResult);
-        return Ajax.error(400, "参数绑定失败: " + errorMessage);
+        return Ajax.error(400, errorMessage);
     }
 
     /**
@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
         String errorMessage = violations.stream()
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.joining("; "));
-        return Ajax.error(400, "参数校验失败: " + errorMessage);
+        return Ajax.error(400, errorMessage);
     }
 
     /**

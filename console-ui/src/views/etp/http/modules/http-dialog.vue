@@ -114,11 +114,7 @@
       <ElFormItem v-if="formData.deployMode === 'cluster'" label="服务列表" prop="targets">
         <div class="border border-gray-200 rounded p-4">
           <ElTable :data="formData.targets" style="width: 100%">
-            <ElTableColumn v-if="dialogType === 'edit'" prop="id" label="ID" width="100">
-              <template #default="scope">
-                <ElInput v-model="scope.row.id" disabled style="width: 100%" />
-              </template>
-            </ElTableColumn>
+
             <ElTableColumn prop="name" label="服务名称" min-width="150">
               <template #default="scope">
                 <ElInput
@@ -315,7 +311,7 @@
           name: proxyDetail.name || '',
           status: proxyDetail.status?.toString() || '1',
           domainType: proxyDetail.domainType?.toString() || '0',
-          domains: proxyDetail.domain ? proxyDetail.domain.join('\n') : '',
+          domains: proxyDetail.domains ? proxyDetail.domains.join('\n') : '',
           encrypt: proxyDetail.transport?.encrypt || false,
           tunnelType: proxyDetail.tunnelType?.toString() || '1',
           deployMode: proxyDetail.deploymentMode === 1 ? 'single' : 'cluster',

@@ -15,11 +15,15 @@
  */
 package com.xiaoniucode.etp.server.web.param.loadbalance;
 
+
+import com.xiaoniucode.etp.core.enums.LoadBalanceType;
+import com.xiaoniucode.etp.server.web.support.validation.EnumValue;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class LoadBalanceParam {
     @NotNull(message = "负载均衡策略不能为空")
+    @EnumValue(enumClass = LoadBalanceType.class)
     private Integer strategy;
 }

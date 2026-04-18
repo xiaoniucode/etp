@@ -107,11 +107,7 @@
       <ElFormItem v-if="formData.deployMode === 'cluster'" label="服务列表" prop="targets">
         <div class="targets-table">
           <ElTable :data="formData.targets" style="width: 100%">
-            <ElTableColumn v-if="dialogType === 'edit'" prop="id" label="ID" width="100">
-              <template #default="scope">
-                <ElInput v-model="scope.row.id" disabled style="width: 100%" />
-              </template>
-            </ElTableColumn>
+
             <ElTableColumn prop="name" label="服务名称" min-width="150">
               <template #default="scope">
                 <ElInput

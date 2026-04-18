@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.client.transport;
 
-import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
@@ -19,11 +18,6 @@ import java.util.Optional;
  */
 public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(RealServerHandler.class);
-    private final AgentContext agentContext;
-
-    public RealServerHandler(AgentContext agentContext) {
-        this.agentContext = agentContext;
-    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {

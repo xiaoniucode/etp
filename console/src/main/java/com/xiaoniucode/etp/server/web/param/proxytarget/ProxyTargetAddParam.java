@@ -15,8 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.param.proxytarget;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -24,9 +23,12 @@ public class ProxyTargetAddParam {
     @NotEmpty(message = "host 不能为空")
     private String host;
     @NotNull(message = "port 不能为空")
+    @Min(value = 1, message = "port 必须大于 0")
+    @Max(value = 65535, message = "port 必须小于等于 65535")
     private Integer port;
     @NotNull(message = "weight 不能为空")
     private Integer weight;
     @NotEmpty(message = "name 不能为空")
+    @Size(max = 30, message = "name 长度不能超过 30")
     private String name;
 }
