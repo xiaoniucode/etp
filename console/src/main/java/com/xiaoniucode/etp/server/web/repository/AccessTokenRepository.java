@@ -27,7 +27,14 @@ public interface AccessTokenRepository extends JpaRepository<AccessTokenDO, Inte
      * 检查是否存在指定名称但排除指定 ID 的访问令牌
      */
     boolean existsByNameAndIdNot(String name, Integer id);
-    
+
+    /**
+     * 查询访问令牌是否已经存在
+     * @param name 名称
+     * @param token 令牌值
+     * @return 只要name 或token有一个就算存在
+     */
+    boolean existsByNameOrToken(String name, String token);
     /**
      * 根据 token 查询访问令牌
      */

@@ -17,28 +17,29 @@
 package com.xiaoniucode.etp.server.web.listener;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
+import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.DashboardConfig;
+import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
+import com.xiaoniucode.etp.server.web.common.exception.SystemException;
 import com.xiaoniucode.etp.server.web.entity.SysUserDO;
 import com.xiaoniucode.etp.server.web.repository.UserRepository;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 /**
- * 初始化管理员用户，首次从配置文件中加载，后续修改以数据库为主
+ * 将管理面板用户信息同步至数据库，如果已经存在则不同步
  */
 @Component
-public class AdminInitializer implements ApplicationRunner {
+public class DashboardAdminSynchronizer implements EventListener<TunnelServerBindEvent> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AdminInitializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(DashboardAdminSynchronizer.class);
 
     @Resource
     private AppConfig appConfig;
@@ -54,7 +55,7 @@ public class AdminInitializer implements ApplicationRunner {
     private final static String DEFAULT_ROLE = "R_SUPER";
 
     @Override
-    public void run(ApplicationArguments args) {
+    public void onEvent(TunnelServerBindEvent event) {
         try {
             DashboardConfig dashboard = appConfig.getDashboard();
             if (dashboard == null) {
@@ -65,22 +66,22 @@ public class AdminInitializer implements ApplicationRunner {
 
             Optional<SysUserDO> existOpt = userRepository.findByUsername(username);
             if (existOpt.isPresent()) {
-                logger.debug("管理员用户已存在于数据库中，跳过初始化");
+                logger.debug("管理员用户已存在于数据库中，跳过同步");
                 return;
             }
             if (!StringUtils.hasText(username) || !StringUtils.hasText(password)) {
-                logger.warn("Dashboard 管理员用户名或密码未配置，跳过管理员初始化");
-                return;
+                logger.warn("Dashboard 管理员用户名或密码未配置，管理面板用户同步失败");
+                throw new SystemException("Dashboard 管理员用户名或密码未配置，管理面板用户同步失败");
             }
             SysUserDO sysUserDO = new SysUserDO();
             sysUserDO.setUsername(username);
             sysUserDO.setPassword(passwordEncoder.encode(password));
             sysUserDO.setRole(DEFAULT_ROLE);
             userRepository.save(sysUserDO);
-            logger.debug("管理员用户 {} 已成功初始化", username);
+            logger.debug("管理员用户 {} 已成功同步至数据库", username);
         } catch (Exception e) {
-            logger.error("初始化管理员用户失败", e);
-            throw e;
+            logger.error("管理面板用户同步失败", e);
+            throw new SystemException("初始化管理员用户失败，请检查配置和数据库连接", e);
         }
     }
 }
