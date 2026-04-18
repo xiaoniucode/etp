@@ -93,8 +93,6 @@ private final InternalLogger logger= InternalLoggerFactory.getInstance(Heartbeat
             heartbeatFuture.cancel(false);
             heartbeatFuture = null;
             logger.debug("心跳任务已停止");
-        } else {
-            logger.debug("心跳任务不存在，无需停止");
         }
     }
 }

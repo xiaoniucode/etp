@@ -31,8 +31,8 @@ public class StreamManager {
         return Optional.ofNullable(streams.get(streamId));
     }
 
-    public static Optional<StreamContext> getStreamContext(Channel visitor) {
-        Integer streamId = visitor.attr(AttributeKeys.STREAM_ID).get();
+    public static Optional<StreamContext> getStreamContext(Channel server) {
+        Integer streamId = server.attr(AttributeKeys.STREAM_ID).get();
         if (streamId == null) {
             return Optional.empty();
         }

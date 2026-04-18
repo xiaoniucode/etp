@@ -74,7 +74,7 @@ public class DirectTunnelBridge implements TunnelBridge {
     @Override
     public void forwardToLocal(ByteBuf payload) {
         if (streamContext.isChannelClosed(server)) {
-            logger.error("真实服务连接没有激活，关闭流：streamId={}", streamContext.getStreamId());
+            logger.error("目标服务连接已断开，关闭流：streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }

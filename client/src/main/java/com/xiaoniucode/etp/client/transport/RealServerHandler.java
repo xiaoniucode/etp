@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.util.internal.logging.InternalLogger;
@@ -43,9 +44,11 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
+        logger.debug("目标服务连接断开");
         Channel server = ctx.channel();
         Optional<StreamContext> streamCtx = StreamManager.getStreamContext(server);
         streamCtx.ifPresent(streamContext -> {
+            logger.debug("目标服务连接断开，关闭流 {} ", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
         ctx.fireChannelInactive();
@@ -68,7 +71,14 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error(cause.getMessage(), cause);
+        logger.error("目标服务连接发生异常", cause);
+        Channel server = ctx.channel();
+        Optional<StreamContext> streamCtx = StreamManager.getStreamContext(server);
+        streamCtx.ifPresent(streamContext -> {
+            logger.error("目标服务连接发生异常，关闭流：{}",streamContext.getStreamId());
+            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+        });
+        ChannelUtils.closeOnFlush(server);
         ctx.fireExceptionCaught(cause);
     }
 
