@@ -36,6 +36,7 @@ public class StreamOpenAction extends StreamBaseAction {
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
+        logger.debug("开始打开流 {}", context.getStreamId());
         if (context.hasVariable(StreamConstants.VISIT_INFO)) {
             AgentContext agentContext = (AgentContext) context.getAgentContext();
             Channel control = agentContext.getControl();
@@ -51,7 +52,7 @@ public class StreamOpenAction extends StreamBaseAction {
             Bootstrap serverBootstrap = agentContext.getServerBootstrap();
             serverBootstrap.connect(localIp, localPort).addListener((ChannelFutureListener) serverFuture -> {
                 if (serverFuture.isSuccess()) {
-                    logger.debug("连接到目标服务 - [地址={}，端口={}]", localIp, localPort);
+                    logger.debug("成功连接到目标服务 - [地址={}，端口={}]", localIp, localPort);
                     Channel server = serverFuture.channel();
                     server.config().setOption(ChannelOption.AUTO_READ, false);
                     server.attr(AttributeKeys.STREAM_ID).set(streamId);
@@ -59,48 +60,51 @@ public class StreamOpenAction extends StreamBaseAction {
                     TunnelEntry tunnelEntry = getOrCreateTunnel(context);
 
                     if (tunnelEntry == null) {
-                        logger.error("获取隧道失败，关闭流：streamId={}", streamId);
+                        logger.error("没有可用连接，关闭流 {}", streamId);
                         context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
                         return;
                     }
 
-                    if (control != null && control.isActive()) {
-                        context.setServer(server);
-                        context.setTunnelEntry(tunnelEntry);
-
-                        Integer connectionId = agentContext.getConnectionId();
-                        Message.StreamOpenResponse req = Message.StreamOpenResponse.newBuilder()
-                                .setCode(0)
-                                .setConnectionId(connectionId)
-                                .setTunnelId(tunnelEntry.getTunnelId())
-                                .build();
-                        ByteBuf payload = ProtobufUtil.toByteBuf(req, control.alloc());
-                        TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload);
-                        frame.setCompressed(context.isCompress());
-                        frame.setEncrypted(context.isEncrypt());
-                        frame.setMultiplexTunnel(context.isMultiplex());
-                        control.writeAndFlush(frame).addListener(f -> {
-                            if (f.isSuccess()) {
-                                TunnelBridge tunnelBridge;
-                                if (context.isMultiplex()) {
-                                    tunnelBridge = TunnelBridgeFactory.buildMux(context);
-                                    logger.debug("流打开成功 - [隧道类型=多路复用， 目标地址={}，目标端口={}]", localIp, localPort);
-                                } else {
-                                    tunnelBridge = TunnelBridgeFactory.buildDirect(context);
-                                    logger.debug("流打开成功 - [隧道类型=独立连接， 目标地址={}，目标端口={}]", localIp, localPort);
-                                }
-                                tunnelBridge.open();
-                                context.setTunnelBridge(tunnelBridge);
-                                context.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
-                                tunnelEntry.getChannel().config().setOption(ChannelOption.AUTO_READ, true);
-                                server.config().setOption(ChannelOption.AUTO_READ, true);
-                            }
-                        });
+                    if (!control.isActive()) {
+                        logger.error("控制连接不可用，关闭流 {} ", context.getStreamId());
+                        context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
                     }
 
+                    context.setServer(server);
+                    context.setTunnelEntry(tunnelEntry);
+
+                    Integer connectionId = agentContext.getConnectionId();
+                    Message.StreamOpenResponse req = Message.StreamOpenResponse.newBuilder()
+                            .setCode(0)
+                            .setConnectionId(connectionId)
+                            .setTunnelId(tunnelEntry.getTunnelId())
+                            .build();
+                    ByteBuf payload = ProtobufUtil.toByteBuf(req, control.alloc());
+                    TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload);
+                    frame.setCompressed(context.isCompress());
+                    frame.setEncrypted(context.isEncrypt());
+                    frame.setMultiplexTunnel(context.isMultiplex());
+                    control.writeAndFlush(frame).addListener(f -> {
+                        if (f.isSuccess()) {
+                            TunnelBridge tunnelBridge;
+                            if (context.isMultiplex()) {
+                                tunnelBridge = TunnelBridgeFactory.buildMux(context);
+                                logger.debug("流打开成功 - [隧道类型=多路复用， 目标地址={}，目标端口={}]", localIp, localPort);
+                            } else {
+                                tunnelBridge = TunnelBridgeFactory.buildDirect(context);
+                                logger.debug("流打开成功 - [隧道类型=独立连接， 目标地址={}，目标端口={}]", localIp, localPort);
+                            }
+                            tunnelBridge.open();
+                            context.setTunnelBridge(tunnelBridge);
+                            context.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
+                            tunnelEntry.getChannel().config().setOption(ChannelOption.AUTO_READ, true);
+                            server.config().setOption(ChannelOption.AUTO_READ, true);
+                        }
+                    });
+
                 } else {
-                    control.writeAndFlush(new TMSPFrame(streamId, TMSP.MSG_ERROR));
-                    logger.error("流打开失败 - [服务地址={}:服务端口={}] 不可用!", localIp, localPort);
+                    context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                    logger.error("流打开失败 - [服务地址={}:服务端口={}] 不可用! 关闭流", localIp, localPort);
                 }
             });
         }

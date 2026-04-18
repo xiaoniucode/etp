@@ -83,7 +83,7 @@ public class CompositeDomainStore implements DomainStore {
             
             return domainDO != null ? domainStoreConvert.toDomainBinding(domainDO) : null;
         });
-        logger.debug("根据完整域名查询绑定完成，完整域名: {}, 结果: {}", fullDomain, result != null ? "找到绑定" : "未找到绑定");
+        logger.debug("根据完整域名查询绑定完成，完整域名: {}", fullDomain);
         return result;
     }
 

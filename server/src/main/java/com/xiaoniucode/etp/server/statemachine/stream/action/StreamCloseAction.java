@@ -36,6 +36,7 @@ public class StreamCloseAction extends StreamBaseAction {
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
+        logger.debug("开启清理流 {} 相关资源", context.getStreamId());
         int streamId = context.getStreamId();
         Channel visitor = context.getVisitor();
 

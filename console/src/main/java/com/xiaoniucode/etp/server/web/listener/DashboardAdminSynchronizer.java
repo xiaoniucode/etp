@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.web.listener;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
+import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.DashboardConfig;
@@ -24,6 +25,7 @@ import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
 import com.xiaoniucode.etp.server.web.common.exception.SystemException;
 import com.xiaoniucode.etp.server.web.entity.SysUserDO;
 import com.xiaoniucode.etp.server.web.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +51,17 @@ public class DashboardAdminSynchronizer implements EventListener<TunnelServerBin
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private EventBus eventBus;
     /**
      * 默认角色
      */
     private final static String DEFAULT_ROLE = "R_SUPER";
+
+    @PostConstruct
+    public void init() {
+        eventBus.register(this);
+    }
 
     @Override
     public void onEvent(TunnelServerBindEvent event) {
