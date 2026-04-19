@@ -46,12 +46,15 @@ public class AgentManager {
         AgentContext agentContext = connToContext.get(connectionId);
         return Optional.ofNullable(agentContext);
     }
+
     public Optional<AgentContext> getAgentContext(String agentId) {
         return Optional.ofNullable(agentToContextIndex.get(agentId));
     }
+
     public Optional<AgentContext> getAgentContext(Integer connectionId) {
         return Optional.ofNullable(connToContext.get(connectionId));
     }
+
     public Optional<AgentContext> getAgentContextByProxyId(String proxyId) {
         if (!StringUtils.hasText(proxyId)) {
             throw new IllegalArgumentException("proxyId can not null");

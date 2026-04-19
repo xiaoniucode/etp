@@ -17,6 +17,8 @@ package com.xiaoniucode.etp.server.web.controller;
 
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.common.monitor.ServerMonitor;
+import com.xiaoniucode.etp.server.web.service.StatsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,14 +26,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/monitor")
 public class MonitorController {
+    @Autowired
+    private StatsService statsService;
 
     /**
-     * 获取服务器信息，用于监控
+     * 获取服务器信息
      */
     @GetMapping("server-info")
     public Ajax getServerInfo() {
         return Ajax.success(ServerMonitor.getServerInfo());
     }
 
+    @GetMapping("get-dashboard-summary")
+    public Ajax getDashboardSummary() {
+        return Ajax.success(statsService.getDashboardSummary());
+    }
 
 }

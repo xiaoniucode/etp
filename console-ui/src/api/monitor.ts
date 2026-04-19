@@ -9,3 +9,13 @@ export function fetchGetServerInfo() {
     url: '/api/monitor/server-info'
   })
 }
+
+/**
+ * 获取仪表盘摘要信息
+ * @returns 仪表盘摘要信息
+ */
+export function fetchGetDashboardSummary() {
+  return request.get<Api.Monitor.DashboardSummary>({
+    url: '/api/monitor/get-dashboard-summary'
+  })
+}

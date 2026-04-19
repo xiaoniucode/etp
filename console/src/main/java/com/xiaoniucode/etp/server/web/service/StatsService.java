@@ -14,8 +14,12 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service;
+
+import com.xiaoniucode.etp.server.web.dto.stats.DashboardSummaryDTO;
+
 /**
  * 统计服务接口
  */
 public interface StatsService {
+    DashboardSummaryDTO getDashboardSummary();
 }

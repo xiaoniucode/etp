@@ -217,5 +217,13 @@ declare namespace Api {
       jvmMem: JvmMemoryInfo
       osMem: OsMemoryInfo
     }
+
+    /** 仪表盘摘要信息 */
+    interface DashboardSummary {
+      totalAgents: number
+      onlineAgents: number
+      totalProxies: number
+      startedProxies: number
+    }
   }
 }

@@ -1,8 +1,10 @@
 package com.xiaoniucode.etp.server.web.repository;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
+import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -57,23 +59,14 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     ProxyDetailQueryResult findProxyDetailByProxyId(@Param("id") String id);
 
 
+
     @Query("""
-            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(
-                                       a, p, t, b, lb,ba,ac)
-            FROM ProxyDO p
-            LEFT JOIN AgentDO a ON p.agentId = a.id
-            LEFT JOIN TransportDO t ON t.proxyId = p.id
-            LEFT JOIN BandwidthDO b ON b.proxyId = p.id
-            LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
-            LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
-            LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
-            WHERE p.remotePort = :remotePort
-            """)
-    ProxyDetailQueryResult findProxyDetailByRemotePort(@Param("remotePort") Integer remotePort);
-
-
-    void deleteByIdIn(List<String> ids);
-
+    SELECT 
+        COUNT(p) as totalCount,
+        SUM(CASE WHEN p.status = :status THEN 1 ELSE 0 END) as enabledCount
+    FROM ProxyDO p
+    """)
+    Tuple countTotalAndEnabledCount(@Param("status") ProxyStatus status);
 
     @Query("SELECT p.id FROM ProxyDO p WHERE p.agentId = :agentId")
     List<String> findProxyIdsByAgentId(@Param("agentId") String agentId);
@@ -81,4 +74,6 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     Optional<ProxyDO> findByRemotePort(Integer remotePort);
 
     Optional<ProxyDO> findByAgentIdAndName(String agentId, String proxyName);
+
+    void deleteByIdIn(List<String> ids);
 }

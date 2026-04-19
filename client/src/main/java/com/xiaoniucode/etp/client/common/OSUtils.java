@@ -25,7 +25,7 @@ public class OSUtils {
 
     /**
      * 获取当前操作系统名称
-     * 返回示例：Windows、macOS、Linux
+     * @return
      */
     public static String getOS() {
         String os = System.getProperty("os.name").toLowerCase();

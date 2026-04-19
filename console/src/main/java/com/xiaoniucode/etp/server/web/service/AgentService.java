@@ -30,4 +30,6 @@ public interface AgentService {
      */
     void kickout(String agentId);
     List<AgentDTO> findAll();
+
+  
 }

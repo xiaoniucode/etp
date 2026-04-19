@@ -309,7 +309,11 @@ public class ProxyServiceImpl implements ProxyService {
     @Transactional(rollbackFor = Exception.class)
     public void createTcpProxy(TcpProxyCreateParam param) {
 
-        String proxyId = UUID.randomUUID().toString();
+        String proxyId = uidGenerator.getUIDAsString();
+        ProxyConfig proxyConfig = proxyConfigAssembler.toDomain(param);
+        proxyConfig.setProxyId(proxyId);
+        RegisterResult registerResult = proxyManager.register(proxyConfig);
+
         //1.基础信息
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
@@ -342,6 +346,8 @@ public class ProxyServiceImpl implements ProxyService {
         accessControlDO.setMode(AccessControl.DENY);
         accessControlDO.setEnabled(false);
         accessControlRepository.save(accessControlDO);
+
+
         logger.debug("TCP 代理创建成功：{}", proxyDO.getName());
     }
 

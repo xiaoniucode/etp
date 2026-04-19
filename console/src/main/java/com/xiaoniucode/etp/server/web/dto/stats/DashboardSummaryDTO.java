@@ -14,42 +14,16 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.dto.monitor;
+package com.xiaoniucode.etp.server.web.dto.stats;
 
 import lombok.Data;
 
-/**
- * 统计概览
- */
+import java.io.Serializable;
+
 @Data
-public class TunnelStatsDTO {
-
-    /**
-     * 客户端总数
-     */
-    private Long totalClients;
-
-    /**
-     * 在线客户端数
-     */
-    private Long onlineClients;
-
-    /**
-     * 代理总数
-     */
-    private Long totalProxies;
-
-    /**
-     * 已启动代理数
-     */
-    private Long activeProxies;
-    /**
-     * 总入站流量（字节）
-     */
-    private Long totalInboundBytes;
-
-    /**
-     * 总出站流量（字节）
-     */
-    private Long totalOutboundBytes;
+public class DashboardSummaryDTO implements Serializable {
+    private long totalAgents;
+    private long onlineAgents;
+    private long totalProxies;
+    private long startedProxies;
 }
