@@ -136,9 +136,9 @@
     core: {
       apiFn: fetchGetHttpProxyList,
       apiParams: {
-        keyword: undefined,
         page: 1,
-        size: 10
+        size: 10,
+        keyword: undefined
       },
       columnsFactory: () => [
         { type: 'selection' },

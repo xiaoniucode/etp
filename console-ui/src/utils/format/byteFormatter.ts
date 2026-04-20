@@ -49,4 +49,30 @@ export class ByteUtils {
       return `${formatted}${unit}`
     }
   }
+
+  /**
+   * 格式化大数字，和formatBytes(bytes: number): string相同
+   * @param num 数字
+   * @returns 格式化后的数字
+   */
+  public static formatNumber(num: number): number {
+    if (num <= 0) return 0
+    let value = num
+    
+    if (value >= 1024 * 1024 * 1024 * 1024) {
+      value /= (1024.0 * 1024 * 1024 * 1024) // 转换为TB单位
+    } else if (value >= 1024 * 1024 * 1024) {
+      value /= (1024.0 * 1024 * 1024) // 转换为GB单位
+    } else if (value >= 1024 * 1024) {
+      value /= (1024.0 * 1024) // 转换为MB单位
+    } else if (value >= 1024) {
+      value /= 1024.0 // 转换为KB单位
+    }
+    
+    if (value === Math.floor(value)) {
+      return Math.floor(value)
+    } else {
+      return parseFloat(value.toFixed(2).replace(/\.?0*$/, ''))
+    }
+  }
 }

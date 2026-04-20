@@ -23,14 +23,14 @@
         />
         <ArtStatsCard
           title="上行流量"
-          :count="metricsData.readBytes || 0"
+          :count="ByteUtils.formatNumber(metricsData.readBytes || 0)"
           :description="ByteUtils.formatBytes(metricsData.readBytes || 0)"
           icon="ri:arrow-up-line"
           iconStyle="bg-green-500"
         />
         <ArtStatsCard
           title="下行流量"
-          :count="metricsData.writeBytes || 0"
+          :count="ByteUtils.formatNumber(metricsData.writeBytes || 0)"
           :description="ByteUtils.formatBytes(metricsData.writeBytes || 0)"
           icon="ri:arrow-down-line"
           iconStyle="bg-orange-500"

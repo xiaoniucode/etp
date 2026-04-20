@@ -8,25 +8,20 @@
     </div>
     <div class="flex items-center justify-center h-[calc(100%-56px)]">
       <ArtRingChart
-        height="200px"
         :data="proxyData"
+        :radius="['0%', '70%']"
         :showLegend="true"
-        legendPosition="right"
-        :centerText="totalCount"
+        legendPosition="bottom"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, computed } from 'vue'
+  import { ref, onMounted } from 'vue'
   import ArtRingChart from '@/components/core/charts/art-ring-chart/index.vue'
   import { fetchGetProxyProtocolStats } from '@/api/monitor'
 
-  /**
-   * 代理类型数据
-   * 包含 HTTP 和 TCP 代理的数量
-   */
   const proxyData = ref([
     {
       name: 'HTTP 代理',
@@ -37,14 +32,6 @@
       value: 0
     }
   ])
-
-  /**
-   * 计算代理总数
-   */
-  const totalCount = computed(() => {
-    const total = proxyData.value.reduce((sum, item) => sum + item.value, 0)
-    return `代理总数\n${total}`
-  })
 
   /**
    * 获取代理协议统计数据
@@ -65,9 +52,6 @@
     }
   }
 
-  /**
-   * 组件挂载时获取数据
-   */
   onMounted(() => {
     getProxyProtocolStats()
   })
