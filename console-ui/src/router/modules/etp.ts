@@ -56,7 +56,7 @@ export const penetrationRoutes: AppRouteRecord[] = [
     path: '/monitor',
     component: '/etp/monitor',
     meta: {
-      title: '服务监控',
+      title: '系统监控',
       icon: 'ri:server-line',
       roles: ['R_SUPER']
     }

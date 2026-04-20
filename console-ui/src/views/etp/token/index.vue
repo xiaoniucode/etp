@@ -125,7 +125,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 120,
+          width: 130,
           fixed: 'right',
           formatter: (row: TokenItem) =>
             h('div', [

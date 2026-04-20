@@ -19,6 +19,7 @@ import com.baidu.fsg.uid.UidGenerator;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.AccessControl;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.enums.ProxySourceType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.registry.ProxyManager;
@@ -116,11 +117,13 @@ public class ProxyServiceImpl implements ProxyService {
         String proxyId = uidGenerator.getUIDAsString();
         ProxyConfig proxyConfig = proxyConfigAssembler.toDomain(param);
         proxyConfig.setProxyId(proxyId);
+        proxyConfig.setSourceType(ProxySourceType.MANUAL);
         RegisterResult registerResult = proxyManager.register(proxyConfig);
         //如果数据库事务执行失败，清理缓存
         transactionHelper.afterRollback(() -> proxyManager.remove(proxyId));
 
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
+        proxyDO.setSourceType(ProxySourceType.MANUAL);
         proxyRepository.save(proxyDO);
         //3.服务列表
         if (proxyDO.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
@@ -170,6 +173,7 @@ public class ProxyServiceImpl implements ProxyService {
         }
         //1.基本信息
         proxyConvert.updateDO(param, proxyDO);
+        proxyDO.setSourceType(ProxySourceType.MANUAL);
         proxyRepository.save(proxyDO);
 
         //3.服务列表

@@ -18,6 +18,7 @@ package com.xiaoniucode.etp.core.domain;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 
+import com.xiaoniucode.etp.core.enums.ProxySourceType;
 import lombok.*;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
@@ -50,6 +51,11 @@ public class ProxyConfig implements Serializable {
      */
     @Setter
     private ProtocolType protocol;
+    /**
+     * 代理配置来源
+     */
+    @Setter
+    private ProxySourceType sourceType;
     /**
      * TCP 代理 远程端口
      */

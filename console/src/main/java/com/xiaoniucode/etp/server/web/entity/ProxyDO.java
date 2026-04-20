@@ -56,6 +56,13 @@ public class ProxyDO {
     @Convert(converter = ProxyStatusConverter.class)
     private ProxyStatus status;
     /**
+     * 配置来源类型
+     * 用于区分是后台手动创建，还是客户端上报等
+     */
+    @Column(name = "source_type", nullable = false)
+    @Convert(converter = ProxySourceTypeConverter.class)
+    private ProxySourceType sourceType;
+    /**
      * 域名类型
      */
     @Convert(converter = DomainTypeConverter.class)

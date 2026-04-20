@@ -84,6 +84,7 @@ public class ProxyCreateAction extends AgentBaseAction {
 
     private ProxyConfig buildProxyConfig(Message.NewProxy proxy) {
         ProxyConfig proxyConfig = new ProxyConfig();
+        proxyConfig.setSourceType(ProxySourceType.AGENT);
         proxyConfig.setName(proxy.getName());
         List<Target> targets = proxy.getTargetsList().stream().map(p -> {
             Target target = new Target();
