@@ -42,12 +42,6 @@ public class InMemoryProxyStore implements ProxyStore {
     }
 
     @Override
-    public void replace(ProxyConfig proxyConfig) {
-        deleteById(proxyConfig.getProxyId());
-        save(proxyConfig);
-    }
-
-    @Override
     public ProxyConfig findById(String proxyId) {
         return proxyStore.get(proxyId);
     }

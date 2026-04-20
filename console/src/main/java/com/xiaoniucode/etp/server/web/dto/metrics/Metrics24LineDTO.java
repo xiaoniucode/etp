@@ -14,12 +14,14 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.metrics;
+package com.xiaoniucode.etp.server.web.dto.metrics;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class Count {
-    private long in;
-    private long out;
+public class Metrics24LineDTO {
+    private List<String> xAxis;
+    private List<Long> yAxis;
 }

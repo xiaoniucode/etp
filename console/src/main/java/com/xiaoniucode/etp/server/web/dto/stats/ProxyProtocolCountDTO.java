@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http:
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,15 +13,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.service;
 
-import com.xiaoniucode.etp.server.web.dto.stats.DashboardSummaryDTO;
-import com.xiaoniucode.etp.server.web.dto.stats.ProxyProtocolCountDTO;
+package com.xiaoniucode.etp.server.web.dto.stats;
 
-/**
- * 统计服务接口
- */
-public interface StatsService {
-    DashboardSummaryDTO getDashboardSummary();
-    ProxyProtocolCountDTO getProxyProtocolStats();
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProxyProtocolCountDTO implements Serializable {
+
+    /**
+     * HTTP 代理数量
+     */
+    private Long httpCount;
+
+    /**
+     * TCP 代理数量
+     */
+    private Long tcpCount;
 }

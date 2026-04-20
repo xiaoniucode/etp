@@ -43,8 +43,8 @@
 
       <ElFormItem label="隧道类型" prop="tunnelType">
         <ElRadioGroup v-model="formData.tunnelType">
-          <ElRadio label="1">多路复用</ElRadio>
-          <ElRadio label="0">独立隧道</ElRadio>
+          <ElRadio label="0">多路复用</ElRadio>
+          <ElRadio label="1">独立隧道</ElRadio>
         </ElRadioGroup>
       </ElFormItem>
 
@@ -239,7 +239,7 @@
     status: '1',
     remotePort: 80,
     encrypt: false,
-    tunnelType: '1',
+    tunnelType: '0',
     deployMode: 'single',
     singleHost: '127.0.0.1',
     singlePort: 80,

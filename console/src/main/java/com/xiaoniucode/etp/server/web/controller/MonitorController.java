@@ -42,4 +42,8 @@ public class MonitorController {
         return Ajax.success(statsService.getDashboardSummary());
     }
 
+    @GetMapping("get-proxy-protocol-stats")
+    public Ajax getProxyProtocolStats() {
+        return Ajax.success(statsService.getProxyProtocolStats());
+    }
 }

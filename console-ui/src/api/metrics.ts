@@ -42,3 +42,13 @@ export function fetchGetMetricsList(page: number = 0, size: number = 10) {
     }
   })
 }
+
+/**
+ * 获取24小时流量统计数据
+ * @returns 24小时流量统计数据
+ */
+export function fetchGet24hMetrics() {
+  return request.get<Api.Metrics.Metrics24LineDTO>({
+    url: '/api/metrics/24h'
+  })
+}

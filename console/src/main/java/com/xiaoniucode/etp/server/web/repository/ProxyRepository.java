@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.web.repository;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
+import com.xiaoniucode.etp.server.web.dto.stats.ProxyProtocolCountDTO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
@@ -59,14 +60,25 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     ProxyDetailQueryResult findProxyDetailByProxyId(@Param("id") String id);
 
 
+    @Query("""
+            SELECT 
+                COUNT(p) as totalCount,
+                SUM(CASE WHEN p.status = :status THEN 1 ELSE 0 END) as enabledCount
+            FROM ProxyDO p
+            """)
+    Tuple countTotalAndEnabledCount(@Param("status") ProxyStatus status);
 
     @Query("""
-    SELECT 
-        COUNT(p) as totalCount,
-        SUM(CASE WHEN p.status = :status THEN 1 ELSE 0 END) as enabledCount
-    FROM ProxyDO p
-    """)
-    Tuple countTotalAndEnabledCount(@Param("status") ProxyStatus status);
+            SELECT NEW com.xiaoniucode.etp.server.web.dto.stats.ProxyProtocolCountDTO(
+                SUM(CASE WHEN p.protocol = :http THEN 1 ELSE 0 END),
+                SUM(CASE WHEN p.protocol = :tcp THEN 1 ELSE 0 END)
+            )
+            FROM ProxyDO p
+            """)
+    ProxyProtocolCountDTO countHttpAndTcp(
+            @Param("http") ProtocolType http,
+            @Param("tcp") ProtocolType tcp
+    );
 
     @Query("SELECT p.id FROM ProxyDO p WHERE p.agentId = :agentId")
     List<String> findProxyIdsByAgentId(@Param("agentId") String agentId);

@@ -69,12 +69,6 @@ public class CompositeProxyStore implements ProxyStore {
     }
 
     @Override
-    public void replace(ProxyConfig newProxyConfig) {
-        logger.debug("替换代理配置，代理ID: {}", newProxyConfig.getProxyId());
-        clearProxyCache(newProxyConfig.getProxyId());
-    }
-
-    @Override
     public ProxyConfig findById(String proxyId) {
         return multiLevelCache.getAndPut(CACHE_NAME, "id:" + proxyId, () -> {
             ProxyDetailQueryResult detail = proxyRepository.findProxyDetailByProxyId(proxyId);

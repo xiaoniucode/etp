@@ -86,24 +86,16 @@
       columnsFactory: () => [
         { type: 'index', width: 60, label: '序号' },
         {
+          prop: 'id',
+          label: '客户端标识',
+          width: 160
+        },
+        {
           prop: 'name',
           label: '客户端名称',
           minWidth: 120
         },
-        {
-          prop: 'token',
-          label: '访问令牌',
-          minWidth: 240
-        },
-        {
-          prop: 'isOnline',
-          label: '状态',
-          width: 80,
-          formatter: (row: ClientItem) => {
-            const statusConfig = getClientStatusConfig(row.isOnline)
-            return h(ElTag, { type: statusConfig.type }, () => statusConfig.text)
-          }
-        },
+
         {
           prop: 'os',
           label: '操作系统',
@@ -127,6 +119,15 @@
             return h(ElTag, { type: row.agentType === 1 ? 'primary' : 'warning' }, () =>
               row.agentType === 1 ? 'BINARY' : 'SESSION'
             )
+          }
+        },
+        {
+          prop: 'isOnline',
+          label: '状态',
+          width: 80,
+          formatter: (row: ClientItem) => {
+            const statusConfig = getClientStatusConfig(row.isOnline)
+            return h(ElTag, { type: statusConfig.type }, () => statusConfig.text)
           }
         },
         {

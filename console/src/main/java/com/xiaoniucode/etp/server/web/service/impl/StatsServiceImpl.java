@@ -17,11 +17,14 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.web.dto.stats.DashboardSummaryDTO;
+import com.xiaoniucode.etp.server.web.dto.stats.ProxyProtocolCountDTO;
 import com.xiaoniucode.etp.server.web.repository.AgentRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
+import com.xiaoniucode.etp.server.web.service.ProxyService;
 import com.xiaoniucode.etp.server.web.service.StatsService;
 import jakarta.persistence.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +37,8 @@ public class StatsServiceImpl implements StatsService {
     private AgentRepository agentRepository;
     @Autowired
     private ProxyRepository proxyRepository;
-
+    @Autowired
+    private ProxyService proxyService;
     @Autowired
     private AgentManager agentManager;
 
@@ -52,5 +56,10 @@ public class StatsServiceImpl implements StatsService {
 
         ds.setOnlineAgents(agentManager.getOnlineCount());
         return ds;
+    }
+
+    @Override
+    public ProxyProtocolCountDTO getProxyProtocolStats() {
+        return proxyRepository.countHttpAndTcp(ProtocolType.HTTP, ProtocolType.TCP);
     }
 }

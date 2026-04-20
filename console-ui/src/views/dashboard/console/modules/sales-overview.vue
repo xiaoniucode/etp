@@ -2,8 +2,8 @@
   <div class="art-card h-105 p-5 mb-5 max-sm:mb-4">
     <div class="art-card-header">
       <div class="title">
-        <h4>访问量</h4>
-        <p>今年增长<span class="text-success">+15%</span></p>
+        <h4>24小时总流量统计</h4>
+        <p>最近24小时流量变化</p>
       </div>
     </div>
     <ArtLineChart
@@ -17,27 +17,34 @@
 </template>
 
 <script setup lang="ts">
-  /**
-   * 全年访问量数据
-   * 记录每月的访问量统计
-   */
-  const data = [50, 25, 40, 20, 70, 35, 65, 30, 35, 20, 40, 44]
+  import { ref, onMounted } from 'vue'
+  import { fetchGet24hMetrics } from '@/api/metrics'
 
   /**
-   * X 轴月份标签
+   * 24小时流量数据
    */
-  const xAxisData = [
-    '1月',
-    '2月',
-    '3月',
-    '4月',
-    '5月',
-    '6月',
-    '7月',
-    '8月',
-    '9月',
-    '10月',
-    '11月',
-    '12月'
-  ]
+  const data = ref<number[]>([])
+
+  /**
+   * X 轴小时标签
+   */
+  const xAxisData = ref<string[]>([])
+
+  /**
+   * 获取24小时流量数据
+   */
+  const get24hMetrics = async () => {
+    const metricsData = await fetchGet24hMetrics()
+    if (metricsData) {
+      data.value = metricsData.yAxis
+      xAxisData.value = metricsData.xAxis
+    }
+  }
+
+  /**
+   * 组件挂载时获取数据
+   */
+  onMounted(() => {
+    get24hMetrics()
+  })
 </script>

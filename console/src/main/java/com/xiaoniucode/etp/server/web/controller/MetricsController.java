@@ -19,14 +19,18 @@ import com.xiaoniucode.etp.common.message.PageResult;
 import com.xiaoniucode.etp.server.metrics.Metrics;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+//traffic
 @RequestMapping("/api/metrics")
 public class MetricsController {
     @Autowired
     private MetricsCollector metricsCollector;
+    @Autowired
+    private MetricsService metricsService;
 
     @GetMapping("/{proxyId}")
     public Ajax get(@PathVariable String proxyId) {
@@ -39,4 +43,10 @@ public class MetricsController {
         PageResult<Metrics> res = metricsCollector.listAllMetrics(page, size);
         return Ajax.success(res);
     }
+
+    @GetMapping("24h")
+    public Ajax getAll24hMetrics() {
+        return Ajax.success(metricsService.getTotal24hTraffic());
+    }
+
 }

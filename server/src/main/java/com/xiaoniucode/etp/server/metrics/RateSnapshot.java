@@ -16,23 +16,20 @@
 
 package com.xiaoniucode.etp.server.metrics;
 
-import lombok.Getter;
+import lombok.Data;
 
-import java.time.LocalDateTime;
-
-@Getter
-public class MetricsSnapshot {
+@Data
+public class RateSnapshot {
     private final long readBytes;
     private final long writeBytes;
     private final long readMessages;
     private final long writeMessages;
-    private final LocalDateTime timestamp;
+    private final long timestamp = System.currentTimeMillis();
 
-    public MetricsSnapshot(long readBytes, long writeBytes, long readMessages, long writeMessages, LocalDateTime timestamp) {
+    public RateSnapshot(long readBytes, long writeBytes, long readMessages, long writeMessages) {
         this.readBytes = readBytes;
         this.writeBytes = writeBytes;
         this.readMessages = readMessages;
         this.writeMessages = writeMessages;
-        this.timestamp = timestamp;
     }
 }

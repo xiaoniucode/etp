@@ -80,7 +80,8 @@ public class DefaultProxyManager implements ProxyManager {
         //删除IP访问控制
         ipAccessChecker.invalidate(oldConfig.getProxyId());
         //替换
-        proxyStore.replace(newConfig);
+        proxyStore.deleteById(oldConfig.getProxyId());
+        proxyStore.save(newConfig);
         return registerResult;
     }
 

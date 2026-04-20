@@ -7,8 +7,6 @@ import java.util.List;
 public interface ProxyStore {
     ProxyConfig save(ProxyConfig config);
 
-    void replace(ProxyConfig newProxyConfig);
-
     ProxyConfig findById(String proxyId);
 
     List<String> findProxyIdsByAgentId(String agentId);

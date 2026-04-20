@@ -173,6 +173,12 @@ declare namespace Api {
       writeRate: number
       lastActiveTime: string
     }
+
+    /** 24小时流量统计数据 */
+    interface Metrics24LineDTO {
+      xAxis: string[]
+      yAxis: number[]
+    }
   }
 
   /** 应用配置类型 */
@@ -224,6 +230,12 @@ declare namespace Api {
       onlineAgents: number
       totalProxies: number
       startedProxies: number
+    }
+
+    /** 代理协议统计信息 */
+    interface ProxyProtocolCountDTO {
+      httpCount: number
+      tcpCount: number
     }
   }
 }
