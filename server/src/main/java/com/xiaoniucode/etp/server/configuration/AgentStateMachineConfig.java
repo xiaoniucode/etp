@@ -40,7 +40,7 @@ public class AgentStateMachineConfig {
      * 创建隧道动作
      */
     @Autowired
-    private CreateConnAction createConnAction;
+    private CreateConnectionAction createConnectionAction;
 
     /**
      * GoAway 动作
@@ -114,7 +114,7 @@ public class AgentStateMachineConfig {
                 .within(AgentState.CONNECTED)
                 .on(AgentEvent.CREATE_TUNNEL)
                 .when(ctx -> true)
-                .perform(createConnAction);
+                .perform(createConnectionAction);
 
         // 网络断开
         builder.externalTransition()

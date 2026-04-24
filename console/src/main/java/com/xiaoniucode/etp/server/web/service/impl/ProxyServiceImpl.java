@@ -22,8 +22,8 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxySourceType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.registry.ProxyManager;
-import com.xiaoniucode.etp.server.registry.RegisterResult;
+import com.xiaoniucode.etp.server.service.his.ProxyManager;
+import com.xiaoniucode.etp.server.service.his.RegisterResult;
 import com.xiaoniucode.etp.server.vhost.DomainBinding;
 import com.xiaoniucode.etp.server.vhost.DomainManager;
 import com.xiaoniucode.etp.server.web.assembler.ProxyConfigAssembler;
@@ -53,7 +53,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -118,9 +117,6 @@ public class ProxyServiceImpl implements ProxyService {
         ProxyConfig proxyConfig = proxyConfigAssembler.toDomain(param);
         proxyConfig.setProxyId(proxyId);
         proxyConfig.setSourceType(ProxySourceType.MANUAL);
-        RegisterResult registerResult = proxyManager.register(proxyConfig);
-        //如果数据库事务执行失败，清理缓存
-        transactionHelper.afterRollback(() -> proxyManager.remove(proxyId));
 
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
         proxyDO.setSourceType(ProxySourceType.MANUAL);
@@ -158,6 +154,10 @@ public class ProxyServiceImpl implements ProxyService {
         basicAuthDO.setEnabled(false);
         basicAuthDO.setProxyId(proxyId);
         basicAuthRepository.save(basicAuthDO);
+
+        transactionHelper.afterCommit(() -> {
+            proxyManager.register(proxyConfig);
+        });
 
         logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
     }
@@ -323,6 +323,7 @@ public class ProxyServiceImpl implements ProxyService {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
         }
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
+        proxyDO.setSourceType(ProxySourceType.MANUAL);
         proxyRepository.save(proxyDO);
 
 

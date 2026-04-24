@@ -7,10 +7,11 @@ import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.registry.ProxyManager;
-import com.xiaoniucode.etp.server.registry.RegisterResult;
+import com.xiaoniucode.etp.server.service.his.ProxyManager;
+import com.xiaoniucode.etp.server.service.his.RegisterResult;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentConstants;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
@@ -42,6 +43,8 @@ public class ProxyCreateAction extends AgentBaseAction {
     private UidGenerator uidGenerator;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private EventBus eventBus;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -55,7 +58,17 @@ public class ProxyCreateAction extends AgentBaseAction {
             config.setProxyId(uidGenerator.getUIDAsString());
             config.setAgentType(context.getAgentInfo().getAgentType());
 
-            RegisterResult registerResult = proxyManager.register(config);
+
+
+
+            //config.setListenPort(); 设置实际监听端口
+            //注册代理到内存中
+            proxyManager.register(config);
+
+            //todo 发布代理注册事件
+            eventBus.publishAsync(new ProxyCreateEvent());
+            eventBus.publishAsync(new ProxyUpdateEvent());
+
             ProxyConfig register = registerResult.getProxyConfig();
             Message.NewProxyResp newProxyResp = buildResponse(registerResult);
             ByteBuf payload = ProtobufUtil.toByteBuf(newProxyResp, control.alloc());

@@ -22,7 +22,6 @@ enum LoadBalanceStrategy {
 enum TransportProtocolType{
   T_TCP = 0;
 }
-
 message AuthInfo {
   string token = 1;
   string version = 5;
@@ -33,7 +32,7 @@ message AuthInfo {
   optional string arch = 7;
 }
 message LimitNotify{
-   uint32 delayMs=1;
+  uint32 delayMs = 1;
 }
 message TunnelCreateRequest{
   string tunnel_id = 1;
@@ -112,7 +111,7 @@ message NewProxy {
   optional Transport transport = 15;
 }
 message NewProxyResp {
-  string proxyId=1;
+  string proxyId = 1;
   string proxy_name = 2;
   string remote_addr = 3;
 }

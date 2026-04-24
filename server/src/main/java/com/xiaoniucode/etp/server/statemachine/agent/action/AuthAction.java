@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.event.AgentAuthEvent;
+import com.xiaoniucode.etp.server.service.AgentConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.security.TokenManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
@@ -36,6 +37,8 @@ public class AuthAction extends AgentBaseAction {
     private UidGenerator uuidGenerator;
     @Autowired
     private EventBus eventBus;
+    @Autowired
+    private AgentConfigService agentConfigService;
 
     /**
      * 检查 Token 是否存在
@@ -111,8 +114,8 @@ public class AuthAction extends AgentBaseAction {
                 agentId = uuidGenerator.getUIDAsString();
             }
         } else {
-            //如果携带了 agentId 需要检查是否合法
-            Optional<AgentInfo> agentInfoOpt =  agentManager.findById(agentId);
+            //如果携带了 agentId 需要检查是否存在
+            Optional<AgentInfo> agentInfoOpt = agentConfigService.findById(agentId);
             if (agentInfoOpt.isEmpty()) {
                 logger.warn("设备ID {} 不存在", agentId);
                 Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
@@ -132,9 +135,8 @@ public class AuthAction extends AgentBaseAction {
 
         if (!isReconnect) {
             tokenManager.incrementConnection(token);
-            agentManager.save(agentInfo);
         }
-        agentManager.addClientContextIndex(agentId, context);
+        agentManager.addAgentContextIndex(agentId, context);
         Message.AuthResponse authResponse = Message.AuthResponse.newBuilder().setCode(0)
                 .setConnectionId(context.getConnectionId())
                 .setAgentId(agentId)
@@ -146,7 +148,7 @@ public class AuthAction extends AgentBaseAction {
         authFrame.setPayload(payload);
 
         //发布客户端认证异步事件
-        eventBus.publishAsync(new AgentAuthEvent(agentInfo,isReconnect));
+        eventBus.publishAsync(new AgentAuthEvent(agentInfo, isReconnect));
         //发布状态机 认证成功事件
         context.fireEvent(AgentEvent.AUTH_SUCCESS);
         control.writeAndFlush(authFrame).addListener((ChannelFutureListener) future -> {

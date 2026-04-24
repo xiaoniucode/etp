@@ -36,12 +36,6 @@ public class DomainGenerator {
     private static final int MAX_PREFIX_LENGTH = 10;
     private static final String PREFIX_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-    /**
-     *
-     * @param routeConfig
-     * @param occupiedChecker
-     * @return 返回完整域名列表 子域名格式为 subdomain.baseDomain
-     */
     public List<DomainBinding> generate(String proxyId, RouteConfig routeConfig, Function<String, Boolean> occupiedChecker) {
         DomainType domainType = routeConfig.getDomainType();
         List<DomainBinding> res = new ArrayList<>();
@@ -70,7 +64,6 @@ public class DomainGenerator {
         }
         if (domainType == DomainType.AUTO) {
             String prefix = generateRandomDomainPrefix(occupiedChecker);
-            String fullDomain = prefix + "." + baseDomain;
             DomainBinding domainBinding = new DomainBinding(proxyId, baseDomain, prefix, routeConfig.getDomainType());
             res.add(domainBinding);
         }
@@ -95,25 +88,5 @@ public class DomainGenerator {
             sb.append(PREFIX_CHARS.charAt(ThreadLocalRandom.current().nextInt(PREFIX_CHARS.length())));
         }
         return sb.toString();
-    }
-
-    public DomainBinding generate(String proxyId, String domain, DomainType domainType, Function<String, Boolean> isOccupied) {
-        if (domainType == DomainType.CUSTOM_DOMAIN) {
-            if (domain != null && !isOccupied.apply(domain)) {
-                return new DomainBinding(proxyId, null, domain, domainType);
-            }
-            throw new DomainConflictException("域名[" + domain + "]已被占用");
-        }
-        if (domainType == DomainType.SUBDOMAIN) {
-            if (domain != null && !domain.isEmpty()) {
-                String fullDomain = domain + "." + baseDomain;
-                if (!isOccupied.apply(fullDomain)) {
-                    return new DomainBinding(proxyId, baseDomain, domain, domainType);
-
-                }
-                throw new DomainConflictException("子域名[" + domain + "]已被占用");
-            }
-        }
-        return null;
     }
 }

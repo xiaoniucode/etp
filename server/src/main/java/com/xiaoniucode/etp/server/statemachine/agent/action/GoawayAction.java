@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.statemachine.agent.action;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
-import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.service.his.ProxyManager;
 import com.xiaoniucode.etp.server.security.TokenManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;

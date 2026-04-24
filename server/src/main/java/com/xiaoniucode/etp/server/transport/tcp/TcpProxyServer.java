@@ -21,7 +21,6 @@ import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
-import com.xiaoniucode.etp.server.event.TcpProxyInitializedEvent;
 import com.xiaoniucode.etp.server.transport.UploadRateLimitHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -81,10 +80,8 @@ public final class TcpProxyServer implements Lifecycle {
                     }
                 });
         init.set(true);
-        eventBus.publishAsync(new TcpProxyInitializedEvent(serverBootstrap));
         logger.debug("TCP 代理服务初始化成功");
     }
-
 
     @Override
     @PreDestroy

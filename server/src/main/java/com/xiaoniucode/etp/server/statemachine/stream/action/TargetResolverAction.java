@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancerFactory;
-import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
@@ -28,27 +28,25 @@ import java.util.Optional;
 public class TargetResolverAction extends StreamBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(TargetResolverAction.class);
     @Autowired
-    private ProxyManager proxyManager;
-    @Autowired
     private LoadBalancerFactory loadBalancerFactory;
-
     @Autowired
     private AgentManager agentManager;
     @Autowired
     private HealthManager healthManager;
+    @Autowired
+    private ProxyConfigService proxyConfigService;
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         Channel visitor = context.getVisitor();
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
         ProxyConfig config = resolveProxyConfig(context);
-        if (config == null || !config.isEnabled()) {
+        if (config == null || !config.getStatus().isClosed()) {
             logger.debug("代理不可用，关闭流：streamId={}", context.getStreamId());
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
-
-        Optional<AgentContext> gentContextOpt = agentManager.getAgentContextByProxyId(config.getProxyId());
+        Optional<AgentContext> gentContextOpt = agentManager.getAgentContext(config.getAgentId());
         if (gentContextOpt.isPresent()) {
             context.setAgentContext(gentContextOpt.get());
             context.setProxyConfig(config);
@@ -112,11 +110,11 @@ public class TargetResolverAction extends StreamBaseAction {
     private ProxyConfig resolveProxyConfig(StreamContext context) {
         if (context.getCurrentProtocol() == ProtocolType.HTTP) {
             String domain = context.getVisitorDomain();
-            return proxyManager.findByDomain(domain).orElse(null);
+            return proxyConfigService.findByDomain(domain).orElse(null);
 
         } else if (context.getCurrentProtocol() == ProtocolType.TCP) {
             int remotePort = context.getListenerPort();
-            return proxyManager.findByRemotePort(remotePort).orElse(null);
+            return proxyConfigService.findByRemotePort(remotePort).orElse(null);
         }
         return null;
     }

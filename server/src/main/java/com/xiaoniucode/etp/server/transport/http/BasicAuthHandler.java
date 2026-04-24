@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.core.domain.HttpUser;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
-import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.service.his.ProxyManager;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;

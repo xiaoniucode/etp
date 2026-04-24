@@ -19,6 +19,7 @@ import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 
 import com.xiaoniucode.etp.core.enums.ProxySourceType;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.*;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
@@ -72,10 +73,10 @@ public class ProxyConfig implements Serializable {
      */
     private final List<Target> targets = new CopyOnWriteArrayList<>();
     /**
-     * 是否开启代理
+     * 代理状态
      */
     @Setter
-    private boolean enabled = true;
+    private ProxyStatus status;
     /**
      * HTTP(s) 域名配置
      */

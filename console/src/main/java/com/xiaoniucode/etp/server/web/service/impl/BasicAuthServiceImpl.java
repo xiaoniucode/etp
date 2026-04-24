@@ -18,7 +18,7 @@ package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
 import com.xiaoniucode.etp.core.domain.HttpUser;
-import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.service.his.ProxyManager;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.basicauth.BasicAuthDetailDTO;
 import com.xiaoniucode.etp.server.web.entity.BasicAuthDO;

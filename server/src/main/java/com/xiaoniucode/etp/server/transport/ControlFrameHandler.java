@@ -23,7 +23,7 @@ import com.xiaoniucode.etp.core.transport.IntSet;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
-import com.xiaoniucode.etp.server.statemachine.agent.command.ConnCreateCmd;
+import com.xiaoniucode.etp.server.statemachine.agent.command.ConnectionCreateCmd;
 import com.xiaoniucode.etp.server.statemachine.stream.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -116,9 +116,9 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                             return;
                         }
                         Message.TunnelCreateRequest req = ProtobufUtil.parseFrom(frame.getPayload(), Message.TunnelCreateRequest.parser());
-                        ConnCreateCmd cmd = new ConnCreateCmd(tunnel, frame.isEncrypted(), frame.isMuxTunnel(), req.getTunnelId());
+                        ConnectionCreateCmd cmd = new ConnectionCreateCmd(tunnel, frame.isEncrypted(), frame.isMuxTunnel(), req.getTunnelId());
                         control.eventLoop().execute(() -> {
-                            agentContext.setVariable("tunnelCreateCmd", cmd);
+                            agentContext.setVariable(AgentConstants.TUNNEL_CREATE_CMD, cmd);
                             agentContext.fireEvent(AgentEvent.CREATE_TUNNEL);
                         });
                     } else {

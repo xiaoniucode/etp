@@ -17,23 +17,10 @@
 package com.xiaoniucode.etp.server.web.configuration;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.xiaoniucode.etp.server.web.support.store.MultiLevelCache;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
-import tools.jackson.databind.ObjectMapper;
-
-import java.time.Duration;
 
 @Configuration
 @EnableConfigurationProperties({
@@ -53,36 +40,5 @@ public class CacheConfig {
                 .maximumSize(props.getMaximumSize())
                 .expireAfterAccess(props.getExpireAfterAccess()));
         return manager;
-    }
-
-    /**
-     * L2：Redis（可选）
-     */
-    @Bean
-    @ConditionalOnProperty(name = "cache.redis.enabled", havingValue = "true")
-    public RedisCacheManager redisCacheManager(RedisConnectionFactory factory,RedisCacheProperties props) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        GenericJacksonJsonRedisSerializer serializer = new GenericJacksonJsonRedisSerializer(objectMapper);
-
-        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(props.getDefaultTtl())
-                .disableCachingNullValues()
-                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
-
-        return RedisCacheManager.builder(factory)
-                .cacheDefaults(config)
-                .build();
-    }
-    @Bean
-    public MultiLevelCache multiLevelCache(
-            CaffeineCacheManager caffeineCacheManager,
-            ObjectProvider<RedisCacheManager> redisProvider) {
-
-        return new MultiLevelCache(
-                caffeineCacheManager,
-                redisProvider.getIfAvailable()
-        );
     }
 }

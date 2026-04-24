@@ -18,7 +18,7 @@ package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.enums.AccessControl;
-import com.xiaoniucode.etp.server.registry.ProxyManager;
+import com.xiaoniucode.etp.server.service.his.ProxyManager;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;

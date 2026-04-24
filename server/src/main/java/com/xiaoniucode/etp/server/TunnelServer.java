@@ -12,7 +12,6 @@ import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.config.domain.TransportConfig;
 import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
-import com.xiaoniucode.etp.server.event.TunnelServerStartingEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.core.transport.TlsContextHolder;
@@ -59,7 +58,6 @@ public class TunnelServer implements Lifecycle {
     public void start() {
         try {
             logger.debug("正在启动ETP服务");
-            eventBus.publishSync(new TunnelServerStartingEvent());
             TransportConfig transportConfig = config.getTransportConfig();
             TlsConfig tlsConfig = transportConfig.getTlsConfig();
 
@@ -94,7 +92,7 @@ public class TunnelServer implements Lifecycle {
                         }
                     });
             serverBootstrap.bind(config.getServerAddr(), config.getServerPort()).sync();
-            logger.info("ETP隧道已开启:{}:{}", config.getServerAddr(), config.getServerPort());
+            logger.info("ETP隧道已开启监听:{}:{}", config.getServerAddr(), config.getServerPort());
             eventBus.publishAsync(new TunnelServerBindEvent());
         } catch (Throwable e) {
             logger.error("ETP隧道开启失败", e);

@@ -1,14 +1,8 @@
 package com.xiaoniucode.etp.server.security;
 
-import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.domain.AuthConfig;
 import com.xiaoniucode.etp.server.config.domain.TokenConfig;
-import com.xiaoniucode.etp.server.store.TokenStore;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -34,27 +28,6 @@ public class TokenManager {
      * todo token --> 代理ID集合
      */
     private final ConcurrentMap<String, Set<String>> agentIdMap = new ConcurrentHashMap<>();
-
-    @Resource
-    private AppConfig appConfig;
-    @Autowired
-    private TokenStore tokenStore;
-
-    /**
-     * 初始化静态配置文件的令牌
-     */
-    @PostConstruct
-    public void init() {
-        AuthConfig authConfig = appConfig.getAuthConfig();
-        List<TokenConfig> tokens = authConfig.getTokens();
-
-        if (tokens != null && !tokens.isEmpty()) {
-            for (TokenConfig tokenConfig : tokens) {
-                addToken(tokenConfig);
-            }
-            logger.debug("初始化访问令牌完成，共加载 {} 个令牌", tokens.size());
-        }
-    }
 
     public boolean addToken(TokenConfig tokenConfig) {
         try {
