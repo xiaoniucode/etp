@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class MultiplexPool {
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(MultiplexPool.class);
+public class MultiplexConnectionPool {
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(MultiplexConnectionPool.class);
 
     /**
      * agentId --> Pool

@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.service.his;
+package com.xiaoniucode.etp.server.service.diff;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.vhost.DomainBinding;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,10 +27,10 @@ import java.util.List;
 @NoArgsConstructor
 public class RegisterResult {
     private ProxyConfig proxyConfig;
-    private List<DomainBinding> domainBindings;
+    private List<DomainInfo> domainBindings;
     private Integer listenPort;
 
-    public RegisterResult(ProxyConfig proxyConfig, List<DomainBinding> domainBindings) {
+    public RegisterResult(ProxyConfig proxyConfig, List<DomainInfo> domainBindings) {
         this.proxyConfig = proxyConfig;
         this.domainBindings = domainBindings;
     }
@@ -42,7 +42,7 @@ public class RegisterResult {
         return new RegisterResult(proxyConfig, listenPort);
     }
 
-    public static RegisterResult of(ProxyConfig proxyConfig, List<DomainBinding> domainBindings) {
+    public static RegisterResult of(ProxyConfig proxyConfig, List<DomainInfo> domainBindings) {
         return new RegisterResult(proxyConfig, domainBindings);
     }
 }

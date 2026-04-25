@@ -19,8 +19,10 @@ package com.xiaoniucode.etp.server.manager;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
+import com.xiaoniucode.etp.server.port.PortAcceptor;
+import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
-import com.xiaoniucode.etp.server.service.handler.ConfigHandlerFactory;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,22 +39,58 @@ public class ProxyManager {
     private Map<String/*agentId*/, List<String/*proxyId*/>> agentProxyIndex = new ConcurrentHashMap<>();
     private Map<Integer/*listenPort*/, String/*proxyId*/> portProxyIndex = new ConcurrentHashMap<>();
     private Map<String/*domain*/, String/*proxyId*/> domainProxyIndex = new ConcurrentHashMap<>();
-    @Autowired
-    private ConfigHandlerFactory configHandlerFactory;
+
     @Autowired
     private MetricsCollector metricsCollector;
     @Autowired
     private IpAccessChecker ipAccessChecker;
+    @Autowired
+    private PortAcceptor portAcceptor;
+    @Autowired
+    private PortManager portManager;
+    @Autowired
+    private StreamManager streamManager;
 
-    public void register(ProxyConfig proxyConfig) throws EtpException {
-        String proxyId = proxyConfig.getProxyId();
-        String agentId = proxyConfig.getAgentId();
-        proxyRegistry.put(proxyId, proxyConfig);
-        configHandlerFactory.getHandler(proxyConfig).handRegister(proxyConfig);
+    public void register(ProxyConfig config) throws EtpException {
+        String proxyId = config.getProxyId();
+        String agentId = config.getAgentId();
+        proxyRegistry.put(proxyId, config);
+
+        if (config.isTcp()) {
+            portAcceptor.bindPort(config.getListenPort());
+        } else if (config.isTcp()) {
+
+        }
     }
 
     public void unregister(String proxyId) throws EtpException {
+        ProxyConfig config = proxyRegistry.remove(proxyId);
+        if (config == null) {
+            return;
+        }
+        if (config.isTcp()) {
+            closeCacheByPort(config.getListenPort());
+        } else if (config.isHttp()) {
+//            for (int i = 0; i < 10; i++) {
+//                streamManager.fireCloseByDomain(domainBinding.getDomain());
+//            }
 
+        }
+        //删除IP访问控制
+        ipAccessChecker.invalidate(proxyId);
+        //删除代理流量统计记录
+        metricsCollector.removeByProxyId(proxyId);
+    }
+
+
+    public void reregister(ProxyConfig oldConfig,ProxyConfig newConfig) throws EtpException {
+
+    }
+
+    private void closeCacheByPort(int listenPort) {
+        portManager.release(listenPort);
+        portAcceptor.stopPortListen(listenPort);
+        streamManager.fireCloseByPort(listenPort);
     }
 
     public void unregisterAll(String agentId) throws EtpException {
@@ -60,10 +98,20 @@ public class ProxyManager {
     }
 
     public void changeStatus(String proxyId, boolean enabled) throws EtpException {
+        ProxyConfig config = proxyRegistry.get(proxyId);
+        if (config.isTcp()) {
+            Integer listenPort = config.getListenPort();
+            if (enabled && !config.getStatus().isOpen()) {
+                portAcceptor.bindPort(listenPort);
+            } else {
+                portAcceptor.stopPortListen(listenPort);
+                streamManager.fireCloseByPort(listenPort);
+            }
+        }
 
     }
 
     public boolean exist(String proxyId) {
-        return false;
+        return proxyRegistry.containsKey(proxyId);
     }
 }

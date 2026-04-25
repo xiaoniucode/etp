@@ -118,10 +118,10 @@ public class PortManager {
         return tryBindPort(port);
     }
 
-    public void addPort(Integer port) {
+    public void addPort(Integer port) throws EtpException {
         if (port < startPort || port > endPort) {
             logger.warn("addPort: 端口 {} 不在范围 {}-{}", port, startPort, endPort);
-            return;
+            throw new EtpException("端口 " + port + " 不在允许范围内");
         }
         int offset = port - startPort;
         allocatedPorts.set(offset);

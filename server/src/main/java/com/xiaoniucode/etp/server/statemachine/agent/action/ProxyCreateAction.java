@@ -10,13 +10,20 @@ import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.service.his.ProxyManager;
-import com.xiaoniucode.etp.server.service.his.RegisterResult;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentConstants;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.server.vhost.DomainBinding;
+import com.xiaoniucode.etp.server.event.ProxyCreateEvent;
+import com.xiaoniucode.etp.server.event.ProxyUpdateEvent;
+import com.xiaoniucode.etp.server.exceptions.DomainConflictException;
+import com.xiaoniucode.etp.server.exceptions.PortConflictException;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.port.PortManager;
+import com.xiaoniucode.etp.server.service.DomainConfigService;
+import com.xiaoniucode.etp.server.service.ProxyConfigService;
+import com.xiaoniucode.etp.server.service.checker.ProxyConfigChecker;
+import com.xiaoniucode.etp.server.service.diff.ConfigChangeDetector;
+import com.xiaoniucode.etp.server.service.diff.RegisterResult;
+import com.xiaoniucode.etp.server.statemachine.agent.*;
+import com.xiaoniucode.etp.server.vhost.DomainGenerator;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -45,31 +52,84 @@ public class ProxyCreateAction extends AgentBaseAction {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private EventBus eventBus;
+    @Autowired
+    private ConfigChangeDetector configChangeDetector;
+    @Autowired
+    private ProxyConfigService proxyConfigService;
+    @Autowired
+    private DomainGenerator domainGenerator;
+    @Autowired
+    private PortManager portManager;
+    @Resource
+    private AppConfig appConfig;
+    @Autowired
+    private DomainConfigService domainConfigService;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         Channel control = context.getControl();
         try {
             Message.NewProxy proxy = context.getAndRemoveAs(AgentConstants.NEWA_PROXY, Message.NewProxy.class);
-            String agentId = context.getAgentInfo().getAgentId();
-            ProxyConfig config = buildProxyConfig(proxy);
-            logger.debug("{}", config);
-            config.setAgentId(agentId);
-            config.setProxyId(uidGenerator.getUIDAsString());
-            config.setAgentType(context.getAgentInfo().getAgentType());
+            AgentInfo agentInfo = context.getAgentInfo();
+            String agentId = agentInfo.getAgentId();
+
+            ProxyConfig newConfig = buildProxyConfig(proxy);
+            newConfig.setAgentId(agentId);
+            newConfig.setAgentType(context.getAgentInfo().getAgentType());
 
 
+            ProxyConfig oldConfig = proxyConfigService.findByAgentAndName(agentId, newConfig.getName());
+            if (oldConfig == null) {
+                logger.debug("代理配置 {} 不存在，准备创建", newConfig.getName());
+                newConfig.setProxyId(uidGenerator.getUIDAsString());
+                if (newConfig.isTcp()) {
+                    Integer remotePort = newConfig.getRemotePort();
+                    //如果没有指定远程端口，自动分配一个可用端口
+                    if (remotePort == null || remotePort == 0) {
+                        int listenPort = portManager.acquire();
+                        newConfig.setListenPort(listenPort);
+                    } else {
+                        //如果指定了远程端口，检查端口是否可用
+                        if (!portManager.isAvailable(remotePort)) {
+                            throw new PortConflictException(remotePort);
+                        }
+                        //设置监听端口
+                        newConfig.setListenPort(remotePort);
+                    }
+                    proxyManager.register(newConfig);
+                    eventBus.publishAsync(new ProxyCreateEvent(agentInfo, newConfig));
 
+                } else if (newConfig.isHttp()) {
+                    RouteConfig routeConfig = newConfig.getRouteConfig();
+                    DomainType domainType = routeConfig.getDomainType();
+                    List<DomainInfo> subdomains;
+                    if (domainType.isCustomDomain()) {
+                        routeConfig.getCustomDomains().forEach(domain -> {
+                            if (domainConfigService.exists(domain)) {
+                                throw new DomainConflictException("域名[" + domain + "]已被占用");
+                            }
+                        });
+                        proxyManager.register(newConfig);
+                        eventBus.publishAsync(new ProxyCreateEvent(agentInfo, newConfig));
+                    } else {
+                        String baseDomain = appConfig.getBaseDomain();
+                        subdomains = domainGenerator.generateSubdomain(baseDomain, routeConfig);
+                        proxyManager.register(newConfig);
+                        eventBus.publishAsync(new ProxyCreateEvent(agentInfo, subdomains, newConfig));
+                    }
+                }
+            } else {
+                logger.debug("代理配置 {} 已存在，准备更新", newConfig.getName());
+                newConfig.setProxyId(oldConfig.getProxyId());
+                if (configChangeDetector.hasChanges(oldConfig, newConfig)) {
+                    logger.debug("代理配置 {} 发生变更，准备更新", newConfig.getName());
+                    proxyManager.reregister(oldConfig, newConfig);
+                    eventBus.publishAsync(new ProxyUpdateEvent(context.getAgentInfo(), newConfig));
+                } else {
+                    logger.debug("代理配置 {} 没有发生变更，无需更新", newConfig.getName());
+                }
+            }
 
-            //config.setListenPort(); 设置实际监听端口
-            //注册代理到内存中
-            proxyManager.register(config);
-
-            //todo 发布代理注册事件
-            eventBus.publishAsync(new ProxyCreateEvent());
-            eventBus.publishAsync(new ProxyUpdateEvent());
-
-            ProxyConfig register = registerResult.getProxyConfig();
             Message.NewProxyResp newProxyResp = buildResponse(registerResult);
             ByteBuf payload = ProtobufUtil.toByteBuf(newProxyResp, control.alloc());
             TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, payload);
@@ -116,8 +176,8 @@ public class ProxyCreateAction extends AgentBaseAction {
             proxyConfig.setRemotePort(proxy.getRemotePort());
         }
         proxyConfig.setProtocol(ProtocolType.getByName(proxy.getProtocol().name()));
-        if (proxy.hasEnable()) {
-            proxyConfig.setEnabled(proxy.getEnable());
+        if (proxy.hasEnable() && proxy.getEnable()) {
+            proxyConfig.setStatus(ProxyStatus.OPEN);
         }
         if (proxy.hasDomain()) {
             Message.DomainInfo domainInfo = proxy.getDomain();
@@ -199,16 +259,16 @@ public class ProxyCreateAction extends AgentBaseAction {
         };
     }
 
-    private Message.NewProxyResp buildResponse( RegisterResult registerResult) {
+    private Message.NewProxyResp buildResponse(RegisterResult registerResult) {
         ProxyConfig config = registerResult.getProxyConfig();
         ProtocolType protocol = config.getProtocol();
         StringBuilder remoteAddr = new StringBuilder();
         if (protocol.isHttp()) {
-            List<DomainBinding> domains = registerResult.getDomainBindings();
+            List<DomainInfo> domains = registerResult.getDomainBindings();
             if (domains != null) {
                 if (ProtocolType.isHttp(protocol)) {
                     int httpProxyPort = appConfig.getHttpProxyPort();
-                    for (DomainBinding domain : domains) {
+                    for (DomainInfo domain : domains) {
                         remoteAddr.append("http://").append(domain.getDomain());
                         if (httpProxyPort != 80) {
                             remoteAddr.append(":").append(httpProxyPort);

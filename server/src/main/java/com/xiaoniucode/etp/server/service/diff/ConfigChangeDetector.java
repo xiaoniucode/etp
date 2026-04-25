@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.service;
+package com.xiaoniucode.etp.server.service.diff;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import org.javers.core.Javers;

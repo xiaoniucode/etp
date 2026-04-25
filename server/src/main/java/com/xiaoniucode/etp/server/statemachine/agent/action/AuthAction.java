@@ -7,11 +7,10 @@ import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
-import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.event.AgentAuthEvent;
 import com.xiaoniucode.etp.server.service.AgentConfigService;
+import com.xiaoniucode.etp.server.service.TokenConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
-import com.xiaoniucode.etp.server.security.TokenManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -32,7 +31,7 @@ public class AuthAction extends AgentBaseAction {
     @Autowired
     private AgentManager agentManager;
     @Autowired
-    private TokenManager tokenManager;
+    private TokenConfigService tokenConfigService;
     @Autowired
     private UidGenerator uuidGenerator;
     @Autowired
@@ -78,21 +77,11 @@ public class AuthAction extends AgentBaseAction {
             }
         }
         String token = authInfo.getToken();
-        if (!tokenManager.existsByToken(token) && !isReconnect) {
+        if (!tokenConfigService.existsByToken(token) && !isReconnect) {
             logger.error("客户端认证失败，无效令牌：{}", token);
             Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
                     .setCode(1)
                     .setMessage("认证失败，无效令牌:" + token).build();
-            sendAuthError(control, authResponse);
-            context.fireEvent(AgentEvent.AUTH_FAILURE);
-            return;
-        }
-        TokenConfig tokenConfig = tokenManager.getByToken(token);
-        if (!tokenManager.checkConnectionsLimit(token) && !isReconnect) {
-            logger.warn("访问令牌 {} 连接数已达上限 {}", token, tokenConfig.getMaxConnections());
-            Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                    .setCode(1)
-                    .setMessage("访问令牌 " + token + " 连接数已达上限:" + tokenConfig.getMaxConnections()).build();
             sendAuthError(control, authResponse);
             context.fireEvent(AgentEvent.AUTH_FAILURE);
             return;
@@ -102,17 +91,7 @@ public class AuthAction extends AgentBaseAction {
         String agentId = authInfo.getAgentId();
         AgentInfo oldAgentInfo = null;
         if (!StringUtils.hasText(agentId)) {
-            if (!tokenManager.checkAgentLimit(token)) {
-                logger.warn("访问令牌 {} 客户端注册数已达上限 {}", token, tokenConfig.getMaxDevices());
-                Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                        .setCode(1)
-                        .setMessage("访问令牌 " + token + " 客户端注册数已达上限:" + tokenConfig.getMaxDevices()).build();
-                sendAuthError(control, authResponse);
-                context.fireEvent(AgentEvent.AUTH_FAILURE);
-                return;
-            } else {
-                agentId = uuidGenerator.getUIDAsString();
-            }
+            agentId = uuidGenerator.getUIDAsString();
         } else {
             //如果携带了 agentId 需要检查是否存在
             Optional<AgentInfo> agentInfoOpt = agentConfigService.findById(agentId);
@@ -127,15 +106,11 @@ public class AuthAction extends AgentBaseAction {
             } else {
                 oldAgentInfo = agentInfoOpt.get();
             }
-
         }
         AgentInfo agentInfo = createOrUpdateAgentInfo(agentId, oldAgentInfo, authInfo);
         context.setControl(control);
         context.setAgentInfo(agentInfo);
 
-        if (!isReconnect) {
-            tokenManager.incrementConnection(token);
-        }
         agentManager.addAgentContextIndex(agentId, context);
         Message.AuthResponse authResponse = Message.AuthResponse.newBuilder().setCode(0)
                 .setConnectionId(context.getConnectionId())

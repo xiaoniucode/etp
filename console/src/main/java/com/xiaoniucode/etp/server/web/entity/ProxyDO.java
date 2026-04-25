@@ -80,6 +80,21 @@ public class ProxyDO {
     @Convert(converter = DeploymentModeConverter.class)
     private DeploymentMode deploymentMode;
     /**
+     * 总带宽限制（bps）
+     */
+    @Column(name = "limit_total",comment = "总带宽限制（bps）")
+    private Long limitTotal;
+    /**
+     * 入站带宽限制（bps）
+     */
+    @Column(name = "limit_in",comment = "入站带宽限制（bps）")
+    private Long limitIn;
+    /**
+     * 出站带宽限制（bps）
+     */
+    @Column(name = "limit_out",comment = "出站带宽限制（bps）")
+    private Long limitOut;
+    /**
      * 创建时间
      */
     @Column(name = "created_at")

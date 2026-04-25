@@ -24,4 +24,8 @@ import org.springframework.stereotype.Service;
 public class TokenConfigService {
     @Autowired
     private TokenQueryRepository tokenQueryRepository;
+
+    public boolean existsByToken(String token) {
+        return tokenQueryRepository.existsByToken(token);
+    }
 }

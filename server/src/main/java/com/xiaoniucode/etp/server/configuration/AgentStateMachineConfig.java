@@ -28,7 +28,7 @@ public class AgentStateMachineConfig {
      * 代理初始化动作
      */
     @Autowired
-    private ProxyInitAction proxyInitAction;
+    private AgentInitAction agentInitAction;
 
     /**
      * 代理创建动作
@@ -88,12 +88,12 @@ public class AgentStateMachineConfig {
                 .to(AgentState.CONNECTED)
                 .on(AgentEvent.AUTH_SUCCESS)
                 .when(ctx -> true)
-                .perform(proxyInitAction);
+                .perform(agentInitAction);
         builder.internalTransition()
                 .within(AgentState.CONNECTED)
                 .on(AgentEvent.REBUILD_CONTEXT)
                 .when(ctx -> true)
-                .perform(proxyInitAction);
+                .perform(agentInitAction);
         // 认证失败
         builder.externalTransition()
                 .from(AgentState.AUTHENTICATING)

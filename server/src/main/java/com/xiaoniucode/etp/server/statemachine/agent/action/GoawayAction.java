@@ -3,12 +3,11 @@ package com.xiaoniucode.etp.server.statemachine.agent.action;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
-import com.xiaoniucode.etp.server.service.his.ProxyManager;
-import com.xiaoniucode.etp.server.security.TokenManager;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
-import com.xiaoniucode.etp.server.transport.connection.DirectPool;
-import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
+import com.xiaoniucode.etp.server.transport.connection.DirectConnectionPool;
+import com.xiaoniucode.etp.server.transport.connection.MultiplexConnectionPool;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.util.internal.logging.InternalLogger;
@@ -25,13 +24,11 @@ public class GoawayAction extends AgentBaseAction {
     @Autowired
     private StreamManager streamManager;
     @Autowired
-    private DirectPool directPool;
+    private DirectConnectionPool directConnectionPool;
     @Autowired
-    private MultiplexPool multiplexPool;
+    private MultiplexConnectionPool multiplexConnectionPool;
     @Autowired
     private ProxyManager proxyManager;
-    @Autowired
-    private TokenManager tokenManager;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -48,11 +45,9 @@ public class GoawayAction extends AgentBaseAction {
             // cleanupStreams(agentId);
             logger.debug("清理客户端 {} 所有连接", agentId);
             // 清理隧道资源
-            directPool.offline(agentId);
-            multiplexPool.offline(agentId);
-            proxyManager.clearByAgentId(agentId);
-            //减少Token 当前连接数
-            tokenManager.decrementConnection(agentInfo.getToken());
+            directConnectionPool.offline(agentId);
+            multiplexConnectionPool.offline(agentId);
+            proxyManager.unregisterAll(agentId);
             agentManager.removeAgentContext(agentId);
             // 清理代理资源
             //cleanupAgent(agentId);

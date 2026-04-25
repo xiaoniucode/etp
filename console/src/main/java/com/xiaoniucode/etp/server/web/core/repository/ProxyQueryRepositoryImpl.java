@@ -20,11 +20,47 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 @Repository
 public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
     @Override
     public Optional<ProxyConfig> findById(String proxyId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Integer> findAllRemotePorts() {
+        return List.of();
+    }
+
+    @Override
+    public List<Integer> findAgentPortsByAgentId(String agentId) {
+        return List.of();
+    }
+
+    @Override
+    public List<Integer> findAllPorts() {
+        return List.of();
+    }
+
+    @Override
+    public List<ProxyConfig> findByAgentId(String agentId) {
+        return List.of();
+    }
+
+    @Override
+    public Optional<ProxyConfig> findByAgentAndName(String agentId, String proxyName) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ProxyConfig> findByRemotePort(int remotePort) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ProxyConfig> findByDomain(String domain) {
         return Optional.empty();
     }
 }

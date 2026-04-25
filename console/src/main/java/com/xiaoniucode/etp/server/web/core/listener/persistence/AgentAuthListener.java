@@ -47,6 +47,7 @@ public class AgentAuthListener implements EventListener<AgentAuthEvent> {
 
     @Override
     public void onEvent(AgentAuthEvent event) {
+        logger.debug("Received AgentAuthEvent: {}", event);
         boolean reconnect = event.isReconnect();
         AgentInfo agentInfo = event.getAgentInfo();
         if (reconnect || agentInfo.getAgentType() == AgentType.SESSION) {

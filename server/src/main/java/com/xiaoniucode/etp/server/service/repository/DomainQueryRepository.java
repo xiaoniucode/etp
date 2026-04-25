@@ -17,4 +17,7 @@
 package com.xiaoniucode.etp.server.service.repository;
 
 public interface DomainQueryRepository {
+    boolean existsBySubdomain(String baseDomain, String domain);
+
+    boolean existsByDomain(String customDomain);
 }

@@ -18,8 +18,27 @@ package com.xiaoniucode.etp.server.service.repository;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProxyQueryRepository {
     Optional<ProxyConfig> findById(String proxyId);
+
+    /**
+     * 查询所有远程端口
+     * @return 远程端口列表
+     */
+    List<Integer> findAllRemotePorts();
+
+    List<Integer> findAgentPortsByAgentId(String agentId);
+
+    List<Integer> findAllPorts();
+
+    List<ProxyConfig> findByAgentId(String agentId);
+
+    Optional<ProxyConfig> findByAgentAndName(String agentId, String proxyName);
+
+    Optional<ProxyConfig> findByRemotePort(int remotePort);
+
+    Optional<ProxyConfig> findByDomain(String domain);
 }

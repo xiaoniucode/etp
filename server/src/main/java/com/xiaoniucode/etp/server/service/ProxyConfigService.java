@@ -22,6 +22,7 @@ import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,20 +31,33 @@ public class ProxyConfigService {
     private ProxyQueryRepository proxyQueryRepository;
     @Autowired
     private ProxyManager proxyManager;
-    public ProxyConfig getProxyConfig(String proxyId) {
+
+    public ProxyConfig findById(String proxyId) {
         Optional<ProxyConfig> byId = proxyQueryRepository.findById(proxyId);
         return null;
     }
 
+    public List<ProxyConfig> findByAgentId(String agentId) {
+        return proxyQueryRepository.findByAgentId(agentId);
+    }
+
     public Optional<ProxyConfig> findByDomain(String domain) {
-        return null;
+        return proxyQueryRepository.findByDomain(domain);
+    }
+
+    public ProxyConfig findByAgentAndName(String agentId, String proxyName) {
+        return proxyQueryRepository.findByAgentAndName(agentId, proxyName).orElseGet(null);
     }
 
     public Optional<ProxyConfig> findByRemotePort(int remotePort) {
-        return null;
+        return proxyQueryRepository.findByRemotePort(remotePort);
     }
-    public void remove(String proxyId){
-        proxyManager.unregister(proxyId);
-        //清空缓存
+
+    public List<Integer> getAgentAllPorts(String agentId) {
+        return proxyQueryRepository.findAgentPortsByAgentId(agentId);
+    }
+
+    public List<Integer> getAllPorts() {
+        return proxyQueryRepository.findAllPorts();
     }
 }

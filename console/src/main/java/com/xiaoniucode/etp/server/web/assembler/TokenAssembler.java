@@ -27,18 +27,14 @@ public class TokenAssembler {
     public TokenConfig toDomain(AccessTokenCreateParam param) {
         return new TokenConfig(
                 param.getName(),
-                null,
-                param.getMaxDevices(),
-                param.getMaxConnections()
+                null
         );
     }
 
     public TokenConfig toDomain(AccessTokenUpdateParam param) {
         return new TokenConfig(
                 param.getName(),
-                null,
-                param.getMaxDevices(),
-                param.getMaxConnections()
+                null
         );
     }
 }

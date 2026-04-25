@@ -21,4 +21,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class TokenQueryRepositoryImpl implements TokenQueryRepository {
+
+    @Override
+    public boolean existsByToken(String token) {
+        return false;
+    }
 }

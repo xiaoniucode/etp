@@ -17,4 +17,5 @@
 package com.xiaoniucode.etp.server.service.repository;
 
 public interface TokenQueryRepository {
+    boolean existsByToken(String token);
 }

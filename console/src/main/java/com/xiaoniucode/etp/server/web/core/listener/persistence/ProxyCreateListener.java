@@ -43,5 +43,6 @@ public class ProxyCreateListener implements EventListener<ProxyCreateEvent> {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void onEvent(ProxyCreateEvent event) {
+        logger.debug("Received ProxyCreateEvent: {}", event);
     }
 }

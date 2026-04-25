@@ -22,9 +22,9 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxySourceType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.service.his.ProxyManager;
-import com.xiaoniucode.etp.server.service.his.RegisterResult;
-import com.xiaoniucode.etp.server.vhost.DomainBinding;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.service.diff.RegisterResult;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import com.xiaoniucode.etp.server.vhost.DomainManager;
 import com.xiaoniucode.etp.server.web.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
@@ -65,8 +65,6 @@ public class ProxyServiceImpl implements ProxyService {
     @Autowired
     private ProxyTargetRepository proxyTargetRepository;
     @Autowired
-    private BandwidthRepository bandwidthRepository;
-    @Autowired
     private LoadBalanceRepository loadBalanceRepository;
     @Autowired
     private TransportRepository transportRepository;
@@ -89,8 +87,6 @@ public class ProxyServiceImpl implements ProxyService {
     private TransportConvert transportConvert;
     @Autowired
     private LoadBalanceConvert loadBalanceConvert;
-    @Autowired
-    private BandwidthConvert bandwidthConvert;
     @Autowired
     private ProxyConfigAssembler proxyConfigAssembler;
     @Autowired
@@ -133,14 +129,11 @@ public class ProxyServiceImpl implements ProxyService {
             LoadBalanceDO loadBalanceDO = loadBalanceConvert.toDO(param.getLoadBalance(), proxyId);
             loadBalanceRepository.save(loadBalanceDO);
         }
-        //5.带宽
-        BandwidthDO bandwidthDO = bandwidthConvert.toDO(param.getBandwidth(), proxyId);
-        bandwidthRepository.save(bandwidthDO);
         //6.传输
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
         transportRepository.save(transportDO);
         //7.HTTP域名信息
-        List<DomainBinding> domainBindings = registerResult.getDomainBindings();
+        List<DomainInfo> domainBindings = registerResult.getDomainBindings();
         List<HttpProxyDomainDO> httpProxyDomainList = proxyDomainConvert.toDOList(domainBindings, proxyId);
         proxyDomainRepository.saveAll(httpProxyDomainList);
         //init access control
@@ -203,18 +196,13 @@ public class ProxyServiceImpl implements ProxyService {
             //单机服务 尝试删除负载均衡配置
             loadBalanceRepository.deleteById(proxyId);
         }
-
-        //5.带宽
-        bandwidthRepository.deleteById(proxyId);
-        BandwidthDO bandwidthDO = bandwidthConvert.toDO(param.getBandwidth(), proxyId);
-        bandwidthRepository.save(bandwidthDO);
         //6.传输
         transportRepository.deleteById(proxyId);
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
         transportRepository.save(transportDO);
         //todo 7.HTTP域名信息
         proxyDomainRepository.deleteByProxyId(proxyId);
-        List<DomainBinding> boundDomains = domainManager.getBoundDomains(proxyId);
+        List<DomainInfo> boundDomains = domainManager.getBoundDomains(proxyId);
         if (!CollectionUtils.isEmpty(boundDomains)) {
             List<HttpProxyDomainDO> domainList = proxyDomainConvert.toDOList(boundDomains, proxyId);
             proxyDomainRepository.saveAll(domainList);
@@ -284,7 +272,6 @@ public class ProxyServiceImpl implements ProxyService {
         AgentDO agentDO = detail.getAgentDO();
         ProxyDO proxyDO = detail.getProxyDO();
         TransportDO transportDO = detail.getTransportDO();
-        BandwidthDO bandwidthDO = detail.getBandwidthDO();
         LoadBalanceDO loadBalanceDO = detail.getLoadBalanceDO();
 
         List<ProxyTargetDO> proxyTargetDos = proxyTargetRepository.findByProxyId(id);
@@ -292,11 +279,9 @@ public class ProxyServiceImpl implements ProxyService {
 
         HttpProxyDetailDTO httpProxyDetailDTO = proxyConvert.toHttpDetailDTO(proxyDO, agentDO.getAgentType().getCode());
         TransportDTO transportDTO = transportConvert.toDTO(transportDO);
-        BandwidthDTO bandwidthDTO = bandwidthConvert.toDTO(bandwidthDO);
 
         List<TargetDTO> targetDTOList = proxyTargetConvert.toDTOList(proxyTargetDos);
         httpProxyDetailDTO.setTransport(transportDTO);
-        httpProxyDetailDTO.setBandwidth(bandwidthDTO);
 
         if (proxyDO.getDeploymentMode().isCluster()) {
             LoadBalanceDTO loadBalanceDTO = loadBalanceConvert.toDTO(loadBalanceDO);

@@ -7,8 +7,8 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.loadbalance.LeastConnHooks;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.stream.*;
-import com.xiaoniucode.etp.server.transport.connection.DirectPool;
-import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
+import com.xiaoniucode.etp.server.transport.connection.DirectConnectionPool;
+import com.xiaoniucode.etp.server.transport.connection.MultiplexConnectionPool;
 import com.xiaoniucode.etp.core.transport.TunnelBridge;
 import com.xiaoniucode.etp.server.transport.bridge.TunnelBridgeFactory;
 import io.netty.buffer.ByteBuf;
@@ -28,9 +28,9 @@ import org.springframework.stereotype.Component;
 public class StreamOpenResponseAction extends StreamBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(StreamOpenResponseAction.class);
     @Autowired
-    private DirectPool directPool;
+    private DirectConnectionPool directConnectionPool;
     @Autowired
-    private MultiplexPool multiplexPool;
+    private MultiplexConnectionPool multiplexConnectionPool;
     @Autowired
     private LeastConnHooks leastConnHooks;
     @Autowired
@@ -44,9 +44,9 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         String agentId = agentInfo.getAgentId();
         TunnelEntry tunnelEntry;
         if (context.isMultiplex()) {
-            tunnelEntry = multiplexPool.acquire(agentId, context.isEncrypt());
+            tunnelEntry = multiplexConnectionPool.acquire(agentId, context.isEncrypt());
         } else {
-            tunnelEntry = directPool.borrow(agentId, tunnelId, context.isEncrypt());
+            tunnelEntry = directConnectionPool.borrow(agentId, tunnelId, context.isEncrypt());
         }
         if (tunnelEntry == null) {
             logger.warn("连接池没有可用连接，关闭流");

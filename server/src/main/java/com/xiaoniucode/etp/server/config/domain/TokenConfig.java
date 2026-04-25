@@ -23,17 +23,10 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode
 public class TokenConfig implements Serializable {
-    public static final int UNLIMITED_DEVICES = 0;
-    public static final int UNLIMITED_CONNECTIONS = 0;
     private String name;
     private String token;
-    private Integer maxDevices;
-    private Integer maxConnections;
-
-    public TokenConfig(String name, String token, Integer maxDevices, Integer maxConnections) {
+    public TokenConfig(String name, String token) {
         this.name = name;
         this.token = token;
-        this.maxDevices = maxDevices;
-        this.maxConnections = maxConnections;
     }
 }

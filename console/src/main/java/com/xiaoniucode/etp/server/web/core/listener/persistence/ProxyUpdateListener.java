@@ -15,9 +15,11 @@
  */
 
 package com.xiaoniucode.etp.server.web.core.listener.persistence;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.ProxyUpdateEvent;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,5 +41,9 @@ public class ProxyUpdateListener implements EventListener<ProxyUpdateEvent> {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void onEvent(ProxyUpdateEvent event) {
+        logger.debug("Received ProxyUpdateEvent: {}", event);
+        AgentInfo agentInfo = event.getAgentInfo();
+        ProxyConfig proxyConfig = event.getProxyConfig();
+
     }
 }

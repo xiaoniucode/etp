@@ -21,6 +21,7 @@ public final class PortAcceptor {
 
     /**
      * 绑定并监听指定端口。
+     *
      * @param listenPort 要监听的端口。不可为null，需合法（0-65535）。
      */
     public void bindPort(@Nonnull final Integer listenPort) {
@@ -38,9 +39,7 @@ public final class PortAcceptor {
                 }
                 ServerBootstrap serverBootstrap = tcpProxyServer.getServerBootstrap();
                 ChannelFuture future = serverBootstrap.bind(listenPort).sync();
-                Channel channel = future.channel();
-                logger.debug("成功绑定端口: {}", listenPort);
-                return channel;
+                return future.channel();
             } catch (Throwable t) {
                 logger.error("绑定端口 {} 失败", listenPort, t);
                 return null;
@@ -50,6 +49,7 @@ public final class PortAcceptor {
 
     /**
      * 停止监听指定端口。
+     *
      * @param listenPort 要释放的端口
      */
     public void stopPortListen(@Nonnull final Integer listenPort) {

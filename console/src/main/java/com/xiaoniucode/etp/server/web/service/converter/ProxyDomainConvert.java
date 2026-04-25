@@ -16,7 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.service.converter;
 
-import com.xiaoniucode.etp.server.vhost.DomainBinding;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import com.xiaoniucode.etp.server.web.entity.HttpProxyDomainDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,9 +30,9 @@ public interface ProxyDomainConvert {
     HttpProxyDomainDO toDO(String domain, String proxyId);
 
     @Mapping(target = "proxyId", source = "proxyId")
-    HttpProxyDomainDO toDO(DomainBinding domainBinding, String proxyId);
+    HttpProxyDomainDO toDO(DomainInfo domainBinding, String proxyId);
 
-    default List<HttpProxyDomainDO> toDOList(List<DomainBinding> list, String proxyId) {
+    default List<HttpProxyDomainDO> toDOList(List<DomainInfo> list, String proxyId) {
         if (list == null || list.isEmpty()) {
             return List.of();
         }

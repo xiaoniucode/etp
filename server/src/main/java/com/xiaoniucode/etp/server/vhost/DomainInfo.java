@@ -22,8 +22,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class DomainBinding {
-    private String proxyId;
+public class DomainInfo {
     /**
      * 子域名/自动域名 的基础域名
      */

@@ -10,8 +10,8 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.command.ConnectionCreateCmd;
-import com.xiaoniucode.etp.server.transport.connection.DirectPool;
-import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
+import com.xiaoniucode.etp.server.transport.connection.DirectConnectionPool;
+import com.xiaoniucode.etp.server.transport.connection.MultiplexConnectionPool;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -25,9 +25,9 @@ import org.springframework.stereotype.Component;
 public class CreateConnectionAction extends AgentBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(CreateConnectionAction.class);
     @Autowired
-    private DirectPool directPool;
+    private DirectConnectionPool directConnectionPool;
     @Autowired
-    private MultiplexPool multiplexPool;
+    private MultiplexConnectionPool multiplexConnectionPool;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -86,9 +86,9 @@ public class CreateConnectionAction extends AgentBaseAction {
             if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER)==null){
                 pipeline.addBefore(NettyConstants.CONTROL_FRAME_HANDLER,NettyConstants.IDLE_CHECK_HANDLER,new IdleCheckHandler());
             }
-            multiplexPool.setChannel(agentId, isEncrypt, poolEntry);
+            multiplexConnectionPool.setChannel(agentId, isEncrypt, poolEntry);
         } else {
-            directPool.register(agentId, poolEntry);
+            directConnectionPool.register(agentId, poolEntry);
         }
     }
 }

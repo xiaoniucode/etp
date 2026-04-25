@@ -12,8 +12,8 @@ import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
-import com.xiaoniucode.etp.server.transport.connection.DirectPool;
-import com.xiaoniucode.etp.server.transport.connection.MultiplexPool;
+import com.xiaoniucode.etp.server.transport.connection.DirectConnectionPool;
+import com.xiaoniucode.etp.server.transport.connection.MultiplexConnectionPool;
 import io.netty.channel.Channel;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -28,9 +28,9 @@ public class StreamCloseAction extends StreamBaseAction {
     @Autowired
     private LeastConnHooks leastConnHooks;
     @Autowired
-    private DirectPool directPool;
+    private DirectConnectionPool directConnectionPool;
     @Autowired
-    private MultiplexPool multiplexPool;
+    private MultiplexConnectionPool multiplexConnectionPool;
     @Autowired
     private MetricsCollector metricsCollector;
 
@@ -50,7 +50,7 @@ public class StreamCloseAction extends StreamBaseAction {
         if (context.isDirectConnection() && tunnelEntry != null) {
             AgentInfo agentInfo = agentContext.getAgentInfo();
             logger.debug("回收客户端 {} 独立连接 {}", agentInfo.getAgentId(), tunnelEntry.getTunnelId());
-            directPool.release(agentInfo.getAgentId(), tunnelEntry);
+            directConnectionPool.release(agentInfo.getAgentId(), tunnelEntry);
         }
         streamManager.removeStreamContext(streamId);
         //流可能是半打开状态，Agent可能为空

@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 独立隧道连接池
  */
 @Component
-public class DirectPool {
+public class DirectConnectionPool {
 
     /**
      * 最大回收总连接数限制
