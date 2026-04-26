@@ -40,7 +40,7 @@ public class ProxyConfigAssembler {
         proxyConfig.setAgentId(param.getAgentId());
         proxyConfig.setAgentType(AgentType.BINARY);
         proxyConfig.setName(param.getName());
-        proxyConfig.setEnabled(Objects.equals(param.getStatus(), ProxyStatus.OPEN.getCode()));
+        proxyConfig.setStatus(ProxyStatus.fromCode(param.getStatus()));
         proxyConfig.setProtocol(ProtocolType.HTTP);
 
         // 转换目标服务
@@ -65,7 +65,7 @@ public class ProxyConfigAssembler {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setAgentId(param.getAgentId());
         proxyConfig.setName(param.getName());
-        proxyConfig.setEnabled(Objects.equals(param.getStatus(), ProxyStatus.OPEN.getCode()));
+        proxyConfig.setStatus(ProxyStatus.fromCode(param.getStatus()));
         proxyConfig.setProtocol(ProtocolType.TCP);
         proxyConfig.setRemotePort(param.getRemotePort());
 
@@ -88,7 +88,7 @@ public class ProxyConfigAssembler {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setProxyId(param.getId());
         proxyConfig.setName(param.getName());
-        proxyConfig.setEnabled(param.getStatus() == 1);
+        proxyConfig.setStatus(ProxyStatus.fromCode(param.getStatus()));
         proxyConfig.setProtocol(ProtocolType.HTTP);
 
         // 转换目标服务
@@ -113,7 +113,7 @@ public class ProxyConfigAssembler {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setProxyId(param.getId());
         proxyConfig.setName(param.getName());
-        proxyConfig.setEnabled(param.getStatus() == 1);
+        proxyConfig.setStatus(ProxyStatus.fromCode(param.getStatus()));
         proxyConfig.setProtocol(ProtocolType.TCP);
         proxyConfig.setRemotePort(param.getRemotePort());
 

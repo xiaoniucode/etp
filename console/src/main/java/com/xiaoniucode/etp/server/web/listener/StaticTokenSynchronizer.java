@@ -75,8 +75,6 @@ public class StaticTokenSynchronizer implements EventListener<TunnelServerBindEv
         AccessTokenDO accessTokenDO = new AccessTokenDO();
         accessTokenDO.setName(info.getName());
         accessTokenDO.setToken(info.getToken());
-        accessTokenDO.setMaxDevices(info.getMaxDevices());
-        accessTokenDO.setMaxConnections(info.getMaxConnections());
         return accessTokenDO;
     }
 }

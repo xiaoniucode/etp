@@ -47,11 +47,10 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
 
     @Query("""
             SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(
-                                       a, p, t, b, lb,ba,ac)
+                                       a, p, t,  lb,ba,ac)
             FROM ProxyDO p
             LEFT JOIN AgentDO a ON p.agentId = a.id
             LEFT JOIN TransportDO t ON t.proxyId = p.id
-            LEFT JOIN BandwidthDO b ON b.proxyId = p.id
             LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
             LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
             LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id

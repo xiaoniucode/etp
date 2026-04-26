@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.core.repository.converter;
+package com.xiaoniucode.etp.server.web.core.converter;
 
 import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import com.xiaoniucode.etp.server.web.entity.HttpProxyDomainDO;

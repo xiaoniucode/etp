@@ -19,6 +19,7 @@ package com.xiaoniucode.etp.server.web.core.listener.persistence;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.ProxyCreateEvent;
+import com.xiaoniucode.etp.server.web.service.ProxyService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,8 @@ public class ProxyCreateListener implements EventListener<ProxyCreateEvent> {
     private final Logger logger = LoggerFactory.getLogger(ProxyCreateListener.class);
     @Autowired
     private EventBus eventBus;
+    @Autowired
+    private ProxyService proxyService;
 
     @PostConstruct
     public void init() {
@@ -43,6 +46,8 @@ public class ProxyCreateListener implements EventListener<ProxyCreateEvent> {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void onEvent(ProxyCreateEvent event) {
+
+
         logger.debug("Received ProxyCreateEvent: {}", event);
     }
 }

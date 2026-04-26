@@ -22,14 +22,9 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxySourceType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.service.diff.RegisterResult;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
-import com.xiaoniucode.etp.server.vhost.DomainManager;
 import com.xiaoniucode.etp.server.web.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
-import com.xiaoniucode.etp.server.web.dto.bandwidth.BandwidthDTO;
 import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.*;
 import com.xiaoniucode.etp.server.web.dto.transport.TransportDTO;
@@ -89,14 +84,9 @@ public class ProxyServiceImpl implements ProxyService {
     private LoadBalanceConvert loadBalanceConvert;
     @Autowired
     private ProxyConfigAssembler proxyConfigAssembler;
-    @Autowired
-    private ProxyManager proxyManager;
-    @Autowired
-    private TransactionHelper transactionHelper;
+
     @Resource
     private AppConfig appConfig;
-    @Autowired
-    private DomainManager domainManager;
     @Autowired
     private UidGenerator uidGenerator;
 
@@ -132,10 +122,8 @@ public class ProxyServiceImpl implements ProxyService {
         //6.传输
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
         transportRepository.save(transportDO);
-        //7.HTTP域名信息
-        List<DomainInfo> domainBindings = registerResult.getDomainBindings();
-        List<HttpProxyDomainDO> httpProxyDomainList = proxyDomainConvert.toDOList(domainBindings, proxyId);
-        proxyDomainRepository.saveAll(httpProxyDomainList);
+        //7.todo HTTP域名信息
+        proxyDomainRepository.saveAll(new ArrayList<>());
         //init access control
         AccessControlDO accessControlDO = new AccessControlDO();
         accessControlDO.setProxyId(proxyId);
@@ -148,11 +136,7 @@ public class ProxyServiceImpl implements ProxyService {
         basicAuthDO.setProxyId(proxyId);
         basicAuthRepository.save(basicAuthDO);
 
-        transactionHelper.afterCommit(() -> {
-            proxyManager.register(proxyConfig);
-        });
-
-        logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
+              logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
     }
 
     @Override
@@ -202,11 +186,11 @@ public class ProxyServiceImpl implements ProxyService {
         transportRepository.save(transportDO);
         //todo 7.HTTP域名信息
         proxyDomainRepository.deleteByProxyId(proxyId);
-        List<DomainInfo> boundDomains = domainManager.getBoundDomains(proxyId);
-        if (!CollectionUtils.isEmpty(boundDomains)) {
-            List<HttpProxyDomainDO> domainList = proxyDomainConvert.toDOList(boundDomains, proxyId);
-            proxyDomainRepository.saveAll(domainList);
-        }
+
+//        if (!CollectionUtils.isEmpty(boundDomains)) {
+//            List<HttpProxyDomainDO> domainList = proxyDomainConvert.toDOList(boundDomains, proxyId);
+//            proxyDomainRepository.saveAll(domainList);
+//        }
         logger.debug("HTTP代理更新成功：{}", proxyDO.getName());
     }
 
@@ -301,7 +285,6 @@ public class ProxyServiceImpl implements ProxyService {
         String proxyId = uidGenerator.getUIDAsString();
         ProxyConfig proxyConfig = proxyConfigAssembler.toDomain(param);
         proxyConfig.setProxyId(proxyId);
-        RegisterResult registerResult = proxyManager.register(proxyConfig);
 
         //1.基础信息
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
@@ -324,9 +307,6 @@ public class ProxyServiceImpl implements ProxyService {
             LoadBalanceDO loadBalanceDO = loadBalanceConvert.toDO(param.getLoadBalance(), proxyId);
             loadBalanceRepository.save(loadBalanceDO);
         }
-        //5.带宽
-        BandwidthDO bandwidthDO = bandwidthConvert.toDO(param.getBandwidth(), proxyId);
-        bandwidthRepository.save(bandwidthDO);
         //6.传输
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
         transportRepository.save(transportDO);
@@ -383,10 +363,6 @@ public class ProxyServiceImpl implements ProxyService {
             loadBalanceRepository.deleteById(proxyId);
         }
 
-        //5.带宽
-        bandwidthRepository.deleteById(proxyId);
-        BandwidthDO bandwidthDO = bandwidthConvert.toDO(param.getBandwidth(), proxyId);
-        bandwidthRepository.save(bandwidthDO);
         //6.传输
         transportRepository.deleteById(proxyId);
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
@@ -400,18 +376,15 @@ public class ProxyServiceImpl implements ProxyService {
         AgentDO agentDO = detail.getAgentDO();
         ProxyDO proxyDO = detail.getProxyDO();
         TransportDO transportDO = detail.getTransportDO();
-        BandwidthDO bandwidthDO = detail.getBandwidthDO();
         LoadBalanceDO loadBalanceDO = detail.getLoadBalanceDO();
 
         List<ProxyTargetDO> proxyTargetDos = proxyTargetRepository.findByProxyId(id);
 
         TcpProxyDetailDTO tcpProxyDetailDTO = proxyConvert.toTcpDetailDTO(proxyDO, agentDO.getAgentType().getCode());
         TransportDTO transportDTO = transportConvert.toDTO(transportDO);
-        BandwidthDTO bandwidthDTO = bandwidthConvert.toDTO(bandwidthDO);
 
         List<TargetDTO> targetDTOList = proxyTargetConvert.toDTOList(proxyTargetDos);
         tcpProxyDetailDTO.setTransport(transportDTO);
-        tcpProxyDetailDTO.setBandwidth(bandwidthDTO);
 
         if (proxyDO.getDeploymentMode().isCluster()) {
             LoadBalanceDTO loadBalanceDTO = loadBalanceConvert.toDTO(loadBalanceDO);
@@ -477,7 +450,6 @@ public class ProxyServiceImpl implements ProxyService {
         //Common
         proxyTargetRepository.deleteByProxyIdIn(ids);
         loadBalanceRepository.deleteByProxyIdIn(ids);
-        bandwidthRepository.deleteByProxyIdIn(ids);
         transportRepository.deleteByProxyIdIn(ids);
         //IP CIDR
         accessControlRepository.deleteByProxyIdIn(ids);
@@ -488,7 +460,6 @@ public class ProxyServiceImpl implements ProxyService {
         basicUserRepository.deleteByProxyIdIn(ids);
         // Base
         proxyRepository.deleteByIdIn(ids);
-        transactionHelper.afterCommit(() -> proxyManager.batchRemove(ids));
         logger.debug("批量删除代理成功，数量: {}", ids.size());
     }
 
@@ -501,8 +472,5 @@ public class ProxyServiceImpl implements ProxyService {
         }
         proxyDO.setStatus(ProxyStatus.fromCode(status));
         proxyRepository.save(proxyDO);
-        //更新内存状态
-        transactionHelper.afterCommit(() ->
-                proxyManager.changeStatus(id, Objects.equals(status, ProxyStatus.OPEN.getCode())));
     }
 }

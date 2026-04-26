@@ -10,23 +10,14 @@ import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.event.ProxyCreateEvent;
-import com.xiaoniucode.etp.server.event.ProxyUpdateEvent;
-import com.xiaoniucode.etp.server.exceptions.DomainConflictException;
-import com.xiaoniucode.etp.server.exceptions.PortConflictException;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.service.DomainConfigService;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
-import com.xiaoniucode.etp.server.service.checker.ProxyConfigChecker;
 import com.xiaoniucode.etp.server.service.diff.ConfigChangeDetector;
-import com.xiaoniucode.etp.server.service.diff.RegisterResult;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.Resource;
@@ -42,8 +33,6 @@ import java.util.stream.Collectors;
 @Component
 public class ProxyCreateAction extends AgentBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(ProxyCreateAction.class);
-    @Autowired
-    private ProxyManager proxyManager;
     @Resource
     private AppConfig appConfig;
     @Autowired
@@ -60,92 +49,124 @@ public class ProxyCreateAction extends AgentBaseAction {
     private DomainGenerator domainGenerator;
     @Autowired
     private PortManager portManager;
-    @Resource
-    private AppConfig appConfig;
     @Autowired
     private DomainConfigService domainConfigService;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-        Channel control = context.getControl();
-        try {
-            Message.NewProxy proxy = context.getAndRemoveAs(AgentConstants.NEWA_PROXY, Message.NewProxy.class);
-            AgentInfo agentInfo = context.getAgentInfo();
-            String agentId = agentInfo.getAgentId();
-
-            ProxyConfig newConfig = buildProxyConfig(proxy);
-            newConfig.setAgentId(agentId);
-            newConfig.setAgentType(context.getAgentInfo().getAgentType());
-
-
-            ProxyConfig oldConfig = proxyConfigService.findByAgentAndName(agentId, newConfig.getName());
-            if (oldConfig == null) {
-                logger.debug("代理配置 {} 不存在，准备创建", newConfig.getName());
-                newConfig.setProxyId(uidGenerator.getUIDAsString());
-                if (newConfig.isTcp()) {
-                    Integer remotePort = newConfig.getRemotePort();
-                    //如果没有指定远程端口，自动分配一个可用端口
-                    if (remotePort == null || remotePort == 0) {
-                        int listenPort = portManager.acquire();
-                        newConfig.setListenPort(listenPort);
-                    } else {
-                        //如果指定了远程端口，检查端口是否可用
-                        if (!portManager.isAvailable(remotePort)) {
-                            throw new PortConflictException(remotePort);
-                        }
-                        //设置监听端口
-                        newConfig.setListenPort(remotePort);
-                    }
-                    proxyManager.register(newConfig);
-                    eventBus.publishAsync(new ProxyCreateEvent(agentInfo, newConfig));
-
-                } else if (newConfig.isHttp()) {
-                    RouteConfig routeConfig = newConfig.getRouteConfig();
-                    DomainType domainType = routeConfig.getDomainType();
-                    List<DomainInfo> subdomains;
-                    if (domainType.isCustomDomain()) {
-                        routeConfig.getCustomDomains().forEach(domain -> {
-                            if (domainConfigService.exists(domain)) {
-                                throw new DomainConflictException("域名[" + domain + "]已被占用");
-                            }
-                        });
-                        proxyManager.register(newConfig);
-                        eventBus.publishAsync(new ProxyCreateEvent(agentInfo, newConfig));
-                    } else {
-                        String baseDomain = appConfig.getBaseDomain();
-                        subdomains = domainGenerator.generateSubdomain(baseDomain, routeConfig);
-                        proxyManager.register(newConfig);
-                        eventBus.publishAsync(new ProxyCreateEvent(agentInfo, subdomains, newConfig));
-                    }
-                }
-            } else {
-                logger.debug("代理配置 {} 已存在，准备更新", newConfig.getName());
-                newConfig.setProxyId(oldConfig.getProxyId());
-                if (configChangeDetector.hasChanges(oldConfig, newConfig)) {
-                    logger.debug("代理配置 {} 发生变更，准备更新", newConfig.getName());
-                    proxyManager.reregister(oldConfig, newConfig);
-                    eventBus.publishAsync(new ProxyUpdateEvent(context.getAgentInfo(), newConfig));
-                } else {
-                    logger.debug("代理配置 {} 没有发生变更，无需更新", newConfig.getName());
-                }
-            }
-
-            Message.NewProxyResp newProxyResp = buildResponse(registerResult);
-            ByteBuf payload = ProtobufUtil.toByteBuf(newProxyResp, control.alloc());
-            TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, payload);
-            control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
-                if (future.isSuccess()) {
-                    logger.debug("代理配置 {} 创建结果发送成功", register.getName());
-                } else {
-                    logger.error("代理配置 {} 创建失败", register.getName(), future.cause());
-                }
-            });
-            context.fireEvent(AgentEvent.REBUILD_CONTEXT);
-            logger.debug("代理注册成功: {}", register);
-        } catch (Exception e) {
-            logger.error("代理配置注册失败", e);
-            sendErrorMessage(e.getMessage(), control);
-        }
+//        Channel control = context.getControl();
+//        try {
+//            Message.NewProxy proxy = context.getAndRemoveAs(AgentConstants.NEWA_PROXY, Message.NewProxy.class);
+//            AgentInfo agentInfo = context.getAgentInfo();
+//            String agentId = agentInfo.getAgentId();
+//
+//            ProxyConfig newConfig = buildProxyConfig(proxy);
+//            newConfig.setAgentId(agentId);
+//            newConfig.setAgentType(context.getAgentInfo().getAgentType());
+//
+//            List<String>domains=null;
+//            ProxyConfig oldConfig = proxyConfigService.findByAgentAndName(agentId, newConfig.getName());
+//            if (oldConfig == null) {
+//                logger.debug("代理配置 {} 不存在，准备创建", newConfig.getName());
+//                newConfig.setProxyId(uidGenerator.getUIDAsString());
+//                if (newConfig.isTcp()) {
+//                    Integer remotePort = newConfig.getRemotePort();
+//                    //如果没有指定远程端口，自动分配一个可用端口
+//                    if (remotePort == null || remotePort == 0) {
+//                        int listenPort = portManager.acquire();
+//                        newConfig.setListenPort(listenPort);
+//                    } else {
+//                        //如果指定了远程端口，检查端口是否可用
+//                        if (!portManager.isAvailable(remotePort)) {
+//                            throw new PortConflictException(remotePort);
+//                        }
+//                        //设置监听端口
+//                        newConfig.setListenPort(remotePort);
+//                    }
+//                    proxyManager.register(newConfig);
+//                    eventBus.publishAsync(new ProxyCreateEvent(agentInfo, newConfig));
+//
+//                } else if (newConfig.isHttp()) {
+//                    domains=new ArrayList<>();
+//
+//                    RouteConfig routeConfig = newConfig.getRouteConfig();
+//                    DomainType domainType = routeConfig.getDomainType();
+//                    if (domainType.isCustomDomain()) {
+//                        routeConfig.getCustomDomains().forEach(domain -> {
+//                            if (domainConfigService.exists(domain)) {
+//                                throw new DomainConflictException("域名[" + domain + "]已被占用");
+//                            }
+//                        });
+//                        proxyManager.register(newConfig);
+//                        eventBus.publishAsync(new ProxyCreateEvent(agentInfo, newConfig));
+//                    } else if (domainType.isAuto()) {
+//                        String baseDomain = appConfig.getBaseDomain();
+//                        List<String> autoSubdomains = domainGenerator.generateSubdomain(baseDomain, routeConfig);
+//                    }else {
+//                        String baseDomain = appConfig.getBaseDomain();
+//                        Set<String> subDomains = routeConfig.getSubDomains();
+//                        proxyManager.register(newConfig);
+//                      //  eventBus.publishAsync(new ProxyCreateEvent(agentInfo, subdomains, newConfig));
+//                    }
+//                }
+//            } else {
+//                logger.debug("代理配置 {} 已存在，准备更新", newConfig.getName());
+//                newConfig.setProxyId(oldConfig.getProxyId());
+//                if (configChangeDetector.hasChanges(oldConfig, newConfig)) {
+//                    logger.debug("代理配置 {} 发生变更，准备更新", newConfig.getName());
+//
+//                    ProtocolType newProtocol = newConfig.getProtocol();
+//                    ProtocolType oldProtocol = oldConfig.getProtocol();
+//                    //如果协议发生改变
+//                    if (newProtocol != oldProtocol) {
+//                        proxyManager.unregister(oldConfig.getProxyId());
+//                    }
+//
+//                    Integer oldRemotePort = oldConfig.getRemotePort();
+//                    Integer newRemotePort = newConfig.getRemotePort();
+//                    if (newConfig.isTcp() && !newRemotePort.equals(oldRemotePort)) {
+//                        if (!portManager.isAvailable(newRemotePort)) {
+//                            throw new PortConflictException(newRemotePort);
+//                        }
+//                        //释放旧端口
+//                        proxyManager.unregister(oldConfig.getProxyId());
+//                        //设置监听端口为新远程端口
+//                        newConfig.setListenPort(newRemotePort);
+//                        proxyManager.register(newConfig);
+//                    } else {
+//                        newConfig.setListenPort(oldConfig.getListenPort());
+//                    }
+//                    if (oldProtocol.isHttp()&&newProtocol.isTcp()&&(newRemotePort==null||newRemotePort==0)){
+//                        //如果原来是HTTP代理，新的TCP代理没有指定远程端口，自动分配一个可用端口
+//                        int listenPort = portManager.acquire();
+//                        newConfig.setListenPort(listenPort);
+//                    }
+//
+//
+//
+//                    proxyManager.reregister(oldConfig, newConfig);
+//                    eventBus.publishAsync(new ProxyUpdateEvent(context.getAgentInfo(), newConfig));
+//                } else {
+//                    logger.debug("代理配置 {} 没有发生变更，无需更新", newConfig.getName());
+//                }
+//            }
+//
+//            Message.NewProxyResp newProxyResp = buildResponse(newConfig,new ArrayList<>());
+//            ByteBuf payload = ProtobufUtil.toByteBuf(newProxyResp, control.alloc());
+//            TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, payload);
+//            control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
+//                if (future.isSuccess()) {
+//                    logger.debug("代理配置 {} 创建结果发送成功", newConfig.getName());
+//                } else {
+//                    logger.error("代理配置 {} 创建失败", newConfig.getName(), future.cause());
+//                }
+//            });
+//            context.fireEvent(AgentEvent.REBUILD_CONTEXT);
+//            logger.debug("代理注册成功: {}", newConfig);
+//        } catch (Exception e) {
+//            logger.error("代理配置注册失败", e);
+//            sendErrorMessage(e.getMessage(), control);
+//        }
     }
 
     public void sendErrorMessage(String message, Channel control) {
@@ -259,17 +280,16 @@ public class ProxyCreateAction extends AgentBaseAction {
         };
     }
 
-    private Message.NewProxyResp buildResponse(RegisterResult registerResult) {
-        ProxyConfig config = registerResult.getProxyConfig();
+    private Message.NewProxyResp buildResponse(ProxyConfig config,List<String>domains) {
+
         ProtocolType protocol = config.getProtocol();
         StringBuilder remoteAddr = new StringBuilder();
         if (protocol.isHttp()) {
-            List<DomainInfo> domains = registerResult.getDomainBindings();
             if (domains != null) {
                 if (ProtocolType.isHttp(protocol)) {
                     int httpProxyPort = appConfig.getHttpProxyPort();
-                    for (DomainInfo domain : domains) {
-                        remoteAddr.append("http://").append(domain.getDomain());
+                    for (String domain : domains) {
+                        remoteAddr.append("http://").append(domain);
                         if (httpProxyPort != 80) {
                             remoteAddr.append(":").append(httpProxyPort);
                         }

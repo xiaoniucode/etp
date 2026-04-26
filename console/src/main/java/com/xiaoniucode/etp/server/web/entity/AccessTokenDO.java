@@ -46,16 +46,6 @@ public class AccessTokenDO {
     @Column(name = "token", nullable = false)
     private String token;
     /**
-     * 最大设备数
-     */
-    @Column(name = "max_devices", nullable = false)
-    private Integer maxDevices;
-    /**
-     * 最大连接数
-     */
-    @Column(name = "max_connections", nullable = false)
-    private Integer maxConnections;
-    /**
      * 创建时间
      */
     @CreationTimestamp

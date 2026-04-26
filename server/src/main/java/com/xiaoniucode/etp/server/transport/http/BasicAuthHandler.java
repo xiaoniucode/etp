@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.core.domain.HttpUser;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
-import com.xiaoniucode.etp.server.service.his.ProxyManager;
+import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -24,7 +24,7 @@ import java.util.Base64;
 public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(BasicAuthHandler.class);
     @Autowired
-    private ProxyManager proxyManager;
+    private ProxyConfigService proxyConfigService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -32,7 +32,7 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel visitor = ctx.channel();
         String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
-        proxyManager.findByDomain(domain).ifPresent(config -> {
+        proxyConfigService.findByDomain(domain).ifPresent(config -> {
             String basicAuthHeader = visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).get();
             BasicAuthConfig basicAuth = config.getBasicAuth();
             if (basicAuth != null && basicAuth.isEnabled()) {

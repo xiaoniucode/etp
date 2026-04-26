@@ -17,7 +17,6 @@ package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
-import com.xiaoniucode.etp.server.security.TokenManager;
 import com.xiaoniucode.etp.server.web.assembler.TokenAssembler;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.accesstoken.AccessTokenDTO;
@@ -50,14 +49,12 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     @Autowired
     private TokenAssembler tokenAssembler;
     @Autowired
-    private TokenManager tokenManager;
-    @Autowired
     private TransactionHelper transactionHelper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AccessTokenDTO create(AccessTokenCreateParam param) {
-        if (accessTokenRepository.existsByName(param.getName()) || tokenManager.existsByName(param.getName())) {
+        if (accessTokenRepository.existsByName(param.getName())) {
             throw new BizException("令牌名称已存在");
         }
 
@@ -68,7 +65,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 
         TokenConfig tokenConfig = tokenAssembler.toDomain(param);
         tokenConfig.setToken(token);
-        transactionHelper.afterCommit(() -> tokenManager.addToken(tokenConfig));
 
         return accessTokenConvert.toDTO(save);
     }
@@ -104,7 +100,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
             accessTokenConvert.updateDO(accessTokenDO, param);
             accessTokenRepository.save(accessTokenDO);
             TokenConfig tokenConfig = tokenAssembler.toDomain(param);
-            transactionHelper.afterCommit(() -> tokenManager.updateToken(tokenConfig));
         }
     }
 
@@ -115,7 +110,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         if (tokenOpt.isPresent()) {
             accessTokenRepository.deleteById(id);
             AccessTokenDO accessTokenDO = tokenOpt.get();
-            transactionHelper.afterCommit(() -> tokenManager.removeByToken(accessTokenDO.getToken()));
         }
     }
 
@@ -129,7 +123,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                     .map(AccessTokenDO::getToken)
                     .toList();
             accessTokenRepository.deleteAllById(ids);
-            transactionHelper.afterCommit(() -> tokenManager.removeByTokens(tokenList));
         }
     }
 }

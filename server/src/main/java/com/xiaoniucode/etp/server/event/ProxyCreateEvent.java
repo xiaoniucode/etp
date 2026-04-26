@@ -28,16 +28,16 @@ import java.util.List;
 
 @Getter
 public class ProxyCreateEvent extends Event {
-    private AgentInfo agentInfo;
-    private ProxyConfig proxyConfig;
-    private List<DomainInfo> subdomains;
+    private final AgentInfo agentInfo;
+    private final ProxyConfig proxyConfig;
+    private List<String> subdomains;
 
     public ProxyCreateEvent(AgentInfo agentInfo, ProxyConfig proxyConfig) {
         this.agentInfo = agentInfo;
         this.proxyConfig = proxyConfig;
     }
 
-    public ProxyCreateEvent(AgentInfo agentInfo, List<DomainInfo> subdomains, ProxyConfig proxyConfig) {
+    public ProxyCreateEvent(AgentInfo agentInfo, List<String> subdomains, ProxyConfig proxyConfig) {
         this.agentInfo = agentInfo;
         this.subdomains = subdomains;
         this.proxyConfig = proxyConfig;

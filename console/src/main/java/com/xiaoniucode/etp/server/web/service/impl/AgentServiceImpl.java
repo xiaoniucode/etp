@@ -58,8 +58,10 @@ public class AgentServiceImpl implements AgentService {
         agentDTOList.forEach(dto -> {
             String agentId = dto.getId();
             dto.setIsOnline(agentManager.isOnline(agentId));
-            Optional<AgentInfo> agentInfoOpt = agentManager.getAgentInfo(agentId);
-            agentInfoOpt.ifPresent(agentInfo -> dto.setLastActiveTime(agentInfo.getLastActiveTime()));
+            agentManager.getAgentContext(agentId).ifPresent(agentContext -> {
+                AgentInfo agentInfo = agentContext.getAgentInfo();
+                dto.setLastActiveTime(agentInfo.getLastActiveTime());
+            });
         });
         return agentDTOList;
     }
@@ -69,8 +71,10 @@ public class AgentServiceImpl implements AgentService {
         AgentDO agent = agentRepository.findById(agentId).orElseThrow(() -> new BizException("客户端不存在"));
         AgentDTO dto = agentConvert.toDTO(agent);
         dto.setIsOnline(agentManager.isOnline(dto.getId()));
-        Optional<AgentInfo> agentInfoOpt = agentManager.getAgentInfo(agentId);
-        agentInfoOpt.ifPresent(agentInfo -> dto.setLastActiveTime(agentInfo.getLastActiveTime()));
+        agentManager.getAgentContext(agentId).ifPresent(agentContext -> {
+            AgentInfo agentInfo = agentContext.getAgentInfo();
+            dto.setLastActiveTime(agentInfo.getLastActiveTime());
+        });
         return dto;
     }
 

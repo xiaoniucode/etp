@@ -29,10 +29,6 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
         return Optional.empty();
     }
 
-    @Override
-    public List<Integer> findAllRemotePorts() {
-        return List.of();
-    }
 
     @Override
     public List<Integer> findAgentPortsByAgentId(String agentId) {
@@ -40,7 +36,7 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
     }
 
     @Override
-    public List<Integer> findAllPorts() {
+    public List<Integer> findAllListenPorts() {
         return List.of();
     }
 
@@ -61,6 +57,11 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
 
     @Override
     public Optional<ProxyConfig> findByDomain(String domain) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ProxyConfig> findBySubdomain(String baseDomain, String prefix) {
         return Optional.empty();
     }
 }

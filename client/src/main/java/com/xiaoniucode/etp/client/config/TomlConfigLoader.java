@@ -11,6 +11,7 @@ import com.xiaoniucode.etp.core.domain.TransportCustomConfig;
 import com.xiaoniucode.etp.core.enums.AccessControl;
 import com.xiaoniucode.etp.core.enums.LoadBalanceType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.Getter;
 
 import java.util.*;
@@ -206,7 +207,7 @@ public class TomlConfigLoader implements ConfigSource {
                 }
 
                 if (enableV != null) {
-                    proxyConfig.setEnabled(enableV);
+                    proxyConfig.setStatus(enableV? ProxyStatus.OPEN : ProxyStatus.CLOSED);
                 }
                 //访问控制
                 Toml accessControl = proxyTable.getTable("access_control");

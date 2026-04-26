@@ -21,6 +21,7 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.AgentAuthEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
+import com.xiaoniucode.etp.server.web.core.converter.AgentModelConvert;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
 import com.xiaoniucode.etp.server.web.repository.AgentRepository;
 import jakarta.annotation.PostConstruct;
@@ -39,6 +40,8 @@ public class AgentAuthListener implements EventListener<AgentAuthEvent> {
     private EventBus eventBus;
     @Autowired
     private AgentRepository agentRepository;
+    @Autowired
+    private AgentModelConvert agentModelConvert;
 
     @PostConstruct
     public void init() {
@@ -53,23 +56,9 @@ public class AgentAuthListener implements EventListener<AgentAuthEvent> {
         if (reconnect || agentInfo.getAgentType() == AgentType.SESSION) {
             return;
         }
-
-        agentRepository.save(toAgentDTO(agentInfo));
-        logger.info("客户端信息持久化成功: agentId={}, name={}, reconnect={}",
+        AgentDO agentDO = agentModelConvert.toDO(agentInfo);
+        agentRepository.save(agentDO);
+        logger.info("客户端信息保存成功: agentId={}, name={}, reconnect={}",
                 agentInfo.getAgentId(), agentInfo.getName(), event.isReconnect());
-    }
-
-    private AgentDO toAgentDTO(AgentInfo agentInfo) {
-        AgentDO agentDO = new AgentDO();
-        agentDO.setId(agentInfo.getAgentId());
-        agentDO.setName(agentInfo.getName());
-        agentDO.setToken(agentInfo.getToken());
-        agentDO.setAgentType(agentInfo.getAgentType());
-        agentDO.setOs(agentInfo.getOs());
-        agentDO.setArch(agentInfo.getArch());
-        agentDO.setVersion(agentInfo.getVersion());
-        agentDO.setLastActiveTime(agentInfo.getLastActiveTime());
-        agentDO.setCreatedAt(agentInfo.getCreatedAt());
-        return agentDO;
     }
 }

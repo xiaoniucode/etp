@@ -17,10 +17,13 @@
 package com.xiaoniucode.etp.server.service;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
+import com.xiaoniucode.etp.server.utils.DomainUtils;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,12 +32,11 @@ import java.util.Optional;
 public class ProxyConfigService {
     @Autowired
     private ProxyQueryRepository proxyQueryRepository;
-    @Autowired
-    private ProxyManager proxyManager;
+    @Resource
+    private AppConfig appConfig;
 
-    public ProxyConfig findById(String proxyId) {
-        Optional<ProxyConfig> byId = proxyQueryRepository.findById(proxyId);
-        return null;
+    public Optional<ProxyConfig> findById(String proxyId) {
+        return proxyQueryRepository.findById(proxyId);
     }
 
     public List<ProxyConfig> findByAgentId(String agentId) {
@@ -42,11 +44,21 @@ public class ProxyConfigService {
     }
 
     public Optional<ProxyConfig> findByDomain(String domain) {
-        return proxyQueryRepository.findByDomain(domain);
+        String baseDomain = appConfig.getBaseDomain();
+
+        if (!StringUtils.hasText(baseDomain)) {
+            return proxyQueryRepository.findByDomain(domain);
+        }
+        String prefix = DomainUtils.extractPrefix(domain, baseDomain);
+
+        if (prefix == null) {
+            return proxyQueryRepository.findByDomain(domain);
+        }
+        return proxyQueryRepository.findBySubdomain(baseDomain, prefix);
     }
 
-    public ProxyConfig findByAgentAndName(String agentId, String proxyName) {
-        return proxyQueryRepository.findByAgentAndName(agentId, proxyName).orElseGet(null);
+    public Optional<ProxyConfig> findByAgentAndName(String agentId, String proxyName) {
+        return proxyQueryRepository.findByAgentAndName(agentId, proxyName);
     }
 
     public Optional<ProxyConfig> findByRemotePort(int remotePort) {
@@ -58,6 +70,6 @@ public class ProxyConfigService {
     }
 
     public List<Integer> getAllPorts() {
-        return proxyQueryRepository.findAllPorts();
+        return proxyQueryRepository.findAllListenPorts();
     }
 }

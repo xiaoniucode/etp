@@ -18,7 +18,6 @@ package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.enums.AccessControl;
-import com.xiaoniucode.etp.server.service.his.ProxyManager;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;
@@ -48,8 +47,6 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Autowired
     private AccessControlConvert accessControlConvert;
     @Autowired
-    private ProxyManager proxyManager;
-    @Autowired
     private TransactionHelper transactionHelper;
     @Autowired
     private IpAccessChecker ipAccessChecker;
@@ -70,16 +67,6 @@ public class AccessControlServiceImpl implements AccessControlService {
                 .orElseThrow(() -> new BizException("访问控制配置不存在"));
         accessControlConvert.updateDO(accessControlDO, param);
         accessControlRepository.save(accessControlDO);
-        //数据库事务提交以后更新缓存
-        transactionHelper.afterCommit(() -> {
-            proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
-                AccessControlConfig ac = proxyConfig.getOrCreateAccessControlConfig();
-                ac.setMode(accessControlDO.getMode());
-                ac.setEnabled(accessControlDO.getEnabled());
-                proxyConfig.setAccessControl(ac);
-                ipAccessChecker.invalidate(proxyId);
-            });
-        });
     }
 
     @Override
@@ -90,18 +77,6 @@ public class AccessControlServiceImpl implements AccessControlService {
 
         String proxyId = accessControlRuleDO.getProxyId();
         accessControlRuleRepository.deleteById(id);
-
-        transactionHelper.afterCommit(() -> {
-            proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
-                AccessControlConfig ac = proxyConfig.getOrCreateAccessControlConfig();
-                switch (accessControlRuleDO.getMode()) {
-                    case ALLOW -> ac.removeAllow(accessControlRuleDO.getCidr());
-                    case DENY -> ac.removeDeny(accessControlRuleDO.getCidr());
-                }
-                proxyConfig.setAccessControl(ac);
-                ipAccessChecker.invalidate(proxyId);
-            });
-        });
     }
 
     @Override
@@ -115,18 +90,6 @@ public class AccessControlServiceImpl implements AccessControlService {
 
         AccessControlRuleDO accessControlRuleDO = accessControlConvert.toRuleDO(param);
         accessControlRuleRepository.save(accessControlRuleDO);
-        //更新缓存
-        transactionHelper.afterCommit(() -> {
-            proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
-                AccessControlConfig ac = proxyConfig.getOrCreateAccessControlConfig();
-                switch (accessControlRuleDO.getMode()) {
-                    case ALLOW -> ac.addAllow(accessControlRuleDO.getCidr());
-                    case DENY -> ac.addDeny(accessControlRuleDO.getCidr());
-                }
-                proxyConfig.setAccessControl(ac);
-                ipAccessChecker.invalidate(proxyId);
-            });
-        });
     }
 
     @Override
@@ -159,23 +122,5 @@ public class AccessControlServiceImpl implements AccessControlService {
         accessControlConvert.updateRuleDO(ruleDO, param);
         accessControlRuleRepository.save(ruleDO);
 
-        AccessControl newRule = ruleDO.getMode();
-        //更新缓存
-        transactionHelper.afterCommit(() -> {
-            proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
-                AccessControlConfig ac = proxyConfig.getOrCreateAccessControlConfig();
-                //删除旧的
-                switch (oldRule) {
-                    case ALLOW -> ac.removeAllow(oldCidr);
-                    case DENY -> ac.removeDeny(oldCidr);
-                }
-                switch (newRule) {
-                    case ALLOW -> ac.addAllow(ruleDO.getCidr());
-                    case DENY -> ac.addDeny(ruleDO.getCidr());
-                }
-                proxyConfig.setAccessControl(ac);
-                ipAccessChecker.invalidate(proxyId);
-            });
-        });
     }
 }

@@ -16,7 +16,6 @@
 
 package com.xiaoniucode.etp.server.service;
 
-import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.service.repository.AgentQueryRepository;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +27,11 @@ import java.util.Optional;
 public class AgentConfigService {
     @Autowired
     private AgentQueryRepository agentQueryRepository;
-    @Autowired
-    private ProxyManager proxyManager;
 
     public Optional<AgentInfo> findById(String agentId) {
         return agentQueryRepository.findById(agentId);
     }
 
     public void remove(String agentId) {
-        proxyManager.unregisterAll(agentId);//下线该客户端所有运行中代理
     }
 }

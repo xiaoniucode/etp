@@ -20,6 +20,7 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.ProxyUpdateEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
+import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,8 @@ public class ProxyUpdateListener implements EventListener<ProxyUpdateEvent> {
     private final Logger logger = LoggerFactory.getLogger(ProxyUpdateListener.class);
     @Autowired
     private EventBus eventBus;
+    @Autowired
+    private ProxyRepository proxyRepository;
     @PostConstruct
     public void init() {
         eventBus.register(this);

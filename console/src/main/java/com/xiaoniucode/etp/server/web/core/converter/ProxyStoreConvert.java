@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.core.repository.converter;
+package com.xiaoniucode.etp.server.web.core.converter;
 
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.TunnelType;
@@ -33,10 +33,6 @@ public interface ProxyStoreConvert {
     List<Target> toTargetDomains(List<ProxyTargetDO> proxyTargetDos);
 
     LoadBalanceConfig toLoadBalanceDomain(LoadBalanceDO loadBalanceDO);
-
-    default BandwidthConfig toBandwidthDomain(BandwidthDO bandwidthDO) {
-        return new BandwidthConfig(bandwidthDO.getLimitTotal(), bandwidthDO.getLimitIn(), bandwidthDO.getLimitOut());
-    }
 
     default TransportCustomConfig toTransportDomain(TransportDO transportDO) {
         TransportCustomConfig tc = new TransportCustomConfig();

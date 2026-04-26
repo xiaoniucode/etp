@@ -24,15 +24,9 @@ import java.util.Optional;
 public interface ProxyQueryRepository {
     Optional<ProxyConfig> findById(String proxyId);
 
-    /**
-     * 查询所有远程端口
-     * @return 远程端口列表
-     */
-    List<Integer> findAllRemotePorts();
-
     List<Integer> findAgentPortsByAgentId(String agentId);
 
-    List<Integer> findAllPorts();
+    List<Integer> findAllListenPorts();
 
     List<ProxyConfig> findByAgentId(String agentId);
 
@@ -41,4 +35,6 @@ public interface ProxyQueryRepository {
     Optional<ProxyConfig> findByRemotePort(int remotePort);
 
     Optional<ProxyConfig> findByDomain(String domain);
+
+    Optional<ProxyConfig> findBySubdomain(String baseDomain, String prefix);
 }

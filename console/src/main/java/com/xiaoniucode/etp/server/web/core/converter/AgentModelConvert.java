@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.core.repository.converter;
+package com.xiaoniucode.etp.server.web.core.converter;
 
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
@@ -24,9 +24,12 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface AgentStoreConvert {
+public interface AgentModelConvert {
     @Mapping(target = "agentId", source = "id")
-    AgentInfo toAgentInfo(AgentDO agentDO);
+    AgentInfo toModel(AgentDO agentDO);
+
+    @Mapping(target = "id", source = "agentId")
+    AgentDO toDO(AgentInfo model);
 
     List<AgentInfo> toAgentInfoList(List<AgentDO> agentDOs);
 }

@@ -16,9 +16,6 @@
 
 package com.xiaoniucode.etp.server.web.service.impl;
 
-import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
-import com.xiaoniucode.etp.core.domain.HttpUser;
-import com.xiaoniucode.etp.server.service.his.ProxyManager;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.basicauth.BasicAuthDetailDTO;
 import com.xiaoniucode.etp.server.web.entity.BasicAuthDO;
@@ -48,8 +45,6 @@ public class BasicAuthServiceImpl implements BasicAuthService {
     @Autowired
     private BasicAuthConvert basicAuthConvert;
     @Autowired
-    private ProxyManager proxyManager;
-    @Autowired
     private TransactionHelper transactionHelper;
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -70,14 +65,6 @@ public class BasicAuthServiceImpl implements BasicAuthService {
                 .orElseThrow(() -> new BizException("Basic Auth 配置不存在"));
         basicAuthDO.setEnabled(request.getEnabled());
         basicAuthRepository.save(basicAuthDO);
-
-        transactionHelper.afterCommit(() -> {
-            proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
-                BasicAuthConfig ba = proxyConfig.getOrCreateBasicAuthConfig();
-                ba.setEnabled(basicAuthDO.getEnabled());
-                proxyConfig.setBasicAuth(ba);
-            });
-        });
     }
 
     @Override
@@ -93,13 +80,6 @@ public class BasicAuthServiceImpl implements BasicAuthService {
         String encode = passwordEncoder.encode(request.getPassword());
         basicUserDO.setPassword(encode);
         basicUserRepository.save(basicUserDO);
-        transactionHelper.afterCommit(() -> {
-            proxyManager.findById(basicAuthDO.getProxyId()).ifPresent(proxyConfig -> {
-                BasicAuthConfig ba = proxyConfig.getOrCreateBasicAuthConfig();
-                HttpUser httpUser = HttpUser.of(basicUserDO.getUsername(), encode);
-                ba.addUser(httpUser);
-            });
-        });
     }
 
     @Override
@@ -131,15 +111,6 @@ public class BasicAuthServiceImpl implements BasicAuthService {
         basicUserDO.setPassword(encode);
         basicAuthConvert.updateUserDO(basicUserDO, param);
         basicUserRepository.save(basicUserDO);
-
-        transactionHelper.afterCommit(() -> {
-            proxyManager.findById(basicUserDO.getProxyId()).ifPresent(proxyConfig -> {
-                BasicAuthConfig ba = proxyConfig.getOrCreateBasicAuthConfig();
-                HttpUser httpUser = HttpUser.of(basicUserDO.getUsername(), encode);
-                ba.removeUser(oldUsername);
-                ba.addUser(httpUser);
-            });
-        });
     }
 
     @Override
@@ -148,12 +119,6 @@ public class BasicAuthServiceImpl implements BasicAuthService {
         BasicUserDO basicUserDO = basicUserRepository.findById(id).orElseThrow(() -> new BizException("用户不存在"));
         String proxyId = basicUserDO.getProxyId();
         basicUserRepository.deleteById(id);
-        transactionHelper.afterCommit(() -> {
-            proxyManager.findById(proxyId).ifPresent(proxyConfig -> {
-                BasicAuthConfig ba = proxyConfig.getOrCreateBasicAuthConfig();
-                ba.removeUser(basicUserDO.getUsername());
-            });
-        });
     }
 }
 

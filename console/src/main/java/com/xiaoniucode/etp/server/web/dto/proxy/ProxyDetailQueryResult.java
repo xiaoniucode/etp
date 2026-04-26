@@ -28,7 +28,6 @@ public class ProxyDetailQueryResult {
     private AgentDO agentDO;
     private ProxyDO proxyDO;
     private TransportDO transportDO;
-    private BandwidthDO bandwidthDO;
     private LoadBalanceDO loadBalanceDO;
     private BasicAuthDO basicAuthDO;
     private AccessControlDO accessControlDO;

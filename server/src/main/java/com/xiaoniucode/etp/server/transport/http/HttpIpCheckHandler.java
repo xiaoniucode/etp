@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.server.transport.http;
 
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
-import com.xiaoniucode.etp.server.service.his.ProxyManager;
+import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.transport.IpCheckHandler;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
 import io.netty.channel.Channel;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class HttpIpCheckHandler extends IpCheckHandler {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(HttpIpCheckHandler.class);
     @Autowired
-    private ProxyManager proxyManager;
+    private ProxyConfigService proxyConfigService;
 
     @Autowired
     public HttpIpCheckHandler(IpAccessChecker ipAccessChecker) {
@@ -31,7 +31,7 @@ public class HttpIpCheckHandler extends IpCheckHandler {
         logger.debug("IP访问控制检查");
         Channel visitor = ctx.channel();
         String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
-        proxyManager.findByDomain(domain)
+        proxyConfigService.findByDomain(domain)
                 .ifPresent(config -> {
                     if (doCheckAccess(visitor, config)) {
                         logger.debug("访问权限检查通过，放行");

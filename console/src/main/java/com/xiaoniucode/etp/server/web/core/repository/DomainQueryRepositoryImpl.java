@@ -22,4 +22,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class DomainQueryRepositoryImpl implements DomainQueryRepository {
 
+    @Override
+    public boolean existsBySubdomain(String baseDomain, String domain) {
+        return false;
+    }
+
+    @Override
+    public boolean existsByDomain(String customDomain) {
+        return false;
+    }
 }

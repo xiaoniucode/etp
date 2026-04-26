@@ -63,7 +63,7 @@ public class AuthSuccessAction extends AgentBaseAction {
                 .addAllTargets(targets)
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
 
-        if (config.isEnabled()) {
+        if (config.getStatus().isOpen()) {
             newProxyBuilder.setEnable(true);
         }
 

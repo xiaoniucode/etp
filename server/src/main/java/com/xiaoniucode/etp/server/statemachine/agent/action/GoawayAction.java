@@ -3,7 +3,6 @@ package com.xiaoniucode.etp.server.statemachine.agent.action;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
-import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.transport.connection.DirectConnectionPool;
@@ -27,8 +26,6 @@ public class GoawayAction extends AgentBaseAction {
     private DirectConnectionPool directConnectionPool;
     @Autowired
     private MultiplexConnectionPool multiplexConnectionPool;
-    @Autowired
-    private ProxyManager proxyManager;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -47,7 +44,6 @@ public class GoawayAction extends AgentBaseAction {
             // 清理隧道资源
             directConnectionPool.offline(agentId);
             multiplexConnectionPool.offline(agentId);
-            proxyManager.unregisterAll(agentId);
             agentManager.removeAgentContext(agentId);
             // 清理代理资源
             //cleanupAgent(agentId);
