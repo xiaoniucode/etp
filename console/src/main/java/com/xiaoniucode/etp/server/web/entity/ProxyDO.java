@@ -74,6 +74,11 @@ public class ProxyDO {
     @Column(name = "remote_port")
     private Integer remotePort;
     /**
+     * 实际监听的端口
+     */
+    @Column(name = "listen_port")
+    private Integer listenPort;
+    /**
      * 部署模式
      */
     @Column(name = "deployment_mode", nullable = false)

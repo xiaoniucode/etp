@@ -17,7 +17,7 @@
 package com.xiaoniucode.etp.server.web.service.converter;
 
 import com.xiaoniucode.etp.server.vhost.DomainInfo;
-import com.xiaoniucode.etp.server.web.entity.HttpProxyDomainDO;
+import com.xiaoniucode.etp.server.web.entity.ProxyDomainDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -27,12 +27,12 @@ import java.util.List;
 public interface ProxyDomainConvert {
     @Mapping(target = "domain", source = "domain")
     @Mapping(target = "proxyId", source = "proxyId")
-    HttpProxyDomainDO toDO(String domain, String proxyId);
+    ProxyDomainDO toDO(String domain, String proxyId);
 
     @Mapping(target = "proxyId", source = "proxyId")
-    HttpProxyDomainDO toDO(DomainInfo domainBinding, String proxyId);
+    ProxyDomainDO toDO(DomainInfo domainBinding, String proxyId);
 
-    default List<HttpProxyDomainDO> toDOList(List<DomainInfo> list, String proxyId) {
+    default List<ProxyDomainDO> toDOList(List<DomainInfo> list, String proxyId) {
         if (list == null || list.isEmpty()) {
             return List.of();
         }

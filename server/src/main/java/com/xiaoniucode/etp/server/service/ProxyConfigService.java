@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.service;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import com.xiaoniucode.etp.server.utils.DomainUtils;
@@ -37,10 +38,6 @@ public class ProxyConfigService {
 
     public Optional<ProxyConfig> findById(String proxyId) {
         return proxyQueryRepository.findById(proxyId);
-    }
-
-    public List<ProxyConfig> findByAgentId(String agentId) {
-        return proxyQueryRepository.findByAgentId(agentId);
     }
 
     public Optional<ProxyConfig> findByDomain(String domain) {
@@ -65,11 +62,11 @@ public class ProxyConfigService {
         return proxyQueryRepository.findByRemotePort(remotePort);
     }
 
-    public List<Integer> getAgentAllPorts(String agentId) {
-        return proxyQueryRepository.findAgentPortsByAgentId(agentId);
-    }
-
     public List<Integer> getAllPorts() {
         return proxyQueryRepository.findAllListenPorts();
+    }
+
+    public List<Integer> findListenPortByAgentIdAndProxyStatus(String agentId, ProxyStatus proxyStatus) {
+        return proxyQueryRepository.findListenPortByAgentIdAndProxyStatus(agentId,proxyStatus);
     }
 }

@@ -22,7 +22,6 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxySourceType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.web.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
@@ -34,7 +33,6 @@ import com.xiaoniucode.etp.server.web.param.proxy.*;
 import com.xiaoniucode.etp.server.web.repository.*;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import com.xiaoniucode.etp.server.web.service.converter.*;
-import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,8 +80,6 @@ public class ProxyServiceImpl implements ProxyService {
     private TransportConvert transportConvert;
     @Autowired
     private LoadBalanceConvert loadBalanceConvert;
-    @Autowired
-    private ProxyConfigAssembler proxyConfigAssembler;
 
     @Resource
     private AppConfig appConfig;
@@ -100,9 +96,6 @@ public class ProxyServiceImpl implements ProxyService {
         }
         //生成代理配置信息
         String proxyId = uidGenerator.getUIDAsString();
-        ProxyConfig proxyConfig = proxyConfigAssembler.toDomain(param);
-        proxyConfig.setProxyId(proxyId);
-        proxyConfig.setSourceType(ProxySourceType.MANUAL);
 
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
         proxyDO.setSourceType(ProxySourceType.MANUAL);
@@ -231,8 +224,8 @@ public class ProxyServiceImpl implements ProxyService {
         Map<String, List<String>> domainsMap = proxyDomainRepository.findByProxyIdIn(proxyIds)
                 .stream()
                 .collect(Collectors.groupingBy(
-                        HttpProxyDomainDO::getProxyId,
-                        Collectors.mapping(HttpProxyDomainDO::getFullDomain, Collectors.toList())
+                        ProxyDomainDO::getProxyId,
+                        Collectors.mapping(ProxyDomainDO::getFullDomain, Collectors.toList())
                 ));
         List<HttpProxyListDTO> res = new ArrayList<>();
         for (Object[] objects : content) {
@@ -252,14 +245,14 @@ public class ProxyServiceImpl implements ProxyService {
 
     @Override
     public HttpProxyDetailDTO getHttpProxyById(String id) {
-        ProxyDetailQueryResult detail = proxyRepository.findProxyDetailByProxyId(id);
+        ProxyDetailQueryResult detail = proxyRepository.findDetailByProxyId(id);
         AgentDO agentDO = detail.getAgentDO();
         ProxyDO proxyDO = detail.getProxyDO();
         TransportDO transportDO = detail.getTransportDO();
         LoadBalanceDO loadBalanceDO = detail.getLoadBalanceDO();
 
         List<ProxyTargetDO> proxyTargetDos = proxyTargetRepository.findByProxyId(id);
-        List<HttpProxyDomainDO> httpProxyDomainDOs = proxyDomainRepository.findByProxyId(id);
+        List<ProxyDomainDO> httpProxyDomainDOs = proxyDomainRepository.findByProxyId(id);
 
         HttpProxyDetailDTO httpProxyDetailDTO = proxyConvert.toHttpDetailDTO(proxyDO, agentDO.getAgentType().getCode());
         TransportDTO transportDTO = transportConvert.toDTO(transportDO);
@@ -273,7 +266,7 @@ public class ProxyServiceImpl implements ProxyService {
         }
 
         httpProxyDetailDTO.setTargets(targetDTOList);
-        List<String> domains = httpProxyDomainDOs.stream().map(HttpProxyDomainDO::getDomain).toList();
+        List<String> domains = httpProxyDomainDOs.stream().map(ProxyDomainDO::getDomain).toList();
         httpProxyDetailDTO.setDomains(domains);
         return httpProxyDetailDTO;
     }
@@ -283,8 +276,6 @@ public class ProxyServiceImpl implements ProxyService {
     public void createTcpProxy(TcpProxyCreateParam param) {
 
         String proxyId = uidGenerator.getUIDAsString();
-        ProxyConfig proxyConfig = proxyConfigAssembler.toDomain(param);
-        proxyConfig.setProxyId(proxyId);
 
         //1.基础信息
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
@@ -372,7 +363,7 @@ public class ProxyServiceImpl implements ProxyService {
 
     @Override
     public TcpProxyDetailDTO getTcpProxyById(String id) {
-        ProxyDetailQueryResult detail = proxyRepository.findProxyDetailByProxyId(id);
+        ProxyDetailQueryResult detail = proxyRepository.findDetailByProxyId(id);
         AgentDO agentDO = detail.getAgentDO();
         ProxyDO proxyDO = detail.getProxyDO();
         TransportDO transportDO = detail.getTransportDO();

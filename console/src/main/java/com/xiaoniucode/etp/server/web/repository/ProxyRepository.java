@@ -56,7 +56,33 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
             LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
             WHERE p.id = :id
             """)
-    ProxyDetailQueryResult findProxyDetailByProxyId(@Param("id") String id);
+    ProxyDetailQueryResult findDetailByProxyId(@Param("id") String id);
+
+    @Query("""
+            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(
+                                       a, p, t,  lb,ba,ac)
+            FROM ProxyDO p
+            LEFT JOIN AgentDO a ON p.agentId = a.id
+            LEFT JOIN TransportDO t ON t.proxyId = p.id
+            LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
+            LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
+            LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
+            WHERE p.remotePort = :remotePort
+            """)
+    ProxyDetailQueryResult findDetailByRemotePort(@Param("remotePort") Integer remotePort);
+
+    @Query("""
+            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(
+                                       a, p, t,  lb,ba,ac)
+            FROM ProxyDO p
+            LEFT JOIN AgentDO a ON p.agentId = a.id
+            LEFT JOIN TransportDO t ON t.proxyId = p.id
+            LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
+            LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
+            LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
+            WHERE a.id=:agentId AND p.name = :proxyName
+            """)
+    ProxyDetailQueryResult findDetailByAgentIdAndProxyName(@Param("agentId") String agentId, @Param("name") String proxyName);
 
 
     @Query("""
@@ -87,4 +113,16 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     Optional<ProxyDO> findByAgentIdAndName(String agentId, String proxyName);
 
     void deleteByIdIn(List<String> ids);
+
+    @Query("""
+            SELECT p.listenPort FROM AgentDO a
+             inner join ProxyDO p ON a.id=p.agentId
+              where p.agentId = :agentId and a.id=:agentId and p.status=:status
+            """)
+    List<Integer> findPortByAgentIdAndProxyStatus(@Param("agentId") String agentId, @Param("status") ProxyStatus status);
+    @Query("""
+            SELECT p.remotePort FROM ProxyDO p
+            """)
+    List<Integer> findAllRemotePorts();
+
 }

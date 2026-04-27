@@ -16,7 +16,7 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
 
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
@@ -41,13 +41,11 @@ public class AgentInitAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.debug("初始化客户端配置信息");
-        List<ProxyConfig> configs = proxyConfigService.findByAgentId(context.getAgentInfo().getAgentId());
+        List<Integer> configs = proxyConfigService.findListenPortByAgentIdAndProxyStatus(context.getAgentInfo().getAgentId(), ProxyStatus.OPEN);
         if (!CollectionUtils.isEmpty(configs)) {
-            configs.forEach(config -> {
-                if (config.getStatus().isOpen()) {
-                    logger.debug("开启TCP代理端口监听: {}", config.getListenPort());
-                    portAcceptor.bindPort(config.getListenPort());
-                }
+            configs.forEach(listenPort -> {
+                logger.debug("开启TCP代理端口监听: {}", listenPort);
+                portAcceptor.bindPort(listenPort);
             });
         }
     }

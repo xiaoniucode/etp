@@ -17,51 +17,96 @@
 package com.xiaoniucode.etp.server.web.core.repository;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
+import com.xiaoniucode.etp.server.web.core.repository.assembler.ProxyConfigAssembler;
+import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
+import com.xiaoniucode.etp.server.web.entity.ProxyDomainDO;
+import com.xiaoniucode.etp.server.web.entity.ProxyTargetDO;
+import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
+import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
+import com.xiaoniucode.etp.server.web.repository.ProxyTargetRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+
 @Repository
 public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
+    @Autowired
+    private ProxyRepository proxyRepository;
+    @Autowired
+    private ProxyConfigAssembler proxyConfigAssembler;
+    @Autowired
+    private ProxyTargetRepository proxyTargetRepository;
+    @Autowired
+    private ProxyDomainRepository proxyDomainRepository;
+
+
     @Override
     public Optional<ProxyConfig> findById(String proxyId) {
-        return Optional.empty();
+        ProxyDetailQueryResult result = proxyRepository.findDetailByProxyId(proxyId);
+        return Optional.of(assembleProxyConfig(result));
     }
 
-
-    @Override
-    public List<Integer> findAgentPortsByAgentId(String agentId) {
-        return List.of();
+    private ProxyConfig assembleProxyConfig(ProxyDetailQueryResult result) {
+        if (result == null) {
+            return null;
+        }
+        ProxyConfig config = proxyConfigAssembler.assembleBase(result);
+        if (config == null) {
+            return null;
+        }
+        List<ProxyTargetDO> targets = proxyTargetRepository.findByProxyId(config.getProxyId());
+        proxyConfigAssembler.assembleTargets(config, targets);
+        if (config.getProtocol().isHttp()) {
+            List<ProxyDomainDO> domainDOs = proxyDomainRepository.findByProxyId(config.getProxyId());
+            proxyConfigAssembler.assembleDomains(config, domainDOs);
+        }
+        return config;
     }
 
     @Override
     public List<Integer> findAllListenPorts() {
-        return List.of();
-    }
-
-    @Override
-    public List<ProxyConfig> findByAgentId(String agentId) {
-        return List.of();
+        return proxyRepository.findAllRemotePorts();
     }
 
     @Override
     public Optional<ProxyConfig> findByAgentAndName(String agentId, String proxyName) {
-        return Optional.empty();
+        ProxyDetailQueryResult result = proxyRepository.findDetailByAgentIdAndProxyName(agentId, proxyName);
+        return Optional.ofNullable(assembleProxyConfig(result));
     }
 
     @Override
     public Optional<ProxyConfig> findByRemotePort(int remotePort) {
-        return Optional.empty();
+        ProxyDetailQueryResult result = proxyRepository.findDetailByRemotePort(remotePort);
+        return Optional.ofNullable(assembleProxyConfig(result));
     }
 
     @Override
     public Optional<ProxyConfig> findByDomain(String domain) {
-        return Optional.empty();
+        Optional<ProxyDomainDO> domainDO = proxyDomainRepository.findByDomain(domain);
+        if (domainDO.isEmpty()) {
+            return Optional.empty();
+        }
+        String proxyId = domainDO.get().getProxyId();
+        return findById(proxyId);
     }
 
     @Override
     public Optional<ProxyConfig> findBySubdomain(String baseDomain, String prefix) {
-        return Optional.empty();
+        Optional<ProxyDomainDO> domainDO = proxyDomainRepository.findByDomainAndBaseDomain(prefix, baseDomain);
+        if (domainDO.isEmpty()) {
+            return Optional.empty();
+        }
+        String proxyId = domainDO.get().getProxyId();
+        return findById(proxyId);
     }
+
+    @Override
+    public List<Integer> findListenPortByAgentIdAndProxyStatus(String agentId, ProxyStatus proxyStatus) {
+        return proxyRepository.findPortByAgentIdAndProxyStatus(agentId, proxyStatus);
+    }
+
 }

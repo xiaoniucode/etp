@@ -63,7 +63,7 @@ public class ProxyConfig implements Serializable {
     @Setter
     private Integer remotePort;
     /**
-     * 如果 remotePort 未指定则自动生成，listenPort为实际端口
+     * 实际监听的端口
      */
     @DiffIgnore
     @Setter

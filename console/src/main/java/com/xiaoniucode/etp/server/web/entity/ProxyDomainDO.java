@@ -26,7 +26,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "http_proxy_domain")
-public class HttpProxyDomainDO {
+public class ProxyDomainDO {
     /**
      * 主键ID
      */

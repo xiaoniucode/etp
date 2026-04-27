@@ -26,24 +26,24 @@ import java.util.List;
 import java.util.Set;
 
 @Mapper(componentModel = "spring")
-public interface ProxyStoreConvert {
+public interface ProxyModelConvert {
     @Mapping(target = "proxyId",source = "id")
-    ProxyConfig toBaseDomain(ProxyDO proxyDO);
+    ProxyConfig toProxyConfig(ProxyDO proxyDO);
 
-    List<Target> toTargetDomains(List<ProxyTargetDO> proxyTargetDos);
+    List<Target> toTargetModel(List<ProxyTargetDO> proxyTargetDos);
 
-    LoadBalanceConfig toLoadBalanceDomain(LoadBalanceDO loadBalanceDO);
+    LoadBalanceConfig toLoadBalanceConfig(LoadBalanceDO loadBalanceDO);
 
-    default TransportCustomConfig toTransportDomain(TransportDO transportDO) {
+    default TransportCustomConfig toTransportConfig(TransportDO transportDO) {
         TransportCustomConfig tc = new TransportCustomConfig();
         tc.setMultiplex(transportDO.getTunnelType() == TunnelType.MULTIPLEX);
         tc.setEncrypt(transportDO.getEncrypt());
         return tc;
     }
 
-    AccessControlConfig toAccessControlDomain(AccessControlDO accessControlDO);
+    AccessControlConfig toAccessControlConfig(AccessControlDO accessControlDO);
 
-    BasicAuthConfig toBasicAuthDomain(BasicAuthDO basicAuthDO);
+    BasicAuthConfig toBasicAuthConfig(BasicAuthDO basicAuthDO);
 
     Set<HttpUser> toBasicUserDomains(List<BasicUserDO> basicUsers);
 }

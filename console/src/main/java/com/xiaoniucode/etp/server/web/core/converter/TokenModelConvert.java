@@ -19,12 +19,11 @@ package com.xiaoniucode.etp.server.web.core.converter;
 import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.web.entity.AccessTokenDO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface TokenStoreConvert {
+public interface TokenModelConvert {
 
     TokenConfig toTokenConfig(AccessTokenDO accessTokenDO);
 

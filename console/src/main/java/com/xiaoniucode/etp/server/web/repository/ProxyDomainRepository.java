@@ -1,5 +1,5 @@
 package com.xiaoniucode.etp.server.web.repository;
-import com.xiaoniucode.etp.server.web.entity.HttpProxyDomainDO;
+import com.xiaoniucode.etp.server.web.entity.ProxyDomainDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,16 +10,18 @@ import java.util.Optional;
  * 代理域名 Repository
  */
 @Repository
-public interface ProxyDomainRepository extends JpaRepository<HttpProxyDomainDO, Integer> {
+public interface ProxyDomainRepository extends JpaRepository<ProxyDomainDO, Integer> {
     void deleteByProxyId(String proxyId);
 
-    List<HttpProxyDomainDO> findByProxyIdIn(List<String> proxyIds);
+    List<ProxyDomainDO> findByProxyIdIn(List<String> proxyIds);
 
-    List<HttpProxyDomainDO> findByProxyId(String id);
+    List<ProxyDomainDO> findByProxyId(String id);
 
     void deleteByProxyIdIn(List<String> ids);
 
-    Optional<HttpProxyDomainDO> findByDomainAndBaseDomain(String domain, String baseDomain);
+    Optional<ProxyDomainDO> findByDomainAndBaseDomain(String domain, String baseDomain);
 
-    Optional<HttpProxyDomainDO> findByDomainAndBaseDomainIsNull(String fullDomain);
+    Optional<ProxyDomainDO> findByDomainAndBaseDomainIsNull(String fullDomain);
+
+    Optional<ProxyDomainDO> findByDomain(String domain);
 }
