@@ -20,11 +20,9 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
-import com.xiaoniucode.etp.server.utils.DomainUtils;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +50,7 @@ public class ProxyConfigService {
         return proxyQueryRepository.findByRemotePort(remotePort);
     }
 
-    public List<Integer> getAllPorts() {
+    public List<Integer> getAllListenPorts() {
         return proxyQueryRepository.findAllListenPorts();
     }
 

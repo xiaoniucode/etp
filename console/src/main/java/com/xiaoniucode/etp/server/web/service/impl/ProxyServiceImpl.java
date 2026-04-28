@@ -322,9 +322,7 @@ public class ProxyServiceImpl implements ProxyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createTcpProxy(TcpProxyCreateParam param) {
-
         String proxyId = uidGenerator.getUIDAsString();
-
         //1.基础信息
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
@@ -332,8 +330,6 @@ public class ProxyServiceImpl implements ProxyService {
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
         proxyDO.setSourceType(ProxySourceType.MANUAL);
         proxyRepository.save(proxyDO);
-
-
         //3.服务列表
         if (proxyDO.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
             throw new BizException("单机服务只能配置一个目标节点");
@@ -355,7 +351,6 @@ public class ProxyServiceImpl implements ProxyService {
         accessControlDO.setMode(AccessControl.DENY);
         accessControlDO.setEnabled(false);
         accessControlRepository.save(accessControlDO);
-
 
         logger.debug("TCP 代理创建成功：{}", proxyDO.getName());
     }

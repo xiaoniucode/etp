@@ -69,7 +69,7 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
 
     @Override
     public List<Integer> findAllListenPorts() {
-        return proxyRepository.findAllRemotePorts();
+        return proxyRepository.findAllListenPorts();
     }
 
     @Override

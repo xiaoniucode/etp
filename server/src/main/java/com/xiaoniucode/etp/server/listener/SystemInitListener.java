@@ -51,7 +51,7 @@ public class SystemInitListener implements EventListener<TunnelServerBindEvent> 
     public void onEvent(TunnelServerBindEvent event) {
         // 端口初始化监听器，在服务器启动时加载所有已配置的端口并添加到PortManager中
         logger.debug("初始化端口管理器，加载已配置的端口");
-        List<Integer> allPorts = proxyConfigService.getAllPorts();
+        List<Integer> allPorts = proxyConfigService.getAllListenPorts();
         for (Integer port : allPorts) {
             portManager.addPort(port);
         }

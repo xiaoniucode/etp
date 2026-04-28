@@ -16,10 +16,7 @@
 
 package com.xiaoniucode.etp.server.vhost;
 
-import com.xiaoniucode.etp.core.domain.RouteConfig;
-import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.server.exceptions.DomainConflictException;
-import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.service.DomainConfigService;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -52,7 +49,7 @@ public class DomainGenerator {
     private String generateRandomDomainPrefix(String baseDomain) {
         for (int i = 0; i < 20; i++) {
             String prefix = generateRandomPrefix();
-            if (!domainConfigService.existsSubdomain(baseDomain, prefix)) {
+            if (!domainConfigService.exists(prefix + "." + baseDomain)) {
                 return prefix;
             }
         }
