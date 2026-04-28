@@ -33,14 +33,6 @@ public class AccessTokenDTO {
      */
     private String token;
     /**
-     * 最大设备数
-     */
-    private Integer maxDevices;
-    /**
-     * 最大连接数
-     */
-    private Integer maxConnections;
-    /**
      * 创建时间
      */
     private LocalDateTime createdAt;

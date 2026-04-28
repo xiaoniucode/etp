@@ -26,7 +26,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface AgentModelConvert {
     @Mapping(target = "agentId", source = "id")
-    AgentInfo toModel(AgentDO agentDO);
+    AgentInfo toAgentInfo(AgentDO agentDO);
 
     @Mapping(target = "id", source = "agentId")
     AgentDO toDO(AgentInfo model);

@@ -42,19 +42,11 @@ public class DomainGenerator {
     /**
      * 子域名生成
      *
-     * @param baseDomain  基础域名
-     * @param routeConfig 域名配置信息
+     * @param baseDomain 基础域名
      * @return 生成的域名绑定列表
      */
-    public List<String> generateSubdomain(String baseDomain, RouteConfig routeConfig) throws DomainConflictException {
-        DomainType domainType = routeConfig.getDomainType();
-        List<String> res = new ArrayList<>();
-        if (domainType == DomainType.CUSTOM_DOMAIN || DomainType.SUBDOMAIN == domainType) {
-            throw new EtpException("不支持自定义域名生成，请直接绑定域名");
-        }
-        String prefix = generateRandomDomainPrefix(baseDomain);
-        res.add(prefix);
-        return res;
+    public String generateSubdomain(String baseDomain) throws DomainConflictException {
+        return generateRandomDomainPrefix(baseDomain);
     }
 
     private String generateRandomDomainPrefix(String baseDomain) {

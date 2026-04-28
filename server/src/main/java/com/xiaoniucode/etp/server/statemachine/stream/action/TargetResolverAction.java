@@ -41,7 +41,7 @@ public class TargetResolverAction extends StreamBaseAction {
         Channel visitor = context.getVisitor();
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
         ProxyConfig config = resolveProxyConfig(context);
-        if (config == null || !config.getStatus().isClosed()) {
+        if (config == null || config.getStatus().isClosed()) {
             logger.debug("代理不可用，关闭流：streamId={}", context.getStreamId());
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;

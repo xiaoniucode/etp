@@ -55,11 +55,7 @@ export function fetchDeleteBatchTokens(ids: number[]) {
  * @param params 创建参数
  * @returns 创建结果
  */
-export function fetchCreateToken(params: {
-  name: string
-  maxDevice: number
-  maxConnection: number
-}) {
+export function fetchCreateToken(params: { name: string }) {
   return request.post({
     url: '/api/access-tokens',
     params
@@ -72,14 +68,7 @@ export function fetchCreateToken(params: {
  * @param params 更新参数
  * @returns 更新结果
  */
-export function fetchUpdateToken(
-  id: number,
-  params: {
-    name: string
-    maxDevice: number
-    maxConnection: number
-  }
-) {
+export function fetchUpdateToken(id: number, params: { name: string }) {
   return request.put({
     url: '/api/access-tokens',
     params: {

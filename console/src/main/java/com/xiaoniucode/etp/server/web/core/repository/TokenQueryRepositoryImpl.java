@@ -17,13 +17,17 @@
 package com.xiaoniucode.etp.server.web.core.repository;
 
 import com.xiaoniucode.etp.server.service.repository.TokenQueryRepository;
+import com.xiaoniucode.etp.server.web.repository.AccessTokenRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class TokenQueryRepositoryImpl implements TokenQueryRepository {
+    @Autowired
+    private AccessTokenRepository accessTokenRepository;
 
     @Override
     public boolean existsByToken(String token) {
-        return false;
+        return accessTokenRepository.existsByToken(token);
     }
 }

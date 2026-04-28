@@ -16,18 +16,16 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.baidu.fsg.uid.UidGenerator;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.enums.AccessControl;
-import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.core.enums.ProxySourceType;
-import com.xiaoniucode.etp.core.enums.ProxyStatus;
+import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.vhost.DomainGenerator;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.*;
 import com.xiaoniucode.etp.server.web.dto.transport.TransportDTO;
 import com.xiaoniucode.etp.server.web.entity.*;
+import com.xiaoniucode.etp.server.web.param.bandwidth.BandwidthSaveParam;
 import com.xiaoniucode.etp.server.web.param.loadbalance.LoadBalanceParam;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
 import com.xiaoniucode.etp.server.web.repository.*;
@@ -85,7 +83,8 @@ public class ProxyServiceImpl implements ProxyService {
     private AppConfig appConfig;
     @Autowired
     private UidGenerator uidGenerator;
-
+    @Autowired
+    private DomainGenerator domainGenerator;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -99,6 +98,10 @@ public class ProxyServiceImpl implements ProxyService {
 
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
         proxyDO.setSourceType(ProxySourceType.MANUAL);
+        BandwidthSaveParam bandwidth = param.getBandwidth();
+        if (bandwidth != null) {
+
+        }
         proxyRepository.save(proxyDO);
         //3.服务列表
         if (proxyDO.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
@@ -115,8 +118,53 @@ public class ProxyServiceImpl implements ProxyService {
         //6.传输
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
         transportRepository.save(transportDO);
-        //7.todo HTTP域名信息
-        proxyDomainRepository.saveAll(new ArrayList<>());
+        //7.HTTP域名信息
+        String baseDomain = appConfig.getBaseDomain();
+        DomainType domainType = proxyDO.getDomainType();
+        if (domainType.isAuto()) {
+            String domain = domainGenerator.generateSubdomain(baseDomain);
+            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain, baseDomain, domainType));
+        } else if (domainType.isCustomDomain()) {
+            Set<String> domains = param.getDomains();
+            List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
+            if (!existsList.isEmpty()) {
+                String existDomains = existsList.stream()
+                        .map(ProxyDomainDO::getDomain)
+                        .collect(Collectors.joining(", "));
+                throw new BizException("以下域名已被使用: " + existDomains);
+            }
+            List<ProxyDomainDO> list = domains.stream()
+                    .map(domain -> new ProxyDomainDO(
+                            proxyId,
+                            domain,
+                            null,
+                            domainType
+                    ))
+                    .toList();
+            proxyDomainRepository.saveAll(list);
+        } else if (domainType.isSubdomain()) {
+            Set<String> prefixes = param.getDomains();
+            List<String> fullDomains = prefixes.stream()
+                    .map(prefix -> prefix + "." + baseDomain)
+                    .toList();
+            List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(fullDomains);
+            if (!existsList.isEmpty()) {
+                String existDomains = existsList.stream()
+                        .map(ProxyDomainDO::getDomain)
+                        .collect(Collectors.joining(", "));
+                throw new BizException("以下子域名已被使用: " + existDomains);
+            }
+            List<ProxyDomainDO> list = prefixes.stream()
+                    .map(prefix -> new ProxyDomainDO(
+                            proxyId,
+                            prefix,
+                            baseDomain,
+                            domainType
+                    ))
+                    .toList();
+            proxyDomainRepository.saveAll(list);
+        }
+
         //init access control
         AccessControlDO accessControlDO = new AccessControlDO();
         accessControlDO.setProxyId(proxyId);
@@ -129,7 +177,7 @@ public class ProxyServiceImpl implements ProxyService {
         basicAuthDO.setProxyId(proxyId);
         basicAuthRepository.save(basicAuthDO);
 
-              logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
+        logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
     }
 
     @Override

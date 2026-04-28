@@ -1,8 +1,10 @@
 package com.xiaoniucode.etp.server.web.repository;
+
 import com.xiaoniucode.etp.server.web.entity.ProxyDomainDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,4 +26,12 @@ public interface ProxyDomainRepository extends JpaRepository<ProxyDomainDO, Inte
     Optional<ProxyDomainDO> findByDomainAndBaseDomainIsNull(String fullDomain);
 
     Optional<ProxyDomainDO> findByDomain(String domain);
+
+    boolean existsByDomainAndBaseDomain(String domain, String baseDomain);
+
+    boolean existsByFullDomain(String domain);
+
+    List<ProxyDomainDO> findByFullDomainIn(Collection<String> domains);
+
+    Optional<ProxyDomainDO> findByFullDomain(String domain);
 }

@@ -19,6 +19,7 @@ import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.server.web.entity.converter.DomainTypeConverter;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 代理域名实体类
@@ -26,6 +27,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "http_proxy_domain")
+@NoArgsConstructor
 public class ProxyDomainDO {
     /**
      * 主键ID
@@ -46,12 +48,23 @@ public class ProxyDomainDO {
 
     @Column(name = "base_domain")
     private String baseDomain;
+
+    @Column(name = "full_domain",nullable = false, unique = true)
+    private String fullDomain;
     /**
      * 域名类型
      */
     @Convert(converter = DomainTypeConverter.class)
     @Column(name = "domain_type")
     private DomainType domainType;
+
+    public ProxyDomainDO(String proxyId, String domain, String baseDomain, DomainType domainType) {
+        this.proxyId = proxyId;
+        this.domain = domain;
+        this.baseDomain = baseDomain;
+        this.domainType = domainType;
+        this.fullDomain = getFullDomain();
+    }
 
     public String getFullDomain() {
         if (domainType == DomainType.CUSTOM_DOMAIN) {

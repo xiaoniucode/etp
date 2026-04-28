@@ -92,8 +92,6 @@ declare namespace Api {
       id: number
       name: string
       token: string
-      maxDevices: number
-      maxConnections: number
       createdAt: string
       updatedAt: string
     }

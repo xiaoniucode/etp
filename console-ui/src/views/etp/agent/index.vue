@@ -88,7 +88,7 @@
         {
           prop: 'id',
           label: '客户端标识',
-          width: 160
+          width: 170
         },
         {
           prop: 'name',

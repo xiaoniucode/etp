@@ -26,12 +26,4 @@ public class AccessTokenCreateParam {
      * 令牌名称
      */
     private String name;
-    /**
-     * 最大设备数
-     */
-    private Integer maxDevices;
-    /**
-     * 最大连接数
-     */
-    private Integer maxConnections;
 }

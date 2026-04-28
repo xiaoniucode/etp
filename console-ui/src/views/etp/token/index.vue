@@ -59,8 +59,6 @@
     id: number
     name: string
     token: string
-    maxDevices: number
-    maxConnections: number
     createdAt: string
     updatedAt: string
   }
@@ -111,16 +109,6 @@
           prop: 'token',
           label: '令牌',
           minWidth: 200
-        },
-        {
-          prop: 'maxDevices',
-          label: '最大设备数',
-          width: 120
-        },
-        {
-          prop: 'maxConnections',
-          label: '最大连接数',
-          width: 120
         },
         {
           prop: 'operation',

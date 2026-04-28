@@ -43,6 +43,7 @@ public class ProxyConfigAssembler {
 
         ProxyConfig config = proxyModelConvert.toProxyConfig(proxyDO);
         config.setAgentId(agentDO.getId());
+        config.setAgentType(agentDO.getAgentType());
         config.setListenPort(config.getRemotePort());
 
         TransportDO transportDO = result.getTransportDO();

@@ -85,18 +85,8 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
     }
 
     @Override
-    public Optional<ProxyConfig> findByDomain(String domain) {
-        Optional<ProxyDomainDO> domainDO = proxyDomainRepository.findByDomain(domain);
-        if (domainDO.isEmpty()) {
-            return Optional.empty();
-        }
-        String proxyId = domainDO.get().getProxyId();
-        return findById(proxyId);
-    }
-
-    @Override
-    public Optional<ProxyConfig> findBySubdomain(String baseDomain, String prefix) {
-        Optional<ProxyDomainDO> domainDO = proxyDomainRepository.findByDomainAndBaseDomain(prefix, baseDomain);
+    public Optional<ProxyConfig> findByFullDomain(String domain) {
+        Optional<ProxyDomainDO> domainDO = proxyDomainRepository.findByFullDomain(domain);
         if (domainDO.isEmpty()) {
             return Optional.empty();
         }

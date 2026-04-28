@@ -26,6 +26,7 @@ logging:
 server:
   servlet:
     context-path: /
+
 jwt:
   secret:
   expiration: 3600
@@ -40,4 +41,3 @@ cache:
     initial-capacity: 10000
     maximum-size: 150000
     expire-after-access: 30m
-

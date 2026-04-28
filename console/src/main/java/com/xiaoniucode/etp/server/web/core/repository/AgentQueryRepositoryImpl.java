@@ -18,14 +18,24 @@ package com.xiaoniucode.etp.server.web.core.repository;
 
 import com.xiaoniucode.etp.server.service.repository.AgentQueryRepository;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
+import com.xiaoniucode.etp.server.web.core.converter.AgentModelConvert;
+import com.xiaoniucode.etp.server.web.entity.AgentDO;
+import com.xiaoniucode.etp.server.web.repository.AgentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
 public class AgentQueryRepositoryImpl implements AgentQueryRepository {
+    @Autowired
+    private AgentRepository agentRepository;
+    @Autowired
+    private AgentModelConvert agentModelConvert;
+
     @Override
     public Optional<AgentInfo> findById(String agentId) {
-        return Optional.empty();
+        Optional<AgentDO> agentDO = agentRepository.findById(agentId);
+        return agentDO.map(aDo -> agentModelConvert.toAgentInfo(aDo));
     }
 }

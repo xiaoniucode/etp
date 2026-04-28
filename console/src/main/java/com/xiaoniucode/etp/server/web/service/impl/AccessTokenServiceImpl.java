@@ -17,7 +17,6 @@ package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
-import com.xiaoniucode.etp.server.web.assembler.TokenAssembler;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.accesstoken.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenBatchDeleteParam;
@@ -47,8 +46,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     @Autowired
     private AccessTokenConvert accessTokenConvert;
     @Autowired
-    private TokenAssembler tokenAssembler;
-    @Autowired
     private TransactionHelper transactionHelper;
 
     @Override
@@ -62,9 +59,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         String token = uuidGenerator.uuid32().toUpperCase();
         accessToken.setToken(token);
         AccessTokenDO save = accessTokenRepository.save(accessToken);
-
-        TokenConfig tokenConfig = tokenAssembler.toDomain(param);
-        tokenConfig.setToken(token);
 
         return accessTokenConvert.toDTO(save);
     }
@@ -99,7 +93,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
             }
             accessTokenConvert.updateDO(accessTokenDO, param);
             accessTokenRepository.save(accessTokenDO);
-            TokenConfig tokenConfig = tokenAssembler.toDomain(param);
         }
     }
 
@@ -109,7 +102,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         Optional<AccessTokenDO> tokenOpt = accessTokenRepository.findById(id);
         if (tokenOpt.isPresent()) {
             accessTokenRepository.deleteById(id);
-            AccessTokenDO accessTokenDO = tokenOpt.get();
         }
     }
 
@@ -118,10 +110,6 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     public void deleteBatch(AccessTokenBatchDeleteParam param) {
         List<Integer> ids = param.getIds();
         if (ids != null && !ids.isEmpty()) {
-            List<AccessTokenDO> tokens = accessTokenRepository.findAllById(ids);
-            List<String> tokenList = tokens.stream()
-                    .map(AccessTokenDO::getToken)
-                    .toList();
             accessTokenRepository.deleteAllById(ids);
         }
     }

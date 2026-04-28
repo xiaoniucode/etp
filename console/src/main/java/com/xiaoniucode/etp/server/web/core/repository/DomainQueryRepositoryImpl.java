@@ -17,18 +17,18 @@
 package com.xiaoniucode.etp.server.web.core.repository;
 
 import com.xiaoniucode.etp.server.service.repository.DomainQueryRepository;
+import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class DomainQueryRepositoryImpl implements DomainQueryRepository {
+    @Autowired
+    private ProxyDomainRepository proxyDomainRepository;
+
 
     @Override
-    public boolean existsBySubdomain(String baseDomain, String domain) {
-        return false;
-    }
-
-    @Override
-    public boolean existsByDomain(String customDomain) {
-        return false;
+    public boolean existsByFullDomain(String fullDomain) {
+        return proxyDomainRepository.existsByFullDomain(fullDomain);
     }
 }

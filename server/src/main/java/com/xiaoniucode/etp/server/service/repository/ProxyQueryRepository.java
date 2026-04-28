@@ -31,9 +31,7 @@ public interface ProxyQueryRepository {
 
     Optional<ProxyConfig> findByRemotePort(int remotePort);
 
-    Optional<ProxyConfig> findByDomain(String domain);
-
-    Optional<ProxyConfig> findBySubdomain(String baseDomain, String prefix);
+    Optional<ProxyConfig> findByFullDomain(String domain);
 
     List<Integer> findListenPortByAgentIdAndProxyStatus(String agentId, ProxyStatus proxyStatus);
 }

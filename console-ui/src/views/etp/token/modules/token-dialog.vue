@@ -15,12 +15,6 @@
       <ElFormItem label="令牌名称" prop="name">
         <ElInput v-model="formData.name" placeholder="请输入令牌名称" />
       </ElFormItem>
-      <ElFormItem label="最大设备数" prop="maxDevices">
-        <ElInputNumber v-model="formData.maxDevices" :min="1" :max="1000" />
-      </ElFormItem>
-      <ElFormItem label="最大连接数" prop="maxConnections">
-        <ElInputNumber v-model="formData.maxConnections" :min="1" :max="10000" />
-      </ElFormItem>
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
@@ -64,38 +58,28 @@
   const formData = reactive({
     id: undefined as number | undefined,
     token: '',
-    name: '',
-    maxDevices: 3,
-    maxConnections: 3
+    name: ''
   })
 
   const rules: FormRules = {
-    name: [{ required: true, message: '请输入令牌名称', trigger: 'blur' }],
-    maxDevices: [{ required: true, message: '请输入最大设备数', trigger: 'blur' }],
-    maxConnections: [{ required: true, message: '请输入最大连接数', trigger: 'blur' }]
+    name: [{ required: true, message: '请输入令牌名称', trigger: 'blur' }]
   }
 
   const initFormData = async () => {
     if (props.type === 'add') {
-      // 重置表单
       Object.assign(formData, {
         id: undefined,
         token: '',
-        name: '',
-        maxDevices: 3,
-        maxConnections: 3
+        name: ''
       })
     } else if (props.type === 'edit' && props.tokenId) {
-      // 根据 ID 获取详情
       loading.value = true
       try {
         const data = await fetchGetTokenById(props.tokenId)
         Object.assign(formData, {
           id: data.id,
           token: data.token || '',
-          name: data.name || '',
-          maxDevices: data.maxDevices || 3,
-          maxConnections: data.maxConnections || 3
+          name: data.name || ''
         })
       } catch (error) {
         console.error('获取令牌详情失败:', error)
@@ -127,17 +111,13 @@
         try {
           if (dialogType.value === 'add') {
             await fetchCreateToken({
-              name: formData.name,
-              maxDevices: formData.maxDevices,
-              maxConnections: formData.maxConnections
+              name: formData.name
             })
             ElMessage.success('创建成功')
           } else {
             if (formData.id) {
               await fetchUpdateToken(formData.id, {
-                name: formData.name,
-                maxDevices: formData.maxDevices,
-                maxConnections: formData.maxConnections
+                name: formData.name
               })
               ElMessage.success('更新成功')
             }

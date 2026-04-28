@@ -41,17 +41,7 @@ public class ProxyConfigService {
     }
 
     public Optional<ProxyConfig> findByDomain(String domain) {
-        String baseDomain = appConfig.getBaseDomain();
-
-        if (!StringUtils.hasText(baseDomain)) {
-            return proxyQueryRepository.findByDomain(domain);
-        }
-        String prefix = DomainUtils.extractPrefix(domain, baseDomain);
-
-        if (prefix == null) {
-            return proxyQueryRepository.findByDomain(domain);
-        }
-        return proxyQueryRepository.findBySubdomain(baseDomain, prefix);
+        return proxyQueryRepository.findByFullDomain(domain);
     }
 
     public Optional<ProxyConfig> findByAgentAndName(String agentId, String proxyName) {
@@ -67,6 +57,6 @@ public class ProxyConfigService {
     }
 
     public List<Integer> findListenPortByAgentIdAndProxyStatus(String agentId, ProxyStatus proxyStatus) {
-        return proxyQueryRepository.findListenPortByAgentIdAndProxyStatus(agentId,proxyStatus);
+        return proxyQueryRepository.findListenPortByAgentIdAndProxyStatus(agentId, proxyStatus);
     }
 }

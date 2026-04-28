@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.assembler;
+package com.xiaoniucode.etp.server.web.core.repository.assembler;
 
 import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenCreateParam;
@@ -24,14 +24,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenAssembler {
 
-    public TokenConfig toDomain(AccessTokenCreateParam param) {
+    public TokenConfig toTokenConfig(AccessTokenCreateParam param) {
         return new TokenConfig(
                 param.getName(),
                 null
         );
     }
 
-    public TokenConfig toDomain(AccessTokenUpdateParam param) {
+    public TokenConfig toTokenConfig(AccessTokenUpdateParam param) {
         return new TokenConfig(
                 param.getName(),
                 null
