@@ -274,16 +274,16 @@ public class ProxyServiceImpl implements ProxyService {
             }
         }
 
-        Page<Object[]> resultPage = proxyRepository.findProxiesWithAssociations(queryKey, ProtocolType.HTTP, pageable);
+        Page<ProxyListQueryResult> resultPage = proxyRepository.findProxiesWithAssociations(queryKey, ProtocolType.HTTP, pageable);
 
         if (resultPage.isEmpty()) {
             return PageResult.empty(page, size);
         }
         int httpProxyPort = appConfig.getHttpProxyPort();
-        List<Object[]> content = resultPage.getContent();
+        List<ProxyListQueryResult> content = resultPage.getContent();
 
         List<String> proxyIds = content.stream()
-                .map(row -> (ProxyDO) row[0])
+                .map(ProxyListQueryResult::getProxyDO)
                 .map(ProxyDO::getId)
                 .collect(Collectors.toList());
         Map<String, List<String>> domainsMap = proxyDomainRepository.findByProxyIdIn(proxyIds)
@@ -292,16 +292,20 @@ public class ProxyServiceImpl implements ProxyService {
                         ProxyDomainDO::getProxyId,
                         Collectors.mapping(ProxyDomainDO::getFullDomain, Collectors.toList())
                 ));
+        Map<String, List<ProxyTargetDO>> targetsMap = proxyTargetRepository.findByProxyIdIn(proxyIds)
+                .stream()
+                .collect(java.util.stream.Collectors.groupingBy(ProxyTargetDO::getProxyId));
         List<HttpProxyListDTO> res = new ArrayList<>();
-        for (Object[] objects : content) {
-            ProxyDO proxyDO = (ProxyDO) objects[0];
-            AgentDO agentDO = (AgentDO) objects[1];
+        for (ProxyListQueryResult r : content) {
+            ProxyDO proxyDO = r.getProxyDO();
+            AgentDO agentDO = r.getAgentDO();
             HttpProxyListDTO httpDTO = proxyConvert.toHttpListDTO(proxyDO, httpProxyPort);
 
             if (agentDO != null && agentDO.getAgentType() != null) {
                 httpDTO.setAgentType(agentDO.getAgentType().getCode());
             }
             httpDTO.setDomains(domainsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
+            httpDTO.setTargets(proxyTargetConvert.toDTOList(targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList())));
             httpDTO.setHttpProxyPort(httpProxyPort);
             res.add(httpDTO);
         }
@@ -462,20 +466,27 @@ public class ProxyServiceImpl implements ProxyService {
                 queryKey = "%" + keyword.trim() + "%";
             }
         }
-        Page<Object[]> resultPage = proxyRepository.findProxiesWithAssociations(queryKey, ProtocolType.TCP, pageable);
+        Page<ProxyListQueryResult> resultPage = proxyRepository.findProxiesWithAssociations(queryKey, ProtocolType.TCP, pageable);
         if (resultPage.isEmpty()) {
             return PageResult.empty(page, size);
         }
-        List<Object[]> content = resultPage.getContent();
+        List<ProxyListQueryResult> content = resultPage.getContent();
+        List<String> proxyIds = content.stream()
+                .map(ProxyListQueryResult::getProxyDO)
+                .map(ProxyDO::getId)
+                .toList();
+        Map<String, List<ProxyTargetDO>> targetsMap = proxyTargetRepository.findByProxyIdIn(proxyIds)
+                .stream()
+                .collect(java.util.stream.Collectors.groupingBy(ProxyTargetDO::getProxyId));
         List<TcpProxyListDTO> res = new ArrayList<>();
-        for (Object[] objects : content) {
-            ProxyDO proxyDO = (ProxyDO) objects[0];
-            AgentDO agentDO = (AgentDO) objects[1];
-
+        for (ProxyListQueryResult r : content) {
+            ProxyDO proxyDO = r.getProxyDO();
+            AgentDO agentDO = r.getAgentDO();
             TcpProxyListDTO tcpListDTO = proxyConvert.toTcpListDTO(proxyDO);
             if (agentDO != null && agentDO.getAgentType() != null) {
                 tcpListDTO.setAgentType(agentDO.getAgentType().getCode());
             }
+            tcpListDTO.setTargets(proxyTargetConvert.toDTOList(targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList())));
             res.add(tcpListDTO);
         }
         return PageResult.wrap(resultPage, res);

@@ -19,6 +19,7 @@ package com.xiaoniucode.etp.server.web.dto.proxy;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class ProxyListDTO implements Serializable {
@@ -28,4 +29,5 @@ public class ProxyListDTO implements Serializable {
     private Integer protocol;
     private Integer agentType;
     private Integer status;
+    private List<TargetDTO> targets;
 }

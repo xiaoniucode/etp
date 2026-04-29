@@ -13,16 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.xiaoniucode.etp.server.web.dto.proxy;
 
+import com.xiaoniucode.etp.server.web.entity.AgentDO;
+import com.xiaoniucode.etp.server.web.entity.ProxyDO;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class TcpProxyListDTO extends ProxyListDTO implements Serializable {
-    private Integer remotePort;
-
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProxyListQueryResult {
+    private AgentDO agentDO;
+    private ProxyDO proxyDO;
 }

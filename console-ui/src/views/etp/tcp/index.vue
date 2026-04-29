@@ -66,7 +66,7 @@
   import TcpDialog from './modules/tcp-dialog.vue'
   import AccessControlDialog from '../modules/access-control-dialog.vue'
   import MetricsDialog from '../modules/metrics-dialog.vue'
-  import { ElTag, ElMessage, ElMessageBox } from 'element-plus'
+  import { ElTag, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
   import { DialogType } from '@/types'
 
   defineOptions({ name: 'TcpPenetration' })
@@ -79,6 +79,14 @@
     agentType: number
     status: number
     remotePort: number
+    targets: Array<{
+      id: number
+      proxyId: string
+      host: string
+      port: number
+      weight: number
+      name: string
+    }>
   }
 
   // 选中行
@@ -104,8 +112,8 @@
 
   const getProxyStatusConfig = (status: number) => {
     return status === 1
-      ? { type: 'success' as const, text: '运行中' }
-      : { type: 'info' as const, text: '已停止' }
+      ? { type: 'success' as const, text: '开启' }
+      : { type: 'info' as const, text: '关闭' }
   }
 
   const {
@@ -138,27 +146,33 @@
         {
           prop: 'name',
           label: '代理名称',
-          minWidth: 120
+          minWidth: 100
         },
         {
           prop: 'remotePort',
           label: '远程端口',
-          width: 120
+          width: 90
         },
         {
-          prop: 'agentType',
-          label: '客户端类型',
-          width: 120,
+          prop: 'targets',
+          label: '目标服务',
+          minWidth: 150,
           formatter: (row: TcpProxyItem) => {
-            return h(ElTag, { type: row.agentType === 1 ? 'primary' : 'warning' }, () =>
-              row.agentType === 1 ? 'BINARY' : 'SESSION'
+            if (!row.targets || row.targets.length === 0) {
+              return ''
+            }
+            return h(ElSpace, { direction: 'horizontal', size: 4, wrap: true }, () =>
+              row.targets.map((target) => {
+                const text = `${target.host}:${target.port}`
+                return h(ElTag, { type: 'primary', size: 'small' }, () => text)
+              })
             )
           }
         },
         {
           prop: 'status',
           label: '状态',
-          width: 120,
+          width: 80,
           formatter: (row: TcpProxyItem) => {
             const statusConfig = getProxyStatusConfig(row.status)
             return h(ElTag, { type: statusConfig.type }, () => statusConfig.text)

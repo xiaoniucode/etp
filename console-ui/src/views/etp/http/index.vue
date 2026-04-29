@@ -74,7 +74,7 @@
   import AccessControlDialog from '../modules/access-control-dialog.vue'
   import BasicAuthDialog from './modules/basic-auth-dialog.vue'
   import MetricsDialog from '../modules/metrics-dialog.vue'
-  import { ElTag, ElMessage, ElMessageBox } from 'element-plus'
+  import { ElTag, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
   import { DialogType } from '@/types'
 
   defineOptions({ name: 'HttpPenetration' })
@@ -88,6 +88,14 @@
     status: number
     domains: string[]
     httpProxyPort: number
+    targets: Array<{
+      id: number
+      proxyId: string
+      host: string
+      port: number
+      weight: number
+      name: string
+    }>
   }
 
   // 选中行
@@ -117,8 +125,8 @@
 
   const getProxyStatusConfig = (status: number) => {
     return status === 1
-      ? { type: 'success' as const, text: '运行中' }
-      : { type: 'info' as const, text: '已停止' }
+      ? { type: 'success' as const, text: '开启' }
+      : { type: 'info' as const, text: '关闭' }
   }
   const {
     columns,
@@ -146,40 +154,56 @@
         {
           prop: 'name',
           label: '代理名称',
-          minWidth: 120
+          minWidth: 80
         },
         {
           prop: 'domains',
-          label: '域名',
-          minWidth: 200,
+          label: '访问域名',
+          minWidth: 150,
           formatter: (row: HttpProxyItem) => {
             if (!row.domains || row.domains.length === 0) {
               return ''
             }
-            return row.domains
-              .map((domain) => {
-                if (row.httpProxyPort && row.httpProxyPort !== 80) {
-                  return `${domain}:${row.httpProxyPort}`
-                }
-                return domain
+            return h(ElSpace, { direction: 'horizontal', size: 4, wrap: true }, () =>
+              row.domains.map((domain) => {
+                const fullDomain =
+                  row.httpProxyPort && row.httpProxyPort !== 80
+                    ? `${domain}:${row.httpProxyPort}`
+                    : domain
+                return h(
+                  ElTag,
+                  {
+                    type: 'warning',
+                    size: 'small',
+                    style: 'cursor: pointer;',
+                    onClick: () => window.open(`http://${fullDomain}`, '_blank')
+                  },
+                  () => domain
+                )
               })
-              .join(', ')
+            )
           }
         },
         {
-          prop: 'agentType',
-          label: '客户端类型',
-          width: 120,
+          prop: 'targets',
+          label: '目标服务',
+          minWidth: 150,
           formatter: (row: HttpProxyItem) => {
-            return h(ElTag, { type: row.agentType === 1 ? 'primary' : 'warning' }, () =>
-              row.agentType === 1 ? 'BINARY' : 'SESSION'
+            if (!row.targets || row.targets.length === 0) {
+              return ''
+            }
+            return h(ElSpace, { direction: 'horizontal', size: 4, wrap: true }, () =>
+              row.targets.map((target) => {
+                const text = `${target.host}:${target.port}`
+                return h(ElTag, { type: 'primary', size: 'small' }, () => text)
+              })
             )
           }
         },
         {
           prop: 'status',
           label: '状态',
-          width: 100,
+          width: 80,
           formatter: (row: HttpProxyItem) => {
             const statusConfig = getProxyStatusConfig(row.status)
             return h(ElTag, { type: statusConfig.type }, () => statusConfig.text)
@@ -188,7 +212,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 400,
+          width: 390,
           fixed: 'right',
           formatter: (row: HttpProxyItem) =>
             h('div', [

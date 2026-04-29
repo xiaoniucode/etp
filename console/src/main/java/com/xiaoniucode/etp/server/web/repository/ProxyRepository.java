@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.web.repository;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
+import com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult;
 import com.xiaoniucode.etp.server.web.dto.stats.ProxyProtocolCountDTO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import jakarta.persistence.Tuple;
@@ -27,7 +28,8 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     boolean existsByAgentIdAndNameAndIdNot(String agentId, String name, String id);
 
     @Query("""
-            SELECT p, a
+            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult(
+                                       a, p)
             FROM ProxyDO p
             LEFT JOIN AgentDO a ON a.id = p.agentId
             WHERE p.protocol = :protocolType
@@ -39,7 +41,7 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
               )
             ORDER BY p.updatedAt DESC
             """)
-    Page<Object[]> findProxiesWithAssociations(
+    Page<ProxyListQueryResult> findProxiesWithAssociations(
             @Param("keyword") String keyword,
             @Param("protocolType") ProtocolType protocolType,
             Pageable pageable
@@ -83,7 +85,6 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
             WHERE a.id=:agentId AND p.name = :proxyName
             """)
     ProxyDetailQueryResult findDetailByAgentIdAndProxyName(@Param("agentId") String agentId, @Param("name") String proxyName);
-
 
     @Query("""
             SELECT 
