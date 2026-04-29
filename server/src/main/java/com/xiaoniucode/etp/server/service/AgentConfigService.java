@@ -31,7 +31,4 @@ public class AgentConfigService {
     public Optional<AgentInfo> findById(String agentId) {
         return agentQueryRepository.findById(agentId);
     }
-
-    public void remove(String agentId) {
-    }
 }

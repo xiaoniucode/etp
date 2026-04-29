@@ -19,25 +19,23 @@ package com.xiaoniucode.etp.server.event;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.notify.Event;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
 @Getter
-public class ProxyCreateEvent extends Event {
+public class ProxyReportEvent extends Event {
     private final AgentInfo agentInfo;
     private final ProxyConfig proxyConfig;
     private List<String> subdomains;
+    private boolean isUpdate;
 
-    public ProxyCreateEvent(AgentInfo agentInfo, ProxyConfig proxyConfig) {
+    public ProxyReportEvent(AgentInfo agentInfo, ProxyConfig proxyConfig) {
         this.agentInfo = agentInfo;
         this.proxyConfig = proxyConfig;
     }
 
-    public ProxyCreateEvent(AgentInfo agentInfo, List<String> subdomains, ProxyConfig proxyConfig) {
+    public ProxyReportEvent(AgentInfo agentInfo, List<String> subdomains, ProxyConfig proxyConfig) {
         this.agentInfo = agentInfo;
         this.subdomains = subdomains;
         this.proxyConfig = proxyConfig;

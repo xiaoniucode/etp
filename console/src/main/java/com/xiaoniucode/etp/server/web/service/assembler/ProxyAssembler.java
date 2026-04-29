@@ -14,27 +14,20 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.core.repository.assembler;
+package com.xiaoniucode.etp.server.web.service.assembler;
 
-import com.xiaoniucode.etp.server.config.domain.TokenConfig;
-import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenCreateParam;
-import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenUpdateParam;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.server.web.core.converter.ProxyModelConvert;
+import com.xiaoniucode.etp.server.web.entity.ProxyDO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TokenAssembler {
-
-    public TokenConfig toTokenConfig(AccessTokenCreateParam param) {
-        return new TokenConfig(
-                param.getName(),
-                null
-        );
-    }
-
-    public TokenConfig toTokenConfig(AccessTokenUpdateParam param) {
-        return new TokenConfig(
-                param.getName(),
-                null
-        );
+public class ProxyAssembler {
+@Autowired
+private ProxyModelConvert proxyModelConvert;
+    public ProxyConfig toProxyConfig(ProxyDO proxyDO) {
+        ProxyConfig proxyConfig = proxyModelConvert.toProxyConfig(proxyDO);
+        return proxyConfig;
     }
 }

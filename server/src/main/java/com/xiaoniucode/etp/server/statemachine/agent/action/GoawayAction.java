@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.statemachine.agent.action;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.transport.connection.DirectConnectionPool;
@@ -26,6 +27,8 @@ public class GoawayAction extends AgentBaseAction {
     private DirectConnectionPool directConnectionPool;
     @Autowired
     private MultiplexConnectionPool multiplexConnectionPool;
+    @Autowired
+    private ProxyManager proxyManager;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -45,6 +48,8 @@ public class GoawayAction extends AgentBaseAction {
             directConnectionPool.offline(agentId);
             multiplexConnectionPool.offline(agentId);
             agentManager.removeAgentContext(agentId);
+
+            proxyManager.onAgentOffline(agentId);
             // 清理代理资源
             //cleanupAgent(agentId);
 
@@ -53,7 +58,7 @@ public class GoawayAction extends AgentBaseAction {
 
             // 清理Context 中的临时数据
             //cleanupContextData(context);
-            if (event==AgentEvent.LOCAL_GOAWAY){
+            if (event == AgentEvent.LOCAL_GOAWAY) {
                 Channel control = context.getControl();
                 control.writeAndFlush(new TMSPFrame(0, TMSP.MSG_GOAWAY)).addListener((ChannelFutureListener) future -> {
                     if (!future.isSuccess()) {

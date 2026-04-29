@@ -16,8 +16,10 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.baidu.fsg.uid.UidGenerator;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
@@ -30,7 +32,9 @@ import com.xiaoniucode.etp.server.web.param.loadbalance.LoadBalanceParam;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
 import com.xiaoniucode.etp.server.web.repository.*;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
+import com.xiaoniucode.etp.server.web.service.assembler.ProxyAssembler;
 import com.xiaoniucode.etp.server.web.service.converter.*;
+import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,13 +82,18 @@ public class ProxyServiceImpl implements ProxyService {
     private TransportConvert transportConvert;
     @Autowired
     private LoadBalanceConvert loadBalanceConvert;
-
+    @Autowired
+    private ProxyAssembler proxyAssembler;
     @Resource
     private AppConfig appConfig;
     @Autowired
     private UidGenerator uidGenerator;
     @Autowired
     private DomainGenerator domainGenerator;
+    @Autowired
+    private ProxyManager proxyManager;
+    @Autowired
+    private TransactionHelper transactionHelper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -93,6 +102,7 @@ public class ProxyServiceImpl implements ProxyService {
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
         }
+
         //生成代理配置信息
         String proxyId = uidGenerator.getUIDAsString();
 
@@ -177,6 +187,11 @@ public class ProxyServiceImpl implements ProxyService {
         basicAuthDO.setProxyId(proxyId);
         basicAuthRepository.save(basicAuthDO);
 
+        if (proxyDO.getStatus().isOpen()) {
+            transactionHelper.afterCommit(() ->
+                    proxyManager.activate(proxyAssembler.toProxyConfig(proxyDO)));
+        }
+
         logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
     }
 
@@ -232,6 +247,8 @@ public class ProxyServiceImpl implements ProxyService {
 //            List<HttpProxyDomainDO> domainList = proxyDomainConvert.toDOList(boundDomains, proxyId);
 //            proxyDomainRepository.saveAll(domainList);
 //        }
+        transactionHelper.afterCommit(() ->
+                proxyManager.reconcile(proxyAssembler.toProxyConfig(proxyDO)));
         logger.debug("HTTP代理更新成功：{}", proxyDO.getName());
     }
 
@@ -328,6 +345,7 @@ public class ProxyServiceImpl implements ProxyService {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
         }
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
+        proxyDO.setListenPort(param.getRemotePort());
         proxyDO.setSourceType(ProxySourceType.MANUAL);
         proxyRepository.save(proxyDO);
         //3.服务列表
@@ -352,6 +370,10 @@ public class ProxyServiceImpl implements ProxyService {
         accessControlDO.setEnabled(false);
         accessControlRepository.save(accessControlDO);
 
+        if (proxyDO.getStatus().isOpen()) {
+            transactionHelper.afterCommit(() ->
+                    proxyManager.activate(proxyAssembler.toProxyConfig(proxyDO)));
+        }
         logger.debug("TCP 代理创建成功：{}", proxyDO.getName());
     }
 
@@ -494,6 +516,8 @@ public class ProxyServiceImpl implements ProxyService {
         basicUserRepository.deleteByProxyIdIn(ids);
         // Base
         proxyRepository.deleteByIdIn(ids);
+        //清空运行时数据
+        transactionHelper.afterCommit(() -> proxyManager.deactivates(ids));
         logger.debug("批量删除代理成功，数量: {}", ids.size());
     }
 

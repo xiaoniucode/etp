@@ -15,38 +15,39 @@
  */
 
 package com.xiaoniucode.etp.server.web.core.listener.persistence;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
+
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
-import com.xiaoniucode.etp.server.event.ProxyUpdateEvent;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
-import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
+import com.xiaoniucode.etp.server.event.ProxyReportEvent;
+import com.xiaoniucode.etp.server.web.service.ProxyService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 /**
- * 代理配置更新事件处理
+ * 代理配置创建事件处理，用于持久化代理客户端注册的代理配置信息
  */
 @Component
-public class ProxyUpdateListener implements EventListener<ProxyUpdateEvent> {
-    private final Logger logger = LoggerFactory.getLogger(ProxyUpdateListener.class);
+public class ProxyReportListener implements EventListener<ProxyReportEvent> {
+    private final Logger logger = LoggerFactory.getLogger(ProxyReportListener.class);
     @Autowired
     private EventBus eventBus;
     @Autowired
-    private ProxyRepository proxyRepository;
+    private ProxyService proxyService;
+
     @PostConstruct
     public void init() {
         eventBus.register(this);
     }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void onEvent(ProxyUpdateEvent event) {
-        logger.debug("Received ProxyUpdateEvent: {}", event);
-        AgentInfo agentInfo = event.getAgentInfo();
-        ProxyConfig proxyConfig = event.getProxyConfig();
+    public void onEvent(ProxyReportEvent event) {
 
+
+        logger.debug("Received ProxyCreateEvent: {}", event);
     }
 }

@@ -57,4 +57,13 @@ public class ProxyConfigService {
     public List<Integer> findListenPortByAgentIdAndProxyStatus(String agentId, ProxyStatus proxyStatus) {
         return proxyQueryRepository.findListenPortByAgentIdAndProxyStatus(agentId, proxyStatus);
     }
+    public void evictByAgentId(String agentId){
+
+    }
+    public void evictByProxyId(String proxyId){
+
+    }
+    public void evictAll(){
+
+    }
 }
