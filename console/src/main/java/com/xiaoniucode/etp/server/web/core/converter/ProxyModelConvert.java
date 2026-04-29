@@ -46,4 +46,6 @@ public interface ProxyModelConvert {
     BasicAuthConfig toBasicAuthConfig(BasicAuthDO basicAuthDO);
 
     Set<HttpUser> toBasicUserDomains(List<BasicUserDO> basicUsers);
+    @Mapping(target = "proxyId",source = "id")
+    List<ProxyConfig> toProxyConfig(List<ProxyDO> proxyDOS);
 }

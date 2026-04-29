@@ -33,5 +33,5 @@ public interface ProxyQueryRepository {
 
     Optional<ProxyConfig> findByFullDomain(String domain);
 
-    List<Integer> findListenPortByAgentIdAndProxyStatus(String agentId, ProxyStatus proxyStatus);
+    List<ProxyConfig> findByAgentId(String agentId);
 }

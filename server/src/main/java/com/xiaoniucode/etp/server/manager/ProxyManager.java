@@ -84,7 +84,7 @@ public class ProxyManager {
      * @throws EtpException
      */
     public void deactivate(String proxyId) {
-        logger.debug("激活代理: {}", proxyId);
+        logger.debug("停用代理: {}", proxyId);
         Integer listenPort = portMap.remove(proxyId);
         if (listenPort != null) {
             shutdownPortResources(listenPort);

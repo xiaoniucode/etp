@@ -124,4 +124,5 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     @Query("SELECT p.listenPort FROM ProxyDO p WHERE p.listenPort IS NOT NULL")
     List<Integer> findAllListenPorts();
 
+    List<ProxyDO> findByAgentId(String agentId);
 }

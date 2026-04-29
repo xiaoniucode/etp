@@ -16,8 +16,8 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
 
-import com.xiaoniucode.etp.core.enums.ProxyStatus;
-import com.xiaoniucode.etp.server.port.PortAcceptor;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
@@ -36,16 +36,18 @@ public class AgentInitAction extends AgentBaseAction {
     @Autowired
     private ProxyConfigService proxyConfigService;
     @Autowired
-    private PortAcceptor portAcceptor;
+    private ProxyManager proxyManager;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.debug("初始化客户端配置信息");
-        List<Integer> configs = proxyConfigService.findListenPortByAgentIdAndProxyStatus(context.getAgentInfo().getAgentId(), ProxyStatus.OPEN);
+        List<ProxyConfig> configs = proxyConfigService.findByAgentId(context.getAgentInfo().getAgentId());
         if (!CollectionUtils.isEmpty(configs)) {
-            configs.forEach(listenPort -> {
-                logger.debug("开启TCP代理端口监听: {}", listenPort);
-                portAcceptor.bindPort(listenPort);
+            configs.forEach(config -> {
+                if (config.getStatus().isOpen()) {
+                    logger.debug("激活代理配置: {}", config);
+                    proxyManager.activate(config);
+                }
             });
         }
     }

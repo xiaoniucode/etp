@@ -53,10 +53,6 @@ public class ProxyConfigService {
     public List<Integer> getAllListenPorts() {
         return proxyQueryRepository.findAllListenPorts();
     }
-
-    public List<Integer> findListenPortByAgentIdAndProxyStatus(String agentId, ProxyStatus proxyStatus) {
-        return proxyQueryRepository.findListenPortByAgentIdAndProxyStatus(agentId, proxyStatus);
-    }
     public void evictByAgentId(String agentId){
 
     }
@@ -65,5 +61,9 @@ public class ProxyConfigService {
     }
     public void evictAll(){
 
+    }
+
+    public List<ProxyConfig> findByAgentId(String agentId) {
+        return proxyQueryRepository.findByAgentId(agentId);
     }
 }

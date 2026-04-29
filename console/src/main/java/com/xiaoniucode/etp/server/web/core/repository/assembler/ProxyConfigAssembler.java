@@ -87,4 +87,8 @@ public class ProxyConfigAssembler {
         }
         config.setRouteConfig(routeConfig);
     }
+
+    public List<ProxyConfig> assembleList(List<ProxyDO> list) {
+        return proxyModelConvert.toProxyConfig(list);
+    }
 }

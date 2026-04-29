@@ -50,6 +50,7 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
         BandwidthLimiter limiter = streamContext.getBandwidthLimiter();
         if (limiter == null) {
             logger.debug("没有配置限速");
+            ctx.fireChannelRead(payload.retain());
             return;
         }
         if (limiter.tryUpload(payload)) {

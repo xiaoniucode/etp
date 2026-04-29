@@ -21,6 +21,7 @@ import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import com.xiaoniucode.etp.server.web.core.repository.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
+import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDomainDO;
 import com.xiaoniucode.etp.server.web.entity.ProxyTargetDO;
 import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
@@ -95,8 +96,8 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
     }
 
     @Override
-    public List<Integer> findListenPortByAgentIdAndProxyStatus(String agentId, ProxyStatus proxyStatus) {
-        return proxyRepository.findPortByAgentIdAndProxyStatus(agentId, proxyStatus);
+    public List<ProxyConfig> findByAgentId(String agentId) {
+        List<ProxyDO> list = proxyRepository.findByAgentId(agentId);
+        return proxyConfigAssembler.assembleList(list);
     }
-
 }
