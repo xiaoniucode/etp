@@ -48,7 +48,7 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
     @Override
     public Optional<ProxyConfig> findById(String proxyId) {
         ProxyDetailQueryResult result = proxyRepository.findDetailByProxyId(proxyId);
-        return Optional.of(assembleProxyConfig(result));
+        return Optional.ofNullable(assembleProxyConfig(result));
     }
 
     private ProxyConfig assembleProxyConfig(ProxyDetailQueryResult result) {

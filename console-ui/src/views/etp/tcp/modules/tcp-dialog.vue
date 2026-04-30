@@ -342,7 +342,7 @@
           status: proxyDetail.status?.toString() || '1',
           remotePort: proxyDetail.remotePort || 0,
           encrypt: proxyDetail.transport?.encrypt || false,
-          tunnelType: proxyDetail.tunnelType?.toString() || '1',
+          tunnelType: proxyDetail.transport?.tunnelType?.toString() || '1',
           deployMode: proxyDetail.deploymentMode === 1 ? 'single' : 'cluster',
           singleHost:
             proxyDetail.targets && proxyDetail.targets.length > 0

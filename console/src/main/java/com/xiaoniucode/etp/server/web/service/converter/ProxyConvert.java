@@ -45,6 +45,7 @@ public interface ProxyConvert {
     ProxyDO toDO(TcpProxyCreateParam request, String proxyId);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(source = "param.domainType", target = "domainType", qualifiedByName = "codeToDomainType")
     void updateDO(HttpProxyUpdateParam param, @MappingTarget ProxyDO proxyDO);
 
     @Mapping(target = "id", ignore = true)
@@ -67,7 +68,10 @@ public interface ProxyConvert {
     static Integer domainTypeToCode(DomainType domainType) {
         return domainType != null ? domainType.getCode() : null;
     }
-
+    @Named("codeToDomainType")
+    static DomainType codeToDomainType(Integer code) {
+        return DomainType.fromCode(code);
+    }
     @Mapping(source = "httpProxyPort", target = "httpProxyPort")
     HttpProxyListDTO toHttpListDTO(ProxyDO proxyDO, int httpProxyPort);
 }

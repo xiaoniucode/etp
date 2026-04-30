@@ -33,6 +33,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -129,20 +130,20 @@ public class ProxyManager {
 
     public void reconcile(ProxyConfig config) throws EtpException {
         logger.debug("更新代理：{}", config.getProxyId());
+        String proxyId = config.getProxyId();
+        if (config.getStatus().isClosed()) {
+            deactivate(proxyId);
+            return;
+        }
         if (config.isTcp()) {
-            String proxyId = config.getProxyId();
             Integer oldPort = portMap.get(proxyId);
             int newPort = config.getListenPort();
-            if (oldPort == null) {
-                activate(config);
+            if (Objects.equals(oldPort, newPort)) {
                 return;
             }
-            if (oldPort == newPort) {
-                return;
-            }
-            deactivate(proxyId);
-            activate(config);
         }
+        deactivate(proxyId);
+        activate(config);
     }
 
     /**

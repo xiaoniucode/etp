@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.security.cert.CertificateException;
 
 public class TlsHelper {
+    private static final String DEFAULT_PROTOCOL = "TLSv1.3";
+
     public static SslContext buildSslContext(boolean forClient, TlsConfig tlsConfig, boolean isTestMode) throws IOException, CertificateException {
         SslProvider provider = SslProvider.JDK;
         if (forClient) {
@@ -41,7 +43,7 @@ public class TlsHelper {
     private static SslContext createTestSslContextForClient(SslProvider provider) throws IOException {
         return SslContextBuilder
                 .forClient()
-                .protocols("TLSv1.3")
+                .protocols(DEFAULT_PROTOCOL)
                 .sslProvider(provider)
                 .trustManager(InsecureTrustManagerFactory.INSTANCE)
                 .build();
@@ -51,6 +53,7 @@ public class TlsHelper {
     private static SslContext createSslContextForClient(TlsConfig tlsConfig, SslProvider provider) throws IOException {
         SslContextBuilder sslContextBuilder = SslContextBuilder
                 .forClient()
+                .protocols(DEFAULT_PROTOCOL)
                 .sslProvider(provider);
 
         if (!tlsConfig.mTLSEnabled()) {
@@ -73,7 +76,7 @@ public class TlsHelper {
         return SslContextBuilder
                 .forServer(selfSignedCertificate.certificate(), selfSignedCertificate.privateKey())
                 .sslProvider(provider)
-                .protocols("TLSv1.3")
+                .protocols(DEFAULT_PROTOCOL)
                 .clientAuth(ClientAuth.OPTIONAL)
                 .build();
     }
@@ -84,6 +87,7 @@ public class TlsHelper {
                         StringUtils.hasText(tlsConfig.getCertFile()) ? new FileInputStream(tlsConfig.getCertFile()) : null,
                         StringUtils.hasText(tlsConfig.getKeyFile()) ? new FileInputStream(tlsConfig.getKeyFile()) : null
                 )
+                .protocols(DEFAULT_PROTOCOL)
                 .sslProvider(provider);
 
         if (!tlsConfig.mTLSEnabled()) {
