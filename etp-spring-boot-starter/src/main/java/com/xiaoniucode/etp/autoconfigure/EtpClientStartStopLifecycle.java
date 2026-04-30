@@ -149,7 +149,7 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
                 .Builder()
                 .serverAddr(properties.getServerAddr())
                 .serverPort(properties.getServerPort())
-                .agentType(AgentType.SESSION)
+                .agentType(AgentType.EMBEDDED)
                 .transportConfig(transportConfig)
                 .connectionConfig(connectionConfig)
                 .authConfig(authConfig)

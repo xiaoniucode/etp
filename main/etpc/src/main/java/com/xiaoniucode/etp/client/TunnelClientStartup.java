@@ -99,7 +99,7 @@ public class TunnelClientStartup {
             authConfig.setToken(cmdArgs.get("token"));
             builder.authConfig(authConfig);
         }
-        builder.agentType(AgentType.BINARY);
+        builder.agentType(AgentType.STANDALONE);
         return builder.build();
     }
 

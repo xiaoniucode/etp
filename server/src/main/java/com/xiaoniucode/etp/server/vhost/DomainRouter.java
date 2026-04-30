@@ -14,12 +14,28 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.service.repository;
+package com.xiaoniucode.etp.server.vhost;
 
-import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public interface DomainQueryRepository {
-    boolean existsByFullDomain(String fullDomain);
+@Component
+public class DomainRouter {
 
-    Set<String> findDomainsByProxyId(String proxyId);
+    @Autowired
+    private DomainRegistry domainRegistry;
+
+    /**
+     * 根据域名获取代理ID
+     *
+     * @param domain 域名
+     * @return proxyId
+     */
+    public String route(String domain) {
+        String proxyId = domainRegistry.getProxyIdByDomain(domain);
+        if (proxyId != null) {
+            return proxyId;
+        }
+        return null;
+    }
 }

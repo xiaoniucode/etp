@@ -34,7 +34,7 @@ public class DefaultAppConfig implements AppConfig {
         private AuthConfig authConfig = new AuthConfig();
         private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
         private LogConfig logConfig;
-        private AgentType agentType = AgentType.BINARY;
+        private AgentType agentType = AgentType.STANDALONE;
         private TransportConfig transportConfig = new TransportConfig();
         private ConnectionConfig connectionConfig = new ConnectionConfig();
 

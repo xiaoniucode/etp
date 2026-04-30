@@ -21,6 +21,8 @@ import com.xiaoniucode.etp.server.service.repository.DomainQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class DomainConfigService {
     @Autowired
@@ -34,5 +36,9 @@ public class DomainConfigService {
      */
     public boolean exists(String fullDomain) {
         return domainQueryRepository.existsByFullDomain(fullDomain);
+    }
+
+    public Set<String> findDomainsByProxyId(String proxyId) {
+        return domainQueryRepository.findDomainsByProxyId(proxyId);
     }
 }

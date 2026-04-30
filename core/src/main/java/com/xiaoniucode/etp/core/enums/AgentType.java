@@ -11,14 +11,14 @@ import lombok.Getter;
 public enum AgentType {
 
     /**
-     * 会话级 Agent（集成在 Spring Boot 等框架中，短生命周期、一次性使用）
+     * 内嵌客户端 Agent（集成在 Spring Boot 等框架中，短生命周期、一次性使用）
      */
-    SESSION(0, "Session Agent", true),
+    EMBEDDED(0, "Embedded Agent", true),
 
     /**
-     * 二进制 Agent（独立运行的可执行程序，长期运行，支持配置持久化）
+     * 标准客户端（独立运行的可执行程序，长期运行，支持配置持久化）
      */
-    BINARY(1, "Binary Agent", false);
+    STANDALONE(1, "Standalone Agent", false);
 
     private final Integer code;
     private final String description;
@@ -34,10 +34,10 @@ public enum AgentType {
     }
 
     public boolean isSession() {
-        return this == SESSION;
+        return this == EMBEDDED;
     }
 
     public boolean isBinary() {
-        return this == BINARY;
+        return this == STANDALONE;
     }
 }

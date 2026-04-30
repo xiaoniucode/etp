@@ -158,7 +158,7 @@
         },
         {
           prop: 'domains',
-          label: '访问域名',
+          label: '远程地址',
           minWidth: 150,
           formatter: (row: HttpProxyItem) => {
             if (!row.domains || row.domains.length === 0) {

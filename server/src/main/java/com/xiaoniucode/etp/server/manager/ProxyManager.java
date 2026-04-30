@@ -22,7 +22,9 @@ import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
+import com.xiaoniucode.etp.server.service.DomainConfigService;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
+import com.xiaoniucode.etp.server.vhost.DomainRegistry;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +54,17 @@ public class ProxyManager {
     @Autowired
     private PortManager portManager;
     @Autowired
+    private DomainRegistry domainRegistry;
+    @Autowired
     private StreamManager streamManager;
+    @Autowired
+    private DomainConfigService domainConfigService;
 
     /**
      * 激活代理
      *
-     * @param config
-     * @throws EtpException
+     * @param config 代理配置信息
+     * @throws EtpException 异常
      */
     public void activate(ProxyConfig config) throws EtpException {
         if (config == null || config.getStatus().isClosed()) {
@@ -75,6 +81,13 @@ public class ProxyManager {
             portAcceptor.bindPort(listenPort);
             agentPortMap.computeIfAbsent(config.getAgentId(), k -> ConcurrentHashMap.newKeySet())
                     .add(proxyId);
+        }
+        if (config.isHttp()) {
+            Set<String> domains = domainConfigService.findDomainsByProxyId(proxyId);
+            if (!CollectionUtils.isEmpty(domains)) {
+                //将域名注册到域名注册中心
+                domainRegistry.register(proxyId, domains);
+            }
         }
     }
 
@@ -96,6 +109,11 @@ public class ProxyManager {
                 set.remove(proxyId);
             }
         }
+        Set<String> domains = domainRegistry.getDomainsByProxyId(proxyId);
+        for (String domain : domains) {
+            streamManager.fireCloseByDomain(domain);
+        }
+        domainRegistry.unregister(proxyId);//从注册中心删除
         //删除IP访问控制
         ipAccessChecker.invalidate(proxyId);
         //删除代理流量统计记录

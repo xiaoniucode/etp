@@ -53,7 +53,7 @@ public class AgentAuthListener implements EventListener<AgentAuthEvent> {
         logger.debug("Received AgentAuthEvent: {}", event);
         boolean reconnect = event.isReconnect();
         AgentInfo agentInfo = event.getAgentInfo();
-        if (reconnect || agentInfo.getAgentType() == AgentType.SESSION) {
+        if (reconnect || agentInfo.getAgentType() == AgentType.EMBEDDED) {
             return;
         }
         AgentDO agentDO = agentModelConvert.toDO(agentInfo);

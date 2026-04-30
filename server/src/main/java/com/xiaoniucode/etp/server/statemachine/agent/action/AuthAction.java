@@ -155,10 +155,10 @@ public class AuthAction extends AgentBaseAction {
     private AgentType getAgentType(Message.AuthInfo authInfo) {
         switch (authInfo.getAgentType()) {
             case BINARY -> {
-                return AgentType.BINARY;
+                return AgentType.STANDALONE;
             }
             case SESSION -> {
-                return AgentType.SESSION;
+                return AgentType.EMBEDDED;
             }
         }
         return null;

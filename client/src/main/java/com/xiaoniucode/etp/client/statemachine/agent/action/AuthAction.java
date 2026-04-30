@@ -40,7 +40,7 @@ public class AuthAction extends AgentBaseAction {
                     .setArch(OSUtils.getOSArch())
                     .setName(OSUtils.getHostName());
 
-            if (config.getAgentType() == AgentType.BINARY) {
+            if (config.getAgentType() == AgentType.STANDALONE) {
                 AgentIdentity agentIdentity = ctx.getAgentIdentity();
                 String agentId = agentIdentity.getIdentity();
                 if (StringUtils.hasText(agentId)) {
@@ -69,9 +69,9 @@ public class AuthAction extends AgentBaseAction {
             return Message.AgentType.UNRECOGNIZED;
         }
         switch (agentType) {
-            case BINARY:
+            case STANDALONE:
                 return Message.AgentType.BINARY;
-            case SESSION:
+            case EMBEDDED:
                 return Message.AgentType.SESSION;
             default:
                 return Message.AgentType.UNRECOGNIZED;
