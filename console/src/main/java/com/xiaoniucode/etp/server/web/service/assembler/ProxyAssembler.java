@@ -25,11 +25,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProxyAssembler {
-@Autowired
-private ProxyModelConvert proxyModelConvert;
+    @Autowired
+    private ProxyModelConvert proxyModelConvert;
+
     public ProxyConfig toProxyConfig(ProxyDO proxyDO) {
         ProxyConfig proxyConfig = proxyModelConvert.toProxyConfig(proxyDO);
-        BandwidthConfig bc = new BandwidthConfig();
+        BandwidthConfig bc = new BandwidthConfig(proxyDO.getLimitTotal(), proxyDO.getLimitIn(), proxyDO.getLimitOut());
         proxyConfig.setBandwidth(bc);
         return proxyConfig;
     }

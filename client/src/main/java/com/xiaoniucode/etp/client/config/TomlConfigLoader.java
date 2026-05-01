@@ -250,7 +250,7 @@ public class TomlConfigLoader implements ConfigSource {
                 //带宽限制
                 Toml bandwidth = proxyTable.getTable("bandwidth");
                 if (bandwidth != null) {
-                    String limit = bandwidth.getString("limit");
+                    String limit = bandwidth.getString("limit_total");
                     String limitIn = bandwidth.getString("limit_in");
                     String limitOut = bandwidth.getString("limit_out");
                     if (StringUtils.hasText(limit) || StringUtils.hasText(limitIn) || StringUtils.hasText(limitOut)) {

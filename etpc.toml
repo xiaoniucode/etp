@@ -205,9 +205,9 @@ encrypt = true
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 [proxies.bandwidth] #带宽限制
-limit = "2M" #总带宽限制(可选)
-#limit_in = "10M" #入口带宽限制(可选)
-#limit_out = "10M" #出口带宽限制(可选)
+limit_total = "2Mbps" #总带宽限制(可选)
+#limit_in = "10Mbps" #入口带宽限制(可选)
+#limit_out = "10Mbps" #出口带宽限制(可选)
 
 
 [[proxies]]

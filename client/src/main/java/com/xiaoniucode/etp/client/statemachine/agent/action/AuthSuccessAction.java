@@ -144,7 +144,7 @@ public class AuthSuccessAction extends AgentBaseAction {
             BandwidthConfig bandwidth = config.getBandwidth();
             Message.Bandwidth.Builder bw = Message.Bandwidth.newBuilder();
             if (bandwidth.hasLimitConfigured()) {
-                bw.setLimit(bandwidth.getLimit());
+                bw.setLimit(bandwidth.getLimitTotal());
             }
             if (bandwidth.hasLimitInConfigured()) {
                 bw.setLimitIn(bandwidth.getLimitIn());
