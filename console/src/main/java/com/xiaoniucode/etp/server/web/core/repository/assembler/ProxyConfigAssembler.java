@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.core.repository.assembler;
 
+import com.xiaoniucode.etp.core.domain.BandwidthConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.RouteConfig;
 import com.xiaoniucode.etp.core.domain.Target;
@@ -45,6 +46,10 @@ public class ProxyConfigAssembler {
         config.setAgentId(agentDO.getId());
         config.setAgentType(agentDO.getAgentType());
         config.setListenPort(config.getRemotePort());
+
+        if (proxyDO.getLimitTotal() != null || proxyDO.getLimitIn() != null || proxyDO.getLimitOut() != null) {
+            config.setBandwidth(new BandwidthConfig(proxyDO.getLimitTotal(), proxyDO.getLimitIn(), proxyDO.getLimitOut()));
+        }
 
         TransportDO transportDO = result.getTransportDO();
         if (transportDO != null) {

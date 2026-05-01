@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.transport;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
@@ -35,11 +36,14 @@ import java.util.concurrent.TimeUnit;
 public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(UploadRateLimitHandler.class);
     @Autowired
-
     private StreamManager streamManager;
+    /**
+     * 限流最大等待时间，如果超过这个时间直接决绝
+     */
+    private static final long MAX_WAIT_MS = 500;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf payload) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf payload) {
         Channel visitor = ctx.channel();
         Optional<StreamContext> streamContextOpt = streamManager.getStreamContext(visitor);
         if (streamContextOpt.isEmpty()) {
@@ -60,31 +64,32 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
         }
         int bytes = payload.readableBytes();
         long waitNanos = limiter.getUploadWaitNanos(bytes);
-        logger.warn("访问速度太快，触发限流：streamId={} bytes={} 等待 {} ms", streamContext.getStreamId(), bytes, waitNanos / 1_000_000);
-        //响应HTTP 上传时发 429 + close
-        ProtocolType protocol = streamContext.getCurrentProtocol();
-        if (protocol != null && protocol.isHttp()) {
-            NettyHttpUtils.sendHttpTooManyRequests(visitor)
-                    .addListener(f -> {
-                        // 等待 waitNanos 后恢复读取
-                        scheduleResume(streamContext, visitor, waitNanos);
-                    });
-        } else {
-            // 等待 waitNanos 后恢复读取
-            visitor.config().setOption(ChannelOption.AUTO_READ, false);
-            scheduleResume(streamContext, visitor, waitNanos);
-        }
-        logger.debug("发送限流时从访问流收到的数据包到内网");
-        ctx.fireChannelRead(payload.retain());
-    }
-
-    private void scheduleResume(StreamContext streamContext, Channel channel, long waitNanos) {
-        if (channel == null) return;
         long waitMillis = Math.max(1, waitNanos / 1_000_000);
-        channel.eventLoop().schedule(() -> {
-            channel.config().setOption(ChannelOption.AUTO_READ, true);
+
+        if (waitMillis > MAX_WAIT_MS) {
+            logger.warn("触发强限流（直接拒绝）：streamId={} wait={}ms", streamContext.getStreamId(), waitMillis);
+            ProtocolType protocol = streamContext.getCurrentProtocol();
+            if (protocol.isHttp()) {
+                //响应HTTP 上传时发 429
+                NettyHttpUtils.sendHttpTooManyRequests(visitor)
+                        .addListener(f -> {
+                            ChannelUtils.closeOnFlush(visitor);
+                        });
+            }
+            if (protocol.isTcp()){
+                ChannelUtils.closeOnFlush(visitor);
+            }
+            return;
+        }
+        logger.warn("访问速度太快，触发限流：streamId={} bytes={} 等待 {} ms", streamContext.getStreamId(), bytes, waitNanos / 1_000_000);
+        visitor.config().setOption(ChannelOption.AUTO_READ, false);
+        payload.retain();
+        visitor.eventLoop().schedule(() -> {
+            ctx.fireChannelRead(payload);
+            visitor.config().setOption(ChannelOption.AUTO_READ, true);
+            visitor.read();
             logger.debug("限流恢复，继续读取：streamId={}", streamContext.getStreamId());
-            channel.read();
         }, waitMillis, TimeUnit.MILLISECONDS);
+        logger.debug("发送限流时从访问流收到的数据包到内网");
     }
 }

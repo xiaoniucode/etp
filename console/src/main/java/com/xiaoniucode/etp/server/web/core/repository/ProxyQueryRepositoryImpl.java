@@ -59,6 +59,7 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
         if (config == null) {
             return null;
         }
+
         List<ProxyTargetDO> targets = proxyTargetRepository.findByProxyId(config.getProxyId());
         proxyConfigAssembler.assembleTargets(config, targets);
         if (config.getProtocol().isHttp()) {
