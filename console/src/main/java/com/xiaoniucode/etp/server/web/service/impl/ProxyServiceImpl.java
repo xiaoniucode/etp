@@ -101,18 +101,32 @@ public class ProxyServiceImpl implements ProxyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createHttpProxy(HttpProxyCreateParam param) {
+        String baseDomain = appConfig.getBaseDomain();
+        DomainType domainType = DomainType.fromCode(param.getDomainType());
+        if (!StringUtils.hasText(baseDomain) && (domainType.isAuto() || domainType.isSubdomain())) {
+            throw new BizException("域名类型不支持，请先配置基础域名！");
+        }
         //1.基础信息
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
         }
-
-        //生成代理配置信息
         String proxyId = uidGenerator.getUIDAsString();
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
         proxyDO.setSourceType(ProxySourceType.MANUAL);
+
         BandwidthSaveParam bandwidth = param.getBandwidth();
         if (bandwidth != null) {
-
+            bandwidth.valid();//带宽配置校验
+            BandwidthUnit unit = BandwidthUnit.fromCode(bandwidth.getUnit());//带宽单位
+            if (bandwidth.getLimitTotal() != null) {
+                proxyDO.setLimitTotal(unit.toBps(bandwidth.getLimitTotal()));
+            }
+            if (bandwidth.getLimitIn() != null) {
+                proxyDO.setLimitIn(unit.toBps(bandwidth.getLimitIn()));
+            }
+            if (bandwidth.getLimitOut() != null) {
+                proxyDO.setLimitOut(unit.toBps(bandwidth.getLimitOut()));
+            }
         }
         proxyRepository.save(proxyDO);
         //3.服务列表
@@ -131,8 +145,6 @@ public class ProxyServiceImpl implements ProxyService {
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
         transportRepository.save(transportDO);
         //7.HTTP域名信息
-        String baseDomain = appConfig.getBaseDomain();
-        DomainType domainType = proxyDO.getDomainType();
         if (domainType.isAuto()) {
             String domain = domainGenerator.generateSubdomain(baseDomain);
             proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain, baseDomain, domainType));
@@ -401,7 +413,7 @@ public class ProxyServiceImpl implements ProxyService {
             proxyDO.setListenPort(acquire);
         } else if (!portManager.isAvailable(remotePort)) {
             throw new BizException("远程端口不可用");
-        }else {
+        } else {
             proxyDO.setListenPort(param.getRemotePort());
         }
         proxyDO.setSourceType(ProxySourceType.MANUAL);

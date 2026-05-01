@@ -67,7 +67,7 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
         long waitMillis = Math.max(1, waitNanos / 1_000_000);
 
         if (waitMillis > MAX_WAIT_MS) {
-            logger.warn("触发强限流（直接拒绝）：streamId={} wait={}ms", streamContext.getStreamId(), waitMillis);
+            logger.debug("访问速度过快，触发强限流（直接拒绝）：streamId={} wait={}ms", streamContext.getStreamId(), waitMillis);
             ProtocolType protocol = streamContext.getCurrentProtocol();
             if (protocol.isHttp()) {
                 //响应HTTP 上传时发 429
@@ -81,7 +81,7 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
             }
             return;
         }
-        logger.warn("访问速度太快，触发限流：streamId={} bytes={} 等待 {} ms", streamContext.getStreamId(), bytes, waitNanos / 1_000_000);
+        logger.debug("访问速度太快，触发限流：streamId={} bytes={} 等待 {} ms", streamContext.getStreamId(), bytes, waitNanos / 1_000_000);
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
         payload.retain();
         visitor.eventLoop().schedule(() -> {

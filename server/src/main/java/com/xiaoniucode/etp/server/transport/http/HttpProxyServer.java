@@ -21,6 +21,8 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
+import com.xiaoniucode.etp.server.transport.UploadRateLimitHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -60,6 +62,7 @@ public class HttpProxyServer implements Lifecycle {
     public void start() {
         try {
             int httpProxyPort = appConfig.getHttpProxyPort();
+            UploadRateLimitHandler uploadRateLimitHandler = SpringContextHolder.getBean(UploadRateLimitHandler.class);
             bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             workerGroup = NettyEventLoopFactory.eventLoopGroup();
             ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -72,6 +75,7 @@ public class HttpProxyServer implements Lifecycle {
                         protected void initChannel(SocketChannel sc) {
                             sc.pipeline().addLast(new HostSnifferHandler());
                             sc.pipeline().addLast(httpIpCheckHandler);
+                            sc.pipeline().addLast(uploadRateLimitHandler);
                             sc.pipeline().addLast(basicAuthHandler);
                             sc.pipeline().addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);
                         }

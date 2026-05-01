@@ -645,10 +645,10 @@
             deploymentMode: formData.deployMode === 'single' ? 1 : 0, // 1: STANDALONE, 0: CLUSTER
             targets: targets,
             bandwidth: {
-              limitTotal:
-                convertDisplayValueToBps(formData.limitTotal, formData.bandwidthUnit) ?? null,
-              limitIn: convertDisplayValueToBps(formData.limitIn, formData.bandwidthUnit) ?? null,
-              limitOut: convertDisplayValueToBps(formData.limitOut, formData.bandwidthUnit) ?? null,
+              // 后端会基于 unit 转换到 bps，这里应传用户输入值，避免重复换算
+              limitTotal: formData.limitTotal ?? null,
+              limitIn: formData.limitIn ?? null,
+              limitOut: formData.limitOut ?? null,
               unit: formData.bandwidthUnit
             },
             loadBalance:
