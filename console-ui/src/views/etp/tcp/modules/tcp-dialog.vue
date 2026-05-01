@@ -18,14 +18,7 @@
       </ElFormItem>
 
       <ElFormItem label="代理名称" prop="name">
-        <ElInput v-model="formData.name" placeholder="请输入代理名称" />
-      </ElFormItem>
-
-      <ElFormItem label="状态" prop="status">
-        <ElRadioGroup v-model="formData.status">
-          <ElRadio label="1">开启</ElRadio>
-          <ElRadio label="0">关闭</ElRadio>
-        </ElRadioGroup>
+        <ElInput v-model="formData.name" placeholder="请输入代理名称" clearable />
       </ElFormItem>
 
       <ElFormItem label="远程端口" prop="remotePort">
@@ -37,57 +30,30 @@
         />
       </ElFormItem>
 
-      <ElFormItem label="TLS加密" prop="encrypt">
-        <ElSwitch v-model="formData.encrypt" />
-      </ElFormItem>
-
-      <ElFormItem label="隧道类型" prop="tunnelType">
-        <ElRadioGroup v-model="formData.tunnelType">
-          <ElRadio label="0">多路复用</ElRadio>
-          <ElRadio label="1">独立隧道</ElRadio>
-        </ElRadioGroup>
-      </ElFormItem>
-
-      <ElRow :gutter="20">
-        <ElCol :span="8">
-          <ElFormItem label="总带宽限制" prop="limitTotal">
-            <ElInput v-model="formData.limitTotal" placeholder="如 5M" />
-          </ElFormItem>
-        </ElCol>
-        <ElCol :span="8">
-          <ElFormItem label="入站带宽限制" prop="limitIn">
-            <ElInput v-model="formData.limitIn" placeholder="如 5M" />
-          </ElFormItem>
-        </ElCol>
-        <ElCol :span="8">
-          <ElFormItem label="出站带宽限制" prop="limitOut">
-            <ElInput v-model="formData.limitOut" placeholder="如 5M" />
-          </ElFormItem>
-        </ElCol>
-      </ElRow>
-
       <ElFormItem label="部署模式" prop="deployMode">
         <ElRadioGroup v-model="formData.deployMode">
-          <ElRadio label="single">单节点</ElRadio>
+          <ElRadio label="single">单机</ElRadio>
           <ElRadio label="cluster">集群</ElRadio>
         </ElRadioGroup>
       </ElFormItem>
 
-      <!-- 单节点模式 -->
-      <ElFormItem v-if="formData.deployMode === 'single'" label="服务地址" :required="true">
+      <ElFormItem v-show="formData.deployMode === 'single'" label="目标服务" :required="true">
         <ElRow :gutter="20">
           <ElCol :span="12">
-            <ElInput v-model="formData.singleHost" placeholder="请输入主机" />
+            <ElInput v-model="formData.singleHost" placeholder="请输入内网地址" />
           </ElCol>
           <ElCol :span="12">
-            <ElInput v-model.number="formData.singlePort" type="number" placeholder="请输入端口" />
+            <ElInput
+              v-model.number="formData.singlePort"
+              type="number"
+              placeholder="请输入内网端口"
+            />
           </ElCol>
         </ElRow>
       </ElFormItem>
 
-      <!-- 集群模式 -->
       <ElFormItem
-        v-if="formData.deployMode === 'cluster'"
+        v-show="formData.deployMode === 'cluster'"
         label="负载均衡策略"
         prop="loadBalanceStrategy"
         :required="formData.deployMode === 'cluster'"
@@ -104,30 +70,35 @@
         </ElSelect>
       </ElFormItem>
 
-      <ElFormItem v-if="formData.deployMode === 'cluster'" label="服务列表" prop="targets">
+      <ElFormItem v-show="formData.deployMode === 'cluster'" label="服务列表" prop="targets">
         <div class="targets-table">
           <ElTable :data="formData.targets" style="width: 100%">
-
             <ElTableColumn prop="name" label="服务名称" min-width="150">
               <template #default="scope">
                 <ElInput
                   v-model="scope.row.name"
                   placeholder="请输入服务名称"
                   style="width: 100%"
+                  clearable
                 />
               </template>
             </ElTableColumn>
             <ElTableColumn prop="host" label="主机" min-width="180">
               <template #default="scope">
-                <ElInput v-model="scope.row.host" placeholder="请输入主机" style="width: 100%" />
+                <ElInput
+                  v-model="scope.row.host"
+                  placeholder="请输入主机"
+                  style="width: 100%"
+                  clearable
+                />
               </template>
             </ElTableColumn>
-            <ElTableColumn prop="port" label="端口" width="100">
+            <ElTableColumn prop="port" label="服务端口" width="100">
               <template #default="scope">
                 <ElInput
                   v-model.number="scope.row.port"
                   type="number"
-                  placeholder="请输入端口"
+                  placeholder="内网端口"
                   style="width: 100%"
                 />
               </template>
@@ -137,7 +108,7 @@
                 <ElInput
                   v-model.number="scope.row.weight"
                   type="number"
-                  placeholder="请输入权重"
+                  placeholder="负载均衡权重"
                   style="width: 100%"
                 />
               </template>
@@ -155,6 +126,82 @@
           >
         </div>
       </ElFormItem>
+
+      <ElFormItem label="带宽限流">
+        <ElRow :gutter="20">
+          <ElCol :span="6">
+            <ElFormItem label="总带宽" prop="limitTotal" label-width="70px">
+              <ElInputNumber
+                v-model="formData.limitTotal"
+                placeholder="带宽总和"
+                :controls="false"
+                :min="0"
+                :precision="0"
+                style="width: 100%"
+              />
+            </ElFormItem>
+          </ElCol>
+          <ElCol :span="6">
+            <ElFormItem label="入站带宽" prop="limitIn" label-width="70px">
+              <ElInputNumber
+                v-model="formData.limitIn"
+                placeholder="入站带宽"
+                :controls="false"
+                :min="0"
+                :precision="0"
+                style="width: 100%"
+              />
+            </ElFormItem>
+          </ElCol>
+          <ElCol :span="6">
+            <ElFormItem label="出站带宽" prop="limitOut" label-width="70px">
+              <ElInputNumber
+                v-model="formData.limitOut"
+                placeholder="出站带宽"
+                :controls="false"
+                :min="0"
+                :precision="0"
+                style="width: 100%"
+              />
+            </ElFormItem>
+          </ElCol>
+          <ElCol :span="6">
+            <ElFormItem label="单位" prop="bandwidthUnit" label-width="50px">
+              <ElSelect v-model="formData.bandwidthUnit" placeholder="单位" style="width: 100%">
+                <ElOption label="bps" value="bps" />
+                <ElOption label="Kbps" value="Kbps" />
+                <ElOption label="Mbps" value="Mbps" />
+                <ElOption label="Gbps" value="Gbps" />
+              </ElSelect>
+            </ElFormItem>
+          </ElCol>
+        </ElRow>
+      </ElFormItem>
+
+      <ElFormItem label="开启状态" prop="status">
+        <ElRadioGroup v-model="formData.status">
+          <ElRadio label="1">开启</ElRadio>
+          <ElRadio label="0">关闭</ElRadio>
+        </ElRadioGroup>
+      </ElFormItem>
+
+      <ElCollapse accordion>
+        <ElCollapseItem name="1">
+          <template #title>
+            <span>高级配置</span>
+          </template>
+          <ElFormItem label="TLS加密" prop="encrypt">
+            <ElSwitch v-model="formData.encrypt" />
+          </ElFormItem>
+
+          <ElFormItem label="隧道类型" prop="tunnelType">
+            <ElRadioGroup v-model="formData.tunnelType">
+              <ElRadio label="0">多路复用</ElRadio>
+              <ElRadio label="1">独立隧道</ElRadio>
+            </ElRadioGroup>
+          </ElFormItem>
+        </ElCollapseItem>
+      </ElCollapse>
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
@@ -181,6 +228,25 @@
     port: number
     weight: number
     name: string
+  }
+  type BandwidthUnit = 'bps' | 'Kbps' | 'Mbps' | 'Gbps'
+
+  interface FormDataState {
+    agentId: string
+    name: string
+    status: string
+    remotePort: string | number
+    encrypt: boolean
+    tunnelType: string
+    deployMode: string
+    singleHost: string
+    singlePort: string | number
+    targets: Target[]
+    limitTotal: number | undefined
+    limitIn: number | undefined
+    limitOut: number | undefined
+    bandwidthUnit: BandwidthUnit
+    loadBalanceStrategy: string
   }
 
   interface Props {
@@ -233,22 +299,31 @@
     }
   )
 
-  const formData = reactive({
+  const DEFAULT_FORM_DATA: FormDataState = {
     agentId: '',
     name: '',
     status: '1',
-    remotePort: 80,
+    remotePort: '',
     encrypt: false,
     tunnelType: '0',
     deployMode: 'single',
     singleHost: '127.0.0.1',
-    singlePort: 80,
+    singlePort: '',
     targets: [] as Target[],
-    limitTotal: '',
-    limitIn: '',
-    limitOut: '',
+    limitTotal: undefined as number | undefined,
+    limitIn: undefined as number | undefined,
+    limitOut: undefined as number | undefined,
+    bandwidthUnit: 'Mbps',
     loadBalanceStrategy: '1'
-  })
+  }
+  const formData = reactive<FormDataState>({ ...DEFAULT_FORM_DATA })
+  const isInitializingBandwidth = ref(false)
+  const UNIT_FACTORS: Record<BandwidthUnit, number> = {
+    bps: 1,
+    Kbps: 1000,
+    Mbps: 1000 * 1000,
+    Gbps: 1000 * 1000 * 1000
+  }
 
   const rules: FormRules = {
     agentId: [{ required: true, message: '请选择客户端', trigger: 'change' }],
@@ -311,7 +386,6 @@
 
   const fetchAgents = async () => {
     try {
-      // 调用后端接口获取客户端列表
       const agentsList = await fetchGetAgentListAll()
       agents.value = agentsList || []
     } catch (error) {
@@ -320,8 +394,104 @@
     }
   }
 
+  const resetFormData = () => {
+    Object.assign(formData, { ...DEFAULT_FORM_DATA, targets: [] })
+  }
+
+  const findBestCommonUnit = (
+    limitTotalBps: number | undefined,
+    limitInBps: number | undefined,
+    limitOutBps: number | undefined
+  ): string => {
+    // 收集所有有值的
+    const values = [limitTotalBps, limitInBps, limitOutBps].filter((v): v is number => v != null)
+    if (values.length === 0) return 'Mbps'
+
+    // 找到最大的那个值，用它来决定单位
+    const maxValue = Math.max(...values)
+
+    if (maxValue >= 1000 * 1000 * 1000) {
+      return 'Gbps'
+    } else if (maxValue >= 1000 * 1000) {
+      return 'Mbps'
+    } else if (maxValue >= 1000) {
+      return 'Kbps'
+    } else {
+      return 'bps'
+    }
+  }
+
+  const convertBandwidthToUnit = (
+    bps: number | undefined,
+    targetUnit: string
+  ): number | undefined => {
+    if (bps == null) return undefined
+    return Math.round(bps / UNIT_FACTORS[targetUnit as BandwidthUnit])
+  }
+
+  const convertDisplayValueToBps = (
+    value: number | undefined,
+    unit: string
+  ): number | undefined => {
+    if (value == null) return undefined
+    return Math.round(value * UNIT_FACTORS[unit as BandwidthUnit])
+  }
+
+  const convertBandwidth = (
+    value: number | undefined,
+    oldUnit: string,
+    newUnit: string
+  ): number | undefined => {
+    if (value == null) return undefined
+    // 1. 先把旧值转回 bps: value * oldFactor
+    // 2. 再转成新单位: / newFactor
+    const result =
+      (value * UNIT_FACTORS[oldUnit as BandwidthUnit]) / UNIT_FACTORS[newUnit as BandwidthUnit]
+    return Math.round(result)
+  }
+
+  const getDisplayBandwidthFromBps = (
+    limitTotalBps: number | undefined,
+    limitInBps: number | undefined,
+    limitOutBps: number | undefined
+  ) => {
+    const targetUnit = findBestCommonUnit(limitTotalBps, limitInBps, limitOutBps)
+    return {
+      bandwidthUnit: targetUnit,
+      limitTotal: convertBandwidthToUnit(limitTotalBps, targetUnit),
+      limitIn: convertBandwidthToUnit(limitInBps, targetUnit),
+      limitOut: convertBandwidthToUnit(limitOutBps, targetUnit)
+    }
+  }
+
+  const mapTarget = (target: any): Target => ({
+    id: target?.id || '',
+    host: target?.host || '',
+    port: target?.port || '',
+    weight: target?.weight || 1,
+    name: target?.name || ''
+  })
+
+  const applyBandwidthDisplayData = async (bandwidthData: {
+    limitTotal: number | undefined
+    limitIn: number | undefined
+    limitOut: number | undefined
+    bandwidthUnit: string
+  }) => {
+    isInitializingBandwidth.value = true
+    try {
+      formData.limitTotal = bandwidthData.limitTotal
+      formData.limitIn = bandwidthData.limitIn
+      formData.limitOut = bandwidthData.limitOut
+      formData.bandwidthUnit = bandwidthData.bandwidthUnit as BandwidthUnit
+      await nextTick()
+    } finally {
+      isInitializingBandwidth.value = false
+    }
+  }
+
   const addTarget = () => {
-    formData.targets.push({ host: '127.0.0.1', port: 80, weight: 1, name: '' })
+    formData.targets.push({ host: '127.0.0.1', port: '', weight: 1, name: '' })
   }
 
   const removeTarget = (index: number) => {
@@ -333,10 +503,15 @@
 
     if (isEdit) {
       try {
-        // 从服务端获取真实的代理详情数据
         const proxyDetail = await fetchGetTcpProxyById(props.proxyData!.id!)
-
+        const bandwidthDisplayData = getDisplayBandwidthFromBps(
+          proxyDetail.bandwidth?.limitTotal,
+          proxyDetail.bandwidth?.limitIn,
+          proxyDetail.bandwidth?.limitOut
+        )
+        const detailTargets = proxyDetail.targets?.map(mapTarget) || []
         Object.assign(formData, {
+          ...DEFAULT_FORM_DATA,
           agentId: proxyDetail.agentId || '',
           name: proxyDetail.name || '',
           status: proxyDetail.status?.toString() || '1',
@@ -344,39 +519,23 @@
           encrypt: proxyDetail.transport?.encrypt || false,
           tunnelType: proxyDetail.transport?.tunnelType?.toString() || '1',
           deployMode: proxyDetail.deploymentMode === 1 ? 'single' : 'cluster',
-          singleHost:
-            proxyDetail.targets && proxyDetail.targets.length > 0
-              ? proxyDetail.targets[0].host || '127.0.0.1'
-              : '127.0.0.1',
-          singlePort:
-            proxyDetail.targets && proxyDetail.targets.length > 0
-              ? proxyDetail.targets[0].port || 80
-              : 80,
-          targets: proxyDetail.targets
-            ? proxyDetail.targets.map((t: any) => ({
-                id: t.id || '',
-                host: t.host || '',
-                port: t.port || 80,
-                weight: t.weight || 1,
-                name: t.name || ''
-              }))
-            : [],
-          limitTotal: proxyDetail.bandwidth
-            ? proxyDetail.bandwidth.uploadLimit?.toString() || ''
-            : '',
-          limitIn: proxyDetail.bandwidth
-            ? proxyDetail.bandwidth.downloadLimit?.toString() || ''
-            : '',
-          limitOut: '',
+          singleHost: detailTargets.length > 0 ? detailTargets[0].host || '127.0.0.1' : '127.0.0.1',
+          singlePort: detailTargets.length > 0 ? detailTargets[0].port || '' : '',
+          targets: detailTargets,
           loadBalanceStrategy: proxyDetail.loadBalance?.strategy?.toString() || '1'
         })
+        await applyBandwidthDisplayData(bandwidthDisplayData)
       } catch (error) {
         console.error('获取代理详情失败:', error)
         ElMessage.error('获取代理详情失败，请稍后重试')
-
-        // 失败时使用props.proxyData作为 fallback
         const row = props.proxyData
+        const bandwidthDisplayData = getDisplayBandwidthFromBps(
+          row?.bandwidth?.limitTotal,
+          row?.bandwidth?.limitIn,
+          row?.bandwidth?.limitOut
+        )
         Object.assign(formData, {
+          ...DEFAULT_FORM_DATA,
           agentId: row ? row.agentId || '' : '',
           name: row ? row.name || '' : '',
           status: row ? row.status?.toString() || '1' : '1',
@@ -384,45 +543,15 @@
           encrypt: row ? row.encrypt || false : false,
           tunnelType: row ? row.tunnelType?.toString() || '1' : '1',
           deployMode: 'single',
-          singleHost: '127.0.0.1',
-          singlePort: 80,
-          targets:
-            row && row.targets
-              ? row.targets.map((t: any) => ({
-                  id: t.id || '',
-                  host: t.host || '',
-                  port: t.port || 80,
-                  weight: t.weight || 1,
-                  name: t.name || ''
-                }))
-              : [],
-          limitTotal: row && row.bandwidth ? row.bandwidth.uploadLimit?.toString() || '' : '',
-          limitIn: row && row.bandwidth ? row.bandwidth.downloadLimit?.toString() || '' : '',
-          limitOut: '',
+          targets: row?.targets ? row.targets.map(mapTarget) : [],
           loadBalanceStrategy: '1'
         })
+        await applyBandwidthDisplayData(bandwidthDisplayData)
       }
     } else {
-      // 新增模式，使用默认值
-      Object.assign(formData, {
-        agentId: '',
-        name: '',
-        status: '1',
-        remotePort: 80,
-        encrypt: false,
-        tunnelType: '1',
-        deployMode: 'single',
-        singleHost: '127.0.0.1',
-        singlePort: 80,
-        targets: [],
-        limitTotal: '',
-        limitIn: '',
-        limitOut: '',
-        loadBalanceStrategy: '1'
-      })
+      resetFormData()
     }
 
-    // 如果没有目标地址，添加一个默认的
     if (formData.targets.length === 0) {
       addTarget()
     }
@@ -432,6 +561,8 @@
     () => [props.visible, props.type, props.proxyData],
     async ([visible]) => {
       if (visible) {
+        resetFormData()
+        formRef.value?.clearValidate()
         await fetchAgents()
         await initFormData()
         nextTick(() => {
@@ -442,7 +573,6 @@
     { immediate: true }
   )
 
-  // 监听服务列表数量变化，触发负载均衡策略验证
   watch(
     () => formData.targets.length,
     () => {
@@ -450,7 +580,6 @@
     }
   )
 
-  // 监听部署模式变化，触发相关字段验证
   watch(
     () => formData.deployMode,
     () => {
@@ -462,40 +591,53 @@
     }
   )
 
+  watch(
+    () => formData.bandwidthUnit,
+    (newUnit, oldUnit) => {
+      if (isInitializingBandwidth.value) return
+      if (!oldUnit || !newUnit || oldUnit === newUnit) return
+
+      if (formData.limitTotal != null) {
+        formData.limitTotal = convertBandwidth(formData.limitTotal, oldUnit, newUnit)
+      }
+      if (formData.limitIn != null) {
+        formData.limitIn = convertBandwidth(formData.limitIn, oldUnit, newUnit)
+      }
+      if (formData.limitOut != null) {
+        formData.limitOut = convertBandwidth(formData.limitOut, oldUnit, newUnit)
+      }
+    }
+  )
+
   watch(dialogVisible, (newVal) => {
     emit('update:visible', newVal)
+    if (!newVal) {
+      resetFormData()
+      formRef.value?.clearValidate()
+    }
   })
 
   const handleSubmit = async () => {
     if (!formRef.value) return
 
-    // 确保remotePort是数字类型
     const remotePortNum = parseInt(formData.remotePort as any)
     formData.remotePort = remotePortNum
-
-    console.log('远程端口值:', formData.remotePort, '类型:', typeof formData.remotePort)
 
     await formRef.value.validate(async (valid) => {
       if (valid) {
         try {
-          // 根据部署模式生成targets数据
-          let targets = []
-          if (formData.deployMode === 'single') {
-            // 单节点模式，生成一个目标服务
-            targets = [
-              {
-                name: formData.name, // 服务名称与代理名称保持一致
-                host: formData.singleHost,
-                port: formData.singlePort,
-                weight: 1 // 权重默认为1
-              }
-            ]
-          } else {
-            // 集群模式，使用现有targets数据
-            targets = formData.targets
-          }
+          const targets =
+            formData.deployMode === 'single'
+              ? [
+                  {
+                    name: formData.name,
+                    host: formData.singleHost,
+                    port: formData.singlePort,
+                    weight: 1
+                  }
+                ]
+              : formData.targets
 
-          // 构建通用的请求数据
           const commonData = {
             name: formData.name,
             status: parseInt(formData.status),
@@ -503,9 +645,11 @@
             deploymentMode: formData.deployMode === 'single' ? 1 : 0, // 1: STANDALONE, 0: CLUSTER
             targets: targets,
             bandwidth: {
-              limitTotal: formData.limitTotal,
-              limitIn: formData.limitIn,
-              limitOut: formData.limitOut
+              limitTotal:
+                convertDisplayValueToBps(formData.limitTotal, formData.bandwidthUnit) ?? null,
+              limitIn: convertDisplayValueToBps(formData.limitIn, formData.bandwidthUnit) ?? null,
+              limitOut: convertDisplayValueToBps(formData.limitOut, formData.bandwidthUnit) ?? null,
+              unit: formData.bandwidthUnit
             },
             loadBalance:
               formData.deployMode === 'cluster'
@@ -520,27 +664,23 @@
           }
 
           if (dialogType.value === 'add') {
-            // 构建创建请求数据
             const requestData = {
               agentId: formData.agentId,
               ...commonData
             }
-
-            console.log('创建TCP代理数据:', requestData)
             await fetchCreateTcpProxy(requestData)
           } else {
-            // 构建更新请求数据
             const requestData = {
               id: props.proxyData?.id,
               ...commonData
             }
-
-            console.log('更新TCP代理数据:', requestData)
             await fetchUpdateTcpProxy(requestData)
           }
 
           dialogVisible.value = false
           emit('submit')
+          resetFormData()
+          formRef.value?.clearValidate()
         } catch (error) {
           console.error('提交失败:', error)
         }
@@ -554,5 +694,17 @@
     border: 1px solid #e4e7ed;
     border-radius: 4px;
     padding: 10px;
+  }
+
+  :deep(.el-collapse) {
+    border: none;
+  }
+
+  :deep(.el-collapse-item__header) {
+    border-bottom: none;
+  }
+
+  :deep(.el-collapse-item__wrap) {
+    border-top: none;
   }
 </style>

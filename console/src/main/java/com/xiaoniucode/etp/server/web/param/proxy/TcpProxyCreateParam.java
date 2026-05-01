@@ -56,6 +56,5 @@ public class TcpProxyCreateParam {
     @Valid
     @NotNull(message = "transport 不能为空")
     private TransportSaveParam transport;
-    @NotNull(message = "remotePort 不能为空")
     private Integer remotePort;
 }

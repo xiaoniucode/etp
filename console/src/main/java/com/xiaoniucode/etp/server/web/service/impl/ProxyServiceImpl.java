@@ -20,6 +20,7 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
@@ -92,6 +93,8 @@ public class ProxyServiceImpl implements ProxyService {
     private DomainGenerator domainGenerator;
     @Autowired
     private ProxyManager proxyManager;
+    @Autowired
+    private PortManager portManager;
     @Autowired
     private TransactionHelper transactionHelper;
 
@@ -388,8 +391,36 @@ public class ProxyServiceImpl implements ProxyService {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
         }
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
-        proxyDO.setListenPort(param.getRemotePort());
+        Integer remotePort = param.getRemotePort();
+        if (remotePort == null) {
+            Integer acquire = portManager.acquire();
+            if (acquire == null) {
+                throw new BizException("没有可用远程端口");
+            }
+            proxyDO.setRemotePort(acquire);
+            proxyDO.setListenPort(acquire);
+        } else if (!portManager.isAvailable(remotePort)) {
+            throw new BizException("远程端口不可用");
+        }else {
+            proxyDO.setListenPort(param.getRemotePort());
+        }
         proxyDO.setSourceType(ProxySourceType.MANUAL);
+
+        BandwidthSaveParam bandwidth = param.getBandwidth();
+        if (bandwidth != null) {
+            bandwidth.valid();//带宽配置校验
+            BandwidthUnit unit = BandwidthUnit.fromCode(bandwidth.getUnit());//带宽单位
+            if (bandwidth.getLimitTotal() != null) {
+                proxyDO.setLimitTotal(unit.toBps(bandwidth.getLimitTotal()));
+            }
+            if (bandwidth.getLimitIn() != null) {
+                proxyDO.setLimitIn(unit.toBps(bandwidth.getLimitIn()));
+            }
+            if (bandwidth.getLimitOut() != null) {
+                proxyDO.setLimitOut(unit.toBps(bandwidth.getLimitOut()));
+            }
+        }
+
         proxyRepository.save(proxyDO);
         //3.服务列表
         if (proxyDO.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
@@ -432,6 +463,23 @@ public class ProxyServiceImpl implements ProxyService {
         }
         //1.基本信息
         proxyConvert.updateDO(param, proxyDO);
+
+        proxyDO.setListenPort(param.getRemotePort());
+        BandwidthSaveParam bandwidth = param.getBandwidth();
+        if (bandwidth != null) {
+            bandwidth.valid();//带宽配置校验
+            BandwidthUnit unit = BandwidthUnit.fromCode(bandwidth.getUnit());//带宽单位
+            if (bandwidth.getLimitTotal() != null) {
+                proxyDO.setLimitTotal(unit.toBps(bandwidth.getLimitTotal()));
+            }
+            if (bandwidth.getLimitIn() != null) {
+                proxyDO.setLimitIn(unit.toBps(bandwidth.getLimitIn()));
+            }
+            if (bandwidth.getLimitOut() != null) {
+                proxyDO.setLimitOut(unit.toBps(bandwidth.getLimitOut()));
+            }
+        }
+
         proxyRepository.save(proxyDO);
 
         //3.服务列表
@@ -466,7 +514,7 @@ public class ProxyServiceImpl implements ProxyService {
         transportRepository.deleteById(proxyId);
         TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
         transportRepository.save(transportDO);
-        transactionHelper.afterCommit(()-> proxyManager.reconcile(proxyAssembler.toProxyConfig(proxyDO)));
+        transactionHelper.afterCommit(() -> proxyManager.reconcile(proxyAssembler.toProxyConfig(proxyDO)));
         logger.debug("TCP 代理更新成功：{}", proxyDO.getName());
     }
 

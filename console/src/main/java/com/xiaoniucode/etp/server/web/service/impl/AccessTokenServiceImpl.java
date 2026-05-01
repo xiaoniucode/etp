@@ -15,7 +15,6 @@
  */
 package com.xiaoniucode.etp.server.web.service.impl;
 
-import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.accesstoken.AccessTokenDTO;

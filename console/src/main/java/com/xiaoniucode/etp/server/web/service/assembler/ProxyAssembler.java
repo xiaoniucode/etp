@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.service.assembler;
 
+import com.xiaoniucode.etp.core.domain.BandwidthConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.web.core.converter.ProxyModelConvert;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
@@ -28,6 +29,8 @@ public class ProxyAssembler {
 private ProxyModelConvert proxyModelConvert;
     public ProxyConfig toProxyConfig(ProxyDO proxyDO) {
         ProxyConfig proxyConfig = proxyModelConvert.toProxyConfig(proxyDO);
+        BandwidthConfig bc = new BandwidthConfig();
+        proxyConfig.setBandwidth(bc);
         return proxyConfig;
     }
 }

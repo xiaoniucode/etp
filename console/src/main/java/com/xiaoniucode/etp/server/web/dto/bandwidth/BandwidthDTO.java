@@ -20,13 +20,13 @@ public class BandwidthDTO {
     /**
      * 总带宽限制
      */
-    private String limitTotal;
+    private Long limitTotal;
     /**
      * 入站带宽限制
      */
-    private String limitIn;
+    private Long limitIn;
     /**
      * 出站带宽限制
      */
-    private String limitOut;
+    private Long limitOut;
 }

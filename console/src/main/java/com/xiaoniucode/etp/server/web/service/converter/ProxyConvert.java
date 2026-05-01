@@ -30,7 +30,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
@@ -38,17 +37,29 @@ import java.util.List;
 public interface ProxyConvert {
     @Mapping(target = "protocol", expression = "java(ProtocolType.HTTP)")
     @Mapping(source = "proxyId", target = "id")
+    @Mapping(target = "limitTotal", ignore = true)
+    @Mapping(target = "limitIn", ignore = true)
+    @Mapping(target = "limitOut", ignore = true)
     ProxyDO toDO(HttpProxyCreateParam request, String proxyId);
 
     @Mapping(target = "protocol", expression = "java(ProtocolType.TCP)")
     @Mapping(source = "proxyId", target = "id")
+    @Mapping(target = "limitTotal", ignore = true)
+    @Mapping(target = "limitIn", ignore = true)
+    @Mapping(target = "limitOut", ignore = true)
     ProxyDO toDO(TcpProxyCreateParam request, String proxyId);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "param.domainType", target = "domainType", qualifiedByName = "codeToDomainType")
+    @Mapping(target = "limitTotal", ignore = true)
+    @Mapping(target = "limitIn", ignore = true)
+    @Mapping(target = "limitOut", ignore = true)
     void updateDO(HttpProxyUpdateParam param, @MappingTarget ProxyDO proxyDO);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "limitTotal", ignore = true)
+    @Mapping(target = "limitIn", ignore = true)
+    @Mapping(target = "limitOut", ignore = true)
     void updateDO(TcpProxyUpdateParam param, @MappingTarget ProxyDO proxyDO);
 
     @Mapping(source = "agentType", target = "agentType")
@@ -56,6 +67,9 @@ public interface ProxyConvert {
     HttpProxyDetailDTO toHttpDetailDTO(ProxyDO proxyDO, Integer agentType);
 
     @Mapping(source = "agentType", target = "agentType")
+    @Mapping(source = "proxyDO.limitTotal", target = "bandwidth.limitTotal")
+    @Mapping(source = "proxyDO.limitIn", target = "bandwidth.limitIn")
+    @Mapping(source = "proxyDO.limitOut", target = "bandwidth.limitOut")
     TcpProxyDetailDTO toTcpDetailDTO(ProxyDO proxyDO, Integer agentType);
 
     List<HttpProxyListDTO> toHttpDTOList(List<ProxyDO> proxies);
@@ -68,10 +82,12 @@ public interface ProxyConvert {
     static Integer domainTypeToCode(DomainType domainType) {
         return domainType != null ? domainType.getCode() : null;
     }
+
     @Named("codeToDomainType")
     static DomainType codeToDomainType(Integer code) {
         return DomainType.fromCode(code);
     }
+
     @Mapping(source = "httpProxyPort", target = "httpProxyPort")
     HttpProxyListDTO toHttpListDTO(ProxyDO proxyDO, int httpProxyPort);
 }

@@ -2,24 +2,23 @@ package com.xiaoniucode.etp.core.domain;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode
+@Getter
 public class BandwidthConfig {
     /**
-     * 总带宽限制
-     * 单位（bps）
+     * 总带宽（出站+入站）
      */
     private String limit;
     /**
-     * 入口带宽限制（下载）
-     * 单位（bps）
+     * 入站带宽
      */
     private String limitIn;
     /**
-     * 出口带宽限制（上传）
-     * 单位（bps）
+     * 出站带宽
      */
     private String limitOut;
     private Long limitBytes;
@@ -217,17 +216,5 @@ public class BandwidthConfig {
     public void setLimitOut(String limitOut) {
         this.limitOut = limitOut;
         parseAndValidate();
-    }
-
-    public String getLimit() {
-        return limit;
-    }
-
-    public String getLimitIn() {
-        return limitIn;
-    }
-
-    public String getLimitOut() {
-        return limitOut;
     }
 }
