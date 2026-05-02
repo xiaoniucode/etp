@@ -3,7 +3,9 @@ etp:
     enabled: true
     server-addr: 127.0.0.1 # IP or domain
     auth:
-      token: 5E793FAD27AA713D
+      token: 5E793FAD27AA715D
+    proxy:
+      custom-domains: test.domain1.com
     connection:
       retry:
         initial-delay: 1
@@ -15,22 +17,21 @@ etp:
         cert-file: classpath:certs/client.crt
         key-file: classpath:certs/client.key
         ca-file: classpath:certs/ca.crt
-    proxy:
-      custom-domains: test.domain1.com
-      basic-auth:
-        enabled: true
-        users:
-          - user: admin
-            pass: 123
-      transport:
-        multiplex: true
-        encrypt: true
-      bandwidth:
-        limit: 2M
-      access-control:
-        enabled: true
-        allow:
-          - 127.0.0.1
+
+#      basic-auth:
+#        enabled: true
+#        users:
+#          - user: admin
+#            pass: 123
+#      transport:
+#        multiplex: true
+#        encrypt: true
+#      bandwidth:
+#        limit: 2M
+#      access-control:
+#        enabled: true
+#        allow:
+#          - 127.0.0.1
 
 
 
