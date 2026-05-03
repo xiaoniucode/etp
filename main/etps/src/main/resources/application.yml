@@ -5,21 +5,7 @@ spring:
     resources:
       static-locations: classpath:/static/
   profiles:
-    active: mysql
-  data:
-    redis:
-      host: 127.0.0.1
-      port: 6379
-      password:
-      database: 0
-      timeout: 5s
-      lettuce:
-        pool:
-          max-active: 100      # 最大连接数
-          max-idle: 50         # 最大空闲连接
-          min-idle: 10         # 最小空闲连接
-          max-wait: 3s         # 获取连接最大等待时间
-
+    active: h2
 logging:
   level:
     com.xiaoniucode.etp: debug

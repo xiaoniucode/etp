@@ -5,15 +5,15 @@ sidebar_position: 7
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# SpringBoot集成
-`etp`支持客户端嵌入到`SpringBoot`应用中运行，只需引入`Maven/Gradle`坐标，添加几行配置即可无缝集成，生命周期与`SpringBoot`完全同步，无需单独安装`etpc`客户端。环境要求如下：
+# SpringBoot
+`etp`支持客户端嵌入到`SpringBoot`应用中运行，只需引入`Maven/Gradle`坐标，添加几行配置即可无缝集成，无需单独安装`etpc`客户端，主要用于临时测试，
+配置信息不会持久化到数据库。环境要求如下：
 
 - JDK8+
 - Maven or Gradle
 
 ## 引入依赖
-根据自己项目使用的`SpringBoot`版本引入对应的依赖，最新版本可从[Maven中央仓库](https://central.sonatype.com/)中获取。仓库也提供了使用案例，[下载地址](https://github.com/xiaoniucode/etp)。
-### SpringBoot 2.x
+最新版本可从[Maven中央仓库](https://central.sonatype.com/)中获取。仓库也提供了使用案例，[下载地址](https://github.com/xiaoniucode/etp)。
 
 <Tabs>
     <TabItem value="Maven" label="Maven" default>
@@ -21,53 +21,13 @@ import TabItem from '@theme/TabItem';
         <dependency>
             <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-spring-boot-starter</artifactId>
-            <version>0.2.1</version>
+            <version>0.3.0</version>
         </dependency>
         ```
     </TabItem>
     <TabItem value="Gradle" label="Gradle">
         ```groovy
-        implementation("io.github.xiaoniucode:etp-spring-boot-starter:0.2.1")
-        ```
-    </TabItem>
-</Tabs>
-
-
-
-### SpringBoot 3.x
-
-<Tabs>
-    <TabItem value="Maven" label="Maven" default>
-        ```xml
-        <dependency>
-            <groupId>io.github.xiaoniucode</groupId>
-            <artifactId>etp-spring-boot3-starter</artifactId>
-            <version>0.2.1</version>
-        </dependency>
-        ```
-    </TabItem>
-    <TabItem value="Gradle" label="Gradle">
-        ```groovy
-        implementation("io.github.xiaoniucode:etp-spring-boot3-starter:0.2.1")
-        ```
-    </TabItem>
-</Tabs>
-
-### SpringBoot 4.x
-
-<Tabs>
-    <TabItem value="Maven" label="Maven" default>
-        ```xml
-        <dependency>
-            <groupId>io.github.xiaoniucode</groupId>
-            <artifactId>etp-spring-boot4-starter</artifactId>
-            <version>0.2.1</version>
-        </dependency>
-        ```
-    </TabItem>
-    <TabItem value="Gradle" label="Gradle">
-        ```groovy
-        implementation("io.github.xiaoniucode:etp-spring-boot4-starter:0.2.1")
+        implementation("io.github.xiaoniucode:etp-spring-boot-starter:0.3.0")
         ```
     </TabItem>
 </Tabs>

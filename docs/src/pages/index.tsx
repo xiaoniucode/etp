@@ -83,6 +83,7 @@ $ ./etpc -c etpc.toml`,
 function QuickInstall() {
     const [role, setRole] = useState<InstallRole>('server');
     const [methodIndex, setMethodIndex] = useState(0);
+    const [copied, setCopied] = useState(false);
 
     const tabs = role === 'server' ? INSTALL_SERVER : INSTALL_CLIENT;
 
@@ -90,10 +91,26 @@ function QuickInstall() {
         setMethodIndex(0);
     }, [role]);
 
+    useEffect(() => {
+        if (copied) {
+            const timer = setTimeout(() => setCopied(false), 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [copied]);
+
     const safeIndex = Math.min(methodIndex, tabs.length - 1);
     const active = tabs[safeIndex] ?? tabs[0];
 
     const windowTitle = `${role === 'server' ? 'etps' : 'etpc'} · ${active.label}`;
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(active.code);
+            setCopied(true);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
 
     return (
         <section className={styles.qiSection} aria-labelledby="home-qi-title">
@@ -141,6 +158,23 @@ function QuickInstall() {
                                 <span className={styles.qiDotG}/>
                             </span>
                             <span className={styles.qiWindowTitle}>{windowTitle}</span>
+                            <button
+                                type="button"
+                                className={clsx(styles.qiCopyBtn, copied && styles.qiCopyBtnSuccess)}
+                                onClick={handleCopy}
+                                aria-label={copied ? '已复制' : '复制代码'}
+                                title={copied ? '已复制' : '复制代码'}>
+                                {copied ? (
+                                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M4 10l4 4 8-8" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                ) : (
+                                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8">
+                                        <rect x="7" y="7" width="9" height="9" rx="1.5"/>
+                                        <path d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-6A1.5 1.5 0 0 0 3 5v6c0 .8.7 1.5 1.5 1.5H5" strokeLinecap="round"/>
+                                    </svg>
+                                )}
+                            </button>
                         </div>
                         <div className={styles.qiWindowMeta}>
                             <p className={styles.qiHint}>{active.hint}</p>

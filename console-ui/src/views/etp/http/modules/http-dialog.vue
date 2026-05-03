@@ -202,7 +202,7 @@
             <ElSwitch v-model="formData.encrypt" />
           </ElFormItem>
 
-          <ElFormItem label="隧道类型" prop="tunnelType">
+          <ElFormItem label="传输隧道" prop="tunnelType">
             <ElRadioGroup v-model="formData.tunnelType">
               <ElRadio label="0">多路复用</ElRadio>
               <ElRadio label="1">独立隧道</ElRadio>

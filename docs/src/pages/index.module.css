@@ -562,6 +562,45 @@
     color: var(--ifm-color-emphasis-600);
 }
 
+.qiCopyBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ifm-color-emphasis-600);
+    cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+    flex-shrink: 0;
+}
+
+.qiCopyBtn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.qiCopyBtn:hover {
+    color: var(--ifm-color-primary);
+    background: color-mix(in srgb, var(--ifm-color-primary) 10%, transparent);
+}
+
+.qiCopyBtn:active {
+    transform: scale(0.92);
+}
+
+.qiCopyBtnSuccess {
+    color: #22c55e;
+}
+
+.qiCopyBtnSuccess:hover {
+    color: #16a34a;
+    background: color-mix(in srgb, #22c55e 10%, transparent);
+}
+
 .qiWindowMeta {
     padding: 0.55rem 0.85rem;
     background: var(--etp-qi-meta-bg);
