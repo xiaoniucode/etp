@@ -1,18 +1,22 @@
-/* 首页：Hero 左文右图（隧道示意）+ 彩带分割 + 双色特性卡 + 渐变分区 */
-
 .page {
     --etp-home-max: 1080px;
     --etp-home-radius: 16px;
+    /* 大区块之间：相邻 section 的「上内边距 + 下内边距」= 2×此值，故取中等略紧的 clamp */
+    --etp-home-stack-y: clamp(2.35rem, 4.25vw, 3.125rem);
+    --etp-home-gutter-x: 1.5rem;
+    /* Hero 首屏略松，仅影响顶边 */
+    --etp-home-hero-pt: clamp(2.75rem, 6vw, 4.25rem);
     --etp-home-border: var(--ifm-color-emphasis-200);
     --etp-home-surface: var(--ifm-card-background-color);
     --etp-home-grid-line: var(--ifm-color-emphasis-200);
     --etp-home-visual-fg: var(--ifm-color-emphasis-800);
-    /* 快速上手：窗口标题栏与代码区（与主题切换同步） */
     --etp-qi-chrome-bg: color-mix(in srgb, var(--ifm-color-emphasis-200) 55%, var(--ifm-background-color));
     --etp-qi-chrome-border: var(--etp-home-border);
-    --etp-qi-code-bg: #1e293b;
+    --etp-qi-meta-bg: color-mix(in srgb, var(--ifm-color-emphasis-100) 88%, var(--ifm-background-color));
+    --etp-qi-code-bg: color-mix(in srgb, #1e293b 92%, var(--ifm-color-primary-darkest) 8%);
     --etp-qi-code-fg: #e2e8f0;
     --etp-qi-code-dim: #94a3b8;
+    background: var(--ifm-background-color);
 }
 
 [data-theme='dark'] .page {
@@ -21,18 +25,16 @@
     --etp-home-visual-fg: var(--ifm-color-emphasis-600);
     --etp-qi-chrome-bg: color-mix(in srgb, var(--ifm-color-emphasis-200) 40%, var(--ifm-background-color));
     --etp-qi-chrome-border: var(--etp-home-border);
-    --etp-qi-code-bg: #070b12;
+    --etp-qi-meta-bg: color-mix(in srgb, var(--ifm-color-emphasis-200) 22%, var(--etp-qi-code-bg));
+    --etp-qi-code-bg: color-mix(in srgb, #070b12 88%, var(--ifm-color-primary-darkest) 12%);
     --etp-qi-code-fg: #e2e8f0;
     --etp-qi-code-dim: #8892a0;
-    --etp-qi-meta-bg: color-mix(in srgb, var(--ifm-color-emphasis-200) 22%, var(--etp-qi-code-bg));
 }
 
 /* ----- Hero ----- */
 .hero {
     position: relative;
-    padding: clamp(2.5rem, 6vw, 4.25rem) 1.5rem clamp(2rem, 4vw, 2.85rem);
-    border-bottom: 1px solid var(--etp-home-border);
-    background: var(--ifm-background-color);
+    padding: var(--etp-home-hero-pt) var(--etp-home-gutter-x) var(--etp-home-stack-y);
     overflow: hidden;
 }
 
@@ -41,16 +43,18 @@
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(ellipse 90% 70% at 80% 10%, color-mix(in srgb, var(--ifm-color-primary-lightest) 35%, transparent), transparent 52%),
-        radial-gradient(ellipse 70% 55% at 10% 90%, color-mix(in srgb, var(--ifm-color-primary) 22%, transparent), transparent 50%),
-        radial-gradient(ellipse 50% 40% at 50% 0%, color-mix(in srgb, var(--ifm-color-primary-lighter) 15%, transparent), transparent 45%);
+        radial-gradient(ellipse 90% 70% at 80% 10%, color-mix(in srgb, var(--ifm-color-primary-lightest) 22%, transparent), transparent 52%),
+        radial-gradient(ellipse 70% 55% at 10% 90%, color-mix(in srgb, var(--ifm-color-primary) 14%, transparent), transparent 50%),
+        radial-gradient(ellipse 50% 40% at 50% 0%, color-mix(in srgb, var(--ifm-color-primary-lighter) 10%, transparent), transparent 45%);
+    opacity: 0.85;
 }
 
 [data-theme='dark'] .heroMesh {
     background:
-        radial-gradient(ellipse 85% 65% at 85% 5%, color-mix(in srgb, var(--ifm-color-primary) 22%, transparent), transparent 48%),
-        radial-gradient(ellipse 60% 50% at 5% 95%, color-mix(in srgb, var(--ifm-color-primary-darker) 28%, transparent), transparent 52%),
-        radial-gradient(ellipse 45% 35% at 40% 0%, color-mix(in srgb, var(--ifm-color-primary-light) 12%, transparent), transparent 42%);
+        radial-gradient(ellipse 85% 65% at 85% 5%, color-mix(in srgb, var(--ifm-color-primary) 14%, transparent), transparent 48%),
+        radial-gradient(ellipse 60% 50% at 5% 95%, color-mix(in srgb, var(--ifm-color-primary-darker) 18%, transparent), transparent 52%),
+        radial-gradient(ellipse 45% 35% at 40% 0%, color-mix(in srgb, var(--ifm-color-primary-light) 8%, transparent), transparent 42%);
+    opacity: 0.9;
 }
 
 .heroInner {
@@ -173,7 +177,6 @@
     flex-shrink: 0;
 }
 
-/* 右侧：隧道示意图 + 色块点缀 */
 .heroVisual {
     position: relative;
     border-radius: var(--etp-home-radius);
@@ -215,12 +218,12 @@
         linear-gradient(var(--etp-home-grid-line) 1px, transparent 1px),
         linear-gradient(90deg, var(--etp-home-grid-line) 1px, transparent 1px);
     background-size: 22px 22px;
-    opacity: 0.28;
+    opacity: 0.22;
     mask-image: radial-gradient(ellipse 75% 75% at 50% 55%, black 15%, transparent 72%);
 }
 
 [data-theme='dark'] .heroVisualGrid {
-    opacity: 0.32;
+    opacity: 0.28;
 }
 
 .heroVisualSvg {
@@ -248,135 +251,15 @@
     }
 }
 
-/* 彩带分割 */
-.colorRibbon {
-    height: 4px;
-    background: linear-gradient(
-        90deg,
-        var(--ifm-color-primary-lightest),
-        var(--ifm-color-primary),
-        var(--ifm-color-primary-darker),
-        var(--ifm-color-primary-light)
-    );
-    opacity: 0.92;
-}
-
-[data-theme='dark'] .colorRibbon {
-    opacity: 0.72;
-    background: linear-gradient(
-        90deg,
-        var(--ifm-color-primary-darker),
-        var(--ifm-color-primary),
-        var(--ifm-color-primary-light),
-        var(--ifm-color-primary-darker)
-    );
-}
-
-/* ----- 徽章带 ----- */
-.badgeStrip {
-    padding: 1rem 1.5rem 1.15rem;
-    border-bottom: 1px solid var(--etp-home-border);
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--ifm-color-primary) 10%, var(--ifm-background-color)) 0%,
-        color-mix(in srgb, var(--ifm-color-primary) 4%, var(--ifm-background-color)) 100%
-    );
-}
-
-[data-theme='dark'] .badgeStrip {
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--ifm-color-primary) 10%, var(--ifm-background-color)) 0%,
-        color-mix(in srgb, var(--ifm-color-primary) 4%, var(--ifm-background-color)) 100%
-    );
-}
-
-.badgeStripInner {
-    max-width: var(--etp-home-max);
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem 0.55rem;
-}
-
-.badgePill {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--ifm-font-color-base);
-    padding: 0.4rem 0.75rem;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--ifm-color-primary) 35%, var(--etp-home-border));
-    background: linear-gradient(180deg, var(--etp-home-surface), color-mix(in srgb, var(--ifm-color-primary) 6%, var(--etp-home-surface)));
-}
-
-[data-theme='dark'] .badgePill {
-    border-color: color-mix(in srgb, var(--ifm-color-primary) 28%, var(--etp-home-border));
-    background: linear-gradient(
-        180deg,
-        var(--etp-home-surface),
-        color-mix(in srgb, var(--ifm-color-primary) 8%, var(--etp-home-surface))
-    );
-}
-
 /* ----- 功能特性 ----- */
 .featureSection {
     position: relative;
-    padding: clamp(2.4rem, 4.8vw, 3.4rem) 1.5rem;
-    background: linear-gradient(
-        180deg,
-        var(--ifm-background-color),
-        color-mix(in srgb, var(--ifm-color-primary) 5%, var(--ifm-background-color))
-    );
-    border-bottom: 1px solid var(--etp-home-border);
-}
-
-[data-theme='dark'] .featureSection {
-    background: linear-gradient(
-        180deg,
-        var(--ifm-background-color),
-        color-mix(in srgb, var(--ifm-color-primary) 3%, var(--ifm-background-color))
-    );
+    padding: clamp(1.1rem, 2vw, 1.5rem) var(--etp-home-gutter-x) var(--etp-home-stack-y);
 }
 
 .featureSectionInner {
     max-width: var(--etp-home-max);
     margin: 0 auto;
-}
-
-.featureIntro {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-    max-width: none;
-    width: 100%;
-    margin-bottom: clamp(1.75rem, 3vw, 2.35rem);
-}
-
-.featureIntroMark {
-    width: 5px;
-    min-height: 3.25rem;
-    border-radius: 3px;
-    flex-shrink: 0;
-    background: linear-gradient(180deg, var(--ifm-color-primary-lightest), var(--ifm-color-primary), var(--ifm-color-primary-darker));
-    margin-top: 0.2rem;
-}
-
-.featureIntroTitle {
-    margin: 0 0 0.45rem;
-    font-size: clamp(1.4rem, 2.5vw, 1.75rem);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    color: var(--ifm-heading-color);
-}
-
-.featureIntroLead {
-    margin: 0;
-    font-size: 0.95rem;
-    line-height: 1.62;
-    color: var(--ifm-color-emphasis-700);
 }
 
 .featureGrid {
@@ -468,125 +351,9 @@
     color: var(--ifm-color-emphasis-700);
 }
 
-/* ----- 双栏（渐变底 + 双色卡片） ----- */
-.splitSection {
-    position: relative;
-    padding: clamp(2.1rem, 4vw, 3rem) 1.5rem;
-    border-bottom: 1px solid var(--etp-home-border);
-    overflow: hidden;
-}
-
-.splitSectionBg {
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(ellipse 55% 80% at 0% 50%, color-mix(in srgb, var(--ifm-color-primary) 14%, transparent), transparent 55%),
-        radial-gradient(ellipse 50% 75% at 100% 40%, color-mix(in srgb, var(--ifm-color-primary-light) 12%, transparent), transparent 52%),
-        var(--ifm-background-color);
-    pointer-events: none;
-}
-
-[data-theme='dark'] .splitSectionBg {
-    background:
-        radial-gradient(ellipse 55% 80% at 0% 50%, color-mix(in srgb, var(--ifm-color-primary) 8%, transparent), transparent 55%),
-        radial-gradient(ellipse 50% 75% at 100% 40%, color-mix(in srgb, var(--ifm-color-primary-light) 6%, transparent), transparent 52%),
-        var(--ifm-background-color);
-}
-
-.splitInner {
-    position: relative;
-    z-index: 1;
-    max-width: var(--etp-home-max);
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.05rem;
-}
-
-.splitCard {
-    border-radius: var(--etp-home-radius);
-    border: 1px solid var(--etp-home-border);
-    padding: 1.25rem 1.3rem 1.2rem;
-    background: var(--etp-home-surface);
-    box-shadow: 0 10px 36px -18px color-mix(in srgb, var(--ifm-color-primary) 12%, transparent);
-}
-
-[data-theme='dark'] .splitCard {
-    box-shadow: 0 10px 36px -18px rgba(0, 0, 0, 0.35);
-}
-
-.splitCardA {
-    border-left: 4px solid var(--ifm-color-primary);
-}
-
-.splitCardB {
-    border-left: 4px solid var(--ifm-color-primary-light);
-}
-
-.splitTitle {
-    margin: 0 0 1rem;
-    font-size: 0.8125rem;
-    font-weight: 800;
-    letter-spacing: 0.11em;
-    text-transform: uppercase;
-    color: var(--ifm-color-primary);
-}
-
-.splitList {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.splitList li + li {
-    margin-top: 0.45rem;
-}
-
-.splitLink {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--ifm-font-color-base);
-    text-decoration: none !important;
-    padding: 0.15rem 0;
-}
-
-.splitLink:hover {
-    color: var(--ifm-color-primary);
-}
-
-.splitDot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    background: linear-gradient(135deg, var(--ifm-color-primary-lighter), var(--ifm-color-primary-dark));
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--ifm-color-primary) 18%, transparent);
-}
-
-[data-theme='dark'] .splitDot {
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--ifm-color-primary) 35%, var(--etp-home-border));
-}
-
-/* ----- 快速上手：与徽章带同系浅底 + 居中窄卡片 + mac 窗口代码区 ----- */
+/* ----- 快速上手 ----- */
 .qiSection {
-    padding: clamp(1.5rem, 3vw, 2.15rem) 1.5rem;
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--ifm-color-primary) 10%, var(--ifm-background-color)) 0%,
-        color-mix(in srgb, var(--ifm-color-primary) 4%, var(--ifm-background-color)) 100%
-    );
-    border-bottom: 1px solid var(--etp-home-border);
-}
-
-[data-theme='dark'] .qiSection {
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--ifm-color-primary) 10%, var(--ifm-background-color)) 0%,
-        color-mix(in srgb, var(--ifm-color-primary) 4%, var(--ifm-background-color)) 100%
-    );
+    padding: var(--etp-home-stack-y) var(--etp-home-gutter-x) clamp(1.1rem, 2vw, 1.5rem);
 }
 
 .qiInner {
@@ -730,7 +497,6 @@
     background: color-mix(in srgb, var(--ifm-color-primary) 12%, transparent);
 }
 
-/* macOS 风格窗口 */
 .qiWindow {
     border-radius: 12px;
     overflow: hidden;
@@ -798,7 +564,7 @@
 
 .qiWindowMeta {
     padding: 0.55rem 0.85rem;
-    background: color-mix(in srgb, var(--ifm-color-emphasis-100) 90%, var(--ifm-background-color));
+    background: var(--etp-qi-meta-bg);
     border-bottom: 1px solid var(--etp-home-border);
 }
 
@@ -882,113 +648,6 @@
     color: var(--ifm-color-primary);
 }
 
-/* ----- 资源 ----- */
-.resourceSection {
-    padding: 1.35rem 1.5rem 1.5rem;
-    background: linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--ifm-color-primary) 8%, var(--ifm-background-color)),
-        color-mix(in srgb, var(--ifm-color-primary-light) 6%, var(--ifm-background-color)),
-        color-mix(in srgb, var(--ifm-color-primary) 8%, var(--ifm-background-color))
-    );
-    border-bottom: 1px solid var(--etp-home-border);
-}
-
-[data-theme='dark'] .resourceSection {
-    background: linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--ifm-color-primary) 6%, var(--ifm-background-color)),
-        color-mix(in srgb, var(--ifm-color-primary) 4%, var(--ifm-background-color)),
-        color-mix(in srgb, var(--ifm-color-primary) 6%, var(--ifm-background-color))
-    );
-}
-
-.resourceInner {
-    max-width: var(--etp-home-max);
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.55rem;
-}
-
-.resourcePill {
-    font-size: 0.8125rem;
-    font-weight: 700;
-    padding: 0.5rem 1rem;
-    border-radius: 999px;
-    border: none;
-    color: var(--etp-color-on-primary, #fff) !important;
-    text-decoration: none !important;
-    background: linear-gradient(135deg, var(--ifm-color-primary-dark), var(--ifm-color-primary));
-    box-shadow: 0 4px 14px color-mix(in srgb, var(--ifm-color-primary) 38%, transparent);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.resourcePill:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 22px color-mix(in srgb, var(--ifm-color-primary) 45%, transparent);
-    color: var(--etp-color-on-primary, #fff) !important;
-}
-
-[data-theme='dark'] .resourcePill {
-    background: linear-gradient(135deg, var(--ifm-color-primary-darkest), var(--ifm-color-primary-darker));
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-}
-
-[data-theme='dark'] .resourcePill:hover {
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
-}
-
-/* ----- 页脚 ----- */
-.engage {
-    padding: 1.35rem 1.5rem 2.25rem;
-    background: color-mix(in srgb, var(--ifm-color-primary) 6%, var(--ifm-background-color));
-}
-
-[data-theme='dark'] .engage {
-    background: color-mix(in srgb, var(--ifm-color-primary) 7%, var(--ifm-background-color));
-}
-
-.engageInner {
-    max-width: var(--etp-home-max);
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.55rem 1.1rem;
-}
-
-.engageLabel {
-    margin: 0;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--ifm-color-emphasis-600);
-}
-
-.engageNav {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.3rem 0.45rem;
-}
-
-.engageLink {
-    font-size: 0.84rem;
-    font-weight: 600;
-    color: var(--ifm-font-color-base);
-    text-decoration: none !important;
-}
-
-.engageLink:hover {
-    color: var(--ifm-color-primary);
-}
-
-.engageSep {
-    color: var(--ifm-color-emphasis-400);
-    user-select: none;
-}
-
 @media (min-width: 1024px) {
     .featureGrid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1003,10 +662,6 @@
     .heroVisual {
         order: -1;
         min-height: 240px;
-    }
-
-    .splitInner {
-        grid-template-columns: 1fr;
     }
 }
 
@@ -1033,53 +688,25 @@
     .heroActions {
         flex-direction: column;
     }
-
-    .resourcePill {
-        flex: 1 1 auto;
-        text-align: center;
-        justify-content: center;
-    }
 }
 
 @supports not (color: color-mix(in srgb, red, blue)) {
     .heroMesh {
-        background: radial-gradient(ellipse 90% 70% at 80% 10%, rgba(94, 234, 212, 0.2), transparent 52%);
+        background: radial-gradient(ellipse 90% 70% at 80% 10%, rgba(94, 234, 212, 0.16), transparent 52%);
     }
 
     [data-theme='dark'] .heroMesh {
-        background: radial-gradient(ellipse 85% 65% at 85% 5%, rgba(45, 212, 191, 0.2), transparent 48%);
+        background: radial-gradient(ellipse 85% 65% at 85% 5%, rgba(45, 212, 191, 0.16), transparent 48%);
     }
 
-    .badgeStrip {
-        background: var(--ifm-color-emphasis-100);
+    .page {
+        --etp-qi-meta-bg: var(--ifm-color-emphasis-100);
+        --etp-qi-code-bg: #1e293b;
     }
 
-    [data-theme='dark'] .badgeStrip {
-        background: var(--ifm-background-surface-color);
-    }
-
-    .featureSection {
-        background: var(--ifm-background-color);
-    }
-
-    .splitSectionBg {
-        background: var(--ifm-background-color);
-    }
-
-    .resourceSection {
-        background: var(--ifm-color-emphasis-100);
-    }
-
-    [data-theme='dark'] .resourceSection {
-        background: var(--ifm-background-surface-color);
-    }
-
-    .engage {
-        background: var(--ifm-color-emphasis-100);
-    }
-
-    [data-theme='dark'] .engage {
-        background: var(--ifm-background-surface-color);
+    [data-theme='dark'] .page {
+        --etp-qi-meta-bg: var(--ifm-color-emphasis-200);
+        --etp-qi-code-bg: #070b12;
     }
 
     .btnPrimary {
@@ -1100,34 +727,16 @@
         box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.4);
     }
 
+    .qiWindow {
+        border-color: var(--etp-home-border);
+    }
+
     .featureIconWrap {
         background: var(--ifm-color-primary);
     }
 
     [data-theme='dark'] .featureIconWrap {
         background: var(--ifm-color-primary-darkest);
-    }
-
-    .resourcePill {
-        background: var(--ifm-color-primary);
-        box-shadow: 0 4px 14px rgba(15, 118, 110, 0.28);
-    }
-
-    [data-theme='dark'] .resourcePill {
-        background: var(--ifm-color-primary-darkest);
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-    }
-
-    .qiSection {
-        background: var(--ifm-color-emphasis-100);
-    }
-
-    [data-theme='dark'] .qiSection {
-        background: var(--ifm-background-surface-color);
-    }
-
-    .qiWindow {
-        border-color: var(--etp-home-border);
     }
 
     .qiPre {
@@ -1138,5 +747,9 @@
     [data-theme='dark'] .qiPre {
         background: #070b12;
         color: #e2e8f0;
+    }
+
+    [data-theme='dark'] .qiWindowMeta {
+        border-bottom: 1px solid var(--etp-home-border);
     }
 }

@@ -7,11 +7,6 @@ import Layout from '@theme/Layout';
 import styles from './index.module.css';
 
 const GITHUB = 'https://github.com/xiaoniucode/etp';
-const GITHUB_ISSUES = 'https://github.com/xiaoniucode/etp/issues';
-const GITHUB_DISCUSSIONS = 'https://github.com/xiaoniucode/etp/discussions';
-
-const heroBadges = ['TCP / HTTP', 'TLS 1.3', 'Netty', 'Spring Boot', 'Toml / 控制台', '跨平台'];
-
 const features: Array<{
     id: 'panel' | 'speed' | 'shield' | 'sparkle' | 'globe' | 'stack';
     title: string;
@@ -23,33 +18,6 @@ const features: Array<{
     {id: 'sparkle', title: '简单易用', description: '零外部依赖，静态 Toml 或控制台动态配置。'},
     {id: 'globe', title: '跨平台', description: 'Linux / Windows / macOS / Docker，ARM64 与 AMD64。'},
     {id: 'stack', title: '能力矩阵', description: '端口池、多客户端、无客户端模式、强制下线等。'},
-];
-
-const colTunnel = {
-    title: '场景与隧道',
-    items: [
-        {label: 'TCP 协议隧道', to: '/docs/use-case/TCP协议隧道'},
-        {label: 'HTTP 协议隧道', to: '/docs/use-case/HTTP协议隧道'},
-        {label: '隧道加密', to: '/docs/use-case/隧道加密'},
-        {label: '客户端说明', to: '/docs/use-case/客户端'},
-    ],
-};
-
-const colPlatform = {
-    title: '平台与集成',
-    items: [
-        {label: '项目概述', to: '/docs/overview'},
-        {label: '安装（Docker 等）', to: '/docs/install/docker'},
-        {label: 'Spring 集成', to: '/docs/spring'},
-        {label: 'Java SDK', to: '/docs/client-sdk'},
-    ],
-};
-
-const resourceLinks = [
-    {label: '性能测试', to: '/docs/性能测试'},
-    {label: '技术清单', to: '/docs/design/技术清单'},
-    {label: '常见问题', to: '/docs/faq/faq'},
-    {label: '下载', to: '/docs/download'},
 ];
 
 type InstallRole = 'server' | 'client';
@@ -66,7 +34,7 @@ const INSTALL_SERVER: InstallTabConfig[] = [
     {
         id: 'docker',
         label: 'Docker',
-        hint: '适合已有 Docker 的环境。默认映射控制台 8020、隧道通信 9527；更多端口与数据卷见完整文档。',
+        hint: '默认登录用户名和密码为 admin / 123456',
         code: `$ docker run -d \\
   --name etps \\
   -p 8020:8020 \\
@@ -77,18 +45,10 @@ const INSTALL_SERVER: InstallTabConfig[] = [
     {
         id: 'jar',
         label: 'JAR',
-        hint: '从 GitHub Release 获取 etps.jar，与 etps.toml 放在同一目录（需 JDK 8+）。',
+        hint: '要求JDK 25+',
         code: '$ java -jar etps.jar -c etps.toml',
         doc: '/docs/install/linux',
-    },
-    {
-        id: 'binary',
-        label: '二进制',
-        hint: 'Linux / macOS / Windows 均有对应可执行文件；以下为 Linux / macOS 常见用法，Windows 见安装文档中的 .exe 示例。',
-        code: `$ chmod +x etps
-$ ./etps -c etps.toml`,
-        doc: '/docs/install/linux',
-    },
+    }
 ];
 
 const INSTALL_CLIENT: InstallTabConfig[] = [
@@ -110,11 +70,11 @@ $ ./etpc -c etpc.toml`,
     {
         id: 'spring',
         label: 'Spring Boot',
-        hint: '将 etpc 能力嵌入 Spring Boot，无需单独维护客户端进程；按需选用 Boot 2.x / 3.x 坐标。',
+        hint: '将 etpc 能力嵌入 Spring Boot，无需单独维护客户端进程',
         code: `<dependency>
   <groupId>io.github.xiaoniucode</groupId>
-  <artifactId>etp-spring-boot3-starter</artifactId>
-  <version>0.2.1</version>
+  <artifactId>etp-spring-boot-starter</artifactId>
+  <version>0.3.0</version>
 </dependency>`,
         doc: '/docs/spring',
     },
@@ -139,15 +99,6 @@ function QuickInstall() {
         <section className={styles.qiSection} aria-labelledby="home-qi-title">
             <div className={styles.qiInner}>
                 <div className={styles.qiCard}>
-                    <header className={styles.qiCardHead}>
-                        <h2 id="home-qi-title" className={styles.qiTitle}>
-                            快速上手
-                        </h2>
-                        <p className={styles.qiSubtitle}>
-                            选择 <strong>etps</strong> / <strong>etpc</strong> 与安装方式，下方为可复制命令或依赖片段。
-                        </p>
-                    </header>
-
                     <div className={styles.qiToolbar}>
                         <div className={styles.qiRoleRow} role="tablist" aria-label="安装角色">
                             <button
@@ -156,7 +107,7 @@ function QuickInstall() {
                                 aria-selected={role === 'server'}
                                 className={clsx(styles.qiRoleBtn, role === 'server' && styles.qiRoleBtnActive)}
                                 onClick={() => setRole('server')}>
-                                服务端 etps
+                                服务端
                             </button>
                             <button
                                 type="button"
@@ -164,7 +115,7 @@ function QuickInstall() {
                                 aria-selected={role === 'client'}
                                 className={clsx(styles.qiRoleBtn, role === 'client' && styles.qiRoleBtnActive)}
                                 onClick={() => setRole('client')}>
-                                客户端 etpc
+                                客户端
                             </button>
                         </div>
                         <div className={styles.qiTabs} role="tablist" aria-label="安装方式">
@@ -351,33 +302,10 @@ export default function Home() {
                     </div>
                 </section>
 
-                <div className={styles.colorRibbon} aria-hidden/>
-
-                <div className={styles.badgeStrip}>
-                    <div className={styles.badgeStripInner}>
-                        {heroBadges.map((b) => (
-                            <span key={b} className={styles.badgePill}>
-                                {b}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-
                 <QuickInstall/>
 
                 <section className={styles.featureSection} aria-labelledby="home-features-title">
                     <div className={styles.featureSectionInner}>
-                        <header className={styles.featureIntro}>
-                            <span className={styles.featureIntroMark} aria-hidden/>
-                            <div>
-                                <h2 id="home-features-title" className={styles.featureIntroTitle}>
-                                    核心能力
-                                </h2>
-                                <p className={styles.featureIntroLead}>
-                                    传输、安全、控制台与运维能力分层呈现，便于对照你的部署形态。
-                                </p>
-                            </div>
-                        </header>
                         <ul className={styles.featureGrid}>
                             {features.map((f, i) => (
                                 <li key={f.title} className={clsx(styles.featureCard, styles[`featureTone${(i % 3) + 1}`])}>
@@ -392,71 +320,6 @@ export default function Home() {
                         </ul>
                     </div>
                 </section>
-
-                <section className={styles.splitSection} aria-label="文档导航">
-                    <div className={styles.splitSectionBg} aria-hidden/>
-                    <div className={styles.splitInner}>
-                        <div className={clsx(styles.splitCard, styles.splitCardA)}>
-                            <h2 className={styles.splitTitle}>{colTunnel.title}</h2>
-                            <ul className={styles.splitList}>
-                                {colTunnel.items.map((item) => (
-                                    <li key={item.to}>
-                                        <Link className={styles.splitLink} to={item.to}>
-                                            <span className={styles.splitDot}/>
-                                            {item.label}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div className={clsx(styles.splitCard, styles.splitCardB)}>
-                            <h2 className={styles.splitTitle}>{colPlatform.title}</h2>
-                            <ul className={styles.splitList}>
-                                {colPlatform.items.map((item) => (
-                                    <li key={item.to}>
-                                        <Link className={styles.splitLink} to={item.to}>
-                                            <span className={styles.splitDot}/>
-                                            {item.label}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-
-                <section className={styles.resourceSection} aria-label="扩展阅读">
-                    <div className={styles.resourceInner}>
-                        {resourceLinks.map((r) => (
-                            <Link key={r.to} className={styles.resourcePill} to={r.to}>
-                                {r.label}
-                            </Link>
-                        ))}
-                    </div>
-                </section>
-
-                <footer className={styles.engage} aria-label="开源与反馈">
-                    <div className={styles.engageInner}>
-                        <p className={styles.engageLabel}>开源与反馈</p>
-                        <nav className={styles.engageNav}>
-                            <Link className={styles.engageLink} href={GITHUB}>
-                                源码仓库
-                            </Link>
-                            <span className={styles.engageSep} aria-hidden>
-                                ·
-                            </span>
-                            <Link className={styles.engageLink} href={GITHUB_ISSUES}>
-                                Issues
-                            </Link>
-                            <span className={styles.engageSep} aria-hidden>
-                                ·
-                            </span>
-                            <Link className={styles.engageLink} href={GITHUB_DISCUSSIONS}>
-                                Discussions
-                            </Link>
-                        </nav>
-                    </div>
-                </footer>
             </div>
         </Layout>
     );
