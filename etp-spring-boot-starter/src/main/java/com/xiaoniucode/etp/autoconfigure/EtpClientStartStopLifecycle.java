@@ -82,12 +82,12 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
                 accessControl.getDeny()
         );
         proxyConfig.setAccessControl(accessControlConfig);
-        if (StringUtils.hasText(bandwidth.getLimit())||
+        if (StringUtils.hasText(bandwidth.getLimitTotal())||
                 StringUtils.hasText(bandwidth.getLimitIn())||
         StringUtils.hasText(bandwidth.getLimitOut())){
             // 配置带宽限制
             BandwidthConfig bandwidthConfig = new BandwidthConfig(
-                    bandwidth.getLimit(),
+                    bandwidth.getLimitTotal(),
                     bandwidth.getLimitIn(),
                     bandwidth.getLimitOut()
             );

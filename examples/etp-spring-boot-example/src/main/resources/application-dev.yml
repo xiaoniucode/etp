@@ -5,61 +5,53 @@ etp:
     server-port: 9527
     auth:
       token: 5E793FAD27AA713D
+
+    connection:
       retry:
         initial-delay: 1
         max-delay: 20
         max-retries: 5
-#
-#    access-control:
-#      enable: true
-#      allow:
-#        - localhost
-#        - 127.0.0.1
-#        - 192.168.0.1
-#
-#      mode: allow
-#      deny:
-#        - 127.0.0.2/32
-#        - 127.0.0.3/34
-    bandwidth:
-      limit: 100M
-#      limit-in: 1M
-#      limit-out: 1M
-#    basic-auth:
-#      enable: true
-#      users:
-#        - user: admin
-#          pass: 123
-#        - user: guest
-#          pass: 123
-    proxy:
-      protocol: http
-      local-ip: 127.0.0.1
-      auto-domain: true # http only
-#      custom-domains: # http only
-#        - example.com
-#        - test.com
-#      sub-domains: # http only
-#        - api
-#        - ui
-    #      remote-port: 8086 #tcp only
+
     transport:
-      compress: false # 压缩传输隧道，默认关闭
-      encrypt: false # 加密传输隧道，默认开启，采用测试模式证书，生产环境请使用自定义证书
-      multiplex: true # 多路复用传输隧道，默认开启
-    tls:
-      cert-file: classpath:certs/client.crt
-      key-file: classpath:certs/client.key
-      ca-file: classpath:certs/ca.crt
-      test-mode: false
-      enabled: false
-    access-control:
-      enabled: false
+      tls:
+        enabled: true
+        cert-file: classpath:certs/client.crt
+        key-file: classpath:certs/client.key
+        ca-file: classpath:certs/ca.crt
+        key-password:
 
+    proxy:
+      protocol: HTTP
+      local-ip: 127.0.0.1
+      auto-domain: true
+      custom-domains:
+        - a.domain.com
+        - b.domain.com
+      sub-domains:
+        - api
+        - ui
+      transport:
+        encrypt: true
+        multiplex: true
 
+      bandwidth:
+        limit-total: 2Mbps
+        limit-in: 1Mbps
+        limit-out: 1Mbps
 
+      basic-auth:
+        enabled: true
+        users:
+          - user: admin
+            pass: 123456
+          - user: guest
+            pass: 123456
 
-
-
-
-
+      access-control:
+        enabled: true
+        mode: allow
+        allow:
+          - 192.168.1.0/24
+          - 10.0.0.0/8
+        deny:
+          - 192.168.1.100/32

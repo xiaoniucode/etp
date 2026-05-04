@@ -30,7 +30,7 @@ public class BandwidthProperties implements Serializable {
     /**
      * 总带宽限制（可选）
      */
-    private String limit;
+    private String limitTotal;
 
     /**
      * 入口带宽限制（可选）
