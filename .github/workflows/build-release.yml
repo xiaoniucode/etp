@@ -35,6 +35,11 @@ jobs:
             artifact_suffix: windows_amd64
             display_name: "Windows AMD64"
 
+          - os: windows-latest
+            platform: windows
+            arch: arm64
+            artifact_suffix: windows_arm64
+            display_name: "Windows ARM64"
           # macOS 平台
           - os: macos-latest
             platform: darwin

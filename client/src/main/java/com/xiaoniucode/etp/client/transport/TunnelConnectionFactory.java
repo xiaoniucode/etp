@@ -3,6 +3,8 @@ package com.xiaoniucode.etp.client.transport;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
+import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
+import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
 import com.xiaoniucode.etp.core.transport.IdleCheckHandler;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
@@ -50,6 +52,8 @@ public class TunnelConnectionFactory {
                             sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
                         }
                         sc.pipeline()
+                                .addLast(new SnappyEncoder())
+                                .addLast(new SnappyDecoder())
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                 .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler())
                                 .addLast(NettyConstants.CONTROL_FRAME_HANDLER, agentContext.getControlFrameHandler());

@@ -15,6 +15,8 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.transport.connection.DirectPool;
 import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
+import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
+import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.server.Lifecycle;
@@ -101,6 +103,8 @@ public final class TunnelClient implements Lifecycle {
                         }
                         sc.pipeline()
                                 .addLast(loggingHandler)
+                                .addLast(new SnappyEncoder())
+                                .addLast(new SnappyDecoder())
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                 .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentContext, 90, 0, 0, TimeUnit.SECONDS))
                                 .addLast(new HeartbeatHandler(30))

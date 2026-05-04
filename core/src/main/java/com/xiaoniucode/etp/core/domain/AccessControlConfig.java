@@ -1,10 +1,7 @@
 package com.xiaoniucode.etp.core.domain;
 
 import com.xiaoniucode.etp.core.enums.AccessControl;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Collections;

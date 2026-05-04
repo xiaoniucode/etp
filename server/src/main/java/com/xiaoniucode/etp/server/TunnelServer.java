@@ -1,6 +1,8 @@
 package com.xiaoniucode.etp.server;
 
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
+import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
+import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
@@ -85,6 +87,8 @@ public class TunnelServer implements Lifecycle {
                             }
                             sc.pipeline()
                                     .addLast(loggingHandler)
+                                    .addLast(new SnappyEncoder())
+                                    .addLast(new SnappyDecoder())
                                     .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                     .addLast(downloadRateLimitHandler)
                                     .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentManager,90,0,0, TimeUnit.SECONDS))
