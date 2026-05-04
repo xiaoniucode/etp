@@ -22,7 +22,7 @@ import org.springframework.util.StringUtils;
  * 域名工具类
  * 通用域名解析、拆分、前缀提取等操作
  *
- * @author Grok
+ * @author xiaoniucode
  */
 public class DomainUtils {
 
@@ -88,20 +88,5 @@ public class DomainUtils {
             clean = clean.substring(0, clean.length() - 1);
         }
         return clean.split("\\.").length;
-    }
-
-
-
-    /**
-     * 示例使用（可删除）
-     */
-    public static void main(String[] args) {
-        String base = "example.com";
-
-        System.out.println(extractPrefix("api.example.com", base));           // api
-        System.out.println(extractPrefix("test.user.example.com", base));     // test.user
-        System.out.println(extractPrefix("example.com", base));               // "" (空字符串)
-        System.out.println(extractPrefix("other.com", base));                 // null
-        System.out.println(extractPrefix("sub.other.com", base));             // null
     }
 }

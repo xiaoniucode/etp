@@ -16,7 +16,7 @@ server_port = 9527
 # HTTP 代理端口
 http_proxy_port = 80
 # 基础域名（用于自动分配子域名）
-base_domain = "domain1.com"
+base_domain = "domain.com"
 ```
 
 ## 参数说明

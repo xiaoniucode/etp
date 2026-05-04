@@ -18,6 +18,7 @@ import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.core.domain.TransportCustomConfig;
 import com.xiaoniucode.etp.core.enums.AccessControl;
 import com.xiaoniucode.etp.core.enums.AgentType;
+import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
@@ -69,7 +70,7 @@ public class EtpClientStartStopLifecycle implements SmartLifecycle {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setName(applicationName);
         proxyConfig.addTarget(new Target(proxy.getLocalIp(), localPort, 1, applicationName));
-        proxyConfig.setEnabled(true);
+        proxyConfig.setStatus(ProxyStatus.OPEN);
         proxyConfig.setProtocol(proxy.getProtocol());
         proxyConfig.setRemotePort(proxy.getRemotePort());
 
