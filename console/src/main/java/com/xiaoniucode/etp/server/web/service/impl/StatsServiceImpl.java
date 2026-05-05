@@ -44,17 +44,9 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public DashboardSummaryDTO getDashboardSummary() {
-        DashboardSummaryDTO ds = new DashboardSummaryDTO();
-
+        DashboardSummaryDTO ds = proxyRepository.countTotalAndEnabledCount(ProxyStatus.OPEN);
         ds.setTotalAgents(agentRepository.count());
-
-        Tuple tuple = proxyRepository.countTotalAndEnabledCount(ProxyStatus.OPEN);
-        Long totalCount = tuple.get("totalCount", Long.class);
-        Long enabledCount = tuple.get("enabledCount", Long.class);
-        ds.setTotalProxies(totalCount);
-        ds.setStartedProxies(enabledCount);
-
-        ds.setOnlineAgents(agentManager.getOnlineCount());
+        ds.setOnlineAgents((long) agentManager.getOnlineCount());
         return ds;
     }
 

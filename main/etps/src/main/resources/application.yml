@@ -5,7 +5,7 @@ spring:
     resources:
       static-locations: classpath:/static/
   profiles:
-    active: h2
+    active: mysql
 logging:
   level:
     com.xiaoniucode.etp: debug

@@ -16,14 +16,18 @@
 
 package com.xiaoniucode.etp.server.web.dto.stats;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DashboardSummaryDTO implements Serializable {
-    private long totalAgents;
-    private long onlineAgents;
-    private long totalProxies;
-    private long startedProxies;
+    private Long totalAgents;
+    private Long onlineAgents;
+    private Long totalProxies;
+    private Long startedProxies;
 }

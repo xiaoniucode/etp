@@ -15,14 +15,14 @@ import org.springframework.core.io.ResourceLoader;
 @EnableConfigurationProperties(EtpClientProperties.class)
 public class EtpClientAutoConfiguration {
     @Bean
-    public SmartLifecycle etpClientLifecycle(Environment environment,
-                                             WebServerPortListener webServerPortListener,
-                                             EtpClientProperties properties, ResourceLoader resourceLoader) {
-        return new EtpClientStartStopLifecycle(environment, webServerPortListener,properties,resourceLoader);
+    public ClientBootstrap etpClientLifecycle(Environment environment,
+                                              PortHolder portHolder,
+                                              EtpClientProperties properties, ResourceLoader resourceLoader) {
+        return new ClientBootstrap(environment, properties, portHolder, resourceLoader);
     }
 
     @Bean
-    public WebServerPortListener webServerPortListener() {
-        return new WebServerPortListener();
+    public PortHolder portHolder(Environment env) {
+        return new PortHolder(env);
     }
 }

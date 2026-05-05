@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult;
+import com.xiaoniucode.etp.server.web.dto.stats.DashboardSummaryDTO;
 import com.xiaoniucode.etp.server.web.dto.stats.ProxyProtocolCountDTO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import jakarta.persistence.Tuple;
@@ -87,12 +88,15 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     ProxyDetailQueryResult findDetailByAgentIdAndProxyName(@Param("agentId") String agentId, @Param("name") String proxyName);
 
     @Query("""
-            SELECT 
-                COUNT(p) as totalCount,
-                SUM(CASE WHEN p.status = :status THEN 1 ELSE 0 END) as enabledCount
+            SELECT NEW com.xiaoniucode.etp.server.web.dto.stats.DashboardSummaryDTO(
+                null ,
+                null ,
+                COUNT(p),
+                SUM(CASE WHEN p.status = :status THEN 1 ELSE 0 END)
+            )
             FROM ProxyDO p
             """)
-    Tuple countTotalAndEnabledCount(@Param("status") ProxyStatus status);
+    DashboardSummaryDTO countTotalAndEnabledCount(@Param("status") ProxyStatus status);
 
     @Query("""
             SELECT NEW com.xiaoniucode.etp.server.web.dto.stats.ProxyProtocolCountDTO(

@@ -16,10 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.core.repository.assembler;
 
-import com.xiaoniucode.etp.core.domain.BandwidthConfig;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.domain.RouteConfig;
-import com.xiaoniucode.etp.core.domain.Target;
+import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.server.web.core.converter.ProxyModelConvert;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
@@ -95,5 +92,12 @@ public class ProxyConfigAssembler {
 
     public List<ProxyConfig> assembleList(List<ProxyDO> list) {
         return proxyModelConvert.toProxyConfig(list);
+    }
+
+    public void assembleBasicAuthUsers(ProxyConfig config, List<BasicUserDO> basicUsers) {
+        BasicAuthConfig basicAuth = config.getBasicAuth();
+        if (basicAuth != null) {
+            basicAuth.addUsers(proxyModelConvert.toBasicAuthUserConfig(basicUsers));
+        }
     }
 }

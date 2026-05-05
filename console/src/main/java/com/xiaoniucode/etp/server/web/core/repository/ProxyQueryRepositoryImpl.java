@@ -17,13 +17,14 @@
 package com.xiaoniucode.etp.server.web.core.repository;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import com.xiaoniucode.etp.server.web.core.repository.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
+import com.xiaoniucode.etp.server.web.entity.BasicUserDO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDomainDO;
 import com.xiaoniucode.etp.server.web.entity.ProxyTargetDO;
+import com.xiaoniucode.etp.server.web.repository.BasicUserRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyTargetRepository;
@@ -43,7 +44,8 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
     private ProxyTargetRepository proxyTargetRepository;
     @Autowired
     private ProxyDomainRepository proxyDomainRepository;
-
+    @Autowired
+    private BasicUserRepository basicUserRepository;
 
     @Override
     public Optional<ProxyConfig> findById(String proxyId) {
@@ -65,6 +67,11 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
         if (config.getProtocol().isHttp()) {
             List<ProxyDomainDO> domainDOs = proxyDomainRepository.findByProxyId(config.getProxyId());
             proxyConfigAssembler.assembleDomains(config, domainDOs);
+            if (result.getBasicAuthDO()!=null){
+                String proxyId = result.getBasicAuthDO().getProxyId();
+                List<BasicUserDO> basicUsers = basicUserRepository.findByProxyId(proxyId);
+                proxyConfigAssembler.assembleBasicAuthUsers(config, basicUsers);
+            }
         }
         return config;
     }
