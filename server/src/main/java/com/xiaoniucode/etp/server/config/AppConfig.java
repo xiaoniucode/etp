@@ -1,12 +1,9 @@
 package com.xiaoniucode.etp.server.config;
 
 import com.xiaoniucode.etp.common.config.Config;
-import com.xiaoniucode.etp.common.log.LogConfig;
 import com.xiaoniucode.etp.server.config.domain.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Set;
 
 @Getter
 @Setter
@@ -15,7 +12,7 @@ public class AppConfig implements Config {
     private int serverPort;
     private int httpProxyPort;
     private int httpsProxyPort;
-    private LogConfig logConfig;
+//    private LogConfig logConfig;
     private DashboardConfig dashboard;
     private PortPolicyConfig portPolicy;
     private String baseDomain;
@@ -27,7 +24,7 @@ public class AppConfig implements Config {
         this.serverPort = builder.serverPort;
         this.httpProxyPort = builder.httpProxyPort;
         this.httpsProxyPort = builder.httpsProxyPort;
-        this.logConfig = builder.logConfig;
+//        this.logConfig = builder.logConfig;
         this.dashboard = builder.dashboard;
         this.portPolicy = builder.portPolicy;
         this.baseDomain = builder.baseDomain;
@@ -42,7 +39,7 @@ public class AppConfig implements Config {
         private int httpsProxyPort = 443;
         private TransportConfig transportConfig = new TransportConfig();
         private String baseDomain;
-        private LogConfig logConfig;
+//        private LogConfig logConfig;
         private DashboardConfig dashboard = new DashboardConfig(true);
         private PortPolicyConfig portPolicy = new PortPolicyConfig(1, 65535);
         private AuthConfig authConfig = new AuthConfig();
@@ -62,10 +59,10 @@ public class AppConfig implements Config {
             return this;
         }
 
-        public Builder logConfig(LogConfig logConfig) {
-            this.logConfig = logConfig;
-            return this;
-        }
+//        public Builder logConfig(LogConfig logConfig) {
+//            this.logConfig = logConfig;
+//            return this;
+//        }
 
         public Builder dashboard(DashboardConfig dashboard) {
             this.dashboard = dashboard;

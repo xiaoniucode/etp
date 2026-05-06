@@ -101,7 +101,7 @@ public class CIDRMatcher {
         }
 
         List<CIDRRange> merged = new ArrayList<>(size);
-        CIDRRange current = list.getFirst();
+        CIDRRange current = list.get(0);
 
         for (int i = 1; i < size; i++) {
             CIDRRange next = list.get(i);

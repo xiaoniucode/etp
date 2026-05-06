@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.security.cert.CertificateException;
 
 public class TlsHelper {
-    private static final String DEFAULT_PROTOCOL = "TLSv1.3";
-
     public static SslContext buildSslContext(boolean forClient, TlsConfig tlsConfig, boolean isTestMode) throws IOException, CertificateException {
         SslProvider provider = SslProvider.JDK;
         if (forClient) {
@@ -43,7 +41,7 @@ public class TlsHelper {
     private static SslContext createTestSslContextForClient(SslProvider provider) throws IOException {
         return SslContextBuilder
                 .forClient()
-                .protocols(DEFAULT_PROTOCOL)
+                .protocols(getProtocols())
                 .sslProvider(provider)
                 .trustManager(InsecureTrustManagerFactory.INSTANCE)
                 .build();
@@ -53,7 +51,7 @@ public class TlsHelper {
     private static SslContext createSslContextForClient(TlsConfig tlsConfig, SslProvider provider) throws IOException {
         SslContextBuilder sslContextBuilder = SslContextBuilder
                 .forClient()
-                .protocols(DEFAULT_PROTOCOL)
+                .protocols(getProtocols())
                 .sslProvider(provider);
 
         if (!tlsConfig.mTLSEnabled()) {
@@ -76,7 +74,7 @@ public class TlsHelper {
         return SslContextBuilder
                 .forServer(selfSignedCertificate.certificate(), selfSignedCertificate.privateKey())
                 .sslProvider(provider)
-                .protocols(DEFAULT_PROTOCOL)
+                .protocols(getProtocols())
                 .clientAuth(ClientAuth.OPTIONAL)
                 .build();
     }
@@ -87,7 +85,7 @@ public class TlsHelper {
                         StringUtils.hasText(tlsConfig.getCertFile()) ? new FileInputStream(tlsConfig.getCertFile()) : null,
                         StringUtils.hasText(tlsConfig.getKeyFile()) ? new FileInputStream(tlsConfig.getKeyFile()) : null
                 )
-                .protocols(DEFAULT_PROTOCOL)
+                .protocols(getProtocols())
                 .sslProvider(provider);
 
         if (!tlsConfig.mTLSEnabled()) {
@@ -99,5 +97,31 @@ public class TlsHelper {
         }
         sslContextBuilder.clientAuth(tlsConfig.getClientAuthMode());
         return sslContextBuilder.build();
+    }
+
+    public static String getProtocols() {
+        if (isJava11OrHigher()) {
+            return "TLSv1.3";
+        } else {
+            return "TLSv1.2";
+        }
+    }
+
+    public static boolean isJava11OrHigher() {
+        String version = System.getProperty("java.specification.version");
+        if (version == null || version.isEmpty()) {
+            return false;
+        }
+        try {
+            if (version.startsWith("1.")) {
+                int minor = Integer.parseInt(version.substring(2));
+                return minor >= 11;
+            }
+            int major = Integer.parseInt(version);
+            return major >= 11;
+
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

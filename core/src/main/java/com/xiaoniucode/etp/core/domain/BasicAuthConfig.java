@@ -4,6 +4,7 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -85,6 +86,6 @@ public class BasicAuthConfig {
     }
 
     public Set<HttpUser> getUsers() {
-        return Set.copyOf(users);
+        return Collections.unmodifiableSet(users);
     }
 }

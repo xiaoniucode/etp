@@ -47,7 +47,7 @@ public final class AgentIdentity {
      * 更新身份标识
      */
     public void updateIdentity(String identity, boolean persist) {
-        if (identity == null || identity.isBlank()) {
+        if (!StringUtils.hasText(identity)) {
             return;
         }
 
@@ -101,11 +101,10 @@ public final class AgentIdentity {
     private void setOwnerOnlyPermissions(Path path) {
         try {
             if (!System.getProperty("os.name").toLowerCase().contains("win")) {
-                Files.setPosixFilePermissions(path,
-                        java.util.Set.of(
-                                java.nio.file.attribute.PosixFilePermission.OWNER_READ,
-                                java.nio.file.attribute.PosixFilePermission.OWNER_WRITE
-                        ));
+                java.util.Set<java.nio.file.attribute.PosixFilePermission> perms = new java.util.HashSet<>();
+                perms.add(java.nio.file.attribute.PosixFilePermission.OWNER_READ);
+                perms.add(java.nio.file.attribute.PosixFilePermission.OWNER_WRITE);
+                Files.setPosixFilePermissions(path, perms);
             }
         } catch (Exception ignored) {
             // 权限设置失败不影响功能

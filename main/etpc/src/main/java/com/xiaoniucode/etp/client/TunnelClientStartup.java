@@ -8,7 +8,7 @@ import com.xiaoniucode.etp.client.config.TomlConfigLoader;
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.config.domain.LogConfig;
 import com.xiaoniucode.etp.common.*;
-import com.xiaoniucode.etp.common.log.LogbackConfigurator;
+import com.xiaoniucode.etp.client.log.LogbackConfigurator;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -19,6 +19,7 @@ import io.netty.channel.Channel;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class AuthSuccessAction extends AgentBaseAction {
     private final AtomicBoolean init = new AtomicBoolean(false);
@@ -58,7 +59,7 @@ public class AuthSuccessAction extends AgentBaseAction {
                     }
                     return target.build();
                 }
-        ).toList();
+        ).collect(Collectors.toList());
         newProxyBuilder.setName(config.getName())
                 .addAllTargets(targets)
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));

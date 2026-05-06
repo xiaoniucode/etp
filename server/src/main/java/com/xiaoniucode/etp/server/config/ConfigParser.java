@@ -1,10 +1,7 @@
 package com.xiaoniucode.etp.server.config;
 
-import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.common.CommandLineArgs;
 import com.xiaoniucode.etp.common.PortChecker;
-import com.xiaoniucode.etp.common.log.LogConfig;
-import com.xiaoniucode.etp.common.log.LogbackConfigurator;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -18,7 +15,7 @@ public class ConfigParser{
         try {
             System.setProperty("io.netty.leakDetection.level", "DISABLED");
             AppConfig appConfig = buildConfig(args);
-            initLogback(appConfig);
+//            initLogback(appConfig);
             int bindPort = appConfig.getServerPort();
             if (PortChecker.isPortOccupied(bindPort)) {
                 logger.error("{} 端口已经被占用", bindPort);
@@ -72,24 +69,24 @@ public class ConfigParser{
         System.out.println("  etps -c etps.toml");
         System.out.println("  etps");
     }
-
-    private static void initLogback(AppConfig config) {
-        LogConfig log = config.getLogConfig();
-        if (log == null) {
-            return;
-        }
-        new LogbackConfigurator.Builder()
-                .setPath(log.getPath())
-                .setLogPattern(log.getLogPattern())
-                .setArchivePattern(log.getArchivePattern())
-                .setLogLevel(log.getLevel())
-                .setLogName(log.getName())
-                .setMaxHistory(log.getMaxHistory())
-                .setTotalSizeCap(log.getTotalSizeCap())
-                .addLogger("io.netty.channel.ChannelHandlerMask", Level.INFO)
-                .build()
-                .configure();
-    }
+//
+//    private static void initLogback(AppConfig config) {
+//        LogConfig log = config.getLogConfig();
+//        if (log == null) {
+//            return;
+//        }
+//        new LogbackConfigurator.Builder()
+//                .setPath(log.getPath())
+//                .setLogPattern(log.getLogPattern())
+//                .setArchivePattern(log.getArchivePattern())
+//                .setLogLevel(log.getLevel())
+//                .setLogName(log.getName())
+//                .setMaxHistory(log.getMaxHistory())
+//                .setTotalSizeCap(log.getTotalSizeCap())
+//                .addLogger("io.netty.channel.ChannelHandlerMask", Level.INFO)
+//                .build()
+//                .configure();
+//    }
 
     private static AppConfig loadConfigFromFile(String configPath) {
         if (!Files.exists(Paths.get(configPath))) {

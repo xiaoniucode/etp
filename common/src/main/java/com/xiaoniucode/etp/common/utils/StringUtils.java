@@ -7,7 +7,7 @@ package com.xiaoniucode.etp.common.utils;
  */
 public abstract class StringUtils {
     public static boolean hasLength(CharSequence str) {
-        return (str != null && !str.isEmpty());
+        return (str != null && str.length() > 0);
     }
 
     public static boolean hasLength(String str) {
@@ -15,7 +15,7 @@ public abstract class StringUtils {
     }
 
     public static boolean hasText(CharSequence str) {
-        return (str != null && !str.isEmpty() && containsText(str));
+        return (str != null && str.length() > 0 && containsText(str));
     }
 
     public static boolean hasText(String str) {

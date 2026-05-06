@@ -4,15 +4,15 @@
 
     <groupId>io.github.xiaoniucode</groupId>
     <artifactId>etp-spring-boot-starter</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <name>etp-spring-boot-starter</name>
     <packaging>jar</packaging>
     <description>etp-spring-boot-starter</description>
     <properties>
-        <java.version>25</java.version>
+        <java.version>8</java.version>
         <etp.version>0.10.0</etp.version>
-        <etp-spring-boot.version>0.2.1</etp-spring-boot.version>
-        <spring-boot.version>3.5.9</spring-boot.version>
+        <etp-spring-boot.version>0.3.0</etp-spring-boot.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

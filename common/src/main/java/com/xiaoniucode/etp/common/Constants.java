@@ -1,14 +1,11 @@
 package com.xiaoniucode.etp.common;
 
-import ch.qos.logback.classic.Level;
-
 /**
  * 系统常量
  *
  * @author liuxin
  */
 public class Constants {
-    public static final Level LOG_LEVEL = Level.INFO;
     public static final String LOG_BASE_PATH = "logs";
 
     public static final int LOG_MAX_HISTORY = 30;

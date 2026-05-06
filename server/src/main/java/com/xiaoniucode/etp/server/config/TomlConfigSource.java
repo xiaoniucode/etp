@@ -17,8 +17,6 @@ package com.xiaoniucode.etp.server.config;
 
 import com.xiaoniucode.etp.common.config.ConfigSource;
 import com.xiaoniucode.etp.common.config.ConfigSourceType;
-import com.xiaoniucode.etp.common.log.LogConfig;
-import com.xiaoniucode.etp.common.utils.LogUtils;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
@@ -48,7 +46,7 @@ public class TomlConfigSource implements ConfigSource {
         AppConfig.Builder builder = AppConfig.builder();
 
         parseRoot(builder, root);
-        parseLogConfig(builder, root);
+//        parseLogConfig(builder, root);
         parseDashboard(builder, root);
         parseTransport(builder, root);
         parsePortPolicy(builder, root);
@@ -81,12 +79,12 @@ public class TomlConfigSource implements ConfigSource {
         builder.httpsProxyPort(httpsPort);
     }
 
-    private void parseLogConfig(AppConfig.Builder builder, Toml root) {
-        LogConfig logConfig = LogUtils.parseLogConfig(root.getTable("log"), true);
-        if (logConfig != null) {
-            builder.logConfig(logConfig);
-        }
-    }
+//    private void parseLogConfig(AppConfig.Builder builder, Toml root) {
+//        LogConfig logConfig = LogUtils.parseLogConfig(root.getTable("log"), true);
+//        if (logConfig != null) {
+//            builder.logConfig(logConfig);
+//        }
+//    }
 
     private void parseDashboard(AppConfig.Builder builder, Toml root) {
         Toml dash = root.getTable("dashboard");
