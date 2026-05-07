@@ -1,4 +1,20 @@
-package com.xiaoniucode.etp.server.transport.http;
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package com.xiaoniucode.etp.server.transport;
 
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
@@ -13,11 +29,11 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-public class HostSnifferHandler extends ByteToMessageDecoder {
-    private final InternalLogger logger = InternalLoggerFactory.getInstance(HostSnifferHandler.class);
+public class VisitorInfoDecoder extends ByteToMessageDecoder {
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(VisitorInfoDecoder.class);
     private boolean sniffing = true;
 
-    public HostSnifferHandler() {
+    public VisitorInfoDecoder() {
     }
 
     @Override
@@ -34,6 +50,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
         boolean isHttp = false;
         String domain = null;
         String basicAuth = null;
+        String visitorIp = null;
         try {
             int len = Math.min(in.readableBytes(), 4096);
             byte[] bytes = new byte[len];
@@ -49,6 +66,7 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
                         domain = host;
                     }
                     basicAuth = parseAuthHeader(content);
+                    visitorIp = parseXForwardedFor(content);
                 }
                 isHttp = true;
             }
@@ -58,11 +76,15 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             in.resetReaderIndex();
             sniffing = false;
         }
+        if (visitorIp == null) {
+            visitorIp = fallbackRemoteIp(visitor);
+        }
         if (isHttp) {
             visitor.attr(AttributeKeys.PROTOCOL_TYPE).set(ProtocolType.HTTP);
             visitor.attr(AttributeKeys.VISIT_DOMAIN).set(domain);
             visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).set(basicAuth);
         }
+        visitor.attr(AttributeKeys.VISITOR_REAL_IP).set(visitorIp);
         ctx.pipeline().remove(this);
     }
 
@@ -103,5 +125,24 @@ public class HostSnifferHandler extends ByteToMessageDecoder {
             }
         }
         return null;
+    }
+
+    private String parseXForwardedFor(String content) {
+        for (String line : content.split("\\r?\\n")) {
+            if (line.toLowerCase().startsWith("x-forwarded-for:")) {
+                String value = line.substring(15).trim();
+                if (!value.isEmpty()) {
+                    return value.split(",")[0].trim();
+                }
+            }
+        }
+        return null;
+    }
+
+    private String fallbackRemoteIp(Channel visitor) {
+        if (visitor.remoteAddress() instanceof InetSocketAddress addr) {
+            return addr.getAddress().getHostAddress();
+        }
+        return visitor.remoteAddress().toString();
     }
 }

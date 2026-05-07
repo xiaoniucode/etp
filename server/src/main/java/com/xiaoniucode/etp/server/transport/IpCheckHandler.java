@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.transport;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
@@ -30,11 +31,7 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
      * @return IP 地址
      */
     protected String getVisitorIp(Channel visitor) {
-        if (visitor.remoteAddress() instanceof InetSocketAddress) {
-            return ((InetSocketAddress) visitor.remoteAddress())
-                    .getAddress().getHostAddress();
-        }
-        return visitor.remoteAddress().toString();
+        return visitor.attr(AttributeKeys.VISITOR_REAL_IP).get();
     }
 
     /**
@@ -48,7 +45,7 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
         return sa.getPort();
     }
 
-    protected boolean doCheckAccess( Channel visitor, ProxyConfig proxyConfig) {
+    protected boolean doCheckAccess(Channel visitor, ProxyConfig proxyConfig) {
         String visitorIp = getVisitorIp(visitor);
         boolean checkAccess = ipAccessChecker.checkAccess(proxyConfig, visitorIp);
         if (!checkAccess) {
@@ -58,7 +55,7 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
                 NettyHttpUtils.sendHttp403(visitor).addListener(future -> {
                     ChannelUtils.closeOnFlush(visitor);
                 });
-            } else if (protocol.isTcp()){
+            } else if (protocol.isTcp()) {
                 ChannelUtils.closeOnFlush(visitor);
             }
             return false;

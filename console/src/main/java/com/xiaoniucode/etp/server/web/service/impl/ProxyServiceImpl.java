@@ -16,7 +16,6 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.baidu.fsg.uid.UidGenerator;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
@@ -146,7 +145,7 @@ public class ProxyServiceImpl implements ProxyService {
         transportRepository.save(transportDO);
         //7.HTTP域名信息
         if (domainType.isAuto()) {
-            String domain = domainGenerator.generateSubdomain(baseDomain);
+            String domain = domainGenerator.generateRandomSubdomain(baseDomain);
             proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain, baseDomain, domainType));
         } else if (domainType.isCustomDomain()) {
             Set<String> domains = param.getDomains();
@@ -259,7 +258,7 @@ public class ProxyServiceImpl implements ProxyService {
         String baseDomain = appConfig.getBaseDomain();
         DomainType domainType = proxyDO.getDomainType();
         if (domainType.isAuto() && !existsDomainType.isAuto()) {
-            String domain = domainGenerator.generateSubdomain(baseDomain);
+            String domain = domainGenerator.generateRandomSubdomain(baseDomain);
             proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain, baseDomain, domainType));
         } else if (domainType.isCustomDomain()) {
             Set<String> domains = param.getDomains();

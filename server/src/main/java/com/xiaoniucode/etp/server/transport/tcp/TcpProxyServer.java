@@ -22,6 +22,7 @@ import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
 import com.xiaoniucode.etp.server.transport.UploadRateLimitHandler;
+import com.xiaoniucode.etp.server.transport.VisitorInfoDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -74,6 +75,7 @@ public final class TcpProxyServer implements Lifecycle {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
+                        sc.pipeline().addLast(new VisitorInfoDecoder());
                         sc.pipeline().addLast(tcpIpCheckHandler);
                         sc.pipeline().addLast(uploadRateLimitHandler);
                         sc.pipeline().addLast(NettyConstants.TCP_VISITOR_HANDLER, tcpVisitorHandler);
