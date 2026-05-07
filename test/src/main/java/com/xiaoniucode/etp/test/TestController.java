@@ -16,16 +16,25 @@
 
 package com.xiaoniucode.etp.test;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 @RequestMapping
 public class TestController {
-    @GetMapping
+    
+    @GetMapping("/api/test")
     public String test() {
         System.out.println("success!");
         return "say hello";
+    }
+    
+    @GetMapping("/")
+    public String index(HttpServletRequest request) {
+        String header = request.getHeader("X-Forwarded-For");
+        System.out.println("X-Forwarded-For: " + header);
+        return "index";
     }
 }

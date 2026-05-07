@@ -23,10 +23,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author liuxin
  */
 @SpringBootApplication
-public class EtpTestApplication {
+public class TestApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(EtpTestApplication.class, args);
+        SpringApplication.run(TestApplication.class, args);
     }
 
 }

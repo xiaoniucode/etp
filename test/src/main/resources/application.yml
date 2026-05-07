@@ -3,6 +3,15 @@ spring:
     active: mysql
   jpa:
     show-sql: false
+  freemarker:
+    cache: false
+    charset: UTF-8
+    content-type: text/html
+    suffix: .ftl
+    template-loader-path: classpath:/templates/
+    expose-request-attributes: true
+    expose-session-attributes: true
+    request-context-attribute: request
 server:
   port: 8090
 

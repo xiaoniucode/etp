@@ -13,7 +13,6 @@
     <description>etp-test</description>
     <properties>
         <etp.version>0.10.0</etp.version>
-
         <java.version>21</java.version>
         <maven.test.skip>false</maven.test.skip>
         <skipTests>false</skipTests>
@@ -34,6 +33,10 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
@@ -42,16 +45,6 @@
             <artifactId>mysql-connector-j</artifactId>
             <version>${mysql-connector-j.version}</version>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.78.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.78.1</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -75,37 +68,6 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.128.Final</version>
-        </dependency>
-        <!-- ACME4J dependencies -->
-        <dependency>
-            <groupId>org.shredzone.acme4j</groupId>
-            <artifactId>acme4j-client</artifactId>
-            <version>2.16</version>
-        </dependency>
-        <dependency>
-            <groupId>org.shredzone.acme4j</groupId>
-            <artifactId>acme4j-utils</artifactId>
-            <version>2.16</version>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-buffer</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.fusesource.jansi</groupId>
-            <artifactId>jansi</artifactId>
-            <version>2.4.1</version>
-        </dependency>
-        <dependency>
-            <groupId>me.tongfei</groupId>
-            <artifactId>progressbar</artifactId>
-            <version>0.10.1</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -118,8 +80,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>21</source>
-                    <target>21</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
         </plugins>

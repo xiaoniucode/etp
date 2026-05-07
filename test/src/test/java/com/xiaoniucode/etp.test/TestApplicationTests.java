@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-class EtpTestApplicationTests {
+class TestApplicationTests {
     @Autowired
     private UserRepository userRepository;
     @Autowired
