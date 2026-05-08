@@ -7,4 +7,4 @@ spring:
     name: 订单服务
 logging:
   level:
-    com.xiaoniucode.etp: debug
+    com.xiaoniucode.etp: info

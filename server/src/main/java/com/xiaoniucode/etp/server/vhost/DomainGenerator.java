@@ -23,26 +23,31 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class DomainGenerator {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(DomainGenerator.class);
-
-    private static final int MIN_PREFIX_LENGTH = 2;
+    private static final int MIN_PREFIX_LENGTH = 1;
     private static final int MAX_PREFIX_LENGTH = 10;
     private static final String PREFIX_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
     @Autowired
     private DomainConfigService domainConfigService;
 
-    /**
-     * 子域名生成
-     *
-     * @param baseDomain 基础域名
-     * @return 生成的域名绑定列表
-     */
-    public String generateSubdomain(String baseDomain) throws DomainConflictException {
+    public List<String> generateRandomSubdomains(String baseDomain, int count) {
+        List<String> domains = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            String domain = generateRandomSubdomain(baseDomain);
+            domains.add(domain);
+        }
+        return domains;
+    }
+
+    public String generateRandomSubdomain(String baseDomain) throws DomainConflictException {
         return generateRandomDomainPrefix(baseDomain);
     }
 
@@ -63,5 +68,29 @@ public class DomainGenerator {
             sb.append(PREFIX_CHARS.charAt(ThreadLocalRandom.current().nextInt(PREFIX_CHARS.length())));
         }
         return sb.toString();
+    }
+
+    public List<String> generateSubdomains(String baseDomain, Set<String> subDomains) {
+       List<String> res = new ArrayList<>();
+        //todo 一次性检查所有子域名是否存在，避免多次查询
+        for (String subDomain : subDomains) {
+            if (domainConfigService.exists(subDomain + "." + baseDomain)) {
+                throw new DomainConflictException("域名[" + subDomain + "." + baseDomain + "]已被占用");
+            }
+            res.add(subDomain + "." + baseDomain);
+        }
+        return res;
+    }
+
+    public List<String> generateCustomDomains(Set<String> customDomains) {
+        //todo 一次性检查所有子域名是否存在，避免多次查询
+        List<String> validatedDomains = new ArrayList<>();
+        for (String domain : customDomains) {
+            if (domainConfigService.exists(domain)) {
+                throw new DomainConflictException("域名[" + domain + "]已被占用");
+            }
+            validatedDomains.add(domain);
+        }
+        return validatedDomains;
     }
 }

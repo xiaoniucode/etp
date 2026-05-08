@@ -33,7 +33,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -84,6 +83,9 @@ public class ProxyManager {
                     .add(proxyId);
         }
         if (config.isHttp()) {
+            if (domainRegistry.exists(proxyId)) {
+                return;
+            }
             Set<String> domains = domainConfigService.findDomainsByProxyId(proxyId);
             if (!CollectionUtils.isEmpty(domains)) {
                 //将域名注册到域名注册中心
@@ -134,13 +136,6 @@ public class ProxyManager {
         if (config.getStatus().isClosed()) {
             deactivate(proxyId);
             return;
-        }
-        if (config.isTcp()) {
-            Integer oldPort = portMap.get(proxyId);
-            int newPort = config.getListenPort();
-            if (Objects.equals(oldPort, newPort)) {
-                return;
-            }
         }
         deactivate(proxyId);
         activate(config);

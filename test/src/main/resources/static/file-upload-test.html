@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件上传测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            color: #333;
+            border-radius: 0;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>文件上传测试</h1>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'single')">单个文件上传</button>
+            <button class="tablinks" onclick="openTab(event, 'multiple')">多文件上传</button>
+        </div>
+        
+        <!-- 单个文件上传 -->
+        <div id="single" class="tabcontent" style="display: block;">
+            <form id="single-upload-form">
+                <div class="form-group">
+                    <label for="single-file">选择文件：</label>
+                    <input type="file" id="single-file" name="file">
+                </div>
+                <button type="submit">上传文件</button>
+            </form>
+            <div id="single-response" class="response" style="display: none;">
+                <h3>响应结果：</h3>
+                <pre id="single-response-content"></pre>
+            </div>
+        </div>
+        
+        <!-- 多文件上传 -->
+        <div id="multiple" class="tabcontent">
+            <form id="multiple-upload-form">
+                <div class="form-group">
+                    <label for="multiple-files">选择文件：</label>
+                    <input type="file" id="multiple-files" name="files" multiple>
+                </div>
+                <button type="submit">上传文件</button>
+            </form>
+            <div id="multiple-response" class="response" style="display: none;">
+                <h3>响应结果：</h3>
+                <pre id="multiple-response-content"></pre>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 切换标签
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        
+        // 单个文件上传
+        document.getElementById('single-upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('single-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('请选择要上传的文件');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const responseDiv = document.getElementById('single-response');
+                const responseContent = document.getElementById('single-response-content');
+                
+                // 构建响应内容，包含可点击的下载链接
+                let responseText = JSON.stringify(data, null, 2);
+                if (data.status === 'success' && data.downloadUrl) {
+                    responseText += '\n\n下载链接: <a href="' + data.downloadUrl + '" target="_blank">点击下载</a>';
+                }
+                
+                responseContent.innerHTML = responseText;
+                responseDiv.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('上传失败:', error);
+                alert('上传失败，请稍后重试');
+            });
+        });
+        
+        // 多文件上传
+        document.getElementById('multiple-upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('multiple-files');
+            const files = fileInput.files;
+            
+            if (!files || files.length === 0) {
+                alert('请选择要上传的文件');
+                return;
+            }
+            
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+            
+            fetch('/upload-multiple', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const responseDiv = document.getElementById('multiple-response');
+                const responseContent = document.getElementById('multiple-response-content');
+                
+                // 构建响应内容，为每个文件添加可点击的下载链接
+                let responseText = JSON.stringify(data, null, 2);
+                if (data.status === 'success' && data.fileDetails) {
+                    responseText += '\n\n下载链接:';
+                    for (const fileName in data.fileDetails) {
+                        if (data.fileDetails[fileName].downloadUrl) {
+                            responseText += '\n' + fileName + ': <a href="' + data.fileDetails[fileName].downloadUrl + '" target="_blank">点击下载</a>';
+                        }
+                    }
+                }
+                
+                responseContent.innerHTML = responseText;
+                responseDiv.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('上传失败:', error);
+                alert('上传失败，请稍后重试');
+            });
+        });
+    </script>
+</body>
+</html>

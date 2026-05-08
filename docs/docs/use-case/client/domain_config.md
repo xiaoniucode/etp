@@ -74,5 +74,5 @@ targets = [
 | auto_domain    | Boolean         | true | 是否自动分配子域名                  | 否  |
 
 :::tip
-三种域名配置方式可同时配置，系统会按优先级依次检查：custom_domains > sub_domains > auto_domain
+三种域名配置方式可同时配置，系统会按优先级依次检查：custom_domains > sub_domains > auto_domain，以优先级最高的方式生成域名。
 :::

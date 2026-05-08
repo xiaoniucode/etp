@@ -20,7 +20,7 @@
             <span class="w-20 font-medium">控制模式：</span>
             <ElRadioGroup v-model="formData.mode" @change="handleModeChange">
               <ElRadio :label="1">白名单（只允许指定IP访问）</ElRadio>
-              <ElRadio :label="0">黑名单（拒绝指定IP访问）</ElRadio>
+              <ElRadio :label="0">黑名单（禁止指定IP访问）</ElRadio>
             </ElRadioGroup>
           </div>
         </div>
@@ -45,11 +45,11 @@
             <ElTableColumn prop="ruleType" label="规则类型" width="150">
               <template #default="scope">
                 <ElRadioGroup v-if="editingRuleId === scope.row.id" v-model="scope.row.ruleType">
-                  <ElRadio :label="1">允许</ElRadio>
-                  <ElRadio :label="0">拒绝</ElRadio>
+                  <ElRadio :label="1">放行</ElRadio>
+                  <ElRadio :label="0">禁止</ElRadio>
                 </ElRadioGroup>
                 <ElTag v-else :type="scope.row.ruleType === 1 ? 'success' : 'danger'">
-                  {{ scope.row.ruleType === 1 ? '允许' : '拒绝' }}
+                  {{ scope.row.ruleType === 1 ? '放行' : '禁止' }}
                 </ElTag>
               </template>
             </ElTableColumn>
@@ -94,7 +94,7 @@
 
 <script setup lang="ts">
   import { ref, reactive, watch, onMounted } from 'vue'
-  import { ElMessage, ElMessageBox, ElEmpty } from 'element-plus'
+  import { ElMessage, ElMessageBox } from 'element-plus'
   import { Plus, Edit, Delete } from '@element-plus/icons-vue'
   import {
     fetchGetAccessControl,
@@ -281,7 +281,6 @@
 
   // 处理弹窗关闭
   const handleClose = () => {
-    // 取消编辑状态
     if (editingRuleId.value !== null) {
       editingRuleId.value = null
       editingRuleBackup.value = null

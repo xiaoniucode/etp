@@ -18,26 +18,38 @@ package com.xiaoniucode.etp.server.event;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.notify.Event;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
 public class ProxyReportEvent extends Event {
-    private final AgentInfo agentInfo;
+    /**
+     * 最新的代理配置信息
+     */
     private final ProxyConfig proxyConfig;
+    /**
+     * 基础域名，用于子域名
+     */
+    private String baseDomain;
+    /**
+     * 完整子域名列表，完整域名=子域名.基础域名
+     */
     private List<String> subdomains;
-    private boolean isUpdate;
+    /**
+     * 是否是更新事件，true=更新事件，false=新增事件
+     */
+    private final boolean isUpdate;
 
-    public ProxyReportEvent(AgentInfo agentInfo, ProxyConfig proxyConfig) {
-        this.agentInfo = agentInfo;
+    public ProxyReportEvent(boolean isUpdate, ProxyConfig proxyConfig) {
+        this.isUpdate = isUpdate;
         this.proxyConfig = proxyConfig;
     }
 
-    public ProxyReportEvent(AgentInfo agentInfo, List<String> subdomains, ProxyConfig proxyConfig) {
-        this.agentInfo = agentInfo;
-        this.subdomains = subdomains;
+    public ProxyReportEvent(boolean isUpdate, String baseDomain, List<String> subdomains, ProxyConfig proxyConfig) {
+        this.isUpdate = isUpdate;
         this.proxyConfig = proxyConfig;
+        this.baseDomain = baseDomain;
+        this.subdomains = subdomains;
     }
 }

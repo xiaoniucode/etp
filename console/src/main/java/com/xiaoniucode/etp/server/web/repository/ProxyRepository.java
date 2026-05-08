@@ -83,9 +83,9 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
             LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
             LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
             LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
-            WHERE a.id=:agentId AND p.name = :proxyName
+            WHERE a.id=:agentId AND p.name =:name
             """)
-    ProxyDetailQueryResult findDetailByAgentIdAndProxyName(@Param("agentId") String agentId, @Param("name") String proxyName);
+    ProxyDetailQueryResult findDetailByAgentIdAndProxyName(@Param("agentId") String agentId, @Param("name") String name);
 
     @Query("""
             SELECT NEW com.xiaoniucode.etp.server.web.dto.stats.DashboardSummaryDTO(

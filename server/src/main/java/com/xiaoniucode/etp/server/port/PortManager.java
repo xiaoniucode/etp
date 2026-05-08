@@ -22,8 +22,8 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.BitSet;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 端口分配管理器
@@ -38,6 +38,9 @@ public class PortManager {
     private final int startPort;
     private final int endPort;
     private final int portCount;
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
+    private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
 
     public PortManager(int start, int end) {
         startPort = Math.max(start, 1);
@@ -53,33 +56,38 @@ public class PortManager {
     }
 
     public Integer acquire() {
-        int totalAllocated = allocatedPorts.cardinality();
-        if (totalAllocated >= portCount) {
-            throw new EtpException("无可用端口");
-        }
-        // 随机尝试最多20次
-        for (int i = 0; i < 20; i++) {
-            int offset = ThreadLocalRandom.current().nextInt(portCount);
-            int absPort = startPort + offset;
-            if (allocatedPorts.get(offset)) continue;
-            if (tryBindPort(absPort)) {
-                allocatedPorts.set(offset);
-                logger.debug("端口分配成功: {}", absPort);
-                return absPort;
+        writeLock.lock();
+        try {
+            int totalAllocated = allocatedPorts.cardinality();
+            if (totalAllocated >= portCount) {
+                throw new EtpException("无可用端口");
             }
-        }
-        logger.warn("随机分配端口失败，尝试顺序查找");
-        for (int offset = 0; offset < portCount; offset++) {
-            if (allocatedPorts.get(offset)) continue;
-            int absPort = startPort + offset;
-            if (tryBindPort(absPort)) {
-                allocatedPorts.set(offset);
-                logger.debug("端口分配成功: {}", absPort);
-                return absPort;
+            for (int i = 0; i < 20; i++) {
+                int offset = ThreadLocalRandom.current().nextInt(portCount);
+                int absPort = startPort + offset;
+                if (allocatedPorts.get(offset)) continue;
+                if (tryBindPort(absPort)) {
+                    allocatedPorts.set(offset);
+                    logger.debug("端口分配成功: {}", absPort);
+                    return absPort;
+                }
             }
+            logger.debug("随机分配端口失败，尝试顺序查找");
+            for (int offset = 0; offset < portCount; offset++) {
+                if (allocatedPorts.get(offset)) continue;
+                int absPort = startPort + offset;
+                if (tryBindPort(absPort)) {
+                    allocatedPorts.set(offset);
+                    logger.debug("端口分配成功: {}", absPort);
+                    return absPort;
+                }
+            }
+            logger.debug("范围内所有端口都不可用");
+            return null;
+        } finally {
+            writeLock.unlock();
         }
-        logger.error("范围内所有端口都不可用");
-        return null;
+
     }
 
     private boolean tryBindPort(int port) {
@@ -91,31 +99,41 @@ public class PortManager {
     }
 
     public boolean release(int port) {
-        if (port < startPort || port > endPort) {
-            logger.warn("释放端口超出范围: {}", port);
-            return false;
-        }
-        int offset = port - startPort;
-        if (allocatedPorts.get(offset)) {
-            allocatedPorts.clear(offset);
-            logger.debug("释放端口占用: {}", port);
-            return true;
-        } else {
-            logger.warn("尝试释放未分配的端口: {}", port);
-            return false;
+        writeLock.lock();
+        try {
+            if (port < startPort || port > endPort) {
+                logger.debug("释放端口超出范围: {}", port);
+                return false;
+            }
+            int offset = port - startPort;
+            if (allocatedPorts.get(offset)) {
+                allocatedPorts.clear(offset);
+                logger.debug("释放端口占用: {}", port);
+                return true;
+            } else {
+                logger.debug("尝试释放未分配的端口: {}", port);
+                return false;
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
     public boolean isAvailable(int port) {
-        if (port < startPort || port > endPort) {
-            logger.warn("端口 {} 不在允许范围 {}-{} 内", port, startPort, endPort);
-            return false;
+        readLock.lock();
+        try {
+            if (port < startPort || port > endPort) {
+                logger.warn("端口 {} 不在允许范围 {}-{} 内", port, startPort, endPort);
+                return false;
+            }
+            int offset = port - startPort;
+            if (allocatedPorts.get(offset)) {
+                return false;
+            }
+            return tryBindPort(port);
+        } finally {
+            readLock.unlock();
         }
-        int offset = port - startPort;
-        if (allocatedPorts.get(offset)) {
-            return false;
-        }
-        return tryBindPort(port);
     }
 
     public void addPort(Integer port) throws EtpException {
