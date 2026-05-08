@@ -16,26 +16,40 @@
 
 package com.xiaoniucode.etp.server.web.core.repository;
 
+import com.xiaoniucode.etp.server.service.repository.AgentStore;
 import com.xiaoniucode.etp.server.service.repository.AgentQueryRepository;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
-import com.xiaoniucode.etp.server.web.core.converter.AgentModelConvert;
-import com.xiaoniucode.etp.server.web.entity.AgentDO;
-import com.xiaoniucode.etp.server.web.repository.AgentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
-@Repository
-public class AgentQueryRepositoryImpl implements AgentQueryRepository {
-    @Autowired
-    private AgentRepository agentRepository;
-    @Autowired
-    private AgentModelConvert agentModelConvert;
+@Repository("embeddedAgentQueryRepository")
+public class EmbeddedAgentQueryRepository implements AgentQueryRepository, AgentStore {
+    private final Map<String, AgentInfo> map = new ConcurrentHashMap<>();
 
     @Override
     public Optional<AgentInfo> findById(String agentId) {
-        Optional<AgentDO> agentDO = agentRepository.findById(agentId);
-        return agentDO.map(aDo -> agentModelConvert.toAgentInfo(aDo));
+        if (agentId == null) return Optional.empty();
+        return Optional.ofNullable(map.get(agentId));
+    }
+
+    @Override
+    public List<AgentInfo> findAll() {
+        return new ArrayList<>(map.values());
+    }
+
+    @Override
+    public void save(AgentInfo agentInfo) {
+        map.put(agentInfo.getAgentId(), agentInfo);
+    }
+
+    @Override
+    public void delete(String agentId) {
+        if (agentId == null) return;
+        map.remove(agentId);
     }
 }

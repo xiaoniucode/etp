@@ -14,12 +14,22 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.service.repository;
+package com.xiaoniucode.etp.server.service;
+
+import com.xiaoniucode.etp.core.enums.AgentType;
+import lombok.Data;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+@Data
+public class AgentMeta {
+    private final String agentId;
+    private final AgentType agentType = AgentType.EMBEDDED;
+    private final Set<String> proxyIds = ConcurrentHashMap.newKeySet();
+    private final Set<Integer> listenPorts = ConcurrentHashMap.newKeySet();
+    private final Set<String> domains = ConcurrentHashMap.newKeySet();
 
-public interface DomainQueryRepository {
-    boolean existsByFullDomain(String fullDomain);
-
-    Set<String> findDomainsByProxyId(String proxyId);
+    public AgentMeta(String agentId) {
+        this.agentId = agentId;
+    }
 }

@@ -183,7 +183,6 @@ strategy = "random" # 策略：roundrobin/weight/random/leastconn
 [[proxies]]
 name = "postgre"
 protocol = "tcp"
-remote_port = 5432
 enabled = true
 targets = [
     { host = "127.0.0.1", port = 5432, weight = 70, name = "web-instance-1" },
@@ -193,7 +192,6 @@ targets = [
 name = "test"
 protocol = "tcp"
 enabled = true
-remote_port = 5202
 targets = [
     #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
@@ -214,7 +212,6 @@ limit_total = "2Mbps" #总带宽限制(可选)
 name = "test_mux"
 protocol = "tcp"
 enabled = true
-remote_port = 5203
 targets = [
     #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
@@ -234,7 +231,6 @@ limit = "1M" #总带宽限制(可选)
 name = "test_mux_tls"
 protocol = "tcp"
 enabled = true
-remote_port = 5204
 targets = [
     #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }

@@ -14,23 +14,11 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.statemachine.agent.action.config;
+package com.xiaoniucode.etp.server.service.repository;
 
-import lombok.Getter;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 
-import java.util.List;
-import java.util.Set;
-
-/**
- * 操作结果
- */
-@Getter
-public class ProxyOperationResult {
-    private final Set<String> domains;
-    private final Integer listenPort;
-
-    public ProxyOperationResult(Set<String> domains, Integer listenPort) {
-        this.domains = domains;
-        this.listenPort = listenPort;
-    }
+public interface AgentStore {
+    void save(AgentInfo agentInfo);
+    void delete(String agentId);
 }

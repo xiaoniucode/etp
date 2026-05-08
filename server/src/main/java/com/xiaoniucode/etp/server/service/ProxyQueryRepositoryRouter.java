@@ -17,20 +17,23 @@
 package com.xiaoniucode.etp.server.service;
 
 import com.xiaoniucode.etp.core.enums.AgentType;
-import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
+import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
 
 @Service
-public class AgentConfigService {
+public class ProxyQueryRepositoryRouter {
     @Autowired
-    private AgentQueryRepositoryRouter agentQueryRepositoryRouter;
-    @Autowired
-    private EmbeddedAgentRegistry embeddedAgentRegistry;
+    @Qualifier("standaloneProxyQueryRepository")
+    private ProxyQueryRepository standalone;
 
-    public Optional<AgentInfo> findById(String agentId) {
-        AgentType agentType = embeddedAgentRegistry.identifyByAgentId(agentId);
-        return agentQueryRepositoryRouter.route(agentType).findById(agentId);
+    @Autowired
+    @Qualifier("embeddedProxyQueryRepository")
+    private ProxyQueryRepository embedded;
+
+    public ProxyQueryRepository route(AgentType type) {
+        if (type.isEmbedded()) return embedded;
+        return standalone;
     }
 }

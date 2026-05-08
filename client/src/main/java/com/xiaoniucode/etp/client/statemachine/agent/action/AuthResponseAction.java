@@ -22,7 +22,7 @@ public class AuthResponseAction extends AgentBaseAction {
             context.setConnectionId(authResponse.getConnectionId());
             context.setAuthenticated(true);
             AgentType agentType = context.getAgentType();
-            context.getAgentIdentity().updateIdentity(agentId, agentType.isBinary());
+            context.getAgentIdentity().updateIdentity(agentId, agentType.isStandalone());
             context.fireEvent(AgentEvent.AUTH_SUCCESS);
         } else {
             logger.error("{}", authResponse.getMessage());

@@ -23,16 +23,18 @@ import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.service.DomainConfigService;
+import com.xiaoniucode.etp.server.service.EmbeddedAgentRegistry;
+import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -43,14 +45,16 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(HttpProxyOperationStrategy.class);
 
     private final ProxyManager proxyManager;
-    private final DomainConfigService domainConfigService;
     private final DomainGenerator domainGenerator;
     @Resource
     private AppConfig appConfig;
+    @Autowired
+    private EmbeddedAgentRegistry embeddedAgentRegistry;
+    @Autowired
+    private ProxyConfigService proxyConfigService;
 
-    public HttpProxyOperationStrategy(ProxyManager proxyManager, DomainConfigService domainConfigService, DomainGenerator domainGenerator) {
+    public HttpProxyOperationStrategy(ProxyManager proxyManager, DomainGenerator domainGenerator) {
         this.proxyManager = proxyManager;
-        this.domainConfigService = domainConfigService;
         this.domainGenerator = domainGenerator;
     }
 
@@ -58,7 +62,7 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
     public ProxyOperationResult create(ProxyConfig config, AgentInfo agentInfo) {
         String baseDomain = appConfig.getBaseDomain();
         logger.debug("创建HTTP代理: {}", config.getName());
-        List<String> domains;
+        Set<String> domains;
 
         RouteConfig routeConfig = config.getRouteConfig();
         DomainType domainType = routeConfig.getDomainType();
@@ -69,7 +73,8 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
                 throw new EtpException("服务不支持自动生成域名");
             }
             String domain = domainGenerator.generateRandomSubdomain(baseDomain);
-            domains = List.of(domain + "." + baseDomain);
+            domains = new HashSet<>();
+            domains.add(domain + "." + baseDomain);
         } else {
             if (!StringUtils.hasText(baseDomain)) {
                 throw new EtpException("不支持子域名");
@@ -80,7 +85,11 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
             }
             domains = domainGenerator.generateSubdomains(baseDomain, subDomains);
         }
-        proxyManager.activate(config);
+        if (agentInfo.getAgentType().isEmbedded()) {
+            embeddedAgentRegistry.addProxyId(agentInfo.getAgentId(), config.getProxyId());
+            embeddedAgentRegistry.addDomains(agentInfo.getAgentId(), domains);
+        }
+        proxyManager.activate(config,domains);
         logger.debug("HTTP代理 {} 创建成功，域名: {}", config.getName(), domains);
         return new ProxyOperationResult(domains, null);
     }
@@ -92,6 +101,10 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
                     newConfig.getName(), oldConfig.getProtocol().name(), newConfig.getProtocol().name());
         }
         logger.debug("更新HTTP代理: {}", newConfig.getName());
+        if (agentInfo.getAgentType().isEmbedded()) {
+            Set<String> domains = proxyConfigService.findDomainsByProxyId(oldConfig.getProxyId());
+            embeddedAgentRegistry.removeDomains(agentInfo.getAgentId(), domains);
+        }
         proxyManager.deactivate(oldConfig.getProxyId());
         return create(newConfig, agentInfo);
     }

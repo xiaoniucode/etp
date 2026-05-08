@@ -18,6 +18,7 @@ package com.xiaoniucode.etp.server.statemachine.agent.action;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
+import com.xiaoniucode.etp.server.service.ProxyConfigExt;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
@@ -41,12 +42,18 @@ public class AgentInitAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.debug("初始化客户端配置信息");
-        List<ProxyConfig> configs = proxyConfigService.findByAgentId(context.getAgentInfo().getAgentId());
+        List<ProxyConfigExt> configs = proxyConfigService.findByAgentId(context.getAgentInfo().getAgentId());
         if (!CollectionUtils.isEmpty(configs)) {
-            configs.forEach(config -> {
+            configs.forEach(configExt -> {
+                ProxyConfig config = configExt.getProxyConfig();
                 if (config.getStatus().isOpen()) {
-                    logger.debug("激活代理配置: {}", config);
-                    proxyManager.activate(config);
+                    if (config.isHttp()) {
+                        proxyManager.activate(config, configExt.getDomains());
+                        logger.debug("激活HTTP代理配置: {}", config);
+                    } else {
+                        logger.debug("激活TCP代理配置: {}", config);
+                        proxyManager.activate(config);
+                    }
                 }
             });
         }

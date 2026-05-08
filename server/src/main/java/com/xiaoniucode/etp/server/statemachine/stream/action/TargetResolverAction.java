@@ -117,7 +117,7 @@ public class TargetResolverAction extends StreamBaseAction {
             return proxyConfigService.findById(proxyId).orElse(null);
         } else if (context.getCurrentProtocol() == ProtocolType.TCP) {
             int remotePort = context.getListenerPort();
-            return proxyConfigService.findByRemotePort(remotePort).orElse(null);
+            return proxyConfigService.findByListenPort(remotePort).orElse(null);
         }
         return null;
     }

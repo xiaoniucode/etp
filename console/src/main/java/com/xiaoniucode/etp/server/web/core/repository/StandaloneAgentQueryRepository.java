@@ -16,27 +16,26 @@
 
 package com.xiaoniucode.etp.server.web.core.repository;
 
-import com.xiaoniucode.etp.server.service.repository.DomainQueryRepository;
-import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
+import com.xiaoniucode.etp.server.service.repository.AgentQueryRepository;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
+import com.xiaoniucode.etp.server.web.core.converter.AgentModelConvert;
+import com.xiaoniucode.etp.server.web.entity.AgentDO;
+import com.xiaoniucode.etp.server.web.repository.AgentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Set;
+import java.util.Optional;
 
-@Repository
-public class DomainQueryRepositoryImpl implements DomainQueryRepository {
+@Repository("standaloneAgentQueryRepository")
+public class StandaloneAgentQueryRepository implements AgentQueryRepository {
     @Autowired
-    private ProxyDomainRepository proxyDomainRepository;
-
-
-    @Override
-    public boolean existsByFullDomain(String fullDomain) {
-        return proxyDomainRepository.existsByFullDomain(fullDomain);
-    }
+    private AgentRepository agentRepository;
+    @Autowired
+    private AgentModelConvert agentModelConvert;
 
     @Override
-    public Set<String> findDomainsByProxyId(String proxyId) {
-       return proxyDomainRepository.findFullDomainsByProxyId(proxyId);
-
+    public Optional<AgentInfo> findById(String agentId) {
+        Optional<AgentDO> agentDO = agentRepository.findById(agentId);
+        return agentDO.map(aDo -> agentModelConvert.toAgentInfo(aDo));
     }
 }

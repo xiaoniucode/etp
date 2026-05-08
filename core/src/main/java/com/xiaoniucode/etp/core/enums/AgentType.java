@@ -18,7 +18,8 @@ public enum AgentType {
     /**
      * 标准客户端（独立运行的可执行程序，长期运行，支持配置持久化）
      */
-    STANDALONE(1, "Standalone Agent", false);
+    STANDALONE(1, "Standalone Agent", false),
+    UNKNOWN(-1, "UNKNOWN", true);
 
     private final Integer code;
     private final String description;
@@ -33,11 +34,11 @@ public enum AgentType {
         return null;
     }
 
-    public boolean isSession() {
+    public boolean isEmbedded() {
         return this == EMBEDDED;
     }
 
-    public boolean isBinary() {
+    public boolean isStandalone() {
         return this == STANDALONE;
     }
 }

@@ -14,20 +14,17 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.core.repository;
+package com.xiaoniucode.etp.server.service;
 
-import com.xiaoniucode.etp.server.service.repository.TokenQueryRepository;
-import com.xiaoniucode.etp.server.web.repository.AccessTokenRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Repository
-public class TokenQueryRepositoryImpl implements TokenQueryRepository {
-    @Autowired
-    private AccessTokenRepository accessTokenRepository;
+import java.util.Set;
 
-    @Override
-    public boolean existsByToken(String token) {
-        return accessTokenRepository.existsByToken(token);
-    }
+@Data
+@AllArgsConstructor
+public class ProxyConfigExt {
+    private ProxyConfig proxyConfig;
+    private Set<String> domains;
 }

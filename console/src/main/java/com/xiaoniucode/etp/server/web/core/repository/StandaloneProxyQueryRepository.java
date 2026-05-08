@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.web.core.repository;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.server.service.ProxyConfigExt;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import com.xiaoniucode.etp.server.web.core.repository.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
@@ -30,12 +31,13 @@ import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyTargetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
-@Repository
-public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
+@Repository("standaloneProxyQueryRepository")
+public class StandaloneProxyQueryRepository implements ProxyQueryRepository {
     @Autowired
     private ProxyRepository proxyRepository;
     @Autowired
@@ -67,7 +69,7 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
         if (config.getProtocol().isHttp()) {
             List<ProxyDomainDO> domainDOs = proxyDomainRepository.findByProxyId(config.getProxyId());
             proxyConfigAssembler.assembleDomains(config, domainDOs);
-            if (result.getBasicAuthDO()!=null){
+            if (result.getBasicAuthDO() != null) {
                 String proxyId = result.getBasicAuthDO().getProxyId();
                 List<BasicUserDO> basicUsers = basicUserRepository.findByProxyId(proxyId);
                 proxyConfigAssembler.assembleBasicAuthUsers(config, basicUsers);
@@ -88,8 +90,8 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
     }
 
     @Override
-    public Optional<ProxyConfig> findByRemotePort(int remotePort) {
-        ProxyDetailQueryResult result = proxyRepository.findDetailByRemotePort(remotePort);
+    public Optional<ProxyConfig> findByListenPort(int listenPort) {
+        ProxyDetailQueryResult result = proxyRepository.findDetailByListenPort(listenPort);
         return Optional.ofNullable(assembleProxyConfig(result));
     }
 
@@ -104,8 +106,34 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
     }
 
     @Override
-    public List<ProxyConfig> findByAgentId(String agentId) {
+    public List<ProxyConfigExt> findByAgentId(String agentId) {
         List<ProxyDO> list = proxyRepository.findByAgentId(agentId);
-        return proxyConfigAssembler.assembleList(list);
+        if (CollectionUtils.isEmpty(list)) {
+            return List.of();
+        }
+        List<String> proxyIds = list.stream().map(ProxyDO::getId).toList();
+        List<ProxyDomainDO> proxyDomainDOs = proxyDomainRepository.findByProxyIdIn(proxyIds);
+        Map<String, List<ProxyDomainDO>> domainMap = proxyDomainDOs.stream()
+                .collect(Collectors.groupingBy(ProxyDomainDO::getProxyId));
+        return proxyConfigAssembler.assembleList(list).stream()
+                .map(config -> {
+                    List<ProxyDomainDO> domains = domainMap.getOrDefault(config.getProxyId(), List.of());
+                    Set<String> domainList = domains.stream()
+                            .map(ProxyDomainDO::getDomain)
+                            .collect(Collectors.toSet());
+                    return new ProxyConfigExt(config, domainList);
+                })
+                .toList();
+    }
+
+    @Override
+    public boolean existsByFullDomain(String fullDomain) {
+        return proxyDomainRepository.existsByFullDomain(fullDomain);
+    }
+
+    @Override
+    public Set<String> findDomainsByProxyId(String proxyId) {
+        return proxyDomainRepository.findFullDomainsByProxyId(proxyId);
+
     }
 }

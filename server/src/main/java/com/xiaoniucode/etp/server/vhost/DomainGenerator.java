@@ -17,14 +17,14 @@
 package com.xiaoniucode.etp.server.vhost;
 
 import com.xiaoniucode.etp.server.exceptions.DomainConflictException;
-import com.xiaoniucode.etp.server.service.DomainConfigService;
+import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,7 +36,7 @@ public class DomainGenerator {
     private static final int MAX_PREFIX_LENGTH = 10;
     private static final String PREFIX_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
     @Autowired
-    private DomainConfigService domainConfigService;
+    private ProxyConfigService proxyConfigService;
 
     public List<String> generateRandomSubdomains(String baseDomain, int count) {
         List<String> domains = new ArrayList<>();
@@ -54,7 +54,7 @@ public class DomainGenerator {
     private String generateRandomDomainPrefix(String baseDomain) {
         for (int i = 0; i < 20; i++) {
             String prefix = generateRandomPrefix();
-            if (!domainConfigService.exists(prefix + "." + baseDomain)) {
+            if (!proxyConfigService.exists(prefix + "." + baseDomain)) {
                 return prefix;
             }
         }
@@ -70,11 +70,11 @@ public class DomainGenerator {
         return sb.toString();
     }
 
-    public List<String> generateSubdomains(String baseDomain, Set<String> subDomains) {
-       List<String> res = new ArrayList<>();
+    public Set<String> generateSubdomains(String baseDomain, Set<String> subDomains) {
+        Set<String> res = new HashSet<>();
         //todo 一次性检查所有子域名是否存在，避免多次查询
         for (String subDomain : subDomains) {
-            if (domainConfigService.exists(subDomain + "." + baseDomain)) {
+            if (proxyConfigService.exists(subDomain + "." + baseDomain)) {
                 throw new DomainConflictException("域名[" + subDomain + "." + baseDomain + "]已被占用");
             }
             res.add(subDomain + "." + baseDomain);
@@ -82,11 +82,11 @@ public class DomainGenerator {
         return res;
     }
 
-    public List<String> generateCustomDomains(Set<String> customDomains) {
+    public Set<String> generateCustomDomains(Set<String> customDomains) {
         //todo 一次性检查所有子域名是否存在，避免多次查询
-        List<String> validatedDomains = new ArrayList<>();
+        Set<String> validatedDomains = new HashSet<>();
         for (String domain : customDomains) {
-            if (domainConfigService.exists(domain)) {
+            if (proxyConfigService.exists(domain)) {
                 throw new DomainConflictException("域名[" + domain + "]已被占用");
             }
             validatedDomains.add(domain);

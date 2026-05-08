@@ -16,16 +16,21 @@
 
 package com.xiaoniucode.etp.server.web.core.listener.persistence;
 
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.enums.AgentType;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.ProxyReportEvent;
-import com.xiaoniucode.etp.server.web.service.ProxyService;
+import com.xiaoniucode.etp.server.service.repository.ProxyStore;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 /**
  * 代理配置创建事件处理，用于持久化代理客户端注册的代理配置信息
@@ -36,7 +41,7 @@ public class ProxyReportListener implements EventListener<ProxyReportEvent> {
     @Autowired
     private EventBus eventBus;
     @Autowired
-    private ProxyService proxyService;
+    private ProxyStore proxyStore;
 
     @PostConstruct
     public void init() {
@@ -46,6 +51,21 @@ public class ProxyReportListener implements EventListener<ProxyReportEvent> {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void onEvent(ProxyReportEvent event) {
+        ProxyConfig config = event.getProxyConfig();
+        AgentType agentType = config.getAgentType();
+        ProtocolType protocol = config.getProtocol();
+        boolean update = event.isUpdate();
+        if (agentType.isEmbedded()) {
+            if (protocol.isTcp()) {
+                proxyStore.saveTcp(config);
+            } else if (protocol.isHttp()) {
+                String baseDomain = event.getBaseDomain();
+                Set<String> subdomains = event.getSubdomains();
+                proxyStore.saveHttp(config, subdomains);
+            }
+        } else {
+
+        }
 
 
         logger.debug("Received ProxyCreateEvent: {}", event);

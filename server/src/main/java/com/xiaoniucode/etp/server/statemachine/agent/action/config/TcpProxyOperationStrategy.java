@@ -21,22 +21,22 @@ import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.exceptions.PortConflictException;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.port.PortManager;
+import com.xiaoniucode.etp.server.service.EmbeddedAgentRegistry;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(TcpProxyOperationStrategy.class);
-
-    private final PortManager portManager;
-    private final ProxyManager proxyManager;
-
-    public TcpProxyOperationStrategy(PortManager portManager, ProxyManager proxyManager) {
-        this.portManager = portManager;
-        this.proxyManager = proxyManager;
-    }
+    @Autowired
+    private PortManager portManager;
+    @Autowired
+    private ProxyManager proxyManager;
+    @Autowired
+    private EmbeddedAgentRegistry embeddedAgentRegistry;
 
     @Override
     public ProxyOperationResult create(ProxyConfig config, AgentInfo agentInfo) {
@@ -57,9 +57,13 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
             portManager.addPort(remotePort);
         }
         proxyManager.activate(config);
+        if (agentInfo.getAgentType().isEmbedded()) {
+            String agentId = agentInfo.getAgentId();
+            embeddedAgentRegistry.addProxyId(agentId, config.getProxyId());
+            embeddedAgentRegistry.addListenPort(agentId, config.getListenPort());
+        }
         logger.debug("TCP代理 {} 注册成功，监听端口: {}", config.getName(), config.getListenPort());
         return new ProxyOperationResult(null, config.getListenPort());
-
     }
 
     @Override
@@ -80,6 +84,10 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
                     throw new PortConflictException(newRemotePort);
                 }
                 newConfig.setListenPort(newRemotePort);
+                if (agentInfo.getAgentType().isEmbedded()) {
+                    embeddedAgentRegistry.removeListenPort(agentInfo.getAgentId(), oldConfig.getListenPort());
+                    embeddedAgentRegistry.addListenPort(agentInfo.getAgentId(), newConfig.getListenPort());
+                }
                 portManager.addPort(newRemotePort);
             } else {
                 newConfig.setRemotePort(oldConfig.getListenPort());

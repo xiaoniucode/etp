@@ -40,7 +40,6 @@ public class TMSPCodec {
         protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
             ByteBuf byteBuf = (ByteBuf) super.decode(ctx, in);
             if (byteBuf == null) {
-                //数据包不足，等待下一次
                 return null;
             }
             try {

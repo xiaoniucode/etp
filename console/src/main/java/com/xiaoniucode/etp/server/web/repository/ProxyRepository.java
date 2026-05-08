@@ -7,7 +7,6 @@ import com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult;
 import com.xiaoniucode.etp.server.web.dto.stats.DashboardSummaryDTO;
 import com.xiaoniucode.etp.server.web.dto.stats.ProxyProtocolCountDTO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
-import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -70,9 +69,9 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
             LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
             LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
             LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
-            WHERE p.remotePort = :remotePort
+            WHERE p.listenPort = :listenPort
             """)
-    ProxyDetailQueryResult findDetailByRemotePort(@Param("remotePort") Integer remotePort);
+    ProxyDetailQueryResult findDetailByListenPort(@Param("listenPort") Integer listenPort);
 
     @Query("""
             SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(

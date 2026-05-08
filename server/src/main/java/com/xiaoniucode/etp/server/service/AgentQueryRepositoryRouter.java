@@ -16,29 +16,25 @@
 
 package com.xiaoniucode.etp.server.service;
 
-
-import com.xiaoniucode.etp.server.service.repository.DomainQueryRepository;
+import com.xiaoniucode.etp.core.enums.AgentType;
+import com.xiaoniucode.etp.server.service.repository.AgentQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-
 @Service
-public class DomainConfigService {
+public class AgentQueryRepositoryRouter {
     @Autowired
-    private DomainQueryRepository domainQueryRepository;
+    @Qualifier("standaloneAgentQueryRepository")
+    private AgentQueryRepository standalone;
+    @Autowired
+    @Qualifier("embeddedAgentQueryRepository")
+    private AgentQueryRepository embedded;
 
-    /**
-     * 检查域名是否存在
-     *
-     * @param fullDomain 完整域名
-     * @return true 如果域名已存在，false 如果域名不存在
-     */
-    public boolean exists(String fullDomain) {
-        return domainQueryRepository.existsByFullDomain(fullDomain);
-    }
-
-    public Set<String> findDomainsByProxyId(String proxyId) {
-        return domainQueryRepository.findDomainsByProxyId(proxyId);
+    public AgentQueryRepository route(AgentType agentType) {
+        if (agentType.isEmbedded()) {
+            return embedded;
+        }
+        return standalone;
     }
 }

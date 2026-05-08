@@ -9,7 +9,6 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.ProxyReportEvent;
-import com.xiaoniucode.etp.server.service.DomainConfigService;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.service.diff.ConfigChangeDetector;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
@@ -24,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class ProxyCreateAction extends AgentBaseAction {
@@ -46,8 +42,6 @@ public class ProxyCreateAction extends AgentBaseAction {
     private ProxyOperationStrategyFactory strategyFactory;
     @Autowired
     private ProxyConfigResponseBuilder responseBuilder;
-    @Autowired
-    private DomainConfigService domainConfigService;
     @Autowired
     private EventBus eventBus;
 
@@ -79,7 +73,7 @@ public class ProxyCreateAction extends AgentBaseAction {
         }
     }
 
-    private void notifyProxyReport(boolean isUpdate, ProxyConfig config, List<String> domains) {
+    private void notifyProxyReport(boolean isUpdate, ProxyConfig config, Set<String> domains) {
         String baseDomain = appConfig.getBaseDomain();
         if (!isUpdate) {
             if (config.isTcp()) {
@@ -114,8 +108,8 @@ public class ProxyCreateAction extends AgentBaseAction {
         newConfig.setProxyId(oldConfig.getProxyId());
         if (!configChangeDetector.hasChanges(oldConfig, newConfig)) {
             logger.debug("代理配置 {} 没有发生变更，无需更新", newConfig.getName());
-            Set<String> domains = domainConfigService.findDomainsByProxyId(oldConfig.getProxyId());
-            return new ProxyOperationResult(new ArrayList<>(domains), oldConfig.getListenPort());
+            Set<String> domains = proxyConfigService.findDomainsByProxyId(oldConfig.getProxyId());
+            return new ProxyOperationResult(new HashSet<>(domains), oldConfig.getListenPort());
         }
         ProxyConfigOperationStrategy strategy = strategyFactory.getStrategy(newConfig);
         return strategy.update(newConfig, oldConfig, context.getAgentInfo());
@@ -135,7 +129,7 @@ public class ProxyCreateAction extends AgentBaseAction {
     /**
      * 发送成功响应
      */
-    private void sendSuccessResponse(ProxyConfig config, List<String> domains, Channel control) {
+    private void sendSuccessResponse(ProxyConfig config, Set<String> domains, Channel control) {
         Message.NewProxyResp response = responseBuilder.buildNewProxyResponse(config, domains);
         ByteBuf payload = ProtobufUtil.toByteBuf(response, control.alloc());
         TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, payload);

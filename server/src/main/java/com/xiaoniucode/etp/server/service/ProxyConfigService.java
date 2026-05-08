@@ -17,53 +17,65 @@
 package com.xiaoniucode.etp.server.service;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.enums.ProxyStatus;
-import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
-import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ProxyConfigService {
     @Autowired
-    private ProxyQueryRepository proxyQueryRepository;
-    @Resource
-    private AppConfig appConfig;
+    private ProxyQueryRepositoryRouter proxyQueryRepositoryRouter;
+    @Autowired
+    private EmbeddedAgentRegistry embeddedAgentRegistry;
 
     public Optional<ProxyConfig> findById(String proxyId) {
-        return proxyQueryRepository.findById(proxyId);
+        AgentType type = embeddedAgentRegistry.identifyByProxyId(proxyId);
+        ProxyQueryRepository repo = proxyQueryRepositoryRouter.route(type);
+        return repo.findById(proxyId);
     }
 
     public Optional<ProxyConfig> findByDomain(String domain) {
-        return proxyQueryRepository.findByFullDomain(domain);
+        AgentType type = embeddedAgentRegistry.identifyByDomain(domain);
+        ProxyQueryRepository repo = proxyQueryRepositoryRouter.route(type);
+        return repo.findByFullDomain(domain);
     }
 
     public Optional<ProxyConfig> findByAgentAndName(String agentId, String proxyName) {
-        return proxyQueryRepository.findByAgentAndName(agentId, proxyName);
+        AgentType type = embeddedAgentRegistry.identifyByAgentId(agentId);
+        ProxyQueryRepository repo = proxyQueryRepositoryRouter.route(type);
+        return repo.findByAgentAndName(agentId, proxyName);
     }
 
-    public Optional<ProxyConfig> findByRemotePort(int remotePort) {
-        return proxyQueryRepository.findByRemotePort(remotePort);
+    public Optional<ProxyConfig> findByListenPort(int remotePort) {
+        AgentType type = embeddedAgentRegistry.identifyByListenPort(remotePort);
+        ProxyQueryRepository repo = proxyQueryRepositoryRouter.route(type);
+        return repo.findByListenPort(remotePort);
+    }
+
+    public boolean exists(String fullDomain) {
+        AgentType type = embeddedAgentRegistry.identifyByDomain(fullDomain);
+        ProxyQueryRepository repo = proxyQueryRepositoryRouter.route(type);
+        return repo.existsByFullDomain(fullDomain);
+    }
+
+    public Set<String> findDomainsByProxyId(String proxyId) {
+        AgentType type = embeddedAgentRegistry.identifyByProxyId(proxyId);
+        ProxyQueryRepository repo = proxyQueryRepositoryRouter.route(type);
+        return repo.findDomainsByProxyId(proxyId);
     }
 
     public List<Integer> getAllListenPorts() {
-        return proxyQueryRepository.findAllListenPorts();
-    }
-    public void evictByAgentId(String agentId){
-
-    }
-    public void evictByProxyId(String proxyId){
-
-    }
-    public void evictAll(){
-
+        return proxyQueryRepositoryRouter.route(AgentType.STANDALONE).findAllListenPorts();
     }
 
-    public List<ProxyConfig> findByAgentId(String agentId) {
-        return proxyQueryRepository.findByAgentId(agentId);
+    public List<ProxyConfigExt> findByAgentId(String agentId) {
+        AgentType type = embeddedAgentRegistry.identifyByAgentId(agentId);
+        ProxyQueryRepository repo = proxyQueryRepositoryRouter.route(type);
+        return repo.findByAgentId(agentId);
     }
 }

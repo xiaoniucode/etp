@@ -16,12 +16,12 @@
 
 package com.xiaoniucode.etp.server.web.core.listener.persistence;
 
-import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.AgentAuthEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.web.core.converter.AgentModelConvert;
+import com.xiaoniucode.etp.server.service.repository.AgentStore;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
 import com.xiaoniucode.etp.server.web.repository.AgentRepository;
 import jakarta.annotation.PostConstruct;
@@ -42,7 +42,8 @@ public class AgentAuthListener implements EventListener<AgentAuthEvent> {
     private AgentRepository agentRepository;
     @Autowired
     private AgentModelConvert agentModelConvert;
-
+    @Autowired
+    private AgentStore agentStore;
     @PostConstruct
     public void init() {
         eventBus.register(this);
@@ -53,8 +54,12 @@ public class AgentAuthListener implements EventListener<AgentAuthEvent> {
         logger.debug("Received AgentAuthEvent: {}", event);
         boolean reconnect = event.isReconnect();
         AgentInfo agentInfo = event.getAgentInfo();
-        if (reconnect || agentInfo.getAgentType() == AgentType.EMBEDDED) {
+        if (reconnect) {
             return;
+        }
+        if (agentInfo.getAgentType().isEmbedded()) {
+            agentStore.save(agentInfo);
+
         }
         AgentDO agentDO = agentModelConvert.toDO(agentInfo);
         agentRepository.save(agentDO);

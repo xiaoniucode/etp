@@ -22,7 +22,6 @@ import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
-import com.xiaoniucode.etp.server.service.DomainConfigService;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.vhost.DomainRegistry;
 import io.netty.util.internal.logging.InternalLogger;
@@ -57,8 +56,6 @@ public class ProxyManager {
     private DomainRegistry domainRegistry;
     @Autowired
     private StreamManager streamManager;
-    @Autowired
-    private DomainConfigService domainConfigService;
 
     /**
      * 激活代理
@@ -67,6 +64,10 @@ public class ProxyManager {
      * @throws EtpException 异常
      */
     public void activate(ProxyConfig config) throws EtpException {
+        activate(config, null);
+    }
+
+    public void activate(ProxyConfig config, Set<String> domains) throws EtpException {
         if (config == null || config.getStatus().isClosed()) {
             return;
         }
@@ -86,7 +87,6 @@ public class ProxyManager {
             if (domainRegistry.exists(proxyId)) {
                 return;
             }
-            Set<String> domains = domainConfigService.findDomainsByProxyId(proxyId);
             if (!CollectionUtils.isEmpty(domains)) {
                 //将域名注册到域名注册中心
                 domainRegistry.register(proxyId, domains);

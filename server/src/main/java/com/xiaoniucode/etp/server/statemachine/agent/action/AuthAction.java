@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.event.AgentAuthEvent;
 import com.xiaoniucode.etp.server.service.AgentConfigService;
+import com.xiaoniucode.etp.server.service.EmbeddedAgentRegistry;
 import com.xiaoniucode.etp.server.service.TokenConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
@@ -38,6 +39,8 @@ public class AuthAction extends AgentBaseAction {
     private EventBus eventBus;
     @Autowired
     private AgentConfigService agentConfigService;
+    @Autowired
+    private EmbeddedAgentRegistry embeddedAgentRegistry;
 
     /**
      * 检查 Token 是否存在
@@ -117,7 +120,7 @@ public class AuthAction extends AgentBaseAction {
                 .setAgentId(agentId)
                 .setMessage("认证成功")
                 .build();
-
+        embeddedAgentRegistry.addAgent(agentId);
         TMSPFrame authFrame = new TMSPFrame(0, TMSP.MSG_AUTH_RESP);
         ByteBuf payload = ProtobufUtil.toByteBuf(authResponse, control.alloc());
         authFrame.setPayload(payload);

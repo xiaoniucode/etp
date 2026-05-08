@@ -18,8 +18,13 @@ package com.xiaoniucode.etp.server.service.repository;
 
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AgentQueryRepository {
     Optional<AgentInfo> findById(String agentId);
+
+    default List<AgentInfo> findAll() {
+        return List.of();
+    }
 }

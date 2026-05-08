@@ -21,6 +21,7 @@ import com.xiaoniucode.etp.core.notify.Event;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 public class ProxyReportEvent extends Event {
@@ -35,7 +36,7 @@ public class ProxyReportEvent extends Event {
     /**
      * 完整子域名列表，完整域名=子域名.基础域名
      */
-    private List<String> subdomains;
+    private Set<String> subdomains;
     /**
      * 是否是更新事件，true=更新事件，false=新增事件
      */
@@ -46,7 +47,7 @@ public class ProxyReportEvent extends Event {
         this.proxyConfig = proxyConfig;
     }
 
-    public ProxyReportEvent(boolean isUpdate, String baseDomain, List<String> subdomains, ProxyConfig proxyConfig) {
+    public ProxyReportEvent(boolean isUpdate, String baseDomain, Set<String> subdomains, ProxyConfig proxyConfig) {
         this.isUpdate = isUpdate;
         this.proxyConfig = proxyConfig;
         this.baseDomain = baseDomain;
