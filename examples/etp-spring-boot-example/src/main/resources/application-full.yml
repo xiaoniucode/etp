@@ -5,7 +5,6 @@ etp:
     server-port: 9527
     auth:
       token: 5E793FAD27AA713D
-
     connection:
       retry:
         initial-delay: 1
@@ -25,11 +24,11 @@ etp:
       local-ip: 127.0.0.1
       auto-domain: true
       custom-domains:
-        - a.domain.com
-        - b.domain.com
+        - a.domain1.com
+        - b.domain1.com
       sub-domains:
-        - api
-        - ui
+        - sub1
+        - sub2
       transport:
         encrypt: true
         multiplex: true
@@ -51,7 +50,12 @@ etp:
         enabled: true
         mode: allow
         allow:
-          - 192.168.1.0/24
-          - 10.0.0.0/8
+          - 127.0.0.1/32        # 本机回环
+          - 192.168.31.0/24     # 家庭/办公局域网
+          - 10.10.0.0/16        # 公司内网
+          - 172.16.0.0/12       # VPN 网络
+
+        # 风控封禁 IP
         deny:
-          - 192.168.1.100/32
+          - 192.168.31.88/32    # 被封禁的测试设备
+          - 10.10.5.23/32       # 异常访问机器

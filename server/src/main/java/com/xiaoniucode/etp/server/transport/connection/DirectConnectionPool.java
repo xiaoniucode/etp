@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.transport.connection;
 
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
 import org.springframework.stereotype.Component;
 
@@ -37,10 +38,10 @@ public class DirectConnectionPool {
     /**
      * agentId --> Pool
      */
-    private final ConcurrentHashMap<String, Pool> clientPools = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Pool> agentPools = new ConcurrentHashMap<>();
 
     public TunnelEntry borrow(String agentId, String tunnelId, boolean isEncrypt) {
-        Pool pool = clientPools.get(agentId);
+        Pool pool = agentPools.get(agentId);
         if (pool == null) {
             return null;
         }
@@ -60,7 +61,7 @@ public class DirectConnectionPool {
         if (tunnelEntry == null || tunnelEntry.getTunnelId() == null) {
             return;
         }
-        Pool pool = clientPools.get(agentId);
+        Pool pool = agentPools.get(agentId);
         if (pool == null) {
             return;
         }
@@ -68,7 +69,7 @@ public class DirectConnectionPool {
     }
 
     public void remove(String agentId, String tunnelId) {
-        Pool pool = clientPools.get(agentId);
+        Pool pool = agentPools.get(agentId);
         if (pool != null) {
             pool.remove(tunnelId);
         }
@@ -85,13 +86,13 @@ public class DirectConnectionPool {
             plainConnections.incrementAndGet();
         }
 
-        Pool pool = clientPools.computeIfAbsent(agentId, k -> new Pool());
+        Pool pool = agentPools.computeIfAbsent(agentId, k -> new Pool());
         pool.register(tunnelEntry.getTunnelId(), tunnelEntry);
         return true;
     }
 
     public void offline(String agentId) {
-        Pool pool = clientPools.remove(agentId);
+        Pool pool = agentPools.remove(agentId);
         if (pool != null) {
             int plainCount = pool.plainPools.size();
             int encryptCount = pool.encryptPools.size();
@@ -201,12 +202,12 @@ public class DirectConnectionPool {
         public void offline() {
             plainPools.values().forEach(ch -> {
                 if (ch != null && ch.getChannel().isActive()) {
-                    ch.getChannel().close();
+                    ChannelUtils.closeOnFlush(ch.getChannel());
                 }
             });
             encryptPools.values().forEach(ch -> {
                 if (ch != null && ch.getChannel().isActive()) {
-                    ch.getChannel().close();
+                    ChannelUtils.closeOnFlush(ch.getChannel());
                 }
             });
             plainPools.clear();

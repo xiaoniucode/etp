@@ -21,5 +21,5 @@ import lombok.Data;
 @Data
 public class TransportCustomProperties {
     private boolean encrypt;
-    private boolean multiplex;
+    private boolean multiplex = true;
 }

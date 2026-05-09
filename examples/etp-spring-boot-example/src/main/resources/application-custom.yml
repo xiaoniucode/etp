@@ -1,19 +1,23 @@
 etp:
   client:
     enabled: true
-    server-addr: 127.0.0.1 # IP or domain
+    server-addr: 127.0.0.1
+    server-port: 9527
     auth:
       token: 5E793FAD27AA715D
-#    proxy:
-#      custom-domains: test.domain1.com
-#      protocol: http
-#      remote-port: 8008
+    proxy:
+      custom-domains: gateway.domain1.com
+      protocol: http
+      transport:
+        multiplex: true
+        encrypt: true
     transport:
       tls:
         enabled: true
         cert-file: classpath:certs/client.crt
         key-file: classpath:certs/client.key
         ca-file: classpath:certs/ca.crt
+
 
 
 

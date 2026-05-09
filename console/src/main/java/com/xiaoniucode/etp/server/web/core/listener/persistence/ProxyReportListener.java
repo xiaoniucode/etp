@@ -18,6 +18,7 @@ package com.xiaoniucode.etp.server.web.core.listener.persistence;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.AgentType;
+import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
@@ -59,9 +60,12 @@ public class ProxyReportListener implements EventListener<ProxyReportEvent> {
             if (protocol.isTcp()) {
                 proxyStore.saveTcp(config);
             } else if (protocol.isHttp()) {
-                String baseDomain = event.getBaseDomain();
-                Set<String> subdomains = event.getSubdomains();
-                proxyStore.saveHttp(config, subdomains);
+                Set<String> domains = event.getSubdomains();
+                DomainType domainType = config.getRouteConfig().getDomainType();
+                if (domainType.isCustomDomain()){
+                    domains=config.getRouteConfig().getCustomDomains();
+                }
+                proxyStore.saveHttp(config, domains);
             }
         } else {
 

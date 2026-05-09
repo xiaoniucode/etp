@@ -243,7 +243,7 @@ function HeroVisual() {
                     className={styles.heroVisualPulse}
                 />
                 <text x="200" y="92" textAnchor="middle" className={styles.heroVisualCaption} fill="currentColor">
-                    内网 → 隧道 → 公网
+                    内网 ↔ 隧道 ↔ 公网
                 </text>
             </svg>
         </div>

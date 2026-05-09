@@ -186,7 +186,8 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     public void channelInactive(ChannelHandlerContext ctx) {
         agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
             logger.debug("与客户端断开连接");
-            agentContext.fireEvent(AgentEvent.DISCONNECT);
+           //todo agentContext.fireEvent(AgentEvent.DISCONNECT);
+            agentContext.fireEvent(AgentEvent.LOCAL_GOAWAY);
         });
     }
 

@@ -44,6 +44,7 @@ public class AgentAuthListener implements EventListener<AgentAuthEvent> {
     private AgentModelConvert agentModelConvert;
     @Autowired
     private AgentStore agentStore;
+
     @PostConstruct
     public void init() {
         eventBus.register(this);
@@ -54,16 +55,18 @@ public class AgentAuthListener implements EventListener<AgentAuthEvent> {
         logger.debug("Received AgentAuthEvent: {}", event);
         boolean reconnect = event.isReconnect();
         AgentInfo agentInfo = event.getAgentInfo();
-        if (reconnect) {
-            return;
-        }
         if (agentInfo.getAgentType().isEmbedded()) {
             agentStore.save(agentInfo);
-
+            logger.debug("嵌入式客户端信息保存成功: agentId={}, name={}",
+                    agentInfo.getAgentId(), agentInfo.getName());
+        } else {
+            if (!reconnect) {
+                AgentDO agentDO = agentModelConvert.toDO(agentInfo);
+                agentRepository.save(agentDO);
+                logger.debug("客户端信息保存成功: agentId={}, name={}",
+                        agentInfo.getAgentId(), agentInfo.getName());
+            }
         }
-        AgentDO agentDO = agentModelConvert.toDO(agentInfo);
-        agentRepository.save(agentDO);
-        logger.info("客户端信息保存成功: agentId={}, name={}, reconnect={}",
-                agentInfo.getAgentId(), agentInfo.getName(), event.isReconnect());
+
     }
 }

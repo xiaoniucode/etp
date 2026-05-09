@@ -55,11 +55,11 @@ public class DirectPool {
             if (entry.isActive()) {
                 return tunnels.remove(mapEntry.getKey());
             } else {
-                logger.warn("隧道 {} 不活跃，从池中移除", entry.getTunnelId());
+                logger.debug("隧道 {} 不活跃，从池中移除", entry.getTunnelId());
                 removeTunnel(entry.getTunnelId());
             }
         }
-        logger.warn("池中没有可用的活跃{}隧道", isEncrypt ? "加密" : "明文");
+        logger.debug("池中没有可用的活跃{}隧道", isEncrypt ? "加密" : "明文");
         return null;
     }
 

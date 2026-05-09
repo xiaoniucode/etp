@@ -132,15 +132,17 @@ public class EmbeddedProxyQueryRepository implements ProxyQueryRepository, Proxy
 
         Set<String> agentSet = agentIdIndex.get(removed.getAgentId());
         if (agentSet != null) agentSet.remove(proxyId);
-
-        listenPortIndex.remove(removed.getRemotePort());
-
-        Set<String> domains = proxyDomainIndex.get(proxyId);
-        if (domains != null) {
-            for (String domain : domains) {
-                fullDomainIndex.remove(domain);
+        if (removed.isTcp()) {
+            listenPortIndex.remove(removed.getRemotePort());
+        }
+        if (removed.isHttp()) {
+            Set<String> domains = proxyDomainIndex.get(proxyId);
+            if (domains != null) {
+                for (String domain : domains) {
+                    fullDomainIndex.remove(domain);
+                }
+                proxyDomainIndex.remove(proxyId);
             }
-            proxyDomainIndex.remove(proxyId);
         }
         Map<String, String> nameMap = agentNameIndex.get(removed.getAgentId());
         if (nameMap != null) nameMap.remove(removed.getName());

@@ -42,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProxyManager {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(ProxyManager.class);
     private final Map<String/*proxyId*/, Integer/*listenPort*/> portMap = new ConcurrentHashMap<>();
-    private final Map<String/*agentId*/, Set<String/*proxyId*/>> agentPortMap = new ConcurrentHashMap<>();
+    private final Map<String/*agentId*/, Set<String/*proxyId*/>> agentProxyMap = new ConcurrentHashMap<>();
     private final Map<String/*proxyId*/, String/*agentId*/> proxyAgentMap = new ConcurrentHashMap<>();
     @Autowired
     private MetricsCollector metricsCollector;
@@ -75,23 +75,20 @@ public class ProxyManager {
         String agentId = config.getAgentId();
         String proxyId = config.getProxyId();
         proxyAgentMap.put(proxyId, agentId);
-
+        agentProxyMap.computeIfAbsent(config.getAgentId(), k -> ConcurrentHashMap.newKeySet())
+                .add(proxyId);
         if (config.isTcp()) {
             Integer listenPort = config.getListenPort();
             portMap.put(proxyId, listenPort);
             portAcceptor.bindPort(listenPort);
-            agentPortMap.computeIfAbsent(config.getAgentId(), k -> ConcurrentHashMap.newKeySet())
-                    .add(proxyId);
         }
         if (config.isHttp()) {
-            if (domainRegistry.exists(proxyId)) {
-                return;
-            }
-            if (!CollectionUtils.isEmpty(domains)) {
+            if (!CollectionUtils.isEmpty(domains) && !domainRegistry.exists(proxyId)) {
                 //将域名注册到域名注册中心
                 domainRegistry.register(proxyId, domains);
             }
         }
+
     }
 
     /**
@@ -107,16 +104,22 @@ public class ProxyManager {
         }
         String agentId = proxyAgentMap.remove(proxyId);
         if (agentId != null) {
-            Set<String> set = agentPortMap.get(agentId);
+            Set<String> set = agentProxyMap.get(agentId);
             if (set != null) {
                 set.remove(proxyId);
             }
+        }
+        Set<String> agentProxies = agentProxyMap.remove(agentId);
+        agentProxies.remove(proxyId);
+        if (CollectionUtils.isEmpty(agentProxies)) {
+            agentProxyMap.remove(agentId);
         }
         Set<String> domains = domainRegistry.getDomainsByProxyId(proxyId);
         for (String domain : domains) {
             streamManager.fireCloseByDomain(domain);
         }
-        domainRegistry.unregister(proxyId);//从注册中心删除
+        //从注册中心删除
+        domainRegistry.unregister(proxyId);
         //删除IP访问控制
         ipAccessChecker.invalidate(proxyId);
         //删除代理流量统计记录
@@ -148,7 +151,7 @@ public class ProxyManager {
      */
     public void onAgentOffline(String agentId) throws EtpException {
         logger.debug("停用客户端 {} 所有代理", agentId);
-        Set<String> proxyIds = agentPortMap.get(agentId);
+        Set<String> proxyIds = agentProxyMap.get(agentId);
         if (!CollectionUtils.isEmpty(proxyIds)) {
             for (String proxyId : proxyIds) {
                 deactivate(proxyId);

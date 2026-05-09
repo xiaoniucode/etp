@@ -1,10 +1,17 @@
 server:
   port: 8084
+
 spring:
-  profiles:
-    active: dev2
   application:
-    name: 订单服务
+    name: 网关服务
+  profiles:
+    active: simple
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+
 logging:
   level:
-    com.xiaoniucode.etp: info
+    com.xiaoniucode.etp: debug

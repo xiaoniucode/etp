@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.service.EmbeddedAgentRegistry;
+import com.xiaoniucode.etp.server.service.repository.AgentStore;
 import com.xiaoniucode.etp.server.service.repository.ProxyStore;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
@@ -35,8 +36,11 @@ public class GoawayAction extends AgentBaseAction {
     private EmbeddedAgentRegistry embeddedAgentRegistry;
     @Autowired
     private ProxyStore proxyStore;
+    @Autowired
+    private AgentStore agentStore;
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
+        logger.debug("开始清理客户端资源，事件：{}", event);
         AgentInfo agentInfo = context.getAgentInfo();
         if (agentInfo == null) {
             logger.warn("客户端断开，未找到客户端信息，连接ID：{}", context.getConnectionId());
@@ -49,6 +53,7 @@ public class GoawayAction extends AgentBaseAction {
             streamManager.fireCloseByAgent(context.getAgentId());
             embeddedAgentRegistry.removeAgent(agentId);
             proxyStore.deleteByAgent(agentId);
+            agentStore.delete(agentId);
             // cleanupStreams(agentId);
             logger.debug("清理客户端 {} 所有连接", agentId);
             // 清理隧道资源

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>企业欢迎页面</title>
+    <title>测试案例页面</title>
     <style>
         * {
             margin: 0;
@@ -258,6 +258,96 @@
             margin-bottom: 20px;
         }
 
+        /* 文件上传 */
+        .upload-section {
+            padding: 100px 0;
+            background-color: white;
+        }
+
+        .upload-content {
+            display: flex;
+            justify-content: center;
+        }
+
+        .upload-box {
+            background-color: #f9f9f9;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .upload-box h3 {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .file-input-wrapper {
+            margin-bottom: 20px;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            width: 100%;
+            padding: 20px;
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            background-color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .file-input-wrapper input[type="file"]:hover {
+            border-color: #2980b9;
+            background-color: #f0f8ff;
+        }
+
+        .file-hint {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .preview-info {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .preview-info p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+        }
+
+        .upload-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .upload-result.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .upload-result.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         /* 联系我们 */
         .contact {
             padding: 100px 0;
@@ -396,13 +486,14 @@
 <!-- 导航栏 -->
 <header>
     <div class="container nav-container">
-        <div class="logo">企业名称</div>
+        <div class="logo">测试页面</div>
         <ul class="nav-links">
             <li><a href="#">首页</a></li>
             <li><a href="#about">关于我们</a></li>
             <li><a href="#products">产品服务</a></li>
             <li><a href="#team">团队介绍</a></li>
             <li><a href="#cases">客户案例</a></li>
+            <li><a href="#upload">文件上传</a></li>
             <li><a href="#contact">联系我们</a></li>
         </ul>
     </div>
@@ -531,6 +622,30 @@
     </div>
 </section>
 
+<!-- 文件上传 -->
+<section class="upload-section" id="upload">
+    <div class="container">
+        <h2 class="section-title">文件上传</h2>
+        <div class="upload-content">
+            <div class="upload-box">
+                <h3>上传文件（最大100MB）</h3>
+                <form id="uploadForm">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput" name="file" accept="*/*">
+                        <p class="file-hint">支持任意格式文件</p>
+                    </div>
+                    <div id="previewInfo" class="preview-info" style="display: none;">
+                        <p>已选择文件: <span id="fileName"></span></p>
+                        <p>文件大小: <span id="fileSize"></span></p>
+                    </div>
+                    <button type="submit" class="btn upload-btn">上传文件</button>
+                </form>
+                <div id="uploadResult" class="upload-result" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- 联系我们 -->
 <section class="contact" id="contact">
     <div class="container">
@@ -614,6 +729,67 @@
         </div>
     </div>
 </footer>
+
+<script>
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('fileSize').textContent = formatFileSize(file.size);
+        document.getElementById('previewInfo').style.display = 'block';
+    } else {
+        document.getElementById('previewInfo').style.display = 'none';
+    }
+});
+
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    const resultDiv = document.getElementById('uploadResult');
+    
+    if (!file) {
+        resultDiv.textContent = '请选择要上传的文件';
+        resultDiv.className = 'upload-result error';
+        resultDiv.style.display = 'block';
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            resultDiv.textContent = '上传成功！文件信息已打印到服务器日志';
+            resultDiv.className = 'upload-result success';
+        } else {
+            resultDiv.textContent = '上传失败: ' + (data.message || '未知错误');
+            resultDiv.className = 'upload-result error';
+        }
+        resultDiv.style.display = 'block';
+    } catch (error) {
+        resultDiv.textContent = '上传出错: ' + error.message;
+        resultDiv.className = 'upload-result error';
+        resultDiv.style.display = 'block';
+    }
+});
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+</script>
 
 <!-- 增加内容以达到1024k大小 -->
 <div style="display: none;">

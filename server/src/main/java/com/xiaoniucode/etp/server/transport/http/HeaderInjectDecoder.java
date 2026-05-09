@@ -15,22 +15,25 @@ import java.util.List;
 
 public class HeaderInjectDecoder extends ByteToMessageDecoder {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(HeaderInjectDecoder.class);
-    private static final int HEADER_BUFFER_SIZE = 8192;
+
+    private static final int MAX_HEADER_SIZE = 65536;
+
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (in.readableBytes() == 0) {
             return;
         }
-
+        in.markReaderIndex();
         int headerEndIndex = findHeaderEnd(in);
         if (headerEndIndex < 0) {
-            if (in.readableBytes() > HEADER_BUFFER_SIZE) {
-                logger.warn("[HTTP] 缓冲区超过{}字节，未找到有效HTTP header，丢弃数据", HEADER_BUFFER_SIZE);
-                in.skipBytes(in.readableBytes());
-            }
+            in.resetReaderIndex();
             return;
         }
-
+        if (headerEndIndex > MAX_HEADER_SIZE) {
+            logger.debug("[HTTP] HTTP请求头{}字节超过限制{}字节，关闭流", headerEndIndex, MAX_HEADER_SIZE);
+            ChannelUtils.closeOnFlush(ctx.channel());
+            return;
+        }
         in.markReaderIndex();
         byte[] headerBytes = new byte[headerEndIndex];
         in.getBytes(in.readerIndex(), headerBytes);

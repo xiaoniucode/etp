@@ -52,7 +52,7 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
         String basicAuth = null;
         String visitorIp = null;
         try {
-            int len = Math.min(in.readableBytes(), 4096);
+            int len = Math.min(in.readableBytes(), 8192);
             byte[] bytes = new byte[len];
             in.readBytes(bytes);
             String content = new String(bytes, CharsetUtil.UTF_8);
