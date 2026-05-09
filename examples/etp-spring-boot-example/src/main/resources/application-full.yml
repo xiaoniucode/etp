@@ -14,9 +14,9 @@ etp:
     transport:
       tls:
         enabled: true
-        cert-file: classpath:certs/client.crt
-        key-file: classpath:certs/client.key
-        ca-file: classpath:certs/ca.crt
+        cert-file: classpath:cert/client.crt
+        key-file: classpath:cert/client.key
+        ca-file: classpath:cert/ca.crt
         key-password:
 
     proxy:
@@ -55,7 +55,7 @@ etp:
           - 10.10.0.0/16        # 公司内网
           - 172.16.0.0/12       # VPN 网络
 
-        # 风控封禁 IP
+
         deny:
           - 192.168.31.88/32    # 被封禁的测试设备
           - 10.10.5.23/32       # 异常访问机器

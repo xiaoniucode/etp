@@ -311,8 +311,8 @@ export default function Home() {
                             <p className={styles.heroEyebrow}>Easy Tunnel Proxy · etp</p>
                             <h1 className={styles.heroTitle}>{siteConfig.tagline}</h1>
                             <p className={styles.heroLead}>
-                                面向内网穿透的隧道代理：TCP / HTTP、TLS 1.3、Netty 全链路高性能传输；可选 Spring Boot
-                                集成与可视化控制台，用一份配置把本地服务安全暴露到公网。
+                                面向开发和运维的一站式解决方案。TCP/HTTP多协议代理支持，反向代理、TLS传输加密、压缩、负载均衡、精细限流、访问控制、安全认证、
+                                SpringBoot集成，管理面板，具备丰富的场景自定义能力。
                             </p>
                             <div className={styles.heroLogoRow}>
                                 <img src={logoUrl} alt="" className={styles.heroLogoMark} width={52} height={52}/>

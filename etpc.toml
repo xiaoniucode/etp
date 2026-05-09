@@ -96,9 +96,9 @@ ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 #
 #[proxies.bandwidth]
 #enabled= true
-#limit = "20M" #总带宽限制(可选) 20Mbps
-#limit_in = "2M" #入口带宽限制(可选)
-#limit_out = "2M" #出口带宽限制(可选)
+#limit = "20Mbps" #总带宽限制(可选) 20Mbps
+#limit_in = "2Mbps" #入口带宽限制(可选)
+#limit_out = "2Mbps" #出口带宽限制(可选)
 #
 #[[proxies]]
 #name = "web2"
@@ -127,9 +127,9 @@ targets = [
     #    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 ]
 #[proxies.bandwidth] #带宽限制
-#limit = "20M" #总带宽限制(可选)
-#limit_in = "2M" #入口带宽限制(可选)
-#limit_out = "2M" #出口带宽限制(可选)
+#limit = "20Mbps" #总带宽限制(可选)
+#limit_in = "2Mbps" #入口带宽限制(可选)
+#limit_out = "2Mbps" #出口带宽限制(可选)
 [proxies.transport]
 multiplex = true
 compress = true
@@ -164,9 +164,9 @@ encrypt = false
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 
 [proxies.bandwidth] #带宽限制
-limit = "2M" #总带宽限制(可选)
-#limit_in = "64k" #入口带宽限制(可选)
-#limit_out = "64k" #出口带宽限制(可选)
+limit = "2Mbps" #总带宽限制(可选)
+#limit_in = "64Kbps" #入口带宽限制(可选)
+#limit_out = "64Kbps" #出口带宽限制(可选)
 
 [[proxies]]
 name = "redis"
@@ -223,9 +223,9 @@ encrypt = false
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 [proxies.bandwidth] #带宽限制
-limit = "1M" #总带宽限制(可选)
-#limit_in = "10M" #入口带宽限制(可选)
-#limit_out = "10M" #出口带宽限制(可选)
+limit = "1Mbps" #总带宽限制(可选)
+#limit_in = "10Mbps" #入口带宽限制(可选)
+#limit_out = "10Mbps" #出口带宽限制(可选)
 
 [[proxies]]
 name = "test_mux_tls"
@@ -242,9 +242,9 @@ encrypt = true
 [proxies.loadbalance]
 strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
 [proxies.bandwidth] #带宽限制
-limit = "2M" #总带宽限制(可选)
-#limit_in = "10M" #入口带宽限制(可选)
-#limit_out = "10M" #出口带宽限制(可选)
+limit = "2Mbps" #总带宽限制(可选)
+#limit_in = "10Mbps" #入口带宽限制(可选)
+#limit_out = "10Mbps" #出口带宽限制(可选)
 
 #文件日志
 [log]

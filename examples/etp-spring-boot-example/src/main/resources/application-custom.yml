@@ -14,9 +14,9 @@ etp:
     transport:
       tls:
         enabled: true
-        cert-file: classpath:certs/client.crt
-        key-file: classpath:certs/client.key
-        ca-file: classpath:certs/ca.crt
+        cert-file: classpath:cert/client.crt
+        key-file: classpath:cert/client.key
+        ca-file: classpath:cert/ca.crt
 
 
 
