@@ -7,7 +7,7 @@ import TabItem from '@theme/TabItem';
 
 # Spring Boot 集成
 
-etp 支持将客户端嵌入到 Spring Boot 应用中运行，只需引入 Maven/Gradle 依赖并配置即可。
+`etp` 支持将客户端内嵌到 `Spring Boot` 应用中运行，只需引入 `Maven/Gradle` 依赖并配置，即可实现**一键穿透**，非常适用于临时调试、开发环境访问等场景。
 
 ## 环境要求
 
@@ -16,7 +16,7 @@ etp 支持将客户端嵌入到 Spring Boot 应用中运行，只需引入 Maven
 
 ## 引入依赖
 
-最新版本可从 [Maven 中央仓库](https://central.sonatype.com/) 中获取。
+最新版本可从 [Maven 中央仓库](https://central.sonatype.com/) 中获取，目前支持 `Spring Boot 2.x/3.x/4.x`。
 
 <Tabs>
     <TabItem value="Maven" label="Maven" default>
@@ -35,9 +35,7 @@ etp 支持将客户端嵌入到 Spring Boot 应用中运行，只需引入 Maven
     </TabItem>
 </Tabs>
 
-## 快速使用
-
-最小配置即可启动代理：
+## 快速开始
 
 ```yaml
 # application.yml
@@ -70,9 +68,9 @@ etp:
     transport:
       tls:
         enabled: true
-        cert-file: classpath:certs/client.crt
-        key-file: classpath:certs/client.key
-        ca-file: classpath:certs/ca.crt
+        cert-file: classpath:cert/client.crt
+        key-file: classpath:cert/client.key
+        ca-file: classpath:cert/ca.crt
         key-password:
 
     proxy:
@@ -83,8 +81,8 @@ etp:
         - a.domain.com
         - b.domain.com
       sub-domains:
-        - api
-        - ui
+        - sub1
+        - sub2
 
       transport:
         encrypt: true

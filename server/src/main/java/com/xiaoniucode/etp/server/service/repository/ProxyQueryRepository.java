@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.service.repository;
 
+import com.xiaoniucode.etp.common.message.PageResult;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.service.ProxyConfigExt;
 
@@ -41,6 +42,9 @@ public interface ProxyQueryRepository {
     Set<String> findDomainsByProxyId(String proxyId);
 
     default List<ProxyConfig> findAll() {
-        return List.of();
+        return null;
+    }
+    default PageResult<ProxyConfig> findByPage(Integer page, Integer size) {
+        return null;
     }
 }

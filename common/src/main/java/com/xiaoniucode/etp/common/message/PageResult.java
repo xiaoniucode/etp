@@ -26,21 +26,25 @@ public class PageResult<T> {
      * 当前页码
      */
     private Integer page;
-    
+
     /**
      * 每页大小
      */
     private Integer size;
-    
+
     /**
      * 总记录数
      */
     private Long total;
-    
+
     /**
      * 数据列表
      */
     private List<T> records;
+
+    public static <T> PageResult<T> of(List<T> records, long total, int page, int size) {
+        return new PageResult<>(records, total, page, size);
+    }
 
     public PageResult(List<T> records, long total, int page, int size) {
         this.records = records;

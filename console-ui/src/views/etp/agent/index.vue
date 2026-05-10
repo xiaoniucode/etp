@@ -8,45 +8,20 @@
     ></AgentSearch>
 
     <ElCard class="art-table-card">
-      <!-- Tab 组件 -->
-      <el-tabs
-        v-model="activeTab"
-        class="demo-tabs"
-        @tab-click="handleTabClick"
+      <!-- 表格头部 -->
+      <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
+      </ArtTableHeader>
+
+      <!-- 表格 -->
+      <ArtTable
+        :loading="loading"
+        :data="data"
+        :columns="columns"
+        :pagination="pagination"
+        @pagination:size-change="handleSizeChange"
+        @pagination:current-change="handleCurrentChange"
       >
-        <el-tab-pane label="独立" name="1">
-          <!-- 表格头部 -->
-          <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
-          </ArtTableHeader>
-
-          <!-- 表格 -->
-          <ArtTable
-            :loading="loading"
-            :data="data"
-            :columns="columns"
-            :pagination="pagination"
-            @pagination:size-change="handleSizeChange"
-            @pagination:current-change="handleCurrentChange"
-          >
-          </ArtTable>
-        </el-tab-pane>
-        <el-tab-pane label="内嵌" name="2">
-          <!-- 表格头部 -->
-          <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
-          </ArtTableHeader>
-
-          <!-- 表格 -->
-          <ArtTable
-            :loading="loading"
-            :data="data"
-            :columns="columns"
-            :pagination="pagination"
-            @pagination:size-change="handleSizeChange"
-            @pagination:current-change="handleCurrentChange"
-          >
-          </ArtTable>
-        </el-tab-pane>
-      </el-tabs>
+      </ArtTable>
 
       <!-- 客户端详情弹窗 -->
       <AgentDialog v-model:visible="detailDialogVisible" :client-data="selectedClient" />
@@ -61,7 +36,7 @@
   import { fetchGetAgentListByPage, fetchKickoutAgent } from '@/api/agent'
   import AgentSearch from './modules/agent-search.vue'
   import AgentDialog from './modules/agent-dialog.vue'
-  import { ElTag, ElMessageBox, ElMessage, type TabsPaneContext } from 'element-plus'
+  import { ElTag, ElMessageBox, ElMessage } from 'element-plus'
 
   defineOptions({ name: 'ClientManagement' })
 
@@ -74,9 +49,6 @@
 
   // 详情弹窗状态
   const detailDialogVisible = ref(false)
-
-  // 当前激活的 tab
-  const activeTab = ref('1')
 
   // 选中的客户端
   const selectedClient = ref<ClientItem | null>(null)
@@ -222,12 +194,6 @@
     })
   }
 
-  /**
-   * Tab 点击处理
-   */
-  const handleTabClick = (tab: TabsPaneContext, event: Event) => {
-    console.log('Tab 切换:', tab.paneName)
-  }
 </script>
 
 <style lang="scss" scoped></style>

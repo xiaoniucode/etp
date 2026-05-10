@@ -2,6 +2,16 @@ import { AppRouteRecord } from '@/types/router'
 
 export const penetrationRoutes: AppRouteRecord[] = [
   {
+    name: 'Embedded',
+    path: '/embedded',
+    component: '/etp/embedded',
+    meta: {
+      title: '临时隧道',
+      icon: 'ri:network-line',
+      roles: ['R_SUPER']
+    }
+  },
+  {
     name: 'HTTP',
     path: '/http',
     component: '/etp/http',

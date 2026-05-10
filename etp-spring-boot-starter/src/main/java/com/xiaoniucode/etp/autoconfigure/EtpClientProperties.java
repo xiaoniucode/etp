@@ -26,9 +26,9 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 @ConfigurationProperties(prefix = "etp.client")
 public class EtpClientProperties {
     /**
-     * 是否启用 ETP 代理
+     * 是否启用 ETP 内网穿透客户端
      */
-    private boolean enabled = false;
+    private Boolean enabled = false;
 
     /**
      * 代理服务地址

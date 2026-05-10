@@ -1,9 +1,10 @@
+# application.yml
 etp:
   client:
     enabled: true
+    server-addr: 127.0.0.1
     auth:
-      token: 5E793FAD27AA715D
-
-
-
+      token: 414083A8563774142CAC91DDB5C9A2ED
+    proxy:
+      auto-domain: true
 

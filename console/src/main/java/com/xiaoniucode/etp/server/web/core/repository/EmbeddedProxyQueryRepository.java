@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.core.repository;
 
+import com.xiaoniucode.etp.common.message.PageResult;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.service.ProxyConfigExt;
 import com.xiaoniucode.etp.server.service.repository.ProxyStore;
@@ -92,6 +93,18 @@ public class EmbeddedProxyQueryRepository implements ProxyQueryRepository, Proxy
         return new ArrayList<>(proxyMap.values());
     }
 
+    @Override
+    public PageResult<ProxyConfig> findByPage(Integer page, Integer size) {
+        List<ProxyConfig> all = new ArrayList<>(proxyMap.values());
+        int total = all.size();
+        int start = (page - 1) * size;
+        if (start >= total) {
+            return new PageResult<>(List.of(), total, page, size);
+        }
+        int end = Math.min(start + size, total);
+        List<ProxyConfig> pageList = all.subList(start, end);
+        return new PageResult<>(pageList, total, page, size);
+    }
 
     @Override
     public void saveTcp(ProxyConfig proxyConfig) {
