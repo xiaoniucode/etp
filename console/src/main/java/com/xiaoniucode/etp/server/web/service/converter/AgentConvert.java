@@ -15,6 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.service.converter;
 
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
 import org.mapstruct.Mapper;
@@ -26,6 +27,8 @@ import java.util.List;
 public interface AgentConvert {
     @Mapping(target = "agentType", expression = "java(agent.getAgentType().getCode())")
     AgentDTO toDTO(AgentDO agent);
-
+    @Mapping(target = "agentType", expression = "java(agent.getAgentType().getCode())")
+    @Mapping(target = "id", source = "agentId")
+    AgentDTO toDTO(AgentInfo agent);
     List<AgentDTO> toDTOList(List<AgentDO> agents);
 }

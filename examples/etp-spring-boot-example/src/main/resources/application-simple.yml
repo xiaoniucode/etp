@@ -7,4 +7,19 @@ etp:
       token: 414083A8563774142CAC91DDB5C9A2ED
     proxy:
       auto-domain: true
-
+      protocol: http
+      sub-domains:
+        - sub1
+#        - sub2
+#        - sub3
+      bandwidth:
+        limit-in: 2Mbps
+        limit-out: 2Mbps
+        limit-total: 4Mbps
+      basic-auth:
+        enabled: true
+        users:
+          - user: admin
+            pass: 123456
+          - user: guest
+            pass: 123456

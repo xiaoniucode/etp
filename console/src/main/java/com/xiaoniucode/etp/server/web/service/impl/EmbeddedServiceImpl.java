@@ -17,13 +17,21 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.common.message.PageResult;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.*;
+import com.xiaoniucode.etp.core.enums.DeploymentMode;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.service.repository.AgentQueryRepository;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
+import com.xiaoniucode.etp.server.web.common.exception.BizException;
+import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.basicauth.BasicAuthDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.TargetDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelListDTO;
 import com.xiaoniucode.etp.server.web.service.EmbeddedService;
+import com.xiaoniucode.etp.server.web.service.converter.*;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,7 +40,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class EmbeddedServiceImpl implements EmbeddedService {
@@ -42,8 +52,20 @@ public class EmbeddedServiceImpl implements EmbeddedService {
     @Autowired
     @Qualifier("embeddedProxyQueryRepository")
     private ProxyQueryRepository proxyQueryRepository;
+    @Autowired
+    private AgentConvert agentConvert;
+    @Autowired
+    private ProxyConvert proxyConvert;
+    @Autowired
+    private BasicAuthConvert basicAuthConvert;
+    @Autowired
+    private TransportConvert transportConvert;
+    @Autowired
+    private AccessControlConvert accessControlConvert;
     @Resource
     private AppConfig appConfig;
+    @Autowired
+    private AgentManager agentManager;
 
     @Override
     public PageResult<TunnelListDTO> listByPage(int page, int size) {
@@ -58,22 +80,12 @@ public class EmbeddedServiceImpl implements EmbeddedService {
             TunnelListDTO tunnelListDTO = new TunnelListDTO();
             tunnelListDTO.setHttpProxyPort(httpProxyPort);
             if (config.isTcp()) {
-                TunnelListDTO.TcpTunnelListDTO tcpTunnelListDTO = new TunnelListDTO.TcpTunnelListDTO();
-                tcpTunnelListDTO.setProxyId(config.getProxyId());
-                tcpTunnelListDTO.setProtocol(config.getProtocol().getCode());
-                tcpTunnelListDTO.setName(config.getName());
-                tcpTunnelListDTO.setStatus(config.getStatus().getCode());
-                tcpTunnelListDTO.setListenPort(config.getListenPort());
-                tunnelListDTO.setTunnel(tcpTunnelListDTO);
+                tunnelListDTO.setTunnel(proxyConvert.toTcpDTOList(config));
             } else if (config.isHttp()) {
-                TunnelListDTO.HttpTunnelListDTO httpTunnelListDTO = new TunnelListDTO.HttpTunnelListDTO();
-                httpTunnelListDTO.setProxyId(config.getProxyId());
-                httpTunnelListDTO.setProtocol(config.getProtocol().getCode());
-                httpTunnelListDTO.setName(config.getName());
-                httpTunnelListDTO.setStatus(config.getStatus().getCode());
+                TunnelListDTO.HttpTunnelListDTO httpDTOList = proxyConvert.toHttpDTOList(config);
                 Set<String> domains = proxyQueryRepository.findDomainsByProxyId(config.getProxyId());
-                httpTunnelListDTO.setDomains(new ArrayList<>(domains));
-                tunnelListDTO.setTunnel(httpTunnelListDTO);
+                httpDTOList.setDomains(new ArrayList<>(domains));
+                tunnelListDTO.setTunnel(httpDTOList);
             }
             tunnelList.add(tunnelListDTO);
         });
@@ -82,12 +94,51 @@ public class EmbeddedServiceImpl implements EmbeddedService {
 
     @Override
     public TunnelDetailDTO detail(String proxyId) {
+        Optional<ProxyConfig> configOpt = proxyQueryRepository.findById(proxyId);
+        if (configOpt.isEmpty()) {
+            throw new BizException("不存在");
+        }
+        ProxyConfig config = configOpt.get();
+        String agentId = config.getAgentId();
+        Optional<AgentInfo> agentOpt = agentQueryRepository.findById(agentId);
+        if (agentOpt.isEmpty()) {
+            throw new BizException("获取详情失败");
+        }
+        TunnelDetailDTO tunnelDetailDTO = new TunnelDetailDTO();
+        tunnelDetailDTO.setAgent(agentConvert.toDTO(agentOpt.get()));
+        tunnelDetailDTO.setHttpProxyPort(appConfig.getHttpProxyPort());
+        int deploymentMode = config.getTargets().size() > 1 ? DeploymentMode.CLUSTER.getCode() : DeploymentMode.STANDALONE.getCode();
 
-        return null;
+        AccessControlDetailDTO accessControlDetailDTO = accessControlConvert.toDetailDTO(config.getAccessControl());
+        if (config.isHttp()) {
+            TunnelDetailDTO.HttpProxyDTO httpProxyDTO = proxyConvert.toHttpProxyDTO(config);
+            httpProxyDTO.setDeploymentMode(deploymentMode);
+            httpProxyDTO.setDomains(proxyQueryRepository.findDomainsByProxyId(proxyId));
+            httpProxyDTO.setDomainType(config.getRouteConfig().getDomainType().getCode());
+            httpProxyDTO.setTransport(transportConvert.toDTO(config.getTransport()));
+            BasicAuthConfig basicAuth = config.getBasicAuth();
+            if (basicAuth != null) {
+                BasicAuthDetailDTO basicAuthDetailDTO = basicAuthConvert.toDetailDTO(basicAuth, basicAuth.getUsers());
+                httpProxyDTO.setBasicAuth(basicAuthDetailDTO);
+            }
+            httpProxyDTO.setAccessControl(accessControlDetailDTO);
+            tunnelDetailDTO.setProxy(httpProxyDTO);
+        } else if (config.isTcp()) {
+            TunnelDetailDTO.TcpProxyDTO tcpProxyDTO = proxyConvert.toTcpProxyDTO(config);
+            tcpProxyDTO.setDeploymentMode(deploymentMode);
+            tcpProxyDTO.setTransport(transportConvert.toDTO(config.getTransport()));
+            tcpProxyDTO.setAccessControl(accessControlDetailDTO);
+            tunnelDetailDTO.setProxy(tcpProxyDTO);
+        }
+
+        return tunnelDetailDTO;
     }
 
     @Override
-    public void delete(String proxyId) {
-
+    public void batchDelete(List<String> agentIds) {
+        if (CollectionUtils.isEmpty(agentIds)) {
+            return;
+        }
+        agentIds.forEach(agentId -> agentManager.kickout(agentId));
     }
 }

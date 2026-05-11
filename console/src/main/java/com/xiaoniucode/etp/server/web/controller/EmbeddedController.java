@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.web.controller;
 
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.param.proxy.embedded.EmbeddedBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.service.EmbeddedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -38,9 +39,10 @@ public class EmbeddedController {
     public Ajax detail(@PathVariable String proxyId) {
         return Ajax.success(embeddedService.detail(proxyId));
     }
-    @DeleteMapping("{proxyId}")
-    public Ajax delete(@PathVariable String proxyId) {
-        embeddedService.delete(proxyId);
+
+    @DeleteMapping("batch")
+    public Ajax batchDelete(@RequestBody @Validated EmbeddedBatchDeleteParam param) {
+        embeddedService.batchDelete(param.getAgentIds());
         return Ajax.success();
     }
 }

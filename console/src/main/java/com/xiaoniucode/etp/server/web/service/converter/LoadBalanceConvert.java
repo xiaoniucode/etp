@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.service.converter;
 
+import com.xiaoniucode.etp.core.domain.LoadBalanceConfig;
 import com.xiaoniucode.etp.core.enums.LoadBalanceType;
 import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
 import com.xiaoniucode.etp.server.web.entity.LoadBalanceDO;
@@ -35,5 +36,9 @@ public interface LoadBalanceConvert {
 
     @Mapping(target = "strategy", expression = "java(loadBalanceDO.getStrategy().getCode())")
     LoadBalanceDTO toDTO(LoadBalanceDO loadBalanceDO);
+
+
+    @Mapping(target = "strategy", expression = "java(loadBalanceConfig.getStrategy().getCode())")
+    LoadBalanceDTO toDTO(LoadBalanceConfig loadBalanceConfig);
 }
 

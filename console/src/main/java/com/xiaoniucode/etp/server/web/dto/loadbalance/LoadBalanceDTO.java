@@ -16,11 +16,15 @@
 
 package com.xiaoniucode.etp.server.web.dto.loadbalance;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoadBalanceDTO implements Serializable {
     private Integer strategy;
 }

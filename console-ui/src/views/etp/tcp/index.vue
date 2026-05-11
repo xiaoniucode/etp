@@ -164,7 +164,7 @@
             return h(ElSpace, { direction: 'horizontal', size: 4, wrap: true }, () =>
               row.targets.map((target) => {
                 const text = `${target.host}:${target.port}`
-                return h(ElTag, { type: 'primary', size: 'small' }, () => text)
+                return h(ElTag, { type: 'primary' }, () => text)
               })
             )
           }

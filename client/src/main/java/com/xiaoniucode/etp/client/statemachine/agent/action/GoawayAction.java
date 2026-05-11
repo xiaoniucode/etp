@@ -41,6 +41,6 @@ public class GoawayAction extends AgentBaseAction {
         ChannelUtils.closeOnFlush(control);
         //停止客户端进程
         agentContext.getTunnelClient().stop();
-        logger.debug("客户端已停止");
+        logger.debug("ETP 内网穿透客户端已停止");
     }
 }

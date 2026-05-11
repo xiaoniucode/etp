@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.dto.proxy.embedded;
 
+import com.xiaoniucode.etp.server.web.dto.proxy.TargetDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,21 +29,23 @@ public class TunnelListDTO implements Serializable {
     private Integer httpProxyPort;
 
     @Data
-     static class TunnelDTO {
+    static class TunnelDTO {
+        private String agentId;
         private String proxyId;
         private Integer protocol;
         private String name;
+        private List<TargetDTO> targets;
         private Integer status;
     }
 
-    @EqualsAndHashCode(callSuper = true)
     @Data
+    @EqualsAndHashCode(callSuper = true)
     public static class HttpTunnelListDTO extends TunnelDTO {
         private List<String> domains;
     }
 
-    @EqualsAndHashCode(callSuper = true)
     @Data
+    @EqualsAndHashCode(callSuper = true)
     public static class TcpTunnelListDTO extends TunnelDTO {
         private Integer listenPort;
     }

@@ -15,6 +15,8 @@
  */
 package com.xiaoniucode.etp.server.web.service.converter;
 
+import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
+import com.xiaoniucode.etp.core.domain.HttpUser;
 import com.xiaoniucode.etp.server.web.dto.basicauth.BasicAuthDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.basicauth.BasicUserDTO;
 import com.xiaoniucode.etp.server.web.entity.BasicAuthDO;
@@ -26,6 +28,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper(componentModel = "spring")
 public interface BasicAuthConvert {
@@ -39,6 +42,12 @@ public interface BasicAuthConvert {
     BasicUserDO toUserDO(HttpUserAddParam param);
 
     void updateUserDO(@MappingTarget BasicUserDO basicUserDO, HttpUserUpdateParam param);
+
+
+    @Mapping(expression = "java(toUserDTOList(httpUsers))", target = "users")
+    BasicAuthDetailDTO toDetailDTO(BasicAuthConfig basicAuthConfig, Set<HttpUser> httpUsers);
+
+    List<BasicUserDTO> toUserDTOList(Set<HttpUser> httpUsers);
 }
 
 

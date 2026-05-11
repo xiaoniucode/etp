@@ -24,12 +24,13 @@ export function fetchGetEmbeddedDetail(proxyId: string) {
 }
 
 /**
- * 删除隧道
- * @param proxyId 隧道ID
+ * 批量删除隧道
+ * @param params 删除参数
  * @returns 删除结果
  */
-export function fetchDeleteEmbedded(proxyId: string) {
+export function fetchBatchDeleteEmbedded(params: { agentIds: string[] }) {
   return request.del({
-    url: `/api/embedded/${proxyId}`
+    url: '/api/embedded/batch',
+    data: params
   })
 }

@@ -14,8 +14,13 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.dto.bandwidth;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class BandwidthDTO {
     /**
      * 总带宽限制

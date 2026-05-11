@@ -14,18 +14,14 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.service;
+package com.xiaoniucode.etp.server.web.param.proxy.embedded;
 
-import com.xiaoniucode.etp.common.message.PageResult;
-import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelDetailDTO;
-import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelListDTO;
+import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
-public interface EmbeddedService {
-    PageResult<TunnelListDTO> listByPage(int page, int size);
-
-    TunnelDetailDTO detail(String proxyId);
-
-    void batchDelete(List<String> agentIds);
+@Data
+public class EmbeddedBatchDeleteParam implements Serializable {
+    private List<String> agentIds;
 }

@@ -19,6 +19,8 @@ import lombok.Setter;
 import lombok.ToString;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 @Getter
 @Setter
 @ToString
@@ -31,7 +33,10 @@ public class AgentDTO implements Serializable {
     private String arch;
     private String version;
     private Integer agentType;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private LocalDateTime lastActiveTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private LocalDateTime updatedAt;
 }

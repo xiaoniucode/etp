@@ -16,44 +16,51 @@
 
 package com.xiaoniucode.etp.server.web.dto.proxy.embedded;
 
-import com.xiaoniucode.etp.server.web.dto.bandwidth.BandwidthDTO;
-import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
+import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
+import com.xiaoniucode.etp.server.web.dto.basicauth.BasicAuthDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TargetDTO;
 import com.xiaoniucode.etp.server.web.dto.transport.TransportDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class TunnelDetailDTO implements Serializable {
     private AgentDTO agent;
     private ProxyDTO proxy;
-
-    @Data
-    public static class AgentDTO {
-        private String agentId;
-        private String name;
-        private String token;
-        private Boolean isOnline;
-        private String os;
-        private String arch;
-        private String version;
-        private LocalDateTime lastActiveTime;
-    }
+    private Integer httpProxyPort;
 
     @Data
     public static class ProxyDTO {
         private String proxyId;
         private String name;
+        private Integer protocol;
         private Integer status;
         private List<TargetDTO> targets;
         private Integer deploymentMode;
         private TransportDTO transport;
         private BandwidthDTO bandwidth;
-        private LoadBalanceDTO loadBalance;
+        private AccessControlDetailDTO accessControl;
+    }
+
+    @Data
+    public static class BandwidthDTO {
+        /**
+         * 总带宽限制
+         */
+        private String limitTotal;
+        /**
+         * 入站带宽限制
+         */
+        private String limitIn;
+        /**
+         * 出站带宽限制
+         */
+        private String limitOut;
     }
 
     @EqualsAndHashCode(callSuper = true)
@@ -65,8 +72,9 @@ public class TunnelDetailDTO implements Serializable {
     @EqualsAndHashCode(callSuper = true)
     @Data
     public static class HttpProxyDTO extends ProxyDTO {
-        private List<String> domains;
+        private Set<String> domains;
         private Integer domainType;
+        private BasicAuthDetailDTO basicAuth;
     }
 
 }

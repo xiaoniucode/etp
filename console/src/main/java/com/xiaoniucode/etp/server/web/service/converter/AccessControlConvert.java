@@ -15,6 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.service.converter;
 
+import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.enums.AccessControl;
 import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlRuleDTO;
@@ -28,6 +29,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper(componentModel = "spring",imports = {AccessControl.class})
 public interface AccessControlConvert {
@@ -53,5 +55,45 @@ public interface AccessControlConvert {
     AccessControlRuleDTO toRuleDTO(AccessControlRuleDO ruleDO);
 
     List<AccessControlRuleDTO> toRuleDTOList(List<AccessControlRuleDO> rules);
+
+
+
+    @Mapping(expression = "java(toRuleDTOList(accessControl))", target = "rules")
+    @Mapping(expression = "java(accessControl.getMode().getCode())", target = "mode")
+    AccessControlDetailDTO toDetailDTO(AccessControlConfig accessControl);
+
+
+   default List<AccessControlRuleDTO> toRuleDTOList(AccessControlConfig accessControl){
+       Set<String> deny = accessControl.getDeny();
+       Set<String> allow = accessControl.getAllow();
+       
+       List<AccessControlRuleDTO> rules = new java.util.ArrayList<>();
+       
+       if (deny != null) {
+           for (String cidr : deny) {
+               AccessControlRuleDTO ruleDTO = new AccessControlRuleDTO();
+               ruleDTO.setCidr(cidr);
+               ruleDTO.setRuleType(AccessControl.DENY.getCode());
+               rules.add(ruleDTO);
+           }
+       }
+       
+       if (allow != null) {
+           for (String cidr : allow) {
+               AccessControlRuleDTO ruleDTO = new AccessControlRuleDTO();
+               ruleDTO.setCidr(cidr);
+               ruleDTO.setRuleType(AccessControl.ALLOW.getCode());
+               rules.add(ruleDTO);
+           }
+       }
+       
+       return rules;
+   }
+
+
+
+
+
+
 }
 

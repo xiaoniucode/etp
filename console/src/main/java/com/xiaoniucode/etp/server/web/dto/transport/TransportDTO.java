@@ -16,10 +16,14 @@
 
 package com.xiaoniucode.etp.server.web.dto.transport;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TransportDTO implements Serializable {
     private Boolean encrypt;
     private Integer tunnelType;
