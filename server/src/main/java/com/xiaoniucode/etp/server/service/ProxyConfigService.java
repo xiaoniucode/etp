@@ -19,6 +19,7 @@ package com.xiaoniucode.etp.server.service;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +64,7 @@ public class ProxyConfigService {
         return repo.existsByFullDomain(fullDomain);
     }
 
-    public Set<String> findDomainsByProxyId(String proxyId) {
+    public Set<DomainInfo> findDomainsByProxyId(String proxyId) {
         AgentType type = embeddedAgentRegistry.identifyByProxyId(proxyId);
         ProxyQueryRepository repo = proxyQueryRepositoryRouter.route(type);
         return repo.findDomainsByProxyId(proxyId);

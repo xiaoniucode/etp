@@ -100,7 +100,7 @@
         {
           prop: 'tunnel.agentId',
           label: '会话标识',
-          minWidth: 120,
+          minWidth: 140,
           formatter: (row: Api.Embedded.TunnelListDTO) => row.tunnel?.agentId || ''
         },
         {

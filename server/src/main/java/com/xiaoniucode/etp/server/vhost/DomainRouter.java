@@ -32,10 +32,6 @@ public class DomainRouter {
      * @return proxyId
      */
     public String route(String domain) {
-        String proxyId = domainRegistry.getProxyIdByDomain(domain);
-        if (proxyId != null) {
-            return proxyId;
-        }
-        return null;
+        return domainRegistry.getProxyIdByDomain(domain);
     }
 }

@@ -17,15 +17,21 @@ package com.xiaoniucode.etp.server.web.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "basic_user",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_proxy_id_username", columnNames = {"proxy_id", "username"})
+        },
         indexes = {
                 @Index(name = "idx_proxy_id", columnList = "proxy_id"),
                 @Index(name = "idx_username", columnList = "username")
         }
+
 )
+@NoArgsConstructor
 public class BasicUserDO {
     /**
      * 主键ID
@@ -48,4 +54,10 @@ public class BasicUserDO {
      */
     @Column(name = "password")
     private String password;
+
+    public BasicUserDO(String proxyId, String username, String password) {
+        this.proxyId = proxyId;
+        this.username = username;
+        this.password = password;
+    }
 }

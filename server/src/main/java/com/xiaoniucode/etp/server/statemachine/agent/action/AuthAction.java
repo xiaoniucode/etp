@@ -115,12 +115,14 @@ public class AuthAction extends AgentBaseAction {
         context.setAgentInfo(agentInfo);
 
         agentManager.addAgentContextIndex(agentId, context);
+        if (agentInfo.getAgentType().isEmbedded() && !isReconnect) {
+            embeddedAgentRegistry.addAgent(agentId);
+        }
         Message.AuthResponse authResponse = Message.AuthResponse.newBuilder().setCode(0)
                 .setConnectionId(context.getConnectionId())
                 .setAgentId(agentId)
                 .setMessage("认证成功")
                 .build();
-        embeddedAgentRegistry.addAgent(agentId);
         TMSPFrame authFrame = new TMSPFrame(0, TMSP.MSG_AUTH_RESP);
         ByteBuf payload = ProtobufUtil.toByteBuf(authResponse, control.alloc());
         authFrame.setPayload(payload);

@@ -23,6 +23,6 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class TcpProxyListDTO extends ProxyListDTO implements Serializable {
-    private Integer remotePort;
+    private Integer listenPort;
 
 }

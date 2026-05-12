@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.service;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -26,5 +27,5 @@ import java.util.Set;
 @AllArgsConstructor
 public class ProxyConfigExt {
     private ProxyConfig proxyConfig;
-    private Set<String> domains;
+    private Set<DomainInfo> domains;
 }

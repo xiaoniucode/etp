@@ -32,11 +32,11 @@ public interface ProxyDomainRepository extends JpaRepository<ProxyDomainDO, Inte
 
     boolean existsByDomainAndBaseDomain(String domain, String baseDomain);
 
-    boolean existsByFullDomain(String domain);
+    boolean existsByFullDomain(String fullDomain);
 
-    List<ProxyDomainDO> findByFullDomainIn(Collection<String> domains);
+    List<ProxyDomainDO> findByFullDomainIn(Collection<String> fullDomains);
 
-    Optional<ProxyDomainDO> findByFullDomain(String domain);
+    Optional<ProxyDomainDO> findByFullDomain(String fullDomain);
 
     @Query("SELECT p.fullDomain FROM ProxyDomainDO p WHERE p.proxyId = :proxyId")
     Set<String> findFullDomainsByProxyId(@Param("proxyId") String proxyId);

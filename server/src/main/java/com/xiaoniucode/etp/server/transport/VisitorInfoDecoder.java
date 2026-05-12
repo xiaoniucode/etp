@@ -26,7 +26,6 @@ import io.netty.util.CharsetUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-import java.net.InetSocketAddress;
 import java.util.List;
 
 public class VisitorInfoDecoder extends ByteToMessageDecoder {
@@ -50,7 +49,6 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
         boolean isHttp = false;
         String domain = null;
         String basicAuth = null;
-        String visitorIp = null;
         try {
             int len = Math.min(in.readableBytes(), 8192);
             byte[] bytes = new byte[len];
@@ -66,7 +64,6 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
                         domain = host;
                     }
                     basicAuth = parseAuthHeader(content);
-                    visitorIp = parseXForwardedFor(content);
                 }
                 isHttp = true;
             }
@@ -76,15 +73,11 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
             in.resetReaderIndex();
             sniffing = false;
         }
-        if (visitorIp == null) {
-            visitorIp = fallbackRemoteIp(visitor);
-        }
         if (isHttp) {
             visitor.attr(AttributeKeys.PROTOCOL_TYPE).set(ProtocolType.HTTP);
             visitor.attr(AttributeKeys.VISIT_DOMAIN).set(domain);
             visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).set(basicAuth);
         }
-        visitor.attr(AttributeKeys.VISITOR_REAL_IP).set(visitorIp);
         ctx.pipeline().remove(this);
     }
 
@@ -127,22 +120,4 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
         return null;
     }
 
-    private String parseXForwardedFor(String content) {
-        for (String line : content.split("\\r?\\n")) {
-            if (line.toLowerCase().startsWith("x-forwarded-for:")) {
-                String value = line.substring(15).trim();
-                if (!value.isEmpty()) {
-                    return value.split(",")[0].trim();
-                }
-            }
-        }
-        return null;
-    }
-
-    private String fallbackRemoteIp(Channel visitor) {
-        if (visitor.remoteAddress() instanceof InetSocketAddress addr) {
-            return addr.getAddress().getHostAddress();
-        }
-        return visitor.remoteAddress().toString();
-    }
 }

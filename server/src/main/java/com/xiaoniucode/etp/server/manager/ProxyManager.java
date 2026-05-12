@@ -110,10 +110,11 @@ public class ProxyManager {
             }
         }
         Set<String> agentProxies = agentProxyMap.remove(agentId);
-        agentProxies.remove(proxyId);
-        if (CollectionUtils.isEmpty(agentProxies)) {
-            agentProxyMap.remove(agentId);
-        }
+       if (!CollectionUtils.isEmpty(agentProxies)){
+           agentProxies.remove(proxyId);
+       }else {
+           agentProxyMap.remove(agentId);
+       }
         Set<String> domains = domainRegistry.getDomainsByProxyId(proxyId);
         for (String domain : domains) {
             streamManager.fireCloseByDomain(domain);

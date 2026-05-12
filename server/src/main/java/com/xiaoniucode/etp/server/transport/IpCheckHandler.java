@@ -31,7 +31,10 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
      * @return IP 地址
      */
     protected String getVisitorIp(Channel visitor) {
-        return visitor.attr(AttributeKeys.VISITOR_REAL_IP).get();
+        if (visitor.remoteAddress() instanceof InetSocketAddress addr) {
+            return addr.getAddress().getHostAddress();
+        }
+        return visitor.remoteAddress().toString();
     }
 
     /**

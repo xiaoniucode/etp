@@ -15,11 +15,8 @@
  */
 package com.xiaoniucode.etp.core.domain;
 
-import com.xiaoniucode.etp.core.enums.AgentType;
-import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.enums.*;
 
-import com.xiaoniucode.etp.core.enums.ProxySourceType;
-import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.*;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
@@ -196,8 +193,8 @@ public class ProxyConfig implements Serializable {
         return addedCount;
     }
 
-    public BasicAuthConfig getOrCreateBasicAuthConfig(){
-        if (basicAuth==null){
+    public BasicAuthConfig getOrCreateBasicAuthConfig() {
+        if (basicAuth == null) {
             return new BasicAuthConfig();
         }
         return basicAuth;
@@ -208,10 +205,14 @@ public class ProxyConfig implements Serializable {
     }
 
     public AccessControlConfig getOrCreateAccessControlConfig() {
-        if (accessControl==null){
+        if (accessControl == null) {
             return new AccessControlConfig();
         }
         return accessControl;
+    }
+
+    public DeploymentMode getDeploymentMode() {
+        return targets.size() > 1 ? DeploymentMode.CLUSTER : DeploymentMode.STANDALONE;
     }
 }
 

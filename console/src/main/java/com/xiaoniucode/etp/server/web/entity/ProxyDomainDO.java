@@ -28,8 +28,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "http_proxy_domain",
         indexes = {
-                @Index(name = "idx_proxy_id", columnList = "proxy_id"),
-                @Index(name = "idx_full_domain", columnList = "full_domain")
+                @Index(name = "idx_proxy_id", columnList = "proxy_id")
         }
 )
 @NoArgsConstructor

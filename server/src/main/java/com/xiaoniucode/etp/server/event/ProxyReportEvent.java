@@ -17,10 +17,11 @@
 package com.xiaoniucode.etp.server.event;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.notify.Event;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import lombok.Getter;
 
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -34,23 +35,33 @@ public class ProxyReportEvent extends Event {
      */
     private String baseDomain;
     /**
-     * 完整子域名列表，完整域名=子域名.基础域名
+     * 域名列表
      */
-    private Set<String> subdomains;
+    private Set<DomainInfo> domains;
     /**
      * 是否是更新事件，true=更新事件，false=新增事件
      */
     private final boolean isUpdate;
+    /**
+     * 更新操作，是否发生数据变化
+     */
+    private final boolean hasChange;
 
-    public ProxyReportEvent(boolean isUpdate, ProxyConfig proxyConfig) {
+
+    public DomainType getDomainType(){
+        return proxyConfig.getRouteConfig().getDomainType();
+    }
+    public ProxyReportEvent(boolean isUpdate, ProxyConfig proxyConfig,boolean hasChange) {
         this.isUpdate = isUpdate;
         this.proxyConfig = proxyConfig;
+        this.hasChange=hasChange;
     }
 
-    public ProxyReportEvent(boolean isUpdate, String baseDomain, Set<String> subdomains, ProxyConfig proxyConfig) {
+    public ProxyReportEvent(boolean isUpdate, String baseDomain, Set<DomainInfo> domains, ProxyConfig proxyConfig, boolean hasChange) {
         this.isUpdate = isUpdate;
         this.proxyConfig = proxyConfig;
         this.baseDomain = baseDomain;
-        this.subdomains = subdomains;
+        this.domains = domains;
+        this.hasChange=hasChange;
     }
 }

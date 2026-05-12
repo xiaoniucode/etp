@@ -6,7 +6,7 @@ export const penetrationRoutes: AppRouteRecord[] = [
     path: '/embedded',
     component: '/etp/embedded',
     meta: {
-      title: '临时隧道',
+      title: '会话隧道',
       icon: 'ri:network-line',
       roles: ['R_SUPER']
     }

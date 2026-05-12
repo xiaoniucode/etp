@@ -22,11 +22,11 @@ public class ProxyCreationResponseAction extends AgentBaseAction {
         Message.NewProxyResp response = context.getAndRemoveAs("NEW_PROXY_RESP", Message.NewProxyResp.class);
         String remoteAddr = response.getRemoteAddr();
         String proxyName = response.getProxyName();
-        logger.info("ETP 内网穿透安全网关已启动，代理名称: {}, 远程地址: {}", proxyName, remoteAddr);
+        logger.info("ETP 内网穿透已启动，代理名称: {}, 远程地址: {}", proxyName, remoteAddr);
         System.out.println(
                 "\n" +
                         GREEN + "┌─────────────────────────────────────────┐\n" +
-                        "  " + BOLD + "🚀 ETP 内网穿透安全网关已启动" + RESET + GREEN + "\n" +
+                        "  " + BOLD + "🚀 ETP 内网穿透已启动" + RESET + GREEN + "\n" +
                         "├─────────────────────────────────────────┤\n" +
                         "  " + CYAN + "📝 代理名称:" + RESET + "  " + YELLOW + BOLD + proxyName + RESET + "\n" +
                         "  " + CYAN + "🌐 远程地址:" + RESET + "  " + YELLOW + BOLD + remoteAddr + RESET + "\n" +

@@ -144,6 +144,7 @@
     async (newVal) => {
       dialogVisible.value = newVal
       if (newVal && props.proxyId) {
+        resetFormData()
         await fetchAccessControlData()
       }
     }
@@ -154,9 +155,18 @@
     emit('update:visible', newVal)
   })
 
+  const resetFormData = () => {
+    formData.enabled = false
+    formData.mode = 1
+    formData.rules = []
+    editingRuleId.value = null
+    editingRuleBackup.value = null
+  }
+
   // 组件挂载时获取数据
   onMounted(async () => {
     if (props.visible && props.proxyId) {
+      resetFormData()
       await fetchAccessControlData()
     }
   })
@@ -212,79 +222,52 @@
   }
 
   const handleSaveRule = async (rule: any) => {
-    // 验证规则
     if (!rule.cidr) {
       ElMessage.error('请输入IP地址段')
       return
     }
 
-    try {
-      if (rule.id > 0) {
-        // 更新现有规则
-        await fetchUpdateAccessControlRule({
-          id: rule.id,
-          cidr: rule.cidr,
-          ruleType: rule.ruleType
-        })
-      } else {
-        // 添加新规则
-        await fetchAddAccessControlRule({
-          proxyId: props.proxyId,
-          cidr: rule.cidr,
-          ruleType: rule.ruleType
-        })
-      }
-      // 退出编辑状态
-      editingRuleId.value = null
-      // 重新获取数据
-      await fetchAccessControlData()
-    } catch (error) {
-      // 恢复编辑前的数据
-      if (editingRuleBackup.value) {
-        Object.assign(rule, editingRuleBackup.value)
-      }
-    } finally {
-      // 清理备份
-      editingRuleBackup.value = null
+    if (rule.id > 0) {
+      await fetchUpdateAccessControlRule({
+        id: rule.id,
+        cidr: rule.cidr,
+        ruleType: rule.ruleType
+      })
+    } else {
+      await fetchAddAccessControlRule({
+        proxyId: props.proxyId,
+        cidr: rule.cidr,
+        ruleType: rule.ruleType
+      })
     }
+    editingRuleId.value = null
+    await fetchAccessControlData()
+    editingRuleBackup.value = null
   }
 
   // 处理删除规则
   const handleDeleteRule = async (id: number) => {
-    try {
-      await ElMessageBox.confirm('确定要删除此规则吗？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
+    await ElMessageBox.confirm('确定要删除此规则吗？', '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
 
-      if (id > 0) {
-        // 删除已保存的规则
-        await fetchDeleteAccessControlRule(id)
-        // 重新获取数据
-        await fetchAccessControlData()
-      } else {
-        // 删除未保存的规则（直接从列表中移除）
-        const index = formData.rules.findIndex((rule) => rule.id === id)
-        if (index > -1) {
-          formData.rules.splice(index, 1)
-          // 退出编辑状态
-          editingRuleId.value = null
-        }
-      }
-    } catch (error) {
-      if (error !== 'cancel') {
-        console.error('删除规则失败:', error)
+    if (id > 0) {
+      await fetchDeleteAccessControlRule(id)
+      await fetchAccessControlData()
+    } else {
+      const index = formData.rules.findIndex((rule) => rule.id === id)
+      if (index > -1) {
+        formData.rules.splice(index, 1)
+        editingRuleId.value = null
       }
     }
   }
 
   // 处理弹窗关闭
   const handleClose = () => {
-    if (editingRuleId.value !== null) {
-      editingRuleId.value = null
-      editingRuleBackup.value = null
-    }
+    resetFormData()
     dialogVisible.value = false
     emit('close')
   }

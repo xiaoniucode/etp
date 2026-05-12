@@ -27,6 +27,7 @@ import com.xiaoniucode.etp.server.service.EmbeddedAgentRegistry;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.Resource;
@@ -36,6 +37,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * HTTP代理操作策略实现
@@ -62,7 +64,7 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
     public ProxyOperationResult create(ProxyConfig config, AgentInfo agentInfo) {
         String baseDomain = appConfig.getBaseDomain();
         logger.debug("创建HTTP代理: {}", config.getName());
-        Set<String> domains;
+        Set<DomainInfo> domains;
 
         RouteConfig routeConfig = config.getRouteConfig();
         DomainType domainType = routeConfig.getDomainType();
@@ -72,9 +74,9 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
             if (!StringUtils.hasText(baseDomain)) {
                 throw new EtpException("服务不支持自动生成域名");
             }
-            String domain = domainGenerator.generateRandomSubdomain(baseDomain);
+            DomainInfo domainInfo = domainGenerator.generateRandomSubdomain(baseDomain);
             domains = new HashSet<>();
-            domains.add(domain + "." + baseDomain);
+            domains.add(domainInfo);
         } else {
             if (!StringUtils.hasText(baseDomain)) {
                 throw new EtpException("不支持子域名");
@@ -89,9 +91,9 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
             embeddedAgentRegistry.addProxyId(agentInfo.getAgentId(), config.getProxyId());
             embeddedAgentRegistry.addDomains(agentInfo.getAgentId(), domains);
         }
-        proxyManager.activate(config,domains);
+        proxyManager.activate(config, domains.stream().map(DomainInfo::getFullDomain).collect(Collectors.toSet()));
         logger.debug("HTTP代理 {} 创建成功，域名: {}", config.getName(), domains);
-        return new ProxyOperationResult(domains, null);
+        return new ProxyOperationResult(domains, null, true);
     }
 
     @Override
@@ -102,8 +104,8 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
         }
         logger.debug("更新HTTP代理: {}", newConfig.getName());
         if (agentInfo.getAgentType().isEmbedded()) {
-            Set<String> domains = proxyConfigService.findDomainsByProxyId(oldConfig.getProxyId());
-            embeddedAgentRegistry.removeDomains(agentInfo.getAgentId(), domains);
+            Set<DomainInfo> domainInfos = proxyConfigService.findDomainsByProxyId(oldConfig.getProxyId());
+            embeddedAgentRegistry.removeDomains(agentInfo.getAgentId(), domainInfos);
         }
         proxyManager.deactivate(oldConfig.getProxyId());
         return create(newConfig, agentInfo);

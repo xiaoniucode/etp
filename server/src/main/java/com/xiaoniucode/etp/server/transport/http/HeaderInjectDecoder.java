@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.transport.http;
 
-import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
@@ -11,6 +10,7 @@ import io.netty.util.CharsetUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 
 public class HeaderInjectDecoder extends ByteToMessageDecoder {
@@ -45,8 +45,8 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
             return;
         }
 
-        Channel channel = ctx.channel();
-        String visitorIp = channel.attr(AttributeKeys.VISITOR_REAL_IP).get();
+        Channel visitor = ctx.channel();
+        String visitorIp = getVisitorIp(visitor);
         if (visitorIp == null || visitorIp.isEmpty()) {
             logger.warn("[HTTP] 客户端IP为空，跳过X-Forwarded-For注入");
             in.resetReaderIndex();
@@ -73,7 +73,12 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
 
         logger.debug("[HTTP] X-Forwarded-For注入完成，客户端IP={}", visitorIp);
     }
-
+    protected String getVisitorIp(Channel visitor) {
+        if (visitor.remoteAddress() instanceof InetSocketAddress addr) {
+            return addr.getAddress().getHostAddress();
+        }
+        return visitor.remoteAddress().toString();
+    }
     /**
      * 查找HTTP header的结束位置（\r\n\r\n）
      * 返回header结束位置（包含\r\n\r\n），未找到返回-1

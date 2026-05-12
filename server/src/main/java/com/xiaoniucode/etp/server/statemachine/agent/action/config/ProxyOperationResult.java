@@ -16,9 +16,9 @@
 
 package com.xiaoniucode.etp.server.statemachine.agent.action.config;
 
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import lombok.Getter;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -26,11 +26,13 @@ import java.util.Set;
  */
 @Getter
 public class ProxyOperationResult {
-    private final Set<String> domains;
+    private final Set<DomainInfo> domains;
     private final Integer listenPort;
+    private final boolean hasChange;
 
-    public ProxyOperationResult(Set<String> domains, Integer listenPort) {
+    public ProxyOperationResult(Set<DomainInfo> domains, Integer listenPort, boolean hasChange) {
         this.domains = domains;
         this.listenPort = listenPort;
+        this.hasChange = hasChange;
     }
 }

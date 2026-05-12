@@ -21,6 +21,7 @@ import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
@@ -145,8 +146,8 @@ public class ProxyServiceImpl implements ProxyService {
         transportRepository.save(transportDO);
         //7.HTTP域名信息
         if (domainType.isAuto()) {
-            String domain = domainGenerator.generateRandomSubdomain(baseDomain);
-            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain, baseDomain, domainType));
+            DomainInfo domain = domainGenerator.generateRandomSubdomain(baseDomain);
+            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain.getDomain(), baseDomain, domainType));
         } else if (domainType.isCustomDomain()) {
             Set<String> domains = param.getDomains();
             List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
@@ -258,8 +259,8 @@ public class ProxyServiceImpl implements ProxyService {
         String baseDomain = appConfig.getBaseDomain();
         DomainType domainType = proxyDO.getDomainType();
         if (domainType.isAuto() && !existsDomainType.isAuto()) {
-            String domain = domainGenerator.generateRandomSubdomain(baseDomain);
-            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain, baseDomain, domainType));
+            DomainInfo domainInfo = domainGenerator.generateRandomSubdomain(baseDomain);
+            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domainInfo.getDomain(), baseDomain, domainType));
         } else if (domainType.isCustomDomain()) {
             Set<String> domains = param.getDomains();
             List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);

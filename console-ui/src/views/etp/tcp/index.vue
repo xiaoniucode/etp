@@ -78,7 +78,7 @@
     protocol: number
     agentType: number
     status: number
-    remotePort: number
+    listenPort: number
     targets: Array<{
       id: number
       proxyId: string
@@ -149,7 +149,7 @@
           minWidth: 100
         },
         {
-          prop: 'remotePort',
+          prop: 'listenPort',
           label: '远程端口',
           width: 90
         },

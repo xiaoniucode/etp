@@ -17,12 +17,13 @@
 package com.xiaoniucode.etp.server.service.repository;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 
 import java.util.Set;
 
 public interface ProxyStore {
     public void saveTcp(ProxyConfig proxyConfig);
-    public void saveHttp(ProxyConfig proxyConfig, Set<String> domains);
+    public void saveHttp(ProxyConfig proxyConfig, Set<DomainInfo> domains);
 
     public void delete(String proxyId);
 

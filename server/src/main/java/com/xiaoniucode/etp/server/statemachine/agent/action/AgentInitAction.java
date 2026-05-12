@@ -23,6 +23,7 @@ import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class AgentInitAction extends AgentBaseAction {
@@ -48,7 +51,11 @@ public class AgentInitAction extends AgentBaseAction {
                 ProxyConfig config = configExt.getProxyConfig();
                 if (config.getStatus().isOpen()) {
                     if (config.isHttp()) {
-                        proxyManager.activate(config, configExt.getDomains());
+                        Set<String> domains = configExt.getDomains()
+                                .stream()
+                                .map(DomainInfo::getFullDomain)
+                                .collect(Collectors.toSet());
+                        proxyManager.activate(config, domains);
                         logger.debug("激活HTTP代理配置: {}", config);
                     } else {
                         logger.debug("激活TCP代理配置: {}", config);

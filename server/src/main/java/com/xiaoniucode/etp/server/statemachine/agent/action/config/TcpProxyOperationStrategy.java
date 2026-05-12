@@ -63,7 +63,7 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
             embeddedAgentRegistry.addListenPort(agentId, config.getListenPort());
         }
         logger.debug("TCP代理 {} 注册成功，监听端口: {}", config.getName(), config.getListenPort());
-        return new ProxyOperationResult(null, config.getListenPort());
+        return new ProxyOperationResult(null, config.getListenPort(),true);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
                 newConfig.setRemotePort(oldConfig.getListenPort());
             }
             proxyManager.reconcile(newConfig);
-            return new ProxyOperationResult(null, newConfig.getListenPort());
+            return new ProxyOperationResult(null, newConfig.getListenPort(),true);
         }
     }
 

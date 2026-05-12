@@ -21,6 +21,7 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.service.ProxyConfigExt;
 import com.xiaoniucode.etp.server.service.repository.ProxyStore;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -32,7 +33,7 @@ public class EmbeddedProxyQueryRepository implements ProxyQueryRepository, Proxy
     private final Map<String/*agentId*/, Set<String/*proxyId*/>> agentIdIndex = new ConcurrentHashMap<>();
     private final Map<Integer/*remotePort*/, String/*proxyId*/> listenPortIndex = new ConcurrentHashMap<>();
     private final Map<String/*domain*/, String/*proxyId*/> fullDomainIndex = new ConcurrentHashMap<>();
-    private final Map<String/*proxyId*/, Set<String/*domain*/>> proxyDomainIndex = new ConcurrentHashMap<>();
+    private final Map<String/*proxyId*/, Set<DomainInfo/*domain*/>> proxyDomainIndex = new ConcurrentHashMap<>();
     private final Map<String/*agentId*/, Map<String/*proxyName*/, String/*proxyId*/>> agentNameIndex = new ConcurrentHashMap<>();
 
     @Override
@@ -72,7 +73,7 @@ public class EmbeddedProxyQueryRepository implements ProxyQueryRepository, Proxy
         return proxyIds.stream()
                 .map(proxyMap::get)
                 .map(config -> {
-                    Set<String> domains = findDomainsByProxyId(config.getProxyId());
+                    Set<DomainInfo> domains = findDomainsByProxyId(config.getProxyId());
                     return new ProxyConfigExt(config, domains);
                 })
                 .toList();
@@ -84,7 +85,7 @@ public class EmbeddedProxyQueryRepository implements ProxyQueryRepository, Proxy
     }
 
     @Override
-    public Set<String> findDomainsByProxyId(String proxyId) {
+    public Set<DomainInfo> findDomainsByProxyId(String proxyId) {
         return proxyDomainIndex.getOrDefault(proxyId, Set.of());
     }
 
@@ -119,7 +120,7 @@ public class EmbeddedProxyQueryRepository implements ProxyQueryRepository, Proxy
     }
 
     @Override
-    public void saveHttp(ProxyConfig proxyConfig, Set<String> domains) {
+    public void saveHttp(ProxyConfig proxyConfig, Set<DomainInfo> domains) {
         String proxyId = proxyConfig.getProxyId();
         proxyMap.put(proxyId, proxyConfig);
 
@@ -127,8 +128,8 @@ public class EmbeddedProxyQueryRepository implements ProxyQueryRepository, Proxy
                 .add(proxyId);
 
         if (domains != null) {
-            for (String domain : domains) {
-                fullDomainIndex.put(domain, proxyId);
+            for (DomainInfo domainInfo : domains) {
+                fullDomainIndex.put(domainInfo.getFullDomain(), proxyId);
             }
             proxyDomainIndex.put(proxyId, new HashSet<>(domains));
         }
@@ -146,13 +147,13 @@ public class EmbeddedProxyQueryRepository implements ProxyQueryRepository, Proxy
         Set<String> agentSet = agentIdIndex.get(removed.getAgentId());
         if (agentSet != null) agentSet.remove(proxyId);
         if (removed.isTcp()) {
-            listenPortIndex.remove(removed.getRemotePort());
+            listenPortIndex.remove(removed.getListenPort());
         }
         if (removed.isHttp()) {
-            Set<String> domains = proxyDomainIndex.get(proxyId);
+            Set<DomainInfo> domains = proxyDomainIndex.get(proxyId);
             if (domains != null) {
-                for (String domain : domains) {
-                    fullDomainIndex.remove(domain);
+                for (DomainInfo domainInfo : domains) {
+                    fullDomainIndex.remove(domainInfo.getFullDomain());
                 }
                 proxyDomainIndex.remove(proxyId);
             }

@@ -132,6 +132,7 @@
     async (newVal) => {
       dialogVisible.value = newVal
       if (newVal && props.proxyId) {
+        resetFormData()
         await fetchBasicAuthData()
       }
     }
@@ -141,8 +142,16 @@
     emit('update:visible', newVal)
   })
 
+  const resetFormData = () => {
+    formData.enabled = false
+    formData.users = []
+    editingUserId.value = null
+    editingUserBackup.value = null
+  }
+
   onMounted(async () => {
     if (props.visible && props.proxyId) {
+      resetFormData()
       await fetchBasicAuthData()
     }
   })
@@ -209,36 +218,26 @@
   }
 
   const handleDeleteUser = async (id: number) => {
-    try {
-      await ElMessageBox.confirm('确定要删除此用户吗？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
+    await ElMessageBox.confirm('确定要删除此用户吗？', '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
 
-      if (id > 0) {
-        await fetchDeleteBasicAuthUser(id)
-        await fetchBasicAuthData()
-      } else {
-        const index = formData.users.findIndex((user) => user.id === id)
-        if (index > -1) {
-          formData.users.splice(index, 1)
-          editingUserId.value = null
-        }
-      }
-    } catch (error) {
-      // 忽略用户取消操作的错误
-      if (error !== 'cancel') {
-        throw error
+    if (id > 0) {
+      await fetchDeleteBasicAuthUser(id)
+      await fetchBasicAuthData()
+    } else {
+      const index = formData.users.findIndex((user) => user.id === id)
+      if (index > -1) {
+        formData.users.splice(index, 1)
+        editingUserId.value = null
       }
     }
   }
 
   const handleClose = () => {
-    if (editingUserId.value !== null) {
-      editingUserId.value = null
-      editingUserBackup.value = null
-    }
+    resetFormData()
     dialogVisible.value = false
     emit('close')
   }

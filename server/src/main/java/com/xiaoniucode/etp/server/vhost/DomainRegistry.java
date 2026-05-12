@@ -29,7 +29,6 @@ public class DomainRegistry {
     private final Map<String/*proxyId*/, Set<String/*domain*/>> proxyDomains = new ConcurrentHashMap<>();
     private final Map<String/*domain*/, String/*proxyId*/> domainIndex = new ConcurrentHashMap<>();
 
-
     public boolean exists(String proxyId) {
         return proxyDomains.containsKey(proxyId);
     }

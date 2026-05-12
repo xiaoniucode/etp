@@ -19,6 +19,7 @@ package com.xiaoniucode.etp.server.service.repository;
 import com.xiaoniucode.etp.common.message.PageResult;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.service.ProxyConfigExt;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +40,7 @@ public interface ProxyQueryRepository {
 
     boolean existsByFullDomain(String fullDomain);
 
-    Set<String> findDomainsByProxyId(String proxyId);
+    Set<DomainInfo> findDomainsByProxyId(String proxyId);
 
     default List<ProxyConfig> findAll() {
         return null;

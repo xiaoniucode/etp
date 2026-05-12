@@ -13,6 +13,7 @@ import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.service.diff.ConfigChangeDetector;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.agent.action.config.*;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -63,8 +64,9 @@ public class ProxyCreateAction extends AgentBaseAction {
             } else {
                 operationResult = handleProxyCreate(newConfig, context);
             }
+            boolean hasChange = operationResult.isHasChange();
             sendSuccessResponse(newConfig, operationResult.getDomains(), control);
-            notifyProxyReport(isUpdate, newConfig, operationResult.getDomains());
+            notifyProxyReport(isUpdate, newConfig, operationResult.getDomains(), hasChange);
             context.fireEvent(AgentEvent.REBUILD_CONTEXT);
             logger.info("代理{}成功: {}", isUpdate ? "更新" : "创建", newConfig.getName());
         } catch (Exception e) {
@@ -73,19 +75,19 @@ public class ProxyCreateAction extends AgentBaseAction {
         }
     }
 
-    private void notifyProxyReport(boolean isUpdate, ProxyConfig config, Set<String> domains) {
+    private void notifyProxyReport(boolean isUpdate, ProxyConfig config, Set<DomainInfo> domains, boolean hasChange) {
         String baseDomain = appConfig.getBaseDomain();
         if (!isUpdate) {
             if (config.isTcp()) {
-                eventBus.publishAsync(new ProxyReportEvent(false, config));
+                eventBus.publishAsync(new ProxyReportEvent(false, config, hasChange));
             } else {
-                eventBus.publishAsync(new ProxyReportEvent(false, baseDomain, domains, config));
+                eventBus.publishAsync(new ProxyReportEvent(false, baseDomain, domains, config, hasChange));
             }
         } else {
             if (config.isTcp()) {
-                eventBus.publishAsync(new ProxyReportEvent(true, config));
+                eventBus.publishAsync(new ProxyReportEvent(true, config, hasChange));
             } else {
-                eventBus.publishAsync(new ProxyReportEvent(true, baseDomain, domains, config));
+                eventBus.publishAsync(new ProxyReportEvent(true, baseDomain, domains, config, hasChange));
             }
         }
     }
@@ -108,8 +110,9 @@ public class ProxyCreateAction extends AgentBaseAction {
         newConfig.setProxyId(oldConfig.getProxyId());
         if (!configChangeDetector.hasChanges(oldConfig, newConfig)) {
             logger.debug("代理配置 {} 没有发生变更，无需更新", newConfig.getName());
-            Set<String> domains = proxyConfigService.findDomainsByProxyId(oldConfig.getProxyId());
-            return new ProxyOperationResult(new HashSet<>(domains), oldConfig.getListenPort());
+            Set<DomainInfo> domains = proxyConfigService.findDomainsByProxyId(oldConfig.getProxyId());
+
+            return new ProxyOperationResult(domains, oldConfig.getListenPort(), false);
         }
         ProxyConfigOperationStrategy strategy = strategyFactory.getStrategy(newConfig);
         return strategy.update(newConfig, oldConfig, context.getAgentInfo());
@@ -129,7 +132,7 @@ public class ProxyCreateAction extends AgentBaseAction {
     /**
      * 发送成功响应
      */
-    private void sendSuccessResponse(ProxyConfig config, Set<String> domains, Channel control) {
+    private void sendSuccessResponse(ProxyConfig config, Set<DomainInfo> domains, Channel control) {
         Message.NewProxyResp response = responseBuilder.buildNewProxyResponse(config, domains);
         ByteBuf payload = ProtobufUtil.toByteBuf(response, control.alloc());
         TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, payload);

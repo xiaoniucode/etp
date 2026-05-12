@@ -17,11 +17,16 @@
 package com.xiaoniucode.etp.server.service;
 
 import com.xiaoniucode.etp.core.enums.AgentType;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
+
 @Component
 public class EmbeddedAgentRegistry {
     private static final AgentType AGENT_TYPE = AgentType.EMBEDDED;
@@ -49,8 +54,11 @@ public class EmbeddedAgentRegistry {
         if (domain != null) getOrCreate(agentId).getDomains().add(domain);
     }
 
-    public void addDomains(String agentId, Collection<String> domains) {
-        if (domains != null && !domains.isEmpty()) getOrCreate(agentId).getDomains().addAll(domains);
+    public void addDomains(String agentId, Collection<DomainInfo> domains) {
+        if (!CollectionUtils.isEmpty(domains)) {
+            Set<String> fullDomains = domains.stream().map(DomainInfo::getFullDomain).collect(Collectors.toSet());
+            getOrCreate(agentId).getDomains().addAll(fullDomains);
+        }
     }
 
     public AgentType identifyByAgentId(String agentId) {
@@ -96,9 +104,11 @@ public class EmbeddedAgentRegistry {
         if (meta != null && domain != null) meta.getDomains().remove(domain);
     }
 
-    public void removeDomains(String agentId, Collection<String> domains) {
+    public void removeDomains(String agentId, Collection<DomainInfo> domains) {
         AgentMeta meta = agentMetaMap.get(agentId);
-        if (meta != null && domains != null) meta.getDomains().removeAll(domains);
+        if (!CollectionUtils.isEmpty(domains)) {
+            meta.getDomains().removeAll(domains.stream().map(DomainInfo::getFullDomain).collect(Collectors.toSet()));
+        }
     }
 
     public void removeAgent(String agentId) {

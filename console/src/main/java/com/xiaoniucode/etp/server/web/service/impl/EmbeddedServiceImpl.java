@@ -24,10 +24,10 @@ import com.xiaoniucode.etp.server.service.repository.AgentQueryRepository;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.basicauth.BasicAuthDetailDTO;
-import com.xiaoniucode.etp.server.web.dto.proxy.TargetDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelListDTO;
 import com.xiaoniucode.etp.server.web.service.EmbeddedService;
@@ -83,8 +83,9 @@ public class EmbeddedServiceImpl implements EmbeddedService {
                 tunnelListDTO.setTunnel(proxyConvert.toTcpDTOList(config));
             } else if (config.isHttp()) {
                 TunnelListDTO.HttpTunnelListDTO httpDTOList = proxyConvert.toHttpDTOList(config);
-                Set<String> domains = proxyQueryRepository.findDomainsByProxyId(config.getProxyId());
-                httpDTOList.setDomains(new ArrayList<>(domains));
+                Set<DomainInfo> domainInfos = proxyQueryRepository.findDomainsByProxyId(config.getProxyId());
+                List<String> fullDomains = domainInfos.stream().map(DomainInfo::getFullDomain).toList();
+                httpDTOList.setDomains(fullDomains);
                 tunnelListDTO.setTunnel(httpDTOList);
             }
             tunnelList.add(tunnelListDTO);
@@ -113,7 +114,9 @@ public class EmbeddedServiceImpl implements EmbeddedService {
         if (config.isHttp()) {
             TunnelDetailDTO.HttpProxyDTO httpProxyDTO = proxyConvert.toHttpProxyDTO(config);
             httpProxyDTO.setDeploymentMode(deploymentMode);
-            httpProxyDTO.setDomains(proxyQueryRepository.findDomainsByProxyId(proxyId));
+            Set<DomainInfo> domainInfos = proxyQueryRepository.findDomainsByProxyId(proxyId);
+            Set<String> fullDomains = domainInfos.stream().map(DomainInfo::getFullDomain).collect(Collectors.toSet());
+            httpProxyDTO.setDomains(fullDomains);
             httpProxyDTO.setDomainType(config.getRouteConfig().getDomainType().getCode());
             httpProxyDTO.setTransport(transportConvert.toDTO(config.getTransport()));
             BasicAuthConfig basicAuth = config.getBasicAuth();

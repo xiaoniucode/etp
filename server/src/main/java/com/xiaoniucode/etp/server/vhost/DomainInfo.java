@@ -24,15 +24,15 @@ import lombok.Data;
 @AllArgsConstructor
 public class DomainInfo {
     /**
-     * 子域名/自动域名 的基础域名
+     * 基础域名
      */
     private String baseDomain;
     /**
-     * 如果是子域名，此处是前缀，如果域名类型，此处是完整域名
+     * 域名
      */
     private String domain;
     /**
-     * 当前域名类型
+     * 域名类型
      */
     private DomainType domainType;
 

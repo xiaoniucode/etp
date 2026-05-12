@@ -19,6 +19,7 @@ package com.xiaoniucode.etp.server.web.core.repository;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.service.ProxyConfigExt;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import com.xiaoniucode.etp.server.web.core.repository.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
 import com.xiaoniucode.etp.server.web.entity.BasicUserDO;
@@ -118,10 +119,10 @@ public class StandaloneProxyQueryRepository implements ProxyQueryRepository {
         return proxyConfigAssembler.assembleList(list).stream()
                 .map(config -> {
                     List<ProxyDomainDO> domains = domainMap.getOrDefault(config.getProxyId(), List.of());
-                    Set<String> domainList = domains.stream()
-                            .map(ProxyDomainDO::getDomain)
+                    Set<DomainInfo> domainInfos = domains.stream()
+                            .map(domainDO -> new DomainInfo(domainDO.getBaseDomain(), domainDO.getDomain(), domainDO.getDomainType()))
                             .collect(Collectors.toSet());
-                    return new ProxyConfigExt(config, domainList);
+                    return new ProxyConfigExt(config, domainInfos);
                 })
                 .toList();
     }
@@ -132,8 +133,13 @@ public class StandaloneProxyQueryRepository implements ProxyQueryRepository {
     }
 
     @Override
-    public Set<String> findDomainsByProxyId(String proxyId) {
-        return proxyDomainRepository.findFullDomainsByProxyId(proxyId);
-
+    public Set<DomainInfo> findDomainsByProxyId(String proxyId) {
+        List<ProxyDomainDO> proxyDomainDOS = proxyDomainRepository.findByProxyId(proxyId);
+        if (CollectionUtils.isEmpty(proxyDomainDOS)) {
+            return new HashSet<>();
+        }
+        return proxyDomainDOS.stream()
+                .map(d -> new DomainInfo(d.getBaseDomain(), d.getDomain(), d.getDomainType()))
+                .collect(Collectors.toSet());
     }
 }

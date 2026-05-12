@@ -20,6 +20,7 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.server.config.AppConfig;
+import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +37,7 @@ public class ProxyConfigResponseBuilder {
     /**
      * 构建新代理响应
      */
-    public Message.NewProxyResp buildNewProxyResponse(ProxyConfig config, Set<String> domains) {
+    public Message.NewProxyResp buildNewProxyResponse(ProxyConfig config, Set<DomainInfo> domains) {
         String remoteAddr = buildRemoteAddress(config, domains);
 
         return Message.NewProxyResp.newBuilder()
@@ -49,7 +50,7 @@ public class ProxyConfigResponseBuilder {
     /**
      * 构建远程地址信息
      */
-    private String buildRemoteAddress(ProxyConfig config, Set<String> domains) {
+    private String buildRemoteAddress(ProxyConfig config, Set<DomainInfo> domains) {
         ProtocolType protocol = config.getProtocol();
         if (protocol.isHttp()) {
             return buildHttpAddress(domains);
@@ -62,11 +63,11 @@ public class ProxyConfigResponseBuilder {
     /**
      * 构建HTTP地址
      */
-    private String buildHttpAddress(Set<String> domains) {
+    private String buildHttpAddress(Set<DomainInfo> domains) {
         StringBuilder remoteAddr = new StringBuilder();
         int httpProxyPort = appConfig.getHttpProxyPort();
-        for (String domain : domains) {
-            remoteAddr.append("http://").append(domain);
+        for (DomainInfo domain : domains) {
+            remoteAddr.append("http://").append(domain.getFullDomain());
             if (httpProxyPort != 80) {
                 remoteAddr.append(":").append(httpProxyPort);
             }
