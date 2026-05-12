@@ -4,13 +4,13 @@ server_port = 9527
 [auth]
 token = "414083A8563774142CAC91DDB5C9A2ED"
 
+##############################################################################################################
 [connection]
 [connection.retry]
 initial_delay = 2
 max_delay = 8
 max_retries = 5
 
-# 预创建连接池
 [connection.pool]
 enabled = true
 
@@ -32,30 +32,31 @@ cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.crt"
 key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.key"
 ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 
+##################################################代理配置############################################################
 [[proxies]]
 name = "web1"
 protocol = "http"
-auto_domain = false
 custom_domains = ["a.domain1.com"]
 status = 1
 targets = [
     { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
-    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
+    { host = "127.0.0.1", port = 8091, weight = 30, name = "web-instance-2" },
+    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-3" }
 ]
 [[proxies]]
-name = "web3"
+name = "web2"
 protocol = "http"
-sub_domains = ["web3sub1", "web3sub2"]
+sub_domains = ["web2sub1", "web2sub2"]
 status = 1
 targets = [
     { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
-    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
+    { host = "127.0.0.1", port = 8090, weight = 30, name = "web-instance-2" }
 ]
 [proxies.basic_auth]
 enabled = true
 users = [
-    { user = "user1", pass = "pass1" },
-    { user = "user2", pass = "pass2" }
+    { user = "user1", pass = "123" },
+    { user = "user2", pass = "123" }
 ]
 [proxies.access_control]
 enabled = true
@@ -66,105 +67,95 @@ deny = []
 [[proxies]]
 name = "web4"
 protocol = "http"
-custom_domains = ["web3.domain2.com"]
+auto_domain = true
 targets = [
-    { host = "127.0.0.1", port = 8090, weight = 70, name = "web4-instance-1" },
-    { host = "127.0.0.1", port = 8090, weight = 30, name = "web4-instance-2" }
+    { host = "127.0.0.1", port = 8084, weight = 70, name = "web4-instance-1" }
 ]
-#
-#[proxies.load_balance]
-#strategy = "random" # 负载均衡策略 roundrobin/weight/random/leastconn
-#[proxies.health_check]
-#enabled = true
-#interval = 5 #检查间隔
-#timeout = 2 #连接超时
-#max_fail = 3
-#path="/health" #健康检查路径(HTTP协议)
-#
-#[proxies.transport]
-#multiplex = false
-#compress = false
-#encrypt = true
-#
-#[proxies.access_control]
-#enabled = true
-#mode = "allow"
-#allow = ["43.135.115.160/32"]
-#deny = []
-#
-#[proxies.bandwidth]
-#enabled= true
-#limit = "20Mbps" #总带宽限制(可选) 20Mbps
-#limit_in = "2Mbps" #入口带宽限制(可选)
-#limit_out = "2Mbps" #出口带宽限制(可选)
-#
-#[[proxies]]
-#name = "web2"
-#protocol = "http"
-#targets = [
-#    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
-#    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
-#]
-#custom_domains = ["etp.domain2.com"]
+
+[proxies.load_balance]
+strategy = "random"
+[proxies.health_check]
+enabled = true
+interval = 5
+timeout = 2
+max_fail = 3
+path="/health"
+
+[proxies.transport]
+multiplex = false
+encrypt = true
+
+[proxies.access_control]
+enabled = true
+mode = "allow"
+allow = ["43.135.115.160/32"]
+deny = []
+
+[proxies.bandwidth]
+enabled= true
+limit = "4Mbps"
+limit_in = "2Mbps"
+limit_out = "2Mbps"
+
+[[proxies]]
+name = "web5"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
+    { host = "127.0.0.1", port = 8090, weight = 30, name = "web-instance-2" }
+]
+custom_domains = ["web5.domain2.com"]
 #[proxies.access_control]
 #enabled = true
 #mode = "allow"
 #allow = ["127.0.0.1"]
-#[proxies.basic_auth]
-#enabled = true
-#users = [
-#    { user = "user1", pass = "123" },
-#    { user = "user2", pass = "456" }
-#]
+[proxies.basic_auth]
+enabled = true
+users = [
+    { user = "user", pass = "123" },
+    { user = "user2", pass = "456" }
+]
 [[proxies]]
-name = "web22"
+name = "web6"
 protocol = "http"
-custom_domains = ["etp11.domain2.com"]
+custom_domains = ["web6.domain2.com"]
 targets = [
     { host = "127.0.0.1", port = 3006, weight = 70, name = "web-instance-1" }
-    #    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
 ]
-#[proxies.bandwidth] #带宽限制
-#limit = "20Mbps" #总带宽限制(可选)
-#limit_in = "2Mbps" #入口带宽限制(可选)
-#limit_out = "2Mbps" #出口带宽限制(可选)
+[proxies.bandwidth]
+limit = "20Mbps"
 [proxies.transport]
 multiplex = true
-compress = true
 encrypt = false
-#[[proxies]]
-#name = "mysql"
-#protocol = "tcp"
-#status = 1
-#targets = [
-#    { host = "127.0.0.1", port = 8090, weight = 70, name = "web-instance-1" },
-#    { host = "127.0.0.1", port = 8092, weight = 30, name = "web-instance-2" }
-#]
-#[proxies.access_control] #访问控制
-#enabled = true
-#mode = "allow"
-#allow = ["127.0.0.1"]
-#deny = []
 [[proxies]]
-name = "mysql2"
+name = "mysql"
 protocol = "tcp"
 status = 1
+targets = [
+    { host = "127.0.0.1", port = 33061, weight = 70, name = "web-instance-1" },
+    { host = "127.0.0.1", port = 33062, weight = 30, name = "web-instance-2" }
+]
+[proxies.access_control]
+enabled = true
+mode = "allow"
+allow = ["127.0.0.1"]
+deny = []
+[[proxies]]
+name = "ssh"
+protocol = "tcp"
 remote_port = 3309
 targets = [
-    { host = "127.0.0.1", port = 3306, weight = 70, name = "mysql-instance-1" },
-    { host = "127.0.0.1", port = 3306, weight = 90, name = "mysql-instance-2" }
+    { host = "127.0.0.1", port = 8022, weight = 1, name = "ssh" }
 ]
 [proxies.transport]
 multiplex = true
-compress = false
 encrypt = false
 [proxies.loadbalance]
-strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
+strategy = "roundrobin"
 
-[proxies.bandwidth] #带宽限制
-limit = "2Mbps" #总带宽限制(可选)
-#limit_in = "64Kbps" #入口带宽限制(可选)
-#limit_out = "64Kbps" #出口带宽限制(可选)
+[proxies.bandwidth]
+limit_in = "64Kbps"
+limit_out = "64Kbps"
 
 [[proxies]]
 name = "redis"
@@ -176,10 +167,10 @@ targets = [
 ]
 
 [proxies.loadbalance]
-strategy = "random" # 策略：roundrobin/weight/random/leastconn
+strategy = "weight"
 
 [[proxies]]
-name = "postgre"
+name = "PostgreSQL"
 protocol = "tcp"
 enabled = true
 targets = [
@@ -191,7 +182,6 @@ name = "test"
 protocol = "tcp"
 enabled = true
 targets = [
-    #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
 ]
 [proxies.transport]
@@ -199,19 +189,15 @@ multiplex = false
 compress = false
 encrypt = true
 [proxies.loadbalance]
-strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
-[proxies.bandwidth] #带宽限制
-limit_total = "2Mbps" #总带宽限制(可选)
-#limit_in = "10Mbps" #入口带宽限制(可选)
-#limit_out = "10Mbps" #出口带宽限制(可选)
-
+strategy = "leastconn"
+[proxies.bandwidth]
+limit_in = "2Mbps"
 
 [[proxies]]
 name = "test_mux"
 protocol = "tcp"
 enabled = true
 targets = [
-    #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
 ]
 [proxies.transport]
@@ -219,18 +205,15 @@ multiplex = true
 compress = false
 encrypt = false
 [proxies.loadbalance]
-strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
-[proxies.bandwidth] #带宽限制
-limit = "1Mbps" #总带宽限制(可选)
-#limit_in = "10Mbps" #入口带宽限制(可选)
-#limit_out = "10Mbps" #出口带宽限制(可选)
+strategy = "roundrobin"
+[proxies.bandwidth]
+limit_total = "1Mbps"
 
 [[proxies]]
 name = "test_mux_tls"
 protocol = "tcp"
 enabled = true
 targets = [
-    #    { host = "127.0.0.1", port = 8032, weight = 70, name = "test-instance-1" },
     { host = "127.0.0.1", port = 8032, weight = 90, name = "test-instance-2" }
 ]
 [proxies.transport]
@@ -238,13 +221,10 @@ multiplex = true
 compress = false
 encrypt = true
 [proxies.loadbalance]
-strategy = "roundrobin" # 策略：roundrobin/weight/random/leastconn
-[proxies.bandwidth] #带宽限制
-limit = "2Mbps" #总带宽限制(可选)
-#limit_in = "10Mbps" #入口带宽限制(可选)
-#limit_out = "10Mbps" #出口带宽限制(可选)
+strategy = "roundrobin"
+[proxies.bandwidth]
+limit_total = "20Mbps"
 
-#文件日志
 [log]
 level = "debug"
 path = "log"
@@ -253,7 +233,3 @@ archive_pattern = "etpc.%d{yyyy-MM-dd}.log"
 log_pattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 max_history = 30
 total_size_cap = "1GB"
-## 控制台日志
-#[log.console]
-#level = "info"
-#log_pattern = "%d{HH:mm:ss} %msg%n"

@@ -21,12 +21,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * 访问控制实体类
  */
 @Data
 @Entity
 @Table(name = "access_control")
+@NoArgsConstructor
 public class AccessControlDO {
     /**
      * 代理ID
@@ -42,4 +45,9 @@ public class AccessControlDO {
      */
     @Convert(converter = AccessControlModeConverter.class)
     private AccessControl mode;
+
+    public AccessControlDO(String proxyId, AccessControl accessControl) {
+        this.proxyId=proxyId;
+        this.mode=accessControl;
+    }
 }

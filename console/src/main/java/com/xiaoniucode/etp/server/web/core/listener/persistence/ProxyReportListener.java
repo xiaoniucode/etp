@@ -19,6 +19,7 @@ package com.xiaoniucode.etp.server.web.core.listener.persistence;
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.enums.AccessControl;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
@@ -28,6 +29,7 @@ import com.xiaoniucode.etp.server.event.ProxyReportEvent;
 import com.xiaoniucode.etp.server.service.repository.ProxyStore;
 import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import com.xiaoniucode.etp.server.web.core.converter.ProxyModelConvert;
+import com.xiaoniucode.etp.server.web.entity.AccessControlDO;
 import com.xiaoniucode.etp.server.web.entity.BasicAuthDO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDomainDO;
@@ -125,6 +127,8 @@ public class ProxyReportListener implements EventListener<ProxyReportEvent> {
             accessControlRepository.save(proxyModelConvert.toAccessControlDO(accessControl, proxyId));
             //访问控制规则
             accessControlRuleRepository.saveAll(proxyModelConvert.toAccessControlRuleDO(accessControl, proxyId));
+        } else {
+            accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
         }
         //删除所有目标服务
         proxyTargetRepository.deleteByProxyId(proxyId);
@@ -138,12 +142,14 @@ public class ProxyReportListener implements EventListener<ProxyReportEvent> {
             if (basicAuth != null) {
                 basicAuthRepository.save(new BasicAuthDO(proxyId, basicAuth.isEnabled()));
                 basicUserRepository.saveAll(proxyModelConvert.toBasicUserDOList(basicAuth.getUsers(), proxyId));
+            } else {
+                basicAuthRepository.save(new BasicAuthDO(proxyId, false));
             }
             DomainType domainType = event.getDomainType();
             Set<DomainInfo> domains = event.getDomains();
             Set<ProxyDomainDO> proxyDomainDOS = domains.stream().map(domainInfo ->
-                    new ProxyDomainDO(proxyId, domainInfo.getDomain(),
-                            domainInfo.getBaseDomain(), domainInfo.getDomainType()))
+                            new ProxyDomainDO(proxyId, domainInfo.getDomain(),
+                                    domainInfo.getBaseDomain(), domainInfo.getDomainType()))
                     .collect(Collectors.toSet());
 
             proxyDomainRepository.deleteByProxyId(proxyId);
