@@ -26,7 +26,15 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "proxies")
+@Table(name = "proxies",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_agent_name", columnNames = {"agent_id", "name"})
+        },
+        indexes = {
+                @Index(name = "idx_agent_id", columnList = "agent_id"),
+                @Index(name = "idx_agent_name", columnList = "agent_id,name")
+        }
+)
 public class ProxyDO {
     /**
      * 代理ID
@@ -40,7 +48,7 @@ public class ProxyDO {
     /**
      * 代理名称
      */
-    @Column(name = "name", unique = true, nullable = false, length = 30)
+    @Column(name = "name", nullable = false, length = 30)
     private String name;
     /**
      * 协议类型
@@ -87,17 +95,17 @@ public class ProxyDO {
     /**
      * 总带宽限制（bps）
      */
-    @Column(name = "limit_total",comment = "总带宽限制（bps）")
+    @Column(name = "limit_total", comment = "总带宽限制（bps）")
     private Long limitTotal;
     /**
      * 入站带宽限制（bps）
      */
-    @Column(name = "limit_in",comment = "入站带宽限制（bps）")
+    @Column(name = "limit_in", comment = "入站带宽限制（bps）")
     private Long limitIn;
     /**
      * 出站带宽限制（bps）
      */
-    @Column(name = "limit_out",comment = "出站带宽限制（bps）")
+    @Column(name = "limit_out", comment = "出站带宽限制（bps）")
     private Long limitOut;
     /**
      * 创建时间

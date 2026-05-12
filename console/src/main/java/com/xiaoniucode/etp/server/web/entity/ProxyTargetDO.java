@@ -14,17 +14,21 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.entity;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 /**
  * 代理目标实体类
  */
 @Data
 @Entity
-@Table(name = "proxy_target")
+@Table(name = "proxy_target", indexes = {
+        @Index(name = "idx_proxy_id", columnList = "proxy_id"),
+})
 public class ProxyTargetDO {
     /**
      * 主键ID

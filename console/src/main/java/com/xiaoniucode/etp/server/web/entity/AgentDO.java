@@ -24,26 +24,24 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-/**
- * 代理节点实体类
- */
+
 @Data
 @Entity
 @Table(name = "agent")
 public class AgentDO {
     /**
-     * agentId
+     * agentId 唯一标识
      */
     @Id
     @Column(name = "id", nullable = false)
     private String id;
     /**
-     * 代理节点名称
+     * 系统用户名
      */
     @Column(name = "name", nullable = false)
     private String name;
     /**
-     * 登陆令牌
+     * 最后登陆令牌
      */
     @Column(name = "token", nullable = false)
     private String token;

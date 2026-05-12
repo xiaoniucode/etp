@@ -27,7 +27,11 @@ import java.time.LocalDateTime;
  */
 @Data
 @Entity
-@Table(name = "sys_user")
+@Table(name = "sys_user",
+        indexes = {
+                @Index(name = "idx_username", columnList = "username")
+        }
+)
 public class SysUserDO {
     /**
      * 主键ID

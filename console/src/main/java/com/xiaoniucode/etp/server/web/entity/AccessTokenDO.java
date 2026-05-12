@@ -27,7 +27,12 @@ import java.time.LocalDateTime;
  */
 @Data
 @Entity
-@Table(name = "access_token")
+@Table(name = "access_token",
+        indexes = {
+                @Index(name = "idx_name", columnList = "name"),
+                @Index(name = "idx_token", columnList = "token")
+        }
+)
 public class AccessTokenDO {
     /**
      * 主键ID
@@ -38,12 +43,12 @@ public class AccessTokenDO {
     /**
      * 令牌名称
      */
-    @Column(name = "name", nullable = false,unique = true)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
     /**
      * 访问令牌
      */
-    @Column(name = "token", nullable = false)
+    @Column(name = "token", nullable = false, unique = true)
     private String token;
     /**
      * 创建时间

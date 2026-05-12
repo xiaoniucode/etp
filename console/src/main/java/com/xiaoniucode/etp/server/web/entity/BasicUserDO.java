@@ -20,7 +20,12 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "basic_user")
+@Table(name = "basic_user",
+        indexes = {
+                @Index(name = "idx_proxy_id", columnList = "proxy_id"),
+                @Index(name = "idx_username", columnList = "username")
+        }
+)
 public class BasicUserDO {
     /**
      * 主键ID

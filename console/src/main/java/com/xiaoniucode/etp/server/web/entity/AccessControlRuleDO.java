@@ -25,7 +25,13 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "access_control_rule")
+@Table(name = "access_control_rule",
+        uniqueConstraints = {@UniqueConstraint(
+                name = "uk_proxy_id_cidr",
+                columnNames = {"proxy_id", "cidr"}
+        )},
+        indexes = {@Index(name = "idx_proxy_id", columnList = "proxy_id")}
+)
 public class AccessControlRuleDO {
     /**
      * 主键ID

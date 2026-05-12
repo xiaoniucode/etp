@@ -29,16 +29,17 @@ import java.time.LocalDateTime;
 @Table(name = "login_token")
 public class LoginTokenDO {
     /**
+     * 用户ID
+     */
+    @Column(name = "uid", nullable = false)
+    private Integer uid;
+    /**
      * 登录令牌
      */
     @Id
     @Column(name = "token", nullable = false)
     private String token;
-    /**
-     * 用户ID
-     */
-    @Column(name = "uid", nullable = false)
-    private Integer uid;
+
     /**
      * 用户名
      */

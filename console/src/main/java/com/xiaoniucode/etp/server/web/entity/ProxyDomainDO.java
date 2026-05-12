@@ -26,7 +26,12 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @Entity
-@Table(name = "http_proxy_domain")
+@Table(name = "http_proxy_domain",
+        indexes = {
+                @Index(name = "idx_proxy_id", columnList = "proxy_id"),
+                @Index(name = "idx_full_domain", columnList = "full_domain")
+        }
+)
 @NoArgsConstructor
 public class ProxyDomainDO {
     /**
@@ -49,7 +54,7 @@ public class ProxyDomainDO {
     @Column(name = "base_domain")
     private String baseDomain;
 
-    @Column(name = "full_domain",nullable = false, unique = true)
+    @Column(name = "full_domain", nullable = false, unique = true)
     private String fullDomain;
     /**
      * 域名类型
