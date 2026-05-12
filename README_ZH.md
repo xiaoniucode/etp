@@ -26,23 +26,26 @@
 <div align="center">
   <a href="README.md"><strong>README</strong></a> &nbsp;|&nbsp;
   <a href="README_ZH.md"><strong>简体中文</strong></a> &nbsp;|&nbsp;
-  <a href="https://xiaoniucode.github.io/etp"><strong>文档地址</strong></a>
 </div>
+
+## ⚠️ 重要说明
+
+旧版本已弃用，新版本仍在最终收尾阶段，暂未正式发布，预计一周后上线。
 
 ## 介绍
 
-**etp (Easy Tunnel Proxy)** 是一个高性能的**内网穿透网关**，支持**多路复用隧道**和**独立隧道**两种模式，采用**全链路零拷贝**混合协议设计，并由**状态机**驱动实现，保证系统稳定性。
+**etp (Easy Tunnel Proxy)** 是一个高性能的**内网穿透安全网关**。
 
-- 支持 TCP、HTTP协议
+- 支持 TCP、HTTP协议代理
 - 数据压缩
-- mTLS 双向证书加密认证
+- mTLS 传输加密
 - IP CIDR 访问控制（白/黑名单）
 - 多用户 Basic Auth 认证
 - Token令牌认证，支持多客户端
 - 带宽限流与速率限制
 - 多种负载均衡策略、故障转移
-- 域名、子域名及自动/泛域名支持
-- 内置管理面板（Web Admin Dashboard）
+- 域名、子域名支持
+- 内置管理面板
 - Spring Boot 集成与 SDK 支持
 - 跨平台运行：Windows、Linux、macOS
 

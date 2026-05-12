@@ -26,24 +26,31 @@
 <div align="center">
   <a href="README.md"><strong>README</strong></a> &nbsp;|&nbsp;
   <a href="README_ZH.md"><strong>简体中文</strong></a> &nbsp;|&nbsp;
-  <a href="https://xiaoniucode.github.io/etp"><strong>Documentation</strong></a>
 </div>
+
+
+## ⚠️ Important Notice
+
+The legacy version has been deprecated. The new version is in its final stages and has not been officially released yet. It is scheduled for release in approximately one week.
 
 ## Introduce
 
-**etp (Easy Tunnel Proxy)** is an intranet penetration gateway  that supports both **multiplexed tunnels** and **independent tunnels**. It features a full-link **zero-copy** hybrid protocol design driven by a state machine.
+**ETP (Easy Tunnel Proxy)** is a high-performance **secure intranet penetration gateway**.
 
-- Compression
-- **mTLS** (mutual TLS) bidirectional certificate encryption
-- **IP CIDR**-based access control
-- Multi-user **Basic Auth** authentication
-- Bandwidth rate limiting
-- Multiple load balancing strategies
-- Domain name / subdomain / automatic domain support
-- Token authentication
-- Management dashboard / admin panel
-- **Spring Boot** / SDK integration
-- Cross-platform support for **Windows**, **Linux**, and **macOS**
+### Key Features
+
+- TCP and HTTP proxy support
+- Data compression
+- mTLS transport encryption
+- IP CIDR-based access control (whitelist & blacklist)
+- Multi-user Basic Auth authentication
+- Token-based authentication with multi-client support
+- Bandwidth throttling and rate limiting
+- Multiple load balancing strategies and failover support
+- Domain and subdomain support
+- Built-in management dashboard
+- Spring Boot integration and SDK support
+- Cross-platform compatibility: Windows, Linux, macOS
 
 
 ## Issue Feedback
