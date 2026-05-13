@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.web.controller;
 
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.param.proxy.embedded.EmbeddedBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.service.EmbeddedService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,8 @@ public class EmbeddedController {
     private EmbeddedService embeddedService;
 
     @GetMapping
-    public Ajax listByPage(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
-        return Ajax.success(embeddedService.listByPage(page, size));
+    public Ajax listByPage(@ModelAttribute PageQuery pageQuery) {
+        return Ajax.success(embeddedService.listByPage(pageQuery));
     }
 
     @GetMapping("{proxyId}")

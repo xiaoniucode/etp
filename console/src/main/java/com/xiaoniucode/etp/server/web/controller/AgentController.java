@@ -14,38 +14,43 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.controller;
+
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
 import com.xiaoniucode.etp.server.web.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/agents")
+@Validated
 public class AgentController {
     @Autowired
     private AgentService agentService;
-    
+
     @GetMapping("list-by-page")
-    public Ajax listByPage(@RequestParam(required = false) String keyword,
-                     @RequestParam(defaultValue = "1") int page,
-                     @RequestParam(defaultValue = "10") int size) {
-        List<AgentDTO> clients = agentService.findAll(keyword,page,size);
+    public Ajax findByPage(@ModelAttribute PageQuery pageQuery) {
+        PageResult<AgentDTO> clients = agentService.findByPage(pageQuery);
         return Ajax.success(clients);
     }
-    
+
     @GetMapping("list")
     public Ajax listAll() {
         List<AgentDTO> clients = agentService.findAll();
         return Ajax.success(clients);
     }
-    
+
     @GetMapping("/{id}")
     public Ajax getById(@PathVariable String id) {
         AgentDTO client = agentService.findById(id);
         return Ajax.success(client);
     }
-    
+
     @PutMapping("/kickout/{id}")
     public Ajax kickout(@PathVariable String id) {
         agentService.kickout(id);

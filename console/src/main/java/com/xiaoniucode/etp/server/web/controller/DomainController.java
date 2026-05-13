@@ -17,12 +17,15 @@
 package com.xiaoniucode.etp.server.web.controller;
 
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.domain.DomainDTO;
 import com.xiaoniucode.etp.server.web.service.DomainService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/domains")
 public class DomainController {
@@ -30,8 +33,8 @@ public class DomainController {
     private DomainService domainService;
 
     @GetMapping
-    public Ajax findByPage(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
-        PageResult<DomainDTO> domains = domainService.findByPage(page, size);
+    public Ajax findByPage(@ModelAttribute PageQuery pageQuery) {
+        PageResult<DomainDTO> domains = domainService.findByPage(pageQuery);
         return Ajax.success(domains);
     }
 

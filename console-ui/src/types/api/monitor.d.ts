@@ -14,19 +14,40 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.test;
+declare namespace Api.Monitor {
+  interface CpuInfo {
+    total: number
+    used: number | string
+    usage: number | string
+  }
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+  interface JvmMemoryInfo {
+    total: string
+    used: string
+    usage: number | string
+  }
 
-/**
- * @author liuxin
- */
-@SpringBootApplication
-public class TestApplication {
+  interface OsMemoryInfo {
+    total: string
+    used: string
+    usage: number | string
+  }
 
-    public static void main(String[] args) {
-        SpringApplication.run(TestApplication.class, args);
-    }
+  interface ServerInfo {
+    cpu: CpuInfo
+    jvmMem: JvmMemoryInfo
+    osMem: OsMemoryInfo
+  }
 
+  interface DashboardSummary {
+    totalAgents: number
+    onlineAgents: number
+    totalProxies: number
+    startedProxies: number
+  }
+
+  interface ProxyProtocolCountDTO {
+    httpCount: number
+    tcpCount: number
+  }
 }

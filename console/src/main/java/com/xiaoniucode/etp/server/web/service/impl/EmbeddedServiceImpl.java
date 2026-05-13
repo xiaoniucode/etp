@@ -26,6 +26,7 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.dto.accesscontrol.AccessControlDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.basicauth.BasicAuthDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelDetailDTO;
@@ -68,12 +69,12 @@ public class EmbeddedServiceImpl implements EmbeddedService {
     private AgentManager agentManager;
 
     @Override
-    public PageResult<TunnelListDTO> listByPage(int page, int size) {
+    public PageResult<TunnelListDTO> listByPage(PageQuery pageQuery) {
         int httpProxyPort = appConfig.getHttpProxyPort();
-        PageResult<ProxyConfig> res = proxyQueryRepository.findByPage(page, size);
+        PageResult<ProxyConfig> res = proxyQueryRepository.findByPage(pageQuery.getCurrent(), pageQuery.getSize());
         List<ProxyConfig> records = res.getRecords();
         if (CollectionUtils.isEmpty(records)) {
-            return new PageResult<>(List.of(), 0L, page, size);
+            return new PageResult<>(List.of(), 0L, pageQuery.getCurrent(), pageQuery.getSize());
         }
         List<TunnelListDTO> tunnelList = new ArrayList<>();
         records.forEach(config -> {
@@ -90,7 +91,7 @@ public class EmbeddedServiceImpl implements EmbeddedService {
             }
             tunnelList.add(tunnelListDTO);
         });
-        return new PageResult<>(tunnelList, res.getTotal(), page, size);
+        return new PageResult<>(tunnelList, res.getTotal(), pageQuery.getCurrent(), pageQuery.getSize());
     }
 
     @Override

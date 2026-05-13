@@ -5,9 +5,4 @@ declare namespace Api.Domain {
     createdAt: string
     updatedAt: string
   }
-
-  interface DomainSearchParams {
-    page: number
-    size: number
-  }
 }

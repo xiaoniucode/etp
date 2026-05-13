@@ -38,7 +38,7 @@
     core: {
       apiFn: fetchGetDomainListByPage,
       apiParams: {
-        page: 1,
+        current: 1,
         size: 20
       },
       columnsFactory: () => [
@@ -56,15 +56,6 @@
           label: '更新时间'
         }
       ]
-    },
-    transform: {
-      dataTransformer: (records) => {
-        if (!Array.isArray(records)) {
-          console.warn('数据转换器: 期望数组类型，实际收到:', typeof records)
-          return []
-        }
-        return records
-      }
     }
   })
 </script>

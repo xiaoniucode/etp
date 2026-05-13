@@ -1,12 +1,5 @@
 <template>
   <div class="token-page art-full-height">
-    <!-- 搜索栏 -->
-    <TokenSearch
-      v-model="searchForm"
-      @search="handleSearch"
-      @reset="resetSearchParams"
-    ></TokenSearch>
-
     <ElCard class="art-table-card">
       <!-- 表格头部 -->
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
@@ -48,28 +41,14 @@
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { fetchGetTokenList, fetchDeleteToken, fetchDeleteBatchTokens } from '@/api/token'
-  import TokenSearch from './modules/token-search.vue'
   import TokenDialog from './modules/token-dialog.vue'
   import { ElMessageBox, ElMessage } from 'element-plus'
   import { DialogType } from '@/types'
 
   defineOptions({ name: 'TokenManagement' })
 
-  interface TokenItem {
-    id: number
-    name: string
-    token: string
-    createdAt: string
-    updatedAt: string
-  }
-
   // 选中行
-  const selectedRows = ref<TokenItem[]>([])
-
-  // 搜索表单
-  const searchForm = ref({
-    keyword: undefined
-  })
+  const selectedRows = ref<Api.AccessToken.AccessTokenDTO[]>([])
 
   // 弹窗相关
   const dialogType = ref<DialogType>('add')
@@ -83,8 +62,6 @@
     loading,
     pagination,
     getData,
-    searchParams,
-    resetSearchParams,
     handleSizeChange,
     handleCurrentChange,
     refreshData
@@ -93,9 +70,12 @@
     core: {
       apiFn: fetchGetTokenList,
       apiParams: {
-        keyword: undefined,
-        page: 1,
+        current: 1,
         size: 20
+      },
+      paginationKey: {
+        current: 'current',
+        size: 'size'
       },
       columnsFactory: () => [
         { type: 'selection' },
@@ -115,7 +95,7 @@
           label: '操作',
           width: 130,
           fixed: 'right',
-          formatter: (row: TokenItem) =>
+          formatter: (row: Api.AccessToken.AccessTokenDTO) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'edit',
@@ -128,38 +108,13 @@
             ])
         }
       ]
-    },
-    // 数据处理
-    transform: {
-      // 数据转换器
-      dataTransformer: (records) => {
-        // 类型守卫检查
-        if (!Array.isArray(records)) {
-          console.warn('数据转换器: 期望数组类型，实际收到:', typeof records)
-          return []
-        }
-
-        return records
-      }
     }
   })
 
   /**
-   * 搜索处理
-   * @param params 参数
-   */
-  const handleSearch = (params: { keyword?: string }) => {
-    console.log(params)
-    // 搜索参数赋值
-    Object.assign(searchParams, params)
-    getData()
-  }
-
-  /**
    * 删除令牌
    */
-  const deleteToken = (row: TokenItem): void => {
-    console.log('删除令牌:', row)
+  const deleteToken = (row: Api.AccessToken.AccessTokenDTO): void => {
     ElMessageBox.confirm(`确定要删除该访问令牌吗？`, '删除令牌', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -196,16 +151,14 @@
   /**
    * 处理表格行选择变化
    */
-  const handleSelectionChange = (selection: TokenItem[]): void => {
+  const handleSelectionChange = (selection: Api.AccessToken.AccessTokenDTO[]): void => {
     selectedRows.value = selection
-    console.log('选中行数据:', selectedRows.value)
   }
 
   /**
    * 显示对话框
    */
-  const showDialog = (type: DialogType, row?: TokenItem): void => {
-    console.log('打开对话框:', { type, row })
+  const showDialog = (type: DialogType, row?: Api.AccessToken.AccessTokenDTO): void => {
     dialogType.value = type
     currentTokenId.value = row?.id
     nextTick(() => {

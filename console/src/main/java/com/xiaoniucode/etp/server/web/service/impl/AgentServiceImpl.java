@@ -18,6 +18,8 @@ package com.xiaoniucode.etp.server.web.service.impl;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
 import com.xiaoniucode.etp.server.web.repository.AgentRepository;
@@ -32,7 +34,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AgentServiceImpl implements AgentService {
@@ -45,14 +46,15 @@ public class AgentServiceImpl implements AgentService {
     private AgentManager agentManager;
 
     @Override
-    public List<AgentDTO> findAll(String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<AgentDO> agentPage;
-        if (keyword != null && !keyword.isEmpty()) {
-            agentPage = agentRepository.findByKeyword(keyword, pageable);
-        } else {
-            agentPage = agentRepository.findAll(pageable);
+    public PageResult<AgentDTO> findByPage(PageQuery pageQuery) {
+        int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
+        Page<AgentDO> agentPage = agentRepository.findAll(pageable);
+
+        if (agentPage.isEmpty()) {
+            return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
         }
+
         List<AgentDO> agents = agentPage.getContent();
         List<AgentDTO> agentDTOList = agentConvert.toDTOList(agents);
         agentDTOList.forEach(dto -> {
@@ -63,7 +65,7 @@ public class AgentServiceImpl implements AgentService {
                 dto.setLastActiveTime(agentInfo.getLastActiveTime());
             });
         });
-        return agentDTOList;
+        return PageResult.wrap(agentPage, agentDTOList);
     }
 
     @Override

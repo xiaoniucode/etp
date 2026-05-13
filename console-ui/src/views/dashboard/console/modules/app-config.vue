@@ -38,7 +38,7 @@
   defineOptions({ name: 'AppConfig' })
 
   const loading = ref(false)
-  const configInfo = ref<Api.App.AppConfigInfo | null>(null)
+  const configInfo = ref<Api.App.AppConfigInfoDTO | null>(null)
 
   const getData = async () => {
     loading.value = true

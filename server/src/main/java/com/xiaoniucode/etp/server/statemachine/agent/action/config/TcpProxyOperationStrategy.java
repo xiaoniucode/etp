@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.statemachine.agent.action.config;
 
+import com.baidu.fsg.uid.UidGenerator;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.exceptions.PortConflictException;
@@ -35,6 +36,8 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
     private PortManager portManager;
     @Autowired
     private ProxyManager proxyManager;
+    @Autowired
+    private UidGenerator uidGenerator;
     @Autowired
     private EmbeddedAgentRegistry embeddedAgentRegistry;
 
@@ -56,12 +59,15 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
             config.setListenPort(remotePort);
             portManager.addPort(remotePort);
         }
+        String proxyId = uidGenerator.getUIDAsString();
+        config.setProxyId(proxyId);
         proxyManager.activate(config);
         if (agentInfo.getAgentType().isEmbedded()) {
             String agentId = agentInfo.getAgentId();
-            embeddedAgentRegistry.addProxyId(agentId, config.getProxyId());
+            embeddedAgentRegistry.addProxyId(agentId,proxyId);
             embeddedAgentRegistry.addListenPort(agentId, config.getListenPort());
         }
+
         logger.debug("TCP代理 {} 注册成功，监听端口: {}", config.getName(), config.getListenPort());
         return new ProxyOperationResult(null, config.getListenPort(),true);
     }

@@ -35,17 +35,7 @@
 
   defineOptions({ name: 'Stats' })
 
-  type MetricsItem = {
-    proxyId: string
-    activeChannels: number
-    readBytes: number
-    writeBytes: number
-    readMessages: number
-    writeMessages: number
-    readRate: number
-    writeRate: number
-    lastActiveTime: string
-  }
+  type MetricsItem = Api.Metrics.MetricsItemDTO
 
   const metricsDialogVisible = ref(false)
   const currentMetricsProxyId = ref('')
@@ -63,7 +53,7 @@
     core: {
       apiFn: fetchGetMetricsList,
       apiParams: {
-        page: 0,
+        current: 1,
         size: 10
       },
       columnsFactory: () => [
@@ -149,15 +139,6 @@
             ])
         }
       ]
-    },
-    transform: {
-      dataTransformer: (records) => {
-        if (!Array.isArray(records)) {
-          console.warn('数据转换器: 期望数组类型，实际收到:', typeof records)
-          return []
-        }
-        return records
-      }
     }
   })
 

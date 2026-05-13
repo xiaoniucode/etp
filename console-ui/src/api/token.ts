@@ -1,23 +1,19 @@
 import request from '@/utils/http'
 
 /**
- * 获取访问令牌列表
+ * 获取访问令牌列表（分页）
  * @param params 搜索参数
- * @returns 访问令牌列表
+ * @returns 访问令牌分页列表
  */
-export function fetchGetTokenList(params: { keyword?: string; page: number; size: number }) {
-  return request.get<Api.AccessToken.AccessTokenDTO[]>({
+export function fetchGetTokenList(params: Api.Common.CommonSearchParams) {
+  return request.get<Api.Common.PaginatedResponse<Api.AccessToken.AccessTokenDTO>>({
     url: '/api/access-tokens',
-    params: {
-      keyword: params.keyword,
-      page: params.page,
-      size: params.size
-    }
+    params
   })
 }
 
 /**
- * 获取访问令牌详情
+ * 根据ID获取访问令牌详情
  * @param id 访问令牌ID
  * @returns 访问令牌详情
  */
@@ -55,25 +51,21 @@ export function fetchDeleteBatchTokens(ids: number[]) {
  * @param params 创建参数
  * @returns 创建结果
  */
-export function fetchCreateToken(params: { name: string }) {
-  return request.post({
+export function fetchCreateToken(params: Api.AccessToken.AccessTokenCreateParam) {
+  return request.post<Api.AccessToken.AccessTokenDTO>({
     url: '/api/access-tokens',
-    params
+    data: params
   })
 }
 
 /**
  * 更新访问令牌
- * @param id 访问令牌ID
  * @param params 更新参数
  * @returns 更新结果
  */
-export function fetchUpdateToken(id: number, params: { name: string }) {
+export function fetchUpdateToken(params: Api.AccessToken.AccessTokenUpdateParam) {
   return request.put({
     url: '/api/access-tokens',
-    params: {
-      id,
-      ...params
-    }
+    data: params
   })
 }

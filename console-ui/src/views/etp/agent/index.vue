@@ -1,12 +1,5 @@
 <template>
   <div class="client-page art-full-height">
-    <!-- 搜索栏 -->
-    <AgentSearch
-      v-model="searchForm"
-      @search="handleSearch"
-      @reset="resetSearchParams"
-    ></AgentSearch>
-
     <ElCard class="art-table-card">
       <!-- 表格头部 -->
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
@@ -34,18 +27,12 @@
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { fetchGetAgentListByPage, fetchKickoutAgent } from '@/api/agent'
-  import AgentSearch from './modules/agent-search.vue'
   import AgentDialog from './modules/agent-dialog.vue'
   import { ElTag, ElMessageBox, ElMessage } from 'element-plus'
 
   defineOptions({ name: 'ClientManagement' })
 
   type ClientItem = Api.Agent.AgentDTO
-
-  // 搜索表单
-  const searchForm = ref({
-    keyword: undefined
-  })
 
   // 详情弹窗状态
   const detailDialogVisible = ref(false)
@@ -69,18 +56,14 @@
     loading,
     pagination,
     getData,
-    searchParams,
-    resetSearchParams,
     handleSizeChange,
     handleCurrentChange,
     refreshData
   } = useTable({
-    // 核心配置
     core: {
       apiFn: fetchGetAgentListByPage,
       apiParams: {
-        keyword: undefined,
-        page: 1,
+        current: 1,
         size: 20
       },
       columnsFactory: () => [
@@ -141,32 +124,8 @@
             ])
         }
       ]
-    },
-    // 数据处理
-    transform: {
-      // 数据转换器
-      dataTransformer: (records) => {
-        // 类型守卫检查
-        if (!Array.isArray(records)) {
-          console.warn('数据转换器: 期望数组类型，实际收到:', typeof records)
-          return []
-        }
-
-        return records
-      }
     }
   })
-
-  /**
-   * 搜索处理
-   * @param params 参数
-   */
-  const handleSearch = (params: { keyword?: string }) => {
-    console.log(params)
-    // 搜索参数赋值
-    Object.assign(searchParams, params)
-    getData()
-  }
 
   /**
    * 剔除在线客户端

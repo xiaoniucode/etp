@@ -33,16 +33,9 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
             FROM ProxyDO p
             LEFT JOIN AgentDO a ON a.id = p.agentId
             WHERE p.protocol = :protocolType
-              AND (
-                :keyword IS NULL
-                OR p.id = :keyword
-                OR LOWER(p.name) LIKE LOWER(:keyword)
-                OR p.agentId = :keyword
-              )
             ORDER BY p.updatedAt DESC
             """)
     Page<ProxyListQueryResult> findProxiesWithAssociations(
-            @Param("keyword") String keyword,
             @Param("protocolType") ProtocolType protocolType,
             Pageable pageable
     );

@@ -14,15 +14,31 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.test.repository;
+declare namespace Api.Metrics {
+  interface MetricsDTO {
+    key: string
+    channels: number
+    readBytes: number
+    writeBytes: number
+    readMessages: number
+    writeMessages: number
+    time: string
+  }
 
-import com.xiaoniucode.etp.test.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+  interface Metrics24LineDTO {
+    xAxis: string[]
+    yAxis: number[]
+  }
 
-/**
- * @author liuxin
- */
-@Repository
-public interface UserRepository extends JpaRepository<User, String> {
+  interface MetricsItemDTO {
+    proxyId: string
+    activeChannels: number
+    readBytes: number
+    writeBytes: number
+    readMessages: number
+    writeMessages: number
+    readRate: number
+    writeRate: number
+    lastActiveTime: string
+  }
 }

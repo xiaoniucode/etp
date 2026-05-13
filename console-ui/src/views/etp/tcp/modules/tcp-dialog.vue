@@ -218,7 +218,7 @@
   import type { FormInstance, FormRules } from 'element-plus'
   import { DialogType } from '@/types'
   import { fetchGetAgentListAll } from '@/api/agent'
-  import { fetchCreateTcpProxy, fetchUpdateTcpProxy, fetchGetTcpProxyById } from '@/api/tcp-proxy'
+  import { fetchCreateTcpProxy, fetchUpdateTcpProxy, fetchGetTcpProxyById } from '@/api/proxy'
 
   defineOptions({ name: 'TcpDialog' })
 

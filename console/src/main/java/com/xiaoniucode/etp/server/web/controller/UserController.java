@@ -20,9 +20,11 @@ import com.xiaoniucode.etp.server.web.param.user.UserPasswordUpdateParam;
 import com.xiaoniucode.etp.server.web.security.SecurityUtils;
 import com.xiaoniucode.etp.server.web.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
+@Validated
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -30,7 +32,7 @@ public class UserController {
     private UserService userService;
 
     @PutMapping("update-password")
-    public Ajax updatePassword(@RequestBody UserPasswordUpdateParam param) {
+    public Ajax updatePassword(@RequestBody @Validated UserPasswordUpdateParam param) {
         String username = SecurityUtils.getCurrentUsername();
         userService.updatePassword(username, param);
         return Ajax.success("密码修改成功");

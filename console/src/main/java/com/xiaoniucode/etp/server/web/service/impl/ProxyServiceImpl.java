@@ -22,6 +22,7 @@ import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
 import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
@@ -309,29 +310,18 @@ public class ProxyServiceImpl implements ProxyService {
     /**
      * 查询 HTTP 代理列表
      *
-     * @param keyword 关键字
-     * @param page    当前页（从 0 开始）
-     * @param size    每页大小
+     * @param pageQuery 分页查询参数
      * @return HTTP 代理列表
      */
     @Override
-    public PageResult<HttpProxyListDTO> getHttpProxies(String keyword, int page, int size) {
-        int currentPage = Math.max(0, page - 1);
-        Pageable pageable = PageRequest.of(currentPage, size);
+    public PageResult<HttpProxyListDTO> findHttpProxies(PageQuery pageQuery) {
+        int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
 
-        String queryKey = null;
-        if (StringUtils.hasText(keyword)) {
-            if (keyword.matches("\\d{19}")) {
-                queryKey = keyword.trim();
-            } else {
-                queryKey = "%" + keyword.trim() + "%";
-            }
-        }
-
-        Page<ProxyListQueryResult> resultPage = proxyRepository.findProxiesWithAssociations(queryKey, ProtocolType.HTTP, pageable);
+        Page<ProxyListQueryResult> resultPage = proxyRepository.findProxiesWithAssociations(ProtocolType.HTTP, pageable);
 
         if (resultPage.isEmpty()) {
-            return PageResult.empty(page, size);
+            return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
         }
         int httpProxyPort = appConfig.getHttpProxyPort();
         List<ProxyListQueryResult> content = resultPage.getContent();
@@ -555,20 +545,13 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     @Override
-    public PageResult<TcpProxyListDTO> getTcpProxies(String keyword, int page, int size) {
-        int currentPage = Math.max(0, page - 1);
-        Pageable pageable = PageRequest.of(currentPage, size);
-        String queryKey = null;
-        if (StringUtils.hasText(keyword)) {
-            if (keyword.matches("\\d{19}")) {
-                queryKey = keyword.trim();
-            } else {
-                queryKey = "%" + keyword.trim() + "%";
-            }
-        }
-        Page<ProxyListQueryResult> resultPage = proxyRepository.findProxiesWithAssociations(queryKey, ProtocolType.TCP, pageable);
+    public PageResult<TcpProxyListDTO> findTcpProxies(PageQuery pageQuery) {
+        int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
+
+        Page<ProxyListQueryResult> resultPage = proxyRepository.findProxiesWithAssociations(ProtocolType.TCP, pageable);
         if (resultPage.isEmpty()) {
-            return PageResult.empty(page, size);
+            return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
         }
         List<ProxyListQueryResult> content = resultPage.getContent();
         List<String> proxyIds = content.stream()

@@ -5,7 +5,7 @@ import request from '@/utils/http'
  * @param params 搜索参数
  * @returns 域名分页列表
  */
-export function fetchGetDomainListByPage(params: Api.Domain.DomainSearchParams) {
+export function fetchGetDomainListByPage(params: Api.Common.CommonSearchParams) {
   return request.get<Api.Common.PaginatedResponse<Api.Domain.DomainDTO>>({
     url: '/api/domains',
     params

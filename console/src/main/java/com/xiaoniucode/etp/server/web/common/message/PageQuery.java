@@ -14,13 +14,22 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.service;
+package com.xiaoniucode.etp.server.web.common.message;
 
-import com.xiaoniucode.etp.server.web.common.message.PageQuery;
-import com.xiaoniucode.etp.server.web.common.message.PageResult;
-import com.xiaoniucode.etp.server.web.dto.domain.DomainDTO;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface DomainService {
-    PageResult<DomainDTO> findByPage(PageQuery pageQuery);
-    DomainDTO getById(Integer id);
+import java.io.Serializable;
+
+@Getter
+@Setter
+public class PageQuery implements Serializable {
+    @Min(value = 1,message = "最小分页为1")
+    private int current = 1;
+    
+    @Min(1)
+    @Max(value = 100,message = "超过最大分页数")
+    private int size = 10;
 }

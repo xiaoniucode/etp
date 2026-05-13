@@ -16,6 +16,7 @@
 package com.xiaoniucode.etp.server.web.controller;
 
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
@@ -41,25 +42,25 @@ public class ProxyController {
     }
 
     @PostMapping("tcp")
-    public Ajax createTcpProxy(@RequestBody TcpProxyCreateParam param) {
+    public Ajax createTcpProxy(@RequestBody @Validated TcpProxyCreateParam param) {
         proxyService.createTcpProxy(param);
         return Ajax.success();
     }
 
     @PostMapping("http")
-    public Ajax createHttpProxy(@RequestBody HttpProxyCreateParam param) {
+    public Ajax createHttpProxy(@RequestBody @Validated HttpProxyCreateParam param) {
         proxyService.createHttpProxy(param);
         return Ajax.success();
     }
 
     @PutMapping("tcp")
-    public Ajax updateTcpProxy(@RequestBody TcpProxyUpdateParam param) {
+    public Ajax updateTcpProxy(@RequestBody @Validated TcpProxyUpdateParam param) {
         proxyService.updateTcpProxy(param);
         return Ajax.success();
     }
 
     @PutMapping("http")
-    public Ajax updateHttpProxy(@RequestBody HttpProxyUpdateParam param) {
+    public Ajax updateHttpProxy(@RequestBody @Validated HttpProxyUpdateParam param) {
         proxyService.updateHttpProxy(param);
         return Ajax.success();
     }
@@ -77,18 +78,14 @@ public class ProxyController {
     }
 
     @GetMapping("tcp")
-    public Ajax findTcpProxies(@RequestParam(required = false) String keyword,
-                               @RequestParam(defaultValue = "1") int page,
-                               @RequestParam(defaultValue = "10") int size) {
-        PageResult<TcpProxyListDTO> proxies = proxyService.getTcpProxies(keyword, page, size);
+    public Ajax findTcpProxies(@ModelAttribute PageQuery pageQuery) {
+        PageResult<TcpProxyListDTO> proxies = proxyService.findTcpProxies(pageQuery);
         return Ajax.success(proxies);
     }
 
     @GetMapping("http")
-    public Ajax getHttpProxies(@RequestParam(required = false) String keyword,
-                               @RequestParam(defaultValue = "1") int page,
-                               @RequestParam(defaultValue = "10") int size) {
-        PageResult<HttpProxyListDTO> proxies = proxyService.getHttpProxies(keyword, page, size);
+    public Ajax getHttpProxies(@ModelAttribute PageQuery pageQuery) {
+        PageResult<HttpProxyListDTO> proxies = proxyService.findHttpProxies(pageQuery);
         return Ajax.success(proxies);
     }
 

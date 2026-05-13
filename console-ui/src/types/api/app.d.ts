@@ -14,13 +14,13 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.service;
-
-import com.xiaoniucode.etp.server.web.common.message.PageQuery;
-import com.xiaoniucode.etp.server.web.common.message.PageResult;
-import com.xiaoniucode.etp.server.web.dto.domain.DomainDTO;
-
-public interface DomainService {
-    PageResult<DomainDTO> findByPage(PageQuery pageQuery);
-    DomainDTO getById(Integer id);
+declare namespace Api.App {
+  interface AppConfigInfoDTO {
+    serverAddr: string
+    serverPort: number
+    httpProxyPort: number
+    baseDomain: string
+    portStart: number
+    portEnd: number
+  }
 }

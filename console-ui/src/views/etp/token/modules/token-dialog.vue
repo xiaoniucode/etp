@@ -116,7 +116,8 @@
             ElMessage.success('创建成功')
           } else {
             if (formData.id) {
-              await fetchUpdateToken(formData.id, {
+              await fetchUpdateToken({
+                id: formData.id,
                 name: formData.name
               })
               ElMessage.success('更新成功')

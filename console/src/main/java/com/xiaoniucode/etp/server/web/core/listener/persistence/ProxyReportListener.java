@@ -70,8 +70,6 @@ public class ProxyReportListener implements EventListener<ProxyReportEvent> {
     private BasicAuthRepository basicAuthRepository;
     @Autowired
     private BasicUserRepository basicUserRepository;
-
-
     @Autowired
     private ProxyModelConvert proxyModelConvert;
     @Autowired

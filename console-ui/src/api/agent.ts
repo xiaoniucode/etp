@@ -1,12 +1,12 @@
 import request from '@/utils/http'
 
 /**
- * 获取客户端列表
- * @param params 查询参数
- * @returns 客户端列表
+ * 获取客户端列表（分页）
+ * @param params 分页参数
+ * @returns 客户端分页列表
  */
-export function fetchGetAgentListByPage(params: Api.Agent.AgentSearchParams) {
-  return request.get<Api.Agent.AgentDTO[]>({
+export function fetchGetAgentListByPage(params: Api.Common.CommonSearchParams) {
+  return request.get<Api.Common.PaginatedResponse<Api.Agent.AgentDTO>>({
     url: '/api/agents/list-by-page',
     params
   })

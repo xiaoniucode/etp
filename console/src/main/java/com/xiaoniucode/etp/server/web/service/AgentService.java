@@ -14,13 +14,15 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
 import java.util.List;
 public interface AgentService {
     /**
      * 查询所有客户端
      */
-    List<AgentDTO> findAll(String keyword, int page, int size);
+    PageResult<AgentDTO> findByPage(PageQuery pageQuery);
     /**
      * 根据 ID 查询客户端
      */
@@ -30,6 +32,4 @@ public interface AgentService {
      */
     void kickout(String agentId);
     List<AgentDTO> findAll();
-
-  
 }

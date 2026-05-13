@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
-import com.baidu.fsg.uid.UidGenerator;
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
@@ -31,8 +30,6 @@ public class ProxyCreateAction extends AgentBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(ProxyCreateAction.class);
     @Resource
     private AppConfig appConfig;
-    @Autowired
-    private UidGenerator uidGenerator;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -97,7 +94,6 @@ public class ProxyCreateAction extends AgentBaseAction {
      */
     private ProxyOperationResult handleProxyCreate(ProxyConfig newConfig, AgentContext context) throws Exception {
         logger.debug("准备创建新代理: {}", newConfig.getName());
-        newConfig.setProxyId(uidGenerator.getUIDAsString());
         ProxyConfigOperationStrategy strategy = strategyFactory.getStrategy(newConfig);
         return strategy.create(newConfig, context.getAgentInfo());
     }

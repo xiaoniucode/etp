@@ -14,15 +14,18 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.test.repository;
-
-import com.xiaoniucode.etp.test.entity.User2;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-/**
- * @author liuxin
- */
-@Repository
-public interface User2Repository extends JpaRepository<User2, String> {
+declare namespace Api.Agent {
+  interface AgentDTO {
+    id: string
+    name: string
+    token: string
+    isOnline: boolean
+    os: string
+    arch: string
+    version: string
+    agentType: number
+    lastActiveTime: string
+    createdAt: string
+    updatedAt: string
+  }
 }

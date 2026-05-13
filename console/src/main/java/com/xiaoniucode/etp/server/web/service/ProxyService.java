@@ -15,6 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.service;
 
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
@@ -54,7 +55,7 @@ public interface ProxyService {
 
     void setProxyStatus(String id, Integer status);
 
-    PageResult<TcpProxyListDTO> getTcpProxies(String keyword, int page, int size);
+    PageResult<TcpProxyListDTO> findTcpProxies(PageQuery pageQuery);
 
-    PageResult<HttpProxyListDTO> getHttpProxies(String keyword, int page, int size);
+    PageResult<HttpProxyListDTO> findHttpProxies(PageQuery pageQuery);
 }

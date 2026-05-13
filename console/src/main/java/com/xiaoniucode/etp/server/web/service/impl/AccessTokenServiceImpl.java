@@ -17,6 +17,8 @@ package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.accesstoken.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenCreateParam;
@@ -63,16 +65,18 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     }
 
     @Override
-    public List<AccessTokenDTO> findAll(String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<AccessTokenDO> tokenPage;
-        if (keyword != null && !keyword.isEmpty()) {
-            tokenPage = accessTokenRepository.findByKeyword(keyword, pageable);
-        } else {
-            tokenPage = accessTokenRepository.findAll(pageable);
+    public PageResult<AccessTokenDTO> findByPage(PageQuery pageQuery) {
+        int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
+        Page<AccessTokenDO> tokenPage = accessTokenRepository.findAll(pageable);
+
+        if (tokenPage.isEmpty()) {
+            return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
         }
+
         List<AccessTokenDO> tokens = tokenPage.getContent();
-        return accessTokenConvert.toDTOList(tokens);
+        List<AccessTokenDTO> tokenDTOList = accessTokenConvert.toDTOList(tokens);
+        return PageResult.wrap(tokenPage, tokenDTOList);
     }
 
     @Override

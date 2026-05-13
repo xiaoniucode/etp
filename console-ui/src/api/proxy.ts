@@ -1,0 +1,126 @@
+import request from '@/utils/http'
+
+/**
+ * 获取 HTTP 代理列表（分页）
+ * @param params 分页参数
+ * @returns HTTP 代理分页列表
+ */
+export function fetchGetHttpProxyList(params: Api.Common.CommonSearchParams) {
+  return request.get<Api.Common.PaginatedResponse<Api.Proxy.HttpProxyListDTO>>({
+    url: '/api/proxies/http',
+    params
+  })
+}
+
+/**
+ * 获取 TCP 代理列表（分页）
+ * @param params 分页参数
+ * @returns TCP 代理分页列表
+ */
+export function fetchGetTcpProxyList(params: Api.Common.CommonSearchParams) {
+  return request.get<Api.Common.PaginatedResponse<Api.Proxy.TcpProxyListDTO>>({
+    url: '/api/proxies/tcp',
+    params
+  })
+}
+
+/**
+ * 获取 HTTP 代理详情
+ * @param id 代理 ID
+ * @returns HTTP 代理详情
+ */
+export function fetchGetHttpProxyById(id: string) {
+  return request.get<Api.Proxy.HttpProxyDetailDTO>({
+    url: `/api/proxies/http/${id}`
+  })
+}
+
+/**
+ * 获取 TCP 代理详情
+ * @param id 代理 ID
+ * @returns TCP 代理详情
+ */
+export function fetchGetTcpProxyById(id: string) {
+  return request.get<Api.Proxy.TcpProxyDetailDTO>({
+    url: `/api/proxies/tcp/${id}`
+  })
+}
+
+/**
+ * 创建 HTTP 代理
+ * @param data 创建参数
+ * @returns 响应结果
+ */
+export function fetchCreateHttpProxy(data: Api.Proxy.HttpProxyCreateParam) {
+  return request.post({
+    url: '/api/proxies/http',
+    data,
+    showSuccessMessage: true
+  })
+}
+
+/**
+ * 创建 TCP 代理
+ * @param data 创建参数
+ * @returns 响应结果
+ */
+export function fetchCreateTcpProxy(data: Api.Proxy.TcpProxyCreateParam) {
+  return request.post({
+    url: '/api/proxies/tcp',
+    data,
+    showSuccessMessage: true
+  })
+}
+
+/**
+ * 更新 HTTP 代理
+ * @param data 更新参数
+ * @returns 响应结果
+ */
+export function fetchUpdateHttpProxy(data: Api.Proxy.HttpProxyUpdateParam) {
+  return request.put({
+    url: '/api/proxies/http',
+    data,
+    showSuccessMessage: true
+  })
+}
+
+/**
+ * 更新 TCP 代理
+ * @param data 更新参数
+ * @returns 响应结果
+ */
+export function fetchUpdateTcpProxy(data: Api.Proxy.TcpProxyUpdateParam) {
+  return request.put({
+    url: '/api/proxies/tcp',
+    data,
+    showSuccessMessage: true
+  })
+}
+
+/**
+ * 更新代理状态
+ * @param id 代理 ID
+ * @param data 状态更新参数
+ * @returns 响应结果
+ */
+export function fetchUpdateProxyStatus(id: string, data: Api.Proxy.ProxyStatusUpdateParam) {
+  return request.put({
+    url: `/api/proxies/status/${id}`,
+    data,
+    showSuccessMessage: true
+  })
+}
+
+/**
+ * 批量删除代理
+ * @param data 删除参数
+ * @returns 响应结果
+ */
+export function fetchBatchDeleteProxy(data: Api.Proxy.ProxyBatchDeleteParam) {
+  return request.del({
+    url: '/api/proxies',
+    data,
+    showSuccessMessage: true
+  })
+}

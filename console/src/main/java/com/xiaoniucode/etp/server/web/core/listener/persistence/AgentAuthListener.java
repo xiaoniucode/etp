@@ -30,9 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * 监听代理客户端登陆事件，持久化客户端信息
- */
 @Component
 public class AgentAuthListener implements EventListener<AgentAuthEvent> {
     private final Logger logger = LoggerFactory.getLogger(AgentAuthListener.class);

@@ -1,8 +1,5 @@
 <template>
   <div class="http-page art-full-height">
-    <!-- 搜索栏 -->
-    <HttpSearch v-model="searchForm" @search="handleSearch" @reset="resetSearchParams"></HttpSearch>
-
     <ElCard class="art-table-card">
       <!-- 表格头部 -->
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
@@ -68,8 +65,7 @@
   import { ref, h, nextTick } from 'vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { fetchGetHttpProxyList, fetchBatchDeleteHttpProxy } from '@/api/http-proxy'
-  import HttpSearch from './modules/http-search.vue'
+  import { fetchGetHttpProxyList, fetchBatchDeleteProxy } from '@/api/proxy'
   import HttpDialog from './modules/http-dialog.vue'
   import AccessControlDialog from '../modules/access-control-dialog.vue'
   import BasicAuthDialog from './modules/basic-auth-dialog.vue'
@@ -79,32 +75,10 @@
 
   defineOptions({ name: 'HttpPenetration' })
 
-  type HttpProxyItem = {
-    id: string
-    agentId: string
-    name: string
-    protocol: number
-    agentType: number
-    status: number
-    domains: string[]
-    httpProxyPort: number
-    targets: Array<{
-      id: number
-      proxyId: string
-      host: string
-      port: number
-      weight: number
-      name: string
-    }>
-  }
+  type HttpProxyItem = Api.Proxy.HttpProxyListDTO
 
   // 选中行
   const selectedRows = ref<HttpProxyItem[]>([])
-
-  // 搜索表单
-  const searchForm = ref({
-    keyword: undefined
-  })
 
   // 弹窗相关
   const dialogType = ref<DialogType>('add')
@@ -135,8 +109,6 @@
     loading,
     pagination,
     getData,
-    searchParams,
-    resetSearchParams,
     handleSizeChange,
     handleCurrentChange,
     refreshData
@@ -144,9 +116,8 @@
     core: {
       apiFn: fetchGetHttpProxyList,
       apiParams: {
-        page: 1,
-        size: 10,
-        keyword: undefined
+        current: 1,
+        size: 10
       },
       columnsFactory: () => [
         { type: 'selection' },
@@ -241,23 +212,8 @@
             ])
         }
       ]
-    },
-    transform: {
-      dataTransformer: (records) => {
-        if (!Array.isArray(records)) {
-          console.warn('数据转换器: 期望数组类型，实际收到:', typeof records)
-          return []
-        }
-        return records
-      }
     }
   })
-
-  const handleSearch = (params: { keyword?: string }) => {
-    console.log(params)
-    Object.assign(searchParams, params)
-    getData()
-  }
 
   const handleSelectionChange = (selection: HttpProxyItem[]): void => {
     selectedRows.value = selection
@@ -325,7 +281,7 @@
       })
 
       const ids = selectedRows.value.map((item) => item.id)
-      await fetchBatchDeleteHttpProxy({ ids })
+      await fetchBatchDeleteProxy({ ids })
       refreshData()
     } catch (error) {
       if (error !== 'cancel') {
@@ -342,7 +298,7 @@
         type: 'warning'
       })
 
-      await fetchBatchDeleteHttpProxy({ ids: [proxy.id] })
+      await fetchBatchDeleteProxy({ ids: [proxy.id] })
       refreshData()
     } catch (error) {
       if (error !== 'cancel') {

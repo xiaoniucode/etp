@@ -225,6 +225,111 @@ strategy = "roundrobin"
 [proxies.bandwidth]
 limit_total = "20Mbps"
 
+[[proxies]]
+name = "test001"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test1" }
+]
+
+[[proxies]]
+name = "test002"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test2" }
+]
+
+[[proxies]]
+name = "test003"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test3" }
+]
+
+[[proxies]]
+name = "test004"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test4" }
+]
+
+[[proxies]]
+name = "test005"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test5" }
+]
+
+[[proxies]]
+name = "test006"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test6" }
+]
+
+[[proxies]]
+name = "test007"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test7" }
+]
+
+[[proxies]]
+name = "test008"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test8" }
+]
+
+[[proxies]]
+name = "test009"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test9" }
+]
+
+[[proxies]]
+name = "test010"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test10" }
+]
+
+[[proxies]]
+name = "test011"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test11" }
+]
+
+[[proxies]]
+name = "test012"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test12" }
+]
+
+[[proxies]]
+name = "test013"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test13" }
+]
+
+[[proxies]]
+name = "test014"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test14" }
+]
+
+[[proxies]]
+name = "test015"
+protocol = "http"
+targets = [
+    { host = "127.0.0.1", port = 8090, weight = 1, name = "test15" }
+]
+
 [log]
 level = "debug"
 path = "log"

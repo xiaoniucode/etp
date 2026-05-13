@@ -15,6 +15,8 @@
  */
 package com.xiaoniucode.etp.server.web.controller;
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.accesstoken.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenCreateParam;
@@ -23,7 +25,8 @@ import com.xiaoniucode.etp.server.web.service.AccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+
+@Validated
 @RestController
 @RequestMapping("/api/access-tokens")
 public class AccessTokenController {
@@ -31,10 +34,8 @@ public class AccessTokenController {
     private AccessTokenService accessTokenService;
     
     @GetMapping
-    public Ajax getAll(@RequestParam(required = false) String keyword,
-                       @RequestParam(defaultValue = "1") int page,
-                       @RequestParam(defaultValue = "10") int size) {
-        List<AccessTokenDTO> accessTokens = accessTokenService.findAll(keyword,page,size);
+    public Ajax findByPage(@ModelAttribute PageQuery pageQuery) {
+        PageResult<AccessTokenDTO> accessTokens = accessTokenService.findByPage(pageQuery);
         return Ajax.success(accessTokens);
     }
     
@@ -63,7 +64,7 @@ public class AccessTokenController {
     }
     
     @DeleteMapping
-    public Ajax batchDelete(@RequestBody AccessTokenBatchDeleteParam param) {
+    public Ajax batchDelete(@RequestBody @Validated AccessTokenBatchDeleteParam param) {
         accessTokenService.deleteBatch(param);
         return Ajax.success();
     }

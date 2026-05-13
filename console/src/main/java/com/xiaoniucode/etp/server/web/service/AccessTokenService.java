@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.accesstoken.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenCreateParam;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenUpdateParam;
-import java.util.List;
 public interface AccessTokenService {
     /**
      * 创建访问令牌
@@ -27,7 +28,7 @@ public interface AccessTokenService {
     /**
      * 查询所有访问令牌
      */
-    List<AccessTokenDTO> findAll(String keyword, int page, int size);
+    PageResult<AccessTokenDTO> findByPage(PageQuery pageQuery);
     /**
      * 根据 ID 查询访问令牌
      */

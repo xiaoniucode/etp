@@ -60,3 +60,7 @@
     <img src="https://api.star-history.com/svg?repos=xiaoniucode/etp&type=Date" alt="Star History">
   </a>
 </p>
+
+## 法律声明
+
+ETP 是开源项目，仅供学习与自建使用。作者不提供任何公共穿透服务，请勿用于非法用途。

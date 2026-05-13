@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.statemachine.agent.action.config;
 
+import com.baidu.fsg.uid.UidGenerator;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.RouteConfig;
@@ -48,6 +49,8 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
 
     private final ProxyManager proxyManager;
     private final DomainGenerator domainGenerator;
+    @Autowired
+    private UidGenerator uidGenerator;
     @Resource
     private AppConfig appConfig;
     @Autowired
@@ -87,8 +90,10 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
             }
             domains = domainGenerator.generateSubdomains(baseDomain, subDomains);
         }
+        String proxyId = uidGenerator.getUIDAsString();
+        config.setProxyId(proxyId);
         if (agentInfo.getAgentType().isEmbedded()) {
-            embeddedAgentRegistry.addProxyId(agentInfo.getAgentId(), config.getProxyId());
+            embeddedAgentRegistry.addProxyId(agentInfo.getAgentId(), proxyId);
             embeddedAgentRegistry.addDomains(agentInfo.getAgentId(), domains);
         }
         proxyManager.activate(config, domains.stream().map(DomainInfo::getFullDomain).collect(Collectors.toSet()));

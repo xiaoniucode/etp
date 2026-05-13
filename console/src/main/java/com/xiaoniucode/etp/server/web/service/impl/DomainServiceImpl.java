@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.domain.DomainDTO;
 import com.xiaoniucode.etp.server.web.entity.DomainDO;
@@ -39,12 +40,12 @@ public class DomainServiceImpl implements DomainService {
     private DomainConvert domainConvert;
 
     @Override
-    public PageResult<DomainDTO> findByPage(int page, int size) {
-        int currentPage = Math.max(0, page - 1);
-        Pageable pageable = PageRequest.of(currentPage, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+    public PageResult<DomainDTO> findByPage(PageQuery pageQuery) {
+        int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize(), Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<DomainDO> resultPage = domainRepository.findAll(pageable);
         if (resultPage.isEmpty()) {
-            return PageResult.empty(page, size);
+            return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
         }
         List<DomainDTO> dtoList = domainConvert.toDTOList(resultPage.getContent());
         return PageResult.wrap(resultPage, dtoList);

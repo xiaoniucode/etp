@@ -17,13 +17,14 @@
 package com.xiaoniucode.etp.server.web.service;
 
 import com.xiaoniucode.etp.common.message.PageResult;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelListDTO;
 
 import java.util.List;
 
 public interface EmbeddedService {
-    PageResult<TunnelListDTO> listByPage(int page, int size);
+    PageResult<TunnelListDTO> listByPage(PageQuery pageQuery);
 
     TunnelDetailDTO detail(String proxyId);
 

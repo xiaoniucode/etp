@@ -230,7 +230,7 @@
     fetchCreateHttpProxy,
     fetchUpdateHttpProxy,
     fetchGetHttpProxyById
-  } from '@/api/http-proxy'
+  } from '@/api/proxy'
 
   defineOptions({ name: 'HttpDialog' })
 

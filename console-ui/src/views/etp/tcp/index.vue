@@ -1,8 +1,5 @@
 <template>
   <div class="tcp-page art-full-height">
-    <!-- 搜索栏 -->
-    <TcpSearch v-model="searchForm" @search="handleSearch" @reset="resetSearchParams"></TcpSearch>
-
     <ElCard class="art-table-card">
       <!-- 表格头部 -->
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
@@ -61,8 +58,7 @@
   import { ref, h, nextTick } from 'vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { fetchGetTcpProxyList, fetchBatchDeleteTcpProxy } from '@/api/tcp-proxy'
-  import TcpSearch from './modules/tcp-search.vue'
+  import { fetchGetTcpProxyList, fetchBatchDeleteProxy } from '@/api/proxy'
   import TcpDialog from './modules/tcp-dialog.vue'
   import AccessControlDialog from '../modules/access-control-dialog.vue'
   import MetricsDialog from '../modules/metrics-dialog.vue'
@@ -71,31 +67,10 @@
 
   defineOptions({ name: 'TcpPenetration' })
 
-  type TcpProxyItem = {
-    id: string
-    agentId: string
-    name: string
-    protocol: number
-    agentType: number
-    status: number
-    listenPort: number
-    targets: Array<{
-      id: number
-      proxyId: string
-      host: string
-      port: number
-      weight: number
-      name: string
-    }>
-  }
+  type TcpProxyItem = Api.Proxy.TcpProxyListDTO
 
   // 选中行
   const selectedRows = ref<TcpProxyItem[]>([])
-
-  // 搜索表单
-  const searchForm = ref({
-    keyword: undefined
-  })
 
   // 弹窗相关
   const dialogType = ref<DialogType>('add')
@@ -123,8 +98,6 @@
     loading,
     pagination,
     getData,
-    searchParams,
-    resetSearchParams,
     handleSizeChange,
     handleCurrentChange,
     refreshData
@@ -132,13 +105,8 @@
     core: {
       apiFn: fetchGetTcpProxyList,
       apiParams: {
-        keyword: undefined,
-        page: 1,
+        current: 1,
         size: 10
-      },
-      paginationKey: {
-        current: 'page',
-        size: 'size'
       },
       columnsFactory: () => [
         { type: 'selection' },
@@ -203,23 +171,8 @@
             ])
         }
       ]
-    },
-    transform: {
-      dataTransformer: (records) => {
-        if (!Array.isArray(records)) {
-          console.warn('数据转换器: 期望数组类型，实际收到:', typeof records)
-          return []
-        }
-        return records
-      }
     }
   })
-
-  const handleSearch = (params: { keyword?: string }) => {
-    console.log(params)
-    Object.assign(searchParams, params)
-    getData()
-  }
 
   const handleSelectionChange = (selection: TcpProxyItem[]): void => {
     selectedRows.value = selection
@@ -259,7 +212,7 @@
       })
 
       const ids = selectedRows.value.map((item) => item.id)
-      await fetchBatchDeleteTcpProxy({ ids })
+      await fetchBatchDeleteProxy({ ids })
       refreshData()
     } catch (error) {
       if (error !== 'cancel') {
@@ -276,7 +229,7 @@
         type: 'warning'
       })
 
-      await fetchBatchDeleteTcpProxy({ ids: [proxy.id] })
+      await fetchBatchDeleteProxy({ ids: [proxy.id] })
       refreshData()
     } catch (error) {
       if (error !== 'cancel') {
