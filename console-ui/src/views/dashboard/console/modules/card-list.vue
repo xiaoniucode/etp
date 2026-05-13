@@ -39,25 +39,25 @@ interface CardDataItem {
 const dataList = reactive<CardDataItem[]>([
   {
     des: '客户端总数',
-    icon: 'ri:pie-chart-line',
+    icon: 'ri:computer-line',
     num: 0,
     iconBgClass: 'icon-bg-blue'
   },
   {
     des: '在线客户端数',
-    icon: 'ri:group-line',
+    icon: 'ri:user-star-line',
     num: 0,
     iconBgClass: 'icon-bg-green'
   },
   {
-    des: '代理总数',
-    icon: 'ri:fire-line',
+    des: '隧道总数',
+    icon: 'ri:server-line',
     num: 0,
     iconBgClass: 'icon-bg-orange'
   },
   {
-    des: '已启动代理数',
-    icon: 'ri:progress-2-line',
+    des: '已启动隧道数',
+    icon: 'ri:play-circle-line',
     num: 0,
     iconBgClass: 'icon-bg-purple'
   }

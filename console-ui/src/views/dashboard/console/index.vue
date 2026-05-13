@@ -9,10 +9,10 @@
       </ElCol>
     </ElRow>
     <ElRow :gutter="20">
-      <ElCol :sm="24" :md="12" :lg="14">
+      <ElCol :sm="24" :md="12" :lg="12">
         <ProxyTypeChart />
       </ElCol>
-      <ElCol :sm="24" :md="12" :lg="10">
+      <ElCol :sm="24" :md="12" :lg="12">
         <AppConfig />
       </ElCol>
     </ElRow>
