@@ -6,7 +6,7 @@ export const penetrationRoutes: AppRouteRecord[] = [
     path: '/embedded',
     component: '/etp/embedded',
     meta: {
-      title: '会话隧道',
+      title: 'menus.etp.embedded',
       icon: 'ri:network-line',
       roles: ['R_SUPER']
     }
@@ -16,7 +16,7 @@ export const penetrationRoutes: AppRouteRecord[] = [
     path: '/http',
     component: '/etp/http',
     meta: {
-      title: 'HTTP',
+      title: 'menus.etp.http',
       icon: 'ri:global-line',
       roles: ['R_SUPER']
     }
@@ -26,7 +26,7 @@ export const penetrationRoutes: AppRouteRecord[] = [
     path: '/tcp',
     component: '/etp/tcp',
     meta: {
-      title: 'TCP',
+      title: 'menus.etp.tcp',
       icon: 'ri:server-line',
       roles: ['R_SUPER']
     }
@@ -36,7 +36,7 @@ export const penetrationRoutes: AppRouteRecord[] = [
     path: '/agent',
     component: '/etp/agent',
     meta: {
-      title: '客户端',
+      title: 'menus.etp.agent',
       icon: 'ri:computer-line',
       roles: ['R_SUPER']
     }
@@ -46,7 +46,7 @@ export const penetrationRoutes: AppRouteRecord[] = [
     path: '/token',
     component: '/etp/token',
     meta: {
-      title: '访问令牌',
+      title: 'menus.etp.token',
       icon: 'ri:key-line',
       roles: ['R_SUPER']
     }
@@ -56,7 +56,7 @@ export const penetrationRoutes: AppRouteRecord[] = [
     path: '/stats',
     component: '/etp/stats',
     meta: {
-      title: '流量统计',
+      title: 'menus.etp.stats',
       icon: 'ri:bar-chart-line',
       roles: ['R_SUPER']
     }
@@ -66,7 +66,7 @@ export const penetrationRoutes: AppRouteRecord[] = [
     path: '/monitor',
     component: '/etp/monitor',
     meta: {
-      title: '系统监控',
+      title: 'menus.etp.monitor',
       icon: 'ri:server-line',
       roles: ['R_SUPER']
     }

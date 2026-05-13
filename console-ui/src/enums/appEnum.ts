@@ -67,7 +67,9 @@ export enum LanguageEnum {
   /** 中文 */
   ZH = 'zh',
   /** 英文 */
-  EN = 'en'
+  EN = 'en',
+  /** 日语 */
+  JA = 'ja'
 }
 
 /**

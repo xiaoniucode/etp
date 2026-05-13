@@ -1,0 +1,299 @@
+{
+  "httpMsg": {
+    "unauthorized": "未認証アクセスです。再度ログインしてください",
+    "forbidden": "このリソースへのアクセスが禁止されています",
+    "notFound": "要求されたリソースが存在しません",
+    "methodNotAllowed": "要求メソッドが許可されていません",
+    "requestTimeout": "リクエストがタイムアウトしました。後でもう一度お試しください",
+    "internalServerError": "サーバー内部エラーが発生しました。後でもう一度お試しください",
+    "badGateway": "ゲートウェイエラーが発生しました。後でもう一度お試しください",
+    "serviceUnavailable": "サービスが一時的に利用できません。後でもう一度お試しください",
+    "gatewayTimeout": "ゲートウェイがタイムアウトしました。後でもう一度お試しください",
+    "requestCancelled": "リクエストがキャンセルされました",
+    "networkError": "ネットワーク接続エラーが発生しました。ネットワーク接続を確認してください",
+    "requestFailed": "リクエストに失敗しました",
+    "requestConfigError": "リクエスト設定エラー"
+  },
+  "topBar": {
+    "search": {
+      "title": "検索"
+    },
+    "user": {
+      "userCenter": "ユーザーセンター",
+      "docs": "ドキュメント",
+      "github": "Github",
+      "lockScreen": "画面ロック",
+      "logout": "ログアウト"
+    },
+    "guide": {
+      "title": "ここをクリックして表示",
+      "theme": "テーマスタイル",
+      "menu": "トップバーメニューを開く",
+      "description": "その他の設定"
+    }
+  },
+  "common": {
+    "tips": "注意",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "logOutTips": "ログアウトしますか？"
+  },
+  "search": {
+    "placeholder": "ページを検索",
+    "historyTitle": "検索履歴",
+    "switchKeydown": "切り替え",
+    "selectKeydown": "選択",
+    "exitKeydown": "閉じる"
+  },
+  "setting": {
+    "menuType": {
+      "title": "メニューレイアウト",
+      "list": [
+        "垂直",
+        "水平",
+        "混合",
+        "二重"
+      ]
+    },
+    "theme": {
+      "title": "テーマスタイル",
+      "list": [
+        "明るい",
+        "暗い",
+        "システム"
+      ]
+    },
+    "menu": {
+      "title": "メニュースタイル"
+    },
+    "color": {
+      "title": "テーマカラー"
+    },
+    "box": {
+      "title": "ボックススタイル",
+      "list": [
+        "ボーダー",
+        "シャドウ"
+      ]
+    },
+    "container": {
+      "title": "コンテナ幅",
+      "list": [
+        "全幅",
+        "固定幅"
+      ]
+    },
+    "basics": {
+      "title": "基本設定",
+      "list": {
+        "multiTab": "ワークタブを表示",
+        "accordion": "サイドバーをアコーディオンで開く",
+        "collapseSidebar": "サイドバーボタンを表示",
+        "reloadPage": "ページ再読み込みボタンを表示",
+        "fastEnter": "クイックアクセスを表示",
+        "breadcrumb": "クランブナビゲーションを表示",
+        "language": "多言語選択を表示",
+        "progressBar": "トッププログレスバーを表示",
+        "weakMode": "色覚弱者モード",
+        "watermark": "グローバルウォーターマーク",
+        "menuWidth": "メニュー幅",
+        "tabStyle": "タブスタイル",
+        "pageTransition": "ページアニメーション",
+        "borderRadius": "カスタム半径"
+      }
+    },
+    "tabStyle": {
+      "default": "デフォルト",
+      "card": "カード",
+      "google": "クローム"
+    },
+    "transition": {
+      "list": {
+        "none": "なし",
+        "fade": "フェード",
+        "slideLeft": "左スライド",
+        "slideBottom": "下スライド",
+        "slideTop": "上スライド"
+      }
+    },
+    "actions": {
+      "resetConfig": "設定をリセット",
+      "copyConfig": "設定をコピー",
+      "copySuccess": "設定をクリップボードにコピーしました。src/config/setting.tsファイルに貼り付けてください",
+      "copyFailed": "コピーに失敗しました。もう一度お試しください",
+      "resetFailed": "リセットに失敗しました。ページをリロードしてもう一度お試しください"
+    }
+  },
+  "notice": {
+    "title": "通知",
+    "btnRead": "既読にする",
+    "bar": [
+      "通知",
+      "メッセージ",
+      "ToDo"
+    ],
+    "text": [
+      "なし"
+    ],
+    "viewAll": "全て表示"
+  },
+  "worktab": {
+    "btn": {
+      "refresh": "更新",
+      "fixed": "固定",
+      "unfixed": "固定解除",
+      "closeLeft": "左を閉じる",
+      "closeRight": "右を閉じる",
+      "closeOther": "その他を閉じる",
+      "closeAll": "全て閉じる"
+    }
+  },
+  "login": {
+    "leftView": {
+      "title": "イントラネットペネトレーションプラットフォーム",
+      "subTitle": "Easy tunnel proxy"
+    },
+    "title": "ようこそ",
+    "subTitle": "アカウントとパスワードを入力してログインしてください",
+    "roles": {
+      "super": "スーパー管理者",
+      "admin": "管理者",
+      "user": "ユーザー"
+    },
+    "placeholder": {
+      "username": "アカウントを入力してください",
+      "password": "パスワードを入力してください",
+      "slider": "スライドして認証してください"
+    },
+    "sliderText": "スライドして認証",
+    "sliderSuccessText": "認証成功",
+    "rememberPwd": "パスワードを記憶",
+    "forgetPwd": "パスワードを忘れた",
+    "btnText": "ログイン",
+    "noAccount": "アカウントがありませんか？",
+    "register": "登録",
+    "success": {
+      "title": "ログイン成功",
+      "message": "ようこそ"
+    }
+  },
+  "forgetPassword": {
+    "title": "パスワードを忘れた？",
+    "subTitle": "パスワードをリセットするにはメールアドレスを入力してください",
+    "placeholder": "メールアドレスを入力してください",
+    "submitBtnText": "送信",
+    "backBtnText": "戻る"
+  },
+  "register": {
+    "title": "アカウントを作成",
+    "subTitle": "ご加入ありがとうございます。以下の情報を入力して登録を完了してください",
+    "placeholder": {
+      "username": "アカウントを入力してください",
+      "password": "パスワードを入力してください",
+      "confirmPassword": "パスワードをもう一度入力してください"
+    },
+    "rule": {
+      "confirmPasswordRequired": "パスワードをもう一度入力してください",
+      "passwordMismatch": "パスワードが一致しません！",
+      "usernameLength": "長さは3～20文字",
+      "passwordLength": "パスワード長は6文字以上必要です",
+      "agreementRequired": "プライバシーポリシーに同意してください"
+    },
+    "agreeText": "同意する",
+    "privacyPolicy": "プライバシーポリシー",
+    "submitBtnText": "登録",
+    "hasAccount": "既にアカウントがありますか？",
+    "toLogin": "ログイン"
+  },
+  "lockScreen": {
+    "pwdError": "パスワードエラー",
+    "lock": {
+      "inputPlaceholder": "画面ロックパスワードを入力してください",
+      "btnText": "ロック"
+    },
+    "unlock": {
+      "inputPlaceholder": "ロック解除パスワードを入力してください",
+      "btnText": "ロック解除",
+      "backBtnText": "ログインに戻る"
+    }
+  },
+  "greeting": {
+    "dawn": "おはようございます！",
+    "morning": "おはようございます！",
+    "afternoon": "こんにちは！",
+    "evening": "こんばんは！"
+  },
+  "exceptionPage": {
+    "403": "申し訳ありません。このページへのアクセス権限がありません",
+    "404": "申し訳ありません。アクセスしようとしているページが存在しません",
+    "500": "申し訳ありません。サーバーでエラーが発生しました",
+    "gohome": "ホームに戻る"
+  },
+  "menus": {
+    "login": {
+      "title": "ログイン"
+    },
+    "register": {
+      "title": "登録"
+    },
+    "forgetPassword": {
+      "title": "パスワードを忘れた"
+    },
+    "outside": {
+      "title": "外部ページ"
+    },
+    "dashboard": {
+      "title": "ホーム"
+    },
+    "etp": {
+      "embedded": "埋め込みトンネル",
+      "http": "HTTP",
+      "tcp": "TCP",
+      "agent": "クライアント",
+      "token": "アクセストークン",
+      "stats": "トラフィック統計",
+      "monitor": "システム監視"
+    },
+    "exception": {
+      "title": "例外ページ",
+      "forbidden": "403",
+      "notFound": "404",
+      "serverError": "500"
+    },
+    "system": {
+      "title": "システム設定",
+      "user": "ユーザー管理",
+      "role": "ロール管理",
+      "userCenter": "ユーザーセンター",
+      "menu": "メニュー管理"
+    }
+  },
+  "table": {
+    "form": {
+      "reset": "リセット",
+      "submit": "送信"
+    },
+    "searchBar": {
+      "reset": "リセット",
+      "search": "検索",
+      "expand": "展開",
+      "collapse": "折りたたむ",
+      "searchInputPlaceholder": "入力してください",
+      "searchSelectPlaceholder": "選択してください"
+    },
+    "selection": "選択",
+    "sizeOptions": {
+      "small": "コンパクト",
+      "default": "デフォルト",
+      "large": "ルーズ"
+    },
+    "column": {
+      "selection": "選択",
+      "expand": "展開",
+      "index": "インデックス"
+    },
+    "zebra": "縞模様",
+    "border": "ボーダー",
+    "headerBackground": "ヘッダー背景"
+  }
+}

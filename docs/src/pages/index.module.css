@@ -180,75 +180,34 @@
 .heroVisual {
     position: relative;
     border-radius: var(--etp-home-radius);
-    border: 1px solid var(--etp-home-border);
-    background: var(--etp-home-surface);
+    background: transparent;
     min-height: 268px;
     overflow: hidden;
-    box-shadow:
-        0 24px 56px -22px color-mix(in srgb, var(--ifm-color-primary) 28%, transparent),
-        0 0 0 1px color-mix(in srgb, var(--ifm-color-primary-light) 20%, transparent);
 }
 
-[data-theme='dark'] .heroVisual {
-    box-shadow:
-        0 24px 56px -22px rgba(0, 0, 0, 0.5),
-        0 0 0 1px var(--etp-home-border);
-}
-
-.heroVisualBlob {
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    right: -40px;
-    top: -50px;
-    border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in srgb, var(--ifm-color-primary-lightest) 55%, transparent), transparent 70%);
-    pointer-events: none;
-}
-
-[data-theme='dark'] .heroVisualBlob {
-    background: radial-gradient(circle, color-mix(in srgb, var(--ifm-color-primary) 32%, transparent), transparent 72%);
-    opacity: 0.85;
-}
-
-.heroVisualGrid {
-    position: absolute;
-    inset: 0;
-    background-image:
-        linear-gradient(var(--etp-home-grid-line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--etp-home-grid-line) 1px, transparent 1px);
-    background-size: 22px 22px;
-    opacity: 0.22;
-    mask-image: radial-gradient(ellipse 75% 75% at 50% 55%, black 15%, transparent 72%);
-}
-
-[data-theme='dark'] .heroVisualGrid {
-    opacity: 0.28;
-}
-
-.heroVisualSvg {
-    position: relative;
+.heroVisualImg {
     display: block;
     width: 100%;
     height: auto;
-    max-height: 300px;
-    color: var(--etp-home-visual-fg);
+    max-height: 280px;
+    object-fit: contain;
+    object-position: center;
 }
 
-.heroVisualCaption {
-    font-size: 13px;
-    font-weight: 700;
-    opacity: 0.78;
+.heroVisualImgLight {
+    display: block;
 }
 
-.heroVisualPulse {
-    animation: etp-dash 14s linear infinite;
+.heroVisualImgDark {
+    display: none;
 }
 
-@keyframes etp-dash {
-    to {
-        stroke-dashoffset: -400;
-    }
+[data-theme='dark'] .heroVisualImgLight {
+    display: none;
+}
+
+[data-theme='dark'] .heroVisualImgDark {
+    display: block;
 }
 
 /* ----- 功能特性 ----- */

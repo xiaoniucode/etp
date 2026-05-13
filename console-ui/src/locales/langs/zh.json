@@ -150,7 +150,7 @@
   },
   "login": {
     "leftView": {
-      "title": "内网穿透安全网关",
+      "title": "内网穿透平台",
       "subTitle": "Easy tunnel proxy"
     },
     "title": "欢迎回来",
@@ -243,9 +243,17 @@
       "title": "内嵌页面"
     },
     "dashboard": {
-      "title": "仪表盘"
+      "title": "首页"
     },
-
+    "etp": {
+      "embedded": "会话隧道",
+      "http": "HTTP",
+      "tcp": "TCP",
+      "agent": "客户端",
+      "token": "访问令牌",
+      "stats": "流量统计",
+      "monitor": "系统监控"
+    },
     "exception": {
       "title": "异常页面",
       "forbidden": "403",

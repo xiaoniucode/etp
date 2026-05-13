@@ -150,8 +150,8 @@
   },
   "login": {
     "leftView": {
-      "title": "A backend system of beauty and efficiency",
-      "subTitle": "A sleek and practical interface for a great user experience"
+      "title": "Intranet Penetration Platform",
+      "subTitle": "Easy tunnel proxy"
     },
     "title": "Welcome back",
     "subTitle": "Please enter your account and password to login",
@@ -243,9 +243,17 @@
       "title": "Outside"
     },
     "dashboard": {
-      "title": "Dashboard"
+      "title": "Home"
     },
-
+    "etp": {
+      "embedded": "Embedded",
+      "http": "HTTP",
+      "tcp": "TCP",
+      "agent": "Agent",
+      "token": "Token",
+      "stats": "Statistics",
+      "monitor": "Monitor"
+    },
     "exception": {
       "title": "Exception",
       "forbidden": "403",
