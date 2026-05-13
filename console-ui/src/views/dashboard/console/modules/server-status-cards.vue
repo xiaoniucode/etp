@@ -113,7 +113,7 @@
 
     const getColor = (usage: any) => {
       if (usage < 70) return '#20a53a'
-      if (usage < 80) return '#f59e0b'
+      if (usage < 90) return '#f59e0b'
       return '#ef4444'
     }
 
