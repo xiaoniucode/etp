@@ -12,12 +12,12 @@ const features: Array<{
     title: string;
     description: string;
 }> = [
-    {id: 'panel', title: '管理面板', description: 'Web 控制台简化配置，实时流量观测与统计。'},
-    {id: 'speed', title: '高性能传输', description: '全链路零拷贝、压缩与高效协议，可选 GraalVM 毫秒级启动。'},
-    {id: 'shield', title: '协议与加密', description: 'TCP/HTTP 及上层协议代理，PKCS#12 与 TLS 1.3。'},
-    {id: 'sparkle', title: '简单易用', description: '零外部依赖，静态 Toml 或控制台动态配置。'},
-    {id: 'globe', title: '跨平台', description: 'Linux / Windows / macOS / Docker，ARM64 与 AMD64。'},
-    {id: 'stack', title: '能力矩阵', description: '端口池、多客户端、无客户端模式、强制下线等。'},
+    {id: 'panel', title: '管理面板', description: '完善中✍️'},
+    {id: 'speed', title: '高性能传输', description: '完善中✍️'},
+    {id: 'shield', title: '协议与加密', description: '完善中✍️'},
+    {id: 'sparkle', title: '简单易用', description: '完善中✍️'},
+    {id: 'globe', title: '跨平台', description: '完善中✍️'},
+    {id: 'stack', title: '能力矩阵', description: '完善中✍️'},
 ];
 
 type InstallRole = 'server' | 'client';
@@ -338,7 +338,7 @@ export default function Home() {
                     </div>
                 </section>
 
-                <QuickInstall/>
+                {/*<QuickInstall/>*/}
             </div>
         </Layout>
     );
