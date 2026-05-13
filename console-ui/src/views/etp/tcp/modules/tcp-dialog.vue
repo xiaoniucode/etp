@@ -330,9 +330,12 @@
     name: [{ required: true, message: '请输入代理名称', trigger: 'blur' }],
     status: [{ required: true, message: '请选择状态', trigger: 'change' }],
     remotePort: [
-      { required: true, message: '请输入远程端口', trigger: 'blur' },
       {
         validator: (rule: any, value: any, callback: any) => {
+          if (!value) {
+            callback()
+            return
+          }
           const numValue = parseInt(value)
           if (isNaN(numValue)) {
             callback(new Error('远程端口必须是数字'))
@@ -515,7 +518,7 @@
           agentId: proxyDetail.agentId || '',
           name: proxyDetail.name || '',
           status: proxyDetail.status?.toString() || '1',
-          remotePort: proxyDetail.remotePort || 0,
+          remotePort: proxyDetail.listenPort || undefined,
           encrypt: proxyDetail.transport?.encrypt || false,
           tunnelType: proxyDetail.transport?.tunnelType?.toString() || '1',
           deployMode: proxyDetail.deploymentMode === 1 ? 'single' : 'cluster',

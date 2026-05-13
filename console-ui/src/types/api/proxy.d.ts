@@ -90,7 +90,7 @@ declare namespace Api.Proxy {
 
   /** TCP 代理详情 */
   interface TcpProxyDetailDTO extends ProxyDetailDTO {
-    remotePort: number
+    listenPort: number
   }
 
   /** 目标地址创建/更新参数 */

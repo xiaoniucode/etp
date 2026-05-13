@@ -1,6 +1,6 @@
 <template>
   <div class="app-config">
-    <div class="app-config-content art-card p-4">
+    <div class="app-config-content art-card p-4 h-105">
       <div v-if="loading" class="loading-state">
         <ElSkeleton :rows="6" animated />
       </div>

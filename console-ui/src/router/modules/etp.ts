@@ -70,15 +70,5 @@ export const penetrationRoutes: AppRouteRecord[] = [
       icon: 'ri:bar-chart-line',
       roles: ['R_SUPER']
     }
-  },
-  {
-    name: 'Monitor',
-    path: '/monitor',
-    component: '/etp/monitor',
-    meta: {
-      title: 'menus.etp.monitor',
-      icon: 'ri:server-line',
-      roles: ['R_SUPER']
-    }
   }
 ]

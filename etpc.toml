@@ -288,48 +288,6 @@ targets = [
     { host = "127.0.0.1", port = 8090, weight = 1, name = "test9" }
 ]
 
-[[proxies]]
-name = "test010"
-protocol = "http"
-targets = [
-    { host = "127.0.0.1", port = 8090, weight = 1, name = "test10" }
-]
-
-[[proxies]]
-name = "test011"
-protocol = "http"
-targets = [
-    { host = "127.0.0.1", port = 8090, weight = 1, name = "test11" }
-]
-
-[[proxies]]
-name = "test012"
-protocol = "http"
-targets = [
-    { host = "127.0.0.1", port = 8090, weight = 1, name = "test12" }
-]
-
-[[proxies]]
-name = "test013"
-protocol = "http"
-targets = [
-    { host = "127.0.0.1", port = 8090, weight = 1, name = "test13" }
-]
-
-[[proxies]]
-name = "test014"
-protocol = "http"
-targets = [
-    { host = "127.0.0.1", port = 8090, weight = 1, name = "test14" }
-]
-
-[[proxies]]
-name = "test015"
-protocol = "http"
-targets = [
-    { host = "127.0.0.1", port = 8090, weight = 1, name = "test15" }
-]
-
 [log]
 level = "debug"
 path = "log"

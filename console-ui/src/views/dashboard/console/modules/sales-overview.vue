@@ -2,7 +2,7 @@
   <div class="art-card h-105 p-5 mb-5 max-sm:mb-4">
     <div class="art-card-header">
       <div class="title">
-        <h4>24小时总流量统计</h4>
+        <h4>流量</h4>
         <p>最近24小时流量变化</p>
       </div>
     </div>

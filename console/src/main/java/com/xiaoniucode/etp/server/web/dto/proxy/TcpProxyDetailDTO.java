@@ -20,5 +20,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class TcpProxyDetailDTO extends ProxyDetailDTO {
-    private Integer remotePort;
+    private Integer listenPort;
 }

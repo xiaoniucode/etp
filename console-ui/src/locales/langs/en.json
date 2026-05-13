@@ -252,8 +252,7 @@
       "agent": "Agent",
       "domain": "Domain",
       "token": "Token",
-      "stats": "Statistics",
-      "monitor": "Monitor"
+      "stats": "Statistics"
     },
     "exception": {
       "title": "Exception",
