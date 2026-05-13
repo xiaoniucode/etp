@@ -25,7 +25,7 @@ targets = [
 
 配合服务端 `base_domain` 配置使用，只需指定子域名部分，完整域名为 `子域名 + base_domain`。
 
-服务端需配置基础域名（详见 [服务端基础配置](../../server/base_config.md)）：
+服务端需配置基础域名（详见 [服务端基础配置](../server/base_config.md)）：
 
 ```toml
 # etps.toml（服务端配置）
