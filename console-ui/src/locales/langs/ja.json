@@ -250,6 +250,7 @@
       "http": "HTTP",
       "tcp": "TCP",
       "agent": "クライアント",
+      "domain": "ドメイン管理",
       "token": "アクセストークン",
       "stats": "トラフィック統計",
       "monitor": "システム監視"

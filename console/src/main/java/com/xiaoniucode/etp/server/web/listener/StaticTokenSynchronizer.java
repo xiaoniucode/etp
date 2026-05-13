@@ -63,18 +63,14 @@ public class StaticTokenSynchronizer implements EventListener<TunnelServerBindEv
                     continue;
                 }
                 logger.info("静态访问令牌同步成功: 名称={}", config.getName());
-                accessTokenRepository.save(toTokenDO(config));
+                AccessTokenDO accessTokenDO = new AccessTokenDO();
+                accessTokenDO.setName(config.getName());
+                accessTokenDO.setToken(config.getToken());
+                accessTokenRepository.save(accessTokenDO);
             }
         } catch (Exception e) {
             logger.error("静态令牌同步至数据库发生错误", e);
             throw new SystemException("静态访问令牌同步至数据库时发生错误",e);
         }
-    }
-
-    private AccessTokenDO toTokenDO(TokenConfig info) {
-        AccessTokenDO accessTokenDO = new AccessTokenDO();
-        accessTokenDO.setName(info.getName());
-        accessTokenDO.setToken(info.getToken());
-        return accessTokenDO;
     }
 }

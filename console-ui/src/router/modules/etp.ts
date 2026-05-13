@@ -42,6 +42,16 @@ export const penetrationRoutes: AppRouteRecord[] = [
     }
   },
   {
+    name: 'Domain',
+    path: '/domain',
+    component: '/etp/domain',
+    meta: {
+      title: 'menus.etp.domain',
+      icon: 'ri:link',
+      roles: ['R_SUPER']
+    }
+  },
+  {
     name: 'Token',
     path: '/token',
     component: '/etp/token',

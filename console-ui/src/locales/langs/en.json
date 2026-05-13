@@ -250,6 +250,7 @@
       "http": "HTTP",
       "tcp": "TCP",
       "agent": "Agent",
+      "domain": "Domain",
       "token": "Token",
       "stats": "Statistics",
       "monitor": "Monitor"

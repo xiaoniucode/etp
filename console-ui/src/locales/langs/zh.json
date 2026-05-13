@@ -250,6 +250,7 @@
       "http": "HTTP",
       "tcp": "TCP",
       "agent": "客户端",
+      "domain": "域名管理",
       "token": "访问令牌",
       "stats": "流量统计",
       "monitor": "系统监控"
