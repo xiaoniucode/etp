@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="rss.xsl"?>
-<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0">
     <channel>
         <title>etp Blog</title>
         <link>https://etp.github.io/etp/blog</link>
@@ -13,113 +13,6 @@
             <link>https://etp.github.io/etp/blog/index</link>
             <guid>https://etp.github.io/etp/blog/index</guid>
             <pubDate>Wed, 03 Dec 2025 10:55:20 GMT</pubDate>
-            <description><![CDATA[详细发布细节请往Github Release 页面查看]]></description>
-            <content:encoded><![CDATA[<p>详细发布细节请往Github <a href="https://github.com/xiaoniucode/etp/releases" target="_blank" rel="noopener noreferrer">Release</a> 页面查看</p>
-<h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v051">etp v0.5.1<a href="https://etp.github.io/etp/blog/index#etp-v051" class="hash-link" aria-label="etp v0.5.1的直接链接" title="etp v0.5.1的直接链接" translate="no">​</a></h2>
-<ul>
-<li>代码优化，提升代码健壮性，避免意外情况出现异常。</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v050">etp v0.5.0<a href="https://etp.github.io/etp/blog/index#etp-v050" class="hash-link" aria-label="etp v0.5.0的直接链接" title="etp v0.5.0的直接链接" translate="no">​</a></h2>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="新特性">✨新特性<a href="https://etp.github.io/etp/blog/index#%E6%96%B0%E7%89%B9%E6%80%A7" class="hash-link" aria-label="✨新特性的直接链接" title="✨新特性的直接链接" translate="no">​</a></h3>
-<ul>
-<li>优化完善日志管理器，同时支持更多应用日志自定义参数配置</li>
-<li>管理界面增加服务端系统配置信息展示</li>
-<li>文档站点阅读体验优化</li>
-<li>优化etp SpringBoot starter架构，增加扩展性和减少代码冗余</li>
-</ul>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="问题修复">🐛问题修复<a href="https://etp.github.io/etp/blog/index#%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="🐛问题修复的直接链接" title="🐛问题修复的直接链接" translate="no">​</a></h3>
-<ul>
-<li>修复通过SpringBoot starter启动客户端断线重连时，由于配置缺失导致无法连接的问题</li>
-<li>修复端口池未在配置文件中指定范围时抛出异常的问题</li>
-<li>修复界面添加客户端时，没有将客户端ID注册到运行时状态管理器导致通过SpringBoot嵌入运行etp客户端时出现异常</li>
-<li>完善etp.db数据库文件的路径逻辑，添加docker环境下配置路径的环境变量，避免因权限问题导致运行失败</li>
-<li>修复因GraalVM导致的警告问题，避免无害日志打印</li>
-</ul>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="️-配置变更">⚙️ 配置变更<a href="https://etp.github.io/etp/blog/index#%EF%B8%8F-%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4" class="hash-link" aria-label="⚙️ 配置变更的直接链接" title="⚙️ 配置变更的直接链接" translate="no">​</a></h3>
-<ul>
-<li>原<code>path</code>字段表示主日志文件的完整文件路径，现调整为仅表示基础日志目录路径</li>
-<li>新增<code>name</code>字段，用于指定主日志文件名</li>
-<li>原<code>pattern</code>字段表示完整的日志归档路径格式，现改为<code>archivePattern</code>，仅需填写归档文件名模式（无需包含完整路径）</li>
-<li>部分字段是本次版本新增的配置参数</li>
-</ul>
-<p>下面是完整的配置案例：</p>
-<div class="language-toml codeBlockContainer_K4rn theme-code-block" style="--prism-background-color:hsl(220, 13%, 18%);--prism-color:hsl(220, 14%, 71%)"><div class="codeBlockContent_dtSl"><pre tabindex="0" class="prism-code language-toml codeBlock_eTQc thin-scrollbar" style="background-color:hsl(220, 13%, 18%);color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><code class="codeBlockLines_gQtJ"><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token punctuation" style="color:hsl(220, 14%, 71%)">[</span><span class="token table class-name" style="color:hsl(29, 54%, 61%)">log</span><span class="token punctuation" style="color:hsl(220, 14%, 71%)">]</span><span class="token plain"></span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain"></span><span class="token key property" style="color:hsl(355, 65%, 65%)">level</span><span class="token plain"> </span><span class="token punctuation" style="color:hsl(220, 14%, 71%)">=</span><span class="token plain"> </span><span class="token string" style="color:hsl(95, 38%, 62%)">"info"</span><span class="token plain"> </span><span class="token comment" style="color:hsl(220, 10%, 40%)"># 日志级别</span><span class="token plain"></span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain"></span><span class="token key property" style="color:hsl(355, 65%, 65%)">path</span><span class="token plain"> </span><span class="token punctuation" style="color:hsl(220, 14%, 71%)">=</span><span class="token plain"> </span><span class="token string" style="color:hsl(95, 38%, 62%)">"log"</span><span class="token plain"> </span><span class="token comment" style="color:hsl(220, 10%, 40%)"># 基础路径</span><span class="token plain"></span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain"></span><span class="token key property" style="color:hsl(355, 65%, 65%)">name</span><span class="token plain"> </span><span class="token punctuation" style="color:hsl(220, 14%, 71%)">=</span><span class="token plain"> </span><span class="token string" style="color:hsl(95, 38%, 62%)">"etps.log"</span><span class="token plain"> </span><span class="token comment" style="color:hsl(220, 10%, 40%)"># 主日志文件名</span><span class="token plain"></span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain"></span><span class="token key property" style="color:hsl(355, 65%, 65%)">archivePattern</span><span class="token plain"> </span><span class="token punctuation" style="color:hsl(220, 14%, 71%)">=</span><span class="token plain"> </span><span class="token string" style="color:hsl(95, 38%, 62%)">"etpc.%d{yyyy-MM-dd}.log.gz"</span><span class="token plain"> </span><span class="token comment" style="color:hsl(220, 10%, 40%)"># 日志归档格式</span><span class="token plain"></span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain"></span><span class="token key property" style="color:hsl(355, 65%, 65%)">logPattern</span><span class="token plain"> </span><span class="token punctuation" style="color:hsl(220, 14%, 71%)">=</span><span class="token plain"> </span><span class="token string" style="color:hsl(95, 38%, 62%)">"%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"</span><span class="token plain"> </span><span class="token comment" style="color:hsl(220, 10%, 40%)"># 控制台打印格式</span><span class="token plain"></span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain"></span><span class="token key property" style="color:hsl(355, 65%, 65%)">maxHistory</span><span class="token plain"> </span><span class="token punctuation" style="color:hsl(220, 14%, 71%)">=</span><span class="token plain"> </span><span class="token number" style="color:hsl(29, 54%, 61%)">30</span><span class="token plain"> </span><span class="token comment" style="color:hsl(220, 10%, 40%)"># 最大保存天数</span><span class="token plain"></span><br></span><span class="token-line" style="color:hsl(220, 14%, 71%);text-shadow:0 1px rgba(0, 0, 0, 0.3)"><span class="token plain"></span><span class="token key property" style="color:hsl(355, 65%, 65%)">totalSizeCap</span><span class="token plain"> </span><span class="token punctuation" style="color:hsl(220, 14%, 71%)">=</span><span class="token plain"> </span><span class="token string" style="color:hsl(95, 38%, 62%)">"3GB"</span><span class="token plain"> </span><span class="token comment" style="color:hsl(220, 10%, 40%)"># 总空间大小</span><br></span></code></pre></div></div>
-<p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.5.0" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>
-<h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v041">etp v0.4.1<a href="https://etp.github.io/etp/blog/index#etp-v041" class="hash-link" aria-label="etp v0.4.1的直接链接" title="etp v0.4.1的直接链接" translate="no">​</a></h2>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
-<ul>
-<li>修复端口池没有设置范围时空指针异常</li>
-<li>修复etp客户端启动成功回调接口空指针异常</li>
-</ul>
-<p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.4.1" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>
-<h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v040">etp v0.4.0<a href="https://etp.github.io/etp/blog/index#etp-v040" class="hash-link" aria-label="etp v0.4.0的直接链接" title="etp v0.4.0的直接链接" translate="no">​</a></h2>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="新特性-1">✨新特性<a href="https://etp.github.io/etp/blog/index#%E6%96%B0%E7%89%B9%E6%80%A7-1" class="hash-link" aria-label="✨新特性的直接链接" title="✨新特性的直接链接" translate="no">​</a></h3>
-<ul>
-<li>新增springboot 2/3/4版本集成etp的stater，支持嵌入使用，无需安装etp客户端</li>
-<li>客户端支持自定义连接超时配置</li>
-<li>支持端口池，可以在etps.toml中指定公网端口的分配范围</li>
-<li>管理界面展示在线客户端的操作系统信息</li>
-<li>已认证客户端支持自主上报端口映射信息</li>
-<li>管理界面体验优化，调整样式布局</li>
-</ul>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复-1">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D-1" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
-<ul>
-<li>客户端日志文件命名错误修复</li>
-<li>默认日志收集格式修复</li>
-<li>代码优化，解决潜在的空指针问题</li>
-</ul>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="️-配置变更-1">⚙️ 配置变更<a href="https://etp.github.io/etp/blog/index#%EF%B8%8F-%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4-1" class="hash-link" aria-label="⚙️ 配置变更的直接链接" title="⚙️ 配置变更的直接链接" translate="no">​</a></h3>
-<ul>
-<li>
-<p>代理映射的名称可以重复</p>
-</li>
-<li>
-<p>新增端口池配置</p>
-<p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.4.0" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>
-</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v032">etp v0.3.2<a href="https://etp.github.io/etp/blog/index#etp-v032" class="hash-link" aria-label="etp v0.3.2的直接链接" title="etp v0.3.2的直接链接" translate="no">​</a></h2>
-<ul>
-<li>
-<p>优化服务端项目工程代码结构</p>
-</li>
-<li>
-<p>完善管理界面代码</p>
-</li>
-<li>
-<p>登录有效期改为1天</p>
-<p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.3.2" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>
-</li>
-</ul>
-<h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v031">etp v0.3.1<a href="https://etp.github.io/etp/blog/index#etp-v031" class="hash-link" aria-label="etp v0.3.1的直接链接" title="etp v0.3.1的直接链接" translate="no">​</a></h2>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复-2">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D-2" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
-<ul>
-<li>修复TCP协议无法加载HTTP服务WEB页面问题‼️</li>
-</ul>
-<p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.3.1" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>
-<h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v030">etp v0.3.0<a href="https://etp.github.io/etp/blog/index#etp-v030" class="hash-link" aria-label="etp v0.3.0的直接链接" title="etp v0.3.0的直接链接" translate="no">​</a></h2>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="-新功能">✨ 新功能<a href="https://etp.github.io/etp/blog/index#-%E6%96%B0%E5%8A%9F%E8%83%BD" class="hash-link" aria-label="✨ 新功能的直接链接" title="✨ 新功能的直接链接" translate="no">​</a></h3>
-<ul>
-<li>增加SQLite事务管理机制</li>
-</ul>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="-问题修复-3">🐛 问题修复<a href="https://etp.github.io/etp/blog/index#-%E9%97%AE%E9%A2%98%E4%BF%AE%E5%A4%8D-3" class="hash-link" aria-label="🐛 问题修复的直接链接" title="🐛 问题修复的直接链接" translate="no">​</a></h3>
-<ul>
-<li>修复统一异常处理无法处理所有类型异常问题</li>
-<li>完善管理面板接口业务逻辑，添加事务支持</li>
-</ul>
-<p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.3.0" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>
-<h2 class="anchor anchorWithStickyNavbar_iX64" id="etp-v020">etp v0.2.0<a href="https://etp.github.io/etp/blog/index#etp-v020" class="hash-link" aria-label="etp v0.2.0的直接链接" title="etp v0.2.0的直接链接" translate="no">​</a></h2>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="-新功能-1">✨ 新功能<a href="https://etp.github.io/etp/blog/index#-%E6%96%B0%E5%8A%9F%E8%83%BD-1" class="hash-link" aria-label="✨ 新功能的直接链接" title="✨ 新功能的直接链接" translate="no">​</a></h3>
-<ul>
-<li>新增易于操作的图形化管理界面。</li>
-<li>新增支持日志自定义规则配置。</li>
-</ul>
-<h3 class="anchor anchorWithStickyNavbar_iX64" id="️-配置变更-2">⚙️ 配置变更<a href="https://etp.github.io/etp/blog/index#%EF%B8%8F-%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4-2" class="hash-link" aria-label="⚙️ 配置变更的直接链接" title="⚙️ 配置变更的直接链接" translate="no">​</a></h3>
-<ul>
-<li>配置文件中的证书配置属性由 <code>ssl</code> 更名为 <code>tls</code>。</li>
-<li>端口映射增加status状态字段，用于控制映射的开启状态。</li>
-</ul>
-<p><a href="https://github.com/xiaoniucode/etp/releases/tag/v0.2.0" target="_blank" rel="noopener noreferrer">查看本次发行完整信息 ➡️</a></p>]]></content:encoded>
         </item>
     </channel>
 </rss>
