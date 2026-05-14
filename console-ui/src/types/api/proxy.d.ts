@@ -177,6 +177,7 @@ declare namespace Api.Proxy {
   /** 批量删除参数 */
   interface ProxyBatchDeleteParam {
     ids: string[]
+    protocol: number
   }
 
   /** 状态更新参数 */

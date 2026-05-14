@@ -47,22 +47,13 @@ public interface ProxyConvert {
 
     @Mapping(target = "protocol", expression = "java(ProtocolType.TCP)")
     @Mapping(source = "proxyId", target = "id")
-    @Mapping(target = "limitTotal", ignore = true)
-    @Mapping(target = "limitIn", ignore = true)
-    @Mapping(target = "limitOut", ignore = true)
     ProxyDO toDO(TcpProxyCreateParam request, String proxyId);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "param.domainType", target = "domainType", qualifiedByName = "codeToDomainType")
-    @Mapping(target = "limitTotal", ignore = true)
-    @Mapping(target = "limitIn", ignore = true)
-    @Mapping(target = "limitOut", ignore = true)
     void updateDO(HttpProxyUpdateParam param, @MappingTarget ProxyDO proxyDO);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "limitTotal", ignore = true)
-    @Mapping(target = "limitIn", ignore = true)
-    @Mapping(target = "limitOut", ignore = true)
     void updateDO(TcpProxyUpdateParam param, @MappingTarget ProxyDO proxyDO);
 
     @Mapping(source = "agentType", target = "agentType")

@@ -42,24 +42,46 @@
     {
       name: '下行流量',
       data: [
-        60, 50, 40, 35, 30, 40, 80, 200, 450, 800, 1100, 950,
-        1000, 900, 850, 820, 900, 1050, 1300, 1450, 1250, 900, 550, 250
+        60, 50, 40, 35, 30, 40, 80, 200, 450, 800, 1100, 950, 1000, 900, 850, 820, 900, 1050, 1300,
+        1450, 1250, 900, 550, 250
       ] as number[],
       showAreaColor: true
     },
     {
       name: '上行流量',
       data: [
-        42, 35, 28, 24, 21, 28, 56, 140, 315, 560, 770, 665,
-        700, 630, 595, 574, 630, 735, 910, 1015, 875, 630, 385, 175
+        42, 35, 28, 24, 21, 28, 56, 140, 315, 560, 770, 665, 700, 630, 595, 574, 630, 735, 910,
+        1015, 875, 630, 385, 175
       ] as number[],
       showAreaColor: true
     }
   ])
 
   const xAxisData = ref<string[]>([
-    '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00',
-    '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
+    '00:00',
+    '01:00',
+    '02:00',
+    '03:00',
+    '04:00',
+    '05:00',
+    '06:00',
+    '07:00',
+    '08:00',
+    '09:00',
+    '10:00',
+    '11:00',
+    '12:00',
+    '13:00',
+    '14:00',
+    '15:00',
+    '16:00',
+    '17:00',
+    '18:00',
+    '19:00',
+    '20:00',
+    '21:00',
+    '22:00',
+    '23:00'
   ])
 
   const totalSent = computed(() => {
@@ -107,8 +129,6 @@
     if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
     return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`
   }
-
-
 </script>
 
 <style scoped lang="scss">
@@ -141,38 +161,38 @@
     }
   }
 
-.metric-dot {
-  position: relative;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-
-  &::before {
-    position: absolute;
-    inset: 0;
+  .metric-dot {
+    position: relative;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background: inherit;
-    content: '';
-    animation: pulse 2s infinite;
-  }
-}
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
+    flex-shrink: 0;
 
-  70% {
-    transform: scale(2.4);
-    opacity: 0;
+    &::before {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: inherit;
+      content: '';
+      animation: pulse 2s infinite;
+    }
   }
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
 
-  100% {
-    transform: scale(2.4);
-    opacity: 0;
+    70% {
+      transform: scale(2.4);
+      opacity: 0;
+    }
+
+    100% {
+      transform: scale(2.4);
+      opacity: 0;
+    }
   }
-}
 
   .metric-label {
     color: var(--el-text-color-regular);

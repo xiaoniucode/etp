@@ -18,10 +18,9 @@ package com.xiaoniucode.etp.server.web.service.converter;
 
 import com.xiaoniucode.etp.server.web.dto.proxy.TargetDTO;
 import com.xiaoniucode.etp.server.web.entity.ProxyTargetDO;
-import com.xiaoniucode.etp.server.web.param.proxytarget.ProxyTargetAddParam;
+import com.xiaoniucode.etp.server.web.param.proxy.ProxyTargetSaveParam;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,9 +28,9 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ProxyTargetConvert {
     @Mapping(target = "proxyId", source = "proxyId")
-    ProxyTargetDO toDO(ProxyTargetAddParam param, String proxyId);
+    ProxyTargetDO toDO(ProxyTargetSaveParam param, String proxyId);
 
-    default List<ProxyTargetDO> toDOList(List<ProxyTargetAddParam> params, String proxyId) {
+    default List<ProxyTargetDO> toDOList(List<ProxyTargetSaveParam> params, String proxyId) {
         if (params == null) return Collections.emptyList();
         return params.stream()
                 .map(param -> toDO(param, proxyId))

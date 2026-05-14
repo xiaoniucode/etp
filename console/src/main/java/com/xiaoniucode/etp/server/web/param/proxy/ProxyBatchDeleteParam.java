@@ -15,6 +15,9 @@
  */
 package com.xiaoniucode.etp.server.web.param.proxy;
 
+import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.server.web.support.validation.EnumValue;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -23,4 +26,7 @@ import java.util.List;
 @Data
 public class ProxyBatchDeleteParam implements Serializable {
     private List<String> ids;
+    @NotNull(message = "必须指定协议类型")
+    @EnumValue(enumClass = ProtocolType.class,message = "无效协议")
+    private Integer protocol;
 }

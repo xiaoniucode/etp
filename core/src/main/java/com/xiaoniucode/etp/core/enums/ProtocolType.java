@@ -41,7 +41,7 @@ public enum ProtocolType {
         this.desc = desc;
     }
 
-    public static ProtocolType getCode(int type) {
+    public static ProtocolType fromCode(int type) {
         return TYPE_MAP.get(type);
     }
 

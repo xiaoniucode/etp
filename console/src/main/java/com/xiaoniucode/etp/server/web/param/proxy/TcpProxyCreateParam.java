@@ -14,19 +14,18 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.param.proxy;
+
 import com.xiaoniucode.etp.core.enums.DeploymentMode;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.web.param.bandwidth.BandwidthSaveParam;
 import com.xiaoniucode.etp.server.web.param.loadbalance.LoadBalanceParam;
-import com.xiaoniucode.etp.server.web.param.proxytarget.ProxyTargetAddParam;
 import com.xiaoniucode.etp.server.web.param.transport.TransportSaveParam;
 import com.xiaoniucode.etp.server.web.support.validation.EnumValue;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.util.List;
 
 /**
@@ -45,10 +44,11 @@ public class TcpProxyCreateParam {
     @NotNull(message = "部署模式不能为空")
     @EnumValue(enumClass = DeploymentMode.class)
     private Integer deploymentMode;
-    @NotNull(message = "targets 不能为空")
+
+    @NotNull(message = "目标服务不能为空")
     @Valid
-    @Size(min = 1, max = 100, message = "targets 必须包含至少一个服务")
-    private List<ProxyTargetAddParam> targets;
+    @Size(min = 1, max = 100, message = "目标服务数不在范围内：[1-100]")
+    private List<ProxyTargetSaveParam> targets;
     @Valid
     private BandwidthSaveParam bandwidth;
     @Valid
@@ -56,5 +56,8 @@ public class TcpProxyCreateParam {
     @Valid
     @NotNull(message = "transport 不能为空")
     private TransportSaveParam transport;
+
+    @Min(value = 1, message = "远程端口号不能小于1")
+    @Max(value = 65535, message = "远程端口号不能大于65535")
     private Integer remotePort;
 }

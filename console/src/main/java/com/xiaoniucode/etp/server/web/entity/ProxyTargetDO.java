@@ -16,10 +16,7 @@
 package com.xiaoniucode.etp.server.web.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * 代理目标实体类
@@ -54,7 +51,8 @@ public class ProxyTargetDO {
     /**
      * 权重
      */
-    private Integer weight;
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
+    private Integer weight = 1;
     /**
      * 目标名称
      */

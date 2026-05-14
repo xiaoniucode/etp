@@ -19,6 +19,7 @@ import com.xiaoniucode.etp.core.enums.LoadBalanceType;
 import com.xiaoniucode.etp.server.web.entity.converter.LoadBalanceConverter;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 负载均衡实体类
@@ -26,6 +27,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "load_balance")
+@NoArgsConstructor
 public class LoadBalanceDO {
     /**
      * 代理ID
@@ -38,4 +40,9 @@ public class LoadBalanceDO {
      */
     @Convert(converter = LoadBalanceConverter.class)
     private LoadBalanceType strategy;
+
+    public LoadBalanceDO(String proxyId, LoadBalanceType strategy) {
+        this.proxyId = proxyId;
+        this.strategy = strategy;
+    }
 }

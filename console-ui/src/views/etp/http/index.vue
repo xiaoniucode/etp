@@ -72,6 +72,7 @@
   import MetricsDialog from '../modules/metrics-dialog.vue'
   import { ElTag, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
   import { DialogType } from '@/types'
+  import { ProtocolType } from '@/enums/businessEnum'
 
   defineOptions({ name: 'HttpPenetration' })
 
@@ -281,7 +282,7 @@
       })
 
       const ids = selectedRows.value.map((item) => item.id)
-      await fetchBatchDeleteProxy({ ids })
+      await fetchBatchDeleteProxy({ ids, protocol: ProtocolType.HTTP })
       refreshData()
     } catch (error) {
       if (error !== 'cancel') {
@@ -298,7 +299,7 @@
         type: 'warning'
       })
 
-      await fetchBatchDeleteProxy({ ids: [proxy.id] })
+      await fetchBatchDeleteProxy({ ids: [proxy.id], protocol: ProtocolType.HTTP })
       refreshData()
     } catch (error) {
       if (error !== 'cancel') {

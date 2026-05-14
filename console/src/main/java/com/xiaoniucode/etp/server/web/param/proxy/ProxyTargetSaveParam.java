@@ -13,22 +13,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.param.proxytarget;
+package com.xiaoniucode.etp.server.web.param.proxy;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class ProxyTargetAddParam {
-    @NotEmpty(message = "host 不能为空")
+public class ProxyTargetSaveParam {
+    @NotEmpty(message = "服务主机号不能为空")
     private String host;
-    @NotNull(message = "port 不能为空")
-    @Min(value = 1, message = "port 必须大于 0")
-    @Max(value = 65535, message = "port 必须小于等于 65535")
+    @NotNull(message = "服务端口号不能为空")
+    @Min(value = 1, message = "服务端口号必须大于0")
+    @Max(value = 65535, message = "服务端口号必须小于等于65535")
     private Integer port;
-    @NotNull(message = "weight 不能为空")
     private Integer weight;
-    @NotEmpty(message = "name 不能为空")
-    @Size(max = 30, message = "name 长度不能超过 30")
+    @Size(max = 30, message = "服务名称长度不能超过 30")
     private String name;
 }

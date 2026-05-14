@@ -22,7 +22,7 @@ public enum DomainType {
                 return domainType;
             }
         }
-        return null;
+       throw new IllegalArgumentException("不合法输入");
     }
     public boolean isAuto(){
        return this==AUTO;

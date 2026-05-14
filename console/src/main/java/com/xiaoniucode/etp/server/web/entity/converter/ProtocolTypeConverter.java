@@ -46,6 +46,6 @@ public class ProtocolTypeConverter implements AttributeConverter<ProtocolType, I
         if (code == null) {
             return null;
         }
-        return ProtocolType.getCode(code);
+        return ProtocolType.fromCode(code);
     }
 }

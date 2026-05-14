@@ -37,12 +37,14 @@ public enum DeploymentMode {
                 return deploymentMode;
             }
         }
-        return null;
+        throw new IllegalArgumentException("不合法输入：" + code);
     }
-    public boolean isCluster(){
-       return this==CLUSTER;
+
+    public boolean isCluster() {
+        return this == CLUSTER;
     }
-    public boolean isStandalone(){
-        return this==STANDALONE;
+
+    public boolean isStandalone() {
+        return this == STANDALONE;
     }
 }

@@ -20,7 +20,6 @@ import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import com.xiaoniucode.etp.server.web.param.bandwidth.BandwidthSaveParam;
 import com.xiaoniucode.etp.server.web.param.loadbalance.LoadBalanceParam;
-import com.xiaoniucode.etp.server.web.param.proxytarget.ProxyTargetAddParam;
 import com.xiaoniucode.etp.server.web.param.transport.TransportSaveParam;
 import com.xiaoniucode.etp.server.web.support.validation.EnumValue;
 import jakarta.validation.Valid;
@@ -56,7 +55,7 @@ public class HttpProxyUpdateParam {
     @NotNull(message = "targets 不能为空")
     @Valid
     @Size(min = 1, max = 100, message = "targets 必须包含至少一个服务")
-    private List<ProxyTargetAddParam> targets;
+    private List<ProxyTargetSaveParam> targets;
     private BandwidthSaveParam bandwidth;
     @Valid
     private LoadBalanceParam loadBalance;
