@@ -72,7 +72,7 @@ public class BasicAuthServiceImpl implements BasicAuthService {
     public void addUser(HttpUserAddParam request) {
         BasicAuthDO basicAuthDO = basicAuthRepository.findById(request.getProxyId())
                 .orElseThrow(() -> new BizException("Basic Auth 配置不存在"));
-        boolean exists = basicUserRepository.existsByUsername(request.getUsername());
+        boolean exists = basicUserRepository.existsByProxyIdAndUsername(basicAuthDO.getProxyId(), request.getUsername());
         if (exists) {
             throw new BizException("用户名已存在");
         }
@@ -89,7 +89,6 @@ public class BasicAuthServiceImpl implements BasicAuthService {
         BasicUserDO basicUserDO = basicUserRepository.findById(param.getId())
                 .orElseThrow(() -> new BizException("用户不存在"));
 
-        String oldUsername = basicUserDO.getUsername();
         String encode = passwordEncoder.encode(param.getPassword());
         boolean usernameChanged = !Objects.equals(param.getUsername(), basicUserDO.getUsername());
         if (!usernameChanged && param.getPassword() == null) {
@@ -97,12 +96,7 @@ public class BasicAuthServiceImpl implements BasicAuthService {
         }
 
         if (usernameChanged) {
-            boolean exists = basicUserRepository
-                    .existsByProxyIdAndUsernameAndIdNot(
-                            proxyId,
-                            param.getUsername(),
-                            param.getId()
-                    );
+            boolean exists = basicUserRepository.existsByProxyIdAndUsernameAndIdNot(proxyId, param.getUsername(), param.getId());
             if (exists) {
                 throw new BizException("用户名已存在");
             }

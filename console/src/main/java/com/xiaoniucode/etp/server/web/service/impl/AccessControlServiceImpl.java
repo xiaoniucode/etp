@@ -66,6 +66,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                 .orElseThrow(() -> new BizException("访问控制配置不存在"));
         accessControlConvert.updateDO(accessControlDO, param);
         accessControlRepository.save(accessControlDO);
+        transactionHelper.afterCommit(()->ipAccessChecker.invalidate(param.getProxyId()));
     }
 
     @Override
@@ -76,6 +77,7 @@ public class AccessControlServiceImpl implements AccessControlService {
 
         String proxyId = accessControlRuleDO.getProxyId();
         accessControlRuleRepository.deleteById(id);
+        transactionHelper.afterCommit(()->ipAccessChecker.invalidate(proxyId));
     }
 
     @Override
@@ -89,6 +91,7 @@ public class AccessControlServiceImpl implements AccessControlService {
 
         AccessControlRuleDO accessControlRuleDO = accessControlConvert.toRuleDO(param);
         accessControlRuleRepository.save(accessControlRuleDO);
+        transactionHelper.afterCommit(()->ipAccessChecker.invalidate(proxyId));
     }
 
     @Override
@@ -120,6 +123,6 @@ public class AccessControlServiceImpl implements AccessControlService {
         //更新数据库
         accessControlConvert.updateRuleDO(ruleDO, param);
         accessControlRuleRepository.save(ruleDO);
-
+        transactionHelper.afterCommit(()->ipAccessChecker.invalidate(proxyId));
     }
 }

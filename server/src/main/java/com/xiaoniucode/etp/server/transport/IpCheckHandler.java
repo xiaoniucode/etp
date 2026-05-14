@@ -2,9 +2,11 @@ package com.xiaoniucode.etp.server.transport;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
+import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
+import com.xiaoniucode.etp.server.utils.NetUtils;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -19,22 +21,11 @@ import java.net.InetSocketAddress;
 public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(IpCheckHandler.class);
     private final IpAccessChecker ipAccessChecker;
+    private final StreamManager streamManager;
 
-    public IpCheckHandler(IpAccessChecker ipAccessChecker) {
+    public IpCheckHandler(IpAccessChecker ipAccessChecker, StreamManager streamManager) {
         this.ipAccessChecker = ipAccessChecker;
-    }
-
-    /**
-     * 获取访问来源 IP 地址
-     *
-     * @param visitor 管道
-     * @return IP 地址
-     */
-    protected String getVisitorIp(Channel visitor) {
-        if (visitor.remoteAddress() instanceof InetSocketAddress addr) {
-            return addr.getAddress().getHostAddress();
-        }
-        return visitor.remoteAddress().toString();
+        this.streamManager = streamManager;
     }
 
     /**
@@ -49,7 +40,7 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
     }
 
     protected boolean doCheckAccess(Channel visitor, ProxyConfig proxyConfig) {
-        String visitorIp = getVisitorIp(visitor);
+        String visitorIp = NetUtils.getIp(visitor);
         boolean checkAccess = ipAccessChecker.checkAccess(proxyConfig, visitorIp);
         if (!checkAccess) {
             logger.debug("来源IP {} 无访问权限", visitorIp);
@@ -61,6 +52,11 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
             } else if (protocol.isTcp()) {
                 ChannelUtils.closeOnFlush(visitor);
             }
+            //尝试关闭流，可能之前已经建立过连接，后来权限发生变化
+            streamManager.getStreamContext(visitor).ifPresent(context -> {
+                logger.debug("没有隧道访问权限，关闭 {} 流", proxyConfig.getName());
+                context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+            });
             return false;
         }
         return true;

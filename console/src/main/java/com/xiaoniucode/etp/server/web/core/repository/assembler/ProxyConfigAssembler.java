@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.web.core.repository.assembler;
 
 import com.xiaoniucode.etp.core.domain.*;
+import com.xiaoniucode.etp.core.enums.AccessControl;
 import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.server.web.core.converter.ProxyModelConvert;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
@@ -99,5 +100,20 @@ public class ProxyConfigAssembler {
         if (basicAuth != null) {
             basicAuth.addUsers(proxyModelConvert.toBasicAuthUserConfig(basicUsers));
         }
+    }
+
+    public void assembleAccessControlRules(ProxyConfig config, List<AccessControlRuleDO> accessControlRuleDOS) {
+        if (CollectionUtils.isEmpty(accessControlRuleDOS)) {
+            return;
+        }
+        AccessControlConfig accessControl = config.getAccessControl();
+        accessControlRuleDOS.forEach(rule -> {
+            AccessControl mode = rule.getMode();
+            if (mode.isAllowMode()) {
+                accessControl.addAllow(rule.getCidr());
+            } else if (mode.isDenyMode()) {
+                accessControl.addDeny(rule.getCidr());
+            }
+        });
     }
 }

@@ -22,14 +22,8 @@ import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import com.xiaoniucode.etp.server.web.core.repository.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
-import com.xiaoniucode.etp.server.web.entity.BasicUserDO;
-import com.xiaoniucode.etp.server.web.entity.ProxyDO;
-import com.xiaoniucode.etp.server.web.entity.ProxyDomainDO;
-import com.xiaoniucode.etp.server.web.entity.ProxyTargetDO;
-import com.xiaoniucode.etp.server.web.repository.BasicUserRepository;
-import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
-import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
-import com.xiaoniucode.etp.server.web.repository.ProxyTargetRepository;
+import com.xiaoniucode.etp.server.web.entity.*;
+import com.xiaoniucode.etp.server.web.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -49,6 +43,8 @@ public class StandaloneProxyQueryRepository implements ProxyQueryRepository {
     private ProxyDomainRepository proxyDomainRepository;
     @Autowired
     private BasicUserRepository basicUserRepository;
+    @Autowired
+    private AccessControlRuleRepository accessControlRuleRepository;
 
     @Override
     public Optional<ProxyConfig> findById(String proxyId) {
@@ -64,14 +60,19 @@ public class StandaloneProxyQueryRepository implements ProxyQueryRepository {
         if (config == null) {
             return null;
         }
-
+        String proxyId = config.getProxyId();
+        //访问控制
+        List<AccessControlRuleDO> accessControlRuleDOS = accessControlRuleRepository.findByProxyId(proxyId);
+        proxyConfigAssembler.assembleAccessControlRules(config,accessControlRuleDOS);
+        //服务
         List<ProxyTargetDO> targets = proxyTargetRepository.findByProxyId(config.getProxyId());
         proxyConfigAssembler.assembleTargets(config, targets);
         if (config.getProtocol().isHttp()) {
+            //域名
             List<ProxyDomainDO> domainDOs = proxyDomainRepository.findByProxyId(config.getProxyId());
             proxyConfigAssembler.assembleDomains(config, domainDOs);
+            //鉴权认证
             if (result.getBasicAuthDO() != null) {
-                String proxyId = result.getBasicAuthDO().getProxyId();
                 List<BasicUserDO> basicUsers = basicUserRepository.findByProxyId(proxyId);
                 proxyConfigAssembler.assembleBasicAuthUsers(config, basicUsers);
             }

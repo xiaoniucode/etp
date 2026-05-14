@@ -110,11 +110,11 @@ public class ProxyManager {
             }
         }
         Set<String> agentProxies = agentProxyMap.remove(agentId);
-       if (!CollectionUtils.isEmpty(agentProxies)){
-           agentProxies.remove(proxyId);
-       }else {
-           agentProxyMap.remove(agentId);
-       }
+        if (!CollectionUtils.isEmpty(agentProxies)) {
+            agentProxies.remove(proxyId);
+        } else {
+            agentProxyMap.remove(agentId);
+        }
         Set<String> domains = domainRegistry.getDomainsByProxyId(proxyId);
         for (String domain : domains) {
             streamManager.fireCloseByDomain(domain);
@@ -135,6 +135,10 @@ public class ProxyManager {
     }
 
     public void reconcile(ProxyConfig config) throws EtpException {
+        reconcile(config, null);
+    }
+
+    public void reconcile(ProxyConfig config, Set<String> domains) throws EtpException {
         logger.debug("更新代理：{}", config.getProxyId());
         String proxyId = config.getProxyId();
         if (config.getStatus().isClosed()) {
@@ -142,7 +146,7 @@ public class ProxyManager {
             return;
         }
         deactivate(proxyId);
-        activate(config);
+        activate(config, domains);
     }
 
     /**

@@ -15,7 +15,7 @@ public interface BasicUserRepository extends JpaRepository<BasicUserDO, Long> {
 
     List<BasicUserDO> findByProxyId(String proxyId);
 
-    boolean existsByUsername(String username);
+    boolean existsByProxyIdAndUsername(String proxyId,String username);
 
     /**
      * 判断当前代理配置下是否存在相同的用户名，但是排除自己

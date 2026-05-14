@@ -19,10 +19,7 @@ package com.xiaoniucode.etp.server.web.core.listener.persistence;
 import com.xiaoniucode.etp.core.domain.AccessControlConfig;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.enums.AccessControl;
-import com.xiaoniucode.etp.core.enums.AgentType;
-import com.xiaoniucode.etp.core.enums.DomainType;
-import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.ProxyReportEvent;
@@ -115,6 +112,7 @@ public class ProxyReportListener implements EventListener<ProxyReportEvent> {
     private void handleStandaloneAgent(ProxyReportEvent event, ProxyConfig config) {
         String proxyId = config.getProxyId();
         ProxyDO proxyDO = proxyModelConvert.toProxyDO(config);
+        proxyDO.setSourceType(ProxySourceType.AGENT);
         if (config.getBandwidth() != null) {
             //带宽限流
             proxyModelConvert.updateProxyDO(proxyDO, config.getBandwidth());

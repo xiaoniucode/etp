@@ -69,7 +69,7 @@ public class ProxyDO {
      */
     @Column(name = "source_type", nullable = false)
     @Convert(converter = ProxySourceTypeConverter.class)
-    private ProxySourceType sourceType;
+    private ProxySourceType sourceType = ProxySourceType.MANUAL;
     /**
      * 域名类型
      */

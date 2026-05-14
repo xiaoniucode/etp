@@ -113,8 +113,6 @@ public class ProxyServiceImpl implements ProxyService {
         }
         String proxyId = uidGenerator.getUIDAsString();
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
-        proxyDO.setSourceType(ProxySourceType.MANUAL);
-
         BandwidthSaveParam bandwidth = param.getBandwidth();
         if (bandwidth != null) {
             bandwidth.valid();
@@ -142,8 +140,10 @@ public class ProxyServiceImpl implements ProxyService {
         //4.传输
         transportRepository.save(transportConvert.toDO(param.getTransport(), proxyId));
         //5.域名
+        Set<String> fullDomains = new HashSet<>();
         if (domainType.isAuto()) {
             DomainInfo domain = domainGenerator.generateRandomSubdomain(baseDomain);
+            fullDomains.add(domain.getFullDomain());
             proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain.getDomain(), baseDomain, domainType));
         } else if (domainType.isCustomDomain()) {
             Set<String> domains = param.getDomains();
@@ -157,16 +157,18 @@ public class ProxyServiceImpl implements ProxyService {
             List<ProxyDomainDO> list = domains.stream()
                     .map(domain -> new ProxyDomainDO(proxyId, domain, null, domainType)).toList();
             proxyDomainRepository.saveAll(list);
+            fullDomains.addAll(domains);
         } else if (domainType.isSubdomain()) {
             Set<String> prefixes = param.getDomains();
-            List<String> fullDomains = prefixes.stream().map(prefix -> prefix + "." + baseDomain).toList();
-            List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(fullDomains);
+            List<String> domains = prefixes.stream().map(prefix -> prefix + "." + baseDomain).toList();
+            List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
             if (!existsList.isEmpty()) {
                 String existDomains = existsList.stream()
                         .map(ProxyDomainDO::getDomain)
                         .collect(Collectors.joining(", "));
                 throw new BizException("以下子域名已被使用: " + existDomains);
             }
+            fullDomains.addAll(domains);
             List<ProxyDomainDO> list = prefixes.stream()
                     .map(prefix -> new ProxyDomainDO(proxyId, prefix, baseDomain, domainType)).toList();
             proxyDomainRepository.saveAll(list);
@@ -179,7 +181,7 @@ public class ProxyServiceImpl implements ProxyService {
 
         if (proxyDO.getStatus().isOpen()) {
             transactionHelper.afterCommit(() ->
-                    proxyManager.activate(proxyAssembler.toProxyConfig(proxyDO)));
+                    proxyManager.activate(proxyAssembler.toProxyConfig(proxyDO), fullDomains));
         }
         logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
     }
@@ -225,12 +227,20 @@ public class ProxyServiceImpl implements ProxyService {
             proxyDomainRepository.deleteByProxyId(proxyId);
         }
         String baseDomain = appConfig.getBaseDomain();
+        Set<String> fullDomains = new HashSet<>();
         //请求域名类型和存在域名相同且是自动生成域名类型的时保持不变，其他都删除后重新生成
         if (!((requestDomainType == existsDomainType) && existsDomainType.isAuto())) {
             proxyDomainRepository.deleteByProxyId(proxyId);
+        } else {
+            //自动类型域名且未变化
+            List<ProxyDomainDO> proxyDomainDOS = proxyDomainRepository.findByProxyId(proxyId);
+            if (!CollectionUtils.isEmpty(proxyDomainDOS)) {
+                proxyDomainDOS.forEach(domainDO -> fullDomains.add(domainDO.getFullDomain()));
+            }
         }
         if (requestDomainType.isAuto() && !existsDomainType.isAuto()) {
             DomainInfo domainInfo = domainGenerator.generateRandomSubdomain(baseDomain);
+            fullDomains.add(domainInfo.getFullDomain());
             proxyDomainRepository.save(new ProxyDomainDO(proxyId, domainInfo.getDomain(), baseDomain, requestDomainType));
         } else if (requestDomainType.isCustomDomain()) {
             Set<String> domains = param.getDomains();
@@ -239,25 +249,27 @@ public class ProxyServiceImpl implements ProxyService {
                 String existDomains = existsList.stream().map(ProxyDomainDO::getDomain).collect(Collectors.joining(", "));
                 throw new BizException("域名已被占用: " + existDomains);
             }
+            fullDomains.addAll(domains);
             List<ProxyDomainDO> list = domains.stream()
                     .map(domain -> new ProxyDomainDO(proxyId, domain, null, requestDomainType)).toList();
             proxyDomainRepository.saveAll(list);
         } else if (requestDomainType.isSubdomain()) {
             Set<String> prefixes = param.getDomains();
-            List<String> fullDomains = prefixes.stream().map(prefix -> prefix + "." + baseDomain).toList();
-            List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(fullDomains);
+            List<String> domains = prefixes.stream().map(prefix -> prefix + "." + baseDomain).toList();
+            List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
             if (!existsList.isEmpty()) {
                 String existDomains = existsList.stream()
                         .map(ProxyDomainDO::getDomain)
                         .collect(Collectors.joining(", "));
                 throw new BizException("域名已被占用: " + existDomains);
             }
+            fullDomains.addAll(domains);
             List<ProxyDomainDO> list = prefixes.stream()
                     .map(prefix -> new ProxyDomainDO(proxyId, prefix, baseDomain, requestDomainType)).toList();
             proxyDomainRepository.saveAll(list);
         }
         transactionHelper.afterCommit(() ->
-                proxyManager.reconcile(proxyAssembler.toProxyConfig(existsProxyDO)));
+                proxyManager.reconcile(proxyAssembler.toProxyConfig(existsProxyDO), fullDomains));
         logger.debug("HTTP代理更新成功：{}", existsProxyDO.getName());
     }
 
@@ -358,9 +370,10 @@ public class ProxyServiceImpl implements ProxyService {
         } else if (!portManager.isAvailable(remotePort)) {
             throw new BizException("远程端口号不可用或被占用");
         } else {
-            proxyDO.setListenPort(param.getRemotePort());
+            proxyDO.setListenPort(remotePort);
+            portManager.addPort(remotePort);
+            transactionHelper.afterRollback(() -> portManager.release(remotePort));
         }
-        proxyDO.setSourceType(ProxySourceType.MANUAL);
         //2.带宽
         BandwidthSaveParam bandwidth = param.getBandwidth();
         if (bandwidth != null) {
