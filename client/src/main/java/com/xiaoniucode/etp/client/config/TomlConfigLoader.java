@@ -295,8 +295,8 @@ public class TomlConfigLoader implements ConfigSource {
 
         // 读取日志配置
         Toml logTable = root.getTable("log");
+        LogConfig logConfig = new LogConfig();
         if (logTable != null) {
-            LogConfig logConfig = new LogConfig();
             String level = logTable.getString("level");
             String path = logTable.getString("path");
             String name = logTable.getString("name");

@@ -119,12 +119,15 @@ public class EmbeddedServiceImpl implements EmbeddedService {
             Set<String> fullDomains = domainInfos.stream().map(DomainInfo::getFullDomain).collect(Collectors.toSet());
             httpProxyDTO.setDomains(fullDomains);
             httpProxyDTO.setDomainType(config.getRouteConfig().getDomainType().getCode());
+            //传输
             httpProxyDTO.setTransport(transportConvert.toDTO(config.getTransport()));
+            //BasicAuth认证
             BasicAuthConfig basicAuth = config.getBasicAuth();
             if (basicAuth != null) {
                 BasicAuthDetailDTO basicAuthDetailDTO = basicAuthConvert.toDetailDTO(basicAuth, basicAuth.getUsers());
                 httpProxyDTO.setBasicAuth(basicAuthDetailDTO);
             }
+            //访问控制
             httpProxyDTO.setAccessControl(accessControlDetailDTO);
             tunnelDetailDTO.setProxy(httpProxyDTO);
         } else if (config.isTcp()) {
@@ -134,7 +137,6 @@ public class EmbeddedServiceImpl implements EmbeddedService {
             tcpProxyDTO.setAccessControl(accessControlDetailDTO);
             tunnelDetailDTO.setProxy(tcpProxyDTO);
         }
-
         return tunnelDetailDTO;
     }
 

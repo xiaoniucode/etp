@@ -61,12 +61,10 @@
     data,
     loading,
     pagination,
-    getData,
     handleSizeChange,
     handleCurrentChange,
     refreshData
   } = useTable({
-    // 核心配置
     core: {
       apiFn: fetchGetTokenList,
       apiParams: {

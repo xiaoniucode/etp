@@ -47,6 +47,7 @@
                                 <buildArg>--add-opens=java.base/java.nio=ALL-UNNAMED</buildArg>
 
                                 <arg>-Dio.netty.handler.ssl.noOpenSsl=true</arg>
+                                <arg>-Dio.netty.handler.ssl.noBouncyCastle=true</arg>
                             </buildArgs>
                         </configuration>
                     </plugin>

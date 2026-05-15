@@ -19,12 +19,11 @@ import java.nio.file.Paths;
 public class TunnelClientStartup {
     private static final Logger logger = LoggerFactory.getLogger(TunnelClientStartup.class);
     private static TunnelClient tunnelClient;
-
     public static void main(String[] args) {
         try {
             System.setProperty("io.netty.handler.ssl.noOpenSsl", "true");
             AppConfig config = buildConfig(args);
-            initLogback(config);
+          //  initLogback(config);
             if (config.getLogConfig().getLevel().equalsIgnoreCase("debug")){
                 Debugger.enableDebug();
                 System.setProperty("io.netty.leakDetection.level", "PARANOID");

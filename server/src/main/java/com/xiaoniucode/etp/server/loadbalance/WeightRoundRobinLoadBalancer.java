@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.loadbalance;
 import com.xiaoniucode.etp.core.domain.Target;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,9 +16,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Component
 public class WeightRoundRobinLoadBalancer implements LoadBalancer {
-    /**
-     * 日志记录器
-     */
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(WeightRoundRobinLoadBalancer.class);
 
     /**
@@ -29,9 +27,12 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer {
      * 加权轮询数据结构
      * 存储每个目标服务器的权重和当前状态
      */
+    @Data
     protected static class WeightedRoundRobin {
         /**
          * 目标服务器权重
+         * 获取目标服务器权重
+         *
          */
         private int weight;
 
@@ -44,15 +45,6 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer {
          * 最后更新时间，用于判断是否需要回收
          */
         private long lastUpdate;
-
-        /**
-         * 获取目标服务器权重
-         *
-         * @return 权重值
-         */
-        public int getWeight() {
-            return weight;
-        }
 
         /**
          * 设置目标服务器权重
@@ -83,23 +75,6 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer {
             current.addAndGet(-1 * total);
         }
 
-        /**
-         * 获取最后更新时间
-         *
-         * @return 最后更新时间戳
-         */
-        public long getLastUpdate() {
-            return lastUpdate;
-        }
-
-        /**
-         * 设置最后更新时间
-         *
-         * @param lastUpdate 最后更新时间戳
-         */
-        public void setLastUpdate(long lastUpdate) {
-            this.lastUpdate = lastUpdate;
-        }
     }
 
     /**

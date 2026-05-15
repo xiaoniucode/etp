@@ -1,11 +1,17 @@
 spring:
-  mvc:
-    static-path-pattern: /**
-  web:
-    resources:
-      static-locations: classpath:/static/
-  profiles:
-    active: mysql
+  datasource:
+    url: jdbc:h2:file:./etp;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        use_sql_comments: false
 logging:
   level:
     com.xiaoniucode.etp: debug
@@ -20,6 +26,8 @@ jwt:
 security:
   permit-all:
     paths:
+      - /
+      - /static/**
       - /api/auth/login
       - /api/captcha
 cache:

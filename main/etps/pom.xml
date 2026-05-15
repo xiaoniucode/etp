@@ -11,7 +11,7 @@
     <name>etps</name>
     <properties>
         <java.version>25</java.version>
-        <shade.mainClass>com.xiaoniucode.etp.server.TunnelServerStartup</shade.mainClass>
+        <shade.mainClass>com.xiaoniucode.etp.server.web.TunnelServerStartup</shade.mainClass>
         <etp.version>0.10.0</etp.version>
     </properties>
     <dependencies>
@@ -34,7 +34,7 @@
 
                         <arg>-Dio.netty.handler.ssl.noOpenSsl=true</arg>
                     </buildArgs>
-                    <mainClass>com.xiaoniucode.etp.server.TunnelServerStartup</mainClass>
+                    <mainClass>com.xiaoniucode.etp.server.web.TunnelServerStartup</mainClass>
                     <imageName>etps</imageName>
                 </configuration>
             </plugin>
@@ -57,7 +57,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>4.0.2</version>
+                <version>4.0.6</version>
                 <configuration>
                     <excludes>
                         <exclude>

@@ -48,7 +48,10 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     public ControlFrameHandler(AgentContext agentContext) {
         this.agentContext = agentContext;
     }
-
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+        ctx.fireChannelActive();
+    }
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
         byte msgType = frame.getMsgType();

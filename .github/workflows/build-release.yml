@@ -1,10 +1,10 @@
 name: Build release version
 
 on:
-  workflow_dispatch:    #手动触发
+  workflow_dispatch:
   push:
     tags:
-      - 'v*'           # push版本标签时候触发
+      - 'v*'
 env:
   JAVA_VERSION: '25'
 

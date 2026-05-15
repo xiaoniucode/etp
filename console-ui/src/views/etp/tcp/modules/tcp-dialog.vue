@@ -223,7 +223,7 @@
   defineOptions({ name: 'TcpDialog' })
 
   interface Target {
-    id?: string
+    id?: string | number
     host: string
     port: number
     weight: number
@@ -262,8 +262,9 @@
       tunnelType: number
       targets: Target[]
       bandwidth: {
-        uploadLimit: number
-        downloadLimit: number
+        limitTotal: number | null
+        limitIn: number | null
+        limitOut: number | null
       }
       loadBalanceStrategy: number
       transport: {
@@ -289,7 +290,7 @@
 
   const dialogType = computed(() => props.type)
   const formRef = ref<FormInstance>()
-  const agents = ref([])
+  const agents = ref<Api.Agent.AgentDTO[]>([])
 
   // 监听props.visible的变化，同步到dialogVisible
   watch(
@@ -402,9 +403,9 @@
   }
 
   const findBestCommonUnit = (
-    limitTotalBps: number | undefined,
-    limitInBps: number | undefined,
-    limitOutBps: number | undefined
+    limitTotalBps: number | null | undefined,
+    limitInBps: number | null | undefined,
+    limitOutBps: number | null | undefined
   ): string => {
     // 收集所有有值的
     const values = [limitTotalBps, limitInBps, limitOutBps].filter((v): v is number => v != null)
@@ -425,7 +426,7 @@
   }
 
   const convertBandwidthToUnit = (
-    bps: number | undefined,
+    bps: number | null | undefined,
     targetUnit: string
   ): number | undefined => {
     if (bps == null) return undefined
@@ -454,9 +455,9 @@
   }
 
   const getDisplayBandwidthFromBps = (
-    limitTotalBps: number | undefined,
-    limitInBps: number | undefined,
-    limitOutBps: number | undefined
+    limitTotalBps: number | null | undefined,
+    limitInBps: number | null | undefined,
+    limitOutBps: number | null | undefined
   ) => {
     const targetUnit = findBestCommonUnit(limitTotalBps, limitInBps, limitOutBps)
     return {
@@ -494,7 +495,7 @@
   }
 
   const addTarget = () => {
-    formData.targets.push({ host: '127.0.0.1', port: '', weight: 1, name: '' })
+    formData.targets.push({ host: '127.0.0.1', port: 0, weight: 1, name: '' })
   }
 
   const removeTarget = (index: number) => {
@@ -635,20 +636,19 @@
                   {
                     name: formData.name,
                     host: formData.singleHost,
-                    port: formData.singlePort,
+                    port: parseInt(formData.singlePort as any) || 0,
                     weight: 1
                   }
                 ]
-              : formData.targets
+              : formData.targets.map(t => ({ ...t, port: Number(t.port) }))
 
           const commonData = {
             name: formData.name,
             status: parseInt(formData.status),
-            remotePort: formData.remotePort,
+            remotePort: Number(formData.remotePort),
             deploymentMode: formData.deployMode === 'single' ? 1 : 0, // 1: STANDALONE, 0: CLUSTER
             targets: targets,
             bandwidth: {
-              // 后端会基于 unit 转换到 bps，这里应传用户输入值，避免重复换算
               limitTotal: formData.limitTotal ?? null,
               limitIn: formData.limitIn ?? null,
               limitOut: formData.limitOut ?? null,
@@ -659,7 +659,7 @@
                 ? {
                     strategy: parseInt(formData.loadBalanceStrategy)
                   }
-                : undefined,
+                : null,
             transport: {
               tunnelType: parseInt(formData.tunnelType),
               encrypt: formData.encrypt
@@ -674,7 +674,7 @@
             await fetchCreateTcpProxy(requestData)
           } else {
             const requestData = {
-              id: props.proxyData?.id,
+              id: props.proxyData?.id || '',
               ...commonData
             }
             await fetchUpdateTcpProxy(requestData)

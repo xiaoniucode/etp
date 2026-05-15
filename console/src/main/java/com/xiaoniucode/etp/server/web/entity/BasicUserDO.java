@@ -26,7 +26,6 @@ import lombok.NoArgsConstructor;
                 @UniqueConstraint(name = "uk_proxy_id_username", columnNames = {"proxy_id", "username"})
         },
         indexes = {
-                @Index(name = "idx_proxy_id", columnList = "proxy_id"),
                 @Index(name = "idx_username", columnList = "username")
         }
 

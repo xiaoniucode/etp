@@ -1,6 +1,15 @@
 {
   "reflection": [
     {
+      "type": "apple.security.AppleProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "ch.qos.logback.classic.BasicConfigurator",
       "methods": [
         {
@@ -40,13 +49,10 @@
       ]
     },
     {
-      "type": "com.google.protobuf.MessageLite"
-    },
-    {
       "type": "com.lmax.disruptor.AbstractSequencer"
     },
     {
-      "type": "com.lmax.disruptor.Sequence",
+      "type": "com.lmax.disruptor.Value",
       "fields": [
         {
           "name": "value"
@@ -54,13 +60,156 @@
       ]
     },
     {
+      "type": "com.sun.crypto.provider.AESCipher$General",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ARCFOURCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ChaCha20Cipher$ChaCha20Poly1305",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESedeCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DHParameters",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.GaloisCounterMode$AESGCM",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HKDFKeyDerivation$HKDFSHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "javax.crypto.KDFParameters"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HmacCore$HmacSHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.PBEKeyFactory$PBEWithMD5AndDES",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.PBES2Core$HmacSHA256AndAES_256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.PBES2Parameters$General",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.PBES2Parameters$HmacSHA256AndAES_256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.TlsMasterSecretGenerator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "com.xiaoniucode.etp.client.TunnelClient$2"
     },
     {
-      "type": "com.xiaoniucode.etp.client.handler.tunnel.ControlTunnelHandler"
+      "type": "com.xiaoniucode.etp.client.transport.ControlFrameHandler"
     },
     {
-      "type": "com.xiaoniucode.etp.core.handler.IdleCheckHandler"
+      "type": "com.xiaoniucode.etp.client.transport.ControlIdleCheckHandler"
+    },
+    {
+      "type": "com.xiaoniucode.etp.client.transport.HeartbeatHandler"
+    },
+    {
+      "type": "com.xiaoniucode.etp.client.transport.TunnelConnectionFactory$1"
+    },
+    {
+      "type": "com.xiaoniucode.etp.core.codec.compress.SnappyDecoder"
+    },
+    {
+      "type": "com.xiaoniucode.etp.core.codec.compress.SnappyEncoder"
+    },
+    {
+      "type": "com.xiaoniucode.etp.core.transport.IdleCheckHandler"
     },
     {
       "type": "io.netty.buffer.AbstractByteBufAllocator"
@@ -82,6 +231,9 @@
     },
     {
       "type": "io.netty.channel.ChannelOutboundBuffer"
+    },
+    {
+      "type": "io.netty.channel.CombinedChannelDuplexHandler"
     },
     {
       "type": "io.netty.channel.DefaultChannelConfig"
@@ -203,16 +355,10 @@
       "jniAccessible": true
     },
     {
-      "type": "io.netty.handler.codec.protobuf.ProtobufDecoder"
+      "type": "io.netty.handler.logging.LoggingHandler"
     },
     {
-      "type": "io.netty.handler.codec.protobuf.ProtobufEncoder"
-    },
-    {
-      "type": "io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder"
-    },
-    {
-      "type": "io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender"
+      "type": "io.netty.handler.ssl.SslHandler"
     },
     {
       "type": "io.netty.util.AbstractReferenceCounted",
@@ -226,13 +372,13 @@
       "type": "io.netty.util.DefaultAttributeMap"
     },
     {
-      "type": "io.netty.util.DefaultAttributeMap$DefaultAttribute"
-    },
-    {
       "type": "io.netty.util.Recycler$DefaultHandle"
     },
     {
       "type": "io.netty.util.ReferenceCountUtil"
+    },
+    {
+      "type": "io.netty.util.ResourceLeakDetector$DefaultResourceLeak"
     },
     {
       "type": "io.netty.util.concurrent.DefaultPromise"
@@ -277,7 +423,7 @@
       ]
     },
     {
-      "type": "io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueConsumerIndexField",
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.unpadded.MpscUnpaddedArrayQueueConsumerIndexField",
       "fields": [
         {
           "name": "consumerIndex"
@@ -285,7 +431,7 @@
       ]
     },
     {
-      "type": "io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueProducerIndexField",
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.unpadded.MpscUnpaddedArrayQueueProducerIndexField",
       "fields": [
         {
           "name": "producerIndex"
@@ -293,7 +439,7 @@
       ]
     },
     {
-      "type": "io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueProducerLimitField",
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.unpadded.MpscUnpaddedArrayQueueProducerLimitField",
       "fields": [
         {
           "name": "producerLimit"
@@ -314,6 +460,9 @@
       "jniAccessible": true
     },
     {
+      "type": "java.lang.BaseVirtualThread"
+    },
+    {
       "type": "java.lang.Boolean",
       "jniAccessible": true,
       "methods": [
@@ -322,6 +471,24 @@
           "parameterTypes": [
             "java.lang.String"
           ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Class",
+      "methods": [
+        {
+          "name": "getModule",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Module",
+      "methods": [
+        {
+          "name": "getDescriptor",
+          "parameterTypes": []
         }
       ]
     },
@@ -351,19 +518,10 @@
       "jniAccessible": true
     },
     {
-      "type": "java.lang.management.ManagementFactory",
+      "type": "java.lang.Thread",
       "methods": [
         {
-          "name": "getRuntimeMXBean",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
-      "type": "java.lang.management.RuntimeMXBean",
-      "methods": [
-        {
-          "name": "getInputArguments",
+          "name": "isVirtual",
           "parameterTypes": []
         }
       ]
@@ -433,6 +591,18 @@
       "type": "java.nio.channels.FileChannel"
     },
     {
+      "type": "java.security.AlgorithmParametersSpi"
+    },
+    {
+      "type": "java.security.KeyStoreSpi"
+    },
+    {
+      "type": "java.security.interfaces.RSAPrivateKey"
+    },
+    {
+      "type": "java.security.interfaces.RSAPublicKey"
+    },
+    {
       "type": "jdk.internal.misc.Unsafe",
       "methods": [
         {
@@ -445,37 +615,19 @@
       "type": "libcore.io.Memory"
     },
     {
-      "type": "org.robolectric.Robolectric"
+      "type": "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider"
     },
     {
-      "type": "sun.management.VMManagementImpl",
-      "jniAccessible": true,
-      "fields": [
-        {
-          "name": "compTimeMonitoringSupport"
-        },
-        {
-          "name": "currentThreadCpuTimeSupport"
-        },
-        {
-          "name": "objectMonitorUsageSupport"
-        },
-        {
-          "name": "otherThreadCpuTimeSupport"
-        },
-        {
-          "name": "remoteDiagnosticCommandsSupport"
-        },
-        {
-          "name": "synchronizerUsageSupport"
-        },
-        {
-          "name": "threadAllocatedMemorySupport"
-        },
-        {
-          "name": "threadContentionMonitoringSupport"
-        }
-      ]
+      "type": "org.bouncycastle.jce.provider.BouncyCastleProvider"
+    },
+    {
+      "type": "org.bouncycastle.jsse.provider.BouncyCastleJsseProvider"
+    },
+    {
+      "type": "org.bouncycastle.openssl.PEMParser"
+    },
+    {
+      "type": "org.robolectric.Robolectric"
     },
     {
       "type": "sun.misc.Unsafe",
@@ -494,14 +646,47 @@
       ]
     },
     {
-      "type": "sun.misc.VM"
-    },
-    {
       "type": "sun.nio.ch.FileChannelImpl",
       "jniAccessible": true,
       "fields": [
         {
           "name": "fd"
+        }
+      ]
+    },
+    {
+      "type": "sun.security.pkcs12.PKCS12KeyStore",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.pkcs12.PKCS12KeyStore$DualFormatPKCS12",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.DSA$SHA224withDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.DSA$SHA256withDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
         }
       ]
     },
@@ -526,6 +711,264 @@
       ]
     },
     {
+      "type": "sun.security.provider.SHA2$SHA224",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA2$SHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA5$SHA384",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA5$SHA512",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.X509Factory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.certpath.PKIXCertPathValidator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.PSSParameters",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSAKeyFactory$Legacy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSAPSSSignature",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSASignature$SHA224withRSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSASignature$SHA256withRSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.KeyManagerFactoryImpl$SunX509",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.SSLContextImpl$TLSContext",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.AuthorityInfoAccessExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.AuthorityKeyIdentifierExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.BasicConstraintsExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.CRLDistributionPointsExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.CertificatePoliciesExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.ExtendedKeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.KeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.NetscapeCertTypeExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.PrivateKeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.SubjectAlternativeNameExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.SubjectKeyIdentifierExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
       "type": "sun.text.resources.cldr.FormatData"
     },
     {
@@ -533,6 +976,15 @@
     },
     {
       "type": "sun.text.resources.cldr.FormatData_en_US"
+    },
+    {
+      "type": "sun.util.resources.cldr.TimeZoneNames"
+    },
+    {
+      "type": "sun.util.resources.cldr.TimeZoneNames_en"
+    },
+    {
+      "type": "sun.util.resources.cldr.TimeZoneNames_en_US"
     }
   ],
   "resources": [
@@ -544,6 +996,12 @@
     },
     {
       "glob": "META-INF/services/ch.qos.logback.classic.spi.Configurator"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.InetAddressResolverProvider"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.URLStreamHandlerProvider"
     },
     {
       "glob": "META-INF/services/java.nio.channels.spi.SelectorProvider"
@@ -565,6 +1023,14 @@
     },
     {
       "glob": "logback.xml"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt76b/nfc.nrm"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt76b/nfkc.nrm"
     }
   ]
 }

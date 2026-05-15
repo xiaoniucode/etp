@@ -16,12 +16,13 @@
 
 package com.xiaoniucode.etp.server.web.core.repository;
 
+import com.xiaoniucode.etp.server.service.repository.TokenQueryRepository;
 import com.xiaoniucode.etp.server.web.repository.AccessTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
-@Repository
-public class TokenQueryRepository implements com.xiaoniucode.etp.server.service.repository.TokenQueryRepository {
+@Component
+public class StandaloneTokenQueryRepository implements TokenQueryRepository {
     @Autowired
     private AccessTokenRepository accessTokenRepository;
 

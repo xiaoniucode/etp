@@ -26,11 +26,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @Entity
-@Table(name = "http_proxy_domain",
-        indexes = {
-                @Index(name = "idx_proxy_id", columnList = "proxy_id")
-        }
-)
+@Table(name = "http_proxy_domain")
 @NoArgsConstructor
 public class ProxyDomainDO {
     /**

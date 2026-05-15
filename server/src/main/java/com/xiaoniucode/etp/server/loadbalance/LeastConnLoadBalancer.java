@@ -16,20 +16,10 @@ public final class LeastConnLoadBalancer implements LoadBalancer {
      */
     private final LeastConnectionCounter counter;
 
-    /**
-     * 构造方法
-     * @param counter 连接数计数器
-     */
     public LeastConnLoadBalancer(LeastConnectionCounter counter) {
         this.counter = Objects.requireNonNull(counter, "counter");
     }
 
-    /**
-     * 选择目标服务器
-     * @param proxyId 代理ID
-     * @param targets 目标服务器列表
-     * @return 选中的目标服务器
-     */
     @Override
     public Target select(String proxyId, List<Target> targets) {
         if (targets == null || targets.isEmpty()) return null;

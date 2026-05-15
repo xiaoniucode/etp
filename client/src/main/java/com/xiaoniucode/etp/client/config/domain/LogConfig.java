@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.client.config.domain;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
