@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.transport.IpCheckHandler;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
+import com.xiaoniucode.etp.server.utils.NetUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -26,8 +27,8 @@ public class TcpIpCheckHandler extends IpCheckHandler {
     private ProxyConfigService proxyConfigService;
 
     @Autowired
-    public TcpIpCheckHandler(IpAccessChecker ipAccessChecker,StreamManager streamManager) {
-        super(ipAccessChecker,streamManager);
+    public TcpIpCheckHandler(IpAccessChecker ipAccessChecker, StreamManager streamManager) {
+        super(ipAccessChecker, streamManager);
     }
 
     @Override
@@ -35,10 +36,12 @@ public class TcpIpCheckHandler extends IpCheckHandler {
         logger.debug("IP访问控制检查");
         Channel visitor = ctx.channel();
         int remotePort = getListenerPort(visitor);
+        String visitorIp = NetUtils.getIp(visitor);
         Optional<ProxyConfig> opt = proxyConfigService.findByListenPort(remotePort);
         if (opt.isPresent()) {
-            if (doCheckAccess(visitor, opt.get())) {
-                logger.debug("访问权限检查通过，放行");
+            if (!doCheckAccess(visitor, opt.get())) {
+                logger.debug("{} 没有访问权限", visitorIp);
+                return;
             }
         }
         ctx.fireChannelActive();

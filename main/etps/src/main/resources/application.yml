@@ -1,17 +1,34 @@
 spring:
   datasource:
-    url: jdbc:h2:file:./etp;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: jdbc:mysql://localhost:3306/etp?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 12345678
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
-        use_sql_comments: false
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: false
+#  datasource:
+#    url: jdbc:h2:file:./etp;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+#    driver-class-name: org.h2.Driver
+#    username: sa
+#    password:
+#  jpa:
+#    hibernate:
+#      ddl-auto: create-drop
+#    show-sql: false
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.H2Dialect
+#        use_sql_comments: false
 logging:
   level:
     com.xiaoniucode.etp: debug

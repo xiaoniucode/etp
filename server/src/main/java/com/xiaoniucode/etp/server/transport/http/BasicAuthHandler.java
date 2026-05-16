@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.transport.http;
 
 import com.xiaoniucode.etp.core.domain.HttpUser;
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
+import java.util.Optional;
 
 @Component
 @ChannelHandler.Sharable
@@ -32,7 +34,9 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel visitor = ctx.channel();
         String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
-        proxyConfigService.findByDomain(domain).ifPresent(config -> {
+        Optional<ProxyConfig> configOpt = proxyConfigService.findByDomain(domain);
+        if(configOpt.isPresent()){
+            ProxyConfig config = configOpt.get();
             String basicAuthHeader = visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).get();
             BasicAuthConfig basicAuth = config.getBasicAuth();
             if (basicAuth != null && basicAuth.isEnabled()) {
@@ -50,16 +54,19 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
                         String password = parts[1];
                         if (!check(username, password, basicAuth)) {
                             sendBasicAuth(visitor);
+                            return;
                         }
                     } else {
                         sendBasicAuth(visitor);
+                        return;
                     }
                 } catch (Exception e) {
                     logger.debug("Basic Auth 解码失败: {}", e.getMessage());
                     sendBasicAuth(visitor);
+                    return;
                 }
             }
-        });
+        }
         ctx.fireChannelRead(msg);
     }
 

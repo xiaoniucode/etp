@@ -22,6 +22,7 @@ import com.xiaoniucode.etp.server.config.domain.DashboardConfig;
 import com.xiaoniucode.etp.server.config.ConfigParser;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -31,8 +32,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author liuxin
  */
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = {"com.xiaoniucode.etp"})
-@EnableJpaRepositories(basePackages = {"com.xiaoniucode.etp.server.web.repository"})
+@SpringBootApplication
+@ComponentScan("com.xiaoniucode.etp")
+@EnableJpaRepositories(basePackages = "com.xiaoniucode.etp.server.web.repository")
 public class TunnelServerStartup {
     public static void main(String[] args) {
         Debugger.enableDebug();
