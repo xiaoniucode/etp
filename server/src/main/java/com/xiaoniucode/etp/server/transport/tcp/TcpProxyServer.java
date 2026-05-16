@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.transport.tcp;
 
+import com.xiaoniucode.etp.core.transport.IdleCheckHandler;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
@@ -75,10 +76,13 @@ public final class TcpProxyServer implements Lifecycle {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
-                        sc.pipeline().addLast(new VisitorInfoDecoder());
-                        sc.pipeline().addLast(tcpIpCheckHandler);
-                        sc.pipeline().addLast(uploadRateLimitHandler);
-                        sc.pipeline().addLast(NettyConstants.TCP_VISITOR_HANDLER, tcpVisitorHandler);
+                        ChannelPipeline pipeline = sc.pipeline();
+
+                        pipeline.addLast(new IdleCheckHandler());
+                        pipeline.addLast(new VisitorInfoDecoder());
+                        pipeline.addLast(tcpIpCheckHandler);
+                        pipeline.addLast(uploadRateLimitHandler);
+                        pipeline.addLast(NettyConstants.TCP_VISITOR_HANDLER, tcpVisitorHandler);
                     }
                 });
         init.set(true);

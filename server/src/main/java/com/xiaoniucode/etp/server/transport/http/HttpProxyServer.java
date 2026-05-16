@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.transport.http;
 
+import com.xiaoniucode.etp.core.transport.IdleCheckHandler;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.server.Lifecycle;
@@ -28,6 +29,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import jakarta.annotation.PostConstruct;
@@ -74,12 +76,14 @@ public class HttpProxyServer implements Lifecycle {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
-                            sc.pipeline().addLast(new VisitorInfoDecoder());
-                            sc.pipeline().addLast(new HeaderInjectDecoder());
-                            sc.pipeline().addLast(httpIpCheckHandler);
-                            sc.pipeline().addLast(uploadRateLimitHandler);
-                            sc.pipeline().addLast(basicAuthHandler);
-                            sc.pipeline().addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);
+                            ChannelPipeline pipeline = sc.pipeline();
+                            pipeline.addLast(new IdleCheckHandler());
+                            pipeline.addLast(new VisitorInfoDecoder());
+                            pipeline.addLast(new HeaderInjectDecoder());
+                            pipeline.addLast(httpIpCheckHandler);
+                            pipeline.addLast(uploadRateLimitHandler);
+                            pipeline.addLast(basicAuthHandler);
+                            pipeline.addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);
                         }
                     });
             serverBootstrap.bind(httpProxyPort).syncUninterruptibly().get();

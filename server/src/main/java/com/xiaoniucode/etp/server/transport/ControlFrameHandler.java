@@ -189,6 +189,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
            //todo agentContext.fireEvent(AgentEvent.DISCONNECT);
             agentContext.fireEvent(AgentEvent.LOCAL_GOAWAY);
         });
+        //todo 需要处理数据连接断开
     }
 
     @Override
@@ -196,10 +197,12 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
             logger.error("控制连接异常: ", cause);
         });
+        //todo 数据连接异常
     }
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) {
+        //todo 数据连接 控制连接
         Channel tunnel = ctx.channel();
         boolean writable = tunnel.isWritable();
         logger.warn("控制隧道可写性变化：{}", writable);
