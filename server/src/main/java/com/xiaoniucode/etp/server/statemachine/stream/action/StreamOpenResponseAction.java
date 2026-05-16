@@ -63,7 +63,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         TunnelBridge tunnelBridge;
         if (context.isMultiplex()) {
             tunnelBridge = TunnelBridgeFactory.buildMux(context);
-            logger.debug("共享隧道建立成功，访问目标: {}", context.getCurrentTarget());
+            logger.debug("共享隧道建立成功，访问目标: {}", context.getTarget());
         } else {
             tunnelBridge = TunnelBridgeFactory.buildDirect(context);
             logger.debug("独立隧道建立成功，隧道ID: {}", tunnelEntry.getTunnelId());
@@ -79,7 +79,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         //增加连接数量，用于监控统计
         metricsCollector.onChannelActive(context.getProxyId());
         //如果是 HTTP协议需要发送首次建立建立的时候读取到的第一个包
-        if (context.getCurrentProtocol().isHttp()) {
+        if (context.getProtocol().isHttp()) {
             relayHttpFirstPackage(context,visitor, tunnelBridge);
         }
         visitor.config().setOption(ChannelOption.AUTO_READ, true);

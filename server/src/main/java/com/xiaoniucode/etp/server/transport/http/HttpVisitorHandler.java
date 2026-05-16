@@ -40,7 +40,9 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 if (!tunnel.isWritable()) {
                     logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
                     visitor.config().setOption(ChannelOption.AUTO_READ, false);
-                    streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
+                    if (tunnelEntry.getTunnelType().isMultiplex()){
+                        streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
+                    }
                 }
                 streamContext.forwardToLocal(buf);
             } else {
@@ -50,7 +52,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             logger.debug("[HTTP] 创建流上下文");
             visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(buf.retain());
             StreamContext streamContext = streamManager.createStreamContext(visitor, stateMachine);
-            streamContext.setCurrentProtocol(ProtocolType.HTTP);
+            streamContext.setProtocol(ProtocolType.HTTP);
             streamContext.setStreamManager(streamManager);
             streamContext.fireEvent(StreamEvent.STREAM_OPEN);
         }
@@ -86,6 +88,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             if (tunnel != null) {
                 logger.warn("流量过高，触发背压");
                 boolean writable = visitor.isWritable();
+                //todo 需要优化，一个流会导致所有流暂停
                 tunnel.config().setOption(ChannelOption.AUTO_READ, writable);
                 if (writable) {
                     tunnel.read();

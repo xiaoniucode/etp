@@ -33,7 +33,7 @@ public class StreamOpenAction extends StreamBaseAction {
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
-        Target target = context.getCurrentTarget();
+        Target target = context.getTarget();
         ByteBuf payload = control.alloc().buffer();
         NewStreamCodec.encode(payload, target.getHost(), target.getPort());
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN, payload);

@@ -73,13 +73,18 @@ public class StreamManager {
 
     public void removeStreamContext(int streamId) {
         StreamContext streamContext = visitors.remove(streamId);
-        String proxyId = streamContext.getProxyId();
-        //关闭代理连接计数
-        if (StringUtils.hasText(proxyId)) {
-            decrementStreamCount(proxyId);
+        if (!Objects.isNull(streamContext)) {
+            String proxyId = streamContext.getProxyId();
+            //关闭代理连接计数
+            if (StringUtils.hasText(proxyId)) {
+                decrementStreamCount(proxyId);
+            }
+            //清理所有索引映射
+            cleanupIndexes(streamContext);
+        } else {
+            logger.warn("删除流上下文失败，流 {} 不存在 ", streamId);
         }
-        //清理所有索引映射
-        cleanupIndexes(streamContext);
+
     }
 
     /**
@@ -91,7 +96,7 @@ public class StreamManager {
         }
 
         int streamId = context.getStreamId();
-        ProtocolType protocol = context.getCurrentProtocol();
+        ProtocolType protocol = context.getProtocol();
         // 清理端口索引
         if (protocol.isTcp()) {
             Integer listenerPort = context.getListenerPort();
@@ -152,7 +157,7 @@ public class StreamManager {
             return;
         }
         int streamId = context.getStreamId();
-        ProtocolType protocol = context.getCurrentProtocol();
+        ProtocolType protocol = context.getProtocol();
         if (protocol.isHttp()) {
             //处理域名映射 仅限HTTP 代理
             String domain = context.getVisitorDomain();

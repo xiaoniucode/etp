@@ -39,4 +39,12 @@ public enum TunnelType {
         }
         return null;
     }
+
+    public boolean isMultiplex() {
+        return this == MULTIPLEX;
+    }
+
+    public boolean isDirect() {
+        return this == DIRECT;
+    }
 }

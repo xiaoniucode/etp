@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.client.transport.connection;
 
 import com.xiaoniucode.etp.client.common.UUIDGenerator;
-import com.xiaoniucode.etp.core.transport.NettyBatchWriteQueue;
+import com.xiaoniucode.etp.core.enums.TunnelType;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
@@ -33,7 +33,8 @@ public class MultiplexPool {
             return null;
         }
         String tunnelId = UUIDGenerator.generate();
-        TunnelEntry tunnelEntry = new TunnelEntry(tunnelId, isTls, tunnel, NettyBatchWriteQueue.createWriteQueue(tunnel));
+        //NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
+        TunnelEntry tunnelEntry = new TunnelEntry(tunnelId, isTls, tunnel, TunnelType.MULTIPLEX);
         if (isTls) {
             this.tlsTunnelEntry = tunnelEntry;
         } else {

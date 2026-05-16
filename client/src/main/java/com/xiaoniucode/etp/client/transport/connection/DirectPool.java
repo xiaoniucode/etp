@@ -1,7 +1,7 @@
 package com.xiaoniucode.etp.client.transport.connection;
 
 import com.xiaoniucode.etp.client.common.UUIDGenerator;
-import com.xiaoniucode.etp.core.transport.NettyBatchWriteQueue;
+import com.xiaoniucode.etp.core.enums.TunnelType;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
@@ -11,7 +11,6 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -75,8 +74,8 @@ public class DirectPool {
             return null;
         }
         String tunnelId = UUIDGenerator.generate();
-        NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(channel);
-        TunnelEntry tunnelEntry = new TunnelEntry(tunnelId, isEncrypt, channel, writeQueue);
+        //NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(channel);
+        TunnelEntry tunnelEntry = new TunnelEntry(tunnelId, isEncrypt, channel, TunnelType.DIRECT);
         if (isEncrypt) {
             encryptTunnels.putIfAbsent(tunnelId, tunnelEntry);
         } else {

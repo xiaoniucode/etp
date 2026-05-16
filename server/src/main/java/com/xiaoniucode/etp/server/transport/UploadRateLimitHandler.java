@@ -68,7 +68,7 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
 
         if (waitMillis > MAX_WAIT_MS) {
             logger.debug("访问速度过快，触发强限流（直接拒绝）：streamId={} wait={}ms", streamContext.getStreamId(), waitMillis);
-            ProtocolType protocol = streamContext.getCurrentProtocol();
+            ProtocolType protocol = streamContext.getProtocol();
             if (protocol.isHttp()) {
                 //响应HTTP 上传时发 429
                 NettyHttpUtils.sendHttpTooManyRequests(visitor)

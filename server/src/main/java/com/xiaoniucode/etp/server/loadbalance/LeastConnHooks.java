@@ -17,7 +17,7 @@ public final class LeastConnHooks {
 
     public void onStreamOpened(StreamContext ctx) {
         ProxyConfig pc = ctx.getProxyConfig();
-        Target t = ctx.getCurrentTarget();
+        Target t = ctx.getTarget();
         if (pc == null || pc.getProxyId() == null || t == null ||
                 t.getHost() == null || t.getPort() == null) {
             return;

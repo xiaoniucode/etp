@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.transport.tcp;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
@@ -35,8 +36,9 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         logger.debug("[TCP]收到访问者请求");
         Channel visitor = ctx.channel();
         StreamContext streamContext = streamManager.createStreamContext(visitor, stateMachine);
-        streamContext.setCurrentProtocol(ProtocolType.TCP);
+        streamContext.setProtocol(ProtocolType.TCP);
         streamContext.setStreamManager(streamManager);
+
         streamContext.fireEvent(StreamEvent.STREAM_OPEN);
         ctx.fireChannelActive();
     }
@@ -45,22 +47,28 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
         Channel visitor = ctx.channel();
         Optional<StreamContext> contextOpt = streamManager.getStreamContext(visitor);
-        contextOpt.ifPresent(streamContext -> {
-                    TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
-                    if (tunnelEntry==null){
-                        logger.error("tunnel entry is null");
-                        return;
-                    }
-                    Channel tunnel = tunnelEntry.getChannel();
-                    if (!tunnel.isWritable()) {
-                        logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
-                        visitor.config().setOption(ChannelOption.AUTO_READ, false);
-                        streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
-                    }
-                    logger.debug("[TCP] 流 {} 引用计数为：{}",streamContext.getStreamId(),msg.refCnt());
-                    streamContext.forwardToLocal(msg);
+        if (contextOpt.isPresent()) {
+            StreamContext streamContext = contextOpt.get();
+            TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
+            if (tunnelEntry == null) {
+                logger.error("隧道连接不存在，关闭流：", streamContext.getStreamId());
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                return;
+            }
+            Channel tunnel = tunnelEntry.getChannel();
+            if (!tunnel.isWritable()) {
+                logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
+                visitor.config().setOption(ChannelOption.AUTO_READ, false);
+                if (tunnelEntry.getTunnelType().isMultiplex()){
+                    streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
                 }
-        );
+            }
+            logger.debug("[TCP] 流 {} 引用计数为：{}", streamContext.getStreamId(), msg.refCnt());
+            streamContext.forwardToLocal(msg);
+        } else {
+            logger.warn("没有找到流上下文，关闭连接");
+            ChannelUtils.closeOnFlush(visitor);
+        }
     }
 
     @Override
@@ -79,6 +87,7 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             Channel tunnel = streamContext.getTunnelEntry().getChannel();
             if (tunnel != null) {
                 boolean writable = visitor.isWritable();
+                //todo 需要优化，一个流会导致所有流暂停
                 tunnel.config().setOption(ChannelOption.AUTO_READ, writable);
                 if (writable) {
                     tunnel.read();

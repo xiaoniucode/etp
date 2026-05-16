@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
+import com.xiaoniucode.etp.core.enums.TunnelType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
@@ -73,18 +74,18 @@ public class CreateConnectionAction extends AgentBaseAction {
         if (tunnelId == null) {
             throw new IllegalArgumentException("tunnelId 不能为空");
         }
-        if (!tunnel.isActive()){
+        if (!tunnel.isActive()) {
             throw new IllegalArgumentException("连接不可用，连接池创建失败");
         }
         logger.debug("创建隧道 客户端ID={} 隧道ID={} 加密={} 多路复用={}", agentId, tunnelId, isEncrypt, isMultiplex);
-        NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
-        TunnelEntry poolEntry = new TunnelEntry(tunnelId, isEncrypt, tunnel, writeQueue);
+        // NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
+        TunnelEntry poolEntry = new TunnelEntry(tunnelId, isEncrypt, tunnel, isMultiplex ? TunnelType.MULTIPLEX : TunnelType.DIRECT);
         poolEntry.setActive(true);
         if (isMultiplex) {
             PipelineConfigure.removeControlIdleCheckHandler(tunnel);
             ChannelPipeline pipeline = tunnel.pipeline();
-            if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER)==null){
-                pipeline.addBefore(NettyConstants.CONTROL_FRAME_HANDLER,NettyConstants.IDLE_CHECK_HANDLER,new IdleCheckHandler());
+            if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER) == null) {
+                pipeline.addBefore(NettyConstants.CONTROL_FRAME_HANDLER, NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler());
             }
             multiplexConnectionPool.setChannel(agentId, isEncrypt, poolEntry);
         } else {

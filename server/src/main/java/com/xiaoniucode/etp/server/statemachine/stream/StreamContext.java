@@ -23,8 +23,8 @@ public class StreamContext extends AbstractStreamContext {
     private Channel visitor;
     private ProxyConfig proxyConfig;
     private String sourceAddress;
-    private Target currentTarget;
-    private ProtocolType currentProtocol = ProtocolType.TCP;
+    private Target target;
+    private ProtocolType protocol = ProtocolType.TCP;
     private BandwidthLimiter bandwidthLimiter;
     private AgentContext agentContext;
     private StreamManager streamManager;

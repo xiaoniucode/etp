@@ -69,7 +69,7 @@ public class TargetResolverAction extends StreamBaseAction {
             }
             context.setCompress(config.isCompress());
             context.setEncrypt(config.isEncrypt());
-            context.setCurrentTarget(selectedTarget);
+            context.setTarget(selectedTarget);
             context.fireEvent(StreamEvent.TARGET_VALIDATED);
         } else {
             logger.debug("代理 {} 客户端不可用，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
@@ -111,11 +111,11 @@ public class TargetResolverAction extends StreamBaseAction {
     }
 
     private ProxyConfig resolveProxyConfig(StreamContext context) {
-        if (context.getCurrentProtocol() == ProtocolType.HTTP) {
+        if (context.getProtocol() == ProtocolType.HTTP) {
             String domain = context.getVisitorDomain();
             String proxyId = domainRouter.route(domain);
             return proxyConfigService.findById(proxyId).orElse(null);
-        } else if (context.getCurrentProtocol() == ProtocolType.TCP) {
+        } else if (context.getProtocol() == ProtocolType.TCP) {
             int remotePort = context.getListenerPort();
             return proxyConfigService.findByListenPort(remotePort).orElse(null);
         }

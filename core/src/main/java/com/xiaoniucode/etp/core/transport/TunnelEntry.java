@@ -15,6 +15,7 @@
  */
 package com.xiaoniucode.etp.core.transport;
 
+import com.xiaoniucode.etp.core.enums.TunnelType;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,15 +25,21 @@ import lombok.Setter;
 public class TunnelEntry {
     private String tunnelId;
     private boolean active;
+    private TunnelType tunnelType;
     private boolean encrypt;
     private Channel channel;
     private NettyBatchWriteQueue writeQueue;
 
-    public TunnelEntry(String tunnelId, boolean encrypt, Channel channel, NettyBatchWriteQueue writeQueue) {
+    public TunnelEntry(String tunnelId, boolean encrypt, Channel channel, TunnelType tunnelType, NettyBatchWriteQueue writeQueue) {
         this.tunnelId = tunnelId;
         this.channel = channel;
         this.encrypt = encrypt;
+        this.tunnelType = tunnelType;
         this.writeQueue = writeQueue;
+    }
+
+    public TunnelEntry(String tunnelId, boolean encrypt, Channel channel, TunnelType tunnelType) {
+        this(tunnelId, encrypt, channel, tunnelType, null);
     }
 
     public boolean isActive() {
