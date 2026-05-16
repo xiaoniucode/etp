@@ -157,7 +157,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 case TMSP.MSG_STREAM_DATA -> {
                     int streamId = frame.getStreamId();
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
-                    if (streamContext != null) {
+                    if (streamContext != null && streamContext.getState() == StreamState.OPENED) {
                         streamContext.forwardToRemote(frame.getPayload());
                     }
                 }
@@ -169,6 +169,24 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         streamContext.fireEvent(StreamEvent.STREAM_REMOTE_CLOSE);
                     }
                 }
+                //暂停流
+                case TMSP.MSG_STREAM_PAUSE -> {
+                    int streamId = frame.getStreamId();
+                    logger.debug("收到来自远程暂停流 {} 消息", streamId);
+                    StreamContext streamContext = streamManager.getStreamContext(streamId);
+                    if (streamContext != null) {
+                        streamContext.fireEvent(StreamEvent.STREAM_REMOTE_PAUSE);
+                    }
+                }
+                //恢复流
+                case TMSP.MSG_STREAM_RESUME -> {
+                    int streamId = frame.getStreamId();
+                    logger.debug("收到来自远程恢复流 {} 消息", streamId);
+                    StreamContext streamContext = streamManager.getStreamContext(streamId);
+                    if (streamContext != null) {
+                        streamContext.fireEvent(StreamEvent.STREAM_REMOTE_RESUME);
+                    }
+                }
                 case TMSP.MSG_PROXY_CREATE -> {
                     agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
                         Message.NewProxy newProxy = ProtobufUtil.parseFrom(frame.getPayload(), Message.NewProxy.parser());
@@ -176,6 +194,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
                     });
                 }
+
             }
         } catch (Exception e) {
             logger.error(e);
@@ -186,7 +205,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     public void channelInactive(ChannelHandlerContext ctx) {
         agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
             logger.debug("与客户端断开连接");
-           //todo agentContext.fireEvent(AgentEvent.DISCONNECT);
+            //todo agentContext.fireEvent(AgentEvent.DISCONNECT);
             agentContext.fireEvent(AgentEvent.LOCAL_GOAWAY);
         });
         //todo 需要处理数据连接断开

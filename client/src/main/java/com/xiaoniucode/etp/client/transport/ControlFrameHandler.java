@@ -17,10 +17,7 @@ package com.xiaoniucode.etp.client.transport;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.client.statemachine.stream.StreamConstants;
-import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
-import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
-import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
+import com.xiaoniucode.etp.client.statemachine.stream.*;
 import com.xiaoniucode.etp.core.codec.NewStreamCodec;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
@@ -48,10 +45,12 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     public ControlFrameHandler(AgentContext agentContext) {
         this.agentContext = agentContext;
     }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         ctx.fireChannelActive();
     }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
         byte msgType = frame.getMsgType();
@@ -118,7 +117,9 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             case TMSP.MSG_STREAM_DATA: {
                 int streamId = frame.getStreamId();
                 StreamManager.getStreamContext(streamId).ifPresent(streamContext -> {
-                    streamContext.forwardToLocal(frame.getPayload());
+                    if (streamContext.getState() == StreamState.OPENED) {
+                        streamContext.forwardToLocal(frame.getPayload());
+                    }
                 });
                 break;
             }
@@ -126,8 +127,28 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 logger.debug("收到来自远程关闭流消息");
                 StreamManager.getStreamContext(frame.getStreamId())
                         .ifPresent(streamContext -> {
-                    streamContext.fireEvent(StreamEvent.STREAM_REMOTE_CLOSE);
-                });
+                            streamContext.fireEvent(StreamEvent.STREAM_REMOTE_CLOSE);
+                        });
+                break;
+            }
+            //暂停流
+            case TMSP.MSG_STREAM_PAUSE: {
+                int streamId = frame.getStreamId();
+                logger.debug("收到来自远程暂停流 {} 消息", streamId);
+                StreamManager.getStreamContext(streamId)
+                        .ifPresent(streamContext -> {
+                            streamContext.fireEvent(StreamEvent.STREAM_REMOTE_PAUSE);
+                        });
+                break;
+            }
+            //恢复流
+            case TMSP.MSG_STREAM_RESUME: {
+                int streamId = frame.getStreamId();
+                logger.debug("收到来自远程恢复流 {} 消息", streamId);
+                StreamManager.getStreamContext(streamId)
+                        .ifPresent(streamContext -> {
+                            streamContext.fireEvent(StreamEvent.STREAM_REMOTE_RESUME);
+                        });
                 break;
             }
         }

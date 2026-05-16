@@ -34,7 +34,17 @@ public enum StreamEvent {
      * 来自远程的关闭流
      */
     STREAM_REMOTE_CLOSE,
+    /**
+     * 本地主动流控
+     */
+    STREAM_LOCAL_PAUSE,
+    STREAM_LOCAL_RESUME,
 
+    /**
+     * 远端通知流控
+     */
+    STREAM_REMOTE_PAUSE,
+    STREAM_REMOTE_RESUME,
     /**
      * 收到重置流通知
      */

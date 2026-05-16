@@ -6,6 +6,8 @@ import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.xiaoniucode.etp.client.statemachine.stream.action.StreamCloseAction;
 import com.xiaoniucode.etp.client.statemachine.stream.action.StreamOpenAction;
+import com.xiaoniucode.etp.client.statemachine.stream.action.StreamPauseAction;
+import com.xiaoniucode.etp.client.statemachine.stream.action.StreamResumeAction;
 
 /**
  * 客户端流状态机构建器
@@ -29,12 +31,13 @@ public class StreamStateMachineBuilder {
 
         /**
          * 构建状态机
+         *
          * @return 构建好的状态机实例
          */
         private static StateMachine<StreamState, StreamEvent, StreamContext> build() {
-            StateMachineBuilder<StreamState, StreamEvent, StreamContext> builder = 
-                    StateMachineBuilderFactory.create();
-
+            StateMachineBuilder<StreamState, StreamEvent, StreamContext> builder = StateMachineBuilderFactory.create();
+            StreamPauseAction streamPauseAction = new StreamPauseAction();
+            StreamResumeAction streamResumeAction = new StreamResumeAction();
             // 打开流
             builder.externalTransition()
                     .from(StreamState.IDLE)
@@ -50,7 +53,33 @@ public class StreamStateMachineBuilder {
                     .on(StreamEvent.STREAM_OPEN_SUCCESS)
                     .when(ctx -> true)
                     .perform((from, to, event, context) -> context.setState(to));
+            // 暂停流
+            builder.externalTransition()
+                    .from(StreamState.OPENED)
+                    .to(StreamState.PAUSED)
+                    .on(StreamEvent.STREAM_LOCAL_PAUSE)
+                    .when(ctx -> true)
+                    .perform(streamPauseAction);
+            builder.externalTransition()
+                    .from(StreamState.OPENED)
+                    .to(StreamState.PAUSED)
+                    .on(StreamEvent.STREAM_REMOTE_PAUSE)
+                    .when(ctx -> true)
+                    .perform(streamPauseAction);
 
+            //恢复流
+            builder.externalTransition()
+                    .from(StreamState.PAUSED)
+                    .to(StreamState.OPENED)
+                    .on(StreamEvent.STREAM_LOCAL_RESUME)
+                    .when(ctx -> true)
+                    .perform(streamResumeAction);
+            builder.externalTransition()
+                    .from(StreamState.PAUSED)
+                    .to(StreamState.OPENED)
+                    .on(StreamEvent.STREAM_REMOTE_RESUME)
+                    .when(ctx -> true)
+                    .perform(streamResumeAction);
             // 本地关闭流
             builder.externalTransitions()
                     .fromAmong(StreamState.OPENED, StreamState.OPENING, StreamState.FAILED)
@@ -74,6 +103,7 @@ public class StreamStateMachineBuilder {
 
     /**
      * 获取状态机实例
+     *
      * @return 状态机实例
      */
     public static StateMachine<StreamState, StreamEvent, StreamContext> getStateMachine() {

@@ -6,10 +6,7 @@ import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
-import com.xiaoniucode.etp.server.statemachine.stream.action.TargetResolverAction;
-import com.xiaoniucode.etp.server.statemachine.stream.action.StreamCloseAction;
-import com.xiaoniucode.etp.server.statemachine.stream.action.StreamOpenAction;
-import com.xiaoniucode.etp.server.statemachine.stream.action.StreamOpenResponseAction;
+import com.xiaoniucode.etp.server.statemachine.stream.action.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -44,8 +41,15 @@ public class StreamStateMachineConfig {
     @Autowired
     private StreamCloseAction streamCloseAction;
 
+    @Autowired
+    private StreamPauseAction streamPauseAction;
+
+    @Autowired
+    private StreamResumeAction streamResumeAction;
+
     /**
      * 创建流状态机
+     *
      * @return 流状态机实例
      */
     @Bean("streamStateMachine")
@@ -73,7 +77,32 @@ public class StreamStateMachineConfig {
                 .on(StreamEvent.STREAM_OPEN_SUCCESS)
                 .when(ctx -> true)
                 .perform(streamOpenResponseAction);
-
+        // 暂停流
+        builder.externalTransition()
+                .from(StreamState.OPENED)
+                .to(StreamState.PAUSED)
+                .on(StreamEvent.STREAM_LOCAL_PAUSE)
+                .when(ctx -> true)
+                .perform(streamPauseAction);
+        builder.externalTransition()
+                .from(StreamState.OPENED)
+                .to(StreamState.PAUSED)
+                .on(StreamEvent.STREAM_REMOTE_PAUSE)
+                .when(ctx -> true)
+                .perform(streamPauseAction);
+        // 恢复流
+        builder.externalTransition()
+                .from(StreamState.PAUSED)
+                .to(StreamState.OPENED)
+                .on(StreamEvent.STREAM_LOCAL_RESUME)
+                .when(ctx -> true)
+                .perform(streamResumeAction);
+        builder.externalTransition()
+                .from(StreamState.PAUSED)
+                .to(StreamState.OPENED)
+                .on(StreamEvent.STREAM_REMOTE_RESUME)
+                .when(ctx -> true)
+                .perform(streamResumeAction);
         // 打开流失败
         builder.externalTransition()
                 .from(StreamState.OPENING)
@@ -84,7 +113,7 @@ public class StreamStateMachineConfig {
 
         // 本地关闭流事件
         builder.externalTransitions()
-                .fromAmong(StreamState.OPENED, StreamState.FAILED, StreamState.OPENING)
+                .fromAmong(StreamState.OPENED, StreamState.FAILED, StreamState.OPENING, StreamState.PAUSED)
                 .to(StreamState.CLOSED)
                 .on(StreamEvent.STREAM_LOCAL_CLOSE)
                 .when(ctx -> true)
@@ -92,7 +121,7 @@ public class StreamStateMachineConfig {
 
         // 来自远程的关闭流事件
         builder.externalTransitions()
-                .fromAmong(StreamState.OPENED, StreamState.FAILED, StreamState.OPENING)
+                .fromAmong(StreamState.OPENED, StreamState.FAILED, StreamState.OPENING, StreamState.PAUSED)
                 .to(StreamState.CLOSED)
                 .on(StreamEvent.STREAM_REMOTE_CLOSE)
                 .when(ctx -> true)

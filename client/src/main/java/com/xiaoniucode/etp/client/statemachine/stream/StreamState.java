@@ -15,7 +15,10 @@ public enum StreamState {
      * 已打开
      */
     OPENED,
-    
+    /**
+     * 暂停
+     */
+    PAUSED,
     /**
      * 关闭状态
      */

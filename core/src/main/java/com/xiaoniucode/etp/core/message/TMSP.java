@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.core.message;
 
 /**
  * TMSP (Tunnel Multiplexed Stream Protocol)
- * 多路复用流协议
+ * TCP多路复用流协议
  */
 public class TMSP {
     public static final String PROTOCOL_NAME = "TMSP";
@@ -23,8 +23,7 @@ public class TMSP {
     public static final byte MSG_TUNNEL_CREATE = 0x07;  // 隧道创建 客户端发起
     public static final byte MSG_TUNNEL_CREATE_RESP = 0x08;    // 隧道创建响应 服务端响应
     public static final byte MSG_SERVICE_HEALTH_CHANGE = 0x09;    //内网服务健康改变
-
-    // ────────────────────────────────────────────────
+     // ────────────────────────────────────────────────
     // 配置管理消息（Proxy Config Control）—— 认证后才能使用
     // ────────────────────────────────────────────────
     public static final byte MSG_PROXY_CREATE = 0x10;
@@ -45,15 +44,18 @@ public class TMSP {
     public static final byte MSG_PROXY_NOTIFY = 0x1A;
 
     // ────────────────────────────────────────────────
-    // 流控制与数据消息（Stream Level）
+    // 流消息（Stream Level）
     // ────────────────────────────────────────────────
     public static final byte MSG_STREAM_OPEN = 0x20;      // 打开新流
     public static final byte MSG_STREAM_OPEN_RESP = 0x21;  // 打开流响应
-
     public static final byte MSG_STREAM_CLOSE = 0x22;  // 优雅关闭流
     public static final byte MSG_STREAM_RESET = 0x23;  // 强制重置流
-
     public static final byte MSG_STREAM_DATA = 0x24;  // 实际隧道数据
+    // ────────────────────────────────────────────────
+    // 流量控制，用于控制远端流的读写状态（Flow Control）
+    // ─────────────────────────────────────────────
+    public static final byte MSG_STREAM_PAUSE = 0x25;
+    public static final byte MSG_STREAM_RESUME = 0x26;
 
     // flags 位掩码
     public static final byte FLAG_COMPRESSED = 0x01;  // 0000 0001 加密
@@ -61,11 +63,12 @@ public class TMSP {
     public static final byte FLAG_MUX = 0x04;        //  0000 0100 多路复用
 
     // bit 3~5 用来表示压缩算法类型（最多支持 8 种）
-    public static final byte COMPRESS_NONE       = 0x00;   // 0000 0000
-    public static final byte COMPRESS_LZ4        = 0x08;   // 0000 1000  (bit 3)
-    public static final byte COMPRESS_SNAPPY     = 0x10;   // 0001 0000  (bit 4)
+    public static final byte COMPRESS_NONE = 0x00;   // 0000 0000
+    public static final byte COMPRESS_LZ4 = 0x08;   // 0000 1000  (bit 3)
+    public static final byte COMPRESS_SNAPPY = 0x10;   // 0001 0000  (bit 4)
 
-    public static final byte COMPRESS_MASK       = 0x38;   // 0011 1000  (bit 3~5，用于掩码)
+    public static final byte COMPRESS_MASK = 0x38;   // 0011 1000  (bit 3~5，用于掩码)
+
     /**
      * 获取主版本号
      *
