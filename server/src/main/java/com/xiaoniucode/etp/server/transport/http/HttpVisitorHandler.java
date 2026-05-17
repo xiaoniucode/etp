@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.transport.http;
 
 import com.alibaba.cola.statemachine.StateMachine;
+import com.xiaoniucode.etp.core.enums.TunnelType;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
@@ -40,7 +41,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 if (!tunnel.isWritable()) {
                     logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
                     visitor.config().setOption(ChannelOption.AUTO_READ, false);
-                    if (tunnelEntry.getTunnelType().isMultiplex()){
+                    if (tunnelEntry.getTunnelType().isMultiplex()) {
                         streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
                     }
                 }
@@ -71,28 +72,24 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error(cause.getMessage(), cause);
+        logger.error("[HTTP]发生异常", cause);
         streamManager.getStreamContext(ctx.channel()).ifPresent(streamContext -> {
-            logger.warn("[HTTP] 访问者连接发生异常，关闭流: streamId={}", streamContext.getStreamId());
+            logger.error("[HTTP] 访问者连接发生异常，关闭流", cause);
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
         ctx.fireExceptionCaught(cause);
     }
 
     @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) {
         Channel visitor = ctx.channel();
         logger.warn("[HTTP] 访问者可写性发生变化：{}", visitor.isWritable());
         streamManager.getStreamContext(visitor).ifPresent(streamContext -> {
-            Channel tunnel = streamContext.getTunnelEntry().getChannel();
-            if (tunnel != null) {
-                logger.warn("流量过高，触发背压");
-                boolean writable = visitor.isWritable();
-                //todo 需要优化，一个流会导致所有流暂停
-                tunnel.config().setOption(ChannelOption.AUTO_READ, writable);
-                if (writable) {
-                    tunnel.read();
-                }
+            logger.warn("流量过高，触发背压");
+            if (!visitor.isWritable()) {
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_PAUSE);
+            } else {
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_RESUME);
             }
         });
         ctx.fireChannelWritabilityChanged();

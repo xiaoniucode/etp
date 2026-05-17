@@ -19,10 +19,30 @@ package com.xiaoniucode.etp.client.statemachine.stream.action;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamState;
+import com.xiaoniucode.etp.core.message.TMSP;
+import com.xiaoniucode.etp.core.message.TMSPFrame;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
-public class StreamPauseAction extends StreamBaseAction{
+public class StreamPauseAction extends StreamBaseAction {
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(StreamPauseAction.class);
+
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
+        Channel server = context.getServer();
+        if (event == StreamEvent.STREAM_REMOTE_PAUSE) {
+            server.config().setOption(ChannelOption.AUTO_READ, false);
+        }
+        if (event == StreamEvent.STREAM_LOCAL_PAUSE) {
+            sendPauseToRemote(context);
+        }
+    }
 
+    private void sendPauseToRemote(StreamContext context) {
+        logger.debug("通知远程代理服务器暂停流 {} 读取", context.getStreamId());
+        TMSPFrame frame = new TMSPFrame(context.getStreamId(), TMSP.MSG_STREAM_PAUSE);
+        context.getControl().writeAndFlush(frame);
     }
 }

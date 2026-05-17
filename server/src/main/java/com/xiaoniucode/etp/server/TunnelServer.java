@@ -1,8 +1,6 @@
 package com.xiaoniucode.etp.server;
 
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
-import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
-import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
@@ -23,8 +21,8 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.codec.compression.SnappyFrameDecoder;
+import io.netty.handler.codec.compression.SnappyFrameEncoder;
 import io.netty.handler.ssl.OptionalSslHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.util.internal.logging.InternalLogger;
@@ -70,7 +68,6 @@ public class TunnelServer implements Lifecycle {
             tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
 
-            LoggingHandler loggingHandler = new LoggingHandler(LogLevel.DEBUG);
             DownloadRateLimitHandler downloadRateLimitHandler = SpringContextHolder.getBean(DownloadRateLimitHandler.class);
             AgentManager agentManager = SpringContextHolder.getBean(AgentManager.class);
             ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -86,9 +83,8 @@ public class TunnelServer implements Lifecycle {
                                 sc.pipeline().addLast(new OptionalSslHandler(tlsContext));
                             }
                             sc.pipeline()
-                                    .addLast(loggingHandler)
-                                    .addLast(new SnappyEncoder())
-                                    .addLast(new SnappyDecoder())
+                                    .addLast(new SnappyFrameEncoder())
+                                    .addLast(new SnappyFrameDecoder())
                                     .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                     .addLast(downloadRateLimitHandler)
                                     .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentManager,90,0,0, TimeUnit.SECONDS))

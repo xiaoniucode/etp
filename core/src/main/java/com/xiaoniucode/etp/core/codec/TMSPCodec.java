@@ -59,13 +59,13 @@ public class TMSPCodec {
                 frame.setFlags(flags);
                 int length = byteBuf.readInt();
                 if (length > 0) {
-                    ByteBuf payload = byteBuf.readSlice(length);
+                    ByteBuf payload = byteBuf.readRetainedSlice(length);
                     frame.setPayload(payload);
                 }
+                logger.debug("[编码] 流载荷 {} 引用计数为：{}", frame.getStreamId(), frame.refCnt());
                 return frame;
-            } catch (Exception e) {
+            } finally {
                 ReferenceCountUtil.release(byteBuf);
-                throw e;
             }
         }
     }
@@ -82,7 +82,6 @@ public class TMSPCodec {
             int length = payload != null ? payload.readableBytes() : 0;
             out.writeInt(length);
             if (length > 0) {
-                logger.debug("[编码] 流载荷 {} 引用计数为：{}", frame.getStreamId(), frame.refCnt());
                 out.writeBytes(frame.getPayload());
             }
         }

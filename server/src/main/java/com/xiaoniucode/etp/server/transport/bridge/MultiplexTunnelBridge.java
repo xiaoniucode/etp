@@ -32,7 +32,7 @@ public class MultiplexTunnelBridge implements TunnelBridge {
     public void forwardToLocal(ByteBuf payload) {
         Channel tunnel = tunnelEntry.getChannel();
         int streamId = streamContext.getStreamId();
-        if (streamContext.isChannelClosed(tunnel)) {
+        if (!tunnel.isActive()) {
             logger.debug("数据通道未激活，数据转发失败：streamId={}", streamId);
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
@@ -53,12 +53,12 @@ public class MultiplexTunnelBridge implements TunnelBridge {
     @Override
     public void forwardToRemote(ByteBuf payload) {
         int streamId = streamContext.getStreamId();
-        if (streamContext.isChannelClosed(visitor)) {
+        if (!visitor.isActive()) {
             logger.debug("通道未激活，数据转发失败：streamId={}", streamId);
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
-        payload.retain();
+        //payload.retain();
         visitor.writeAndFlush(payload).addListener((ChannelFutureListener) future -> {
             logger.debug("[tunnel-->visitor]流 {} 引用计数为：{}", streamContext.getStreamId(), payload.refCnt());
             if (!future.isSuccess()) {

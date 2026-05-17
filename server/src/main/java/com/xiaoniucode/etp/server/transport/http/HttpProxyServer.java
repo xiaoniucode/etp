@@ -79,7 +79,7 @@ public class HttpProxyServer implements Lifecycle {
                             ChannelPipeline pipeline = sc.pipeline();
                             pipeline.addLast(new IdleCheckHandler());
                             pipeline.addLast(new VisitorInfoDecoder());
-                            pipeline.addLast(new HeaderInjectDecoder());
+//                            pipeline.addLast(new HeaderInjectDecoder());
                             pipeline.addLast(httpIpCheckHandler);
                             pipeline.addLast(uploadRateLimitHandler);
                             pipeline.addLast(basicAuthHandler);

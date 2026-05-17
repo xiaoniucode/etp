@@ -30,7 +30,7 @@ public class MultiplexTunnelBridge implements TunnelBridge {
     @Override
     public void forwardToLocal(ByteBuf payload) {
         int streamId = streamContext.getStreamId();
-        if (streamContext.isChannelClosed(server)) {
+        if (!server.isActive()) {
             logger.debug("通道未激活，数据转发到内网失败，关闭流：streamId={}", streamId);
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
@@ -47,7 +47,7 @@ public class MultiplexTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToRemote(ByteBuf payload) {
-        if (streamContext.isChannelClosed(tunnel)) {
+        if (!tunnel.isActive()) {
             logger.debug("通道未激活，数据转发到远程失败，关闭流：streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;

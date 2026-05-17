@@ -23,17 +23,19 @@ public class TunnelBridgeFactory {
     /**
      * 创建直接（Direct）隧道桥接
      */
-    public static TunnelBridge buildDirect(StreamContext ctx) {
-        TunnelBridge bridge = new DirectTunnelBridge(ctx);
-        return addMetricsIfNeeded(bridge, ctx);
+    public static TunnelBridge buildDirect(StreamContext streamContext) {
+        TunnelBridge bridge = new DirectTunnelBridge(streamContext);
+        TunnelBridge tunnelBridge = addMetricsIfNeeded(bridge, streamContext);
+        return new BackpressureTunnelBridge(tunnelBridge, streamContext);
     }
 
     /**
      * 创建多路复用（Mux）隧道桥接
      */
-    public static TunnelBridge buildMux(StreamContext ctx) {
-        TunnelBridge bridge = new MultiplexTunnelBridge(ctx);
-        return addMetricsIfNeeded(bridge, ctx);
+    public static TunnelBridge buildMux(StreamContext streamContext) {
+        TunnelBridge bridge = new MultiplexTunnelBridge(streamContext);
+        TunnelBridge tunnelBridge = addMetricsIfNeeded(bridge, streamContext);
+        return new BackpressureTunnelBridge(tunnelBridge, streamContext);
     }
 
     /**

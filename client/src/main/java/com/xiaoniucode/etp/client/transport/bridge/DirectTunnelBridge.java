@@ -37,32 +37,14 @@ public class DirectTunnelBridge implements TunnelBridge {
             }
 
             @Override
-            public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+            public void channelWritabilityChanged(ChannelHandlerContext ctx) {
                 logger.debug("隧道可写状态发生变化：{}", ctx.channel().isWritable());
                 Channel tunnel = ctx.channel();
                 boolean writable = tunnel.isWritable();
                 if (writable) {
-                    //数据隧道恢复可写，恢复暂停的从服务器读取
-                    IntSet pausedStreamIds = StreamManager.getPausedStreamIds(tunnel);
-                    if (!pausedStreamIds.isEmpty()) {
-                        logger.debug("控制隧道恢复可写，恢复 {} 个访问者读取", pausedStreamIds.size());
-                        pausedStreamIds.stream().forEach(streamId -> {
-                            Optional<StreamContext> streamContextOpt = StreamManager.getStreamContext(streamId);
-                            if (streamContextOpt.isPresent()) {
-                                StreamContext streamContext = streamContextOpt.get();
-                                Channel server = streamContext.getServer();
-                                if (server != null) {
-                                    ctx.executor().schedule(() -> {
-                                        server.config().setOption(ChannelOption.AUTO_READ, true);
-                                        server.read();
-                                        StreamManager.removePausedStream(tunnel, streamId);
-                                    }, 5, TimeUnit.MILLISECONDS);
-                                }
-                            }
-                        });
-                    }
+                    server.config().setOption(ChannelOption.AUTO_READ, true);
                 }
-                super.channelWritabilityChanged(ctx);
+                ctx.fireChannelWritabilityChanged();
             }
             @Override
             public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
@@ -73,7 +55,7 @@ public class DirectTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToLocal(ByteBuf payload) {
-        if (streamContext.isChannelClosed(server)) {
+        if (!server.isActive()) {
             logger.error("目标服务连接已断开，关闭流：streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
@@ -91,7 +73,7 @@ public class DirectTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToRemote(ByteBuf payload) {
-        if (streamContext.isChannelClosed(tunnel)) {
+        if (!tunnel.isActive()) {
             logger.error("隧道没有激活，关闭流：streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;

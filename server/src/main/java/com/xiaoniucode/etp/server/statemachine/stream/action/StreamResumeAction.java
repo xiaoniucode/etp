@@ -16,15 +16,38 @@
 
 package com.xiaoniucode.etp.server.statemachine.stream.action;
 
+import com.xiaoniucode.etp.core.message.TMSP;
+import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StreamResumeAction extends StreamBaseAction{
+public class StreamResumeAction extends StreamBaseAction {
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(StreamResumeAction.class);
+
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
+        logger.debug("恢复流 {} 读取",context.getStreamId());
+        Channel visitor = context.getVisitor();
+        if (event == StreamEvent.STREAM_REMOTE_RESUME) {
+            visitor.config().setOption(ChannelOption.AUTO_READ, true);
+        }
 
+        if (event == StreamEvent.STREAM_LOCAL_RESUME) {
+            //通知远程恢复
+            sendResumeToRemote(context);
+        }
+    }
+
+    private void sendResumeToRemote(StreamContext context) {
+        logger.debug("通知边缘客户端恢复流 {} 读取", context.getStreamId());
+        TMSPFrame frame = new TMSPFrame(context.getStreamId(), TMSP.MSG_STREAM_RESUME);
+        context.getControl().writeAndFlush(frame);
     }
 }

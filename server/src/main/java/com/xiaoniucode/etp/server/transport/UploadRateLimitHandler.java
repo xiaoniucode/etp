@@ -81,6 +81,7 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
             }
             return;
         }
+        
         logger.debug("访问速度太快，触发限流：streamId={} bytes={} 等待 {} ms", streamContext.getStreamId(), bytes, waitNanos / 1_000_000);
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
         payload.retain();

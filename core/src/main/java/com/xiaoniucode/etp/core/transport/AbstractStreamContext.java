@@ -22,6 +22,10 @@ import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
+
 
 @Getter
 @Setter
@@ -33,6 +37,27 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
     protected boolean multiplex;
     protected AbstractAgentContext agentContext;
     protected TunnelBridge tunnelBridge;
+
+    /**
+     * 高水位，超过此水位通知远端暂停发送数据
+     */
+    protected final long DEFAULT_HIGH_WATERMARK = 8 * 1024 * 1024;
+
+    /**
+     * 低水位，低于此值通知远端恢复数据发送
+     */
+    protected final long DEFAULT_LOW_WATERMARK = 2 * 1024 * 1024;
+
+    private long highWaterMark = DEFAULT_HIGH_WATERMARK;
+    private long lowWaterMark = DEFAULT_LOW_WATERMARK;
+    /**
+     * 当前待发送总字节数
+     */
+    private final AtomicLong pendingBytes = new AtomicLong();
+    /**
+     * 待发送缓冲队列
+     */
+    private final Queue<ByteBuf> pendingQueue = new ConcurrentLinkedQueue<>();
 
     public void forwardToRemote(ByteBuf payload) {
         if (tunnelBridge == null) {
@@ -52,7 +77,24 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
         return !multiplex;
     }
 
-    public boolean isChannelClosed(Channel channel) {
-        return channel == null || !channel.isActive() && !channel.isWritable();
+    public void enqueue(ByteBuf byteBuf) {
+        pendingQueue.offer(byteBuf);
+        pendingBytes.addAndGet(byteBuf.readableBytes());
+    }
+
+    public ByteBuf pollPending() {
+        ByteBuf buf = pendingQueue.poll();
+        if (buf != null) {
+            pendingBytes.addAndGet(-buf.readableBytes());
+        }
+        return buf;
+    }
+
+    public boolean isHighWatermark() {
+        return pendingBytes.get() >= getHighWaterMark();
+    }
+
+    public boolean isLowWatermark() {
+        return pendingBytes.get() <= getLowWaterMark();
     }
 }

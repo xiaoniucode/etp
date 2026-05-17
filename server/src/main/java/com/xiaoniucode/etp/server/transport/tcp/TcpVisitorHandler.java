@@ -72,7 +72,13 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        logger.error(cause);
+        ctx.fireExceptionCaught(cause);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
         streamManager.getStreamContext(ctx.channel()).ifPresent(context -> {
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
@@ -80,18 +86,14 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        logger.warn("流量过高，触发背压");
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) {
         Channel visitor = ctx.channel();
+        logger.warn("访问流可写性发生变化：{}", visitor.isWritable());
         streamManager.getStreamContext(visitor).ifPresent(streamContext -> {
-            Channel tunnel = streamContext.getTunnelEntry().getChannel();
-            if (tunnel != null) {
-                boolean writable = visitor.isWritable();
-                //todo 需要优化，一个流会导致所有流暂停
-                tunnel.config().setOption(ChannelOption.AUTO_READ, writable);
-                if (writable) {
-                    tunnel.read();
-                }
+            if (!visitor.isWritable()) {
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_PAUSE);
+            } else {
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_RESUME);
             }
         });
         ctx.fireChannelWritabilityChanged();

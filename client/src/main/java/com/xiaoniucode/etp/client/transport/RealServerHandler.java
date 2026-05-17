@@ -29,7 +29,9 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
                     if (!tunnel.isWritable()) {
                         logger.debug("数据无法转发到远程，流量过高，隧道不可写，暂停从服务读取，streamId={}", streamContext.getStreamId());
                         server.config().setOption(ChannelOption.AUTO_READ, false);
-                        StreamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
+                        if (tunnelEntry.getTunnelType().isMultiplex()){
+                            StreamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
+                        }
                     }
                     streamContext.forwardToRemote(msg);
                 }

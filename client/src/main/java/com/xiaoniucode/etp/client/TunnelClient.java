@@ -15,8 +15,6 @@ import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.transport.connection.DirectPool;
 import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
-import com.xiaoniucode.etp.core.codec.compress.SnappyDecoder;
-import com.xiaoniucode.etp.core.codec.compress.SnappyEncoder;
 import com.xiaoniucode.etp.core.transport.IdleCheckHandler;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
@@ -25,6 +23,8 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.compression.SnappyFrameDecoder;
+import io.netty.handler.codec.compression.SnappyFrameEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslHandler;
@@ -89,7 +89,6 @@ public final class TunnelClient implements Lifecycle {
         ControlFrameHandler controlTunnelHandler = new ControlFrameHandler(agentContext);
         agentContext.setControlFrameHandler(controlTunnelHandler);
         controlWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
-        LoggingHandler loggingHandler = new LoggingHandler(LogLevel.DEBUG);
         controlBootstrap.group(controlWorkerGroup)
                 .channel(NettyEventLoopFactory.socketChannelClass())
                 .option(ChannelOption.SO_KEEPALIVE, true)
@@ -104,9 +103,8 @@ public final class TunnelClient implements Lifecycle {
                             sc.pipeline().addLast(NettyConstants.TLS_HANDLER, sslHandler);
                         }
                         sc.pipeline()
-                                .addLast(loggingHandler)
-                                .addLast(new SnappyEncoder())
-                                .addLast(new SnappyDecoder())
+                                .addLast(new SnappyFrameEncoder())
+                                .addLast(new SnappyFrameDecoder())
                                 .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                 .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentContext, 90, 0, 0, TimeUnit.SECONDS))
                                 .addLast(new HeartbeatHandler(30))
