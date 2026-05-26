@@ -58,7 +58,7 @@ public class MultiplexTunnelBridge implements TunnelBridge {
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
-        //payload.retain();
+        payload.retain();
         visitor.writeAndFlush(payload).addListener((ChannelFutureListener) future -> {
             logger.debug("[tunnel-->visitor]流 {} 引用计数为：{}", streamContext.getStreamId(), payload.refCnt());
             if (!future.isSuccess()) {
