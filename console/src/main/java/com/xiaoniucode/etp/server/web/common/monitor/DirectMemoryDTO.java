@@ -19,9 +19,8 @@ package com.xiaoniucode.etp.server.web.common.monitor;
 import lombok.Data;
 
 @Data
-public class ServerDTO {
-    private CpuDTO cpu;
-    private JvmMemoryDTO jvmMem;
-    private OsMemoryDTO osMem;
-    private DirectMemoryDTO directMem;
+public class DirectMemoryDTO {
+    private String total;
+    private String used;
+    private Object usage;
 }

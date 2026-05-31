@@ -33,10 +33,17 @@ declare namespace Api.Monitor {
     usage: number | string
   }
 
+  interface DirectMemoryInfo {
+    total: string
+    used: string
+    usage: number | string
+  }
+
   interface ServerInfo {
     cpu: CpuInfo
     jvmMem: JvmMemoryInfo
     osMem: OsMemoryInfo
+    directMem: DirectMemoryInfo
   }
 
   interface DashboardSummary {

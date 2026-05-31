@@ -61,17 +61,6 @@
     if (!serverInfo.value) {
       return [
         {
-          label: '负载',
-          value: '--',
-          percentage: 0,
-          desc: '运行流畅',
-          color: '#303133',
-          ringData: [
-            { value: 0, name: 'used' },
-            { value: 100, name: 'total' }
-          ]
-        },
-        {
           label: 'CPU',
           value: '--',
           percentage: 0,
@@ -83,7 +72,7 @@
           ]
         },
         {
-          label: '内存',
+          label: 'JVM内存',
           value: '--',
           percentage: 0,
           desc: '--',
@@ -94,7 +83,18 @@
           ]
         },
         {
-          label: '/',
+          label: '直接内存',
+          value: '--',
+          percentage: 0,
+          desc: '--',
+          color: '#67C23A',
+          ringData: [
+            { value: 0, name: 'used' },
+            { value: 100, name: 'total' }
+          ]
+        },
+        {
+          label: '物理内存',
           value: '--',
           percentage: 0,
           desc: '--',
@@ -110,6 +110,7 @@
     const cpuUsage = serverInfo.value.cpu?.usage || 0
     const memUsage = serverInfo.value.osMem?.usage || 0
     const jvmUsage = serverInfo.value.jvmMem?.usage || 0
+    const directMemUsage = serverInfo.value.directMem?.usage || 0
 
     const getColor = (usage: any) => {
       if (usage < 70) return '#20a53a'
@@ -118,17 +119,6 @@
     }
 
     return [
-      {
-        label: '负载',
-        value: `${cpuUsage}%`,
-        percentage: cpuUsage,
-        desc: '',
-        color: getColor(cpuUsage),
-        ringData: [
-          { value: cpuUsage, name: 'used' },
-          { value: 100 - cpuUsage, name: 'total' }
-        ]
-      },
       {
         label: 'CPU',
         value: `${serverInfo.value.cpu?.total || 0}核心`,
@@ -151,6 +141,19 @@
         ringData: [
           { value: jvmUsage, name: 'used' },
           { value: 100 - jvmUsage, name: 'total' }
+        ]
+      },
+      {
+        label: '直接内存',
+        value: '',
+        usedValue: serverInfo.value.directMem?.used || '0MB',
+        totalValue: serverInfo.value.directMem?.total || '0MB',
+        percentage: directMemUsage,
+        desc: '',
+        color: getColor(directMemUsage),
+        ringData: [
+          { value: directMemUsage, name: 'used' },
+          { value: 100 - directMemUsage, name: 'total' }
         ]
       },
       {

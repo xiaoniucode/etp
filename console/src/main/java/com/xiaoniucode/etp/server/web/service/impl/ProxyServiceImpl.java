@@ -201,6 +201,21 @@ public class ProxyServiceImpl implements ProxyService {
 
         DomainType existsDomainType = existsProxyDO.getDomainType();
         DomainType requestDomainType = DomainType.fromCode(param.getDomainType());
+        BandwidthSaveParam bandwidth = param.getBandwidth();
+        if (bandwidth != null) {
+            bandwidth.valid();
+            BandwidthUnit unit = BandwidthUnit.fromCode(bandwidth.getUnit());
+            if (bandwidth.getLimitTotal() != null) {
+                existsProxyDO.setLimitTotal(unit.toBps(bandwidth.getLimitTotal()));
+            }
+            if (bandwidth.getLimitIn() != null) {
+                existsProxyDO.setLimitIn(unit.toBps(bandwidth.getLimitIn()));
+            }
+            if (bandwidth.getLimitOut() != null) {
+                existsProxyDO.setLimitOut(unit.toBps(bandwidth.getLimitOut()));
+            }
+        }
+
         proxyConvert.updateDO(param, existsProxyDO);
         proxyRepository.save(existsProxyDO);
 

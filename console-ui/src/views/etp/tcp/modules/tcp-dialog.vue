@@ -306,7 +306,7 @@
     status: '1',
     remotePort: '',
     encrypt: false,
-    tunnelType: '0',
+    tunnelType: '1',
     deployMode: 'single',
     singleHost: '127.0.0.1',
     singlePort: '',

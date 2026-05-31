@@ -58,6 +58,9 @@ public interface ProxyConvert {
 
     @Mapping(source = "agentType", target = "agentType")
     @Mapping(source = "proxyDO.domainType", target = "domainType", qualifiedByName = "domainTypeToCode")
+    @Mapping(source = "proxyDO.limitTotal", target = "bandwidth.limitTotal")
+    @Mapping(source = "proxyDO.limitIn", target = "bandwidth.limitIn")
+    @Mapping(source = "proxyDO.limitOut", target = "bandwidth.limitOut")
     HttpProxyDetailDTO toHttpDetailDTO(ProxyDO proxyDO, Integer agentType);
 
     @Mapping(source = "agentType", target = "agentType")
