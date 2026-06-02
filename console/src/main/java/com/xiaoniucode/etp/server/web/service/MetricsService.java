@@ -14,7 +14,10 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.service;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.metrics.TrafficChartVO;
+import com.xiaoniucode.etp.server.web.dto.metrics.TrafficCountDTO;
 import com.xiaoniucode.etp.server.web.param.metrics.ProxyQueryParam;
 
 public interface MetricsService {
@@ -27,4 +30,6 @@ public interface MetricsService {
     TrafficChartVO getProxy24hTraffic(ProxyQueryParam param);
     void saveHourlyMetricsSnapshot();
     void deleteByProxyId(String proxyId);
+
+    PageResult<TrafficCountDTO> queryPage(PageQuery pageQuery);
 }

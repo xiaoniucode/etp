@@ -18,16 +18,20 @@
 
 package com.xiaoniucode.etp.server.web.dto.metrics;
 
-import lombok.Builder;
-import lombok.Data;
+/**
+ * 按代理聚合后的流量统计 Projection
+ */
+public interface ProxyTrafficQueryResult {
 
-@Data
-@Builder
-public class TrafficChartVO {
-    private Traffic24LineDTO up;
-    private Traffic24LineDTO down;
-    private Long upTotal;
-    private Long downTotal;
-    private Double downRate;
-    private Double upRate;
+    String getProxyId();
+
+    Long getReadBytes();
+
+    Long getWriteBytes();
+
+    Long getReadMessages();
+
+    Long getWriteMessages();
+
+    Long getTotalBytes();
 }

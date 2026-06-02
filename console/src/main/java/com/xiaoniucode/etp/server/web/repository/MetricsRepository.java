@@ -19,8 +19,11 @@
 package com.xiaoniucode.etp.server.web.repository;
 
 import com.xiaoniucode.etp.server.metrics.HourlyTraffic;
+import com.xiaoniucode.etp.server.web.dto.metrics.ProxyTrafficQueryResult;
 import com.xiaoniucode.etp.server.web.dto.metrics.DailyTrafficQueryResult;
 import com.xiaoniucode.etp.server.web.entity.MetricsDO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -69,4 +72,29 @@ public interface MetricsRepository extends JpaRepository<MetricsDO, Long> {
     List<HourlyTraffic> queryHourlyTrafficByRange(@Param("proxyId") String proxyId,
                                                   @Param("startTime") LocalDateTime startTime,
                                                   @Param("endTime") LocalDateTime endTime);
+
+    /**
+     * 分页查询：按 proxy_id 聚合，对该代理所有快照记录求和，按总流量倒序
+     */
+    @Query(value = """
+            SELECT
+                m.proxy_id AS proxyId,
+                CAST(SUM(m.read_bytes) AS UNSIGNED) AS readBytes,
+                CAST(SUM(m.write_bytes) AS UNSIGNED) AS writeBytes,
+                CAST(SUM(m.read_messages) AS UNSIGNED) AS readMessages,
+                CAST(SUM(m.write_messages) AS UNSIGNED) AS writeMessages,
+                CAST(SUM(m.read_bytes) + SUM(m.write_bytes) AS UNSIGNED) AS totalBytes
+            FROM metrics m
+            GROUP BY m.proxy_id
+            ORDER BY totalBytes DESC, proxyId ASC
+            """,
+            countQuery = """
+            SELECT COUNT(*) FROM (
+                SELECT 1 FROM metrics m
+                GROUP BY m.proxy_id
+            ) grouped
+            """,
+            nativeQuery = true)
+    @SuppressWarnings("all")
+    Page<ProxyTrafficQueryResult> pageTrafficByProxy(Pageable pageable);
 }

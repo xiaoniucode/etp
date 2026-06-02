@@ -15,10 +15,8 @@
  */
 package com.xiaoniucode.etp.server.web.controller;
 
-import com.xiaoniucode.etp.common.message.PageResult;
-import com.xiaoniucode.etp.server.metrics.Metrics;
-import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.param.metrics.ProxyQueryParam;
 import com.xiaoniucode.etp.server.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +26,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/metrics")
 public class MetricsController {
     @Autowired
-    private MetricsCollector metricsCollector;
-    @Autowired
     private MetricsService metricsService;
 
     @GetMapping("list")
-    public Ajax list(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        PageResult<Metrics> res = metricsCollector.listAllMetrics(page, size);
-        return Ajax.success(res);
+    public Ajax list(@ModelAttribute PageQuery pageQuery) {
+        return Ajax.success(metricsService.queryPage(pageQuery));
     }
 
     @GetMapping("global/24h")

@@ -1,23 +1,11 @@
 import request from '@/utils/http'
 
 /**
- * 获取流量统计数据
- * @param proxyId 代理ID
- * @returns 流量统计数据
- */
-export function fetchGetMetrics(proxyId: string) {
-  return request.get<Api.Metrics.MetricsItemDTO>({
-    url: `/api/metrics/${proxyId}`
-  })
-}
-
-/**
- * 获取所有代理的流量统计数据（分页）
- * @param params 分页参数
- * @returns 流量统计数据分页列表
+ * 获取所有代理的流量汇总
+ * @param params 分页参数 current、size
  */
 export function fetchGetMetricsList(params: Api.Common.CommonSearchParams) {
-  return request.get<Api.Common.PaginatedResponse<Api.Metrics.MetricsItemDTO>>({
+  return request.get<Api.Common.PaginatedResponse<Api.Metrics.TrafficCountDTO>>({
     url: '/api/metrics/list',
     params
   })

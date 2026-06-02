@@ -122,4 +122,12 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     List<Integer> findAllListenPorts();
 
     List<ProxyDO> findByAgentId(String agentId);
+
+    @Query("""
+            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult(a, p)
+            FROM ProxyDO p
+            LEFT JOIN AgentDO a ON a.id = p.agentId
+            WHERE p.id IN :proxyIds
+            """)
+    List<ProxyListQueryResult> findWithAgentByIdIn(@Param("proxyIds") List<String> proxyIds);
 }

@@ -21,7 +21,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Metrics24LineDTO {
+public class Traffic24LineDTO {
     private List<String> xAxis;
     private List<Long> yAxis;
 }

@@ -18,16 +18,18 @@
 
 package com.xiaoniucode.etp.server.web.dto.metrics;
 
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
-public class TrafficChartVO {
-    private Traffic24LineDTO up;
-    private Traffic24LineDTO down;
-    private Long upTotal;
-    private Long downTotal;
-    private Double downRate;
-    private Double upRate;
+public class TrafficCountDTO {
+    private String proxyId;
+    private String proxyName;
+    private Integer protocol;
+    private String agentId;
+    private String agentName;
+    private long readBytes;
+    private long writeBytes;
+    private long readMessages;
+    private long writeMessages;
+    private long totalBytes;
 }

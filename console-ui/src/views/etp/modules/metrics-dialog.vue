@@ -49,7 +49,12 @@
           <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium m-0 text-g-900">流量趋势</h3>
             <div class="flex items-center gap-2">
-              <ElSelect v-model="timeRange" placeholder="选择时间范围" size="default" style="width: 140px">
+              <ElSelect
+                v-model="timeRange"
+                placeholder="选择时间范围"
+                size="default"
+                style="width: 140px"
+              >
                 <ElOption label="最近24小时" value="24h" />
                 <ElOption label="最近3天" value="3d" />
                 <ElOption label="最近7天" value="7d" />
@@ -148,25 +153,23 @@
     set: (value) => emit('update:visible', value)
   })
 
-  const loading = ref(false)
+  const DEFAULT_TIME_RANGE = '24h'
 
-  const timeRange = ref('24h')
-  const customDate = ref('')
+  const loading = ref(false)
+  const timeRange = ref(DEFAULT_TIME_RANGE)
+  const customDate = ref<string | [string, string] | ''>('')
   const startDateAnchor = ref<Date | null>(null)
 
-  const initialMetricsData: Api.Metrics.TrafficChartVO = {
+  const createEmptyMetricsData = (): Api.Metrics.TrafficChartVO => ({
     up: { xAxis: [], yAxis: [] },
     down: { xAxis: [], yAxis: [] },
     upTotal: 0,
     downTotal: 0,
     upRate: 0,
     downRate: 0
-  }
+  })
 
-  const metricsData = ref<Api.Metrics.TrafficChartVO>({ ...initialMetricsData })
-
-  // 折线图数据
-  const lineChartData = ref([
+  const createEmptyLineChartData = () => [
     {
       name: '下行流量',
       data: [] as number[],
@@ -177,18 +180,39 @@
       data: [] as number[],
       showAreaColor: true
     }
-  ])
+  ]
+
+  const metricsData = ref<Api.Metrics.TrafficChartVO>(createEmptyMetricsData())
+  const lineChartData = ref(createEmptyLineChartData())
   const lineChartXAxis = ref<string[]>([])
   const unitDivisor = ref(1)
   const unitLabel = ref('B')
 
-  // Y轴标签（仅数值）
+  /** 重置 timeRange 时不触发 timeRange 的 watch，避免重复请求 */
+  let suppressRangeWatch = false
+
+  const clearDisplayState = () => {
+    metricsData.value = createEmptyMetricsData()
+    lineChartData.value = createEmptyLineChartData()
+    lineChartXAxis.value = []
+    unitDivisor.value = 1
+    unitLabel.value = 'B'
+  }
+
+  const resetDialogState = () => {
+    suppressRangeWatch = true
+    timeRange.value = DEFAULT_TIME_RANGE
+    customDate.value = ''
+    startDateAnchor.value = null
+    clearDisplayState()
+    suppressRangeWatch = false
+  }
+
   const yAxisLabelFormatter = (value: number): string => {
     if (value <= 0) return '0'
     return Math.round(value / unitDivisor.value).toString()
   }
 
-  // Tooltip（带单位）
   const tooltipFormatter = (params: any[]): string => {
     if (!params || params.length === 0) return ''
     let html = `时间：${params[0].name}<br/>`
@@ -225,18 +249,18 @@
     return false
   }
 
-  // 获取流量统计数据
   const getData = async () => {
     if (!props.proxyId) return
 
-    metricsData.value = { ...initialMetricsData }
-    lineChartData.value[0].data = []
-    lineChartData.value[1].data = []
-    lineChartXAxis.value = []
-
+    clearDisplayState()
     loading.value = true
     try {
-      const requestParams: { proxyId: string; queryType: string; startDate?: string; endDate?: string } = {
+      const requestParams: {
+        proxyId: string
+        queryType: string
+        startDate?: string
+        endDate?: string
+      } = {
         proxyId: props.proxyId,
         queryType: timeRange.value
       }
@@ -250,16 +274,11 @@
       if (response) {
         metricsData.value = response
 
-        // 填充折线图
         lineChartData.value[0].data = response.down?.yAxis || []
         lineChartData.value[1].data = response.up?.yAxis || []
         lineChartXAxis.value = response.down?.xAxis || []
 
-        // 按最大值决定统一单位
-        const allValues = [
-          ...(response.down?.yAxis || []),
-          ...(response.up?.yAxis || [])
-        ]
+        const allValues = [...(response.down?.yAxis || []), ...(response.up?.yAxis || [])]
         const dataMax = allValues.length > 0 ? Math.max(...allValues, 0) : 0
         const unitInfo = ByteUtils.getUnitInfo(dataMax)
         unitDivisor.value = unitInfo.divisor
@@ -271,13 +290,18 @@
   }
 
   watch(
-    () => [props.visible, props.proxyId],
-    ([visible]) => {
-      if (visible) {
-        metricsData.value = { ...initialMetricsData }
-        lineChartData.value[0].data = []
-        lineChartData.value[1].data = []
-        lineChartXAxis.value = []
+    () => [props.visible, props.proxyId] as const,
+    ([visible, proxyId], previous) => {
+      if (!visible) {
+        if (previous?.[0]) {
+          resetDialogState()
+        }
+        return
+      }
+      const wasVisible = previous?.[0] ?? false
+      const prevProxyId = previous?.[1] ?? ''
+      if (!wasVisible || proxyId !== prevProxyId) {
+        resetDialogState()
         getData()
       }
     },
@@ -285,15 +309,19 @@
   )
 
   watch(timeRange, () => {
-    if (props.visible) {
-      if (timeRange.value !== 'custom') {
-        getData()
-      }
+    if (suppressRangeWatch || !props.visible) return
+    if (timeRange.value !== 'custom') {
+      getData()
     }
   })
 
   watch(customDate, () => {
-    if (props.visible && timeRange.value === 'custom' && customDate.value && customDate.value.length === 2) {
+    if (
+      props.visible &&
+      timeRange.value === 'custom' &&
+      customDate.value &&
+      customDate.value.length === 2
+    ) {
       getData()
     }
   })

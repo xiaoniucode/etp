@@ -30,16 +30,17 @@ declare namespace Api.Metrics {
     yAxis: number[]
   }
 
-  interface MetricsItemDTO {
+  interface TrafficCountDTO {
     proxyId: string
-    activeChannels: number
+    proxyName?: string
+    protocol?: number
+    agentId?: string
+    agentName?: string
     readBytes: number
     writeBytes: number
     readMessages: number
     writeMessages: number
-    readRate: number
-    writeRate: number
-    lastActiveTime: string
+    totalBytes: number
   }
 
   interface TrafficChartVO {

@@ -20,14 +20,24 @@ import com.xiaoniucode.etp.server.metrics.HourlyTraffic;
 import com.xiaoniucode.etp.server.metrics.Metrics;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
+import com.xiaoniucode.etp.server.web.dto.metrics.ProxyTrafficQueryResult;
 import com.xiaoniucode.etp.server.web.dto.metrics.DailyTrafficQueryResult;
-import com.xiaoniucode.etp.server.web.dto.metrics.Metrics24LineDTO;
+import com.xiaoniucode.etp.server.web.dto.metrics.Traffic24LineDTO;
 import com.xiaoniucode.etp.server.web.dto.metrics.TrafficChartVO;
+import com.xiaoniucode.etp.server.web.dto.metrics.TrafficCountDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult;
 import com.xiaoniucode.etp.server.web.enums.MetricQueryType;
 import com.xiaoniucode.etp.server.web.param.metrics.ProxyQueryParam;
 import com.xiaoniucode.etp.server.web.repository.MetricsRepository;
+import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
 import com.xiaoniucode.etp.server.web.service.MetricsService;
+import com.xiaoniucode.etp.server.web.service.converter.MetricConvert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +48,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class MetricsServiceImpl implements MetricsService {
@@ -45,6 +57,10 @@ public class MetricsServiceImpl implements MetricsService {
     private MetricsCollector metricsCollector;
     @Autowired
     private MetricsRepository metricsRepository;
+    @Autowired
+    private ProxyRepository proxyRepository;
+    @Autowired
+    private MetricConvert metricConvert;
 
     @Override
     public TrafficChartVO getTotal24hTraffic() {
@@ -124,8 +140,8 @@ public class MetricsServiceImpl implements MetricsService {
             }
         }
 
-        Metrics24LineDTO upDto = new Metrics24LineDTO();
-        Metrics24LineDTO downDto = new Metrics24LineDTO();
+        Traffic24LineDTO upDto = new Traffic24LineDTO();
+        Traffic24LineDTO downDto = new Traffic24LineDTO();
         List<String> xAxis = new ArrayList<>(24);
         List<Long> upYAxis = new ArrayList<>(24);
         List<Long> downYAxis = new ArrayList<>(24);
@@ -163,8 +179,8 @@ public class MetricsServiceImpl implements MetricsService {
      */
     private TrafficChartVO buildTrafficChartVO(List<HourlyTraffic> list, long upTotal,
                                                long downTotal, double upRate, double downRate) {
-        Metrics24LineDTO upDto = new Metrics24LineDTO();
-        Metrics24LineDTO downDto = new Metrics24LineDTO();
+        Traffic24LineDTO upDto = new Traffic24LineDTO();
+        Traffic24LineDTO downDto = new Traffic24LineDTO();
 
         List<String> xAxis = new ArrayList<>(24);
         List<Long> upYAxis = new ArrayList<>(24);
@@ -196,8 +212,8 @@ public class MetricsServiceImpl implements MetricsService {
      */
     private TrafficChartVO buildDailyTrafficChartVO(List<DailyTrafficQueryResult> results,
                                                     LocalDate startDate, LocalDate endDate) {
-        Metrics24LineDTO upDto = new Metrics24LineDTO();
-        Metrics24LineDTO downDto = new Metrics24LineDTO();
+        Traffic24LineDTO upDto = new Traffic24LineDTO();
+        Traffic24LineDTO downDto = new Traffic24LineDTO();
 
         List<String> xAxis = new ArrayList<>();
         List<Long> upYAxis = new ArrayList<>();
@@ -253,5 +269,37 @@ public class MetricsServiceImpl implements MetricsService {
     public void deleteByProxyId(String proxyId) {
         metricsRepository.deleteByProxyId(proxyId);
         metricsCollector.removeByProxyId(proxyId);
+    }
+
+    @Override
+    public PageResult<TrafficCountDTO> queryPage(PageQuery pageQuery) {
+        int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
+        Page<ProxyTrafficQueryResult> page = metricsRepository.pageTrafficByProxy(pageable);
+        if (page.isEmpty()) {
+            return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
+        }
+        List<TrafficCountDTO> records = metricConvert.toDTOList(page.getContent());
+        enrichProxyInfo(records);
+        return PageResult.wrap(page, records);
+    }
+
+    private void enrichProxyInfo(List<TrafficCountDTO> records) {
+        if (records.isEmpty()) {
+            return;
+        }
+        List<String> proxyIds = records.stream()
+                .map(TrafficCountDTO::getProxyId)
+                .distinct()
+                .toList();
+        if (proxyIds.isEmpty()) {
+            return;
+        }
+        Map<String, ProxyListQueryResult> proxyMap = proxyRepository.findWithAgentByIdIn(proxyIds).stream()
+                .collect(Collectors.toMap(r -> r.getProxyDO().getId(), Function.identity(),
+                        (a, b) -> a));
+        for (TrafficCountDTO dto : records) {
+            metricConvert.enrichProxyInfo(dto, proxyMap.get(dto.getProxyId()));
+        }
     }
 }

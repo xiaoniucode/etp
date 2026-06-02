@@ -32,13 +32,18 @@
   import { fetchGetMetricsList } from '@/api/metrics'
   import MetricsDialog from '../modules/metrics-dialog.vue'
   import { ByteUtils } from '@/utils/format/byteFormatter'
+  import { ElTag } from 'element-plus'
 
   defineOptions({ name: 'Stats' })
 
-  type MetricsItem = Api.Metrics.MetricsItemDTO
-
   const metricsDialogVisible = ref(false)
   const currentMetricsProxyId = ref('')
+
+  const getProtocolText = (protocol?: number) => {
+    if (protocol === 2) return 'HTTP'
+    if (protocol === 1) return 'TCP'
+    return '-'
+  }
 
   const {
     columns,
@@ -56,80 +61,69 @@
         current: 1,
         size: 10
       },
+      paginationKey: {
+        current: 'current',
+        size: 'size'
+      },
       columnsFactory: () => [
         { type: 'index', width: 60, label: '序号' },
         {
-          prop: 'proxyId',
-          label: '代理ID',
-          minWidth: 200
+          prop: 'agentName',
+          label: '客户端名称',
+          minWidth: 100,
+          formatter: (row: Api.Metrics.TrafficCountDTO) => row.agentName || '-'
         },
         {
-          prop: 'activeChannels',
-          label: '活动连接数',
-          width: 120
+          prop: 'proxyName',
+          label: '代理名称',
+          minWidth: 100,
+          formatter: (row: Api.Metrics.TrafficCountDTO) => row.proxyName || '-'
         },
         {
-          prop: 'readBytes',
-          label: '上行流量',
-          width: 150,
-          formatter: (row: MetricsItem) => ByteUtils.formatBytes(row.readBytes || 0)
+          prop: 'protocol',
+          label: '协议',
+          width: 90,
+          formatter: (row: Api.Metrics.TrafficCountDTO) => {
+            const text = getProtocolText(row.protocol)
+            if (text === '-') return text
+            const type = row.protocol === 2 ? 'warning' : 'primary'
+            return h(ElTag, { type, size: 'small' }, () => text)
+          }
         },
         {
           prop: 'writeBytes',
-          label: '下行流量',
-          width: 150,
-          formatter: (row: MetricsItem) => ByteUtils.formatBytes(row.writeBytes || 0)
+          label: '上行流量',
+          width: 120,
+          formatter: (row: Api.Metrics.TrafficCountDTO) => ByteUtils.formatBytes(row.writeBytes || 0)
         },
         {
-          prop: 'readMessages',
+          prop: 'readBytes',
+          label: '下行流量',
+          width: 120,
+          formatter: (row: Api.Metrics.TrafficCountDTO) => ByteUtils.formatBytes(row.readBytes || 0)
+        },
+        {
+          prop: 'writeMessages',
           label: '上行消息数',
           width: 120
         },
         {
-          prop: 'writeMessages',
+          prop: 'readMessages',
           label: '下行消息数',
           width: 120
         },
         {
-          prop: 'readRate',
-          label: '上行速率',
-          width: 100,
-          formatter: (row: MetricsItem) => {
-            if (row.readRate === undefined || row.readRate === null) return ''
-            return `${ByteUtils.formatBytes(parseFloat((row.readRate || 0).toFixed(2)))}`
-          }
-        },
-        {
-          prop: 'writeRate',
-          label: '下行速率',
-          width: 100,
-          formatter: (row: MetricsItem) => {
-            if (row.writeRate === undefined || row.writeRate === null) return ''
-            return `${ByteUtils.formatBytes(parseFloat((row.writeRate || 0).toFixed(2)))}`
-          }
-        },
-        {
-          prop: 'lastActiveTime',
-          label: '最后活动时间',
-          minWidth: 180,
-          formatter: (row: MetricsItem) => {
-            if (!row.lastActiveTime) return ''
-            const date = new Date(row.lastActiveTime)
-            return date.toLocaleString('zh-CN', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit'
-            })
-          }
+          prop: 'totalBytes',
+          label: '总流量',
+          width: 150,
+          formatter: (row: Api.Metrics.TrafficCountDTO) => ByteUtils.formatBytes(row.totalBytes || 0)
         },
         {
           prop: 'operation',
           label: '操作',
           width: 150,
           fixed: 'right',
-          formatter: (row: MetricsItem) =>
+          formatter: (row: Api.Metrics.TrafficCountDTO) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'text',
@@ -142,8 +136,8 @@
     }
   })
 
-  const handleViewMetrics = (metrics: MetricsItem) => {
-    currentMetricsProxyId.value = metrics.proxyId
+  const handleViewMetrics = (row: Api.Metrics.TrafficCountDTO) => {
+    currentMetricsProxyId.value = row.proxyId
     metricsDialogVisible.value = true
   }
 
