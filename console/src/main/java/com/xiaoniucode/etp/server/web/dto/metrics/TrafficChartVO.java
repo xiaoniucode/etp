@@ -30,4 +30,8 @@ public class TrafficChartVO {
     private Long downTotal;
     private Double downRate;
     private Double upRate;
+    /**
+     * 时间刻度单位，标识 X 轴数据粒度（hour=小时，day=天）
+     */
+    private String timeUnit;
 }

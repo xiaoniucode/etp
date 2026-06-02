@@ -29,6 +29,7 @@ import com.xiaoniucode.etp.server.web.dto.metrics.TrafficChartVO;
 import com.xiaoniucode.etp.server.web.dto.metrics.TrafficCountDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult;
 import com.xiaoniucode.etp.server.web.enums.MetricQueryType;
+import com.xiaoniucode.etp.server.web.enums.TimeUnit;
 import com.xiaoniucode.etp.server.web.param.metrics.ProxyQueryParam;
 import com.xiaoniucode.etp.server.web.repository.MetricsRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
@@ -171,6 +172,7 @@ public class MetricsServiceImpl implements MetricsService {
         return TrafficChartVO.builder().up(upDto).down(downDto).upTotal(upTotal).downTotal(downTotal)
                 .upRate(0.0)
                 .downRate(0.0)
+                .timeUnit(TimeUnit.HOUR.getCode())
                 .build();
     }
 
@@ -204,6 +206,7 @@ public class MetricsServiceImpl implements MetricsService {
         return TrafficChartVO.builder().up(upDto).down(downDto).upTotal(upTotal).downTotal(downTotal)
                 .downRate(downRate)
                 .upRate(upRate)
+                .timeUnit(TimeUnit.HOUR.getCode())
                 .build();
     }
 
@@ -256,6 +259,7 @@ public class MetricsServiceImpl implements MetricsService {
         return TrafficChartVO.builder().up(upDto).down(downDto).upTotal(upTotal).downTotal(downTotal)
                 .upRate(0.0)
                 .downRate(0.0)
+                .timeUnit(TimeUnit.DAY.getCode())
                 .build();
     }
 

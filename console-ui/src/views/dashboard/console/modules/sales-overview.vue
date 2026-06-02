@@ -119,7 +119,11 @@
 
     data.value[0].data = downYAxis
     data.value[1].data = upYAxis
-    xAxisData.value = result?.down?.xAxis?.map((h: string) => `${h}:00`) || []
+    const rawXAxis = result?.down?.xAxis || []
+    // 后端返回 timeUnit='hour' 时为小时粒度，需加 :00
+    xAxisData.value = result?.timeUnit === 'hour'
+      ? rawXAxis.map((h: string) => `${h}:00`)
+      : rawXAxis
     upTotal.value = result?.upTotal ?? 0
     downTotal.value = result?.downTotal ?? 0
     upRate.value = result?.upRate ?? 0

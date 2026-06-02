@@ -34,7 +34,7 @@
 
         <div class="absolute left-5 bottom-5">
           <div class="text-sm mb-1" style="color: #303133; font-weight: 900">{{ item.label }}</div>
-          <div class="font-bold mb-1" style="font-size: 20px">
+          <div class="font-bold mb-1" style="font-size: 17px">
             <span :style="{ color: item.label === 'CPU' ? '#303133' : item.color }">{{
               item.usedValue || item.value
             }}</span>
