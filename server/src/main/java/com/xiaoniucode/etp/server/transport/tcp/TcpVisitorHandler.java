@@ -72,13 +72,14 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error(cause);
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        logger.error("[TCP]流异常",cause);
         ctx.fireExceptionCaught(cause);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
+        logger.debug("[TCP]流断开");
         streamManager.getStreamContext(ctx.channel()).ifPresent(context -> {
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });

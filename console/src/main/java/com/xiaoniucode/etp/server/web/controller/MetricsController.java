@@ -19,12 +19,12 @@ import com.xiaoniucode.etp.common.message.PageResult;
 import com.xiaoniucode.etp.server.metrics.Metrics;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.param.metrics.ProxyQueryParam;
 import com.xiaoniucode.etp.server.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-//traffic
 @RequestMapping("/api/metrics")
 public class MetricsController {
     @Autowired
@@ -32,21 +32,19 @@ public class MetricsController {
     @Autowired
     private MetricsService metricsService;
 
-    @GetMapping("/{proxyId}")
-    public Ajax get(@PathVariable String proxyId) {
-        Metrics proxyMetrics = metricsCollector.getProxyMetrics(proxyId);
-        return Ajax.success(proxyMetrics);
-    }
-
     @GetMapping("list")
     public Ajax list(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         PageResult<Metrics> res = metricsCollector.listAllMetrics(page, size);
         return Ajax.success(res);
     }
 
-    @GetMapping("24h")
-    public Ajax getAll24hMetrics() {
+    @GetMapping("global/24h")
+    public Ajax getGlobal24hMetrics() {
         return Ajax.success(metricsService.getTotal24hTraffic());
     }
 
+    @PostMapping("proxy/24h")
+    public Ajax getProxy24hMetrics(@RequestBody ProxyQueryParam param) {
+        return Ajax.success(metricsService.getProxy24hTraffic(param));
+    }
 }

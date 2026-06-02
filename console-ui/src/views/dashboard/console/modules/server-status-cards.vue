@@ -107,12 +107,12 @@
       ]
     }
 
-    const cpuUsage = serverInfo.value.cpu?.usage || 0
-    const memUsage = serverInfo.value.osMem?.usage || 0
-    const jvmUsage = serverInfo.value.jvmMem?.usage || 0
-    const directMemUsage = serverInfo.value.directMem?.usage || 0
+    const cpuUsage = Number(serverInfo.value.cpu?.usage || 0)
+    const memUsage = Number(serverInfo.value.osMem?.usage || 0)
+    const jvmUsage = Number(serverInfo.value.jvmMem?.usage || 0)
+    const directMemUsage = Number(serverInfo.value.directMem?.usage || 0)
 
-    const getColor = (usage: any) => {
+    const getColor = (usage: number) => {
       if (usage < 70) return '#20a53a'
       if (usage < 90) return '#f59e0b'
       return '#ef4444'

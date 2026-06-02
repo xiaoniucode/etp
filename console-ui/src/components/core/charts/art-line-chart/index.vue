@@ -198,20 +198,29 @@
         right: 15,
         left: 0
       }),
-      tooltip: props.showTooltip ? getTooltipStyle() : undefined,
+      tooltip: props.showTooltip
+        ? props.tooltipFormatter
+          ? { ...getTooltipStyle(), formatter: props.tooltipFormatter }
+          : getTooltipStyle()
+        : undefined,
       xAxis: {
         type: 'category',
         boundaryGap: false,
         data: props.xAxisData,
         axisTick: getAxisTickStyle(),
         axisLine: getAxisLineStyle(props.showAxisLine),
-        axisLabel: getAxisLabelStyle(props.showAxisLabel)
+        axisLabel: {
+          ...getAxisLabelStyle(props.showAxisLabel),
+          interval: 0
+        }
       },
       yAxis: {
         type: 'value',
         min: 0,
         max: maxValue.value,
-        axisLabel: getAxisLabelStyle(props.showAxisLabel),
+        axisLabel: props.yAxisLabelFormatter
+          ? { ...getAxisLabelStyle(props.showAxisLabel), formatter: props.yAxisLabelFormatter }
+          : getAxisLabelStyle(props.showAxisLabel),
         axisLine: getAxisLineStyle(props.showAxisLine),
         splitLine: getSplitLineStyle(props.showSplitLine)
       }

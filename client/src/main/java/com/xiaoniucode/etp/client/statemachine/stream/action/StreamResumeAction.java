@@ -32,6 +32,7 @@ public class StreamResumeAction extends StreamBaseAction{
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         Channel server = context.getServer();
         if (event == StreamEvent.STREAM_REMOTE_RESUME) {
+            logger.debug("恢复本地服务流读取");
             server.config().setOption(ChannelOption.AUTO_READ, true);
         }
         if (event == StreamEvent.STREAM_LOCAL_RESUME) {

@@ -41,4 +41,13 @@ declare namespace Api.Metrics {
     writeRate: number
     lastActiveTime: string
   }
+
+  interface TrafficChartVO {
+    up: Metrics24LineDTO
+    down: Metrics24LineDTO
+    upTotal: number
+    downTotal: number
+    downRate: number
+    upRate: number
+  }
 }

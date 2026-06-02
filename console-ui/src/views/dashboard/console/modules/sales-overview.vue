@@ -23,7 +23,6 @@
       </div>
     </div>
 
-    <!-- chart -->
     <ArtLineChart
       height="calc(100% - 140px)"
       :data="data"
@@ -31,104 +30,105 @@
       :showAreaColor="true"
       :showAxisLine="false"
       :showLegend="true"
+      :yAxisLabelFormatter="yAxisLabelFormatter"
+      :tooltipFormatter="tooltipFormatter"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
+  import { fetchGet24hMetrics } from '@/api/metrics'
+  import { ByteUtils } from '@/utils/format/byteFormatter'
 
   const data = ref([
     {
       name: '下行流量',
-      data: [
-        60, 50, 40, 35, 30, 40, 80, 200, 450, 800, 1100, 950, 1000, 900, 850, 820, 900, 1050, 1300,
-        1450, 1250, 900, 550, 250
-      ] as number[],
+      data: [] as number[],
       showAreaColor: true
     },
     {
       name: '上行流量',
-      data: [
-        42, 35, 28, 24, 21, 28, 56, 140, 315, 560, 770, 665, 700, 630, 595, 574, 630, 735, 910,
-        1015, 875, 630, 385, 175
-      ] as number[],
+      data: [] as number[],
       showAreaColor: true
     }
   ])
 
-  const xAxisData = ref<string[]>([
-    '00:00',
-    '01:00',
-    '02:00',
-    '03:00',
-    '04:00',
-    '05:00',
-    '06:00',
-    '07:00',
-    '08:00',
-    '09:00',
-    '10:00',
-    '11:00',
-    '12:00',
-    '13:00',
-    '14:00',
-    '15:00',
-    '16:00',
-    '17:00',
-    '18:00',
-    '19:00',
-    '20:00',
-    '21:00',
-    '22:00',
-    '23:00'
-  ])
+  const xAxisData = ref<string[]>([])
+  const upTotal = ref(0)
+  const downTotal = ref(0)
+  const upRate = ref(0)
+  const downRate = ref(0)
 
-  const totalSent = computed(() => {
-    return data.value[1].data.reduce((sum, val) => sum + val, 0)
-  })
-
-  const totalReceived = computed(() => {
-    return data.value[0].data.reduce((sum, val) => sum + val, 0)
-  })
+  // 统一单位（由数据最大值决定）
+  const unitDivisor = ref(1)
+  const unitLabel = ref('B')
 
   const metrics = computed(() => {
-    const downData = data.value[0].data
-    const upData = data.value[1].data
-
-    const currentDown = downData.length > 0 ? downData[downData.length - 1] : 0
-    const currentUp = upData.length > 0 ? upData[upData.length - 1] : 0
-
     return [
       {
-        label: '上行',
-        value: formatBytes(currentUp),
+        label: '上行速率',
+        value: ByteUtils.formatBytes(upRate.value) + '/s',
         color: '#22c55e'
       },
       {
-        label: '下行',
-        value: formatBytes(currentDown),
+        label: '下行速率',
+        value: ByteUtils.formatBytes(downRate.value) + '/s',
         color: '#f59e0b'
       },
       {
-        label: '总发送',
-        value: formatBytes(totalSent.value),
+        label: '上行流量',
+        value: ByteUtils.formatBytes(upTotal.value),
         color: '#3b82f6'
       },
       {
-        label: '总接收',
-        value: formatBytes(totalReceived.value),
+        label: '下行流量',
+        value: ByteUtils.formatBytes(downTotal.value),
         color: '#8b5cf6'
       }
     ]
   })
 
-  const formatBytes = (bytes: number): string => {
-    if (bytes < 1024) return `${bytes.toFixed(1)} B`
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`
-    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
-    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`
+  // Y轴标签（仅数值）
+  const yAxisLabelFormatter = (value: number): string => {
+    if (value <= 0) return '0'
+    return parseFloat((value / unitDivisor.value).toFixed(2)).toString()
   }
+
+  // Tooltip（带单位）
+  const tooltipFormatter = (params: any[]): string => {
+    if (!params || params.length === 0) return ''
+    let html = `时间：${params[0].name}<br/>`
+    params.forEach((item: any) => {
+      html += `${item.marker} ${item.seriesName}: ${ByteUtils.formatBytes(item.value)}<br/>`
+    })
+    return html
+  }
+
+  const initData = async () => {
+    const result = (await fetchGet24hMetrics()) as Api.Metrics.TrafficChartVO
+
+    const downYAxis = result?.down?.yAxis || []
+    const upYAxis = result?.up?.yAxis || []
+    const allValues = [...downYAxis, ...upYAxis]
+
+    const dataMax = allValues.length > 0 ? Math.max(...allValues, 0) : 0
+    const unitInfo = ByteUtils.getUnitInfo(dataMax)
+    unitDivisor.value = unitInfo.divisor
+    unitLabel.value = unitInfo.unit
+
+    data.value[0].data = downYAxis
+    data.value[1].data = upYAxis
+    xAxisData.value = result?.down?.xAxis?.map((h: string) => `${h}:00`) || []
+    upTotal.value = result?.upTotal ?? 0
+    downTotal.value = result?.downTotal ?? 0
+    upRate.value = result?.upRate ?? 0
+    downRate.value = result?.downRate ?? 0
+  }
+
+  onMounted(() => {
+    initData()
+  })
 </script>
 
 <style scoped lang="scss">

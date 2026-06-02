@@ -4,6 +4,7 @@ import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.transport.AbstractStreamContext;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
@@ -14,6 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayDeque;
 
 @Getter
 @Setter
@@ -29,6 +31,8 @@ public class StreamContext extends AbstractStreamContext {
     private AgentContext agentContext;
     private StreamManager streamManager;
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
+
+    private final ArrayDeque<TMSPFrame> messagesQueue = new ArrayDeque<>();
 
     public StreamContext(int streamId, StateMachine<StreamState, StreamEvent, StreamContext> streamStateMachine) {
         this.streamId = streamId;

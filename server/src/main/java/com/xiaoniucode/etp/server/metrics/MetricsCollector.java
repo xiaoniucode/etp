@@ -93,15 +93,6 @@ public class MetricsCollector {
     }
 
     /**
-     * 批量删除
-     */
-    public void removeByProxyIds(Set<String> proxyIds) {
-        if (proxyIds != null) {
-            proxyIds.forEach(this::removeByProxyId);
-        }
-    }
-
-    /**
      * 获取单个代理的实时统计
      */
     public Metrics getProxyMetrics(String proxyId) {
@@ -120,7 +111,7 @@ public class MetricsCollector {
 
         long total = allMetrics.size();
         int currentPage = Math.max(0, page);
-        int pageSize = Math.max(1, Math.min(size, 100));
+        int pageSize = Math.clamp(size, 1, 100);
 
         List<Metrics> pageData = allMetrics.stream()
                 .skip((long) currentPage * pageSize)
@@ -182,10 +173,10 @@ public class MetricsCollector {
                     hourTime = item.getHour();
                 }
 
-                sumInBytes += item.getInboundBytes();
-                sumOutBytes += item.getOutboundBytes();
-                sumInMsg += item.getInboundMessages();
-                sumOutMsg += item.getOutboundMessages();
+                sumInBytes += item.getReadBytes();
+                sumOutBytes += item.getWriteBytes();
+                sumInMsg += item.getReadMessages();
+                sumOutMsg += item.getWriteMessages();
             }
 
             result.add(new HourlyTraffic(
@@ -202,6 +193,51 @@ public class MetricsCollector {
 
     public int getCollectorCount() {
         return PROXY_METRICS.size();
+    }
+
+    public double getTotalReadBytesRate() {
+        if (PROXY_METRICS.isEmpty()) {
+            return 0.0;
+        }
+        return PROXY_METRICS.values().stream()
+                .mapToDouble(m -> m.getReadBytesRate().doubleValue())
+                .sum();
+    }
+
+    public double getTotalWriteBytesRate() {
+        if (PROXY_METRICS.isEmpty()) {
+            return 0.0;
+        }
+        return PROXY_METRICS.values().stream()
+                .mapToDouble(m -> m.getWriteBytesRate().doubleValue())
+                .sum();
+    }
+
+    public long getTotalReadBytes() {
+        if (PROXY_METRICS.isEmpty()) {
+            return 0L;
+        }
+        return PROXY_METRICS.values().stream()
+                .mapToLong(m -> m.getTotalReadBytes().sum())
+                .sum();
+    }
+
+    public long getTotalWriteBytes() {
+        if (PROXY_METRICS.isEmpty()) {
+            return 0L;
+        }
+        return PROXY_METRICS.values().stream()
+                .mapToLong(m -> m.getTotalWriteBytes().longValue())
+                .sum();
+    }
+
+    public int getTotalActiveChannels() {
+        if (PROXY_METRICS.isEmpty()) {
+            return 0;
+        }
+        return PROXY_METRICS.values().stream()
+                .mapToInt(m -> m.getActiveChannels().get())
+                .sum();
     }
 
     /**

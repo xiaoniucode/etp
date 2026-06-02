@@ -33,6 +33,7 @@ public class StreamPauseAction extends StreamBaseAction {
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         Channel server = context.getServer();
         if (event == StreamEvent.STREAM_REMOTE_PAUSE) {
+            logger.debug("暂停本地服务流读取");
             server.config().setOption(ChannelOption.AUTO_READ, false);
         }
         if (event == StreamEvent.STREAM_LOCAL_PAUSE) {

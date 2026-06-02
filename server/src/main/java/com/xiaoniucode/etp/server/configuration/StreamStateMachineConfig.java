@@ -75,33 +75,28 @@ public class StreamStateMachineConfig {
                 .from(StreamState.OPENING)
                 .to(StreamState.OPENED)
                 .on(StreamEvent.STREAM_OPEN_SUCCESS)
-                .when(ctx -> true)
                 .perform(streamOpenResponseAction);
         // 暂停流
         builder.externalTransition()
                 .from(StreamState.OPENED)
                 .to(StreamState.PAUSED)
                 .on(StreamEvent.STREAM_LOCAL_PAUSE)
-                .when(ctx -> true)
                 .perform(streamPauseAction);
         builder.externalTransition()
                 .from(StreamState.OPENED)
                 .to(StreamState.PAUSED)
                 .on(StreamEvent.STREAM_REMOTE_PAUSE)
-                .when(ctx -> true)
                 .perform(streamPauseAction);
         // 恢复流
         builder.externalTransition()
                 .from(StreamState.PAUSED)
                 .to(StreamState.OPENED)
                 .on(StreamEvent.STREAM_LOCAL_RESUME)
-                .when(ctx -> true)
                 .perform(streamResumeAction);
         builder.externalTransition()
                 .from(StreamState.PAUSED)
                 .to(StreamState.OPENED)
                 .on(StreamEvent.STREAM_REMOTE_RESUME)
-                .when(ctx -> true)
                 .perform(streamResumeAction);
         // 打开流失败
         builder.externalTransition()
@@ -113,7 +108,7 @@ public class StreamStateMachineConfig {
 
         // 本地关闭流事件
         builder.externalTransitions()
-                .fromAmong(StreamState.OPENED, StreamState.FAILED, StreamState.OPENING, StreamState.PAUSED)
+                .fromAmong(StreamState.OPENED,StreamState.FAILED, StreamState.OPENING, StreamState.PAUSED)
                 .to(StreamState.CLOSED)
                 .on(StreamEvent.STREAM_LOCAL_CLOSE)
                 .when(ctx -> true)

@@ -17,12 +17,11 @@ package com.xiaoniucode.etp.server.web.dto.metrics;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 public record MetricsDTO(
-    String key,
-    int channels,
+    String proxyId,
     long readBytes,
     long writeBytes,
     long readMessages,
     long writeMessages,
-    LocalDateTime time
+    LocalDateTime createdAt
 ) implements Serializable {
 }

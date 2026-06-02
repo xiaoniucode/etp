@@ -74,7 +74,15 @@ public class ProxyMetrics {
     }
 
     public void decChannels() {
-        activeChannels.decrementAndGet();
+        while (true) {
+            int current = activeChannels.get();
+            if (current <= 0) {
+                break;
+            }
+            if (activeChannels.compareAndSet(current, current - 1)) {
+                break;
+            }
+        }
         lastActiveTime = LocalDateTime.now();
     }
 
@@ -106,7 +114,7 @@ public class ProxyMetrics {
         }
     }
 
-    public void takeHourlySnapshot() {
+    public HourlySnapshot takeHourlySnapshot() {
         long currReadBytes = totalReadBytes.sum();
         long currWriteBytes = totalWriteBytes.sum();
         long currReadMsg = totalReadMessages.sum();
@@ -132,6 +140,7 @@ public class ProxyMetrics {
         lastHourWriteBytes = currWriteBytes;
         lastHourReadMessages = currReadMsg;
         lastHourWriteMessages = currWriteMsg;
+        return snapshot;
     }
 
     /**

@@ -170,6 +170,10 @@ export interface LineChartProps extends BaseChartProps, AxisDisplayProps, Intera
   symbolSize?: number
   /** 多数据动画延迟间隔（毫秒） */
   animationDelay?: number
+  /** Y轴标签格式化函数（可选，不传则走默认） */
+  yAxisLabelFormatter?: (value: number) => string
+  /** Tooltip 格式化函数（可选，不传则走默认） */
+  tooltipFormatter?: (params: any) => string
 }
 
 // 雷达图数据项接口

@@ -29,6 +29,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -109,11 +110,13 @@ public class ProxyManager {
                 set.remove(proxyId);
             }
         }
-        Set<String> agentProxies = agentProxyMap.remove(agentId);
-        if (!CollectionUtils.isEmpty(agentProxies)) {
-            agentProxies.remove(proxyId);
-        } else {
-            agentProxyMap.remove(agentId);
+        if (StringUtils.hasText(agentId)){
+            Set<String> agentProxies = agentProxyMap.remove(agentId);
+            if (!CollectionUtils.isEmpty(agentProxies)) {
+                agentProxies.remove(proxyId);
+            } else {
+                agentProxyMap.remove(agentId);
+            }
         }
         Set<String> domains = domainRegistry.getDomainsByProxyId(proxyId);
         for (String domain : domains) {

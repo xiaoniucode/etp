@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.statemachine.stream.action;
 
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
@@ -14,7 +15,9 @@ import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.transport.connection.DirectConnectionPool;
 import com.xiaoniucode.etp.server.transport.connection.MultiplexConnectionPool;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,10 @@ public class StreamCloseAction extends StreamBaseAction {
         leastConnHooks.onStreamClosed(context);
         metricsCollector.onChannelInactive(context.getProxyId());
 
+        ByteBuf byteBuf = visitor.attr(AttributeKeys.PENDING_READ).get();
+        if (byteBuf != null && byteBuf.refCnt() > 0) {
+            byteBuf.release();
+        }
         ChannelUtils.closeOnFlush(visitor);
         AgentContext agentContext = context.getAgentContext();
         TunnelEntry tunnelEntry = context.getTunnelEntry();

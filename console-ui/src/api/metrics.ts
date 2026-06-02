@@ -6,7 +6,7 @@ import request from '@/utils/http'
  * @returns 流量统计数据
  */
 export function fetchGetMetrics(proxyId: string) {
-  return request.get<Api.Metrics.MetricsDTO>({
+  return request.get<Api.Metrics.MetricsItemDTO>({
     url: `/api/metrics/${proxyId}`
   })
 }
@@ -28,7 +28,24 @@ export function fetchGetMetricsList(params: Api.Common.CommonSearchParams) {
  * @returns 24小时流量统计数据
  */
 export function fetchGet24hMetrics() {
-  return request.get<Api.Metrics.Metrics24LineDTO>({
-    url: '/api/metrics/24h'
+  return request.get<Api.Metrics.TrafficChartVO>({
+    url: '/api/metrics/global/24h'
+  })
+}
+
+/**
+ * 获取单个代理的流量统计数据（支持多种时间范围）
+ * @param params 查询参数
+ * @returns 流量统计数据
+ */
+export function fetchGetProxyMetrics(params: {
+  proxyId: string
+  queryType: string
+  startDate?: string
+  endDate?: string
+}) {
+  return request.post<Api.Metrics.TrafficChartVO>({
+    url: '/api/metrics/proxy/24h',
+    data: params
   })
 }

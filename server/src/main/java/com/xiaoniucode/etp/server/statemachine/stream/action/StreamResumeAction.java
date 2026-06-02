@@ -37,6 +37,7 @@ public class StreamResumeAction extends StreamBaseAction {
         Channel visitor = context.getVisitor();
         if (event == StreamEvent.STREAM_REMOTE_RESUME) {
             visitor.config().setOption(ChannelOption.AUTO_READ, true);
+            visitor.read();
         }
 
         if (event == StreamEvent.STREAM_LOCAL_RESUME) {

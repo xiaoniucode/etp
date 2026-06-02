@@ -1,9 +1,8 @@
 package com.xiaoniucode.etp.server.transport;
 
 import com.xiaoniucode.etp.core.domain.BandwidthConfig;
-import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.BandwidthBuilder;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Refill;
 import io.netty.buffer.ByteBuf;
 
 import java.time.Duration;
@@ -68,14 +67,17 @@ public class BandwidthLimiter {
         long bytesPerSecond = Math.max(1, bps / 8);
 
         return Bucket.builder()
-                .addLimit(Bandwidth.classic(
-                        bytesPerSecond,
-                        Refill.intervally(bytesPerSecond / 10, Duration.ofMillis(100))
-                ))
+                .addLimit(
+                        BandwidthBuilder.builder()
+                                .capacity(bytesPerSecond)
+                                .refillGreedy(
+                                        bytesPerSecond,
+                                        Duration.ofSeconds(1)
+                                )
+                                .build()
+                )
                 .build();
-    }
-
-    public boolean tryUpload(ByteBuf msg) {
+    }    public boolean tryUpload(ByteBuf msg) {
         if (uploadBucket == null) return true;
         return uploadBucket.tryConsume(msg.readableBytes());
     }

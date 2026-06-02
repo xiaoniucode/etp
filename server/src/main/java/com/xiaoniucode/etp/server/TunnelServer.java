@@ -16,7 +16,7 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.core.transport.TlsContextHolder;
 import com.xiaoniucode.etp.server.transport.ControlIdleCheckHandler;
-import com.xiaoniucode.etp.server.transport.DownloadRateLimitHandler;
+import com.xiaoniucode.etp.server.transport.MultiplexDownloadRateLimitHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -68,7 +68,7 @@ public class TunnelServer implements Lifecycle {
             tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
 
-            DownloadRateLimitHandler downloadRateLimitHandler = SpringContextHolder.getBean(DownloadRateLimitHandler.class);
+            MultiplexDownloadRateLimitHandler downloadRateLimitHandler = SpringContextHolder.getBean(MultiplexDownloadRateLimitHandler.class);
             AgentManager agentManager = SpringContextHolder.getBean(AgentManager.class);
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(tunnelBossGroup, tunnelWorkerGroup)
@@ -86,7 +86,7 @@ public class TunnelServer implements Lifecycle {
                                     .addLast(new SnappyFrameEncoder())
                                     .addLast(new SnappyFrameDecoder())
                                     .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
-                                    .addLast(downloadRateLimitHandler)
+                                    //.addLast(downloadRateLimitHandler)
                                     .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentManager,90,0,0, TimeUnit.SECONDS))
                                     .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
                         }

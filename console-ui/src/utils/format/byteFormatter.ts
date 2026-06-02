@@ -24,7 +24,7 @@ export class ByteUtils {
    * @returns 格式化后的字符串
    */
   public static formatBytes(bytes: number): string {
-    if (bytes <= 0) return '0MB'
+    if (bytes <= 0) return '0 B'
     let value = bytes
     let unit = 'B'
     
@@ -43,10 +43,10 @@ export class ByteUtils {
     }
     
     if (value === Math.floor(value)) {
-      return `${Math.floor(value)}${unit}`
+      return `${Math.floor(value)} ${unit}`
     } else {
       const formatted = value.toFixed(2).replace(/\.?0*$/, '')
-      return `${formatted}${unit}`
+      return `${formatted} ${unit}`
     }
   }
 
@@ -73,6 +73,26 @@ export class ByteUtils {
       return Math.floor(value)
     } else {
       return parseFloat(value.toFixed(2).replace(/\.?0*$/, ''))
+    }
+  }
+
+  /**
+   * 根据数据最大值确定统一的显示单位（B / KB / MB / GB / TB）
+   * 用于图表 Y 轴等需要"所有刻度使用同一单位"的场景
+   * @param maxBytes 数据中的最大值（字节数）
+   * @returns { divisor: number; unit: string } 除数与单位标签
+   */
+  public static getUnitInfo(maxBytes: number): { divisor: number; unit: string } {
+    if (maxBytes >= 1024 * 1024 * 1024 * 1024) {
+      return { divisor: 1024 * 1024 * 1024 * 1024, unit: 'TB' }
+    } else if (maxBytes >= 1024 * 1024 * 1024) {
+      return { divisor: 1024 * 1024 * 1024, unit: 'GB' }
+    } else if (maxBytes >= 1024 * 1024) {
+      return { divisor: 1024 * 1024, unit: 'MB' }
+    } else if (maxBytes >= 1024) {
+      return { divisor: 1024, unit: 'KB' }
+    } else {
+      return { divisor: 1, unit: 'B' }
     }
   }
 }

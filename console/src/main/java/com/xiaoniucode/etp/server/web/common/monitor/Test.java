@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http:
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,18 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.xiaoniucode.etp.server.web.service;
-import com.xiaoniucode.etp.server.web.dto.metrics.TrafficChartVO;
-import com.xiaoniucode.etp.server.web.param.metrics.ProxyQueryParam;
 
-public interface MetricsService {
-    /**
-     * 获取所有指标数据
-     * @return 指标数据列表
-     */
-    TrafficChartVO getTotal24hTraffic();
+package com.xiaoniucode.etp.server.web.common.monitor;
 
-    TrafficChartVO getProxy24hTraffic(ProxyQueryParam param);
-    void saveHourlyMetricsSnapshot();
-    void deleteByProxyId(String proxyId);
+public class Test {
+    static void main() {
+        OsMemoryDTO osMemory = ServerMonitor.getOsMemory();
+        String total = osMemory.getTotal();
+    }
 }

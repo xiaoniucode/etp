@@ -23,25 +23,25 @@ import java.time.LocalDateTime;
 @Getter
 public class HourlyTraffic {
     private final LocalDateTime hour;
-    private final long inboundBytes;
-    private final long outboundBytes;
-    private final long inboundMessages;
-    private final long outboundMessages;
+    private final long readBytes;
+    private final long writeBytes;
+    private final long readMessages;
+    private final long writeMessages;
 
     public HourlyTraffic(HourlySnapshot snap) {
         this.hour = snap.getHour();
-        this.inboundBytes = snap.getInboundBytes();
-        this.outboundBytes = snap.getOutboundBytes();
-        this.inboundMessages = snap.getInboundMessages();
-        this.outboundMessages = snap.getOutboundMessages();
+        this.readBytes = snap.getReadBytes();
+        this.writeBytes = snap.getWriteBytes();
+        this.readMessages = snap.getReadMessages();
+        this.writeMessages = snap.getWriteMessages();
     }
 
-    public HourlyTraffic(LocalDateTime hour, long inboundBytes, long outboundBytes,
-                         long inboundMessages, long outboundMessages) {
+    public HourlyTraffic(LocalDateTime hour, long readBytes, long writeBytes,
+                         long readMessages, long writeMessages) {
         this.hour = hour;
-        this.inboundBytes = inboundBytes;
-        this.outboundBytes = outboundBytes;
-        this.inboundMessages = inboundMessages;
-        this.outboundMessages = outboundMessages;
+        this.readBytes = readBytes;
+        this.writeBytes = writeBytes;
+        this.readMessages = readMessages;
+        this.writeMessages = writeMessages;
     }
 }

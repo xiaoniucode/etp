@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.transport;
 
 import com.xiaoniucode.etp.core.enums.ProtocolType;
+import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
@@ -44,6 +45,7 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf payload) {
+        logger.debug("进入上传限流处理器");
         Channel visitor = ctx.channel();
         Optional<StreamContext> streamContextOpt = streamManager.getStreamContext(visitor);
         if (streamContextOpt.isEmpty()) {
@@ -76,17 +78,17 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
                             ChannelUtils.closeOnFlush(visitor);
                         });
             }
-            if (protocol.isTcp()){
+            if (protocol.isTcp()) {
                 ChannelUtils.closeOnFlush(visitor);
             }
             return;
         }
-        
+
         logger.debug("访问速度太快，触发限流：streamId={} bytes={} 等待 {} ms", streamContext.getStreamId(), bytes, waitNanos / 1_000_000);
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
-        payload.retain();
+        visitor.attr(AttributeKeys.PENDING_READ).set(payload.retain());
         visitor.eventLoop().schedule(() -> {
-            ctx.fireChannelRead(payload);
+            ctx.fireChannelRead(visitor.attr(AttributeKeys.PENDING_READ).get());
             visitor.config().setOption(ChannelOption.AUTO_READ, true);
             visitor.read();
             logger.debug("限流恢复，继续读取：streamId={}", streamContext.getStreamId());

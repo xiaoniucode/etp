@@ -55,5 +55,6 @@ public class TunnelServerStartup {
                 .initializers(context ->
                         context.getBeanFactory().registerSingleton("appConfig", config))
                 .run(args);
+
     }
 }
