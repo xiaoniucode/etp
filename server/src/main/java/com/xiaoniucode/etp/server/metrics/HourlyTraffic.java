@@ -30,14 +30,6 @@ public class HourlyTraffic {
     private long readMessages;
     private long writeMessages;
 
-    public HourlyTraffic(HourlySnapshot snap) {
-        this.hour = snap.getHour();
-        this.readBytes = snap.getReadBytes();
-        this.writeBytes = snap.getWriteBytes();
-        this.readMessages = snap.getReadMessages();
-        this.writeMessages = snap.getWriteMessages();
-    }
-
     public HourlyTraffic(LocalDateTime hour, long readBytes, long writeBytes, long readMessages, long writeMessages) {
         this.hour = hour;
         this.readBytes = readBytes;

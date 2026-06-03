@@ -33,6 +33,7 @@ import com.xiaoniucode.etp.server.web.param.bandwidth.BandwidthSaveParam;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
 import com.xiaoniucode.etp.server.web.param.proxy.ProxyTargetSaveParam;
 import com.xiaoniucode.etp.server.web.repository.*;
+import com.xiaoniucode.etp.server.web.service.MetricsService;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import com.xiaoniucode.etp.server.web.service.assembler.ProxyAssembler;
 import com.xiaoniucode.etp.server.web.service.converter.*;
@@ -73,11 +74,10 @@ public class ProxyServiceImpl implements ProxyService {
     private AccessControlRepository accessControlRepository;
     @Autowired
     private AccessControlRuleRepository accessControlRuleRepository;
-
+    @Autowired
+    private MetricsService metricsService;
     @Autowired
     private ProxyConvert proxyConvert;
-    @Autowired
-    private ProxyDomainConvert proxyDomainConvert;
     @Autowired
     private ProxyTargetConvert proxyTargetConvert;
     @Autowired
@@ -559,7 +559,9 @@ public class ProxyServiceImpl implements ProxyService {
             basicAuthRepository.deleteByProxyIdIn(ids);
             basicUserRepository.deleteByProxyIdIn(ids);
         }
-        // Base
+        //删除流量统计数据
+        ids.forEach(proxyId -> metricsService.deleteByProxyId(proxyId));
+        //删除基础信息
         proxyRepository.deleteByIdIn(ids);
         //清空运行时数据
         transactionHelper.afterCommit(() -> proxyManager.deactivates(ids));

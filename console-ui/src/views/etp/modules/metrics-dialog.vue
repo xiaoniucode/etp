@@ -13,7 +13,14 @@
           刷新
         </ElButton>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-8">
+        <ArtStatsCard
+          title="连接数"
+          :count="ByteUtils.formatNumber(metricsData.activeChannels || 0)"
+          description="当前活跃连接"
+          icon="ri:share-line"
+          iconStyle="bg-cyan-500"
+        />
         <ArtStatsCard
           title="上行流量"
           :count="ByteUtils.formatNumber(metricsData.upTotal || 0)"
@@ -28,7 +35,6 @@
           icon="ri:arrow-down-line"
           iconStyle="bg-orange-500"
         />
-
         <ArtStatsCard
           title="上行速率"
           :count="ByteUtils.formatNumber(metricsData.upRate || 0)"
@@ -44,7 +50,7 @@
           iconStyle="bg-indigo-500"
         />
       </div>
-      <div class="pt-5">
+      <div class="pt-4">
         <div class="art-card-sm p-4 mb-5">
           <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium m-0 text-g-900">流量趋势</h3>
@@ -166,7 +172,8 @@
     upTotal: 0,
     downTotal: 0,
     upRate: 0,
-    downRate: 0
+    downRate: 0,
+    activeChannels: 0
   })
 
   const createEmptyLineChartData = () => [

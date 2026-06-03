@@ -62,31 +62,32 @@ public class MetricsServiceImpl implements MetricsService {
 
     @Override
     public TrafficChartVO getTotal24hTraffic() {
-        return buildTrafficChartVO(metricsCollector.getTotal24hTraffic(), metricsCollector.getTotalWriteBytes(),
+        TrafficChartVO trafficChartVO = buildTrafficChartVO(metricsCollector.getTotal24hTraffic(), metricsCollector.getTotalWriteBytes(),
                 metricsCollector.getTotalReadBytes(),
                 metricsCollector.getTotalWriteBytesRate(),
                 metricsCollector.getTotalReadBytesRate()
         );
+        trafficChartVO.setActiveChannels(metricsCollector.getTotalActiveChannels());
+        return trafficChartVO;
     }
 
     @Override
     public TrafficChartVO getProxy24hTraffic(ProxyQueryParam param) {
         String proxyId = param.getProxyId();
         MetricQueryType queryType = MetricQueryType.fromCode(param.getQueryType());
+        TrafficChartVO result;
         switch (queryType) {
-            //最近24小时实时数据
             case LAST_24_HOURS: {
                 List<HourlyTraffic> list = metricsCollector.get24hTraffic(proxyId);
                 Metrics metrics = metricsCollector.getProxyMetrics(proxyId);
                 if (metrics == null) {
-                    return buildTrafficChartVO(list, 0L, 0L, 0.0, 0.0);
+                    result = buildTrafficChartVO(list, 0L, 0L, 0.0, 0.0);
+                } else {
+                    result = buildTrafficChartVO(list, metrics.getWriteBytes(), metrics.getReadBytes(),
+                            metrics.getWriteRate(), metrics.getReadRate());
                 }
-                return buildTrafficChartVO(list, metrics.getWriteBytes(), metrics.getReadBytes(),
-                        metrics.getWriteRate(),
-                        metrics.getReadRate()
-                );
+                break;
             }
-            //历史数据
             case LAST_3_DAYS:
             case LAST_7_DAYS:
             case LAST_30_DAYS: {
@@ -96,7 +97,8 @@ public class MetricsServiceImpl implements MetricsService {
                 LocalDateTime endTime = LocalDate.now().atTime(23, 59, 59);
                 List<DailyTrafficQueryResult> results =
                         metricsRepository.queryDailyTrafficByRange(proxyId, startTime, endTime);
-                return buildDailyTrafficChartVO(results, startDate, LocalDate.now());
+                result = buildDailyTrafficChartVO(results, startDate, LocalDate.now());
+                break;
             }
             case CUSTOM: {
                 LocalDate startDate = param.getStartDate();
@@ -108,20 +110,21 @@ public class MetricsServiceImpl implements MetricsService {
                 if (spanDays <= 0 || spanDays > 15) {
                     throw new BizException("自定义查询天数跨度必须在 1 ~ 15 天之间");
                 }
-                LocalDateTime startTime = startDate.atStartOfDay();
-                LocalDateTime endTime = endDate.atTime(23, 59, 59);
                 if (spanDays == 1) {
-                    return buildHistoricalDayHourlyChartVO(metricsRepository.queryHourlyTrafficByRangeMySQL(
+                    result = buildHistoricalDayHourlyChartVO(metricsRepository.queryHourlyTrafficByRangeMySQL(
                             proxyId, startDate.atStartOfDay(), startDate.plusDays(1).atStartOfDay()), startDate);
                 } else {
                     List<DailyTrafficQueryResult> results =
-                            metricsRepository.queryDailyTrafficByRange(proxyId, startTime, endTime);
-                    return buildDailyTrafficChartVO(results, startDate, endDate);
+                            metricsRepository.queryDailyTrafficByRange(proxyId, startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
+                    result = buildDailyTrafficChartVO(results, startDate, endDate);
                 }
+                break;
             }
             default:
                 return null;
         }
+        result.setActiveChannels(metricsCollector.getActiveChannels(proxyId));
+        return result;
     }
 
     /**
@@ -255,11 +258,6 @@ public class MetricsServiceImpl implements MetricsService {
                 .downRate(0.0)
                 .timeUnit(TimeUnit.DAY.getCode())
                 .build();
-    }
-
-    @Override
-    public void saveHourlyMetricsSnapshot() {
-
     }
 
     @Override

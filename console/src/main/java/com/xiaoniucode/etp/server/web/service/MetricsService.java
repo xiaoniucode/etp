@@ -28,7 +28,6 @@ public interface MetricsService {
     TrafficChartVO getTotal24hTraffic();
 
     TrafficChartVO getProxy24hTraffic(ProxyQueryParam param);
-    void saveHourlyMetricsSnapshot();
     void deleteByProxyId(String proxyId);
 
     PageResult<TrafficCountDTO> queryPage(PageQuery pageQuery);

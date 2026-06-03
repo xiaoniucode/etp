@@ -16,23 +16,16 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.dto.metrics;
+package com.xiaoniucode.etp.server.event;
 
-import lombok.Builder;
-import lombok.Data;
+import com.xiaoniucode.etp.core.notify.Event;
+import com.xiaoniucode.etp.server.metrics.HourlyTraffic;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@Data
-@Builder
-public class TrafficChartVO {
-    private Traffic24LineDTO up;
-    private Traffic24LineDTO down;
-    private Long upTotal;
-    private Long downTotal;
-    private Double downRate;
-    private Double upRate;
-    private Integer activeChannels;
-    /**
-     * 时间刻度单位，标识 X 轴数据粒度（hour=小时，day=天）
-     */
-    private String timeUnit;
+@Getter
+@AllArgsConstructor
+public class HourlyTrafficEvent extends Event {
+    private String proxyId;
+    private HourlyTraffic hourlyTraffic;
 }

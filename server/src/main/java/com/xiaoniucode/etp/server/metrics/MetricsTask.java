@@ -1,19 +1,22 @@
 package com.xiaoniucode.etp.server.metrics;
 
+import com.xiaoniucode.etp.core.notify.EventBus;
+import com.xiaoniucode.etp.server.event.HourlyTrafficEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
- * ProxyMetrics 定时任务
+ * Metrics 定时任务
  */
 @Component
 public class MetricsTask {
-
-    private final MetricsCollector metricsCollector;
-
-    public MetricsTask(MetricsCollector metricsCollector) {
-        this.metricsCollector = metricsCollector;
-    }
+    @Autowired
+    private MetricsCollector metricsCollector;
+    @Autowired
+    private EventBus eventBus;
 
     /**
      * 每小时执行一次，记录小时快照
@@ -21,7 +24,11 @@ public class MetricsTask {
      */
     @Scheduled(cron = "0 5 * * * ?")
     public void hourlySnapshotTask() {
-        metricsCollector.takeAllHourlySnapshots();
+        Map<String, ProxyMetrics> allMetrics = metricsCollector.getAllMetrics();
+        allMetrics.forEach((proxyId, proxyMetrics) -> {
+            HourlyTraffic hourlyTraffic = proxyMetrics.takeHourlySnapshot();
+            eventBus.publishAsync(new HourlyTrafficEvent(proxyId, hourlyTraffic));
+        });
     }
 
     /**
@@ -29,6 +36,7 @@ public class MetricsTask {
      */
     @Scheduled(fixedRate = 1000)
     public void rateUpdateTask() {
-        metricsCollector.updateAllRates();
+        Map<String, ProxyMetrics> allMetrics = metricsCollector.getAllMetrics();
+        allMetrics.values().forEach(ProxyMetrics::updateRate);
     }
 }

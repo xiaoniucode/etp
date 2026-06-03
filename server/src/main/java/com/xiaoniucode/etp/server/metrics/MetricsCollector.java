@@ -29,9 +29,7 @@ import java.util.function.Consumer;
 
 @Component
 public class MetricsCollector {
-
     private final InternalLogger logger = InternalLoggerFactory.getInstance(MetricsCollector.class);
-
     private static final Map<String, ProxyMetrics> PROXY_METRICS = new ConcurrentHashMap<>(256);
 
     public ProxyMetrics getOrCreate(String proxyId) {
@@ -75,6 +73,10 @@ public class MetricsCollector {
         if (m != null) {
             action.accept(m);
         }
+    }
+
+    public Map<String, ProxyMetrics> getAllMetrics() {
+        return PROXY_METRICS;
     }
 
     /**
@@ -122,20 +124,6 @@ public class MetricsCollector {
         return new PageResult<>(pageData, total, currentPage, pageSize);
     }
 
-    /**
-     * 每小时记录所有 proxy 的小时快照
-     */
-    public void takeAllHourlySnapshots() {
-        PROXY_METRICS.values().forEach(ProxyMetrics::takeHourlySnapshot);
-    }
-
-    /**
-     * 每秒更新所有 proxy 的实时速率（bytes/s）
-     */
-    public void updateAllRates() {
-        PROXY_METRICS.values().forEach(ProxyMetrics::updateRate);
-    }
-
     public List<HourlyTraffic> get24hTraffic(String proxyId) {
         ProxyMetrics pm = PROXY_METRICS.get(proxyId);
         if (pm == null) {
@@ -145,7 +133,7 @@ public class MetricsCollector {
     }
 
     /**
-     * 获取所有 proxy 汇总后的24小时统计数据
+     * 获取所有 proxy 汇总后的24小时统计数据，环形滚动
      */
     public List<HourlyTraffic> getTotal24hTraffic() {
         if (PROXY_METRICS.isEmpty()) {
@@ -159,40 +147,25 @@ public class MetricsCollector {
 
         int size = 24;
         List<HourlyTraffic> result = new ArrayList<>(size);
-
         for (int i = 0; i < 24; i++) {
             long sumInBytes = 0, sumOutBytes = 0;
             long sumInMsg = 0, sumOutMsg = 0;
-
             LocalDateTime hourTime = null;
 
             for (List<HourlyTraffic> data : all) {
                 HourlyTraffic item = data.get(i);
-
                 if (hourTime == null) {
                     hourTime = item.getHour();
                 }
-
                 sumInBytes += item.getReadBytes();
                 sumOutBytes += item.getWriteBytes();
                 sumInMsg += item.getReadMessages();
                 sumOutMsg += item.getWriteMessages();
             }
-
-            result.add(new HourlyTraffic(
-                    hourTime,
-                    sumInBytes,
-                    sumOutBytes,
-                    sumInMsg,
-                    sumOutMsg
-            ));
+            result.add(new HourlyTraffic(hourTime, sumInBytes, sumOutBytes, sumInMsg, sumOutMsg));
         }
 
         return result;
-    }
-
-    public int getCollectorCount() {
-        return PROXY_METRICS.size();
     }
 
     public double getTotalReadBytesRate() {
@@ -231,7 +204,7 @@ public class MetricsCollector {
                 .sum();
     }
 
-    public int getTotalActiveChannels() {
+    public Integer getTotalActiveChannels() {
         if (PROXY_METRICS.isEmpty()) {
             return 0;
         }
@@ -240,11 +213,19 @@ public class MetricsCollector {
                 .sum();
     }
 
+    public Integer getActiveChannels(String proxyId) {
+        ProxyMetrics proxyMetrics = PROXY_METRICS.get(proxyId);
+        if (proxyMetrics == null) {
+            return 0;
+        }
+        return proxyMetrics.getActiveChannels().get();
+    }
+
     /**
      * 清空所有统计
      */
     public void clearAll() {
         PROXY_METRICS.clear();
-        logger.warn("已清空所有代理流量统计数据");
+        logger.debug("已清空所有代理流量统计数据");
     }
 }

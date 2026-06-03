@@ -41,7 +41,7 @@ public class ProxyMetrics {
     private volatile LocalDateTime lastActiveTime = LocalDateTime.now();
 
     private static final int HOURS_24 = 24;
-    private final HourlySnapshot[] hourlyRing = new HourlySnapshot[HOURS_24];
+    private final HourlyTraffic[] hourlyRing = new HourlyTraffic[HOURS_24];
     private final AtomicLong hourlyIndex = new AtomicLong(0);
 
     /**
@@ -114,7 +114,7 @@ public class ProxyMetrics {
         }
     }
 
-    public HourlySnapshot takeHourlySnapshot() {
+    public HourlyTraffic takeHourlySnapshot() {
         long currReadBytes = totalReadBytes.sum();
         long currWriteBytes = totalWriteBytes.sum();
         long currReadMsg = totalReadMessages.sum();
@@ -125,7 +125,7 @@ public class ProxyMetrics {
         long deltaMsgRead = currReadMsg - lastHourReadMessages;
         long deltaMsgWrite = currWriteMsg - lastHourWriteMessages;
 
-        HourlySnapshot snapshot = new HourlySnapshot(
+        HourlyTraffic snapshot = new HourlyTraffic(
                 LocalDateTime.now().truncatedTo(ChronoUnit.HOURS),
                 Math.max(0, deltaBytesRead),
                 Math.max(0, deltaBytesWrite),
@@ -230,9 +230,9 @@ public class ProxyMetrics {
         long start = Math.max(0, total - HOURS_24);
 
         for (long i = start; i < total; i++) {
-            HourlySnapshot snap = hourlyRing[(int) (i % HOURS_24)];
+            HourlyTraffic snap = hourlyRing[(int) (i % HOURS_24)];
             if (snap != null) {
-                map.put(snap.getHour(), new HourlyTraffic(snap));
+                map.put(snap.getHour(), snap);
             }
         }
 
@@ -241,8 +241,7 @@ public class ProxyMetrics {
 
         for (int i = 23; i >= 0; i--) {
             LocalDateTime time = now.minusHours(i);
-            result.add(map.getOrDefault(
-                    time,
+            result.add(map.getOrDefault(time,
                     new HourlyTraffic(time, 0L, 0L, 0L, 0L)
             ));
         }
@@ -258,7 +257,6 @@ public class ProxyMetrics {
         m.setWriteBytes(totalWriteBytes.sum());
         m.setReadMessages(totalReadMessages.sum());
         m.setWriteMessages(totalWriteMessages.sum());
-
         m.setReadRate(readBytesRate.doubleValue());
         m.setWriteRate(writeBytesRate.doubleValue());
         m.setLastActiveTime(lastActiveTime);
