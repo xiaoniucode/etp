@@ -94,7 +94,8 @@
           prop: 'writeBytes',
           label: '上行流量',
           width: 120,
-          formatter: (row: Api.Metrics.TrafficCountDTO) => ByteUtils.formatBytes(row.writeBytes || 0)
+          formatter: (row: Api.Metrics.TrafficCountDTO) =>
+            ByteUtils.formatBytes(row.writeBytes || 0)
         },
         {
           prop: 'readBytes',
@@ -116,7 +117,8 @@
           prop: 'totalBytes',
           label: '总流量',
           width: 150,
-          formatter: (row: Api.Metrics.TrafficCountDTO) => ByteUtils.formatBytes(row.totalBytes || 0)
+          formatter: (row: Api.Metrics.TrafficCountDTO) =>
+            ByteUtils.formatBytes(row.totalBytes || 0)
         },
         {
           prop: 'operation',
@@ -127,7 +129,7 @@
             h('div', [
               h(ArtButtonTable, {
                 type: 'text',
-                text: '查看详情',
+                text: '数据',
                 onClick: () => handleViewMetrics(row)
               })
             ])

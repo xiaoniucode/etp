@@ -39,16 +39,17 @@ public interface MetricsRepository extends JpaRepository<MetricsDO, Long> {
 
     @Query(value = """
             SELECT 
-                DATE(m.created_at) AS dateStr, 
-                CAST(SUM(m.write_bytes) AS UNSIGNED) AS totalWrite, 
-                CAST(SUM(m.read_bytes) AS UNSIGNED) AS totalRead 
-            FROM metrics m 
+                DATE(m.created_at) AS dateStr,
+                SUM(m.write_bytes) AS totalWrite,
+                SUM(m.read_bytes) AS totalRead
+            FROM metrics m
             WHERE m.proxy_id = :proxyId 
               AND m.created_at >= :startTime 
-              AND m.created_at <= :endTime 
-            GROUP BY DATE (m.created_at) 
-            ORDER BY DATE(m.created_at) ASC
-            """, nativeQuery = true)
+              AND m.created_at < :endTime
+            GROUP BY DATE(m.created_at)
+            ORDER BY dateStr ASC
+            """,
+            nativeQuery = true)
     @SuppressWarnings("all")
     List<DailyTrafficQueryResult> queryDailyTrafficByRange(@Param("proxyId") String proxyId,
                                                            @Param("startTime") LocalDateTime startTime,
@@ -57,10 +58,10 @@ public interface MetricsRepository extends JpaRepository<MetricsDO, Long> {
     @Query(value = """
             SELECT
                 DATE_ADD(DATE(m.created_at), INTERVAL HOUR(m.created_at) HOUR) AS hour,
-                CAST(SUM(m.read_bytes) AS UNSIGNED) AS readBytes,
-                CAST(SUM(m.write_bytes) AS UNSIGNED) AS writeBytes,
-                CAST(SUM(m.read_messages) AS UNSIGNED) AS readMessages,
-                CAST(SUM(m.write_messages) AS UNSIGNED) AS writeMessages
+                SUM(m.read_bytes) AS readBytes,
+                SUM(m.write_bytes) AS writeBytes,
+                SUM(m.read_messages) AS readMessages,
+                SUM(m.write_messages) AS writeMessages
             FROM metrics m
             WHERE m.proxy_id = :proxyId
               AND m.created_at >= :startTime
@@ -69,9 +70,10 @@ public interface MetricsRepository extends JpaRepository<MetricsDO, Long> {
             ORDER BY hour ASC
             """, nativeQuery = true)
     @SuppressWarnings("all")
-    List<HourlyTraffic> queryHourlyTrafficByRange(@Param("proxyId") String proxyId,
-                                                  @Param("startTime") LocalDateTime startTime,
-                                                  @Param("endTime") LocalDateTime endTime);
+    List<HourlyTraffic> queryHourlyTrafficByRangeMySQL(
+            @Param("proxyId") String proxyId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime);
 
     /**
      * 分页查询：按 proxy_id 聚合，对该代理所有快照记录求和，按总流量倒序
@@ -79,21 +81,22 @@ public interface MetricsRepository extends JpaRepository<MetricsDO, Long> {
     @Query(value = """
             SELECT
                 m.proxy_id AS proxyId,
-                CAST(SUM(m.read_bytes) AS UNSIGNED) AS readBytes,
-                CAST(SUM(m.write_bytes) AS UNSIGNED) AS writeBytes,
-                CAST(SUM(m.read_messages) AS UNSIGNED) AS readMessages,
-                CAST(SUM(m.write_messages) AS UNSIGNED) AS writeMessages,
-                CAST(SUM(m.read_bytes) + SUM(m.write_bytes) AS UNSIGNED) AS totalBytes
+                SUM(m.read_bytes) AS readBytes,
+                SUM(m.write_bytes) AS writeBytes,
+                SUM(m.read_messages) AS readMessages,
+                SUM(m.write_messages) AS writeMessages,
+                SUM(m.read_bytes) + SUM(m.write_bytes) AS totalBytes
             FROM metrics m
             GROUP BY m.proxy_id
             ORDER BY totalBytes DESC, proxyId ASC
             """,
             countQuery = """
-            SELECT COUNT(*) FROM (
-                SELECT 1 FROM metrics m
-                GROUP BY m.proxy_id
-            ) grouped
-            """,
+                    SELECT COUNT(*) FROM (
+                        SELECT 1
+                        FROM metrics m
+                        GROUP BY m.proxy_id
+                    ) grouped
+                    """,
             nativeQuery = true)
     @SuppressWarnings("all")
     Page<ProxyTrafficQueryResult> pageTrafficByProxy(Pageable pageable);

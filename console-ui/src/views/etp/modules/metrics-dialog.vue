@@ -278,9 +278,8 @@
         lineChartData.value[1].data = response.up?.yAxis || []
         const rawXAxis = response.down?.xAxis || []
         // 后端返回 timeUnit='hour' 时为小时粒度，需加 :00
-        lineChartXAxis.value = response.timeUnit === 'hour'
-          ? rawXAxis.map((h: string) => `${h}:00`)
-          : rawXAxis
+        lineChartXAxis.value =
+          response.timeUnit === 'hour' ? rawXAxis.map((h: string) => `${h}:00`) : rawXAxis
 
         const allValues = [...(response.down?.yAxis || []), ...(response.up?.yAxis || [])]
         const dataMax = allValues.length > 0 ? Math.max(...allValues, 0) : 0

@@ -17,16 +17,18 @@
 package com.xiaoniucode.etp.server.metrics;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 public class HourlyTraffic {
-    private final LocalDateTime hour;
-    private final long readBytes;
-    private final long writeBytes;
-    private final long readMessages;
-    private final long writeMessages;
+    private LocalDateTime hour;
+    private long readBytes;
+    private long writeBytes;
+    private long readMessages;
+    private long writeMessages;
 
     public HourlyTraffic(HourlySnapshot snap) {
         this.hour = snap.getHour();
@@ -36,8 +38,7 @@ public class HourlyTraffic {
         this.writeMessages = snap.getWriteMessages();
     }
 
-    public HourlyTraffic(LocalDateTime hour, long readBytes, long writeBytes,
-                         long readMessages, long writeMessages) {
+    public HourlyTraffic(LocalDateTime hour, long readBytes, long writeBytes, long readMessages, long writeMessages) {
         this.hour = hour;
         this.readBytes = readBytes;
         this.writeBytes = writeBytes;

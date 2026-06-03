@@ -45,10 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -113,12 +110,9 @@ public class MetricsServiceImpl implements MetricsService {
                 }
                 LocalDateTime startTime = startDate.atStartOfDay();
                 LocalDateTime endTime = endDate.atTime(23, 59, 59);
-
                 if (spanDays == 1) {
-                    return buildHistoricalDayHourlyChartVO(
-                            metricsRepository.queryHourlyTrafficByRange(
-                                    proxyId, startDate.atStartOfDay(), startDate.plusDays(1).atStartOfDay()),
-                            startDate);
+                    return buildHistoricalDayHourlyChartVO(metricsRepository.queryHourlyTrafficByRangeMySQL(
+                            proxyId, startDate.atStartOfDay(), startDate.plusDays(1).atStartOfDay()), startDate);
                 } else {
                     List<DailyTrafficQueryResult> results =
                             metricsRepository.queryDailyTrafficByRange(proxyId, startTime, endTime);
@@ -292,16 +286,13 @@ public class MetricsServiceImpl implements MetricsService {
         if (records.isEmpty()) {
             return;
         }
-        List<String> proxyIds = records.stream()
-                .map(TrafficCountDTO::getProxyId)
-                .distinct()
-                .toList();
+        List<String> proxyIds = records.stream().map(TrafficCountDTO::getProxyId).distinct().toList();
         if (proxyIds.isEmpty()) {
             return;
         }
         Map<String, ProxyListQueryResult> proxyMap = proxyRepository.findWithAgentByIdIn(proxyIds).stream()
                 .collect(Collectors.toMap(r -> r.getProxyDO().getId(), Function.identity(),
-                        (a, b) -> a));
+                        (a, _) -> a));
         for (TrafficCountDTO dto : records) {
             metricConvert.enrichProxyInfo(dto, proxyMap.get(dto.getProxyId()));
         }
