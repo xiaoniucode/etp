@@ -19,6 +19,7 @@ package com.xiaoniucode.etp.server.metrics;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -225,30 +226,45 @@ public class ProxyMetrics {
 
     public List<HourlyTraffic> getHourlyStatsLast24h() {
         Map<LocalDateTime, HourlyTraffic> map = new HashMap<>();
-
         long total = hourlyIndex.get();
         long start = Math.max(0, total - HOURS_24);
 
+        // 1. 历史小时数据
         for (long i = start; i < total; i++) {
             HourlyTraffic snap = hourlyRing[(int) (i % HOURS_24)];
             if (snap != null) {
                 map.put(snap.getHour(), snap);
             }
         }
+        // 2. 当前时间（小时粒度）
+        LocalDateTime nowHour = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
+        // 3. 计算当前小时实时增量
+        long currReadBytes = totalReadBytes.sum();
+        long currWriteBytes = totalWriteBytes.sum();
+        long currReadMsg = totalReadMessages.sum();
+        long currWriteMsg = totalWriteMessages.sum();
 
+        long deltaReadBytes = Math.max(0, currReadBytes - lastHourReadBytes);
+        long deltaWriteBytes = Math.max(0, currWriteBytes - lastHourWriteBytes);
+        long deltaReadMsg = Math.max(0, currReadMsg - lastHourReadMessages);
+        long deltaWriteMsg = Math.max(0, currWriteMsg - lastHourWriteMessages);
+        // 4. 当前小时实时对象
+        HourlyTraffic realtime = new HourlyTraffic(nowHour, deltaReadBytes, deltaWriteBytes, deltaReadMsg, deltaWriteMsg);
+        // 5. 覆盖当前小时
+        map.put(nowHour, realtime);
+        // 6. 重新拼接24小时
         List<HourlyTraffic> result = new ArrayList<>(24);
-        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
-
         for (int i = 23; i >= 0; i--) {
-            LocalDateTime time = now.minusHours(i);
+            LocalDateTime time = nowHour.minusHours(i);
             result.add(map.getOrDefault(time,
-                    new HourlyTraffic(time, 0L, 0L, 0L, 0L)
-            ));
+                    new HourlyTraffic(time, 0L, 0L, 0L, 0L)));
         }
-
         return result;
     }
-
+    private long hourKey(LocalDateTime time) {
+        return time.truncatedTo(ChronoUnit.HOURS)
+                .toEpochSecond(ZoneOffset.UTC);
+    }
     public Metrics toMetrics() {
         Metrics m = new Metrics();
         m.setProxyId(proxyId);
