@@ -17,30 +17,45 @@
 package com.xiaoniucode.etp.server.metrics;
 
 import com.xiaoniucode.etp.common.message.PageResult;
-import com.xiaoniucode.etp.common.utils.StringUtils;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+/**
+ * 代理流量指标的注册中心，按 {@code proxyId} 维护 {@link ProxyMetrics} 实例。
+ *
+ * <p>写入由隧道桥接层在数据转发时触发；查询与聚合供控制台使用。
+ */
 @Component
 public class MetricsCollector {
+
     private final InternalLogger logger = InternalLoggerFactory.getInstance(MetricsCollector.class);
+
     private static final Map<String, ProxyMetrics> PROXY_METRICS = new ConcurrentHashMap<>(256);
 
+    /**
+     * 获取或创建指定代理的计数器。
+     *
+     * @param proxyId 代理标识
+     * @return 计数器实例；{@code proxyId} 为空时返回 {@code null}
+     */
     public ProxyMetrics getOrCreate(String proxyId) {
-        if (proxyId == null || proxyId.isBlank()) {
+        if (!StringUtils.hasText(proxyId)) {
             return null;
         }
         return PROXY_METRICS.computeIfAbsent(proxyId, ProxyMetrics::new);
     }
 
     /**
-     * 通道激活时调用
+     * 隧道通道建立时递增活跃通道数。
+     *
+     * @param proxyId 代理标识
      */
     public void onChannelActive(String proxyId) {
         ProxyMetrics m = getOrCreate(proxyId);
@@ -50,7 +65,9 @@ public class MetricsCollector {
     }
 
     /**
-     * 通道关闭时调用
+     * 隧道通道关闭时递减活跃通道数。
+     *
+     * @param proxyId 代理标识
      */
     public void onChannelInactive(String proxyId) {
         if (!StringUtils.hasText(proxyId)) {
@@ -63,27 +80,44 @@ public class MetricsCollector {
     }
 
     /**
-     * 收集流量
+     * 在已有计数器上执行写入操作。
+     *
+     * <p>计数器不存在时静默忽略。回调抛出异常时记录警告，不影响调用方。
+     *
+     * @param proxyId 代理标识
+     * @param action  写入回调
      */
     public void collect(String proxyId, Consumer<ProxyMetrics> action) {
-        if (proxyId == null || proxyId.isBlank()) {
+        if (!StringUtils.hasText(proxyId) || action == null) {
             return;
         }
         ProxyMetrics m = PROXY_METRICS.get(proxyId);
         if (m != null) {
-            action.accept(m);
+            try {
+                action.accept(m);
+            } catch (Exception e) {
+                logger.warn("Error collecting metrics for proxy: {}", proxyId, e);
+            }
         }
     }
 
+    /**
+     * 返回当前所有计数器的浅拷贝，调用方不可修改底层 Map。
+     *
+     * @return 不可变的 {@code proxyId} → {@link ProxyMetrics} 映射
+     */
     public Map<String, ProxyMetrics> getAllMetrics() {
-        return PROXY_METRICS;
+        return Collections.unmodifiableMap(new ConcurrentHashMap<>(PROXY_METRICS));
     }
 
     /**
-     * 删除单个 proxy 的统计信息
+     * 移除指定代理的计数器。
+     *
+     * @param proxyId 代理标识
+     * @return 存在并已移除时返回 {@code true}
      */
     public boolean removeByProxyId(String proxyId) {
-        if (proxyId == null || proxyId.isBlank()) {
+        if (!StringUtils.hasText(proxyId)) {
             return false;
         }
         ProxyMetrics m = PROXY_METRICS.remove(proxyId);
@@ -95,36 +129,50 @@ public class MetricsCollector {
     }
 
     /**
-     * 获取单个代理的实时统计
+     * 查询单个代理的实时指标。
+     *
+     * @param proxyId 代理标识
+     * @return 指标快照；标识无效或代理不存在时返回 {@code null}
      */
     public Metrics getProxyMetrics(String proxyId) {
+        if (!StringUtils.hasText(proxyId)) {
+            return null;
+        }
         ProxyMetrics pm = PROXY_METRICS.get(proxyId);
         return pm != null ? pm.toMetrics() : null;
     }
 
     /**
-     * 分页获取所有代理的流量列表
+     * 按读写总流量降序分页查询所有代理指标。
+     *
+     * @param page 页码，从 0 开始
+     * @param size 每页条数，取值范围 [1, 100]
+     * @return 分页结果
      */
     public PageResult<Metrics> listAllMetrics(int page, int size) {
-        List<ProxyMetrics> allMetrics = PROXY_METRICS.values().stream()
+        List<Metrics> pageData = PROXY_METRICS.values().stream()
                 .sorted(Comparator.comparingLong(m ->
                         -(m.getTotalReadBytes().sum() + m.getTotalWriteBytes().sum())))
-                .toList();
-
-        long total = allMetrics.size();
-        int currentPage = Math.max(0, page);
-        int pageSize = Math.clamp(size, 1, 100);
-
-        List<Metrics> pageData = allMetrics.stream()
-                .skip((long) currentPage * pageSize)
-                .limit(pageSize)
+                .skip((long) Math.max(0, page) * Math.clamp(size, 1, 100))
+                .limit(Math.clamp(size, 1, 100))
                 .map(ProxyMetrics::toMetrics)
                 .toList();
 
-        return new PageResult<>(pageData, total, currentPage, pageSize);
+        int pageSize = Math.clamp(size, 1, 100);
+        return new PageResult<>(pageData, (long) PROXY_METRICS.size(),
+                Math.max(0, page), pageSize);
     }
 
+    /**
+     * 查询单个代理最近 24 小时的小时流量。
+     *
+     * @param proxyId 代理标识
+     * @return 24 个小时桶；标识无效或代理不存在时返回空列表
+     */
     public List<HourlyTraffic> get24hTraffic(String proxyId) {
+        if (!StringUtils.hasText(proxyId)) {
+            return Collections.emptyList();
+        }
         ProxyMetrics pm = PROXY_METRICS.get(proxyId);
         if (pm == null) {
             return Collections.emptyList();
@@ -133,59 +181,113 @@ public class MetricsCollector {
     }
 
     /**
-     * 获取所有 proxy 汇总后的24小时统计数据，环形滚动
+     * 按小时下标对齐后，汇总所有代理最近 24 小时流量。
+     *
+     * <p>仅纳入返回 24 个元素的代理数据；任一代理查询异常时返回空列表。
+     *
+     * @return 聚合后的小时流量列表；无代理时返回空列表
      */
     public List<HourlyTraffic> getTotal24hTraffic() {
         if (PROXY_METRICS.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<List<HourlyTraffic>> all = new ArrayList<>(PROXY_METRICS.size());
-        for (ProxyMetrics pm : PROXY_METRICS.values()) {
-            all.add(pm.getHourlyStatsLast24h());
+        List<List<HourlyTraffic>> allTraffic = new ArrayList<>();
+        try {
+            for (ProxyMetrics pm : PROXY_METRICS.values()) {
+                List<HourlyTraffic> traffic = pm.getHourlyStatsLast24h();
+                if (traffic != null && traffic.size() == 24) {
+                    allTraffic.add(traffic);
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Error collecting total 24h traffic", e);
+            return Collections.emptyList();
         }
 
-        int size = 24;
-        List<HourlyTraffic> result = new ArrayList<>(size);
+        if (allTraffic.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<HourlyTraffic> result = new ArrayList<>(24);
         for (int i = 0; i < 24; i++) {
-            long sumInBytes = 0, sumOutBytes = 0;
-            long sumInMsg = 0, sumOutMsg = 0;
+            long sumReadBytes = 0, sumWriteBytes = 0;
+            long sumReadMsg = 0, sumWriteMsg = 0;
             LocalDateTime hourTime = null;
 
-            for (List<HourlyTraffic> data : all) {
-                HourlyTraffic item = data.get(i);
+            for (List<HourlyTraffic> traffic : allTraffic) {
+                HourlyTraffic item = traffic.get(i);
+                if (item == null) {
+                    continue;
+                }
+
                 if (hourTime == null) {
                     hourTime = item.getHour();
                 }
-                sumInBytes += item.getReadBytes();
-                sumOutBytes += item.getWriteBytes();
-                sumInMsg += item.getReadMessages();
-                sumOutMsg += item.getWriteMessages();
+                sumReadBytes += item.getReadBytes();
+                sumWriteBytes += item.getWriteBytes();
+                sumReadMsg += item.getReadMessages();
+                sumWriteMsg += item.getWriteMessages();
             }
-            result.add(new HourlyTraffic(hourTime, sumInBytes, sumOutBytes, sumInMsg, sumOutMsg));
+
+            result.add(new HourlyTraffic(hourTime, sumReadBytes, sumWriteBytes,
+                    sumReadMsg, sumWriteMsg));
         }
 
         return result;
     }
 
+    /**
+     * @return 所有代理入站字节速率之和，单位：字节/秒
+     */
     public double getTotalReadBytesRate() {
         if (PROXY_METRICS.isEmpty()) {
             return 0.0;
         }
         return PROXY_METRICS.values().stream()
-                .mapToDouble(m -> m.getReadBytesRate().doubleValue())
+                .mapToDouble(m -> m.getReadBytesRate().get())
                 .sum();
     }
 
+    /**
+     * @return 所有代理出站字节速率之和，单位：字节/秒
+     */
     public double getTotalWriteBytesRate() {
         if (PROXY_METRICS.isEmpty()) {
             return 0.0;
         }
         return PROXY_METRICS.values().stream()
-                .mapToDouble(m -> m.getWriteBytesRate().doubleValue())
+                .mapToDouble(m -> m.getWriteBytesRate().get())
                 .sum();
     }
 
+    /**
+     * @return 所有代理入站消息速率之和，单位：条/秒
+     */
+    public double getTotalReadMessagesRate() {
+        if (PROXY_METRICS.isEmpty()) {
+            return 0.0;
+        }
+        return PROXY_METRICS.values().stream()
+                .mapToDouble(m -> m.getReadMessagesRate().get())
+                .sum();
+    }
+
+    /**
+     * @return 所有代理出站消息速率之和，单位：条/秒
+     */
+    public double getTotalWriteMessagesRate() {
+        if (PROXY_METRICS.isEmpty()) {
+            return 0.0;
+        }
+        return PROXY_METRICS.values().stream()
+                .mapToDouble(m -> m.getWriteMessagesRate().get())
+                .sum();
+    }
+
+    /**
+     * @return 所有代理入站字节累计值之和
+     */
     public long getTotalReadBytes() {
         if (PROXY_METRICS.isEmpty()) {
             return 0L;
@@ -195,16 +297,46 @@ public class MetricsCollector {
                 .sum();
     }
 
+    /**
+     * @return 所有代理出站字节累计值之和
+     */
     public long getTotalWriteBytes() {
         if (PROXY_METRICS.isEmpty()) {
             return 0L;
         }
         return PROXY_METRICS.values().stream()
-                .mapToLong(m -> m.getTotalWriteBytes().longValue())
+                .mapToLong(m -> m.getTotalWriteBytes().sum())
                 .sum();
     }
 
-    public Integer getTotalActiveChannels() {
+    /**
+     * @return 所有代理入站消息累计值之和
+     */
+    public long getTotalReadMessages() {
+        if (PROXY_METRICS.isEmpty()) {
+            return 0L;
+        }
+        return PROXY_METRICS.values().stream()
+                .mapToLong(m -> m.getTotalReadMessages().sum())
+                .sum();
+    }
+
+    /**
+     * @return 所有代理出站消息累计值之和
+     */
+    public long getTotalWriteMessages() {
+        if (PROXY_METRICS.isEmpty()) {
+            return 0L;
+        }
+        return PROXY_METRICS.values().stream()
+                .mapToLong(m -> m.getTotalWriteMessages().sum())
+                .sum();
+    }
+
+    /**
+     * @return 所有代理活跃隧道通道数之和
+     */
+    public int getTotalActiveChannels() {
         if (PROXY_METRICS.isEmpty()) {
             return 0;
         }
@@ -213,19 +345,65 @@ public class MetricsCollector {
                 .sum();
     }
 
-    public Integer getActiveChannels(String proxyId) {
-        ProxyMetrics proxyMetrics = PROXY_METRICS.get(proxyId);
-        if (proxyMetrics == null) {
+    /**
+     * @param proxyId 代理标识
+     * @return 活跃通道数；标识无效或代理不存在时返回 0
+     */
+    public int getActiveChannels(String proxyId) {
+        if (!StringUtils.hasText(proxyId)) {
             return 0;
         }
-        return proxyMetrics.getActiveChannels().get();
+        ProxyMetrics proxyMetrics = PROXY_METRICS.get(proxyId);
+        return proxyMetrics != null ? proxyMetrics.getActiveChannels().get() : 0;
     }
 
     /**
-     * 清空所有统计
+     * @return 当前持有计数器的代理数量
+     */
+    public int getTotalProxyCount() {
+        return PROXY_METRICS.size();
+    }
+
+    /**
+     * 清空全部内存计数器。
      */
     public void clearAll() {
         PROXY_METRICS.clear();
-        logger.debug("已清空所有代理流量统计数据");
+        logger.info("已清空所有代理流量统计数据");
+    }
+
+    /**
+     * 列出 {@link ProxyMetrics#getLastActiveTime()} 早于阈值的代理。
+     *
+     * @param inactiveDurationMinutes 空闲阈值，单位：分钟
+     * @return 代理标识列表
+     */
+    public List<String> getInactiveProxies(long inactiveDurationMinutes) {
+        if (PROXY_METRICS.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        LocalDateTime threshold = LocalDateTime.now().minusMinutes(inactiveDurationMinutes);
+        return PROXY_METRICS.entrySet().stream()
+                .filter(entry -> entry.getValue().getLastActiveTime().isBefore(threshold))
+                .map(Map.Entry::getKey)
+                .toList();
+    }
+
+    /**
+     * 移除空闲超过阈值的代理计数器。
+     *
+     * @param inactiveDurationMinutes 空闲阈值，单位：分钟
+     * @return 实际移除的数量
+     */
+    public int cleanupInactiveProxies(long inactiveDurationMinutes) {
+        List<String> inactiveProxies = getInactiveProxies(inactiveDurationMinutes);
+        for (String proxyId : inactiveProxies) {
+            removeByProxyId(proxyId);
+        }
+        if (!inactiveProxies.isEmpty()) {
+            logger.info("清理了 {} 个不活动的代理", inactiveProxies.size());
+        }
+        return inactiveProxies.size();
     }
 }
