@@ -31,4 +31,10 @@ public interface MetricsService {
     void deleteByProxyId(String proxyId);
 
     PageResult<TrafficCountDTO> queryPage(PageQuery pageQuery);
+
+    /**
+     * 删除超过指定天数的流量统计记录
+     * @param days 保留天数
+     */
+    void deleteOldMetrics(int days);
 }

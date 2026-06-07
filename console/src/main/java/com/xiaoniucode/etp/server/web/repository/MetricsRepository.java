@@ -100,4 +100,9 @@ public interface MetricsRepository extends JpaRepository<MetricsDO, Long> {
             nativeQuery = true)
     @SuppressWarnings("all")
     Page<ProxyTrafficQueryResult> pageTrafficByProxy(Pageable pageable);
+
+    /**
+     * 删除创建时间早于指定时间的流量记录
+     */
+    void deleteByCreatedAtBefore(LocalDateTime createdAtBefore);
 }

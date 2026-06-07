@@ -295,4 +295,11 @@ public class MetricsServiceImpl implements MetricsService {
             metricConvert.enrichProxyInfo(dto, proxyMap.get(dto.getProxyId()));
         }
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteOldMetrics(int days) {
+        LocalDateTime cutoffTime = LocalDateTime.now().minusDays(days);
+        metricsRepository.deleteByCreatedAtBefore(cutoffTime);
+    }
 }
