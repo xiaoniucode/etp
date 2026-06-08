@@ -9,5 +9,6 @@ public interface NettyConstants {
     String TLS_HANDLER = "tlsHandler";
     String TCP_VISITOR_HANDLER = "tcpVisitorHandler";
     String HTTP_VISITOR_HANDLER = "httpVisitorHandler";
+    String DIRECT_TUNNEL_BRIDGE_HANDLER = "directTunnelBridgeBandler";
 
 }

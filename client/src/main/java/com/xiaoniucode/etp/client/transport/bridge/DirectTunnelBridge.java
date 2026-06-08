@@ -2,17 +2,11 @@ package com.xiaoniucode.etp.client.transport.bridge;
 
 import com.xiaoniucode.etp.client.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.client.statemachine.stream.StreamEvent;
-import com.xiaoniucode.etp.client.statemachine.stream.StreamManager;
-import com.xiaoniucode.etp.core.transport.IntSet;
-import com.xiaoniucode.etp.core.transport.PipelineConfigure;
-import com.xiaoniucode.etp.core.transport.TunnelBridge;
+import com.xiaoniucode.etp.core.transport.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
-
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 public class DirectTunnelBridge implements TunnelBridge {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(DirectTunnelBridge.class);
@@ -30,7 +24,7 @@ public class DirectTunnelBridge implements TunnelBridge {
     public void open() {
         ChannelPipeline pipeline = tunnel.pipeline();
         PipelineConfigure.removeControlHandler(tunnel);
-        pipeline.addLast(new SimpleChannelInboundHandler<ByteBuf>() {
+        pipeline.addLast(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER,new SimpleChannelInboundHandler<ByteBuf>() {
             @Override
             protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
                 streamContext.forwardToLocal(msg);

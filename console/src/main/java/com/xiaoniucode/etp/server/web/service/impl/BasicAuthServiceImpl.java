@@ -89,11 +89,7 @@ public class BasicAuthServiceImpl implements BasicAuthService {
         BasicUserDO basicUserDO = basicUserRepository.findById(param.getId())
                 .orElseThrow(() -> new BizException("用户不存在"));
 
-        String encode = passwordEncoder.encode(param.getPassword());
         boolean usernameChanged = !Objects.equals(param.getUsername(), basicUserDO.getUsername());
-        if (!usernameChanged && param.getPassword() == null) {
-            return;
-        }
 
         if (usernameChanged) {
             boolean exists = basicUserRepository.existsByProxyIdAndUsernameAndIdNot(proxyId, param.getUsername(), param.getId());
@@ -102,8 +98,9 @@ public class BasicAuthServiceImpl implements BasicAuthService {
             }
         }
 
-        basicUserDO.setPassword(encode);
         basicAuthConvert.updateUserDO(basicUserDO, param);
+        String encode = passwordEncoder.encode(param.getPassword());
+        basicUserDO.setPassword(encode);
         basicUserRepository.save(basicUserDO);
     }
 

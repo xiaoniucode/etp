@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -227,11 +228,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         logger.warn("控制隧道可写性变化：{}", writable);
         if (writable) {
             //数据隧道恢复可写，恢复暂停的访问者读取
-            IntSet pausedStreamIds = streamManager.getPausedStreamIds(tunnel);
+             Set<Integer> pausedStreamIds = streamManager.getPausedStreamIds(tunnel);
             logger.debug("获取到 {} 条暂停流数量", pausedStreamIds.size());
             if (!pausedStreamIds.isEmpty()) {
                 logger.debug("控制隧道恢复可写，恢复 {} 个访问者读取", pausedStreamIds.size());
-                pausedStreamIds.stream().forEach(streamId -> {
+                pausedStreamIds.forEach(streamId -> {
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
                     if (streamContext != null) {
                         Channel visitor = streamContext.getVisitor();

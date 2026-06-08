@@ -3,13 +3,13 @@ package com.xiaoniucode.etp.client.statemachine.stream;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
-import com.xiaoniucode.etp.core.transport.IntSet;
 import com.xiaoniucode.etp.core.transport.PausedStreamRegistry;
 import io.netty.channel.Channel;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class StreamManager {
@@ -17,14 +17,11 @@ public class StreamManager {
     private static final PausedStreamRegistry pausedStreamRegistry = new PausedStreamRegistry();
 
     public static StreamContext createStreamContext(Integer streamId, AgentContext agentContext) {
-        if (streams.containsKey(streamId)) {
-            throw new IllegalArgumentException("streamId 已经存在");
-        }
-        StateMachine<StreamState, StreamEvent, StreamContext> stateMachine = StreamStateMachineBuilder.getStateMachine();
-        StreamContext streamContext = new StreamContext(streamId, stateMachine, agentContext);
-
-        streams.put(streamId, streamContext);
-        return streamContext;
+        return streams.computeIfAbsent(streamId, id -> {
+            StateMachine<StreamState, StreamEvent, StreamContext> stateMachine =
+                    StreamStateMachineBuilder.getStateMachine();
+            return new StreamContext(id, stateMachine, agentContext);
+        });
     }
 
     public static Optional<StreamContext> getStreamContext(int streamId) {
@@ -47,7 +44,7 @@ public class StreamManager {
         pausedStreamRegistry.addPausedStreamId(tunnel, streamId);
     }
 
-    public static IntSet getPausedStreamIds(Channel tunnel) {
+    public static   Set<Integer> getPausedStreamIds(Channel tunnel) {
         return pausedStreamRegistry.getPausedStreamIds(tunnel);
     }
 

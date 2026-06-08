@@ -8,9 +8,12 @@ import com.xiaoniucode.etp.client.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.client.transport.connection.DirectPool;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
+import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelPipeline;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -24,6 +27,14 @@ public class StreamCloseAction extends StreamBaseAction {
 
         Channel server = context.getServer();
         TunnelEntry tunnelEntry = context.getTunnelEntry();
+        Channel tunnel = tunnelEntry.getChannel();
+        if (tunnelEntry.getTunnelType().isDirect()) {
+            ChannelPipeline tunnelPipeline = tunnel.pipeline();
+            ChannelHandler channelHandler = tunnelPipeline.get(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
+            if (channelHandler != null) {
+                tunnelPipeline.remove(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
+            }
+        }
         ChannelUtils.closeOnFlush(server);
         AgentContext agentContext = (AgentContext) context.getAgentContext();
         DirectPool directPool = agentContext.getDirectPool();

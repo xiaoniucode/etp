@@ -27,7 +27,7 @@ public class DirectTunnelBridge implements TunnelBridge {
         if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER) == null) {
             pipeline.addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler());
         }
-        pipeline.addLast(new SimpleChannelInboundHandler<ByteBuf>() {
+        pipeline.addLast(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER,new SimpleChannelInboundHandler<ByteBuf>() {
             @Override
             protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
                 streamContext.forwardToRemote(msg);

@@ -239,7 +239,7 @@ public class StreamManager {
         pausedStreamRegistry.addPausedStreamId(tunnel, streamId);
     }
 
-    public IntSet getPausedStreamIds(Channel tunnel) {
+    public   Set<Integer>  getPausedStreamIds(Channel tunnel) {
         return pausedStreamRegistry.getPausedStreamIds(tunnel);
     }
 

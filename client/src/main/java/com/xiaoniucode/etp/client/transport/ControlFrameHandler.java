@@ -31,6 +31,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -209,10 +210,10 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         boolean writable = tunnel.isWritable();
         if (writable) {
             //数据隧道恢复可写，恢复暂停的从服务器读取
-            IntSet pausedStreamIds = StreamManager.getPausedStreamIds(tunnel);
+            Set<Integer> pausedStreamIds = StreamManager.getPausedStreamIds(tunnel);
             if (!pausedStreamIds.isEmpty()) {
                 logger.debug("控制隧道恢复可写，恢复 {} 个访问者读取", pausedStreamIds.size());
-                pausedStreamIds.stream().forEach(streamId -> {
+                pausedStreamIds.forEach(streamId -> {
                     Optional<StreamContext> streamContextOpt = StreamManager.getStreamContext(streamId);
                     if (streamContextOpt.isPresent()) {
                         StreamContext streamContext = streamContextOpt.get();

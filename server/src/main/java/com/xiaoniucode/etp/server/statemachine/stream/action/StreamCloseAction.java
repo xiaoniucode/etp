@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.statemachine.stream.action;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
+import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
@@ -17,6 +18,8 @@ import com.xiaoniucode.etp.server.transport.connection.DirectConnectionPool;
 import com.xiaoniucode.etp.server.transport.connection.MultiplexConnectionPool;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelPipeline;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -53,11 +56,20 @@ public class StreamCloseAction extends StreamBaseAction {
         ChannelUtils.closeOnFlush(visitor);
         AgentContext agentContext = context.getAgentContext();
         TunnelEntry tunnelEntry = context.getTunnelEntry();
+        if (tunnelEntry != null) {
+            if (context.isDirectConnection()) {
+                AgentInfo agentInfo = agentContext.getAgentInfo();
+                logger.debug("回收客户端 {} 独立连接 {}", agentInfo.getAgentId(), tunnelEntry.getTunnelId());
+                directConnectionPool.release(agentInfo.getAgentId(), tunnelEntry);
+                //清除直接隧道消息处理器
+                Channel tunnel = tunnelEntry.getChannel();
+                ChannelPipeline tunnelPipeline = tunnel.pipeline();
+                ChannelHandler channelHandler = tunnelPipeline.get(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
+                if (channelHandler != null) {
+                    tunnelPipeline.remove(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
+                }
+            }
 
-        if (context.isDirectConnection() && tunnelEntry != null) {
-            AgentInfo agentInfo = agentContext.getAgentInfo();
-            logger.debug("回收客户端 {} 独立连接 {}", agentInfo.getAgentId(), tunnelEntry.getTunnelId());
-            directConnectionPool.release(agentInfo.getAgentId(), tunnelEntry);
         }
         streamManager.removeStreamContext(streamId);
         //流可能是半打开状态，Agent可能为空

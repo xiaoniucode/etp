@@ -40,7 +40,7 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        logger.debug("目标服务连接断开");
+        logger.debug("目标服务连接断开",ctx);
         Channel server = ctx.channel();
         Optional<StreamContext> streamCtx = StreamManager.getStreamContext(server);
         streamCtx.ifPresent(streamContext -> {
