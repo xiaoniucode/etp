@@ -48,6 +48,7 @@
       <MetricsDialog
         v-model:visible="metricsDialogVisible"
         :proxy-id="currentMetricsProxyId"
+        :show-time-range="true"
         @close="handleMetricsClose"
       />
     </ElCard>

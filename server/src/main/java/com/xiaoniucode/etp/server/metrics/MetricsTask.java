@@ -48,7 +48,7 @@ public class MetricsTask {
         Map<String, ProxyMetrics> allMetrics = metricsCollector.getAllMetrics();
         allMetrics.forEach((proxyId, proxyMetrics) -> {
             HourlyTraffic hourlyTraffic = proxyMetrics.takeHourlySnapshot();
-            eventBus.publishAsync(new HourlyTrafficEvent(proxyId, hourlyTraffic));
+            eventBus.publishAsync(new HourlyTrafficEvent(proxyId,proxyMetrics.getAgentType(), hourlyTraffic));
         });
     }
 

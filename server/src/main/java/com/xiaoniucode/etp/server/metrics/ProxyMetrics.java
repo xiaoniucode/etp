@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.metrics;
 
+import com.xiaoniucode.etp.core.enums.AgentType;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -37,14 +38,14 @@ import java.util.concurrent.atomic.LongAdder;
  */
 @Getter
 public class ProxyMetrics {
-
+    private final String proxyId;
+    private final AgentType agentType;
     private static final int HOURS_24 = 24;
 
     private static final int RATE_WINDOW_SECONDS = 60;
 
     private static final int RATE_SNAPSHOTS = 60;
 
-    private final String proxyId;
     private final AtomicInteger activeChannels = new AtomicInteger(0);
     private final LongAdder totalReadBytes = new LongAdder();
     private final LongAdder totalWriteBytes = new LongAdder();
@@ -70,8 +71,9 @@ public class ProxyMetrics {
     /**
      * @param proxyId 代理标识
      */
-    public ProxyMetrics(String proxyId) {
+    public ProxyMetrics(String proxyId,AgentType agentType) {
         this.proxyId = proxyId;
+        this.agentType=agentType;
         this.lastActiveTime = LocalDateTime.now();
         this.currentHourBucket = new HourBucket(LocalDateTime.now().truncatedTo(ChronoUnit.HOURS));
     }

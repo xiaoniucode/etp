@@ -43,6 +43,10 @@ public class HourlyTrafficRecord  implements EventListener<HourlyTrafficEvent> {
     }
     @Override
     public void onEvent(HourlyTrafficEvent event) {
+        if (event.getAgentType().isEmbedded()){
+            logger.debug("忽略来自内嵌客户端代理数据指标信息");
+            return;
+        }
         String proxyId = event.getProxyId();
         HourlyTraffic hourlyTraffic = event.getHourlyTraffic();
 

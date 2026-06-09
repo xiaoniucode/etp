@@ -27,7 +27,7 @@
       >
       </ArtTable>
 
-      <EmbeddedDialog v-model="detailDialogVisible" :proxy-id="currentProxyId" />
+
 
       <MetricsDialog
         v-model:visible="metricsDialogVisible"
@@ -43,7 +43,7 @@
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { fetchGetEmbeddedList, fetchBatchDeleteEmbedded } from '@/api/embedded'
-  import EmbeddedDialog from './modules/embedded-dialog.vue'
+
   import MetricsDialog from '../modules/metrics-dialog.vue'
   import { ElCard, ElTag, ElMessage, ElMessageBox, ElSpace, ElButton } from 'element-plus'
 
@@ -51,8 +51,7 @@
 
   const selectedRows = ref<Api.Embedded.TunnelListDTO[]>([])
 
-  const detailDialogVisible = ref(false)
-  const currentProxyId = ref('')
+
 
   const metricsDialogVisible = ref(false)
   const currentMetricsProxyId = ref('')
@@ -190,11 +189,6 @@
                 onClick: () => handleMetrics(row)
               }),
               h(ArtButtonTable, {
-                type: 'text',
-                text: '详情',
-                onClick: () => showDetail(row)
-              }),
-              h(ArtButtonTable, {
                 type: 'delete',
                 onClick: () => handleSingleDelete(row)
               })
@@ -212,11 +206,6 @@
       }
     }
   })
-
-  const showDetail = (row: Api.Embedded.TunnelListDTO) => {
-    currentProxyId.value = row.tunnel?.proxyId || ''
-    detailDialogVisible.value = true
-  }
 
   const handleMetrics = (row: Api.Embedded.TunnelListDTO) => {
     currentMetricsProxyId.value = row.tunnel?.proxyId || ''

@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.metrics;
 
 import com.xiaoniucode.etp.common.message.PageResult;
+import com.xiaoniucode.etp.core.enums.AgentType;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
@@ -45,11 +46,11 @@ public class MetricsCollector {
      * @param proxyId 代理标识
      * @return 计数器实例；{@code proxyId} 为空时返回 {@code null}
      */
-    public ProxyMetrics getOrCreate(String proxyId) {
-        if (!StringUtils.hasText(proxyId)) {
-            return null;
+    public ProxyMetrics getOrCreate(String proxyId, AgentType agentType) {
+        if (!StringUtils.hasText(proxyId) || agentType == null) {
+            throw new IllegalArgumentException("proxyId or agentType not null");
         }
-        return PROXY_METRICS.computeIfAbsent(proxyId, ProxyMetrics::new);
+        return PROXY_METRICS.computeIfAbsent(proxyId, id -> new ProxyMetrics(id, agentType));
     }
 
     /**
@@ -57,8 +58,8 @@ public class MetricsCollector {
      *
      * @param proxyId 代理标识
      */
-    public void onChannelActive(String proxyId) {
-        ProxyMetrics m = getOrCreate(proxyId);
+    public void onChannelActive(String proxyId, AgentType agentType) {
+        ProxyMetrics m = getOrCreate(proxyId, agentType);
         if (m != null) {
             m.incChannels();
         }

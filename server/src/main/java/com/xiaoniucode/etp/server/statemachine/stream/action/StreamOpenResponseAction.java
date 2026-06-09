@@ -77,7 +77,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         //负载均衡 最少连接数
         leastConnHooks.onStreamOpened(context);
         //增加连接数量，用于监控统计
-        metricsCollector.onChannelActive(context.getProxyId());
+        metricsCollector.onChannelActive(context.getProxyId(),agentInfo.getAgentType());
         //如果是 HTTP协议需要发送首次建立建立的时候读取到的第一个包
         if (context.getProtocol().isHttp()) {
             relayHttpFirstPackage(context,visitor, tunnelBridge);

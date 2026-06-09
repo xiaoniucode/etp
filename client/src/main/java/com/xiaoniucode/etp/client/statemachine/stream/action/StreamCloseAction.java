@@ -27,18 +27,18 @@ public class StreamCloseAction extends StreamBaseAction {
 
         Channel server = context.getServer();
         TunnelEntry tunnelEntry = context.getTunnelEntry();
-        Channel tunnel = tunnelEntry.getChannel();
-        if (tunnelEntry.getTunnelType().isDirect()) {
+        if (tunnelEntry != null && tunnelEntry.getTunnelType().isDirect()) {
+            AgentContext agentContext = (AgentContext) context.getAgentContext();
+            DirectPool directPool = agentContext.getDirectPool();
+            directPool.release(tunnelEntry);
+
+            Channel tunnel = tunnelEntry.getChannel();
             ChannelPipeline tunnelPipeline = tunnel.pipeline();
-            ChannelHandler channelHandler = tunnelPipeline.get(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
-            if (channelHandler != null) {
+            if (tunnelPipeline.get(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER) != null) {
                 tunnelPipeline.remove(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
             }
         }
         ChannelUtils.closeOnFlush(server);
-        AgentContext agentContext = (AgentContext) context.getAgentContext();
-        DirectPool directPool = agentContext.getDirectPool();
-        directPool.release(tunnelEntry);
 
         StreamManager.removeStreamContext(streamId);
         if (event == StreamEvent.STREAM_LOCAL_CLOSE) {

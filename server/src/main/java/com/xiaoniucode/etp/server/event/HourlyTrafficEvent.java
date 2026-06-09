@@ -18,6 +18,7 @@
 
 package com.xiaoniucode.etp.server.event;
 
+import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.notify.Event;
 import com.xiaoniucode.etp.server.metrics.HourlyTraffic;
 import lombok.AllArgsConstructor;
@@ -27,5 +28,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class HourlyTrafficEvent extends Event {
     private String proxyId;
+    private AgentType agentType;
     private HourlyTraffic hourlyTraffic;
 }

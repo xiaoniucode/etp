@@ -54,7 +54,7 @@
         <div class="art-card-sm p-4 mb-5">
           <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium m-0 text-g-900">流量趋势</h3>
-            <div class="flex items-center gap-2">
+            <div v-if="showTimeRange" class="flex items-center gap-2">
               <ElSelect
                 v-model="timeRange"
                 placeholder="选择时间范围"
@@ -145,6 +145,7 @@
   interface Props {
     visible: boolean
     proxyId: string
+    showTimeRange?: boolean
   }
 
   interface Emits {
