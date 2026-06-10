@@ -35,6 +35,7 @@ public class CreateConnectionAction extends AgentBaseAction {
         logger.debug("开始建立连接隧道");
         ConnectionCreateCmd cmd = context.getAndRemoveAs(AgentConstants.TUNNEL_CREATE_CMD, ConnectionCreateCmd.class);
         Channel tunnel = cmd.getTunnel();
+        tunnel.attr(AttributeKeys.CHANNEL_TYPE).set(ChannelType.TUNNEL);
 
         String tunnelId = cmd.getTunnelId();
         boolean multiplex = cmd.isMultiplex();

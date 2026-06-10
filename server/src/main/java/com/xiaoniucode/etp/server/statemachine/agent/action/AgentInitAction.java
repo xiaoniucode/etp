@@ -56,9 +56,9 @@ public class AgentInitAction extends AgentBaseAction {
                                 .map(DomainInfo::getFullDomain)
                                 .collect(Collectors.toSet());
                         proxyManager.activate(config, domains);
-                        logger.debug("激活HTTP代理配置: {}", config);
+                        logger.debug("激活HTTP代理配置: {}", config.getName());
                     } else {
-                        logger.debug("激活TCP代理配置: {}", config);
+                        logger.debug("激活TCP代理配置: {}", config.getName());
                         proxyManager.activate(config);
                     }
                 }

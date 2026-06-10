@@ -205,15 +205,9 @@ public class ProxyServiceImpl implements ProxyService {
         if (bandwidth != null) {
             bandwidth.valid();
             BandwidthUnit unit = BandwidthUnit.fromCode(bandwidth.getUnit());
-            if (bandwidth.getLimitTotal() != null) {
-                existsProxyDO.setLimitTotal(unit.toBps(bandwidth.getLimitTotal()));
-            }
-            if (bandwidth.getLimitIn() != null) {
-                existsProxyDO.setLimitIn(unit.toBps(bandwidth.getLimitIn()));
-            }
-            if (bandwidth.getLimitOut() != null) {
-                existsProxyDO.setLimitOut(unit.toBps(bandwidth.getLimitOut()));
-            }
+            existsProxyDO.setLimitTotal(bandwidth.getLimitTotal() != null ? unit.toBps(bandwidth.getLimitTotal()) : null);
+            existsProxyDO.setLimitIn(bandwidth.getLimitIn() != null ? unit.toBps(bandwidth.getLimitIn()) : null);
+            existsProxyDO.setLimitOut(bandwidth.getLimitOut() != null ? unit.toBps(bandwidth.getLimitOut()) : null);
         }
 
         proxyConvert.updateDO(param, existsProxyDO);
@@ -460,15 +454,9 @@ public class ProxyServiceImpl implements ProxyService {
         if (bandwidth != null) {
             bandwidth.valid();
             BandwidthUnit unit = BandwidthUnit.fromCode(bandwidth.getUnit());
-            if (bandwidth.getLimitTotal() != null) {
-                existsProxyDO.setLimitTotal(unit.toBps(bandwidth.getLimitTotal()));
-            }
-            if (bandwidth.getLimitIn() != null) {
-                existsProxyDO.setLimitIn(unit.toBps(bandwidth.getLimitIn()));
-            }
-            if (bandwidth.getLimitOut() != null) {
-                existsProxyDO.setLimitOut(unit.toBps(bandwidth.getLimitOut()));
-            }
+            existsProxyDO.setLimitTotal(bandwidth.getLimitTotal() != null ? unit.toBps(bandwidth.getLimitTotal()) : null);
+            existsProxyDO.setLimitIn(bandwidth.getLimitIn() != null ? unit.toBps(bandwidth.getLimitIn()) : null);
+            existsProxyDO.setLimitOut(bandwidth.getLimitOut() != null ? unit.toBps(bandwidth.getLimitOut()) : null);
         }
         proxyRepository.save(existsProxyDO);
 

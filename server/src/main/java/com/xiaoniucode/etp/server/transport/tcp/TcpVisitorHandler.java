@@ -57,7 +57,7 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             }
             Channel tunnel = tunnelEntry.getChannel();
             if (!tunnel.isWritable()) {
-                logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
+                logger.debug("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
                 visitor.config().setOption(ChannelOption.AUTO_READ, false);
                 if (tunnelEntry.getTunnelType().isMultiplex()){
                     streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
@@ -66,7 +66,7 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             logger.debug("[TCP] 流 {} 引用计数为：{}", streamContext.getStreamId(), msg.refCnt());
             streamContext.forwardToLocal(msg);
         } else {
-            logger.warn("没有找到流上下文，关闭连接");
+            logger.debug("没有找到流上下文，关闭连接");
             ChannelUtils.closeOnFlush(visitor);
         }
     }

@@ -19,7 +19,8 @@ import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
-import com.xiaoniucode.etp.core.transport.IntSet;
+import com.xiaoniucode.etp.core.transport.AttributeKeys;
+import com.xiaoniucode.etp.core.transport.ChannelType;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
@@ -72,7 +73,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 case TMSP.MSG_AUTH -> {
                     ByteBuf payload = frame.getPayload();
                     Message.AuthInfo authInfo = ProtobufUtil.parseFrom(payload, Message.AuthInfo.parser());
-
+                    ctx.channel().attr(AttributeKeys.CHANNEL_TYPE).set(ChannelType.CONTROL);
                     String agentId = authInfo.getAgentId();
                     Optional<AgentContext> contextOpt = agentManager.getAgentContext(ctx.channel());
                     if (contextOpt.isPresent()) {
@@ -195,7 +196,6 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
                     });
                 }
-
             }
         } catch (Exception e) {
             logger.error(e);
@@ -204,48 +204,67 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
-            logger.debug("与客户端断开连接");
-            //todo agentContext.fireEvent(AgentEvent.DISCONNECT);
-            agentContext.fireEvent(AgentEvent.LOCAL_GOAWAY);
-        });
-        //todo 需要处理数据连接断开
+        Channel channel = ctx.channel();
+        ChannelType channelType = getChannelType(channel);
+        if (channelType == ChannelType.CONTROL) {
+            agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
+                logger.debug("与客户端 {} 断开连接", agentContext.getAgentId());
+                //todo agentContext.fireEvent(AgentEvent.DISCONNECT);
+                agentContext.fireEvent(AgentEvent.LOCAL_GOAWAY);
+            });
+        } else if (channelType == ChannelType.TUNNEL) {
+            logger.error("数据连接断开");
+            //todo 需要处理数据连接断开
+        }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error("执行错误",cause);
-        agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
-            //logger.error("控制连接异常: ", cause);
-        });
-        //todo 数据连接异常
+        Channel channel = ctx.channel();
+        ChannelType channelType = getChannelType(channel);
+        if (channelType == ChannelType.CONTROL) {
+            logger.error("控制连接异常: ", cause);
+            agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
+                //...
+            });
+        } else if (channelType == ChannelType.TUNNEL) {
+            logger.error("数据连接异常");
+            //todo 数据连接异常
+        }
     }
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) {
-        Channel tunnel = ctx.channel();
-        boolean writable = tunnel.isWritable();
-        logger.warn("控制隧道可写性变化：{}", writable);
-        if (writable) {
-            //数据隧道恢复可写，恢复暂停的访问者读取
-             Set<Integer> pausedStreamIds = streamManager.getPausedStreamIds(tunnel);
-            logger.debug("获取到 {} 条暂停流数量", pausedStreamIds.size());
-            if (!pausedStreamIds.isEmpty()) {
-                logger.debug("控制隧道恢复可写，恢复 {} 个访问者读取", pausedStreamIds.size());
-                pausedStreamIds.forEach(streamId -> {
-                    StreamContext streamContext = streamManager.getStreamContext(streamId);
-                    if (streamContext != null) {
-                        Channel visitor = streamContext.getVisitor();
-                        if (visitor != null) {
-                            ctx.executor().schedule(() -> {
-                                visitor.config().setOption(ChannelOption.AUTO_READ, true);
-                                visitor.read();
-                                streamManager.removePausedStream(tunnel, streamId);
-                            }, 5, TimeUnit.MILLISECONDS);//延迟5ms，避免隧道在临界状态下来回切换，防止"乒乓效应"
+        Channel channel = ctx.channel();
+        if (getChannelType(channel) == ChannelType.TUNNEL) {
+            boolean writable = channel.isWritable();
+            logger.warn("数据隧道可写性变化：{}", writable);
+            if (writable) {
+                //数据隧道恢复可写，恢复暂停的访问者读取
+                Set<Integer> pausedStreamIds = streamManager.getPausedStreamIds(channel);
+                logger.debug("获取到 {} 条暂停流数量", pausedStreamIds.size());
+                if (!pausedStreamIds.isEmpty()) {
+                    logger.debug("恢复可写，恢复 {} 个访问者读取", pausedStreamIds.size());
+                    pausedStreamIds.forEach(streamId -> {
+                        StreamContext streamContext = streamManager.getStreamContext(streamId);
+                        if (streamContext != null) {
+                            Channel visitor = streamContext.getVisitor();
+                            if (visitor != null) {
+                                ctx.executor().schedule(() -> {
+                                    visitor.config().setOption(ChannelOption.AUTO_READ, true);
+                                    visitor.read();
+                                    streamManager.removePausedStream(channel, streamId);
+                                }, 5, TimeUnit.MILLISECONDS);//延迟5ms，避免隧道在临界状态下来回切换，防止"乒乓效应"
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
+    }
+
+    private ChannelType getChannelType(Channel channel) {
+        ChannelType channelType = channel.attr(AttributeKeys.CHANNEL_TYPE).get();
+        return channelType != null ? channelType : ChannelType.UNKNOWN;
     }
 }

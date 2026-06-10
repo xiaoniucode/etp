@@ -47,6 +47,9 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
             logger.debug("目标服务连接断开，关闭流 {} ", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
+        if (streamCtx.isEmpty()) {
+            logger.debug("没有获取到真实服务流信息");
+        }
         ctx.fireChannelInactive();
     }
 

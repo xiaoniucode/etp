@@ -67,7 +67,6 @@ public class TunnelServer implements Lifecycle {
             }
             tunnelBossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             tunnelWorkerGroup = NettyEventLoopFactory.eventLoopGroup();
-
             MultiplexDownloadRateLimitHandler downloadRateLimitHandler = SpringContextHolder.getBean(MultiplexDownloadRateLimitHandler.class);
             AgentManager agentManager = SpringContextHolder.getBean(AgentManager.class);
             ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -86,8 +85,8 @@ public class TunnelServer implements Lifecycle {
                                     .addLast(new SnappyFrameEncoder())
                                     .addLast(new SnappyFrameDecoder())
                                     .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
-                                    //.addLast(downloadRateLimitHandler)
-                                    .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentManager,90,0,0, TimeUnit.SECONDS))
+                                    .addLast(downloadRateLimitHandler)
+                                    .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentManager, 90, 0, 0, TimeUnit.SECONDS))
                                     .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
                         }
                     });

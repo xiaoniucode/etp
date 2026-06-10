@@ -22,6 +22,7 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -146,6 +147,9 @@ public class ProxyCreateAction extends AgentBaseAction {
      * 发送错误响应
      */
     private void sendErrorResponse(String errorMessage, Channel control) {
+        if (!StringUtils.hasText(errorMessage)) {
+            errorMessage = "error";
+        }
         Message.Error errorMsg = responseBuilder.buildErrorResponse(errorMessage);
         ByteBuf payload = ProtobufUtil.toByteBuf(errorMsg, control.alloc());
         TMSPFrame frame = new TMSPFrame(TMSP.MSG_ERROR, payload);
