@@ -1,17 +1,12 @@
 spring:
   profiles:
     active: mysql
-logging:
-  level:
-    com.xiaoniucode.etp: debug
 server:
   servlet:
     context-path: /
-
 jwt:
   secret:
   expiration: 3600
-
 security:
   permit-all:
     paths:
@@ -24,3 +19,7 @@ cache:
     initial-capacity: 10000
     maximum-size: 150000
     expire-after-access: 30m
+
+logging:
+  level:
+    com.xiaoniucode.etp: debug

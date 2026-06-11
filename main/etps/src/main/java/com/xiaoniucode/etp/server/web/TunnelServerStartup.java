@@ -37,8 +37,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaRepositories(basePackages = "com.xiaoniucode.etp.server.web.repository")
 public class TunnelServerStartup {
     public static void main(String[] args) {
-        Debugger.enableDebug();
-        System.setProperty("io.netty.leakDetection.level", "PARANOID");
         System.setProperty("io.netty.leakDetection.targetRecords", "50");
         System.setProperty("io.netty.leakDetection.samplingRate", "1");
 

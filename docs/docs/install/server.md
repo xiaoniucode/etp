@@ -1,0 +1,174 @@
+---
+sidebar_position: 1
+---
+
+# 服务端
+
+## Docker
+通过`Docker`可以快速部署`etps`服务端，无需手动安装`Java` 运行环境。
+### 一、一键运行
+
+如果已经拥有可用的`MySQL`数据库，可使用以下命令快速启动`etps`：
+```shell
+docker run -d \
+  --name etps \
+  --restart unless-stopped \
+  -p 8020:8020 \
+  -p 9527:9527 \
+  -p 8600-8609:8600-8609 \
+  -e MYSQL_HOST=127.0.0.1 \
+  -e MYSQL_PORT=3306 \
+  -e MYSQL_DATABASE=etps \
+  -e MYSQL_USERNAME=root \
+  -e MYSQL_PASSWORD=123456 \
+  xiaoniucode/etps:latest
+```
+
+### 二、自定义部署
+
+#### 创建目录
+
+推荐使用统一目录管理配置、日志和数据库数据：
+
+```shell
+mkdir -p \
+  /opt/etps/config \
+  /opt/etps/certs \
+  /opt/etps/logs \
+  /opt/etps/mysql/data
+```
+
+目录结构如下：
+
+```text
+/opt/etps
+├── config
+│   └── etps.toml
+├── certs
+├── logs
+└── mysql
+    └── data
+```
+
+:::tip 提示
+如果需要修改和覆盖`etps`应用基础配置信息，可将`application.yml`、`application-mysql.yml`放在**config**目录下。
+:::
+
+#### 创建 Docker 网络
+
+创建独立网络供`etps`与`MySQL`通信：
+
+```shell
+docker network create etps-net
+```
+
+#### 启动MySQL
+```shell
+docker run -d \
+  --name etps-mysql \
+  --network etps-net \
+  --restart unless-stopped \
+  -p 3307:3306 \
+  -e MYSQL_ROOT_PASSWORD=etps.123456 \
+  -e MYSQL_DATABASE=etps \
+  -v "$(pwd)/mysql/data:/var/lib/mysql" \
+  mysql:8.4
+```
+
+查看`MySQL`状态：
+
+```shell
+docker logs -f etps-mysql
+```
+
+#### 启动 etps
+```shell
+docker run -d \
+  --name etps \
+  --network etps-net \
+  --restart unless-stopped \
+  -p 8020:8020 \
+  -p 9527:9527 \
+  -p 8600-8609:8600-8609 \
+  -e MYSQL_HOST=etps-mysql \
+  -e MYSQL_PORT=3306 \
+  -e MYSQL_DATABASE=etps \
+  -e MYSQL_USERNAME=root \
+  -e MYSQL_PASSWORD=etps.123456 \
+  -e JAVA_OPTS="-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC" \
+  -v /opt/etps/config:/app/config \
+  -v /opt/etps/certs:/app/certs \
+  -v /opt/etps/logs:/app/logs \
+  xiaoniucode/etps:latest
+```
+
+
+查看`etps`运行日志：
+
+```shell
+docker logs -f etps
+```
+
+停止`etps`：
+
+```shell
+docker stop etps
+```
+
+### 三、Docker Compose
+
+```shell
+mkdir -p /opt/etps/{config,certs,logs,mysql/data}
+cd /opt/etps
+```
+
+```yaml
+version: "3.8"
+
+services:
+  etps-mysql:
+    image: mysql:8.4
+    container_name: etps-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: etps.123456
+      MYSQL_DATABASE: etps
+    networks:
+      - etps-net
+    volumes:
+      - /opt/etps/mysql/data:/var/lib/mysql
+
+  etps:
+    image: xiaoniucode/etps:latest
+    container_name: etps
+    restart: unless-stopped
+    ports:
+      - "8020:8020"          # Web 管理面板
+      - "9527:9527"          # 控制协议端口
+      - "8600-8609:8600-8609" # 数据端口范围
+    environment:
+      JAVA_OPTS: "-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC"
+    volumes:
+      - /opt/etps/config:/app/config
+      - /opt/etps/certs:/app/certs
+      - /opt/etps/logs:/app/logs
+    networks:
+      - etps-net
+    depends_on:
+      - etps-mysql
+
+networks:
+  etps-net:
+    driver: bridge
+```
+
+```shell
+# 启动服务：
+docker compose up -d
+
+# 查看日志：
+docker logs -f etps
+
+# 停止服务：
+docker compose down
+```

@@ -12,12 +12,12 @@ const features: Array<{
     title: string;
     description: string;
 }> = [
-    {id: 'panel', title: '管理面板', description: '完善中✍️'},
-    {id: 'speed', title: '高性能传输', description: '完善中✍️'},
-    {id: 'shield', title: '协议与加密', description: '完善中✍️'},
-    {id: 'sparkle', title: '简单易用', description: '完善中✍️'},
-    {id: 'globe', title: '跨平台', description: '完善中✍️'},
-    {id: 'stack', title: '能力矩阵', description: '完善中✍️'},
+    {id: 'panel', title: '管理面板', description: '提供现代化Web UI管理面板，实时监控连接状态、在线设备节点、流量统计与运行指标'},
+    {id: 'speed', title: '高性能传输', description: '自研高效多路复用流传输协议、全链路零拷贝设计，采用状态机及事件驱动架构，保证系统稳定传输'},
+    {id: 'shield', title: '协议与加密', description: '支持TCP、HTTP及TCP上层协议代理，提供mTLS双向认证、端到端加密传输和会话级临时隧道机制'},
+    {id: 'sparkle', title: '简单易用', description: '支持客户端自治运行和集中式远程配置管理同步，无需复杂网络知识即可快速完成服务发布与运维管理'},
+    {id: 'globe', title: '跨平台', description: '兼容Windows/Linux/macOS/Docker/k8s环境，同时支持嵌入Spring Boot应用，实现灵活集成部署'},
+    {id: 'stack', title: '能力矩阵', description: '内置压缩传输、负载均衡、访问控制、身份认证、带宽限流、鉴权认证、自定义域名、流量分析等能力'},
 ];
 
 type InstallRole = 'server' | 'client';

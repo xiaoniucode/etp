@@ -4,7 +4,7 @@ sidebar_position: 6
 
 # Q&A
 
-## 1、Linux二进制安装运行`etps/etpc`时出现类似`GNU libc2.32`错误解决方案
+## 1、Linux二进制安装运行时出现类似`GNU libc2.32`错误解决方案
 
 
 :::tip 提示

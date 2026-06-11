@@ -1,24 +1,37 @@
-version: '3.8'
+version: "3.8"
 
 services:
+  etps-mysql:
+    image: mysql:8.4
+    container_name: etps-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: etps.123456
+      MYSQL_DATABASE: etps
+    networks:
+      - etps-net
+    volumes:
+      - /opt/etps/mysql/data:/var/lib/mysql
+
   etps:
     image: xiaoniucode/etps:latest
     container_name: etps
-    restart: always
+    restart: unless-stopped
     ports:
-      - "8020:8020"     # Web管理界面
-      - "9527:9527"     # 客户端通信端口
-      - "8600-8609:8600-8609"  # 端口范围映射
+      - "8020:8020"
+      - "9527:9527"
+      - "8600-8609:8600-8609"
     environment:
-      - ETP_DB_PATH=/app/data/etp.db
-      - JVM_OPTS=-Xmx1g -Xms1g #JVM参数
-    volumes: # 数据持久化
-      - /opt/etps/data:/app/data \ # 数据
-      - /opt/etps/logs:/app/logs \ # 日志
-      - /opt/etps/etps.toml:/app/etps.toml \ # 配置文件
+      JAVA_OPTS: "-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC"
+    volumes:
+      - /opt/etps/config:/app/config
+      - /opt/etps/certs:/app/certs
+      - /opt/etps/logs:/app/logs
     networks:
-      - etps-network
+      - etps-net
+    depends_on:
+      - etps-mysql
 
 networks:
-  etps-network:
+  etps-net:
     driver: bridge
