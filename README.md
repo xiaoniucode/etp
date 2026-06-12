@@ -26,38 +26,72 @@
 <div align="center">
   <a href="README.md"><strong>README</strong></a> &nbsp;|&nbsp;
   <a href="README_ZH.md"><strong>简体中文</strong></a> &nbsp;|&nbsp;
+  <a href="https://xiaoniucode.github.io/etp"><strong>Documentation</strong></a>
 </div>
 
+![dashboard.png](doc/image/dashboard.png)
 
-## ⚠️ Important Notice
-
-The legacy version has been deprecated. The new version is in its final stages and has not been officially released yet. It is scheduled for release in approximately one week.
-
-## Introduce
-
-**ETP (Easy Tunnel Proxy)** is a high-performance **secure intranet penetration gateway**.
-
-### Key Features
-
-- TCP and HTTP proxy support
+## Introduction
+**etp (Easy Tunnel Proxy)** is a high-performance **intranet penetration platform**.
+- Support for TCP and HTTP protocol proxying
 - Data compression
 - mTLS transport encryption
-- IP CIDR-based access control (whitelist & blacklist)
-- Multi-user Basic Auth authentication
-- Token-based authentication with multi-client support
-- Bandwidth throttling and rate limiting
-- Multiple load balancing strategies and failover support
+- IP CIDR access control (whitelist/blacklist)
+- HTTP Basic Auth authentication
+- Token-based authentication
+- Fine-grained bandwidth rate limiting
+- Load balancing with cluster proxy support
 - Domain and subdomain support
-- Built-in management dashboard
+- Built-in Web UI management dashboard
 - Spring Boot integration and SDK support
-- Cross-platform compatibility: Windows, Linux, macOS
+- Compatible with Windows, Linux, and macOS
 
+## Quick Start
 
-## Issue Feedback
+### Server Installation
+
+Requirements:
+
+- Docker 20+
+- Linux x86_64
+
+One-command Docker startup for `etps` server:
+
+```shell
+curl -fsSL https://raw.githubusercontent.com/xiaoniucode/etp/main/scripts/install.sh -o install.sh
+chmod +x install.sh
+sudo sh install.sh
+```
+
+Management dashboard access: `http://server_ip:8020` (admin: 123456)
+
+### Client Installation
+
+Download the latest version from the [GitHub Releases](https://github.com/xiaoniucode/etp/tags) page and select the binary file for your operating system.
+
+After extracting locally, edit the configuration file `etpc.toml`:
+
+```toml
+server_addr = "etps server IP or domain"
+[auth]
+token = "authentication token"
+```
+
+Run the client:
+
+```shell
+./etpc -c etpc.toml # Linux / MacOS
+
+etpc.exe -c etpc.toml # Windows
+```
+
+For more usage details, please refer to the [documentation website](https://xiaoniucode.github.io/etp/).
+
+## Feedback
 
 Report issues: [issues](https://github.com/xiaoniucode/etp/issues)
 
-## Project Trend
+## Project Trends
 
 <p align="center">
   <a href="https://github.com/xiaoniucode/etp/stargazers">

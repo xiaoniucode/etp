@@ -68,10 +68,10 @@ docker run -d \
   --name etps-mysql \
   --network etps-net \
   --restart unless-stopped \
-  -p 3307:3306 \
+  -p 3306:3306 \
   -e MYSQL_ROOT_PASSWORD=etps.123456 \
   -e MYSQL_DATABASE=etps \
-  -v "$(pwd)/mysql/data:/var/lib/mysql" \
+  -v /opt/etps/mysql/data:/var/lib/mysql \
   mysql:8.4
 ```
 
@@ -95,13 +95,12 @@ docker run -d \
   -e MYSQL_DATABASE=etps \
   -e MYSQL_USERNAME=root \
   -e MYSQL_PASSWORD=etps.123456 \
-  -e JAVA_OPTS="-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC" \
+  -e JAVA_OPTS="-Xms512m -Xmx512m -XX:MaxDirectMemorySize=1024m -XX:+UseG1GC" \
   -v /opt/etps/config:/app/config \
   -v /opt/etps/certs:/app/certs \
   -v /opt/etps/logs:/app/logs \
   xiaoniucode/etps:latest
 ```
-
 
 查看`etps`运行日志：
 
@@ -147,7 +146,7 @@ services:
       - "9527:9527"          # 控制协议端口
       - "8600-8609:8600-8609" # 数据端口范围
     environment:
-      JAVA_OPTS: "-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC"
+      JAVA_OPTS: "-Xms512m -Xmx512m -XX:MaxDirectMemorySize=1024m -XX:+UseG1GC"
     volumes:
       - /opt/etps/config:/app/config
       - /opt/etps/certs:/app/certs
