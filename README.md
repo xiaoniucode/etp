@@ -2,7 +2,7 @@
   <img src="doc/logo.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
 </div>
 <p align="center" style="font-size:18px;color:#555;margin-top:-10px;margin-bottom:24px;">
-  An intranet penetration solution implemented based on Netty
+  A high-performance intranet penetration platform
 </p>
 <div align="center">
   <a href="https://github.com/xiaoniucode/etp/stargazers">
@@ -33,18 +33,19 @@
 
 ## Introduction
 **etp (Easy Tunnel Proxy)** is a high-performance **intranet penetration platform**.
-- Support for TCP and HTTP protocol proxying
-- Data compression
-- mTLS transport encryption
-- IP CIDR access control (whitelist/blacklist)
-- HTTP Basic Auth authentication
-- Token-based authentication
-- Fine-grained bandwidth rate limiting
-- Load balancing with cluster proxy support
-- Domain and subdomain support
-- Built-in Web UI management dashboard
-- Spring Boot integration and SDK support
-- Compatible with Windows, Linux, and macOS
+- 🚀 Support for TCP and HTTP protocol proxying
+- ⚡ Data compression transmission, reducing bandwidth consumption
+- 🔄 TCP multiplexing stream transmission, multiple requests over single physical connection
+- 🔒 mTLS mutual authentication for secure data transmission
+- 🛡️ IP CIDR access control (whitelist/blacklist)
+- 🔑 HTTP BasicAuth authentication, Token-based identity verification
+- 📉 Fine-grained bandwidth rate limiting and traffic management
+- ⚖️ Load balancing and cluster proxy support, enhancing system availability
+- 🌐 Custom domain and subdomain routing support
+- 📊 Built-in modern Web UI dashboard for visual management and operational monitoring
+- 🔌 Spring Boot integration, reducing development and testing costs
+- 💻 Compatible with Windows, Linux, and macOS for cross-platform deployment
+- 📚 Client-autonomous + server-centralized management configuration rules for simplified administration
 
 ## Quick Start
 
