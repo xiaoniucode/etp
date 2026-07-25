@@ -46,7 +46,7 @@ allow_rename = true
 浏览器访问：https://nas.domain.com:8443
 
 :::tip
-更多域名配置细节请移步 [域名路由](../networking/domain.mdx)
+更多域名配置细节请移步 [域名路由](../networking/domain.md)
 :::
 
 ## 参数说明
