@@ -34,7 +34,7 @@ const features: Array<{ title: string; details: string; to: string }> = [
     },
     {
         title: '域名证书',
-        details: '集成ACME，通过管理面板实现 TLS 证书签发、部署、续期，支持常见云厂商DNS',
+        details: '集成ACME，通过管理面板实现 TLS 证书签发、部署、续期，内置常见云厂商DNS',
         to: '/docs/console',
     },
     {
@@ -49,7 +49,7 @@ const features: Array<{ title: string; details: string; to: string }> = [
     },
     {
         title: '跨平台',
-        details: '支持 Win / MacOS / Linux 操作系统\n兼容 ARM / X86架构',
+        details: '支持 Windows / MacOS / Linux 操作系统\n兼容 ARM / X86架构',
         to: '/docs/console',
     },
     {
