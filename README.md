@@ -146,8 +146,29 @@ Commands:
   udp     Start a UDP proxy
 ```
 
-案例：
+Examples:
 
+Start with a config file
+```toml
+# orbien.toml
+server_addr = "127.0.0.1"
+server_port = 9527
+
+[auth]
+token = "<your-access-token>"
+
+[[proxies]]
+name = "MySQL"
+protocol = "tcp"
+local_ip = "127.0.0.1"
+local_port = 3306
+remote_port = 9052
+```
+```shell
+orbien run orbien.toml
+```
+
+Quick expose via CLI
 ```shell
 orbien login --server <server-host>:9527 --token <access-token>
 orbien http 8080
