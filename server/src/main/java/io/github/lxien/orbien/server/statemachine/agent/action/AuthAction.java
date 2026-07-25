@@ -4,6 +4,7 @@ import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.statemachine.agent.*;
 import io.github.lxien.orbien.server.uid.UidGenerator;
 import io.github.lxien.orbien.core.enums.AgentType;
+import io.github.lxien.orbien.core.enums.AuthStatusCode;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
@@ -62,32 +63,20 @@ public class AuthAction extends AgentBaseAction {
             String token = authInfo.getToken();
             if (!Objects.equals(token, existAgentInfo.getToken())) {
                 logger.warn("断线重连认证失败，令牌不匹配，当前令牌：{}，历史令牌：{}", token, context.getAgentInfo().getToken());
-                Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                        .setStatus(Message.Status.newBuilder().setCode(1).setMessage("重连认证失败，令牌不匹配"))
-                        .build();
-                sendAuthError(control, authResponse);
-                context.fireEvent(AgentEvent.AUTH_FAILURE);
+                rejectAuth(control, context, AuthStatusCode.FAILURE, "重连认证失败，令牌不匹配");
                 return;
             }
             String agentId = authInfo.getAgentId();
             if (!StringUtils.hasText(agentId) || !Objects.equals(agentId, existAgentInfo.getAgentId())) {
                 logger.warn("断线重连认证失败，设备ID不匹配，当前设备ID：{}，历史设备ID：{}", agentId, context.getAgentInfo().getAgentId());
-                Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                        .setStatus(Message.Status.newBuilder().setCode(1).setMessage("重连认证失败，设备ID不匹配"))
-                        .build();
-                sendAuthError(control, authResponse);
-                context.fireEvent(AgentEvent.AUTH_FAILURE);
+                rejectAuth(control, context, AuthStatusCode.FAILURE, "重连认证失败，设备ID不匹配");
                 return;
             }
         }
         String token = authInfo.getToken();
         if (!tokenConfigService.existsByToken(token) && !isReconnect) {
             logger.error("客户端认证失败，无效令牌：{}", token);
-            Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                    .setStatus(Message.Status.newBuilder().setCode(100).setMessage("认证失败，无效令牌:" + token))
-                    .build();
-            sendAuthError(control, authResponse);
-            context.fireEvent(AgentEvent.AUTH_FAILURE);
+            rejectAuth(control, context, AuthStatusCode.INVALID_TOKEN, "认证失败，无效令牌:" + token);
             return;
         }
 
@@ -102,16 +91,12 @@ public class AuthAction extends AgentBaseAction {
             Optional<AgentInfo> agentInfoOpt = agentConfigService.findById(agentId);
             if (agentInfoOpt.isEmpty()) {
                 if (sessionClient) {
-                    // 进程未退出但记录已清理（或首次连接），分配新 agentId
                     agentId = uuidGenerator.getUIDAsString();
                     logger.debug("会话型客户端分配新 agentId: {}", agentId);
                 } else {
                     logger.warn("设备ID {} 不存在", agentId);
-                    Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                            .setStatus(Message.Status.newBuilder().setCode(100).setMessage("AgentId " + agentId + " 不存在"))
-                            .build();
-                    sendAuthError(control, authResponse);
-                    context.fireEvent(AgentEvent.AUTH_FAILURE);
+                    rejectAuth(control, context, AuthStatusCode.AGENT_NOT_FOUND,
+                            "AgentId " + agentId + " 不存在");
                     return;
                 }
             } else {
@@ -127,7 +112,7 @@ public class AuthAction extends AgentBaseAction {
 
 
         Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                .setStatus(Message.Status.newBuilder().setCode(0).setMessage("认证成功"))
+                .setStatus(status(AuthStatusCode.SUCCESS, AuthStatusCode.SUCCESS.getDescription()))
                 .setConnectionId(context.getConnectionId())
                 .setAgentId(agentId)
                 .build();
@@ -140,11 +125,31 @@ public class AuthAction extends AgentBaseAction {
                 logger.error("发送认证成功消息失败", future.cause());
             }
         });
-        //发布客户端认证异步事件
         eventBus.publishAsync(new AgentAuthEvent(agentInfo, isReconnect));
-        //发布状态机 认证成功事件
         context.fireEvent(AgentEvent.AUTH_SUCCESS);
         logger.debug("设备认证成功：[设备ID={}，设备类型={}，版本号={}]", agentId, agentInfo.getAgentType(), agentInfo.getVersion());
+    }
+
+    private void rejectAuth(Channel control, AgentContext context, AuthStatusCode statusCode, String message) {
+        Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
+                .setStatus(status(statusCode, message))
+                .build();
+        ByteBuf payload = ProtobufUtil.toByteBuf(authResponse, control.alloc());
+        TMSPFrame authFrame = new TMSPFrame(0, TMSP.MSG_AUTH_RESP);
+        authFrame.setPayload(payload);
+        control.writeAndFlush(authFrame).addListener((ChannelFutureListener) future -> {
+            if (!future.isSuccess()) {
+                logger.warn("发送认证失败响应失败", future.cause());
+            }
+            context.fireEvent(AgentEvent.AUTH_FAILURE);
+        });
+    }
+
+    private Message.Status status(AuthStatusCode statusCode, String message) {
+        return Message.Status.newBuilder()
+                .setCode(statusCode.getCode())
+                .setMessage(message)
+                .build();
     }
 
     private AgentInfo createOrUpdateAgentInfo(String agentId, AgentInfo oldAgentInfo, Message.AuthInfo authInfo) {
@@ -175,12 +180,5 @@ public class AuthAction extends AgentBaseAction {
             }
         }
         return null;
-    }
-
-    public void sendAuthError(Channel control, Message.AuthResponse authResponse) {
-        ByteBuf payload = ProtobufUtil.toByteBuf(authResponse, control.alloc());
-        TMSPFrame authFrame = new TMSPFrame(0, TMSP.MSG_AUTH_RESP);
-        authFrame.setPayload(payload);
-        control.writeAndFlush(authFrame);
     }
 }

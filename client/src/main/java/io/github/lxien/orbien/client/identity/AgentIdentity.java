@@ -2,6 +2,8 @@ package io.github.lxien.orbien.client.identity;
 
 import io.github.lxien.orbien.core.enums.AgentType;
 import io.github.lxien.orbien.core.utils.StringUtils;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
 
 import java.io.*;
@@ -17,6 +19,7 @@ import java.util.Properties;
  */
 public final class AgentIdentity {
 
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(AgentIdentity.class);
     private static final String FILE_NAME = "agent.id";
     private static final String KEY_IDENTITY = "agentId";
 
@@ -66,9 +69,18 @@ public final class AgentIdentity {
         }
     }
 
-    /**
-     * 从本地文件加载身份标识
-     */
+    public void clearIdentity() {
+        this.currentIdentity = null;
+        if (storagePath == null) {
+            return;
+        }
+        try {
+            Files.deleteIfExists(Paths.get(storagePath));
+        } catch (Exception e) {
+            logger.warn("Failed to clear agent identity: {}", e.getMessage());
+        }
+    }
+
     private String loadFromStorage() {
         Path path = Paths.get(storagePath);
         if (!Files.exists(path)) {
@@ -101,7 +113,7 @@ public final class AgentIdentity {
 
             setOwnerOnlyPermissions(path);
         } catch (Exception e) {
-            System.err.println("[AgentIdentity] Failed to persist agent identity: " + e.getMessage());
+            logger.warn("Failed to persist agent identity: {}", e.getMessage());
         }
     }
 

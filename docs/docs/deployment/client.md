@@ -59,10 +59,6 @@ docker logs -f orbien
 docker restart orbien
 ```
 
-:::tip
-服务端删过该客户端后，需删除 `.orbien/agent.id` 再启动。
-:::
-
 ## 使用 systemd 安装
 
 ### 下载二进制文件

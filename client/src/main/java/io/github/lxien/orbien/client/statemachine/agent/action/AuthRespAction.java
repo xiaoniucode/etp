@@ -5,7 +5,10 @@ import io.github.lxien.orbien.client.statemachine.agent.AgentContext;
 import io.github.lxien.orbien.client.statemachine.agent.AgentEvent;
 import io.github.lxien.orbien.client.statemachine.agent.AgentState;
 import io.github.lxien.orbien.core.enums.AgentType;
+import io.github.lxien.orbien.core.enums.AuthStatusCode;
 import io.github.lxien.orbien.core.message.Message;
+import io.github.lxien.orbien.core.utils.ChannelUtils;
+import io.netty.channel.Channel;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -18,8 +21,9 @@ public class AuthRespAction extends AgentBaseAction {
         Message.AuthResponse authResponse = context.getAndRemoveAs(ContextConstants.AUTH_RESP,
                 Message.AuthResponse.class);
         Message.Status status = authResponse.getStatus();
-        int code = status.getCode();
-        if (code == 0) {
+        AuthStatusCode statusCode = AuthStatusCode.fromCode(status.getCode());
+
+        if (statusCode != null && statusCode.isSuccess()) {
             logger.info("认证成功");
             String agentId = authResponse.getAgentId();
             context.setConnectionId(authResponse.getConnectionId());
@@ -27,17 +31,23 @@ public class AuthRespAction extends AgentBaseAction {
             AgentType agentType = context.getAgentType();
             context.getAgentIdentity().updateIdentity(agentId, agentType.isStandalone());
             context.fireEvent(AgentEvent.AUTH_SUCCESS);
-        } else if (code == 100) {
-            if (context.getAgentType().isStandalone()) {
-                String storagePath = context.getAgentIdentity().getStoragePath();
-                logger.error("认证失败: {}，请删除本地身份文件后重试: {}", status.getMessage(), storagePath);
-            } else {
-                logger.error("认证失败: {}", status.getMessage());
-            }
-            context.fireEvent(AgentEvent.LOCAL_GOAWAY);
-        } else {
-            logger.error("{}", status.getMessage());
-            context.fireEvent(AgentEvent.LOCAL_GOAWAY);
+            return;
         }
+
+        if (statusCode != null && statusCode.isRecoverable() && context.getAgentType().isStandalone()) {
+            logger.warn("本地设备ID在服务端不存在，已清除本地身份并重新认证: {}", status.getMessage());
+            context.getAgentIdentity().clearIdentity();
+            context.getRetryCount().set(0);
+            Channel control = context.getControl();
+            if (control != null && control.isActive()) {
+                ChannelUtils.closeOnFlush(control);
+            } else {
+                context.fireEvent(AgentEvent.DISCONNECT);
+            }
+            return;
+        }
+
+        logger.error("认证失败: {}", status.getMessage());
+        context.fireEvent(AgentEvent.LOCAL_GOAWAY);
     }
 }
