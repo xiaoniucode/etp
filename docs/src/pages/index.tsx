@@ -29,8 +29,8 @@ const features: Array<{ title: string; details: string; to: string }> = [
     },
     {
         title: '请求重放',
-        details: '能拦截 HTTP / HTTPS 请求，支持原样重放、编辑后再重放',
-        to: '/docs/console',
+        details: '能捕获 HTTP / HTTPS 请求，支持向上游原样重放、编辑后再重放',
+        to: '/docs/console/inspector',
     },
     {
         title: '域名证书',
