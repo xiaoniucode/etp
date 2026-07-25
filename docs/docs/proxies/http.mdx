@@ -1,0 +1,50 @@
+---
+sidebar_position: 1
+title: HTTP
+description: HTTP 反向代理与虚拟主机
+---
+
+# HTTP 代理
+
+## 服务端配置
+
+```toml
+# orbien-server.toml
+server_addr = "0.0.0.0"
+server_port = 9527
+http_proxy_port = 8080
+```
+
+## 客户端配置
+
+```toml
+# orbien.toml
+server_addr = "127.0.0.1"
+server_port = 9527
+
+[[proxies]]
+name = "web"
+protocol = "http"
+local_ip = "127.0.0.1"
+local_port = 8001
+custom_domains = ["web.domain.com"]
+```
+
+浏览器访问：http://web.domain.com:8080
+
+:::tip
+更多域名配置细节请移步 [域名路由](../networking/domain.mdx)
+:::
+
+## 参数说明
+
+| 参数名            | 类型      | 默认值       | 描述                    | 必填 |
+|:---------------|:--------|:----------|:----------------------|:---|
+| name           | String  |           | 代理名称                  | 是  |
+| protocol       | String  |           | 协议类型                  | 是  |
+| local_ip       | String  | 127.0.0.1 | 本地 IP                 | 否  |
+| local_port     | Integer |           | 本地端口                  | 是  |
+| custom_domains | Array   |           | 自定义域名列表               | 否  |
+| sub_domains    | Array   |           | 子域名列表                 | 否  |
+| auto_domain    | Boolean | true      | 未配置域名时是否自动生成          | 否  |
+| enabled        | Boolean | true      | 是否开启代理                | 否  |

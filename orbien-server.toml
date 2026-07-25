@@ -5,6 +5,14 @@ https_proxy_port = 443
 #root_domains = ["domain1.com", "domain2.com"]
 
 ########################################################################################################################
+[[tokens]]
+name="win"
+token="token-value"
+[[tokens]]
+name="mac"
+token="token-value"
+
+
 [transport]
 [transport.tls]
 enabled = true

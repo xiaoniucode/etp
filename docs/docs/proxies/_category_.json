@@ -1,0 +1,10 @@
+{
+  "label": "代理协议",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "title": "代理协议",
+    "description": "访客侧协议：HTTP / HTTPS / TCP / UDP / SOCKS5 / 文件共享，以及 HTTP Header 改写。",
+    "slug": "/proxies"
+  }
+}

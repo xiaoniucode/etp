@@ -1,0 +1,10 @@
+{
+  "label": "部署运维",
+  "position": 9,
+  "link": {
+    "type": "generated-index",
+    "title": "部署运维",
+    "description": "公网服务端与内网客户端的正式部署：数据库选型、Docker / JAR、持久化与升级。",
+    "slug": "/deployment"
+  }
+}

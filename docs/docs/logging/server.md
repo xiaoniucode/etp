@@ -1,3 +1,14 @@
+---
+sidebar_position: 3
+title: 服务端日志
+description: logback-spring.xml
+---
+
+# 服务端日志
+
+如果需要修改服务端日志，可以在`logback-spring.xml`中修改，该文件位于发布包下 `config/logback-spring.xml`，下面是默认配置：
+
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <property name="LOG_FILE" value="./logs/orbien-server"/>
@@ -22,13 +33,14 @@
         </rollingPolicy>
     </appender>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </root>
 
-    <logger name="io.github.lxien.orbien" level="DEBUG"/>
-    <logger name="io.netty.handler.ssl" level="DEBUG"/>
-    <logger name="io.netty.handler.ssl.util.BouncyCastleUtil" level="DEBUG"/>
-    <logger name="io.netty.channel.ChannelHandlerMask" level="DEBUG"/>
+    <logger name="io.github.lxien.orbien" level="INFO"/>
+    <logger name="io.netty.handler.ssl" level="INFO"/>
+    <logger name="io.netty.handler.ssl.util.BouncyCastleUtil" level="INFO"/>
+    <logger name="io.netty.channel.ChannelHandlerMask" level="INFO"/>
 </configuration>
+```

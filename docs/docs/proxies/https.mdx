@@ -1,0 +1,65 @@
+---
+sidebar_position: 2
+title: HTTPS
+description: HTTPS 终止、证书绑定与 force_https 强制跳转
+---
+
+# HTTPS 代理
+
+## 服务端配置
+
+```toml
+# orbien-server.toml
+server_addr = "0.0.0.0"
+server_port = 9527
+https_proxy_port = 8443
+```
+
+## 客户端配置
+
+```toml
+# orbien.toml
+server_addr = "127.0.0.1"
+server_port = 9527
+
+[[proxies]]
+name = "web"
+protocol = "https"
+local_ip = "127.0.0.1"
+local_port = 8001
+force_https = true
+custom_domains = ["web.domain.com"]
+
+[proxies.tls]
+cert_file = "cert/server.crt"
+key_file = "cert/server.key"
+```
+
+浏览器访问：https://web.domain.com:8443
+
+:::tip
+更多域名配置细节请移步 [域名路由](../networking/domain.mdx)
+:::
+
+## 参数说明
+
+| 参数名            | 类型      | 默认值       | 描述                    | 必填 |
+|:---------------|:--------|:----------|:----------------------|:---|
+| name           | String  |           | 代理名称                  | 是  |
+| protocol       | String  |           | 协议类型                  | 是  |
+| local_ip       | String  | 127.0.0.1 | 本地 IP                 | 否  |
+| local_port     | Integer |           | 本地端口                  | 是  |
+| force_https    | Boolean | true      | 是否强制 HTTPS 跳转         | 否  |
+| custom_domains | Array   |           | 自定义域名列表               | 否  |
+| sub_domains    | Array   |           | 子域名列表                 | 否  |
+| auto_domain    | Boolean | true      | 未配置域名时是否自动生成          | 否  |
+| enabled        | Boolean | true      | 是否开启代理                | 否  |
+
+## TLS 证书
+
+可选。用于为该代理绑定独立证书；未配置时使用服务端默认证书。
+
+| 参数名       | 类型     | 默认值 | 描述     | 必填 |
+|:----------|:-------|:----|:-------|:---|
+| cert_file | String |     | 证书文件路径 | 是  |
+| key_file  | String |     | 私钥文件路径 | 是  |

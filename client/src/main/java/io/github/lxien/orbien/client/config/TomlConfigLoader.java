@@ -1,4 +1,7 @@
 package io.github.lxien.orbien.client.config;
+import io.github.lxien.orbien.core.domain.transport.ProtocolListenerConfig;
+import io.github.lxien.orbien.core.domain.transport.QuicProtocolConfig;
+import io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig;
 import io.github.lxien.orbien.core.filetransfer.FileTransferConstants;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 
@@ -204,7 +207,7 @@ public class TomlConfigLoader implements ConfigSource {
                     proxyConfig.setRemotePort(remotePortValue.intValue());
                 }
 
-                //解析目标服务（SOCKS5 无需固定 targets）
+                //解析目标服务
                 if (!protocolType.isSocks5() && !protocolType.isFile()) {
                     List<Target> targets = proxyTable.getList("targets", new ArrayList<>()).stream()
                             .map(item -> {
@@ -503,20 +506,20 @@ public class TomlConfigLoader implements ConfigSource {
     }
 
     private void parseClientProtocolTable(Toml table,
-                                          io.github.lxien.orbien.core.domain.transport.ProtocolListenerConfig target,
+                                          ProtocolListenerConfig target,
                                           int defaultPort) {
         if (table == null) {
             target.setPort(defaultPort);
             return;
         }
         target.setPort(readServerPort(table, defaultPort));
-        if (target instanceof io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig ws) {
+        if (target instanceof WebSocketProtocolConfig ws) {
             String path = table.getString("path");
             if (StringUtils.hasText(path)) {
                 ws.setPath(path.trim());
             }
         }
-        if (target instanceof io.github.lxien.orbien.core.domain.transport.QuicProtocolConfig quic) {
+        if (target instanceof QuicProtocolConfig quic) {
             Long maxIdle = table.getLong("max_idle_timeout_ms");
             if (maxIdle != null) {
                 quic.setMaxIdleTimeoutMs(maxIdle);

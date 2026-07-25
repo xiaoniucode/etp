@@ -1,0 +1,50 @@
+---
+sidebar_position: 5
+title: SOCKS5
+description: 动态 SOCKS5 出口与认证
+---
+
+# SOCKS5 代理
+
+在服务端暴露 SOCKS5 入口，访客经隧道由客户端动态访问任意目标（仅支持 CONNECT）
+
+```toml
+# orbien.toml
+[[proxies]]
+name = "socks5-proxy"
+protocol = "socks5"
+remote_port = 9070
+
+[proxies.socks5_auth]
+enabled = true
+users = [
+    { user = "demo", pass = "demo123" }
+]
+```
+
+## 参数说明
+
+| 参数名         | 类型      | 默认值  | 描述            | 必填 |
+|:------------|:--------|:-----|:--------------|:---|
+| name        | String  |      | 代理名称          | 是  |
+| protocol    | String  |      | 协议类型          | 是  |
+| remote_port | Integer |      | 远程访问端口，留空自动分配 | 否  |
+| enabled     | Boolean | true | 是否开启代理        | 否  |
+
+## 授权认证
+
+| 参数名     | 类型      | 默认值   | 描述          | 必填 |
+|:--------|:--------|:------|:------------|:---|
+| enabled | Boolean | false | 是否开启用户名密码认证 | 否  |
+| users   | Array   |       | 认证用户列表      | 否  |
+
+### 用户信息
+
+| 参数名  | 类型     | 默认值 | 描述  | 必填 |
+|:-----|:-------|:----|:----|:---|
+| user | String |     | 用户名 | 是  |
+| pass | String |     | 密码  | 是  |
+
+:::info 说明
+用户密码会被加密存储
+:::

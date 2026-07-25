@@ -1,0 +1,10 @@
+{
+  "label": "传输与性能",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "title": "传输与性能",
+    "description": "物理传输（TCP / WebSocket / QUIC）、隧道 TLS、多路复用、压缩与带宽限流。",
+    "slug": "/transport"
+  }
+}

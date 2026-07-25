@@ -109,7 +109,7 @@ const config: Config = {
         },
         footer: {
             style: 'dark',
-            copyright: `Copyright © ${new Date().getFullYear()} orbien lxien.com`,
+            copyright: `Copyright © ${new Date().getFullYear()} orbien`,
         },
         prism: {
             //设置高亮语言

@@ -1,0 +1,43 @@
+---
+sidebar_position: 2
+title: Spring Boot 集成
+description: orbien-spring-boot-starter 嵌入客户端
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Spring Boot 集成
+
+**Orbien**客户端支持内嵌到`Spring Boot`应用中运行，主要用于web开发临时测试，快速暴露为远程服务，数据`不会持久化`到服务端，生命周期同项目，
+属于**SESSION**类型客户端。最新版本可从 [Maven 中央仓库](https://central.sonatype.com/)获取。
+
+<Tabs>
+    <TabItem value="Maven" label="Maven" default>
+        ```xml
+        <dependency>
+            <groupId>io.github.lxien</groupId>
+            <artifactId>orbien-spring-boot-starter</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+        ```
+    </TabItem>
+    <TabItem value="Gradle" label="Gradle">
+        ```groovy
+        implementation("io.github.lxien:orbien-spring-boot-starter:0.4.0")
+        ```
+    </TabItem>
+</Tabs>
+
+在`application.yml`中添加配置
+```yaml
+orbien:
+  client:
+    enabled: true
+    server-addr: <server-host>
+    auth:
+      token: <access-token>
+    proxy:
+      protocol: http
+```
+
+更多复杂场景配置请查看源码。

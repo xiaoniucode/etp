@@ -1,0 +1,114 @@
+---
+sidebar_position: 2
+title: 快速开始
+description: 快速搭建Orbien运行环境
+---
+
+# 快速开始
+
+## 启动服务端
+
+首先需要在云服务器安全组中开放TCP端口：9527、8080、8443、8020、9050-9060
+
+在具备**公网IP**和**Docker**运行环境的Linux云服务器上执行如下命令：
+
+```js
+mkdir -p /opt/orbien/data /opt/orbien/logs
+
+cat > /opt/orbien/orbien-server.toml <<'EOF'
+server_addr = "0.0.0.0"
+server_port = 9527
+http_proxy_port = 8080
+https_proxy_port = 8443
+
+[dashboard]
+enabled = true
+addr = "0.0.0.0"
+port = 8020
+username = "admin"
+password = "123456"
+
+[[port_pool.tcp]]
+start = 9050
+end = 9060
+
+EOF
+
+docker run -d \
+  --name orbien-server \
+  --restart unless-stopped \
+  -p 8080:8080 \
+  -p 8443:8443 \
+  -p 8020:8020 \
+  -p 9527:9527 \
+  -p 9050-9060:9050-9060 \
+  -e SPRING_PROFILES_ACTIVE=h2 \
+  -e H2_DATA_DIR=/app/data/orbien-server \
+  -e JAVA_OPTS="-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC --enable-native-access=ALL-UNNAMED" \
+  -e TZ=Asia/Shanghai \
+  -v /opt/orbien/orbien-server.toml:/app/orbien-server.toml:ro \
+  -v /opt/orbien/data:/app/data \
+  -v /opt/orbien/cert:/app/cert \
+  -v /opt/orbien/config:/app/config \
+  lxien/orbien-server:0.21.0
+```
+
+浏览器访问：`http://<your-server-ip>:8020` （admin: 123456）
+
+:::tip
+实际中可根据自己需求配置端口，如果不用TCP或UDP代理，完全可以不用配置端口范围，本文仅作为案例测试使用。
+:::
+
+## 启动客户端
+
+### 二进制启动
+
+从 [Releases](https://github.com/lxien/orbien/releases) 下载对应平台二进制文件
+
+编辑配置文件：
+
+```toml
+# orbien.toml
+server_addr = "<server-addr>"
+server_port = 9527
+
+[auth]
+token = "<your-access-token>"
+```
+运行：
+```shell
+orbien run orbien.toml
+```
+:::tip 提示
+访问令牌`Token`可以在服务端配置文件 `orbien-server.toml` 中配置静态令牌，也可在管理面板中动态创建，此外，代理配置规则可直接在`orbien.toml`中
+配置，如果服务端存在同名代理会被客户端覆盖。
+:::
+
+### Docker启动
+
+```js
+mkdir -p ./orbien/logs ./orbien/.orbien
+
+cat > ./orbien/orbien.toml <<'EOF'
+server_addr = "<server-addr>"
+server_port = 9527
+
+[auth]
+token = "<your-access-token>"
+EOF
+
+docker run -d \
+--name orbien \
+--restart unless-stopped \
+-e TZ=Asia/Shanghai \
+-v ./orbien/orbien.toml:/app/orbien.toml:ro \
+-v ./orbien/logs:/app/logs \
+-v ./orbien/.orbien:/root/.orbien \
+lxien/orbien:0.21.0
+```
+
+
+
+
+
+

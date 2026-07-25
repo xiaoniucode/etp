@@ -1,0 +1,10 @@
+{
+  "label": "高可用与可靠性",
+  "position": 8,
+  "link": {
+    "type": "generated-index",
+    "title": "高可用与可靠性",
+    "description": "负载均衡、健康检查、连接池与重连、多目标 / 多 Agent 调度。",
+    "slug": "/reliability"
+  }
+}

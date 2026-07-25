@@ -1,0 +1,26 @@
+# 介绍
+
+
+## 管理面板配置
+
+管理面板提供集中式配置管理与数据检测，提供了很多开箱即用的功能，方便运维管理；`Orbien`代理配置采用**集中化配置**和**客户端自治**设计，
+用户可根据需求自行选择是否使用管理面板，如果不希望将管理接口暴露在互联网上，可以将其关闭，使用纯配置文件。
+
+```toml
+[dashboard]
+enabled = true
+addr = "0.0.0.0"
+port = 8020
+username = "admin"
+password = "123456"
+#cert_file ="cert/transport/fullchain.key"
+#key_file ="cert/transport/privkey.pem"
+```
+
+如果需要支持HTTPS访问管理面板，可以配置TLS证书，也可直接在Nginx中配置。
+
+:::info 说明
+用户密码会进行加密存储，采用的是Spring Security `BCrypt` 加密算法。用户信息会在系统首次启动时持久化到数据库，默认采用`H2`轻量数据库，
+如果需要修改用户密码，需要在管理面板中修改。
+:::
+
