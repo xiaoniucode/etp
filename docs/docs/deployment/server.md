@@ -80,7 +80,7 @@ docker run -d \
   -v /opt/orbien/data:/app/data \
   -v /opt/orbien/cert:/app/cert \
   -v /opt/orbien/config:/app/config \
-  lxien/orbien-server:0.21.0
+  lxien/orbien-server:0.22.0
 ```
 
 #### Docker Compose
@@ -89,7 +89,7 @@ docker run -d \
 # docker-compose.yml
 services:
   orbien-server:
-    image: lxien/orbien-server:0.21.0
+    image: lxien/orbien-server:0.22.0
     container_name: orbien-server
     restart: unless-stopped
     ports:
@@ -142,7 +142,7 @@ docker run -d \
   -v /opt/orbien/data:/app/data \
   -v /opt/orbien/cert:/app/cert \
   -v /opt/orbien/config:/app/config \
-  lxien/orbien-server:0.21.0
+  lxien/orbien-server:0.22.0
 ```
 
 #### Docker Compose
@@ -151,7 +151,7 @@ docker run -d \
 # docker-compose.yml
 services:
   orbien-server:
-    image: lxien/orbien-server:0.21.0
+    image: lxien/orbien-server:0.22.0
     container_name: orbien-server
     restart: unless-stopped
     ports:
