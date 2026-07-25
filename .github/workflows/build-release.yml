@@ -358,6 +358,9 @@ jobs:
       actions: read
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: 下载所有构件
         uses: actions/download-artifact@v4
         with:
@@ -365,13 +368,9 @@ jobs:
           pattern: 'orbien*'
           merge-multiple: true
 
-      - name: 读取发布信息模板
-        id: release-notes
-        run: echo "content=$(cat .github/RELEASE_NOTES_TEMPLATE.md)" >> $GITHUB_OUTPUT
-
       - name: 创建 GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: artifacts/**/*
+          body_path: .github/RELEASE_NOTES_TEMPLATE.md
           generate_release_notes: true
-          body: ${{ steps.release-notes.outputs.content }}
