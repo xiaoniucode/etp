@@ -16,12 +16,17 @@
 
 package io.github.lxien.orbien.server.event;
 
+import io.github.lxien.orbien.core.enums.AgentType;
 import io.github.lxien.orbien.server.notify.Event;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class AgentOfflineEvent extends Event {
     private final String agentId;
+    private final AgentType agentType;
+
+    public AgentOfflineEvent(String agentId, AgentType agentType) {
+        this.agentId = agentId;
+        this.agentType = agentType;
+    }
 }

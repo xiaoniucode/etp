@@ -67,15 +67,15 @@ public class GoawayAction extends AgentBaseAction {
                                 if (!future.isSuccess()) {
                                     logger.debug("客户端 {} GOAWAY 发送失败", agentId);
                                 }
-                                cleanupResources(context, agentInfo, agentId, control);
+                                cleanupResources(agentInfo, agentId, control);
                             })
             );
             return;
         }
-        cleanupResources(context, agentInfo, agentId, control);
+        cleanupResources(agentInfo, agentId, control);
     }
 
-    private void cleanupResources(AgentContext context, AgentInfo agentInfo, String agentId, Channel control) {
+    private void cleanupResources(AgentInfo agentInfo, String agentId, Channel control) {
         logger.debug("客户端 {} 断开，开始清理资源", agentId);
         try {
             streamManager.fireCloseByAgent(agentId);
@@ -86,10 +86,11 @@ public class GoawayAction extends AgentBaseAction {
             if (control != null) {
                 ChannelUtils.closeOnFlush(control);
             }
-            publishOfflineEvent(agentInfo);
             logger.info("客户端 {} 资源清理完成", agentId);
         } catch (Exception e) {
             logger.error("客户端 {} 资源清理失败", agentId, e);
+        } finally {
+            publishOfflineEvent(agentInfo);
         }
     }
 
@@ -97,6 +98,10 @@ public class GoawayAction extends AgentBaseAction {
         if (agentInfo == null || !StringUtils.hasText(agentInfo.getAgentId())) {
             return;
         }
-        eventBus.publishSync(new AgentOfflineEvent(agentInfo.getAgentId()));
+        try {
+            eventBus.publishSync(new AgentOfflineEvent(agentInfo.getAgentId(), agentInfo.getAgentType()));
+        } catch (Exception e) {
+            logger.error("发布客户端离线事件失败: agentId={}", agentInfo.getAgentId(), e);
+        }
     }
 }
