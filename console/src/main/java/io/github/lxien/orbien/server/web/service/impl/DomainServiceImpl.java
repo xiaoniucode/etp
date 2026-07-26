@@ -152,6 +152,30 @@ public class DomainServiceImpl implements DomainService {
         if (CollectionUtils.isEmpty(ids)) {
             return;
         }
+        List<DomainDO> domains = domainRepository.findAllById(ids);
+        if (CollectionUtils.isEmpty(domains)) {
+            return;
+        }
+
+        List<String> rootDomains = domains.stream()
+                .map(DomainDO::getDomain)
+                .filter(domain -> domain != null && !domain.isBlank())
+                .distinct()
+                .toList();
+        if (!rootDomains.isEmpty()) {
+            List<ProxyDomainDO> used = proxyDomainRepository.findByRootDomainIn(rootDomains);
+            if (!CollectionUtils.isEmpty(used)) {
+                String examples = used.stream()
+                        .map(ProxyDomainDO::getFullDomain)
+                        .filter(full -> full != null && !full.isBlank())
+                        .distinct()
+                        .limit(3)
+                        .collect(Collectors.joining(", "));
+                throw new BizException("根域名仍被代理占用，无法删除"
+                        + (examples.isEmpty() ? "" : "，例如: " + examples));
+            }
+        }
+
         domainRepository.deleteAllById(ids);
         domainConfigService.evictBaseDomains();
     }

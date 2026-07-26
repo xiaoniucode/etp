@@ -19,8 +19,10 @@ package io.github.lxien.orbien.server.web.proxy.listener.persistence;
 import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.server.notify.EventListener;
 import io.github.lxien.orbien.server.event.ProxyDeleteEvent;
+import io.github.lxien.orbien.server.service.ProxyCacheEvictionService;
 import io.github.lxien.orbien.server.web.entity.ProxyDO;
 import io.github.lxien.orbien.server.web.repository.*;
+import io.github.lxien.orbien.server.web.service.AcmeOrderBindSyncService;
 import io.github.lxien.orbien.server.web.service.CertBindingSyncService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -80,6 +82,10 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
     @Autowired
     private CertBindingSyncService certBindingSyncService;
     @Autowired
+    private AcmeOrderBindSyncService acmeOrderBindSyncService;
+    @Autowired
+    private ProxyCacheEvictionService proxyCacheEvictionService;
+    @Autowired
     private TransactionTemplate transactionTemplate;
 
     @PostConstruct
@@ -109,6 +115,8 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
         ProxyDO proxyDO = optional.get();
         List<String> ids = List.of(proxyId);
 
+        proxyCacheEvictionService.evictByProxyId(proxyId);
+
         proxyTargetRepository.deleteByProxyIdIn(ids);
         accessControlRepository.deleteByProxyIdIn(ids);
         accessControlRuleRepository.deleteByProxyIdIn(ids);
@@ -120,6 +128,7 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
             if (proxyDO.getProtocol().isHttps()) {
                 certBindingSyncService.removeBindingsByProxyId(proxyId);
             }
+            acmeOrderBindSyncService.detachByProxyIds(ids);
             proxyDomainRepository.deleteByProxyId(proxyId);
             basicAuthRepository.deleteByProxyIdIn(ids);
             basicUserRepository.deleteByProxyIdIn(ids);
@@ -128,6 +137,7 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
         }
         if (proxyDO.getProtocol().isFile()) {
             certBindingSyncService.removeBindingsByProxyId(proxyId);
+            acmeOrderBindSyncService.detachByProxyIds(ids);
             proxyDomainRepository.deleteByProxyId(proxyId);
             fileShareAuthRepository.deleteByProxyIdIn(ids);
             fileShareUserRepository.deleteByProxyIdIn(ids);

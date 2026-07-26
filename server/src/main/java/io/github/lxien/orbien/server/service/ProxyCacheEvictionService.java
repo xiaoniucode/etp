@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Collection;
+
 @Service
 public class ProxyCacheEvictionService {
 
@@ -32,5 +34,14 @@ public class ProxyCacheEvictionService {
             return;
         }
         evict(proxyConfigService.findById(proxyId));
+    }
+
+    public void evictByProxyIds(Collection<String> proxyIds) {
+        if (CollectionUtils.isEmpty(proxyIds)) {
+            return;
+        }
+        for (String proxyId : proxyIds) {
+            evictByProxyId(proxyId);
+        }
     }
 }

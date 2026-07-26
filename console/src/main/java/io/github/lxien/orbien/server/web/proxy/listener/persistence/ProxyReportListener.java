@@ -29,6 +29,7 @@ import io.github.lxien.orbien.server.event.ProxyAddEvent;
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.proxy.converter.ProxyReportConvert;
 import io.github.lxien.orbien.server.web.repository.*;
+import io.github.lxien.orbien.server.web.service.AcmeOrderBindSyncService;
 import io.github.lxien.orbien.server.web.service.CertBindingService;
 import io.github.lxien.orbien.server.web.service.CertBindingSyncService;
 import io.github.lxien.orbien.server.web.service.TlsCertificateService;
@@ -105,6 +106,8 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
     private CertBindingService certBindingService;
     @Autowired
     private TlsCertificateService tlsCertificateService;
+    @Autowired
+    private AcmeOrderBindSyncService acmeOrderBindSyncService;
 
     @PostConstruct
     public void init() {
@@ -399,6 +402,7 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
                 .toList();
         if (!removedIds.isEmpty()) {
             certBindingSyncService.removeBindingsByProxyDomainIds(removedIds);
+            acmeOrderBindSyncService.detachProxyDomains(removedIds);
             proxyDomainRepository.deleteAllById(removedIds);
         }
 

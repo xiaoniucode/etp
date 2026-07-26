@@ -20,4 +20,6 @@ public interface AcmeCertOrderRepository extends JpaRepository<AcmeCertOrderDO, 
     Optional<AcmeCertOrderDO> findFirstByCertIdAndStatusOrderByCreatedAtDesc(String certId, AcmeOrderStatus status);
 
     Page<AcmeCertOrderDO> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    List<AcmeCertOrderDO> findByBindProxyDomainIdsIsNotNull();
 }

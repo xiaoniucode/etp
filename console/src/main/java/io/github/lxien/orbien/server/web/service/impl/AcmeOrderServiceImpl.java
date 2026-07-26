@@ -21,6 +21,7 @@ import io.github.lxien.orbien.server.web.param.binding.CertBindParam;
 import io.github.lxien.orbien.server.web.repository.AcmeCertOrderRepository;
 import io.github.lxien.orbien.server.web.repository.AcmeDnsChallengeRepository;
 import io.github.lxien.orbien.server.web.repository.DnsCredentialRepository;
+import io.github.lxien.orbien.server.web.repository.ProxyDomainRepository;
 import io.github.lxien.orbien.server.web.service.AcmeOrderService;
 import io.github.lxien.orbien.server.web.service.CertBindingService;
 import io.github.lxien.orbien.server.web.service.DnsCredentialService;
@@ -52,6 +53,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -59,6 +61,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +80,7 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
     private final DnsPropagationChecker dnsPropagationChecker;
     private final TlsCertificateService tlsCertificateService;
     private final CertBindingService certBindingService;
+    private final ProxyDomainRepository proxyDomainRepository;
     private final AcmeProperties acmeProperties;
 
     @Resource(name = AcmeAsyncConfig.ACME_VERIFICATION_EXECUTOR)
@@ -98,7 +102,10 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
         order.setValidationMode(validationMode);
         order.setAutoRenew(Boolean.TRUE.equals(param.getAutoRenew()));
         if (!CollectionUtils.isEmpty(param.getBindProxyDomainIds())) {
-            order.setBindProxyDomainIds(JsonUtils.toJson(param.getBindProxyDomainIds()));
+            List<Long> validBindIds = retainExistingProxyDomainIds(param.getBindProxyDomainIds());
+            if (!validBindIds.isEmpty()) {
+                order.setBindProxyDomainIds(JsonUtils.toJson(validBindIds));
+            }
         }
         if (validationMode == AcmeValidationMode.DNS_API) {
             DnsCredentialDO credential = dnsCredentialRepository.findById(param.getDnsCredentialId())
@@ -303,7 +310,8 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
             AcmeClientService.IssuedCertificate issued = acmeClientService.issueCertificate(login, order.getAcmeOrderUrl());
             TlsCertDTO cert = tlsCertificateService.saveAcmeCert(issued.getKeyPem(), issued.getFullChainPem());
 
-            List<Long> bindDomainIds = JsonUtils.toLongList(order.getBindProxyDomainIds());
+            List<Long> bindDomainIds = retainExistingProxyDomainIds(
+                    JsonUtils.toLongList(order.getBindProxyDomainIds()));
             if (!CollectionUtils.isEmpty(bindDomainIds)) {
                 CertBindParam bindParam = new CertBindParam();
                 bindParam.setCertId(cert.getId());
@@ -522,6 +530,28 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
 
     private String generateOrderNo() {
         return "ACME" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+    }
+
+    /**
+     * 绑定前过滤已不存在的代理域名 ID，避免证书签发成功后绑到已删域名
+     */
+    private List<Long> retainExistingProxyDomainIds(Collection<Long> bindDomainIds) {
+        if (CollectionUtils.isEmpty(bindDomainIds)) {
+            return List.of();
+        }
+        List<Long> requested = bindDomainIds.stream().filter(id -> id != null).distinct().toList();
+        if (requested.isEmpty()) {
+            return List.of();
+        }
+        Set<Long> existing = proxyDomainRepository.findAllById(requested).stream()
+                .map(domain -> domain.getId())
+                .collect(Collectors.toSet());
+        List<Long> retained = requested.stream().filter(existing::contains).toList();
+        if (retained.size() != requested.size()) {
+            logger.warn("ACME 订单绑定域名存在已删除引用，已跳过: requested={}, retained={}",
+                    requested.size(), retained.size());
+        }
+        return retained;
     }
 
     private AcmeOrderDTO toDTO(AcmeCertOrderDO order, List<AcmeDnsChallengeDO> challenges) {

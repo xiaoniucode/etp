@@ -43,6 +43,7 @@ import io.github.lxien.orbien.server.web.proxy.service.ProxyRuntimeSyncService;
 import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.service.ProxyCacheEvictionService;
+import io.github.lxien.orbien.server.web.service.AcmeOrderBindSyncService;
 import io.github.lxien.orbien.server.web.service.CertBindingSyncService;
 import io.github.lxien.orbien.server.web.service.CertBindingService;
 import io.github.lxien.orbien.server.web.service.MetricsService;
@@ -147,6 +148,8 @@ public class ProxyServiceImpl implements ProxyService {
     private ProxyConfigService proxyConfigService;
     @Autowired
     private ProxyCacheEvictionService proxyCacheEvictionService;
+    @Autowired
+    private AcmeOrderBindSyncService acmeOrderBindSyncService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -230,6 +233,7 @@ public class ProxyServiceImpl implements ProxyService {
             if (protocol.isHttps()) {
                 certBindingSyncService.removeBindingsByProxyId(proxyId);
             }
+            acmeOrderBindSyncService.detachByProxyIds(List.of(proxyId));
             proxyDomainRepository.deleteByProxyId(proxyId);
             saveHttpDomains(proxyId, requestDomainType, param.getSubdomainBindings(), param.getCustomDomains(), proxyId);
         }
@@ -565,6 +569,7 @@ public class ProxyServiceImpl implements ProxyService {
             // 自动域名类型未变化，保留已有域名
         } else {
             certBindingSyncService.removeBindingsByProxyId(proxyId);
+            acmeOrderBindSyncService.detachByProxyIds(List.of(proxyId));
             proxyDomainRepository.deleteByProxyId(proxyId);
             saveHttpDomains(proxyId, requestDomainType, param.getSubdomainBindings(), param.getCustomDomains(), proxyId);
         }
@@ -1365,44 +1370,14 @@ public class ProxyServiceImpl implements ProxyService {
         if (CollectionUtils.isEmpty(ids)) {
             return;
         }
-        ProtocolType protocolType = ProtocolType.fromCode(param.getProtocol());
-        //Common
-        proxyTargetRepository.deleteByProxyIdIn(ids);
-
-        //IP CIDR
-        accessControlRepository.deleteByProxyIdIn(ids);
-        accessControlRuleRepository.deleteByProxyIdIn(ids);
-        timeAccessWindowRepository.deleteByProxyIdIn(ids);
-        timeAccessRepository.deleteByProxyIdIn(ids);
-        //HTTP / HTTPS
-        if (protocolType.isHttpOrHttps()) {
-            if (protocolType.isHttps()) {
-                certBindingSyncService.removeBindingsByProxyIds(ids);
-            }
-            proxyDomainRepository.deleteByProxyIdIn(ids);
-            basicAuthRepository.deleteByProxyIdIn(ids);
-            basicUserRepository.deleteByProxyIdIn(ids);
-            headerRewriteRuleRepository.deleteByProxyIdIn(ids);
-            headerRewriteRepository.deleteByProxyIdIn(ids);
+        if (ProtocolType.fromCode(param.getProtocol()) == null) {
+            throw new BizException("无效协议");
         }
-        if (protocolType.isSocks5()) {
-            socks5AuthRepository.deleteByProxyIdIn(ids);
-            socks5UserRepository.deleteByProxyIdIn(ids);
+        List<ProxyDO> proxies = proxyRepository.findAllById(ids);
+        if (CollectionUtils.isEmpty(proxies)) {
+            return;
         }
-        if (protocolType.isFile()) {
-            certBindingSyncService.removeBindingsByProxyIds(ids);
-            proxyDomainRepository.deleteByProxyIdIn(ids);
-            fileShareAuthRepository.deleteByProxyIdIn(ids);
-            fileShareUserRepository.deleteByProxyIdIn(ids);
-            fileShareLimitsRepository.deleteByProxyIdIn(ids);
-        }
-        //删除流量统计数据
-        ids.forEach(proxyId -> metricsService.deleteByProxyId(proxyId));
-        //删除基础信息
-        proxyRepository.deleteByIdIn(ids);
-        //清空运行时数据
-        transactionHelper.afterCommit(() -> proxyManager.deactivates(ids));
-        logger.debug("批量删除代理成功，数量: {}", ids.size());
+        cascadeDeleteProxies(proxies);
     }
 
     @Override
@@ -1418,9 +1393,6 @@ public class ProxyServiceImpl implements ProxyService {
         cascadeDeleteProxies(proxies);
     }
 
-    /**
-     * 级联删除代理及其关联数据、配置缓存，并在事务提交后释放运行时资源
-     */
     private void cascadeDeleteProxies(List<ProxyDO> proxies) {
         List<String> ids = proxies.stream()
                 .map(ProxyDO::getId)
@@ -1431,7 +1403,7 @@ public class ProxyServiceImpl implements ProxyService {
             return;
         }
 
-        ids.forEach(proxyCacheEvictionService::evictByProxyId);
+        proxyCacheEvictionService.evictByProxyIds(ids);
 
         proxyTargetRepository.deleteByProxyIdIn(ids);
         accessControlRepository.deleteByProxyIdIn(ids);
@@ -1470,6 +1442,7 @@ public class ProxyServiceImpl implements ProxyService {
         List<String> httpLikeIds = new ArrayList<>(httpIds.size() + httpsIds.size());
         httpLikeIds.addAll(httpIds);
         httpLikeIds.addAll(httpsIds);
+        acmeOrderBindSyncService.detachByProxyIds(httpLikeIds);
         proxyDomainRepository.deleteByProxyIdIn(httpLikeIds);
         basicAuthRepository.deleteByProxyIdIn(httpLikeIds);
         basicUserRepository.deleteByProxyIdIn(httpLikeIds);
@@ -1483,6 +1456,7 @@ public class ProxyServiceImpl implements ProxyService {
             return;
         }
         certBindingSyncService.removeBindingsByProxyIds(fileIds);
+        acmeOrderBindSyncService.detachByProxyIds(fileIds);
         proxyDomainRepository.deleteByProxyIdIn(fileIds);
         fileShareAuthRepository.deleteByProxyIdIn(fileIds);
         fileShareUserRepository.deleteByProxyIdIn(fileIds);

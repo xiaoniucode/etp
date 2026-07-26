@@ -6,11 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
-/**
- * 代理域名 Repository
- */
 @Repository
 public interface ProxyDomainRepository extends JpaRepository<ProxyDomainDO, Long> {
 
@@ -26,5 +22,6 @@ public interface ProxyDomainRepository extends JpaRepository<ProxyDomainDO, Long
 
     List<ProxyDomainDO> findByFullDomainIn(Collection<String> fullDomains);
 
-    Optional<ProxyDomainDO> findByFullDomain(String fullDomain);
+    List<ProxyDomainDO> findByRootDomainIn(Collection<String> rootDomains);
+
 }
