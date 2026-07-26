@@ -16,7 +16,9 @@
 package io.github.lxien.orbien.server.web.service.impl;
 
 import io.github.lxien.orbien.core.enums.AgentType;
+import io.github.lxien.orbien.server.manager.ProxyManager;
 import io.github.lxien.orbien.server.service.AgentConfigService;
+import io.github.lxien.orbien.server.statemachine.agent.AgentContext;
 import io.github.lxien.orbien.server.statemachine.agent.AgentInfo;
 import io.github.lxien.orbien.server.statemachine.agent.AgentManager;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
@@ -60,6 +62,8 @@ public class AgentServiceImpl implements AgentService {
     @Autowired
     private ProxyService proxyService;
     @Autowired
+    private ProxyManager proxyManager;
+    @Autowired
     private TransactionHelper transactionHelper;
 
     @Override
@@ -84,11 +88,23 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void kickout(String agentId) {
         if (!agentManager.isOnline(agentId)) {
             throw new BizException("客户端未在线，无法强退");
         }
-        logger.info("强制客户端下线：{}", agentId);
+
+        AgentType agentType = resolveOnlineAgentType(agentId);
+        logger.info("强制客户端下线：{}, type={}", agentId, agentType);
+
+        // SESSION 强退等同会话结束/删除：同步清理代理与 agent，不单独依赖异步离线事件
+        if (agentType != null && agentType.isSession()) {
+            deleteSessionAgentData(agentId);
+            transactionHelper.afterCommit(() -> safeKickout(agentId));
+            return;
+        }
+
+        // STANDALONE：仅断开连接，保留客户端与代理配置
         agentManager.kickout(agentId);
     }
 
@@ -99,19 +115,49 @@ public class AgentServiceImpl implements AgentService {
         if (CollectionUtils.isEmpty(ids)) {
             return;
         }
+
+        // DB 级联删除代理；提交后按 proxyId 释放运行时（覆盖离线 STANDALONE 场景）
         proxyService.deleteByAgentIds(ids);
 
         List<String> onlineAgentIds = ids.stream()
                 .filter(agentManager::isOnline)
                 .toList();
+        List<String> runtimeAgentIds = List.copyOf(ids);
 
         agentConfigService.evictByIds(ids);
         agentRepository.deleteAllById(ids);
 
-        if (!onlineAgentIds.isEmpty()) {
-            transactionHelper.afterCommit(() -> onlineAgentIds.forEach(this::safeKickout));
-        }
+        transactionHelper.afterCommit(() -> {
+            runtimeAgentIds.forEach(this::safeReleaseAgentRuntime);
+            onlineAgentIds.forEach(this::safeKickout);
+        });
         logger.debug("批量删除客户端成功，数量: {}", ids.size());
+    }
+
+    private void deleteSessionAgentData(String agentId) {
+        proxyService.deleteByAgentIds(List.of(agentId));
+        agentConfigService.evictById(agentId);
+        if (agentRepository.existsById(agentId)) {
+            agentRepository.deleteById(agentId);
+        }
+        transactionHelper.afterCommit(() -> safeReleaseAgentRuntime(agentId));
+    }
+
+    private AgentType resolveOnlineAgentType(String agentId) {
+        return agentManager.getAgentContext(agentId)
+                .map(AgentContext::getAgentInfo)
+                .map(AgentInfo::getAgentType)
+                .orElseGet(() -> agentRepository.findById(agentId)
+                        .map(AgentDO::getAgentType)
+                        .orElse(null));
+    }
+
+    private void safeReleaseAgentRuntime(String agentId) {
+        try {
+            proxyManager.onAgentOffline(agentId);
+        } catch (Exception e) {
+            logger.warn("删除客户端后释放运行时代理失败: agentId={}", agentId, e);
+        }
     }
 
     private void safeKickout(String agentId) {

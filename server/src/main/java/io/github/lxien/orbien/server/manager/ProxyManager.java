@@ -189,10 +189,10 @@ public class ProxyManager {
         }
         String agentId = proxyAgentMap.remove(proxyId);
         if (StringUtils.hasText(agentId)) {
-            Set<String> set = agentProxyMap.get(agentId);
-            if (!CollectionUtils.isEmpty(set)) {
+            agentProxyMap.computeIfPresent(agentId, (id, set) -> {
                 set.remove(proxyId);
-            }
+                return set.isEmpty() ? null : set;
+            });
         }
         // HTTP(S)协议
         Set<String> domains = domainRegistry.getDomainsByProxyId(proxyId);
