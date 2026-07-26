@@ -42,6 +42,7 @@ import io.github.lxien.orbien.server.loadbalance.HealthManager;
 import io.github.lxien.orbien.server.web.proxy.service.ProxyRuntimeSyncService;
 import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.web.repository.*;
+import io.github.lxien.orbien.server.service.ProxyCacheEvictionService;
 import io.github.lxien.orbien.server.web.service.CertBindingSyncService;
 import io.github.lxien.orbien.server.web.service.CertBindingService;
 import io.github.lxien.orbien.server.web.service.MetricsService;
@@ -144,6 +145,8 @@ public class ProxyServiceImpl implements ProxyService {
     private HealthManager healthManager;
     @Autowired
     private ProxyConfigService proxyConfigService;
+    @Autowired
+    private ProxyCacheEvictionService proxyCacheEvictionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -1404,6 +1407,99 @@ public class ProxyServiceImpl implements ProxyService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void deleteByAgentIds(Collection<String> agentIds) {
+        if (CollectionUtils.isEmpty(agentIds)) {
+            return;
+        }
+        List<ProxyDO> proxies = proxyRepository.findByAgentIdIn(agentIds);
+        if (CollectionUtils.isEmpty(proxies)) {
+            return;
+        }
+        cascadeDeleteProxies(proxies);
+    }
+
+    /**
+     * 级联删除代理及其关联数据、配置缓存，并在事务提交后释放运行时资源
+     */
+    private void cascadeDeleteProxies(List<ProxyDO> proxies) {
+        List<String> ids = proxies.stream()
+                .map(ProxyDO::getId)
+                .filter(StringUtils::hasText)
+                .distinct()
+                .toList();
+        if (ids.isEmpty()) {
+            return;
+        }
+
+        ids.forEach(proxyCacheEvictionService::evictByProxyId);
+
+        proxyTargetRepository.deleteByProxyIdIn(ids);
+        accessControlRepository.deleteByProxyIdIn(ids);
+        accessControlRuleRepository.deleteByProxyIdIn(ids);
+        timeAccessWindowRepository.deleteByProxyIdIn(ids);
+        timeAccessRepository.deleteByProxyIdIn(ids);
+        healthCheckRepository.deleteByProxyIdIn(ids);
+
+        Map<ProtocolType, List<String>> idsByProtocol = proxies.stream()
+                .filter(proxy -> proxy.getProtocol() != null && StringUtils.hasText(proxy.getId()))
+                .collect(Collectors.groupingBy(
+                        ProxyDO::getProtocol,
+                        Collectors.mapping(ProxyDO::getId, Collectors.toList())));
+
+        deleteHttpLikeRelations(idsByProtocol);
+        deleteFileRelations(idsByProtocol);
+        deleteSocks5Relations(idsByProtocol);
+
+        ids.forEach(metricsService::deleteByProxyId);
+        proxyRepository.deleteByIdIn(ids);
+
+        List<String> runtimeIds = List.copyOf(ids);
+        transactionHelper.afterCommit(() -> proxyManager.deactivates(runtimeIds));
+        logger.debug("级联删除代理完成，数量: {}", ids.size());
+    }
+
+    private void deleteHttpLikeRelations(Map<ProtocolType, List<String>> idsByProtocol) {
+        List<String> httpIds = idsByProtocol.getOrDefault(ProtocolType.HTTP, List.of());
+        List<String> httpsIds = idsByProtocol.getOrDefault(ProtocolType.HTTPS, List.of());
+        if (httpIds.isEmpty() && httpsIds.isEmpty()) {
+            return;
+        }
+        if (!httpsIds.isEmpty()) {
+            certBindingSyncService.removeBindingsByProxyIds(httpsIds);
+        }
+        List<String> httpLikeIds = new ArrayList<>(httpIds.size() + httpsIds.size());
+        httpLikeIds.addAll(httpIds);
+        httpLikeIds.addAll(httpsIds);
+        proxyDomainRepository.deleteByProxyIdIn(httpLikeIds);
+        basicAuthRepository.deleteByProxyIdIn(httpLikeIds);
+        basicUserRepository.deleteByProxyIdIn(httpLikeIds);
+        headerRewriteRuleRepository.deleteByProxyIdIn(httpLikeIds);
+        headerRewriteRepository.deleteByProxyIdIn(httpLikeIds);
+    }
+
+    private void deleteFileRelations(Map<ProtocolType, List<String>> idsByProtocol) {
+        List<String> fileIds = idsByProtocol.getOrDefault(ProtocolType.FILE, List.of());
+        if (fileIds.isEmpty()) {
+            return;
+        }
+        certBindingSyncService.removeBindingsByProxyIds(fileIds);
+        proxyDomainRepository.deleteByProxyIdIn(fileIds);
+        fileShareAuthRepository.deleteByProxyIdIn(fileIds);
+        fileShareUserRepository.deleteByProxyIdIn(fileIds);
+        fileShareLimitsRepository.deleteByProxyIdIn(fileIds);
+    }
+
+    private void deleteSocks5Relations(Map<ProtocolType, List<String>> idsByProtocol) {
+        List<String> socks5Ids = idsByProtocol.getOrDefault(ProtocolType.SOCKS5, List.of());
+        if (socks5Ids.isEmpty()) {
+            return;
+        }
+        socks5AuthRepository.deleteByProxyIdIn(socks5Ids);
+        socks5UserRepository.deleteByProxyIdIn(socks5Ids);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void setProxyStatus(String id, Integer status) {
         ProxyDO proxyDO = proxyRepository.findById(id).orElseThrow(() -> new BizException("代理配置信息不存在"));
         ProxyStatus proxyStatus = ProxyStatus.fromCode(status);
@@ -1439,11 +1535,6 @@ public class ProxyServiceImpl implements ProxyService {
         refreshRuntimeProxy(proxyDO.getId(), false);
     }
 
-    /**
-     * 刷新服务端运行时注册（域名/端口监听）；非 SOCKS5 代理额外推送到在线客户端。
-     * <p>
-     * SOCKS5 的认证、监听与动态目标解析均在服务端完成，客户端仅按流打开消息连接目标，无需同步配置。
-     */
     private void refreshRuntimeProxy(String proxyId, boolean newlyCreated) {
         ProxyDO proxyDO = proxyRepository.findById(proxyId).orElse(null);
         if (proxyDO == null) {

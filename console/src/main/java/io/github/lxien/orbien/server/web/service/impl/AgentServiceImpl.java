@@ -5,7 +5,7 @@
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
  *
- *        http:
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,9 @@ import io.github.lxien.orbien.server.web.entity.AgentDO;
 import io.github.lxien.orbien.server.web.param.agent.AgentBatchDeleteParam;
 import io.github.lxien.orbien.server.web.repository.AgentRepository;
 import io.github.lxien.orbien.server.web.service.AgentService;
+import io.github.lxien.orbien.server.web.service.ProxyService;
 import io.github.lxien.orbien.server.web.service.converter.AgentConvert;
+import io.github.lxien.orbien.server.web.support.tx.TransactionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,10 @@ public class AgentServiceImpl implements AgentService {
     private AgentManager agentManager;
     @Autowired
     private AgentConfigService agentConfigService;
+    @Autowired
+    private ProxyService proxyService;
+    @Autowired
+    private TransactionHelper transactionHelper;
 
     @Override
     public PageResult<AgentDTO> findByPage(PageQuery pageQuery) {
@@ -93,14 +99,29 @@ public class AgentServiceImpl implements AgentService {
         if (CollectionUtils.isEmpty(ids)) {
             return;
         }
-        ids.forEach(agentId -> {
+        proxyService.deleteByAgentIds(ids);
+
+        List<String> onlineAgentIds = ids.stream()
+                .filter(agentManager::isOnline)
+                .toList();
+
+        agentConfigService.evictByIds(ids);
+        agentRepository.deleteAllById(ids);
+
+        if (!onlineAgentIds.isEmpty()) {
+            transactionHelper.afterCommit(() -> onlineAgentIds.forEach(this::safeKickout));
+        }
+        logger.debug("批量删除客户端成功，数量: {}", ids.size());
+    }
+
+    private void safeKickout(String agentId) {
+        try {
             if (agentManager.isOnline(agentId)) {
                 agentManager.kickout(agentId);
             }
-        });
-        agentConfigService.evictByIds(ids);
-        agentRepository.deleteAllById(ids);
-        logger.debug("批量删除客户端成功，数量: {}", ids.size());
+        } catch (Exception e) {
+            logger.warn("删除客户端后强制下线失败: agentId={}", agentId, e);
+        }
     }
 
     @Override

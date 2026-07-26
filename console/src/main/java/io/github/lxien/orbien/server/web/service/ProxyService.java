@@ -32,6 +32,8 @@ import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyListDTO;
 import io.github.lxien.orbien.server.web.param.proxy.*;
 import io.github.lxien.orbien.server.web.param.bandwidth.BandwidthSaveParam;
 
+import java.util.Collection;
+
 public interface ProxyService {
     /**
      * 创建 TCP 代理
@@ -91,6 +93,11 @@ public interface ProxyService {
     HttpsProxyDetailDTO getHttpsProxyById(String id);
 
     void batchDeleteProxies(ProxyBatchDeleteParam param);
+
+    /**
+     * 删除指定客户端下的全部代理
+     */
+    void deleteByAgentIds(Collection<String> agentIds);
 
     void setProxyStatus(String id, Integer status);
 

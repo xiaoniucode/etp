@@ -18,9 +18,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * 代理 Repository
- */
 @Repository
 public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpecificationExecutor<ProxyDO> {
     boolean existsByAgentIdAndName(String agentId, String name);
@@ -110,9 +107,9 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
 
     List<ProxyDO> findByAgentId(String agentId);
 
-    List<ProxyDO> findByStatus(ProxyStatus status);
+    List<ProxyDO> findByAgentIdIn(Collection<String> agentIds);
 
-    List<ProxyDO> findByProtocol(ProtocolType protocol);
+    List<ProxyDO> findByStatus(ProxyStatus status);
 
     List<ProxyDO> findByProtocolIn(Collection<ProtocolType> protocols);
 
