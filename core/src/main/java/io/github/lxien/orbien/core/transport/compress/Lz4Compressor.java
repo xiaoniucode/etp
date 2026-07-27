@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * 格式：{@code [int 原始长度][LZ4 压缩字节]}
  * <p>
  * 不使用 {@link LZ4Factory#fastestInstance()}：其在运行时按类名动态加载多种实现，
- * GraalVM native image 下容易因反射类未注册而初始化失败。
+ * GraalVM native image 下容易因反射类未注册而初始化失败
  */
 public class Lz4Compressor implements Compressor {
 

@@ -48,7 +48,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
 /**
- * SOCKS5 握手：方法协商 -> 认证 -> CONNECT。
+ * SOCKS5 握手：方法协商 -> 认证 -> CONNECT
  */
 @Component
 @ChannelHandler.Sharable

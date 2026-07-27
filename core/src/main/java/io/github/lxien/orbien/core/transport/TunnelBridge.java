@@ -22,7 +22,7 @@ import io.netty.util.concurrent.Future;
 public interface TunnelBridge {
 
     /**
-     * 异步打开桥接。独立隧道在隧道 EventLoop 上切换 pipeline 后完成；多路复用立即完成。
+     * 异步打开桥接。独立隧道在隧道 EventLoop 上切换 pipeline 后完成；多路复用立即完成
      */
     Future<Void> openAsync();
 

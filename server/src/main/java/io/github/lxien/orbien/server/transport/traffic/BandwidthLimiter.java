@@ -5,11 +5,12 @@ import io.github.bucket4j.BandwidthBuilder;
 import io.github.bucket4j.Bucket;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import lombok.Getter;
 
 import java.time.Duration;
 
 /**
- * 基于 Bucket4j 的代理级带宽令牌桶，按字节平滑消费。
+ * 基于 Bucket4j 的代理级带宽令牌桶，按字节平滑消费
  */
 public class BandwidthLimiter {
 
@@ -22,7 +23,9 @@ public class BandwidthLimiter {
 
     private final Bucket uploadBucket;
     private final Bucket downloadBucket;
+    @Getter
     private final boolean sharedBucket;
+    @Getter
     private final long bytesPerSecond;
 
     public BandwidthLimiter(BandwidthConfig config) {
@@ -97,15 +100,6 @@ public class BandwidthLimiter {
     public boolean isEnabled() {
         return uploadBucket != null || downloadBucket != null;
     }
-
-    public boolean isSharedBucket() {
-        return sharedBucket;
-    }
-
-    public long getBytesPerSecond() {
-        return bytesPerSecond;
-    }
-
 
     public int consumeUpTo(TrafficDirection direction, int bytes) {
         if (bytes <= 0) {

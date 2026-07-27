@@ -25,7 +25,6 @@ import io.github.lxien.orbien.core.transport.TunnelBridge;
 import io.github.lxien.orbien.server.transport.bridge.TunnelBridgeFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelOption;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -135,7 +134,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     }
 
     /**
-     * 客户端确认透传就绪后，开启 visitor 读取（及 HTTP 首包转发）
+     * 客户端确认透传就绪后，开启 visitor 读取以及 HTTP 首包转发
      */
     public void onClientPassthroughReady(StreamContext context) {
         if (!context.compareAndClearAwaitingClientPassthroughAck()) {

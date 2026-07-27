@@ -13,7 +13,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.util.List;
 
 /**
- * WebSocket 二进制帧与 TMSP 字节流桥接。
+ * WebSocket 二进制帧与 TMSP 字节流桥接
  */
 public final class WebSocketBinaryFrameCodec extends CombinedChannelDuplexHandler<
         WebSocketBinaryFrameCodec.Decoder, WebSocketBinaryFrameCodec.Encoder> {

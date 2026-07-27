@@ -9,9 +9,9 @@ import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
 /**
- * 独立隧道字节流分块编解码。
+ * 独立隧道字节流分块编解码
  * <p>
- * type=0 表示明文，1/2/3 为 Snappy/LZ4/Zstd 压缩块。
+ * type=0 表示明文，1/2/3 为 Snappy/LZ4/Zstd 压缩块
  */
 public final class DirectTunnelChunkCodec {
 

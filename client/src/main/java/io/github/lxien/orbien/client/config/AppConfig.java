@@ -1,6 +1,5 @@
 package io.github.lxien.orbien.client.config;
 
-import io.github.lxien.orbien.client.config.domain.*;
 import io.github.lxien.orbien.common.config.Config;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.enums.AgentType;

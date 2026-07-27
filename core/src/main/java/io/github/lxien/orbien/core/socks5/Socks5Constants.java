@@ -17,7 +17,7 @@
 package io.github.lxien.orbien.core.socks5;
 
 /**
- * SOCKS5 协议常量（RFC 1928 / RFC 1929）。
+ * SOCKS5 协议常量（RFC 1928 / RFC 1929）
  */
 public final class Socks5Constants {
 

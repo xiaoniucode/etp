@@ -15,6 +15,8 @@ import io.netty.util.concurrent.ImmediateEventExecutor;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
+import java.nio.channels.ClosedChannelException;
+
 public class MultiplexTunnelBridge implements TunnelBridge {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(MultiplexTunnelBridge.class);
     private final StreamContext streamContext;
@@ -142,8 +144,6 @@ public class MultiplexTunnelBridge implements TunnelBridge {
             if (!visitor.isWritable()) {
                 streamContext.pauseRemoteProducer(StreamContext.REMOTE_PAUSE_VISITOR_BACKPRESSURE);
             }
-            // writeAndFlush 一旦调用，outbound 所有权交给 Netty（成功或 failFlushed 都会释放）
-            // 监听器里再 release 会与 ChannelOutboundBuffer 双释，尤其是共享 parent refCnt 的 slice
             visitor.writeAndFlush(outbound).addListener((ChannelFutureListener) future -> {
                 if (!future.isSuccess()) {
                     if (!isBenignWriteFailure(future.cause())) {
@@ -170,8 +170,7 @@ public class MultiplexTunnelBridge implements TunnelBridge {
 
     private static boolean isBenignWriteFailure(Throwable cause) {
         for (Throwable c = cause; c != null; c = c.getCause()) {
-            if (c instanceof java.nio.channels.ClosedChannelException
-                    || c instanceof io.netty.channel.StacklessClosedChannelException) {
+            if (c instanceof ClosedChannelException) {
                 return true;
             }
             String msg = c.getMessage();

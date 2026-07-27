@@ -7,9 +7,6 @@ import io.netty.util.CharsetUtil;
 
 import java.nio.charset.StandardCharsets;
 
-/**
- * HTTP 工具类
- */
 public class NettyHttpUtils {
 
     private static ChannelFuture writeAndFlush(Channel channel, ByteBuf buf) {
@@ -115,7 +112,7 @@ public class NettyHttpUtils {
     }
 
     /**
-     * 发送 HTTP 重定向（默认 308 Permanent Redirect）。
+     * 发送 HTTP 重定向（默认 308 Permanent Redirect）
      */
     public static ChannelFuture sendRedirect(Channel channel, int statusCode, String location) {
         String reasonPhrase = statusCode == 308 ? "Permanent Redirect"

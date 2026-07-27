@@ -76,7 +76,7 @@ public class DomainConfigService {
     }
 
     /**
-     * 清理单个域名缓存（当域名被释放时调用）
+     * 清理单个域名缓存
      */
     public void evictDomain(String fullDomain) {
         if (StringUtils.hasText(fullDomain)) {

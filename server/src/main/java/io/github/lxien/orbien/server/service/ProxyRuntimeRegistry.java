@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 将数据库中的已启用代理注册到运行时（域名索引、端口监听等）。
+ * 将数据库中的已启用代理注册到运行状态
  */
 @Service
 public class ProxyRuntimeRegistry {

@@ -21,37 +21,53 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 代理实时指标快照。
- *
- * <p>由 {@link ProxyMetrics#toMetrics()} 生成，供查询接口返回。
+ * 代理实时指标快照
  */
 @Data
 public class Metrics {
 
-    /** 代理标识。 */
+    /**
+     * 代理标识
+     */
     private String proxyId;
 
-    /** 当前活跃隧道通道数。 */
+    /**
+     * 当前活跃隧道通道数
+     */
     private int activeChannels;
 
-    /** 累计入站字节数。 */
+    /**
+     * 累计入站字节数
+     */
     private long readBytes;
 
-    /** 累计出站字节数。 */
+    /**
+     * 累计出站字节数
+     */
     private long writeBytes;
 
-    /** 累计入站消息数。 */
+    /**
+     * 累计入站消息数
+     */
     private long readMessages;
 
-    /** 累计出站消息数。 */
+    /**
+     * 累计出站消息数
+     */
     private long writeMessages;
 
-    /** 入站字节速率，单位：字节/秒。 */
+    /**
+     * 入站字节速率，单位：字节/秒
+     */
     private double readRate;
 
-    /** 出站字节速率，单位：字节/秒。 */
+    /**
+     * 出站字节速率，单位：字节/秒
+     */
     private double writeRate;
 
-    /** 最近一次产生流量的时间。 */
+    /**
+     * 最近一次产生流量的时间
+     */
     private LocalDateTime lastActiveTime;
 }

@@ -232,7 +232,7 @@ public class CIDRMatcher {
             return null;
         }
 
-        // 去首尾空格（避免 trim 产生新对象）
+        // 去首尾空格，避免 trim 产生新对象
         int start = 0;
         int end = len - 1;
 

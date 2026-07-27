@@ -6,7 +6,7 @@ import io.netty.util.ReferenceCountUtil;
 import java.util.ArrayDeque;
 
 /**
- * 限流等待队列，支持从队首按字节切片消费。
+ * 限流等待队列，支持从队首按字节切片消费
  */
 final class TrafficBufferQueue {
 
@@ -46,7 +46,8 @@ final class TrafficBufferQueue {
 
     /**
      * 从队首取出最多 {@code maxBytes} 字节；返回的切片由调用方负责释放或写出
-     * <p>返回值与队列内剩余 buffer 互不共享同一派生对象，clear 不会误伤 in-flight 写出
+     * <p>
+     * 返回值与队列内剩余 buffer 互不共享同一派生对象，clear 不会误伤 in-flight 写出
      */
     ByteBuf pollSlice(int maxBytes) {
         ByteBuf front = buffers.peek();

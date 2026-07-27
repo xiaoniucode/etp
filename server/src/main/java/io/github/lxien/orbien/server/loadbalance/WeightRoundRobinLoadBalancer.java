@@ -31,8 +31,6 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer {
     protected static class WeightedRoundRobin {
         /**
          * 目标服务器权重
-         * 获取目标服务器权重
-         *
          */
         private int weight;
 
@@ -103,7 +101,6 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer {
             return null;
         }
 
-        // 获取当前代理的权重映射，如果不存在则创建
         ConcurrentMap<String, WeightedRoundRobin> map = proxyWeightMap.computeIfAbsent(proxyId, k -> new ConcurrentHashMap<>());
         int totalWeight = 0;
         long maxCurrent = Long.MIN_VALUE;
@@ -113,11 +110,9 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer {
 
         // 遍历所有目标服务器，计算权重并选择
         for (Target target : targets) {
-            // 使用host:port作为目标服务器的唯一标识
             String identifyString = target.getHost() + ":" + target.getPort();
             int weight = target.getWeight();
 
-            // 获取或创建目标服务器的权重信息
             WeightedRoundRobin weightedRoundRobin = map.computeIfAbsent(identifyString, k -> {
                 WeightedRoundRobin wrr = new WeightedRoundRobin();
                 wrr.setWeight(weight);

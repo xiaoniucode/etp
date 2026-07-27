@@ -16,7 +16,7 @@ import lombok.Getter;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * UDP 代理服务启动、停止、管理
+ * UDP 代理服务启动
  */
 public final class UdpProxyServer implements Lifecycle {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(UdpProxyServer.class);

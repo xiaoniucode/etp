@@ -9,7 +9,7 @@ import io.netty.handler.codec.CorruptedFrameException;
 import java.util.List;
 
 /**
- * 独立隧道入站解压：将分块字节流还原为明文 {@link ByteBuf}。
+ * 独立隧道入站解压：将分块字节流还原为明文 {@link ByteBuf}
  */
 public class DirectTunnelCompressionDecoder extends ByteToMessageDecoder {
 

@@ -88,7 +88,6 @@ public class ReplayStreamBootstrap {
         try {
             visitor.finishAndReleaseAll();
         } catch (Exception ignored) {
-            // ignore cleanup errors
         }
         if (visitor.isActive()) {
             visitor.close();

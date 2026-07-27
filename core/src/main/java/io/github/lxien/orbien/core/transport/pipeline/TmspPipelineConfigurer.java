@@ -28,8 +28,8 @@ public final class TmspPipelineConfigurer {
 
     private static final int DEFAULT_MAX_FRAME = 10 * 1024 * 1024;
     /**
-     * Netty 默认 high=64KiB，与常见 64KiB STREAM_DATA 叠加 WS+TLS 后几乎每帧都触发不可写。
-     * 适度抬高到 128/256KiB：既减少 writability 抖动，又避免 1MiB 水位在限流抖动时灌爆 direct memory。
+     * Netty 默认 high=64KiB，与常见 64KiB STREAM_DATA 叠加 WS+TLS 后几乎每帧都触发不可写
+     * 适度抬高到 128/256KiB：既减少 writability 抖动，又避免 1MiB 水位在限流抖动时灌爆 direct memory
      */
     private static final WriteBufferWaterMark WEBSOCKET_WRITE_BUFFER_WATER_MARK =
             new WriteBufferWaterMark(128 * 1024, 256 * 1024);

@@ -19,7 +19,7 @@ public final class TmspPayloadCompressor {
     }
 
     /**
-     * 构建 STREAM_DATA 帧，按代理配置决定是否压缩 payload。
+     * 构建 STREAM_DATA 帧，按代理配置决定是否压缩 payload
      */
     public static TMSPFrame encodeStreamData(Channel channel, int streamId, ByteBuf payload, CompressionType algorithm) {
         int originalBytes = payload != null ? payload.readableBytes() : 0;
@@ -136,7 +136,7 @@ public final class TmspPayloadCompressor {
     }
 
     /**
-     * 压缩率：相对原始数据减少的体积百分比，正值表示压缩有效。
+     * 压缩率：相对原始数据减少的体积百分比，正值表示压缩有效
      */
     public static String formatCompressionRatioPercent(int originalBytes, int compressedBytes) {
         if (originalBytes <= 0) {
@@ -167,21 +167,21 @@ public final class TmspPayloadCompressor {
     }
 
     /**
-     * 压缩单个数据块（Snappy/LZ4 块格式），供独立隧道等字节流场景复用。
+     * 压缩单个数据块（Snappy/LZ4 块格式），供独立隧道等字节流场景复用
      */
     public static ByteBuf compressTransferBlock(Channel channel, ByteBuf in, CompressionType algorithm) {
         return compressBlock(channel, in, algorithm);
     }
 
     /**
-     * 解压单个数据块，算法由协商结果指定。
+     * 解压单个数据块，算法由协商结果指定
      */
     public static ByteBuf decompressTransferBlock(Channel channel, ByteBuf in, CompressionType algorithm) {
         return decompressBlock(channel, in, algorithm);
     }
 
     /**
-     * 解码 TMSP 控制消息 payload；未压缩时返回共享引用。
+     * 解码 TMSP 控制消息 payload；未压缩时返回共享引用
      */
     public static ControlPayload decodeControlPayload(Channel channel, TMSPFrame frame) {
         if (frame == null || frame.getPayload() == null) {
@@ -213,7 +213,7 @@ public final class TmspPayloadCompressor {
     }
 
     /**
-     * 压缩 TMSP 控制消息 payload，并设置帧级压缩标志。
+     * 压缩 TMSP 控制消息 payload，并设置帧级压缩标志
      */
     public static void encodeControlPayload(Channel channel, TMSPFrame frame, CompressionType algorithm) {
         if (frame == null || frame.getPayload() == null) {

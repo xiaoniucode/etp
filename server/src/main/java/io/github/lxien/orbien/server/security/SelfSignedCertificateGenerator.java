@@ -4,6 +4,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -48,7 +49,7 @@ public final class SelfSignedCertificateGenerator {
     public static Result generate() throws Exception {
         SecureRandom random = new SecureRandom();
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC", "BC");
-        kpg.initialize(org.bouncycastle.jce.ECNamedCurveTable.getParameterSpec("secp256r1"), random);
+        kpg.initialize(ECNamedCurveTable.getParameterSpec("secp256r1"), random);
         KeyPair keyPair = kpg.generateKeyPair();
 
         X500Name subject = new X500Name("CN=localhost");

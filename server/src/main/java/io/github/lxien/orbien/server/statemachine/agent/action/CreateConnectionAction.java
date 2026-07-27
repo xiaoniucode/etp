@@ -41,8 +41,8 @@ public class CreateConnectionAction extends AgentBaseAction {
     }
 
     /**
-     * 在数据隧道所属 EventLoop 上同步完成入池与响应，避免 QUIC 等异步传输与控制面竞态。
-     */
+     * 在数据隧道所属 EventLoop 上同步完成入池与响应，避免 QUIC 等异步传输与控制面竞态
+     * */
     public void registerTunnelImmediately(AgentContext agentContext, ConnectionCreateCmd cmd) {
         Channel tunnel = cmd.getTunnel();
         Runnable task = () -> executeRegister(agentContext, cmd);

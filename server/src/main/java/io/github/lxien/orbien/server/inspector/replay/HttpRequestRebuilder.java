@@ -15,19 +15,15 @@ import java.util.Set;
  * 从捕获记录重建 HTTP/1.1 请求报文
  */
 public final class HttpRequestRebuilder {
-    public static final Set<String> ALLOWED_METHODS = Set.of(
-            "GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
-    );
+    public static final Set<String> ALLOWED_METHODS = Set.of("GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
 
     private static final Set<String> HOP_BY_HOP = Set.of(
             "connection", "keep-alive", "proxy-connection", "transfer-encoding",
             "te", "trailer", "upgrade", "content-length"
     );
 
-    private static final Set<String> X_FORWARDED = Set.of(
-            "x-forwarded-for", "x-forwarded-proto", "x-forwarded-host",
-            "x-forwarded-port", "forwarded"
-    );
+    private static final Set<String> X_FORWARDED = Set.of("x-forwarded-for", "x-forwarded-proto",
+            "x-forwarded-host", "x-forwarded-port", "forwarded");
 
     public static final String REPLAY_ID_HEADER = "Orbien-Replay-Original-Request-ID";
 
@@ -96,7 +92,7 @@ public final class HttpRequestRebuilder {
                     continue;
                 }
                 String name = entry.getKey().trim();
-                // 同名（大小写不敏感）去重，保留最后一次
+                // 同名去重，保留最后一次
                 removeHeaderIgnoreCase(merged, name);
                 merged.put(name, entry.getValue() != null ? entry.getValue() : "");
             }
@@ -204,22 +200,6 @@ public final class HttpRequestRebuilder {
             }
         }
         return null;
-    }
-
-    /**
-     * 仅用于单测断言，避免依赖 Netty buffer
-     */
-    static String buildRequestText(HttpCaptureRecord record,
-                                   ReplayOverrides overrides,
-                                   String clientIp,
-                                   String scheme,
-                                   String sourceRecordId) {
-        ByteBuf buf = build(record, overrides, clientIp, scheme, sourceRecordId, ByteBufAllocator.DEFAULT);
-        try {
-            return buf.toString(StandardCharsets.UTF_8);
-        } finally {
-            buf.release();
-        }
     }
 
     private static final class WorkingRequest {

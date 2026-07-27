@@ -38,7 +38,7 @@ public final class TunnelClient implements Lifecycle {
     private EventLoopGroup serverWorkBootstrap;
     private AgentContext agentContext;
     /**
-     * 独立进程模式下停止后退出 JVM。
+     * 独立进程模式下停止后退出 JVM
      */
     @Setter
     private volatile boolean exitJvmOnStop;
@@ -144,7 +144,7 @@ public final class TunnelClient implements Lifecycle {
 
     /**
      * 强退等场景必须在独立线程退出：若在 Netty EventLoop 上 System.exit，
-     * shutdown hook 会再次 shutdownGracefully，与 EventLoop 线程互相等待导致死锁。
+     * shutdown hook 会再次 shutdownGracefully，与 EventLoop 线程互相等待导致死锁
      */
     private void scheduleProcessExit(Future<?> controlShutdown, Future<?> serverShutdown) {
         Thread exitThread = new Thread(() -> {

@@ -30,9 +30,7 @@ public final class LeastConnLoadBalancer implements LoadBalancer {
 
         for (Target t : targets) {
             if (t == null || t.getHost() == null || t.getPort() == null) continue;
-            // 生成目标服务器的唯一标识
             String key = proxyId + ":" + t.getHost() + ":" + t.getPort();
-            // 获取当前连接数
             int c = counter.get(key);
             // 如果当前连接数小于最佳连接数，更新最佳服务器
             if (c < bestCount) {

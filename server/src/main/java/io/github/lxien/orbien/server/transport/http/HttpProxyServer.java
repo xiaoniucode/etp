@@ -38,11 +38,6 @@ import jakarta.annotation.PreDestroy;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-/**
- * Http proxy server
- *
- * @author lxien
- */
 public class HttpProxyServer implements Lifecycle {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(HttpProxyServer.class);
     private EventLoopGroup bossGroup;

@@ -14,9 +14,6 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-/**
- * 内网目标服务 → 隧道。
- */
 public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(RealServerHandler.class);
 
@@ -60,8 +57,6 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) {
-        // 后端通道自身可写性变化不强制恢复 AUTO_READ：
-        // 限流 / 隧道背压暂停必须由对应 reason 清除后才能恢复。
         ctx.fireChannelWritabilityChanged();
     }
 
@@ -104,7 +99,7 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private static boolean isDirectMemoryPressure(Throwable cause) {
         for (Throwable c = cause; c != null; c = c.getCause()) {
-            if (c instanceof OutOfDirectMemoryError || c instanceof OutOfMemoryError) {
+            if (c instanceof OutOfMemoryError) {
                 return true;
             }
         }

@@ -48,7 +48,6 @@ public class TargetResolverAction extends StreamBaseAction {
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
-        Channel visitor = context.getVisitor();
         // UDP 代理复用同一 DatagramChannel，不能关闭 AUTO_READ，否则后续包永远进不了 UdpVisitorHandler
         if (!context.isDatagram()) {
             context.pauseVisitorRead(StreamContext.VISITOR_PAUSE_OPENING);
@@ -136,7 +135,6 @@ public class TargetResolverAction extends StreamBaseAction {
         }
         List<Target> availableTargets = targets;
         HealthCheckConfig healthCheck = config.getHealthCheck();
-        //如果配置了健康检查 则获取健康目标服务列表
         if (healthCheck != null && healthCheck.isEnabled() && !config.isUdp()) {
             availableTargets = healthManager.getAvailableTargets(config.getProxyId(), targets);
         }

@@ -8,7 +8,7 @@ import io.netty.handler.codec.compression.CompressionException;
 import java.util.function.Consumer;
 
 /**
- * Zstd 块压缩实现，用于 TMSP 帧级 payload 压缩。
+ * Zstd 块压缩实现，用于 TMSP 帧级 payload 压缩
  * <p>
  * 格式：{@code [int 原始长度][Zstd 压缩字节]}
  */

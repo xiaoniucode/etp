@@ -12,7 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 空闲检查。
- * <p>数据隧道在限流/背压暂停写时不应因 writer idle 被拆掉，
+ * <p>
+ * 数据隧道在限流/背压暂停写时不应因 writer idle 被拆掉
  */
 public class IdleCheckHandler extends IdleStateHandler {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(IdleCheckHandler.class);

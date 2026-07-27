@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 /**
  * 远端（Agent 后端）生产者门控：限流排队 / visitor 不可写等原因 bitmask，
- * 首次置位发 PAUSE，全部清除发 RESUME。不经过流状态机。
+ * 首次置位发 PAUSE，全部清除发 RESUME
  */
 public final class RemoteProducerGate {
 

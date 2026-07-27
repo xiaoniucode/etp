@@ -38,10 +38,6 @@ import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.util.Set;
 
-/**
- *
- * @author lxien
- */
 @ChannelHandler.Sharable
 public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(ControlFrameHandler.class);

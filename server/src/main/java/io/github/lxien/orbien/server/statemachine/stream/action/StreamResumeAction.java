@@ -39,7 +39,6 @@ public class StreamResumeAction extends StreamBaseAction {
         }
 
         if (event == StreamEvent.STREAM_LOCAL_RESUME) {
-            //通知远程恢复
             sendResumeToRemote(context);
         }
     }

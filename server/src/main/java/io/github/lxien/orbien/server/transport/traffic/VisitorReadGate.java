@@ -3,7 +3,7 @@ package io.github.lxien.orbien.server.transport.traffic;
 import io.github.lxien.orbien.core.transport.ChannelReadGate;
 
 /**
- * Visitor 读门控，语义同 {@link ChannelReadGate}。
+ * Visitor 读门控，语义同 {@link ChannelReadGate}
  */
 public final class VisitorReadGate {
 

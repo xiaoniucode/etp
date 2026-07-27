@@ -16,7 +16,6 @@
 
 package io.github.lxien.orbien.server.transport.socks5;
 
-import io.github.lxien.orbien.core.socks5.Socks5Address;
 import io.github.lxien.orbien.core.socks5.Socks5Constants;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
@@ -28,10 +27,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-import java.net.InetSocketAddress;
-
 /**
- * SOCKS5 CONNECT 响应与 pipeline 切换辅助类。
+ * SOCKS5 CONNECT 响应与 pipeline 切换辅助类
  */
 public final class Socks5ReplyHelper {
 
@@ -95,13 +92,6 @@ public final class Socks5ReplyHelper {
         if (pipeline.get(NettyConstants.SOCKS5_HANDSHAKE_HANDLER) != null) {
             pipeline.remove(NettyConstants.SOCKS5_HANDSHAKE_HANDLER);
         }
-    }
-
-    public static Socks5Address boundAddress(Channel visitor) {
-        if (visitor.localAddress() instanceof InetSocketAddress local) {
-            return new Socks5Address(Socks5Constants.ATYP_IPV4, local.getAddress().getHostAddress(), local.getPort());
-        }
-        return new Socks5Address(Socks5Constants.ATYP_IPV4, "0.0.0.0", 0);
     }
 
     public static void failAndClose(ChannelHandlerContext ctx, byte replyCode) {

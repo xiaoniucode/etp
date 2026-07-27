@@ -43,7 +43,7 @@ public class HealthManager {
     }
 
     /**
-     * 将 proto 健康状态映射为数值：UP=1, DOWN=0。
+     * 将 proto 健康状态映射为数值：UP=1, DOWN=0
      */
     public Integer toTargetHealthCode(Message.HealthStatus status) {
         if (status == Message.HealthStatus.UP) {

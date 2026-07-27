@@ -55,7 +55,7 @@ public class FileAuthService {
     }
 
     /**
-     * 校验会话并按当前代理配置同步权限，权限变更后立即生效。
+     * 校验会话并按当前代理配置同步权限，权限变更后立即生效
      */
     public FileSession syncSession(String sessionId, ProxyConfig config) {
         FileSession session = validate(sessionId);
@@ -79,10 +79,6 @@ public class FileAuthService {
             return updated;
         }
         return session;
-    }
-
-    public void invalidateProxySessions(String proxyId) {
-        sessions.entrySet().removeIf(entry -> proxyId.equals(entry.getValue().proxyId()));
     }
 
     private String resolveUserPermission(FileShareAuthConfig auth, String username) {

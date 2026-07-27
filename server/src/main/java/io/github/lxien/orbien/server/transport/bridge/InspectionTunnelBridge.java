@@ -128,7 +128,7 @@ public class InspectionTunnelBridge extends AbstractTunnelBridgeDecorator {
             return;
         }
         if (context.isReplay()) {
-            // 重放流的 completion 由 StreamOpenResponseAction 注册的 handler 处理；
+            // 重放流的 completion 由 StreamOpenResponseAction 注册的 handler 处理
             // 此处仅兜底：若 lazy 创建的 capture 走到这里，仍需写入缓冲
             if (context.isReplayCaptureToBuffer() && inspectorBuffer != null) {
                 inspectorBuffer.append(record);

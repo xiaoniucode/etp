@@ -18,7 +18,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 /**
- * 控制连接断开事件处理。
+ * 控制连接断开事件处理
  */
 @Component
 public class DisconnectAction extends AgentBaseAction {

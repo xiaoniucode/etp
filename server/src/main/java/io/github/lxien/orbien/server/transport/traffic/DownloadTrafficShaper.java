@@ -35,7 +35,7 @@ final class DownloadTrafficShaper {
         this.callbacks = callbacks;
         long bps = limiter != null ? Math.max(0, limiter.getBytesPerSecond()) : 0;
         // 约 8 秒带宽，夹在 [2MB, 16MB]
-        this.maxQueueBytes = Math.min(MAX_QUEUE_BYTES_CAP, Math.max(MIN_QUEUE_BYTES, bps * 8));
+        this.maxQueueBytes = Math.clamp(bps * 8, MIN_QUEUE_BYTES, MAX_QUEUE_BYTES_CAP);
         this.highWaterBytes = Math.max(256 * 1024L, maxQueueBytes / 2);
         this.lowWaterBytes = Math.max(64 * 1024L, maxQueueBytes / 8);
     }

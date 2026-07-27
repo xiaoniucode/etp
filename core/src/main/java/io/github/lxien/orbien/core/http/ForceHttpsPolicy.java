@@ -3,8 +3,8 @@ package io.github.lxien.orbien.core.http;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
 
 /**
- * HTTPS 强制跳转策略：HTTPS 代理默认开启 HTTP→HTTPS 重定向，可通过 {@code force_https=false} 关闭。
- * 文件共享固定走 HTTPS，明文访问一律重定向。
+ * HTTPS 强制跳转策略：HTTPS 代理默认开启 HTTP→HTTPS 重定向，可通过 {@code force_https=false} 关闭
+ * 文件共享固定走 HTTPS，明文访问一律重定向
  */
 public final class ForceHttpsPolicy {
 
@@ -16,8 +16,8 @@ public final class ForceHttpsPolicy {
     }
 
     /**
-     * 是否应把明文 HTTP 请求重定向到 HTTPS。
-     * 文件共享固定开启；HTTPS 代理在 {@code force_https} 未配置时默认 {@code true}。
+     * 是否应把明文 HTTP 请求重定向到 HTTPS
+     * 文件共享固定开启；HTTPS 代理在 {@code force_https} 未配置时默认 {@code true}
      */
     public static boolean isRedirectEnabled(ProxyConfig config) {
         if (config == null) {
@@ -56,7 +56,7 @@ public final class ForceHttpsPolicy {
     }
 
     /**
-     * 构建重定向 Location，保留 path 与 query。
+     * 构建重定向 Location，保留 path 与 query
      */
     public static String buildHttpsLocation(String host, int httpsPort, String requestUri) {
         String normalizedHost = host == null ? "" : host.trim();

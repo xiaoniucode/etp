@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * 单协议端口池：allowed（可分配）与 allocated（已占用）。
+ * 单协议端口池
  */
 final class PortPool {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(PortPool.class);

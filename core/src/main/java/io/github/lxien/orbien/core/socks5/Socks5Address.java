@@ -23,7 +23,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * SOCKS5 请求中的目标地址。
+ * SOCKS5 请求中的目标地址
  */
 public record Socks5Address(byte addressType, String host, int port) {
 

@@ -1,8 +1,5 @@
 package io.github.lxien.orbien.core.utils;
 
-/**
- * 字符串相关工具函数
- */
 public abstract class StringUtils {
 
     public static boolean hasLength(CharSequence str) {

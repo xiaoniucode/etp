@@ -6,7 +6,7 @@ import io.github.lxien.orbien.server.statemachine.stream.StreamState;
 import io.netty.util.internal.logging.InternalLogger;
 
 /**
- * 流转发失败时的统一止血逻辑：先停读，再关流（幂等）
+ * 流转发失败时的统一止血逻辑：先停读，再关流，保证幂等
  */
 final class StreamForwardHelper {
 

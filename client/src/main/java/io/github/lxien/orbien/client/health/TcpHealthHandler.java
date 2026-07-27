@@ -39,7 +39,6 @@ public class TcpHealthHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         ctx.close();
-        // TCP 连接成功 = UP
         ServiceHealth health = createHealth(System.currentTimeMillis() - startTime);
         future.complete(health);
     }

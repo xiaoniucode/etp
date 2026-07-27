@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
- * Snappy 块压缩实现，用于 TMSP 帧级 payload 压缩。
+ * Snappy 块压缩实现，用于 TMSP 帧级 payload 压缩
  * <p>
  * 格式：{@code [int 原始长度][Snappy 压缩字节]}
  */

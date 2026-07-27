@@ -40,7 +40,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 按代理规则改写 HTTP 请求头。每个请求头块都会重新加载规则，避免 keep-alive 粘住旧配置
+ * 按代理规则改写 HTTP 请求头。
+ * 每个请求头块都会重新加载规则，避免 keep-alive 粘住旧配置
  */
 public class HeaderRewriteRequestDecoder extends ByteToMessageDecoder {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(HeaderRewriteRequestDecoder.class);
@@ -50,9 +51,7 @@ public class HeaderRewriteRequestDecoder extends ByteToMessageDecoder {
     private final String scheme;
     private final HttpHeaderBlockProcessor processor = new HttpHeaderBlockProcessor();
 
-    public HeaderRewriteRequestDecoder(ProxyConfigService proxyConfigService,
-                                       DomainRegistry domainRegistry,
-                                       String scheme) {
+    public HeaderRewriteRequestDecoder(ProxyConfigService proxyConfigService, DomainRegistry domainRegistry, String scheme) {
         this.proxyConfigService = proxyConfigService;
         this.domainRegistry = domainRegistry;
         this.scheme = scheme == null ? "http" : scheme;

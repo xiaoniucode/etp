@@ -6,6 +6,7 @@ import io.github.lxien.orbien.client.transport.TransportClientBootstrap;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
+import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.transport.IdleCheckHandler;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
@@ -13,6 +14,7 @@ import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.utils.ProtobufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -74,8 +76,8 @@ public final class ConnCreateHelper {
         TMSPFrame frame = new TMSPFrame(connectionId, TMSP.MSG_CONNECTION_CREATE, payload);
         frame.setMultiplexTunnel(isMultiplex);
         frame.setEncrypted(isEncrypt);
-        tunnel.attr(io.github.lxien.orbien.core.transport.AttributeKeys.TRANSPORT_PROTOCOL).set(protocol);
-        tunnel.config().setOption(io.netty.channel.ChannelOption.AUTO_READ, true);
+        tunnel.attr(AttributeKeys.TRANSPORT_PROTOCOL).set(protocol);
+        tunnel.config().setOption(ChannelOption.AUTO_READ, true);
         tunnel.writeAndFlush(frame).addListener(f -> {
             if (f.isSuccess()) {
                 logger.debug("[传输] 隧道创建请求已发送 tunnelId={} protocol={} encrypt={} multiplex={} channelClass={}",

@@ -8,9 +8,6 @@ public final class HealthCheckHolder {
     private HealthCheckHolder() {
     }
 
-    /**
-     * 初始化或更新控制通道。重连时必须传入新的 control，否则健康状态仍会发往已断开的连接。
-     */
     public static void init(Channel control) {
         if (control == null) {
             throw new IllegalArgumentException("control cannot be null");

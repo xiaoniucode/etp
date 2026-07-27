@@ -43,7 +43,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * 运行时代理管理器，负责代理的注册、注销和状态变更等操作。
+ * 运行时代理管理器，负责代理的注册、注销和状态变更等操作
  */
 @Component
 public class ProxyManager {

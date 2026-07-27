@@ -30,11 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
- * 单代理流量计数器。
- *
- * <p>可在隧道 I/O 线程并发更新。{@code read} 为入站（{@code forwardToLocal}），
- * {@code write} 为出站（{@code forwardToRemote}）。小时统计按自然小时分桶，
- * 速率基于 60 秒滑动窗口。
+ * 单代理流量计数器
  */
 @Getter
 public class ProxyMetrics {
@@ -71,15 +67,15 @@ public class ProxyMetrics {
     /**
      * @param proxyId 代理标识
      */
-    public ProxyMetrics(String proxyId,AgentType agentType) {
+    public ProxyMetrics(String proxyId, AgentType agentType) {
         this.proxyId = proxyId;
-        this.agentType=agentType;
+        this.agentType = agentType;
         this.lastActiveTime = LocalDateTime.now();
         this.currentHourBucket = new HourBucket(LocalDateTime.now().truncatedTo(ChronoUnit.HOURS));
     }
 
     /**
-     * 活跃隧道通道数加一。
+     * 活跃隧道通道数加一
      */
     public void incChannels() {
         activeChannels.incrementAndGet();
@@ -87,7 +83,7 @@ public class ProxyMetrics {
     }
 
     /**
-     * 活跃隧道通道数减一，计数不低于零。
+     * 活跃隧道通道数减一，计数不低于零
      */
     public void decChannels() {
         int current;
@@ -101,7 +97,7 @@ public class ProxyMetrics {
     }
 
     /**
-     * 累加入站字节数，同时写入当前小时桶。
+     * 累加入站字节数，同时写入当前小时桶
      *
      * @param bytes 字节数，不大于零时忽略
      */
@@ -127,7 +123,7 @@ public class ProxyMetrics {
     }
 
     /**
-     * 累加入站消息数，同时写入当前小时桶。
+     * 累加入站消息数，同时写入当前小时桶
      *
      * @param count 消息数，不大于零时忽略
      */
@@ -140,7 +136,7 @@ public class ProxyMetrics {
     }
 
     /**
-     * 累加出站消息数，同时写入当前小时桶。
+     * 累加出站消息数，同时写入当前小时桶
      *
      * @param count 消息数，不大于零时忽略
      */
@@ -153,7 +149,7 @@ public class ProxyMetrics {
     }
 
     /**
-     * 将增量写入当前小时桶；若系统时钟已进入新的小时，先完成归档切换。
+     * 将增量写入当前小时桶；若系统时钟已进入新的小时，先完成归档切换
      */
     private void recordHourlyTraffic(long readBytes, long writeBytes, long readMessages, long writeMessages) {
         LocalDateTime nowHour = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
@@ -176,9 +172,9 @@ public class ProxyMetrics {
     }
 
     /**
-     * 取出上一自然小时的归档数据，供定时任务持久化。
+     * 取出上一自然小时的归档数据，供定时任务持久化
      *
-     * <p>调用前会先推进小时分桶，确保跨越整点后归档状态一致。
+     * <p>调用前会先推进小时分桶，确保跨越整点后归档状态一致
      *
      * @return 上一小时流量；无记录时各指标为 0
      */
@@ -193,10 +189,9 @@ public class ProxyMetrics {
     }
 
     /**
-     * 推进小时分桶，采样累计值并更新速率。
+     * 推进小时分桶，采样累计值并更新速率
      *
-     * <p>须由 {@link MetricsTask} 每秒调用一次。小时归档在 {@code hourLock} 内完成，
-     * 速率环写入无锁，二者可并行。
+     * <p>须由 {@link MetricsTask} 每秒调用一次。小时归档在 {@code hourLock} 内完成，速率环写入无锁，二者可并行
      */
     public void updateRate() {
         synchronized (hourLock) {
@@ -223,10 +218,9 @@ public class ProxyMetrics {
     }
 
     /**
-     * 在速率环中查找窗口起点，计算指定维度的瞬时速率。
+     * 在速率环中查找窗口起点，计算指定维度的瞬时速率
      *
-     * <p>窗口长度为 {@link #RATE_WINDOW_SECONDS} 秒。样本不足时回退到环中最早快照；
-     * 仍无有效样本则返回 0。
+     * <p>窗口长度为 {@link #RATE_WINDOW_SECONDS} 秒。样本不足时回退到环中最早快照，仍无有效样本则返回 0
      *
      * @param isRead  {@code true} 取入站，{@code false} 取出站
      * @param isBytes {@code true} 取字节，{@code false} 取消息
@@ -301,10 +295,9 @@ public class ProxyMetrics {
     }
 
     /**
-     * 返回以当前时刻为终点的 24 个自然小时流量。
-     *
-     * <p>调用前推进小时分桶。末项读取当前小时桶的实时值，其余从归档 Map 取值；
-     * 无记录的小时以零值填充。列表按时间升序排列。
+     * 返回以当前时刻为终点的 24 个自然小时流量
+     * <p>
+     * 调用前推进小时分桶。末项读取当前小时桶的实时值，其余从归档 Map 取值，无记录的小时以零值填充。列表按时间升序排列。
      *
      * @return 长度恒为 24 的列表
      */
@@ -328,7 +321,7 @@ public class ProxyMetrics {
     }
 
     /**
-     * 检测小时边界，必要时在锁内完成归档切换。
+     * 检测小时边界，必要时在锁内完成归档切换
      *
      * @param nowHour 当前整点小时
      * @return 与 {@code nowHour} 对齐的当前小时桶
@@ -341,10 +334,9 @@ public class ProxyMetrics {
     }
 
     /**
-     * 将早于 {@code nowHour} 的桶依次写入 {@link #hourlySnapshots}。
-     *
-     * <p>代理长时间无流量时，中间空缺的小时以零值桶补全后归档。
-     * 调用方须持有 {@link #hourLock}。
+     * 将早于 {@code nowHour} 的桶依次写入 {@link #hourlySnapshots}
+     * <p>
+     * 代理长时间无流量时，中间空缺的小时以零值桶补全后归档，调用方须持有 {@link #hourLock}
      *
      * @param nowHour 当前整点小时
      */
@@ -362,7 +354,7 @@ public class ProxyMetrics {
     }
 
     /**
-     * 移除超出 24 小时展示窗口的归档条目。
+     * 移除超出 24 小时展示窗口的归档条目
      *
      * @param nowHour 当前整点小时
      */
@@ -372,7 +364,7 @@ public class ProxyMetrics {
     }
 
     /**
-     * 将内存计数器转为查询用 DTO。
+     * 将内存计数器转为查询用 DTO
      *
      * @return 包含累计值与当前速率的快照
      */
@@ -391,7 +383,7 @@ public class ProxyMetrics {
     }
 
     /**
-     * 当前自然小时的内存累加桶。
+     * 当前自然小时的内存累加桶
      */
     private static final class HourBucket {
         private final LocalDateTime hour;

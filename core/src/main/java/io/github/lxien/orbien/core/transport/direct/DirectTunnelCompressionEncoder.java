@@ -6,7 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 /**
- * 独立隧道出站压缩：将明文 {@link ByteBuf} 编码为分块字节流。
+ * 独立隧道出站压缩：将明文 {@link ByteBuf} 编码为分块字节流
  */
 public class DirectTunnelCompressionEncoder extends MessageToByteEncoder<ByteBuf> {
 

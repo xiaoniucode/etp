@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 编辑重放时禁止用户修改的 Header（由系统写入或锁定）
+ * 编辑重放时禁止用户修改的 Header
  */
 public final class ReplayForbiddenHeaders {
     private static final Set<String> FORBIDDEN = Set.of(

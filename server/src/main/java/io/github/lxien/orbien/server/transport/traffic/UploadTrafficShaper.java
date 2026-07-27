@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 final class UploadTrafficShaper {
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(UploadTrafficShaper.class);
-    private static final long MIN_QUEUE_BYTES = 1 * 1024 * 1024L;
+    private static final long MIN_QUEUE_BYTES = 1024 * 1024L;
     private static final long MAX_QUEUE_BYTES_CAP = 8 * 1024 * 1024L;
     private static final int MAX_QUEUE_FRAMES = 4096;
     private static final long EMERGENCY_DROP_BYTES = 16 * 1024 * 1024L;
@@ -29,7 +29,7 @@ final class UploadTrafficShaper {
         this.limiter = limiter;
         this.callbacks = callbacks;
         long bps = limiter != null ? Math.max(0, limiter.getBytesPerSecond()) : 0;
-        this.maxQueueBytes = Math.min(MAX_QUEUE_BYTES_CAP, Math.max(MIN_QUEUE_BYTES, bps * 4));
+        this.maxQueueBytes = Math.clamp(bps * 4, MIN_QUEUE_BYTES, MAX_QUEUE_BYTES_CAP);
     }
 
     /**

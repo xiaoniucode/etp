@@ -115,7 +115,7 @@ public class TlsHelper {
     }
 
     /**
-     * 返回支持的 TLS 协议列表，按优先级排序：JDK 11+ 优先 TLS 1.3，不支持时降级 TLS 1.2。
+     * 返回支持的 TLS 协议列表，按优先级排序：JDK 11+ 优先 TLS 1.3，不支持时降级 TLS 1.2
      */
     public static Iterable<String> getSupportedProtocols() {
         if (isJava11OrHigher()) {

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 服务端向客户端推送的运行时配置（{@link Message.RuntimeInfo}）构建与解析辅助类。
+ * 服务端向客户端推送的运行时配置（{@link Message.RuntimeInfo}）构建与解析辅助类
  */
 public final class RuntimeInfoSupport {
 

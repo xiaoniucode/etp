@@ -6,7 +6,7 @@ import io.github.lxien.orbien.server.ip.cidr.CIDRMatcher;
 import java.util.Set;
 
 /**
- * 校验 PROXY 头来源是否为受信任的 LB（防伪造真实 IP）
+ * 校验 PROXY 头来源是否为受信任的 LB
  */
 final class TrustedProxyMatcher {
 

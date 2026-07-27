@@ -1,5 +1,6 @@
 package io.github.lxien.orbien.client.filetransfer;
 
+import io.github.lxien.orbien.core.domain.FileShareLimitsConfig;
 import io.github.lxien.orbien.core.message.Message;
 
 import java.nio.file.Path;
@@ -62,7 +63,7 @@ public final class FilePermissionChecker {
 
     public static long maxUploadSize(Message.FileShareLimits limits) {
         if (limits == null || limits.getMaxUploadSize() <= 0) {
-            return io.github.lxien.orbien.core.domain.FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE;
+            return FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE;
         }
         return limits.getMaxUploadSize();
     }

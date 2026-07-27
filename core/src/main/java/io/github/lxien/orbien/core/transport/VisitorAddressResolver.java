@@ -9,7 +9,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 /**
- * 统一解析访客真实 IP：优先 HAProxy PROXY 解析结果，否则 fallback 到 TCP remoteAddress。
+ * 统一解析访客真实 IP：优先 HAProxy PROXY 解析结果，否则 fallback 到 TCP remoteAddress
  */
 public final class VisitorAddressResolver {
 

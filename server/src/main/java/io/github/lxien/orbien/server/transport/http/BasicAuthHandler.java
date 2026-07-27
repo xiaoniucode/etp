@@ -42,9 +42,6 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.Base64;
 
-/**
- * HTTP/HTTPS Basic Auth。BCrypt 较慢：每连接只验一次，已验证凭证按代理短缓存。
- */
 @Component
 @ChannelHandler.Sharable
 public class BasicAuthHandler extends ChannelInboundHandlerAdapter {

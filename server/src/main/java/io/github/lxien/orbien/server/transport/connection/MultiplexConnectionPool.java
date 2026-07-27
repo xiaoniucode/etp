@@ -58,7 +58,7 @@ public class MultiplexConnectionPool {
     }
 
     /**
-     * 数据隧道断开时从池中移除，避免后续 acquire 命中已关闭 channel。
+     * 数据隧道断开时从池中移除，避免后续 acquire 命中已关闭 channel
      */
     public void removeByChannel(Channel channel) {
         if (channel == null) {

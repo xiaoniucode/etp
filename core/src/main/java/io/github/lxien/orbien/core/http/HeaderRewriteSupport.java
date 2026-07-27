@@ -29,7 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Header 改写校验、变量渲染与规则应用。
+ * Header 改写校验、变量渲染与规则应用
  */
 public final class HeaderRewriteSupport {
     public static final int MAX_HEADER_BLOCK = 65536;
@@ -118,7 +118,7 @@ public final class HeaderRewriteSupport {
     }
 
     /**
-     * 应用规则。headers 的 key 为小写，value[0]=写出名称，value[1]=值。
+     * 应用规则。headers 的 key 为小写，value[0]=写出名称，value[1]=值
      */
     public static void apply(Map<String, String[]> headers, List<HeaderRewriteRule> rules, Map<String, String> vars) {
         if (headers == null || rules == null || rules.isEmpty()) {

@@ -12,10 +12,6 @@ public final class TransportEndpointResolver {
     private TransportEndpointResolver() {
     }
 
-    public static TransportProtocol resolveControlProtocol(TransportProtocol configured) {
-        return configured != null ? configured : TransportProtocol.TCP;
-    }
-
     public static TransportProtocol resolveDataProtocol(TransportProtocol globalDefault,
                                                         TransportCustomConfig proxyTransport) {
         if (proxyTransport != null && proxyTransport.getProtocol() != null) {

@@ -3,7 +3,7 @@ package io.github.lxien.orbien.core.transport.compress;
 import io.github.lxien.orbien.core.message.TMSP;
 
 /**
- * TMSP 帧级压缩算法。
+ * TMSP 帧级压缩算法
  */
 public enum CompressionType {
     NONE(0, TMSP.COMPRESS_ALGO_NONE),

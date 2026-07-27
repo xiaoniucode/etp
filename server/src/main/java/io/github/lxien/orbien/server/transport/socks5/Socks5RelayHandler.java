@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
- * SOCKS5 握手完成后的双向数据中继。
+ * SOCKS5 握手完成后的双向数据中继
  */
 @Component
 @ChannelHandler.Sharable

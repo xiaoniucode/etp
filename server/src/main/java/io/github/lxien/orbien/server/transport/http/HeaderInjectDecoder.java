@@ -14,7 +14,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.util.List;
 
 /**
- * 首包 HTTP 请求头注入 X-Forwarded-For。
+ * 首包 HTTP 请求头注入 X-Forwarded-For
  */
 public class HeaderInjectDecoder extends ByteToMessageDecoder {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(HeaderInjectDecoder.class);

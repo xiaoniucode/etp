@@ -41,8 +41,6 @@ public class AuthAction extends AgentBaseAction {
     private EventBus eventBus;
     @Autowired
     private AgentConfigService agentConfigService;
-    @Resource
-    private AppConfig appConfig;
 
     /**
      * 检查 Token 是否存在

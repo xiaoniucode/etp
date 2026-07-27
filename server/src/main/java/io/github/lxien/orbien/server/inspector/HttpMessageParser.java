@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * HTTP 报文嗅探解析，不消费待转发的 {@link ByteBuf}。
+ * HTTP 报文嗅探解析，不消费待转发的 {@link ByteBuf}
  */
 public final class HttpMessageParser {
     private static final Set<String> VALID_METHODS = Set.of(
@@ -65,7 +65,7 @@ public final class HttpMessageParser {
     }
 
     /**
-     * 判断首行是否为合法 HTTP 请求行，避免 multipart body 分片被误判为新请求。
+     * 判断首行是否为合法 HTTP 请求行，避免 multipart body 分片被误判为新请求
      */
     public static boolean isValidRequestLine(String requestLine) {
         if (requestLine == null || requestLine.isBlank()) {

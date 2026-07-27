@@ -103,12 +103,6 @@ public class StreamStateMachineBuilder {
             return StateMachineFactory.get(MACHINE_ID);
         }
     }
-
-    /**
-     * 获取状态机实例
-     *
-     * @return 状态机实例
-     */
     public static StateMachine<StreamState, StreamEvent, StreamContext> getStateMachine() {
         return StateMachineHolder.INSTANCE;
     }

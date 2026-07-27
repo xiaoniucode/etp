@@ -35,7 +35,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * TCP服务启动、停止、管理
+ * TCP代理服务启动
  *
  * @author lxien
  */

@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.util.CharsetUtil;
 
 /**
- * 从 HTTP 请求首包解析请求行（method / request-uri / version）。
+ * 从 HTTP 请求首包解析请求行（method / request-uri / version）
  */
 public final class HttpFirstLineParser {
 

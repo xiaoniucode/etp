@@ -25,9 +25,9 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * 流量指标定时任务。
+ * 流量指标定时任务
  *
- * <p>负责小时归档持久化与速率刷新，依赖 Spring {@link Scheduled} 调度。
+ * <p>负责小时归档持久化与速率刷新
  */
 @Component
 public class MetricsTask {
@@ -39,9 +39,9 @@ public class MetricsTask {
     private EventBus eventBus;
 
     /**
-     * 归档上一自然小时流量并发布 {@link HourlyTrafficEvent}。
+     * 归档上一自然小时流量并发布 {@link HourlyTrafficEvent}
      *
-     * <p>固定在每小时第 5 分钟执行（{@code 0 5 * * * ?}），错开整点流量尖峰。
+     * <p>固定在每小时第 5 分钟执行（{@code 0 5 * * * ?}），错开整点流量尖峰
      */
     @Scheduled(cron = "0 5 * * * ?")
     public void hourlySnapshotTask() {
@@ -53,9 +53,9 @@ public class MetricsTask {
     }
 
     /**
-     * 刷新所有代理的滑动窗口速率，并推进小时分桶。
+     * 刷新所有代理的滑动窗口速率，并推进小时分桶
      *
-     * <p>执行间隔 1 秒（{@code fixedRate = 1000}）。
+     * <p>执行间隔 1 秒（{@code fixedRate = 1000}
      */
     @Scheduled(fixedRate = 1000)
     public void rateUpdateTask() {

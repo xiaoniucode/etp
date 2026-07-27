@@ -14,7 +14,6 @@ public class StreamPauseAction extends StreamBaseAction {
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         if (event == StreamEvent.STREAM_REMOTE_PAUSE) {
-            // 兼容旧路径 主路径已在 ControlFrameHandler 直接调用 pauseBackendRead
             logger.debug("暂停本地服务流读取 streamId={}", context.getStreamId());
             context.pauseBackendRead(StreamContext.BACKEND_PAUSE_RATE_LIMIT);
         }

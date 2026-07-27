@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * 客户端认证/重连后，将该客户端下已启用的代理注册到运行时。
+ * 客户端认证/重连后，将该客户端下已启用的代理注册到运行时数据区
  */
 @Component
 public class AgentInitAction extends AgentBaseAction {

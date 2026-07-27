@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * 文件列表排序常量与比较器。
+ * 文件列表排序常量与比较器
  */
 public final class FileListSort {
 

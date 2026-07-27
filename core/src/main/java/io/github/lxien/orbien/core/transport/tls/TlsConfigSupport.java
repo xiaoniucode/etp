@@ -18,7 +18,7 @@ public final class TlsConfigSupport {
     }
 
     /**
-     * 将 TLS 证书路径解析为相对配置文件目录的绝对路径。
+     * 将 TLS 证书路径解析为相对配置文件目录的绝对路径
      */
     public static TlsConfig resolveAbsolutePaths(TlsConfig tlsConfig, Path configDir) {
         if (tlsConfig == null || configDir == null) {
@@ -49,7 +49,7 @@ public final class TlsConfigSupport {
     }
 
     /**
-     * 合并 TLS 配置：优先保留 target 的 enabled/port 等，缺失的证书字段从 fallback 补齐。
+     * 合并 TLS 配置：优先保留 target 的 enabled/port 等，缺失的证书字段从 fallback 补齐
      */
     public static TlsConfig merge(TlsConfig fallback, TlsConfig target) {
         if (fallback == null) {
@@ -66,16 +66,6 @@ public final class TlsConfigSupport {
                 pick(target.getKeyPassword(), fallback.getKeyPassword())
         );
         return merged;
-    }
-
-    public static TlsConfig effective(TlsConfig primary, TlsConfig fallback) {
-        if (primary == null) {
-            return fallback;
-        }
-        if (fallback == null || hasClientCredentials(primary)) {
-            return primary;
-        }
-        return merge(fallback, primary);
     }
 
     private static String pick(String preferred, String alternate) {

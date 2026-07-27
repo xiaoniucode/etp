@@ -90,7 +90,6 @@ public class ForceHttpsRedirectHandler extends ChannelInboundHandlerAdapter {
             return;
         }
 
-        // HTTPS 代理但关闭了强制跳转：拒绝在明文 HTTP 端口访问
         logger.debug("HTTPS 代理 {} 未开启 force_https，拒绝明文 HTTP 访问 domain={}", config.getName(), domain);
         ReferenceCountUtil.release(buf);
         NettyHttpUtils.sendHttp403(visitor).addListener(f -> ChannelUtils.closeOnFlush(visitor));

@@ -24,6 +24,7 @@ import io.github.lxien.orbien.server.transport.TimeAccessHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.ReferenceCountUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,7 +58,7 @@ public class TcpTimeAccessHandler extends TimeAccessHandler {
         }
         ProxyConfigExt ext = proxyConfigService.findByListenPort(getListenerPort(visitor), ProtocolType.TCP);
         if (ext != null && !doCheckAccess(visitor, ext.getProxyConfig())) {
-            io.netty.util.ReferenceCountUtil.release(msg);
+            ReferenceCountUtil.release(msg);
             return;
         }
         ctx.fireChannelRead(msg);

@@ -4,7 +4,7 @@ import io.github.lxien.orbien.core.domain.TlsConfig;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 
 /**
- * 按 本次建连是否加密生成 Pipeline 使用的 TLS 配置副本，避免修改全局配置对象。
+ * 按 本次建连是否加密生成 Pipeline 使用的 TLS 配置副本，避免修改全局配置对象
  */
 public final class TransportTlsConfigFactory {
 
@@ -12,7 +12,7 @@ public final class TransportTlsConfigFactory {
     }
 
     /**
-     * 控制通道：沿用全局 TLS 开关。
+     * 控制通道使用全局 TLS 开关
      */
     public static TlsConfig forControlChannel(TlsConfig global) {
         if (global == null) {
@@ -22,7 +22,7 @@ public final class TransportTlsConfigFactory {
     }
 
     /**
-     * TCP 按 {@code connectionEncrypt} 决定是否启用 TLS；WS/QUIC 始终启用。
+     * TCP 按 {@code connectionEncrypt} 决定是否启用 TLS；WS/QUIC 始终启用
      */
     public static TlsConfig forDataTunnel(TlsConfig global, TransportProtocol protocol, boolean connectionEncrypt) {
         if (TransportEncryptResolver.requiresTls(protocol)) {

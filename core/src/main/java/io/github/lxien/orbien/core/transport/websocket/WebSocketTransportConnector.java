@@ -60,7 +60,7 @@ public class WebSocketTransportConnector implements TransportConnector {
     }
 
     /**
-     * 等待 WebSocket 握手完成后再通知连接就绪，避免在 HTTP 握手阶段写入 TMSP 帧。
+     * 等待 WebSocket 握手完成后再通知连接就绪，避免在 HTTP 握手阶段写入 TMSP 帧
      */
     private static final class WebSocketHandshakeAwaiter extends ChannelInboundHandlerAdapter {
         private final CompletableFuture<TransportSession> future;

@@ -10,6 +10,8 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
+import java.nio.channels.ClosedChannelException;
+
 public class DirectTunnelBridge implements TunnelBridge {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(DirectTunnelBridge.class);
     private final StreamContext streamContext;
@@ -142,7 +144,6 @@ public class DirectTunnelBridge implements TunnelBridge {
                 return;
             }
             channel.writeAndFlush(outbound).addListener((ChannelFutureListener) f -> {
-                // writeAndFlush 后由 Netty 负责释放，监听器不再 release
                 if (f.isSuccess()) {
                     logger.debug("数据转发成功 streamId={} bytes={}", streamContext.getStreamId(), bytes);
                 } else if (!isBenignWriteFailure(f.cause())) {
@@ -158,8 +159,7 @@ public class DirectTunnelBridge implements TunnelBridge {
 
     private static boolean isBenignWriteFailure(Throwable cause) {
         for (Throwable c = cause; c != null; c = c.getCause()) {
-            if (c instanceof java.nio.channels.ClosedChannelException
-                    || c instanceof io.netty.channel.StacklessClosedChannelException) {
+            if (c instanceof ClosedChannelException) {
                 return true;
             }
             String msg = c.getMessage();

@@ -29,10 +29,7 @@ import io.netty.channel.uring.IoUringSocketChannel;
 import java.util.Locale;
 
 /**
- * 按操作系统选择 Netty 原生传输：
- * Linux 优先 io_uring（内核支持时），否则 Epoll；macOS/BSD 用 KQueue；其余用 NIO。
- * <p>
- * Netty 4.2 使用 {@link MultiThreadIoEventLoopGroup} + 传输层 {@link IoHandlerFactory}。
+ * Linux 优先 io_uring（内核支持时），否则 Epoll；macOS/BSD 用 KQueue；其余用 NIO
  */
 public final class NettyEventLoopFactory {
 
@@ -137,15 +134,4 @@ public final class NettyEventLoopFactory {
         };
     }
 
-    /**
-     * 当前选用的原生传输名称，便于日志诊断
-     */
-    public static String nativeTransportName() {
-        return switch (NATIVE_TRANSPORT) {
-            case IO_URING -> "io_uring";
-            case EPOLL -> "epoll";
-            case KQUEUE -> "kqueue";
-            case NIO -> "nio";
-        };
-    }
 }

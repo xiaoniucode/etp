@@ -6,7 +6,7 @@ import io.github.lxien.orbien.server.transport.haproxy.ProxyProtocolDetectHandle
 import io.netty.channel.ChannelPipeline;
 
 /**
- * 访客入口 pipeline 公共装配：HA PROXY 解码器必须在 TLS/业务 handler 之前。
+ * 访客入口 pipeline 公共装配：HA PROXY 解码器必须在 TLS/业务 handler 之前
  * @author lxien
  */
 public final class VisitorPipelineSupport {

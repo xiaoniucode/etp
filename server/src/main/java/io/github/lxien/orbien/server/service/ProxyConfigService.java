@@ -72,7 +72,7 @@ public class ProxyConfigService {
             return;
         }
 
-        // 从二级缓存中取出配置（用于构建一级缓存的 key）
+        // 从二级缓存中取出配置，用于构建一级缓存的 key
         ProxyConfigExt ext = configCache.getIfPresent(proxyId);
         // 清理二级缓存
         configCache.invalidate(proxyId);
@@ -83,7 +83,6 @@ public class ProxyConfigService {
             String agentNameKey = "agent:" + config.getAgentId() + ":name:" + config.getName();
             proxyIdCache.invalidate(agentNameKey);
 
-            // 端口索引
             if (config.isTcp() && config.getListenPort() != null) {
                 proxyIdCache.invalidate(portCacheKey(ProtocolType.TCP, config.getListenPort()));
             }

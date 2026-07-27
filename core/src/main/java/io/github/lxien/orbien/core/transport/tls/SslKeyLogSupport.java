@@ -15,9 +15,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 /**
- * 支持通过 {@code SSLKEYLOGFILE} 环境变量导出 TLS 会话密钥，供 Wireshark 解密 QUIC 流量。
+ * 通过 {@code SSLKEYLOGFILE} 环境变量导出 TLS 会话密钥，供 Wireshark 解密 QUIC 流量
  * <p>
- * TCP / WebSocket 使用 JDK {@link io.netty.handler.ssl.SslProvider#JDK}，暂不支持此机制；
+ * TCP / WebSocket 使用 JDK {@link io.netty.handler.ssl.SslProvider#JDK}，暂不支持此机制
  */
 public final class SslKeyLogSupport {
 

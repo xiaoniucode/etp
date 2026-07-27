@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 时间周期访问判定；按 proxyId 缓存编译后的日程，热路径仅做整数比较
+ * 时间周期访问判定
  * <p>
  * invalidate 会递增 generation，强制 Keep-Alive / 长连接上的 Handler 重新进入判定
  */
@@ -69,7 +69,7 @@ public class TimeAccessChecker {
     }
 
     /**
-     * @return 下次建议再检的绝对时间戳（epoch millis）
+     * @return 下次建议再检的绝对时间戳 epoch millis
      */
     public long nextCheckAtMillis(String proxyId, TimeAccessConfig config) {
         if (config == null || !config.isEnabled()) {
@@ -191,7 +191,7 @@ public class TimeAccessChecker {
                     }
                 }
             }
-            int clamp = Math.max(1, Math.min(bestDelta, 60));
+            int clamp = Math.clamp(bestDelta, 1, 60);
             return instant.plusSeconds(clamp).toEpochMilli();
         }
     }

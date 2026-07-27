@@ -18,7 +18,7 @@ import java.util.Collection;
 /**
  * QUIC(BoringSSL) 校验证书链时不做 hostname 校验，并兼容 TLS1.3 的 authType 差异。
  * Netty QUIC 对 {@code localhost} / IP 地址不发送 SNI；BoringSSL 在 TLS1.3 下传递
- * {@code GENERIC} 作为 authType，而 JDK TrustManager 期望 {@code UNKNOWN}。
+ * {@code GENERIC} 作为 authType，而 JDK TrustManager 期望 {@code UNKNOWN}
  */
 final class QuicChainTrustManager {
 
@@ -71,8 +71,8 @@ final class QuicChainTrustManager {
     }
 
     /**
-     * BoringSSL 在 TLS1.3 握手时传入 GENERIC，JDK 默认 TrustManager 无法识别。
-     * netty-incubator-codec-quic 0.0.74+ 已在框架层修复，此处保留兼容旧版本及双保险。
+     * BoringSSL 在 TLS1.3 握手时传入 GENERIC，JDK 默认 TrustManager 无法识别
+     * netty-incubator-codec-quic 0.0.74+ 已在框架层修复，此处保留兼容旧版本及双保险
      */
     private static String normalizeAuthType(String authType) {
         if (authType == null || authType.isEmpty()) {

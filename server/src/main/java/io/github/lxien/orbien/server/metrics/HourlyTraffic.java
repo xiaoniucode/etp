@@ -22,25 +22,35 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * 单个自然小时的流量统计值。
+ * 单个自然小时的流量统计值
  */
 @Getter
 @Setter
 public class HourlyTraffic {
 
-    /** 小时桶起始时间（整点）。 */
+    /**
+     * 小时桶起始时间
+     */
     private LocalDateTime hour;
 
-    /** 入站字节数。 */
+    /**
+     * 入站字节数
+     */
     private long readBytes;
 
-    /** 出站字节数。 */
+    /**
+     * 出站字节数
+     */
     private long writeBytes;
 
-    /** 入站消息数。 */
+    /**
+     * 入站消息数
+     */
     private long readMessages;
 
-    /** 出站消息数。 */
+    /**
+     * 出站消息数
+     */
     private long writeMessages;
 
     /**

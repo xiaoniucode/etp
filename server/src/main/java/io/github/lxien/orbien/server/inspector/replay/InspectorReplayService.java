@@ -66,7 +66,7 @@ public class InspectorReplayService {
         long timeoutMs = opts.getTimeoutMs() > 0
                 ? opts.getTimeoutMs()
                 : inspectorProperties.getReplayTimeoutMs();
-        timeoutMs = Math.min(Math.max(timeoutMs, 1_000L), 60_000L);
+        timeoutMs = Math.clamp(timeoutMs, 1_000L, 60_000L);
 
         boolean acquired;
         try {
@@ -98,7 +98,7 @@ public class InspectorReplayService {
                     opts.isCaptureToBuffer(),
                     completion
             );
-            requestBuf = null; // ownership transferred to stream / attr
+            requestBuf = null;
 
             HttpCaptureRecord replayRecord = completion.get(timeoutMs, TimeUnit.MILLISECONDS);
             if (replayRecord == null) {
@@ -212,7 +212,6 @@ public class InspectorReplayService {
             }
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         } catch (Exception ignored) {
-            // best-effort
         }
     }
 }

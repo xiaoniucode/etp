@@ -24,19 +24,19 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * 端口区间工具：合并、展开、差集计算。
+ * 端口区间工具：合并、展开、差集计算
  */
 public final class PortIntervalUtils {
     private PortIntervalUtils() {
     }
 
     /**
-     * 合并重叠或相邻的端口区间。
+     * 合并重叠或相邻的端口区间
      * <ol>
      *   <li>按起始端口升序排序</li>
      *   <li>线性扫描：若下一区间与当前区间重叠或相邻（next.start ≤ current.end + 1），则扩展当前右端；否则落盘当前区间并开始新区间</li>
      * </ol>
-     * 时间 O(n log n)，空间 O(n)，n 为输入区间条数。
+     * 时间 O(n log n)，空间 O(n)，n 为输入区间条数
      */
     public static List<PortInterval> merge(Collection<PortInterval> intervals) {
         if (intervals == null || intervals.isEmpty()) {
@@ -65,11 +65,7 @@ public final class PortIntervalUtils {
     }
 
     /**
-     * 从源区间集合中扣除已占用区间，返回剩余可用区间。
-     * <p>
-     * 先合并源与占用区间，再逐段做区间差集。
-     * 时间 O(n log n + m log m + k·s)，空间 O(n + m)，
-     * n、m 为源/占用条数，k 为合并后占用条数，s 为当前可用条数（通常远小于 n）。
+     * 从源区间集合中扣除已占用区间，返回剩余可用区间，先合并源与占用区间，再逐段做区间差集
      */
     public static List<PortInterval> subtractAll(Collection<PortInterval> source, Collection<PortInterval> occupied) {
         if (source == null || source.isEmpty()) {
@@ -89,8 +85,7 @@ public final class PortIntervalUtils {
     }
 
     /**
-     * 将区间集合展开为升序端口列表（内部先 merge 去重合并）。
-     * 时间 O(n log n + P)，空间 O(P)，n 为区间条数，P 为展开后的端口总数。
+     * 将区间集合展开为升序端口列表（内部先 merge 去重合并）
      */
     public static List<Integer> toPortList(Collection<PortInterval> intervals) {
         List<PortInterval> merged = merge(intervals);
@@ -108,8 +103,7 @@ public final class PortIntervalUtils {
     }
 
     /**
-     * 统计区间内的端口总数。
-     * 时间 O(n)，空间 O(1)，n 为区间条数。
+     * 统计区间内的端口总数
      */
     public static int totalCount(Collection<PortInterval> intervals) {
         if (intervals == null || intervals.isEmpty()) {
