@@ -19,7 +19,7 @@ public final class SessionConsole {
     private static final String GREEN = "\u001B[32m";
     private static final String CYAN = "\u001B[36m";
 
-    private static final String DIVIDER = "────────────────────────────────────────────────";
+    private static final String DIVIDER = "────────────────────────────────────────────────────────────────────────────────────────";
 
     private final String serverAddr;
     private final int serverPort;
@@ -74,7 +74,7 @@ public final class SessionConsole {
         out.println();
         out.println(field("连接", color(GREEN, serverAddr + ":" + serverPort)));
         for (Message.RuntimeInfo runtimeInfo : runtimeInfos) {
-            out.println(field("路由", formatForwarding(runtimeInfo)));
+            out.println(field("转发", formatForwarding(runtimeInfo)));
         }
         out.println(dim(DIVIDER));
         out.println();
@@ -98,7 +98,7 @@ public final class SessionConsole {
         String remote = !remoteAddrs.isEmpty()
                 ? color(BOLD + CYAN, remoteAddrs.get(0))
                 : dim("(地址待分配)");
-        return remote + dim(" -> ") + local;
+        return remote + dim(" → ") + local;
     }
 
     private static String inferProtocol(Message.RuntimeInfo runtimeInfo) {
