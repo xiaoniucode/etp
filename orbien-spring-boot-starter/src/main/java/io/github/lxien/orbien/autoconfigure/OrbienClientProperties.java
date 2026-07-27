@@ -1,19 +1,3 @@
-/*
- *    Copyright 2026 lxien
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 package io.github.lxien.orbien.autoconfigure;
 
 import lombok.Getter;
@@ -25,21 +9,21 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 @Setter
 @ConfigurationProperties(prefix = "orbien.client")
 public class OrbienClientProperties {
-    /**
-     * 是否启用 orbien 内网穿透客户端
-     */
-    private Boolean enabled = false;
 
     /**
-     * TCP传输地址
+     * 是否启用Orbien
+     */
+    private boolean enabled = false;
+
+    /**
+     * 服务器地址
      */
     private String serverAddr = "127.0.0.1";
 
     /**
-     * TCP传输端口
+     * 控制面服务端口
      */
     private Integer serverPort = 9527;
-
 
     @NestedConfigurationProperty
     private AuthProperties auth = new AuthProperties();
@@ -49,6 +33,7 @@ public class OrbienClientProperties {
 
     @NestedConfigurationProperty
     private TransportProperties transport = new TransportProperties();
+
     @NestedConfigurationProperty
     private ConnectionProperties connection = new ConnectionProperties();
 }

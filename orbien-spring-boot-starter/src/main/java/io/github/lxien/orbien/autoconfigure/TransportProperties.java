@@ -24,12 +24,12 @@ public class TransportProperties implements Serializable {
     private QuicProperties quic = new QuicProperties();
 
     @Data
-    static class MultiplexProperties implements Serializable {
+    public static class MultiplexProperties implements Serializable {
         private boolean enabled = true;
     }
 
     @Data
-    static class TlsProperties implements Serializable {
+    public static class TlsProperties implements Serializable {
         private Boolean enabled = true;
         private String certFile;
         private String keyFile;
@@ -38,13 +38,13 @@ public class TransportProperties implements Serializable {
     }
 
     @Data
-    static class WebSocketProperties implements Serializable {
+    public static class WebSocketProperties implements Serializable {
         private Integer serverPort = 9528;
         private String path = "/tunnel";
     }
 
     @Data
-    static class QuicProperties implements Serializable {
+    public static class QuicProperties implements Serializable {
         private Integer serverPort = 9529;
     }
 }

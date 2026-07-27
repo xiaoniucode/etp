@@ -15,9 +15,11 @@ public final class SessionConsole {
 
     private static final String RESET = "\u001B[0m";
     private static final String BOLD = "\u001B[1m";
-    private static final String CYAN = "\u001B[36m";
+    private static final String DIM = "\u001B[2m";
     private static final String GREEN = "\u001B[32m";
-    private static final String BRIGHT_CYAN = "\u001B[96m";
+    private static final String CYAN = "\u001B[36m";
+
+    private static final String DIVIDER = "────────────────────────────────────────────────";
 
     private final String serverAddr;
     private final int serverPort;
@@ -67,44 +69,36 @@ public final class SessionConsole {
     private void printSession(Collection<Message.RuntimeInfo> runtimeInfos) {
         PrintStream out = System.out;
         out.println();
-        out.println(color(CYAN, "═══════════════════════════════════════════════════════"));
-        out.println(color(BOLD + GREEN, "  隧道已建立"));
-        out.println(color(CYAN, "═══════════════════════════════════════════════════════"));
-        out.printf("  服务端: %s:%d%n", serverAddr, serverPort);
-        out.println("  状态:   " + color(GREEN, "已连接"));
+        out.println(dim(DIVIDER));
+        out.println("  " + color(BOLD, "Orbien远程隧道已建立"));
         out.println();
-        out.println("  转发规则:");
+        out.println(field("连接", color(GREEN, serverAddr + ":" + serverPort)));
         for (Message.RuntimeInfo runtimeInfo : runtimeInfos) {
-            out.printf("    %s%n", formatForwarding(runtimeInfo));
+            out.println(field("路由", formatForwarding(runtimeInfo)));
         }
-        out.println();
-        out.println("  按 Ctrl+C 退出");
-        out.println(color(CYAN, "═══════════════════════════════════════════════════════"));
+        out.println(dim(DIVIDER));
         out.println();
     }
 
     private void printWaitingHint() {
         PrintStream out = System.out;
         out.println();
-        out.println(color(CYAN, "═══════════════════════════════════════════════════════"));
-        out.println(color(BOLD, "  已连接服务端，等待代理注册..."));
-        out.printf("  服务端: %s:%d%n", serverAddr, serverPort);
-        out.println("  访问地址请查看管理面板");
-        out.println("  按 Ctrl+C 退出");
-        out.println(color(CYAN, "═══════════════════════════════════════════════════════"));
+        out.println(dim(DIVIDER));
+        out.println("  " + color(BOLD, "已连接服务端，等待代理注册"));
+        out.println();
+        out.println(field("连接", color(GREEN, serverAddr + ":" + serverPort)));
+        out.println(field("提示", dim("访问地址请查看管理面板")));
+        out.println(dim(DIVIDER));
         out.println();
     }
 
     private static String formatForwarding(Message.RuntimeInfo runtimeInfo) {
         String local = formatLocalTarget(runtimeInfo);
         List<String> remoteAddrs = runtimeInfo.getRemoteAddrList();
-        String protocolName = inferProtocol(runtimeInfo);
-        String remote = !remoteAddrs.isEmpty() ? highlight(remoteAddrs.get(0)) : "(地址待分配)";
-
-        if (protocolName != null) {
-            return String.format("%-5s %s -> %s", protocolName, remote, local);
-        }
-        return String.format("%s -> %s", remote, local);
+        String remote = !remoteAddrs.isEmpty()
+                ? color(BOLD + CYAN, remoteAddrs.get(0))
+                : dim("(地址待分配)");
+        return remote + dim(" -> ") + local;
     }
 
     private static String inferProtocol(Message.RuntimeInfo runtimeInfo) {
@@ -137,8 +131,12 @@ public final class SessionConsole {
         return hostPort;
     }
 
-    private static String highlight(String text) {
-        return color(BOLD + BRIGHT_CYAN, text);
+    private static String field(String key, String value) {
+        return "  " + dim(key) + "：" + value;
+    }
+
+    private static String dim(String text) {
+        return color(DIM, text);
     }
 
     private static String color(String code, String text) {

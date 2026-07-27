@@ -20,12 +20,10 @@ public class GoawayAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext agentContext) {
         agentContext.markShuttingDown();
-        logger.info("收到停止指令，正在关闭客户端");
-        //关闭所有流
+        logger.info("正在关闭客户端");
         StreamManager.getStreamContexts().forEach(streamContext -> {
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
-        //通知服务端清理资源
         Channel control = agentContext.getControl();
         if (event == AgentEvent.LOCAL_GOAWAY && from == AgentState.CONNECTED && control != null && control.isActive()) {
             control.writeAndFlush(new TMSPFrame(agentContext.getConnectionId(), TMSP.MSG_GOAWAY))
@@ -35,14 +33,11 @@ public class GoawayAction extends AgentBaseAction {
                         }
                     });
         }
-        //关闭连接池所有数据连接
         agentContext.getPoolManager().closeAll();
-        //关闭控制连接
         if (control != null) {
             ChannelUtils.closeOnFlush(control);
         }
-        //停止客户端进程
         agentContext.getTunnelClient().stop();
-        logger.info("orbien 内网穿透客户端已停止");
+        logger.info("Orbien 客户端已停止");
     }
 }

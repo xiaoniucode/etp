@@ -54,7 +54,11 @@ public final class TunnelClient implements Lifecycle {
             initializeStateMachine();
             agentContext.fireEvent(AgentEvent.START);
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("启动隧道客户端失败", e);
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            }
+            throw new IllegalStateException("启动隧道客户端失败", e);
         }
     }
 

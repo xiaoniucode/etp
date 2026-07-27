@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import java.io.Serializable;
 
+
 @Data
 public class ConnectionProperties implements Serializable {
 
@@ -15,14 +16,14 @@ public class ConnectionProperties implements Serializable {
     private PoolProperties pool = new PoolProperties();
 
     @Data
-    static class RetryProperties implements Serializable {
+    public static class RetryProperties implements Serializable {
         private Integer initialDelay = 1;
         private Integer maxDelay = 20;
         private Integer maxRetries = 5;
     }
 
     @Data
-    static class PoolProperties implements Serializable {
+    public static class PoolProperties implements Serializable {
         private boolean enabled = false;
 
         @NestedConfigurationProperty
@@ -33,13 +34,13 @@ public class ConnectionProperties implements Serializable {
     }
 
     @Data
-    static class MultiplexPoolProperties implements Serializable {
+    public static class MultiplexPoolProperties implements Serializable {
         private boolean plain;
         private boolean encrypt;
     }
 
     @Data
-    static class DirectPoolProperties implements Serializable {
+    public static class DirectPoolProperties implements Serializable {
         private int plainCount;
         private int encryptCount;
     }

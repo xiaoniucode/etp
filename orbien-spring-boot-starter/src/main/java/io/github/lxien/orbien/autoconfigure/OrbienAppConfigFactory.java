@@ -29,13 +29,18 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-final class AppConfigBuilder {
+final class OrbienAppConfigFactory {
 
-    private AppConfigBuilder() {
+    private OrbienAppConfigFactory() {
     }
 
     static AppConfig build(OrbienClientProperties properties,
@@ -55,7 +60,7 @@ final class AppConfigBuilder {
 
     private static AuthConfig buildAuthConfig(OrbienClientProperties properties) {
         AuthConfig authConfig = new AuthConfig();
-        authConfig.setToken(properties.getAuth().getToken());
+        authConfig.setToken(properties.getAuth().getToken().trim());
         if (StringUtils.hasText(properties.getAuth().getName())) {
             authConfig.setName(properties.getAuth().getName().trim());
         }
@@ -63,22 +68,16 @@ final class AppConfigBuilder {
     }
 
     private static TransportConfig buildTransportConfig(OrbienClientProperties properties,
-                                                         ResourceLoader resourceLoader) {
+                                                        ResourceLoader resourceLoader) {
         TransportProperties transportProps = properties.getTransport();
-        TransportProperties.TlsProperties tlsProps = transportProps.getTls();
 
         TransportConfig transportConfig = new TransportConfig();
         TransportProtocol controlProtocol = transportProps.getProtocol() != null
                 ? transportProps.getProtocol()
                 : TransportProtocol.TCP;
         transportConfig.setProtocol(controlProtocol);
-
-        MultiplexConfig multiplexConfig = new MultiplexConfig(
-                transportProps.getMultiplex().isEnabled());
-        transportConfig.setMultiplexConfig(multiplexConfig);
-
-        TlsConfig tlsConfig = buildTlsConfig(tlsProps, resourceLoader);
-        transportConfig.setTlsConfig(tlsConfig);
+        transportConfig.setMultiplexConfig(new MultiplexConfig(transportProps.getMultiplex().isEnabled()));
+        transportConfig.setTlsConfig(buildTlsConfig(transportProps.getTls(), resourceLoader));
 
         if (transportProps.getWebsocket().getServerPort() != null) {
             transportConfig.getWebsocket().setPort(transportProps.getWebsocket().getServerPort());
@@ -96,9 +95,9 @@ final class AppConfigBuilder {
                                             ResourceLoader resourceLoader) {
         boolean enabled = tlsProps.getEnabled() == null || tlsProps.getEnabled();
         TlsConfig tlsConfig = new TlsConfig(enabled);
-        tlsConfig.setCertFile(resolvePath(tlsProps.getCertFile(), resourceLoader));
-        tlsConfig.setKeyFile(resolvePath(tlsProps.getKeyFile(), resourceLoader));
-        tlsConfig.setCaFile(resolvePath(tlsProps.getCaFile(), resourceLoader));
+        tlsConfig.setCertFile(resolveTlsPath(tlsProps.getCertFile(), resourceLoader));
+        tlsConfig.setKeyFile(resolveTlsPath(tlsProps.getKeyFile(), resourceLoader));
+        tlsConfig.setCaFile(resolveTlsPath(tlsProps.getCaFile(), resourceLoader));
         tlsConfig.setKeyPassword(tlsProps.getKeyPassword());
         return tlsConfig;
     }
@@ -128,7 +127,6 @@ final class AppConfigBuilder {
         poolConfig.getDirect().setPlainCount(poolProps.getDirect().getPlainCount());
         poolConfig.getDirect().setEncryptCount(poolProps.getDirect().getEncryptCount());
         connectionConfig.setPoolConfig(poolConfig);
-
         return connectionConfig;
     }
 
@@ -136,17 +134,18 @@ final class AppConfigBuilder {
                                                 String appName,
                                                 int localPort) {
         ProxyProperties proxy = properties.getProxy();
+        ProxyProtocol protocol = proxy.getProtocol();
 
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setName(appName);
-        proxyConfig.setProtocol(proxy.getProtocol().toProtocolType());
+        proxyConfig.setProtocol(protocol.toProtocolType());
         proxyConfig.setRemotePort(proxy.getRemotePort());
         proxyConfig.setStatus(ProxyStatus.OPEN);
-        proxyConfig.addTarget(new Target(proxy.getLocalIp(), localPort, 1, appName));
+        proxyConfig.addTarget(new Target(proxy.getLocalIp(), localPort, 1, "local"));
 
-        if (proxy.getProtocol() == WebProxyProtocol.HTTPS) {
-            Boolean forceHttps = proxy.getForceHttps();
-            proxyConfig.setForceHttps(forceHttps == null || forceHttps);
+        // HTTPS：未配置时默认开启强制跳转，与核心 ForceHttpsPolicy 一致
+        if (protocol == ProxyProtocol.HTTPS) {
+            proxyConfig.setForceHttps(proxy.getForceHttps() == null || proxy.getForceHttps());
         } else {
             proxyConfig.setForceHttps(false);
         }
@@ -170,7 +169,7 @@ final class AppConfigBuilder {
                     .map(w -> new TimeAccessWindow(w.getStart(), w.getEnd()))
                     .collect(Collectors.toList());
             TimeAccessConfig timeAccessConfig = new TimeAccessConfig(
-                    timeAccess.isEnabled(),
+                    true,
                     timeAccess.getMode() != null ? timeAccess.getMode() : AccessControl.ALLOW,
                     timeAccess.isTimeEnabled(),
                     timeAccess.getTimezone(),
@@ -192,10 +191,9 @@ final class AppConfigBuilder {
             ));
         }
 
-        // 域名与 Basic Auth 仅适用于 HTTP/HTTPS
-        if (proxy.getProtocol().isHttpOrHttps()) {
+        if (protocol.isHttpOrHttps()) {
             RouteConfig routeConfig = new RouteConfig();
-            routeConfig.setAutoDomain(proxy.getAutoDomain());
+            routeConfig.setAutoDomain(proxy.getAutoDomain() == null || proxy.getAutoDomain());
             routeConfig.getCustomDomains().addAll(proxy.getCustomDomains());
             routeConfig.getSubDomains().addAll(proxy.getSubDomains());
             proxyConfig.setRouteConfig(routeConfig);
@@ -217,28 +215,44 @@ final class AppConfigBuilder {
                 .multiplex(transport.isMultiplex())
                 .encrypt(transport.isEncrypt())
                 .compress(transport.isCompress());
-        if (transport.getCompressAlgorithm() != null) {
+        if (StringUtils.hasText(transport.getCompressAlgorithm())) {
             transportBuilder.compressAlgorithm(CompressionType.of(transport.getCompressAlgorithm()));
         }
         if (transport.getProtocol() != null) {
             transportBuilder.protocol(transport.getProtocol());
         }
         proxyConfig.setTransport(transportBuilder.build());
-
         return proxyConfig;
     }
 
-    private static String resolvePath(String location, ResourceLoader resourceLoader) {
+    /**
+     * 将 Spring Resource 位置解析为本地文件路径；JAR 内资源会复制到临时文件
+     */
+    private static String resolveTlsPath(String location, ResourceLoader resourceLoader) {
         if (!StringUtils.hasText(location)) {
             return null;
         }
         try {
             Resource resource = resourceLoader.getResource(location);
+            if (!resource.exists()) {
+                throw new IllegalStateException("TLS 证书资源不存在: " + location);
+            }
             if (resource.isFile()) {
                 return resource.getFile().getAbsolutePath();
             }
-            return location;
-        } catch (Exception e) {
+
+            String filename = resource.getFilename();
+            String suffix = "";
+            if (filename != null && filename.contains(".")) {
+                suffix = filename.substring(filename.lastIndexOf('.'));
+            }
+            Path tempFile = Files.createTempFile("orbien-tls-", suffix);
+            tempFile.toFile().deleteOnExit();
+            try (InputStream inputStream = resource.getInputStream()) {
+                Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+            return tempFile.toAbsolutePath().toString();
+        } catch (IOException e) {
             throw new IllegalStateException("无法加载 TLS 证书文件: " + location, e);
         }
     }

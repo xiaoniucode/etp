@@ -3,14 +3,32 @@ package io.github.lxien.orbien.autoconfigure;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import lombok.Data;
 
-/**
- * 代理级自定义传输配置
- */
+
 @Data
 public class TransportCustomProperties {
+
+    /**
+     * 数据传输协议
+     */
     private TransportProtocol protocol;
-    private boolean encrypt;
+
+    /**
+     * 数据通道加密
+     */
+    private boolean encrypt = true;
+
+    /**
+     * 多路复用
+     */
     private boolean multiplex = true;
+
+    /**
+     * 是否压缩
+     */
     private boolean compress;
+
+    /**
+     * 压缩算法
+     */
     private String compressAlgorithm = "snappy";
 }

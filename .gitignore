@@ -1,4 +1,6 @@
+# Maven
 target/
+.flattened-pom.xml
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -8,26 +10,34 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
 .project
 .classpath
-/bak/
+.settings/
+.vscode/
 
-server/dependency-reduced-pom.xml
-client/dependency-reduced-pom.xml
-/orbien-test/dependency-reduced-pom.xml
-/common/dependency-reduced-pom.xml
-/core/dependency-reduced-pom.xml
-orbien-server.log
-orbien.log
-.idea
-/cert/
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs & runtime data
+logs/
+*.log
 orbien.db
-orbien.iml
 orbien.mv.db
 orbien.trace.db
-/skills
-/console-ui/cursor.md
 /data
+/cert/
+/bak/
+
+# Local / tooling
 .cursor
 .cursorignore
+/skills
 /local-docs
+/console-ui/cursor.md

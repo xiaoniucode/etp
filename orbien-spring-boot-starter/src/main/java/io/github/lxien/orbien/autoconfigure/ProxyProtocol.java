@@ -2,7 +2,7 @@ package io.github.lxien.orbien.autoconfigure;
 
 import io.github.lxien.orbien.core.enums.ProtocolType;
 
-public enum WebProxyProtocol {
+public enum ProxyProtocol {
     HTTP,
     HTTPS,
     TCP;
