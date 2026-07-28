@@ -33,3 +33,13 @@ futures-util = { version = "0.3", features = ["sink"] }
 
 [dev-dependencies]
 bytes = "1.10"
+
+[profile.release]
+panic = "abort"
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.minimal]
+inherits = "release"
+opt-level = "z"
