@@ -157,6 +157,8 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     }
 
     private void enableVisitorReading(StreamContext context, Channel visitor, TunnelBridge tunnelBridge) {
+        // 先冲刷 OPENING 期间缓存的下行数据（如 MySQL 握手），再放开访问者读取
+        flushPendingDownloads(context);
         if (context.getProtocol() != null && context.getProtocol().isHttpOrHttps()) {
             relayHttpFirstPackage(context, visitor, tunnelBridge);
             flushPendingUploads(context, tunnelBridge);
@@ -167,6 +169,27 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         }
         context.resumeVisitorRead(StreamContext.VISITOR_PAUSE_OPENING);
         logger.debug("流 {} 打开成功，可以从访问者读数据", context.getStreamId());
+    }
+
+    /**
+     * 转发 OPENING 期间缓存的 agent->visitor 数据
+     */
+    private void flushPendingDownloads(StreamContext context) {
+        ByteBuf pending;
+        while ((pending = context.pollPendingDownload()) != null) {
+            try {
+                if (pending.isReadable()) {
+                    logger.debug("[传输] 转发 OPENING 缓存下行 streamId={} bytes={}",
+                            context.getStreamId(), pending.readableBytes());
+                    context.forwardToRemote(pending, false);
+                } else {
+                    safeRelease(pending);
+                }
+            } catch (RuntimeException ex) {
+                safeRelease(pending);
+                throw ex;
+            }
+        }
     }
 
     private void initHttpCaptureIfNeeded(StreamContext context, Channel visitor) {

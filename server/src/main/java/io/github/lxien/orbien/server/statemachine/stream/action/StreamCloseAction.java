@@ -73,6 +73,7 @@ public class StreamCloseAction extends StreamBaseAction {
         while ((pending = context.pollPending()) != null) {
             ReferenceCountUtil.release(pending);
         }
+        context.discardPendingDownloads();
         if (!context.isDatagram()) {
             if (context.getProtocol().isHttpOrHttps()) {
                 closeHttpVisitor(context, from, event, visitor);

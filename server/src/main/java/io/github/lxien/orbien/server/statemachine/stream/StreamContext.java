@@ -6,7 +6,6 @@ import io.github.lxien.orbien.core.domain.Target;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.transport.AbstractStreamContext;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
-import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.github.lxien.orbien.server.statemachine.agent.AgentContext;
 import io.github.lxien.orbien.server.inspector.HttpCaptureRecord;
 import io.github.lxien.orbien.server.inspector.HttpStreamCapture;
@@ -14,7 +13,6 @@ import io.github.lxien.orbien.server.transport.traffic.BandwidthLimiter;
 import io.github.lxien.orbien.server.transport.traffic.RemoteProducerGate;
 import io.github.lxien.orbien.server.transport.traffic.StreamTrafficShaper;
 import io.github.lxien.orbien.server.transport.traffic.VisitorReadGate;
-import io.github.lxien.orbien.server.utils.NettyHttpUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -24,7 +22,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.net.InetSocketAddress;
+import java.util.Deque;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Getter
@@ -32,7 +32,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @EqualsAndHashCode(callSuper = true)
 public class StreamContext extends AbstractStreamContext {
 
-    public static final int VISITOR_PAUSE_RATE_LIMIT = VisitorReadGate.PAUSE_RATE_LIMIT;
     public static final int VISITOR_PAUSE_BACKPRESSURE = VisitorReadGate.PAUSE_BACKPRESSURE;
     public static final int VISITOR_PAUSE_REMOTE = VisitorReadGate.PAUSE_REMOTE;
     public static final int VISITOR_PAUSE_OPENING = VisitorReadGate.PAUSE_OPENING;
@@ -57,6 +56,10 @@ public class StreamContext extends AbstractStreamContext {
 
     private InetSocketAddress visitorAddress;
     private ByteBuf pendingFirstPacket;
+    /**
+     * OPENING 期间到达的 agent->visitor 下行数据
+     */
+    private final Deque<ByteBuf> pendingDownloads = new ConcurrentLinkedDeque<>();
 
     private final AtomicBoolean localForwardingAborted = new AtomicBoolean(false);
     private final AtomicBoolean awaitingClientPassthroughAck = new AtomicBoolean(false);
@@ -162,6 +165,7 @@ public class StreamContext extends AbstractStreamContext {
         while ((pending = pollPending()) != null) {
             ReferenceCountUtil.release(pending);
         }
+        discardPendingDownloads();
         if (v != null) {
             ByteBuf httpFirst = v.attr(AttributeKeys.HTTP_FIRST_PACKET).getAndSet(null);
             if (httpFirst != null && httpFirst.refCnt() > 0) {
@@ -170,6 +174,23 @@ public class StreamContext extends AbstractStreamContext {
         }
         visitorReadGate.reset();
         remoteProducerGate.reset();
+    }
+
+    public void enqueueDownload(ByteBuf buf) {
+        if (buf != null) {
+            pendingDownloads.offer(buf);
+        }
+    }
+
+    public ByteBuf pollPendingDownload() {
+        return pendingDownloads.poll();
+    }
+
+    public void discardPendingDownloads() {
+        ByteBuf pending;
+        while ((pending = pendingDownloads.poll()) != null) {
+            ReferenceCountUtil.release(pending);
+        }
     }
 
     public boolean canAcceptVisitorData() {
@@ -242,18 +263,4 @@ public class StreamContext extends AbstractStreamContext {
         }
     }
 
-    public void rejectVisitorUpload() {
-        Channel v = visitor;
-        if (v == null || !v.isActive()) {
-            return;
-        }
-        if (protocol.isHttp()) {
-            NettyHttpUtils.sendHttpTooManyRequests(v)
-                    .addListener(f -> ChannelUtils.closeOnFlush(v));
-            return;
-        }
-        if (protocol.isTcp() || protocol.isSocks5()) {
-            ChannelUtils.closeOnFlush(v);
-        }
-    }
 }

@@ -35,6 +35,7 @@ export default ({mode}: { mode: string }) => {
                     xfwd: true
                 }
             },
+            allowedHosts:["a.domain1.com"],
             host: true
         },
         // 路径别名

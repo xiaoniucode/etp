@@ -209,6 +209,12 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     if (streamContext != null
                             && (state == StreamState.OPENED || state == StreamState.PAUSED)) {
                         streamContext.forwardToRemote(decoded, forward.sharedWithInbound());
+                    } else if (streamContext != null && state == StreamState.OPENING) {
+                        // OPEN_RESP 与数据隧道首包可能乱序到达；缓存至 OPENED 再转发给访问者
+                        ByteBuf buffered = forward.sharedWithInbound() ? decoded.retain() : decoded;
+                        streamContext.enqueueDownload(buffered);
+                        logger.debug("[传输] OPENING 状态缓存下行数据 streamId={} bytes={}",
+                                streamId, buffered.readableBytes());
                     } else {
                         forward.releaseIfOwned();
                     }
