@@ -138,7 +138,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: agent-rs
+        working-directory: client-rs
 
     steps:
       - name: Checkout
@@ -152,7 +152,7 @@ jobs:
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: agent-rs
+          workspaces: client-rs
           key: ${{ matrix.target }}
 
       - name: Install musl tools
@@ -187,13 +187,13 @@ jobs:
           SUFFIX="${{ matrix.artifact_suffix }}"
           TARGET="${{ matrix.target }}"
           RELEASE_NAME="orbien-rs_${VERSION}_${SUFFIX}"
-          SRC="agent-rs/target/${TARGET}/release/orbien"
+          SRC="client-rs/target/${TARGET}/release/orbien"
 
           test -f "$SRC"
           mkdir -p "$RELEASE_NAME"
           cp "$SRC" "$RELEASE_NAME/orbien"
           chmod +x "$RELEASE_NAME/orbien"
-          cp agent-rs/examples/orbien.toml "$RELEASE_NAME/orbien.toml"
+          cp client-rs/examples/orbien.toml "$RELEASE_NAME/orbien.toml"
 
           tar -czf "${RELEASE_NAME}.tar.gz" "$RELEASE_NAME"
           ls -lh "${RELEASE_NAME}.tar.gz"
@@ -209,12 +209,12 @@ jobs:
           $SUFFIX = "${{ matrix.artifact_suffix }}"
           $TARGET = "${{ matrix.target }}"
           $RELEASE_NAME = "orbien-rs_${VERSION}_${SUFFIX}"
-          $SRC = "agent-rs\target\${TARGET}\release\orbien.exe"
+          $SRC = "client-rs\target\${TARGET}\release\orbien.exe"
 
           if (-not (Test-Path $SRC)) { throw "binary not found: $SRC" }
           New-Item -ItemType Directory -Force -Path $RELEASE_NAME | Out-Null
           Copy-Item $SRC "$RELEASE_NAME\orbien.exe"
-          Copy-Item "agent-rs\examples\orbien.toml" "$RELEASE_NAME\orbien.toml"
+          Copy-Item "client-rs\examples\orbien.toml" "$RELEASE_NAME\orbien.toml"
           Compress-Archive -Path "$RELEASE_NAME\*" -DestinationPath "$RELEASE_NAME.zip" -Force
           Get-Item "$RELEASE_NAME.zip" | Format-List Name, Length
 
