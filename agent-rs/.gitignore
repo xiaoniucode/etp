@@ -1,0 +1,20 @@
+/target/
+.cargo/config.toml
+.cargo/config.toml.local
+
+# Editor / IDE
+**/*.rs.bk
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+*.pdb
+*.dSYM/
+
+/orbien.toml
+/*.log

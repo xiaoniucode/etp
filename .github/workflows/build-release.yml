@@ -2,22 +2,21 @@ name: Build release version
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
+  # push:
+  #   tags:
+  #     - 'v*'
 
 env:
   JAVA_VERSION: '25'
   NODE_VERSION: '24'
 
-# 默认最小权限；需要写权限的 job 单独覆盖
 permissions:
   contents: read
   actions: read
 
 jobs:
   # =============================================
-  # 阶段1：构建 Vue 前端
+  # 构建 Vue 前端
   # =============================================
   build-frontend:
     name: 构建前端资源
@@ -71,7 +70,7 @@ jobs:
           retention-days: 1
 
   # =============================================
-  # 阶段2：构建跨平台 Native 镜像
+  #构建跨平台 Native 镜像
   # =============================================
   build-native:
     name: 构建原生镜像 - ${{ matrix.display_name }}
@@ -241,7 +240,7 @@ jobs:
           path: orbien_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
 
   # =============================================
-  # 阶段3：构建并推送 Docker 镜像
+  # 构建并推送 Docker 镜像
   # =============================================
   docker-build:
     name: 构建并推送 Docker 镜像
@@ -346,7 +345,7 @@ jobs:
             lxien/orbien:${{ steps.version.outputs.version }}
 
   # =============================================
-  # 阶段4：统一发布阶段
+  # 发布
   # =============================================
   create-release:
     name: 创建统一 Release

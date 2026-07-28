@@ -1,0 +1,112 @@
+mod proto {
+    #![allow(clippy::all)]
+    #![allow(dead_code)]
+
+    include!(concat!(
+        env!("OUT_DIR"),
+        "/io.github.lxien.orbien.core.message.rs"
+    ));
+}
+
+pub use proto::*;
+
+use prost::Message;
+
+use crate::config::{AppConfig, ProxyConfig, ProxyProtocol};
+use crate::AGENT_VERSION;
+
+pub fn build_auth_info(config: &AppConfig, agent_id: Option<&str>) -> AuthInfo {
+    AuthInfo {
+        token: config.auth.token.clone(),
+        name: Some(config.auth.name.clone()),
+        agent_type: AgentType::Binary as i32,
+        version: AGENT_VERSION.to_string(),
+        os: Some(std::env::consts::OS.to_string()),
+        arch: Some(std::env::consts::ARCH.to_string()),
+        agent_id: agent_id
+            .filter(|s| !s.is_empty())
+            .map(|s| s.to_string()),
+    }
+}
+
+pub fn build_proxy_report(config: &AppConfig) -> BatchCreateProxiesRequest {
+    let proxies = config
+        .proxies
+        .iter()
+        .filter(|p| p.enabled)
+        .map(proxy_to_proto)
+        .collect();
+    BatchCreateProxiesRequest { proxies }
+}
+
+fn proxy_to_proto(p: &ProxyConfig) -> Proxy {
+    let protocol = match p.protocol {
+        ProxyProtocol::Tcp => ProtocolType::Tcp,
+        ProxyProtocol::Http => ProtocolType::Http,
+    } as i32;
+
+    let targets = p
+        .targets
+        .iter()
+        .map(|t| Target {
+            host: t.host.clone(),
+            port: t.port,
+            name: t.name.clone(),
+            weight: t.weight,
+        })
+        .collect();
+
+    let domain = p.domain.as_ref().map(|d| Domain {
+        auto_domain: Some(d.auto_domain),
+        custom_domains: d.custom_domains.clone(),
+        sub_domains: d.sub_domains.clone(),
+    });
+
+    let transport = {
+        let t = &p.transport;
+        let has_any = t.multiplex.is_some()
+            || t.encrypt.is_some()
+            || t.compress.is_some()
+            || t.protocol.is_some();
+        if has_any {
+            Some(Transport {
+                multiplex: t.multiplex,
+                encrypt: t.encrypt,
+                compress: t.compress,
+                protocol: t.protocol.clone(),
+                compress_algorithm: None,
+            })
+        } else {
+            None
+        }
+    };
+
+    Proxy {
+        proxy_id: String::new(),
+        name: p.name.clone(),
+        protocol,
+        enabled: p.enabled,
+        targets,
+        force_https: false,
+        remote_port: p.remote_port,
+        domain,
+        access_control: None,
+        basic_auth: None,
+        bandwidth: None,
+        load_balance_strategy: None,
+        transport,
+        tls_cert: None,
+        health_check: None,
+        socks5_auth: None,
+        file_auth: None,
+        file_limits: None,
+        header_rewrite: None,
+        time_access: None,
+    }
+}
+
+pub fn encode_message<M: Message>(msg: &M) -> bytes::Bytes {
+    let mut buf = Vec::with_capacity(msg.encoded_len());
+    msg.encode(&mut buf).expect("protobuf 编码失败");
+    bytes::Bytes::from(buf)
+}
