@@ -2,9 +2,9 @@ name: Build Rust client release
 
 on:
   workflow_dispatch:
-  # push:
-  #   tags:
-  #     - 'v*'
+   push:
+     tags:
+       - 'v*'
 
 permissions:
   contents: read
