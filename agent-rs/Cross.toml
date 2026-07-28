@@ -1,23 +1,17 @@
-[target.x86_64-unknown-linux-musl]
-image = ":edge"
-
-[target.aarch64-unknown-linux-musl]
-image = ":edge"
-
 [target.arm-unknown-linux-musleabi]
-image = ":edge"
+image = "ghcr.io/cross-rs/arm-unknown-linux-musleabi:edge"
 
 [target.armv7-unknown-linux-musleabihf]
-image = ":edge"
+image = "ghcr.io/cross-rs/armv7-unknown-linux-musleabihf:edge"
 
 [target.riscv64gc-unknown-linux-musl]
-image = ":edge"
+image = "ghcr.io/cross-rs/riscv64gc-unknown-linux-musl:edge"
 
 [target.loongarch64-unknown-linux-musl]
-image = ":edge"
+image = "ghcr.io/cross-rs/loongarch64-unknown-linux-musl:edge"
 
 [target.x86_64-unknown-freebsd]
-image = ":edge"
+image = "ghcr.io/cross-rs/x86_64-unknown-freebsd:edge"
 
 [target.aarch64-linux-android]
-image = ":edge"
+image = "ghcr.io/cross-rs/aarch64-linux-android:edge"

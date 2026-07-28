@@ -1053,10 +1053,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
   }
 
   /**
-   * <pre>
-   * 1=SET 2=ADD 3=REMOVE
-   * </pre>
-   *
    * Protobuf enum {@code io.github.lxien.orbien.core.message.HeaderAction}
    */
   public enum HeaderAction
@@ -16250,19 +16246,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         getPathBytes();
 
     /**
-     * <pre>
-     * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
-     * </pre>
-     *
      * <code>string sort = 4;</code>
      * @return The sort.
      */
     java.lang.String getSort();
     /**
-     * <pre>
-     * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
-     * </pre>
-     *
      * <code>string sort = 4;</code>
      * @return The bytes for sort.
      */
@@ -16270,19 +16258,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         getSortBytes();
 
     /**
-     * <pre>
-     * 当前目录文件名过滤，空表示不过滤；仅匹配一层，不递归
-     * </pre>
-     *
      * <code>string query = 5;</code>
      * @return The query.
      */
     java.lang.String getQuery();
     /**
-     * <pre>
-     * 当前目录文件名过滤，空表示不过滤；仅匹配一层，不递归
-     * </pre>
-     *
      * <code>string query = 5;</code>
      * @return The bytes for query.
      */
@@ -16452,10 +16432,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     @SuppressWarnings("serial")
     private volatile java.lang.Object sort_ = "";
     /**
-     * <pre>
-     * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
-     * </pre>
-     *
      * <code>string sort = 4;</code>
      * @return The sort.
      */
@@ -16473,10 +16449,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
     /**
-     * <pre>
-     * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
-     * </pre>
-     *
      * <code>string sort = 4;</code>
      * @return The bytes for sort.
      */
@@ -16499,10 +16471,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     @SuppressWarnings("serial")
     private volatile java.lang.Object query_ = "";
     /**
-     * <pre>
-     * 当前目录文件名过滤，空表示不过滤；仅匹配一层，不递归
-     * </pre>
-     *
      * <code>string query = 5;</code>
      * @return The query.
      */
@@ -16520,10 +16488,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
     /**
-     * <pre>
-     * 当前目录文件名过滤，空表示不过滤；仅匹配一层，不递归
-     * </pre>
-     *
      * <code>string query = 5;</code>
      * @return The bytes for query.
      */
@@ -17150,10 +17114,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private java.lang.Object sort_ = "";
       /**
-       * <pre>
-       * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
-       * </pre>
-       *
        * <code>string sort = 4;</code>
        * @return The sort.
        */
@@ -17170,10 +17130,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <pre>
-       * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
-       * </pre>
-       *
        * <code>string sort = 4;</code>
        * @return The bytes for sort.
        */
@@ -17191,10 +17147,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <pre>
-       * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
-       * </pre>
-       *
        * <code>string sort = 4;</code>
        * @param value The sort to set.
        * @return This builder for chaining.
@@ -17208,10 +17160,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <pre>
-       * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
-       * </pre>
-       *
        * <code>string sort = 4;</code>
        * @return This builder for chaining.
        */
@@ -17222,10 +17170,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <pre>
-       * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
-       * </pre>
-       *
        * <code>string sort = 4;</code>
        * @param value The bytes for sort to set.
        * @return This builder for chaining.
@@ -17242,10 +17186,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private java.lang.Object query_ = "";
       /**
-       * <pre>
-       * 当前目录文件名过滤，空表示不过滤；仅匹配一层，不递归
-       * </pre>
-       *
        * <code>string query = 5;</code>
        * @return The query.
        */
@@ -17262,10 +17202,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <pre>
-       * 当前目录文件名过滤，空表示不过滤；仅匹配一层，不递归
-       * </pre>
-       *
        * <code>string query = 5;</code>
        * @return The bytes for query.
        */
@@ -17283,10 +17219,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <pre>
-       * 当前目录文件名过滤，空表示不过滤；仅匹配一层，不递归
-       * </pre>
-       *
        * <code>string query = 5;</code>
        * @param value The query to set.
        * @return This builder for chaining.
@@ -17300,10 +17232,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <pre>
-       * 当前目录文件名过滤，空表示不过滤；仅匹配一层，不递归
-       * </pre>
-       *
        * <code>string query = 5;</code>
        * @return This builder for chaining.
        */
@@ -17314,10 +17242,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <pre>
-       * 当前目录文件名过滤，空表示不过滤；仅匹配一层，不递归
-       * </pre>
-       *
        * <code>string query = 5;</code>
        * @param value The bytes for query to set.
        * @return This builder for chaining.
@@ -19704,10 +19628,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     boolean getUpload();
 
     /**
-     * <pre>
-     * 下载时可选上限，0 表示不限制
-     * </pre>
-     *
      * <code>int64 max_bytes = 6;</code>
      * @return The maxBytes.
      */
@@ -19895,10 +19815,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     public static final int MAX_BYTES_FIELD_NUMBER = 6;
     private long maxBytes_ = 0L;
     /**
-     * <pre>
-     * 下载时可选上限，0 表示不限制
-     * </pre>
-     *
      * <code>int64 max_bytes = 6;</code>
      * @return The maxBytes.
      */
@@ -20603,10 +20519,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private long maxBytes_ ;
       /**
-       * <pre>
-       * 下载时可选上限，0 表示不限制
-       * </pre>
-       *
        * <code>int64 max_bytes = 6;</code>
        * @return The maxBytes.
        */
@@ -20615,10 +20527,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return maxBytes_;
       }
       /**
-       * <pre>
-       * 下载时可选上限，0 表示不限制
-       * </pre>
-       *
        * <code>int64 max_bytes = 6;</code>
        * @param value The maxBytes to set.
        * @return This builder for chaining.
@@ -20631,10 +20539,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <pre>
-       * 下载时可选上限，0 表示不限制
-       * </pre>
-       *
        * <code>int64 max_bytes = 6;</code>
        * @return This builder for chaining.
        */

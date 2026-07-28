@@ -1,14 +1,8 @@
-mod proto {
-    #![allow(clippy::all)]
-    #![allow(dead_code)]
+#![allow(clippy::all)]
+#![allow(dead_code)]
 
-    include!(concat!(
-        env!("OUT_DIR"),
-        "/io.github.lxien.orbien.core.message.rs"
-    ));
-}
-
-pub use proto::*;
+mod generated;
+pub use generated::*;
 
 use prost::Message;
 

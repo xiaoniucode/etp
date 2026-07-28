@@ -31,11 +31,11 @@ jobs:
             rustflags: '-C target-feature=+crt-static'
             optional: false
 
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-musl
             artifact_suffix: linux_arm64
             display_name: "Linux ARM64 (musl)"
-            cross: true
+            cross: false
             archive: tar.gz
             rustflags: '-C target-feature=+crt-static'
             optional: false
@@ -156,7 +156,7 @@ jobs:
           key: ${{ matrix.target }}
 
       - name: Install musl tools
-        if: matrix.target == 'x86_64-unknown-linux-musl'
+        if: contains(matrix.target, '-linux-musl') && !matrix.cross
         run: sudo apt-get update && sudo apt-get install -y musl-tools
 
       - name: Install cross
