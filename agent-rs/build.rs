@@ -6,7 +6,10 @@ fn main() -> Result<()> {
     let include = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("proto");
     println!("cargo:rerun-if-changed={}", proto.display());
 
-    prost_build::Config::new()
-        .compile_protos(&[proto], &[include])?;
+    let mut config = prost_build::Config::new();
+    config.protoc_executable(protoc_bin_vendored::protoc_bin_path().map_err(|e| {
+        std::io::Error::new(std::io::ErrorKind::Other, e.to_string())
+    })?);
+    config.compile_protos(&[proto], &[include])?;
     Ok(())
 }

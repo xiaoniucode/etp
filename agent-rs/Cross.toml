@@ -1,4 +1,23 @@
-[build]
-pre-build = [
-    "apt-get update && apt-get install --assume-yes --no-install-recommends protobuf-compiler",
-]
+[target.x86_64-unknown-linux-musl]
+image = ":edge"
+
+[target.aarch64-unknown-linux-musl]
+image = ":edge"
+
+[target.arm-unknown-linux-musleabi]
+image = ":edge"
+
+[target.armv7-unknown-linux-musleabihf]
+image = ":edge"
+
+[target.riscv64gc-unknown-linux-musl]
+image = ":edge"
+
+[target.loongarch64-unknown-linux-musl]
+image = ":edge"
+
+[target.x86_64-unknown-freebsd]
+image = ":edge"
+
+[target.aarch64-linux-android]
+image = ":edge"

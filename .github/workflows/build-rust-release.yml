@@ -2,9 +2,9 @@ name: Build Rust client release
 
 on:
   workflow_dispatch:
-    push:
-      tags:
-        - 'v*'
+  push:
+    tags:
+      - 'v*'
 
 permissions:
   contents: read
@@ -26,7 +26,7 @@ jobs:
             target: x86_64-unknown-linux-musl
             artifact_suffix: linux_amd64
             display_name: "Linux AMD64 (musl)"
-            cross: true
+            cross: false
             archive: tar.gz
             rustflags: '-C target-feature=+crt-static'
             optional: false
@@ -155,11 +155,9 @@ jobs:
           workspaces: agent-rs
           key: ${{ matrix.target }}
 
-      - name: Install protoc
-        if: ${{ !matrix.cross }}
-        uses: arduino/setup-protoc@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install musl tools
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
 
       - name: Install cross
         if: matrix.cross
