@@ -1,7 +1,7 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    :title="dialogType === 'add' ? '添加端口' : '编辑端口'"
+    :title="dialogType === 'add' ? $t('orbien.portPool.add') : $t('orbien.portPool.edit')"
     width="500px"
     align-center
   >
@@ -9,29 +9,29 @@
       <ElSkeleton :rows="4" animated />
     </div>
     <ElForm v-else ref="formRef" :model="formData" :rules="rules" label-width="100px" :show-message="false">
-      <ElFormItem label="应用类型">
+      <ElFormItem :label="$t('orbien.portPool.appType')">
         <ElSelect
           v-model="quickFillId"
-          placeholder="请选择应用类型"
+          :placeholder="$t('orbien.portPool.selectAppType')"
           class="w-full"
           @change="handleAppTypeChange"
         >
-          <ElOption label="自定义" :value="CUSTOM_PRESET_ID" />
-          <ElOptionGroup v-for="group in presetGroups" :key="group" :label="group">
+          <ElOption :label="$t('orbien.portPool.custom')" :value="CUSTOM_PRESET_ID" />
+          <ElOptionGroup v-for="group in presetGroups" :key="group" :label="getGroupLabel(group)">
             <ElOption
               v-for="preset in presetsByGroup[group]"
               :key="preset.id"
-              :label="preset.label"
+              :label="getPresetLabel(preset.id)"
               :value="preset.id"
             />
           </ElOptionGroup>
         </ElSelect>
       </ElFormItem>
 
-      <ElFormItem label="协议" prop="type">
+      <ElFormItem :label="$t('orbien.common.protocol')" prop="type">
         <ElSelect
           v-model="formData.type"
-          placeholder="请选择协议"
+          :placeholder="$t('orbien.portPool.selectProtocol')"
           class="w-full"
           :disabled="!isCustomMode"
         >
@@ -43,19 +43,19 @@
           />
         </ElSelect>
       </ElFormItem>
-      <ElFormItem label="端口" prop="port">
+      <ElFormItem :label="$t('orbien.common.port')" prop="port">
         <ElInput
           v-model="formData.port"
           :disabled="!isCustomMode"
-          placeholder="单个端口如 8000，范围端口如 8000-9000"
+          :placeholder="$t('orbien.portPool.portPlaceholder')"
         />
       </ElFormItem>
-      <ElFormItem label="备注" prop="remark">
+      <ElFormItem :label="$t('orbien.common.remark')" prop="remark">
         <ElInput
           v-model="formData.remark"
           type="textarea"
           :rows="3"
-          placeholder="请输入备注"
+          :placeholder="$t('orbien.portPool.remarkPlaceholder')"
           maxlength="500"
           show-word-limit
         />
@@ -63,8 +63,8 @@
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
-        <ElButton @click="dialogVisible = false">取消</ElButton>
-        <ElButton type="primary" @click="handleSubmit" :loading="submitting">提交</ElButton>
+        <ElButton @click="dialogVisible = false">{{ $t('common.cancel') }}</ElButton>
+        <ElButton type="primary" @click="handleSubmit" :loading="submitting">{{ $t('common.submit') }}</ElButton>
       </div>
     </template>
   </ElDialog>
@@ -72,6 +72,7 @@
 
 <script setup lang="ts">
   import { ref, reactive, computed, watch, nextTick } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import type { FormInstance, FormRules } from 'element-plus'
   import { ElMessage } from 'element-plus'
   import {
@@ -84,7 +85,8 @@
     CUSTOM_PRESET_ID,
     PORT_POOL_PRESETS,
     PORT_POOL_PRESET_GROUPS,
-    type PortPoolPreset
+    type PortPoolPreset,
+    type PortPoolPresetGroup
   } from './port-pool-presets'
 
   interface Props {
@@ -100,6 +102,8 @@
 
   const props = defineProps<Props>()
   const emit = defineEmits<Emits>()
+
+  const { t } = useI18n()
 
   const dialogVisible = computed({
     get: () => props.visible,
@@ -121,6 +125,12 @@
       return acc
     }, {})
   })
+
+  const getGroupLabel = (group: PortPoolPresetGroup) => t(`orbien.portPool.group.${group}`)
+
+  const getPresetLabel = (presetId: string) => t(`orbien.portPool.preset.${presetId}.label`)
+
+  const getPresetRemark = (presetId: string) => t(`orbien.portPool.preset.${presetId}.remark`)
 
   const formData = reactive({
     id: undefined as number | undefined,
@@ -191,7 +201,7 @@
   const applyPreset = (preset: PortPoolPreset) => {
     formData.type = preset.type
     formData.port = preset.port
-    formData.remark = preset.remark
+    formData.remark = getPresetRemark(preset.id)
     nextTick(() => {
       formRef.value?.clearValidate(['type', 'port'])
     })
@@ -236,7 +246,7 @@
         })
       } catch (error) {
         console.error('获取端口配置失败:', error)
-        ElMessage.error('获取端口配置失败')
+        ElMessage.error(t('orbien.portPool.fetchDetailFailed'))
       } finally {
         loading.value = false
       }
@@ -271,13 +281,13 @@
         }
         if (dialogType.value === 'add') {
           await fetchCreatePortPool(payload)
-          ElMessage.success('添加成功')
+          ElMessage.success(t('common.success.add'))
         } else if (formData.id) {
           await fetchUpdatePortPool({
             id: formData.id,
             ...payload
           })
-          ElMessage.success('更新成功')
+          ElMessage.success(t('common.success.update'))
         }
         dialogVisible.value = false
         emit('submit')

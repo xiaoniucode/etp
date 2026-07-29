@@ -1,21 +1,21 @@
 <template>
   <div class="time-access-page">
     <div class="mb-6">
-      <h3 class="text-lg font-semibold mb-4">基本配置</h3>
+      <h3 class="text-lg font-semibold mb-4">{{ t('orbien.plugin.basic.title') }}</h3>
       <div class="flex flex-col gap-4">
         <div class="flex items-center gap-3">
-          <span class="w-20 font-medium">启用状态：</span>
+          <span class="w-20 font-medium">{{ t('orbien.plugin.basic.enabled') }}：</span>
           <ElSwitch v-model="formData.enabled" @change="handleConfigChange" />
         </div>
         <div class="flex items-center gap-3">
-          <span class="w-20 font-medium">控制模式：</span>
+          <span class="w-20 font-medium">{{ t('orbien.plugin.basic.controlMode') }}：</span>
           <ElRadioGroup v-model="formData.mode" @change="handleConfigChange">
-            <ElRadio :label="AccessControl.ALLOW">允许（仅窗口内可访问）</ElRadio>
-            <ElRadio :label="AccessControl.DENY">禁止（仅窗口内不可访问）</ElRadio>
+            <ElRadio :label="AccessControl.ALLOW">{{ t('orbien.plugin.time.allowInWindow') }}</ElRadio>
+            <ElRadio :label="AccessControl.DENY">{{ t('orbien.plugin.time.denyInWindow') }}</ElRadio>
           </ElRadioGroup>
         </div>
         <div class="flex items-center gap-3">
-          <span class="w-20 font-medium">时区：</span>
+          <span class="w-20 font-medium">{{ t('orbien.plugin.basic.timezone') }}：</span>
           <ElSelect
             v-model="formData.timezone"
             filterable
@@ -31,14 +31,14 @@
     </div>
 
     <div class="mb-6">
-      <h3 class="text-lg font-semibold mb-4">周期限制</h3>
+      <h3 class="text-lg font-semibold mb-4">{{ t('orbien.plugin.time.periodLimit') }}</h3>
       <div class="flex flex-wrap items-center gap-3">
         <ElCheckbox
           :model-value="isAllDaysSelected"
           :indeterminate="isDaysIndeterminate"
           @change="handleSelectAllDays"
         >
-          全选
+          {{ t('orbien.plugin.actions.selectAll') }}
         </ElCheckbox>
         <ElCheckboxGroup v-model="formData.days" @change="handleConfigChange">
           <ElCheckbox v-for="day in weekDays" :key="day.value" :label="day.value">
@@ -50,7 +50,7 @@
 
     <div class="mb-4">
       <div class="flex items-center gap-3 mb-4">
-        <h3 class="text-lg font-semibold">时间限制</h3>
+        <h3 class="text-lg font-semibold">{{ t('orbien.plugin.time.timeLimit') }}</h3>
         <ElSwitch v-model="formData.timeEnabled" @change="handleConfigChange" />
       </div>
       <div
@@ -58,33 +58,33 @@
         :class="{ 'opacity-50 pointer-events-none': !formData.timeEnabled }"
       >
         <ElTable :data="formData.windows" style="width: 100%" border>
-          <ElTableColumn label="开始时间" min-width="180">
+          <ElTableColumn :label="t('orbien.plugin.time.startTime')" min-width="180">
             <template #default="scope">
               <ElTimePicker
                 v-if="editingWindowId === scope.row.id"
                 v-model="scope.row.start"
                 size="small"
                 value-format="HH:mm:ss"
-                placeholder="选择开始时间"
+                :placeholder="t('orbien.plugin.time.selectStartTime')"
                 style="width: 100%"
               />
               <span v-else>{{ scope.row.start }}</span>
             </template>
           </ElTableColumn>
-          <ElTableColumn label="结束时间" min-width="180">
+          <ElTableColumn :label="t('orbien.plugin.time.endTime')" min-width="180">
             <template #default="scope">
               <ElTimePicker
                 v-if="editingWindowId === scope.row.id"
                 v-model="scope.row.end"
                 size="small"
                 value-format="HH:mm:ss"
-                placeholder="选择结束时间"
+                :placeholder="t('orbien.plugin.time.selectEndTime')"
                 style="width: 100%"
               />
               <span v-else>{{ scope.row.end }}</span>
             </template>
           </ElTableColumn>
-          <ElTableColumn label="操作" width="180" fixed="right">
+          <ElTableColumn :label="t('common.actions')" width="180" fixed="right">
             <template #default="scope">
               <ElSpace size="small">
                 <ElButton
@@ -93,16 +93,16 @@
                   size="small"
                   @click="handleSaveWindow(scope.row)"
                 >
-                  保存
+                  {{ t('common.save') }}
                 </ElButton>
                 <ElButton v-else type="link" size="small" @click="handleEditWindow(scope.row)">
-                  编辑
+                  {{ t('common.edit') }}
                 </ElButton>
                 <ElButton type="link" size="small" @click="handleDeleteWindow(scope.row)">
                   <template #icon>
                     <Delete />
                   </template>
-                  删除
+                  {{ t('common.delete') }}
                 </ElButton>
               </ElSpace>
             </template>
@@ -112,7 +112,7 @@
           <template #icon>
             <Plus />
           </template>
-          新增时段
+          {{ t('orbien.plugin.actions.addWindow') }}
         </ElButton>
       </div>
     </div>
@@ -121,6 +121,7 @@
 
 <script setup lang="ts">
   import { ref, reactive, watch, computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import { Plus, Delete } from '@element-plus/icons-vue'
   import {
@@ -134,19 +135,21 @@
 
   defineOptions({ name: 'TimeAccessPage' })
 
+  const { t } = useI18n()
+
   const props = defineProps<{
     proxyId: string
   }>()
 
-  const weekDays = [
-    { value: 1, label: '周一' },
-    { value: 2, label: '周二' },
-    { value: 3, label: '周三' },
-    { value: 4, label: '周四' },
-    { value: 5, label: '周五' },
-    { value: 6, label: '周六' },
-    { value: 7, label: '周日' }
-  ]
+  const weekDays = computed(() => [
+    { value: 1, label: t('orbien.plugin.time.weekdays.mon') },
+    { value: 2, label: t('orbien.plugin.time.weekdays.tue') },
+    { value: 3, label: t('orbien.plugin.time.weekdays.wed') },
+    { value: 4, label: t('orbien.plugin.time.weekdays.thu') },
+    { value: 5, label: t('orbien.plugin.time.weekdays.fri') },
+    { value: 6, label: t('orbien.plugin.time.weekdays.sat') },
+    { value: 7, label: t('orbien.plugin.time.weekdays.sun') }
+  ])
 
   const timezoneOptions = [
     'Asia/Shanghai',
@@ -214,7 +217,7 @@
   }
 
   const handleSelectAllDays = async (checked: boolean | string | number) => {
-    formData.days = checked ? weekDays.map((d) => d.value) : []
+    formData.days = checked ? weekDays.value.map((d) => d.value) : []
     await handleConfigChange()
   }
 
@@ -233,7 +236,7 @@
 
   const handleSaveWindow = async (row: Api.TimeAccess.WindowDTO) => {
     if (!row.start || !row.end) {
-      ElMessage.error('请选择开始与结束时间')
+      ElMessage.error(t('orbien.plugin.time.timeRequired'))
       return
     }
     if (row.id && row.id > 0) {
@@ -255,9 +258,9 @@
   }
 
   const handleDeleteWindow = async (row: Api.TimeAccess.WindowDTO) => {
-    await ElMessageBox.confirm('确定删除该时段吗？', '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('orbien.plugin.deleteConfirm.window'), t('common.warning'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
     if (row.id && row.id > 0) {

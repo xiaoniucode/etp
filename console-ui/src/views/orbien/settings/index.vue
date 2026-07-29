@@ -2,7 +2,7 @@
   <div class="settings-page">
     <ElCard class="art-table-card settings-table-card">
       <ElTabs v-model="activeTab" type="card" class="settings-tabs" @tab-change="onTabChange">
-        <ElTabPane label="三方登录" name="oauth">
+        <ElTabPane :label="$t('orbien.settings.tab.oauth')" name="oauth">
           <div class="tab-panel">
             <OAuthPanel ref="oauthPanelRef" />
           </div>

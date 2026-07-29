@@ -5,9 +5,9 @@
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
         <template #left>
           <ElSpace wrap>
-            <ElButton type="primary" @click="showDialog('add')" v-ripple>添加</ElButton>
+            <ElButton type="primary" @click="showDialog('add')" v-ripple>{{ $t('common.add') }}</ElButton>
             <ElButton @click="handleBatchDelete" v-ripple :disabled="selectedRows.length === 0"
-            >批量删除
+            >{{ $t('common.batchDelete') }}
             </ElButton
             >
           </ElSpace>
@@ -57,6 +57,7 @@
 
 <script setup lang="ts">
 import {ref, h, nextTick} from 'vue'
+import {useI18n} from 'vue-i18n'
 import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
 import {useTable} from '@/hooks/core/useTable'
 import {fetchGetUdpProxyList, fetchBatchDeleteProxy} from '@/api/proxy'
@@ -72,6 +73,8 @@ import {DialogType} from '@/types'
 import {ProtocolType, ProxyStatus} from '@/enums/orbien/business'
 
 defineOptions({name: 'UdpPenetration'})
+
+const {t} = useI18n()
 
 type UdpProxyItem = Api.Proxy.UdpProxyListDTO
 
@@ -115,33 +118,33 @@ const {
       {type: 'selection'},
       {
         prop: 'name',
-        label: '代理名称',
+        label: t('orbien.proxy.name'),
         minWidth: 50
       },
       {
         prop: 'listenPort',
-        label: '远程端口'
+        label: t('orbien.proxy.remotePort')
       },
       {
         prop: 'targets',
-        label: '内网服务',
+        label: t('orbien.proxy.backend'),
         formatter: (row: UdpProxyItem) => renderTargetTags(row.targets, {showHealth: false})
       },
       {
         prop: 'transportProtocol',
-        label: '传输协议',
+        label: t('orbien.proxy.transport'),
         formatter: (row: UdpProxyItem) => renderTransportProtocolTag(row.transportProtocol)
       },
       {
         prop: 'traffic',
-        label: '流量',
+        label: t('orbien.proxy.traffic'),
         width: 130,
         formatter: (row: UdpProxyItem) =>
           renderTrafficRate(row.traffic, () => handleMetrics(row))
       },
       {
         prop: 'status',
-        label: '状态',
+        label: t('common.status'),
         width: 80,
         formatter: (row: UdpProxyItem) =>
             h(ElSwitch, {
@@ -153,24 +156,24 @@ const {
       },
       {
         prop: 'operation',
-        label: '操作',
+        label: t('common.actions'),
         width: 150,
         fixed: 'right',
         formatter: (row: UdpProxyItem) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'link',
-                text: '设置',
+                text: t('common.settings'),
                 onClick: () => handleSettings(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '编辑',
+                text: t('common.edit'),
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '删除',
+                text: t('common.delete'),
                 onClick: () => handleSingleDelete(row)
               })
             ])
@@ -205,14 +208,14 @@ const handleDialogSubmit = async () => {
 
 const handleBatchDelete = async () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请选择要删除的代理')
+    ElMessage.warning(t('orbien.proxy.selectToDelete'))
     return
   }
 
   try {
-    await ElMessageBox.confirm('确定要删除选中的代理吗？', '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('orbien.proxy.deleteBatchTip'), t('common.warning'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
 
@@ -228,9 +231,9 @@ const handleBatchDelete = async () => {
 
 const handleSingleDelete = async (proxy: UdpProxyItem) => {
   try {
-    await ElMessageBox.confirm(`确定要删除代理「${proxy.name}」吗？`, '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('orbien.proxy.deleteOneTip', {name: proxy.name}), t('common.warning'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
 

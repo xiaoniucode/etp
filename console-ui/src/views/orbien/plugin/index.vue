@@ -48,7 +48,7 @@
             :proxy-name="proxyName"
             :protocol="protocol"
         />
-        <ElEmpty v-else description="功能开发中"/>
+        <ElEmpty v-else :description="t('orbien.plugin.dialog.underDevelopment')"/>
       </div>
     </div>
   </ElDialog>
@@ -56,6 +56,7 @@
 
 <script setup lang="ts">
 import {ref, computed, watch, type Component} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {useSettingStore} from '@/store/modules/setting'
 import {storeToRefs} from 'pinia'
 import {ProtocolType} from '@/enums/orbien/business'
@@ -93,6 +94,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 const emit = defineEmits<Emits>()
 
+const {t, locale} = useI18n()
 const settingStore = useSettingStore()
 const {getMenuTheme} = storeToRefs(settingStore)
 
@@ -109,13 +111,16 @@ const menuBgColor = computed(() => getMenuTheme.value.background)
 const menuTextColor = computed(() => getMenuTheme.value.textColor)
 const menuIconColor = computed(() => getMenuTheme.value.iconColor)
 
-const menuItems = computed(() => getProtocolMenus(props.protocol))
+const menuItems = computed(() => {
+  void locale.value
+  return getProtocolMenus(props.protocol)
+})
 
 const dialogTitle = computed(() => {
   if (props.proxyName) {
-    return `${props.proxyName} - 设置`
+    return t('orbien.plugin.dialog.titleWithName', {name: props.proxyName})
   }
-  return '代理设置'
+  return t('orbien.plugin.dialog.title')
 })
 
 const pageComponents: Record<string, Component> = {

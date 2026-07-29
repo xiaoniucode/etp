@@ -13,14 +13,18 @@
               <OAuthProviderIcon :provider="item.provider" :size="24" :alt="item.displayName" />
             </span>
             <span>{{ item.displayName }}</span>
-            <ElTag v-if="item.enabled" type="success" effect="plain" size="small">已启用</ElTag>
-            <ElTag v-else type="info" effect="plain" size="small">未启用</ElTag>
+            <ElTag v-if="item.enabled" type="success" effect="plain" size="small">
+              {{ $t('orbien.settings.oauth.enabled') }}
+            </ElTag>
+            <ElTag v-else type="info" effect="plain" size="small">
+              {{ $t('orbien.settings.oauth.disabled') }}
+            </ElTag>
           </div>
           <div class="provider-switch">
-            <span class="switch-label">启用登录</span>
+            <span class="switch-label">{{ $t('orbien.settings.oauth.enableLogin') }}</span>
             <ElTooltip
               :disabled="canToggle(item)"
-              content="请先保存 Client ID 与 Client Secret"
+              :content="$t('orbien.settings.oauth.saveCredentialsFirst')"
               placement="top"
             >
               <span>
@@ -37,19 +41,19 @@
 
         <ElForm class="provider-form" label-position="top" @submit.prevent>
           <div class="form-grid">
-            <ElFormItem label="Client ID" required>
+            <ElFormItem :label="$t('orbien.settings.oauth.clientId')" required>
               <ElInput
                 v-model="forms[item.provider].clientId"
-                placeholder="OAuth Client ID"
+                :placeholder="$t('orbien.settings.oauth.clientIdPlaceholder')"
                 clearable
               />
             </ElFormItem>
             <ElFormItem>
               <template #label>
                 <span class="secret-label">
-                  Client Secret
+                  {{ $t('orbien.settings.oauth.clientSecret') }}
                   <ElTag v-if="item.secretConfigured" size="small" type="success" effect="plain">
-                    已配置
+                    {{ $t('orbien.settings.oauth.configured') }}
                   </ElTag>
                 </span>
               </template>
@@ -57,16 +61,22 @@
                 v-model="forms[item.provider].clientSecret"
                 type="password"
                 show-password
-                :placeholder="item.secretConfigured ? '留空保留已有密钥' : 'OAuth Client Secret'"
+                :placeholder="
+                  item.secretConfigured
+                    ? $t('orbien.settings.oauth.secretPlaceholderKeep')
+                    : $t('orbien.settings.oauth.secretPlaceholder')
+                "
                 clearable
               />
             </ElFormItem>
           </div>
 
-          <ElFormItem label="回调地址">
+          <ElFormItem :label="$t('orbien.settings.oauth.callbackUrl')">
             <div class="callback-row">
               <ElInput :model-value="item.callbackUrl" readonly />
-              <ElButton @click="copyText(item.callbackUrl)">复制</ElButton>
+              <ElButton @click="copyText(item.callbackUrl)">
+                {{ $t('orbien.settings.oauth.copy') }}
+              </ElButton>
             </div>
           </ElFormItem>
 
@@ -76,7 +86,7 @@
               :loading="savingProvider === item.provider"
               @click="saveCredentials(item.provider)"
             >
-              保存配置
+              {{ $t('orbien.settings.oauth.saveConfig') }}
             </ElButton>
           </div>
         </ElForm>
@@ -87,6 +97,7 @@
 
 <script setup lang="ts">
   import { onMounted, reactive, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage } from 'element-plus'
   import {
     fetchOAuthProviderConfigs,
@@ -97,6 +108,8 @@
 
   defineOptions({ name: 'OAuthPanel' })
 
+  const { t } = useI18n()
+
   const loading = ref(false)
   const savingProvider = ref('')
   const togglingProvider = ref('')
@@ -104,7 +117,6 @@
   const forms = reactive<Record<string, { clientId: string; clientSecret: string }>>({})
 
   const canToggle = (item: Api.OAuth.ProviderConfig) => {
-    // 关闭始终允许；开启须已具备完整凭证
     return item.enabled || (!!item.clientId && item.secretConfigured)
   }
 
@@ -137,11 +149,11 @@
     const form = forms[provider]
     const item = providers.value.find((p) => p.provider === provider)
     if (!form.clientId?.trim()) {
-      ElMessage.warning('请填写 Client ID')
+      ElMessage.warning(t('orbien.settings.oauth.fillClientId'))
       return
     }
     if (!form.clientSecret?.trim() && !item?.secretConfigured) {
-      ElMessage.warning('请填写 Client Secret')
+      ElMessage.warning(t('orbien.settings.oauth.fillClientSecret'))
       return
     }
 
@@ -152,7 +164,7 @@
         clientSecret: form.clientSecret?.trim() || undefined
       })
       applyProvider(saved)
-      ElMessage.success('配置已保存')
+      ElMessage.success(t('orbien.settings.oauth.configSaved'))
     } finally {
       savingProvider.value = ''
     }
@@ -163,9 +175,10 @@
     try {
       const saved = await fetchUpdateOAuthProviderEnabled(provider, { enabled })
       applyProvider(saved)
-      ElMessage.success(enabled ? '登录已启用' : '登录已关闭')
+      ElMessage.success(
+        enabled ? t('orbien.settings.oauth.loginEnabled') : t('orbien.settings.oauth.loginDisabled')
+      )
     } catch {
-      // 请求失败时重新同步，避免开关与服务端状态不一致
       await loadProviders()
     } finally {
       togglingProvider.value = ''
@@ -175,9 +188,9 @@
   const copyText = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
-      ElMessage.success('已复制')
+      ElMessage.success(t('orbien.settings.oauth.copied'))
     } catch {
-      ElMessage.error('复制失败')
+      ElMessage.error(t('orbien.settings.oauth.copyFailed'))
     }
   }
 

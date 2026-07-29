@@ -3,7 +3,7 @@
     <div v-for="(row, index) in rows" :key="row.rowKey" class="subdomain-row">
       <ElInput
         :model-value="row.prefix"
-        placeholder="前缀"
+        :placeholder="t('orbien.proxy.prefix')"
         clearable
         :validate-event="false"
         :class="['subdomain-row__prefix', { 'subdomain-row__prefix--error': isPrefixError(index) }]"
@@ -11,7 +11,7 @@
       />
       <ElSelect
         :model-value="row.rootDomainId"
-        placeholder="根域名"
+        :placeholder="t('orbien.proxy.rootDomain')"
         :loading="loading"
         filterable
         :validate-event="false"
@@ -21,8 +21,8 @@
         <ElOption v-for="item in rootDomains" :key="item.id" :label="item.domain" :value="item.id" />
       </ElSelect>
       <div class="subdomain-row__actions">
-        <ElButton v-if="index > 0" link @click="removeRow(index)">删除</ElButton>
-        <ElButton v-if="index === rows.length - 1" link type="primary" @click="addRow">添加</ElButton>
+        <ElButton v-if="index > 0" link @click="removeRow(index)">{{ t('common.delete') }}</ElButton>
+        <ElButton v-if="index === rows.length - 1" link type="primary" @click="addRow">{{ t('common.add') }}</ElButton>
       </div>
     </div>
   </div>
@@ -30,11 +30,14 @@
 
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import {
     normalizeRootDomainId
   } from '@/views/orbien/proxy/shared/use-root-domain-options'
 
   defineOptions({ name: 'SubdomainBindingRows' })
+
+  const { t } = useI18n()
 
   interface SubdomainBindingRow extends Api.Proxy.SubdomainBindingParam {
     rowKey: number

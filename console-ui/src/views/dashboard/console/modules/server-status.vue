@@ -35,7 +35,10 @@
         <div class="absolute left-5 bottom-5">
           <div class="text-sm mb-1 status-label">{{ item.label }}</div>
           <div class="font-bold mb-1 status-value">
-            <span :class="{ 'value-primary': item.label === 'CPU' }" :style="item.label === 'CPU' ? {} : { color: item.color }">{{
+            <span
+              :class="{ 'value-primary': item.key === 'cpu' }"
+              :style="item.key === 'cpu' ? {} : { color: item.color }"
+            >{{
               item.usedValue || item.value
             }}</span>
             <span v-if="item.totalValue" class="status-total"> / {{ item.totalValue }}</span>
@@ -49,6 +52,7 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElRow, ElCol } from 'element-plus'
   import ArtRingChart from '@/components/core/charts/art-ring-chart/index.vue'
   import { fetchGetServerInfo } from '@/api/monitor'
@@ -56,55 +60,53 @@
 
   defineOptions({ name: 'ServerStatusCards' })
 
+  const { t } = useI18n()
   const settingStore = useSettingStore()
   const serverInfo = ref<Api.Monitor.ServerInfo | null>(null)
+
+  const emptyRingData = [
+    { value: 0, name: 'used' },
+    { value: 100, name: 'total' }
+  ]
 
   const statusData = computed(() => {
     if (!serverInfo.value) {
       return [
         {
-          label: 'CPU',
+          key: 'cpu',
+          label: t('dashboard.status.cpu'),
           value: '--',
           percentage: 0,
           desc: '--',
           color: '#67C23A',
-          ringData: [
-            { value: 0, name: 'used' },
-            { value: 100, name: 'total' }
-          ]
+          ringData: emptyRingData
         },
         {
-          label: '堆内存',
+          key: 'heap',
+          label: t('dashboard.status.heap'),
           value: '--',
           percentage: 0,
           desc: '--',
           color: '#67C23A',
-          ringData: [
-            { value: 0, name: 'used' },
-            { value: 100, name: 'total' }
-          ]
+          ringData: emptyRingData
         },
         {
-          label: '直接内存',
+          key: 'direct',
+          label: t('dashboard.status.direct'),
           value: '--',
           percentage: 0,
           desc: '--',
           color: '#67C23A',
-          ringData: [
-            { value: 0, name: 'used' },
-            { value: 100, name: 'total' }
-          ]
+          ringData: emptyRingData
         },
         {
-          label: '物理内存',
+          key: 'physical',
+          label: t('dashboard.status.physical'),
           value: '--',
           percentage: 0,
           desc: '--',
           color: '#67C23A',
-          ringData: [
-            { value: 0, name: 'used' },
-            { value: 100, name: 'total' }
-          ]
+          ringData: emptyRingData
         }
       ]
     }
@@ -122,8 +124,9 @@
 
     return [
       {
-        label: 'CPU',
-        value: `${serverInfo.value.cpu?.total || 0}核心`,
+        key: 'cpu',
+        label: t('dashboard.status.cpu'),
+        value: t('dashboard.status.cpuCores', { n: serverInfo.value.cpu?.total || 0 }),
         percentage: cpuUsage,
         desc: '',
         color: getColor(cpuUsage),
@@ -133,7 +136,8 @@
         ]
       },
       {
-        label: '堆内存',
+        key: 'heap',
+        label: t('dashboard.status.heap'),
         value: '',
         usedValue: serverInfo.value.jvmMem?.used || '0MB',
         totalValue: serverInfo.value.jvmMem?.total || '0MB',
@@ -146,7 +150,8 @@
         ]
       },
       {
-        label: '直接内存',
+        key: 'direct',
+        label: t('dashboard.status.direct'),
         value: '',
         usedValue: serverInfo.value.directMem?.used || '0MB',
         totalValue: serverInfo.value.directMem?.total || '0MB',
@@ -159,7 +164,8 @@
         ]
       },
       {
-        label: '物理内存',
+        key: 'physical',
+        label: t('dashboard.status.physical'),
         value: '',
         usedValue: serverInfo.value.osMem?.used || '0MB',
         totalValue: serverInfo.value.osMem?.total || '0MB',

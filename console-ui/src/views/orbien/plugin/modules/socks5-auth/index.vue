@@ -1,45 +1,45 @@
 <template>
   <div class="socks5-auth-page">
     <div class="mb-6">
-      <h3 class="text-lg font-semibold mb-4">基本配置</h3>
+      <h3 class="text-lg font-semibold mb-4">{{ t('orbien.plugin.basic.title') }}</h3>
       <div class="flex flex-col gap-4">
         <div class="flex items-center gap-3">
-          <span class="w-20 font-medium">启用状态：</span>
+          <span class="w-20 font-medium">{{ t('orbien.plugin.basic.enabled') }}：</span>
           <ElSwitch v-model="formData.enabled" @change="handleEnableChange"/>
         </div>
       </div>
     </div>
 
     <div>
-      <h3 class="text-lg font-semibold mb-4">用户列表</h3>
+      <h3 class="text-lg font-semibold mb-4">{{ t('orbien.plugin.socks5Auth.userList') }}</h3>
       <div class="border border-gray-200 rounded p-4">
         <ElTable :data="formData.users" style="width: 100%" border>
-          <ElTableColumn prop="username" label="用户名" width="200">
+          <ElTableColumn prop="username" :label="t('orbien.plugin.socks5Auth.username')" width="200">
             <template #default="scope">
               <ElInput
                   v-if="editingUserId === scope.row.id"
                   v-model="scope.row.username"
                   size="small"
-                  placeholder="请输入用户名"
+                  :placeholder="t('orbien.plugin.socks5Auth.usernamePlaceholder')"
                   style="width: 100%"
               />
               <span v-else>{{ scope.row.username }}</span>
             </template>
           </ElTableColumn>
-          <ElTableColumn prop="password" label="密码" width="200">
+          <ElTableColumn prop="password" :label="t('orbien.plugin.socks5Auth.password')" width="200">
             <template #default="scope">
               <ElInput
                   v-if="editingUserId === scope.row.id"
                   v-model="scope.row.password"
                   size="small"
-                  placeholder="请输入密码"
+                  :placeholder="t('orbien.plugin.socks5Auth.passwordPlaceholder')"
                   type="password"
                   style="width: 100%"
               />
               <span v-else>{{ '••••••••' }}</span>
             </template>
           </ElTableColumn>
-          <ElTableColumn label="操作" width="200" fixed="right">
+          <ElTableColumn :label="t('common.actions')" width="200" fixed="right">
             <template #default="scope">
               <ElSpace size="small">
                 <ElButton
@@ -48,16 +48,16 @@
                     size="small"
                     @click="handleSaveUser(scope.row)"
                 >
-                  保存
+                  {{ t('common.save') }}
                 </ElButton>
                 <ElButton v-else type="link" size="small" @click="handleEditUser(scope.row)">
-                  编辑
+                  {{ t('common.edit') }}
                 </ElButton>
                 <ElButton type="link" size="small" @click="handleDeleteUser(scope.row.id)">
                   <template #icon>
                     <Delete/>
                   </template>
-                  删除
+                  {{ t('common.delete') }}
                 </ElButton>
               </ElSpace>
             </template>
@@ -67,7 +67,7 @@
           <template #icon>
             <Plus/>
           </template>
-          新增用户
+          {{ t('orbien.plugin.actions.addUser') }}
         </ElButton>
       </div>
     </div>
@@ -76,6 +76,7 @@
 
 <script setup lang="ts">
 import {ref, reactive, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {Plus, Delete} from '@element-plus/icons-vue'
 import {
@@ -87,6 +88,8 @@ import {
 } from '@/api/socks5-auth'
 
 defineOptions({name: 'Socks5AuthPage'})
+
+const {t} = useI18n()
 
 const props = defineProps<{
   proxyId: string
@@ -155,11 +158,11 @@ const handleEditUser = (user: any) => {
 
 const handleSaveUser = async (user: any) => {
   if (!user.username) {
-    ElMessage.error('请输入用户名')
+    ElMessage.error(t('orbien.plugin.socks5Auth.usernameRequired'))
     return
   }
   if (!user.password) {
-    ElMessage.error('请输入密码')
+    ElMessage.error(t('orbien.plugin.socks5Auth.passwordRequired'))
     return
   }
 
@@ -183,9 +186,9 @@ const handleSaveUser = async (user: any) => {
 }
 
 const handleDeleteUser = async (id: number) => {
-  await ElMessageBox.confirm('确定要删除此用户吗？', '警告', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  await ElMessageBox.confirm(t('orbien.plugin.deleteConfirm.user'), t('common.warning'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     type: 'warning'
   })
 

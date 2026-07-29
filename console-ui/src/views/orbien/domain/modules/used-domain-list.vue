@@ -13,6 +13,7 @@
 
 <script setup lang="ts">
 import {h} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {useRouter} from 'vue-router'
 import {ElTag} from 'element-plus'
 import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
@@ -22,6 +23,8 @@ import {fetchGetUsedDomainListByPage} from '@/api/domain'
 import {resolveProxyListRoute} from '@/views/orbien/proxy/shared/resolve-proxy-list-route'
 
 defineOptions({name: 'UsedDomainList'})
+
+const { t } = useI18n()
 
 const emit = defineEmits<{ change: [] }>()
 const router = useRouter()
@@ -61,11 +64,11 @@ const {
     columnsFactory: () => [
       {
         prop: 'fullDomain',
-        label: '完整域名'
+        label: t('orbien.common.fullDomain')
       },
       {
         prop: 'domainType',
-        label: '域名类型',
+        label: t('orbien.common.domainType'),
         formatter: (row: UsedDomainItem) => {
           const config = getDomainTypeLabel(row.domainType)
           return h(ElTag, {type: config.type, size: 'small'}, () => config.text)
@@ -73,12 +76,12 @@ const {
       },
       {
         prop: 'proxyName',
-        label: '关联代理',
+        label: t('orbien.common.linkedProxy'),
         formatter: (row: UsedDomainItem) => renderProxyLink(row)
       },
       {
         prop: 'rootDomain',
-        label: '根域名',
+        label: t('orbien.common.rootDomain'),
         formatter: (row: UsedDomainItem) => row.rootDomain || ''
       }
     ]

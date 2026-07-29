@@ -9,20 +9,20 @@
   >
     <div v-loading="loading" class="cert-bind-dialog">
       <section class="bind-section">
-        <div class="bind-section__title">绑定域名</div>
+        <div class="bind-section__title">{{ t('orbien.plugin.tls.bindDomains') }}</div>
         <div class="domain-tags">
           <ElTag v-for="item in domains" :key="item.proxyDomainId" type="info" effect="plain">
             {{ item.fullDomain }}
           </ElTag>
         </div>
         <div v-if="overrideCount" class="bind-hint text-warning">
-          {{ overrideCount }} 个域名已有证书，确认后将覆盖
+          {{ t('orbien.plugin.tls.overrideHint', { count: overrideCount }) }}
         </div>
       </section>
 
       <section class="bind-section">
-        <div class="bind-section__title">选择证书</div>
-        <ElEmpty v-if="!loading && !matchedCerts.length" description="暂无覆盖所选域名的证书"/>
+        <div class="bind-section__title">{{ t('orbien.plugin.tls.selectCert') }}</div>
+        <ElEmpty v-if="!loading && !matchedCerts.length" :description="t('orbien.plugin.tls.noMatchingCert')"/>
         <ElRadioGroup v-else v-model="selectedCertId" class="cert-picker">
           <label
               v-for="cert in matchedCerts"
@@ -35,15 +35,15 @@
               <div class="cert-card__header">
                 <span class="cert-card__san">{{ cert.sanDomains?.join(', ') }}</span>
                 <ElTag size="small" :type="cert.source === 2 ? 'primary' : 'warning'" effect="plain">
-                  {{ cert.source === 2 ? 'ACME' : '手动' }}
+                  {{ cert.source === 2 ? t('orbien.plugin.tls.certSource.acme') : t('orbien.plugin.tls.certSource.manual') }}
                 </ElTag>
               </div>
               <div class="cert-card__meta">
-                <span>{{ cert.issuer || '未知颁发者' }}</span>
-                <span>到期 {{ formatDate(cert.notAfter) }}</span>
+                <span>{{ cert.issuer || t('orbien.plugin.tls.unknownIssuer') }}</span>
+                <span>{{ t('orbien.plugin.tls.expiresAt', { date: formatDate(cert.notAfter) }) }}</span>
               </div>
               <div v-if="cert.boundDomainCount" class="cert-card__usage">
-                已用于 {{ cert.boundDomainCount }} 个域名
+                {{ t('orbien.plugin.tls.usedByDomains', { count: cert.boundDomainCount }) }}
               </div>
             </div>
           </label>
@@ -52,9 +52,9 @@
     </div>
 
     <template #footer>
-      <ElButton @click="dialogVisible = false">取消</ElButton>
+      <ElButton @click="dialogVisible = false">{{ t('common.cancel') }}</ElButton>
       <ElButton type="primary" :disabled="!selectedCertId" :loading="submitting" @click="handleSubmit">
-        确认绑定
+        {{ t('orbien.plugin.tls.confirmBind') }}
       </ElButton>
     </template>
   </ElDialog>
@@ -62,11 +62,14 @@
 
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {fetchBindCert} from '@/api/cert-binding'
 import {fetchGetCertListByPage} from '@/api/tls'
 
 defineOptions({name: 'PluginCertBindDialog'})
+
+const {t} = useI18n()
 
 const props = defineProps<{
   visible: boolean
@@ -89,7 +92,9 @@ const allCerts = ref<Api.Tls.CertDTO[]>([])
 const selectedCertId = ref('')
 
 const dialogTitle = computed(() =>
-    props.domains.length > 1 ? `批量绑定证书（${props.domains.length} 个域名）` : '绑定证书'
+    props.domains.length > 1
+        ? t('orbien.plugin.tls.batchBindTitle', { count: props.domains.length })
+        : t('orbien.plugin.tls.bindCert')
 )
 
 const overrideCount = computed(
@@ -161,9 +166,11 @@ watch(matchedCerts, () => {
 const handleSubmit = async () => {
   if (!selectedCertId.value || !props.domains.length) return
   if (overrideCount.value > 0) {
-    await ElMessageBox.confirm('部分域名已有绑定，继续将覆盖原有证书，是否继续？', '绑定确认', {
-      type: 'warning'
-    })
+    await ElMessageBox.confirm(
+        t('orbien.plugin.tls.overrideConfirm'),
+        t('orbien.plugin.tls.bindConfirmTitle'),
+        { type: 'warning' }
+    )
   }
   submitting.value = true
   try {
@@ -173,9 +180,9 @@ const handleSubmit = async () => {
       override: true
     })
     if (result.failedCount > 0) {
-      ElMessage.warning(`绑定完成：成功 ${result.successCount} 个，失败 ${result.failedCount} 个`)
+      ElMessage.warning(t('orbien.plugin.tls.bindResult', { success: result.successCount, failed: result.failedCount }))
     } else {
-      ElMessage.success(`已成功绑定 ${result.successCount} 个域名`)
+      ElMessage.success(t('orbien.plugin.tls.bindSuccessCount', { count: result.successCount }))
     }
     dialogVisible.value = false
     emit('success')

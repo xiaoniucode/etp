@@ -1,7 +1,7 @@
 <template>
   <div class="acme-wizard domain-step">
     <section class="section-block">
-      <div class="section-title">证书品牌</div>
+      <div class="section-title">{{ $t('orbien.tls.acme.section.certBrand') }}</div>
       <ElRadioGroup :model-value="certBrand" @update:model-value="emit('update:certBrand', $event)">
         <ElRadio v-for="item in certBrandOptions" :key="item.value" :value="item.value">
           {{ item.label }}
@@ -10,12 +10,12 @@
     </section>
 
     <section class="section-block">
-      <div class="section-title">HTTPS / 文件共享</div>
+      <div class="section-title">{{ $t('orbien.tls.acme.section.httpsProxy') }}</div>
       <ElSelect
           :model-value="selectedProxyId"
           filterable
           clearable
-          placeholder="选择要申请证书的代理"
+          :placeholder="$t('orbien.tls.acme.section.selectProxy')"
           style="width: 100%"
           :loading="proxyLoading"
           @update:model-value="handleProxyChange"
@@ -28,26 +28,26 @@
         >
           <div class="proxy-option">
             <span class="proxy-option__name">{{ item.name }}</span>
-            <span class="proxy-option__meta">{{ item.agentName }} · {{ item.domainCount }} 个域名</span>
+            <span class="proxy-option__meta">{{ item.agentName }} · {{ $t('orbien.tls.acme.proxy.domainCount', { n: item.domainCount }) }}</span>
           </div>
         </ElOption>
       </ElSelect>
 
       <div v-if="selectedProxy" class="proxy-summary">
         <ElTag size="small" :type="selectedProxy.status === ProxyStatus.OPEN ? 'success' : 'info'">
-          {{ selectedProxy.status === ProxyStatus.OPEN ? '已启用' : '已停用' }}
+          {{ selectedProxy.status === ProxyStatus.OPEN ? $t('orbien.tls.acme.proxy.enabled') : $t('orbien.tls.acme.proxy.disabled') }}
         </ElTag>
         <span v-if="selectedProxy.domainPreview.length" class="proxy-summary__domains">
           {{ selectedProxy.domainPreview.join('、') }}
           <template v-if="selectedProxy.domainCount > selectedProxy.domainPreview.length">
-            等 {{ selectedProxy.domainCount }} 个
+            {{ $t('orbien.tls.acme.proxy.andMore', { n: selectedProxy.domainCount }) }}
           </template>
         </span>
       </div>
     </section>
 
     <section v-if="selectedProxyId" class="section-block">
-      <div class="section-title">选择域名</div>
+      <div class="section-title">{{ $t('orbien.tls.acme.section.selectDomain') }}</div>
       <AcmeDomainSelectTable
           v-model="selectedDomainsModel"
           :loading="domainLoading"
@@ -66,6 +66,7 @@
 
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {fetchAcmeHttpsProxyDomains, fetchAcmeHttpsProxyOptions} from '@/api/acme-order'
 import {ProxyStatus} from '@/enums/orbien/business'
 import {certBrandOptions} from './types'
@@ -74,6 +75,8 @@ import AcmeDomainSelectTable from './acme-domain-select-table.vue'
 import AcmeApplyDomainSummary from './acme-apply-domain-summary.vue'
 
 defineOptions({name: 'AcmeApplyStepDomainGlobal'})
+
+const {t} = useI18n()
 
 const props = defineProps<{
   visible: boolean
@@ -105,7 +108,11 @@ const selectedDomainsModel = computed({
 })
 
 const formatProxyLabel = (item: Api.AcmeOrder.HttpsProxyOption) =>
-    `${item.name}（${item.agentName} · ${item.domainCount} 个域名）`
+    t('orbien.tls.acme.proxy.label', {
+      name: item.name,
+      agentName: item.agentName,
+      n: item.domainCount
+    })
 
 const resolveDefaultProxy = (options: Api.AcmeOrder.HttpsProxyOption[]) => {
   if (!options.length) return undefined

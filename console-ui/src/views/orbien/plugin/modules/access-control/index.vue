@@ -1,50 +1,50 @@
 <template>
   <div class="access-control-page">
     <div class="mb-6">
-      <h3 class="text-lg font-semibold mb-4">基本配置</h3>
+      <h3 class="text-lg font-semibold mb-4">{{ t('orbien.plugin.basic.title') }}</h3>
       <div class="flex flex-col gap-4">
         <div class="flex items-center gap-3">
-          <span class="w-20 font-medium">启用状态：</span>
+          <span class="w-20 font-medium">{{ t('orbien.plugin.basic.enabled') }}：</span>
           <ElSwitch v-model="formData.enabled" @change="handleEnableChange" />
         </div>
         <div class="flex items-center gap-3">
-          <span class="w-20 font-medium">控制模式：</span>
+          <span class="w-20 font-medium">{{ t('orbien.plugin.basic.controlMode') }}：</span>
           <ElRadioGroup v-model="formData.mode" @change="handleModeChange">
-            <ElRadio :label="AccessControl.ALLOW">白名单（只允许指定IP访问）</ElRadio>
-            <ElRadio :label="AccessControl.DENY">黑名单（禁止指定IP访问）</ElRadio>
+            <ElRadio :label="AccessControl.ALLOW">{{ t('orbien.plugin.access.allowWhitelist') }}</ElRadio>
+            <ElRadio :label="AccessControl.DENY">{{ t('orbien.plugin.access.denyBlacklist') }}</ElRadio>
           </ElRadioGroup>
         </div>
       </div>
     </div>
 
     <div>
-      <h3 class="text-lg font-semibold mb-4">访问规则</h3>
+      <h3 class="text-lg font-semibold mb-4">{{ t('orbien.plugin.access.rulesTitle') }}</h3>
       <div class="border border-gray-200 rounded p-4">
         <ElTable :data="formData.rules" style="width: 100%" border>
-          <ElTableColumn prop="cidr" label="IP地址段 (例如：192.168.1.0/24)" width="300">
+          <ElTableColumn prop="cidr" :label="t('orbien.plugin.access.cidrColumn')" width="300">
             <template #default="scope">
               <ElInput
                 v-if="editingRuleId === scope.row.id"
                 v-model="scope.row.cidr"
                 size="small"
-                placeholder="请输入IP地址段，例如：192.168.1.0/24"
+                :placeholder="t('orbien.plugin.access.cidrPlaceholder')"
                 style="width: 100%"
               />
               <span v-else>{{ scope.row.cidr }}</span>
             </template>
           </ElTableColumn>
-          <ElTableColumn prop="ruleType" label="规则类型" width="150">
+          <ElTableColumn prop="ruleType" :label="t('orbien.plugin.access.ruleType')" width="150">
             <template #default="scope">
               <ElRadioGroup v-if="editingRuleId === scope.row.id" v-model="scope.row.ruleType" size="small">
-                <ElRadio :label="AccessControl.ALLOW">放行</ElRadio>
-                <ElRadio :label="AccessControl.DENY">禁止</ElRadio>
+                <ElRadio :label="AccessControl.ALLOW">{{ t('orbien.plugin.access.allow') }}</ElRadio>
+                <ElRadio :label="AccessControl.DENY">{{ t('orbien.plugin.access.deny') }}</ElRadio>
               </ElRadioGroup>
               <ElTag v-else size="small" :type="scope.row.ruleType === AccessControl.ALLOW ? 'primary' : 'danger'">
-                {{ scope.row.ruleType === AccessControl.ALLOW ? '放行' : '禁止' }}
+                {{ scope.row.ruleType === AccessControl.ALLOW ? t('orbien.plugin.access.allow') : t('orbien.plugin.access.deny') }}
               </ElTag>
             </template>
           </ElTableColumn>
-          <ElTableColumn label="操作" width="240" fixed="right">
+          <ElTableColumn :label="t('common.actions')" width="240" fixed="right">
             <template #default="scope">
               <ElSpace size="small">
                 <ElButton
@@ -53,16 +53,16 @@
                   size="small"
                   @click="handleSaveRule(scope.row)"
                 >
-                  保存
+                  {{ t('common.save') }}
                 </ElButton>
                 <ElButton v-else type="link" size="small" @click="handleEditRule(scope.row)">
-                  编辑
+                  {{ t('common.edit') }}
                 </ElButton>
                 <ElButton type="link" size="small" @click="handleDeleteRule(scope.row.id)">
                   <template #icon>
                     <Delete />
                   </template>
-                  删除
+                  {{ t('common.delete') }}
                 </ElButton>
               </ElSpace>
             </template>
@@ -72,7 +72,7 @@
           <template #icon>
             <Plus />
           </template>
-          新增规则
+          {{ t('orbien.plugin.actions.addRule') }}
         </ElButton>
       </div>
     </div>
@@ -81,6 +81,7 @@
 
 <script setup lang="ts">
   import { ref, reactive, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import { Plus, Delete } from '@element-plus/icons-vue'
   import {
@@ -93,6 +94,8 @@
   import { AccessControl } from '@/enums/orbien/business'
 
   defineOptions({ name: 'AccessControlPage' })
+
+  const { t } = useI18n()
 
   const props = defineProps<{
     proxyId: string
@@ -173,7 +176,7 @@
 
   const handleSaveRule = async (rule: any) => {
     if (!rule.cidr) {
-      ElMessage.error('请输入IP地址段')
+      ElMessage.error(t('orbien.plugin.access.cidrRequired'))
       return
     }
 
@@ -196,9 +199,9 @@
   }
 
   const handleDeleteRule = async (id: number) => {
-    await ElMessageBox.confirm('确定要删除此规则吗？', '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('orbien.plugin.deleteConfirm.rule'), t('common.warning'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
 

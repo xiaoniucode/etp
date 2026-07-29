@@ -1,7 +1,7 @@
 <template>
   <ElDialog
       v-model="dialogVisible"
-      :title="dialogType === 'add' ? '添加文件共享' : '编辑文件共享'"
+      :title="dialogType === 'add' ? t('orbien.fileShare.add') : t('orbien.fileShare.edit')"
       width="720px"
       align-center
   >
@@ -12,10 +12,10 @@
         label-width="120px"
         :show-message="false"
     >
-      <ElFormItem label="客户端" prop="agentId">
+      <ElFormItem :label="t('orbien.proxy.client')" prop="agentId">
         <ElSelect
             v-model="formData.agentId"
-            placeholder="请选择客户端"
+            :placeholder="t('orbien.proxy.selectClient')"
             :disabled="dialogType === 'edit'"
             style="width: 250px"
         >
@@ -28,19 +28,19 @@
         </ElSelect>
       </ElFormItem>
 
-      <ElFormItem label="代理名称" prop="name">
-        <ElInput v-model="formData.name" placeholder="请输入代理名称" clearable/>
+      <ElFormItem :label="t('orbien.proxy.name')" prop="name">
+        <ElInput v-model="formData.name" :placeholder="t('orbien.proxy.enterName')" clearable/>
       </ElFormItem>
 
-      <ElFormItem label="根目录" prop="rootPath">
-        <ElInput v-model="formData.rootPath" placeholder="如 /data/share" clearable/>
+      <ElFormItem :label="t('orbien.proxy.rootDir')" prop="rootPath">
+        <ElInput v-model="formData.rootPath" :placeholder="t('orbien.proxy.rootDirPlaceholder')" clearable/>
       </ElFormItem>
 
-      <ElFormItem label="域名类型" prop="domainType">
+      <ElFormItem :label="t('orbien.proxy.domainType')" prop="domainType">
         <ElRadioGroup v-model="formData.domainType">
-          <ElRadio :label="String(DomainType.AUTO)">自动</ElRadio>
-          <ElRadio :label="String(DomainType.SUBDOMAIN)">子域名</ElRadio>
-          <ElRadio :label="String(DomainType.CUSTOM_DOMAIN)">自定义域名</ElRadio>
+          <ElRadio :label="String(DomainType.AUTO)">{{ t('orbien.proxy.auto') }}</ElRadio>
+          <ElRadio :label="String(DomainType.SUBDOMAIN)">{{ t('orbien.proxy.subdomain') }}</ElRadio>
+          <ElRadio :label="String(DomainType.CUSTOM_DOMAIN)">{{ t('orbien.proxy.customDomain') }}</ElRadio>
         </ElRadioGroup>
       </ElFormItem>
 
@@ -56,46 +56,46 @@
 
       <ElFormItem
           v-if="formData.domainType === String(DomainType.CUSTOM_DOMAIN)"
-          label="自定义域名"
+          :label="t('orbien.proxy.customDomain')"
           prop="customDomains"
       >
         <ElInput
             v-model="formData.customDomains"
             type="textarea"
             :rows="3"
-            placeholder="请输入完整域名，多个用换行分隔，如 files.example.com"
+            :placeholder="t('orbien.proxy.customDomainPlaceholderFileShare')"
         />
       </ElFormItem>
 
-      <ElFormItem label="启用认证">
+      <ElFormItem :label="t('orbien.proxy.authEnabled')">
         <div class="auth-switch-row">
           <ElSwitch v-model="formData.authEnabled"/>
-          <span class="auth-switch-tip">开启后访问文件共享需要用户名和密码</span>
+          <span class="auth-switch-tip">{{ t('orbien.proxy.authTipFileShare') }}</span>
         </div>
       </ElFormItem>
 
       <template v-if="formData.authEnabled">
-        <ElFormItem label="认证用户" required>
+        <ElFormItem :label="t('orbien.proxy.authUsers')" required>
           <div class="auth-users-panel">
-            <ElTable :data="authUsers" border size="small" empty-text="请至少添加一个认证用户">
-              <ElTableColumn prop="username" label="用户名" min-width="140">
+            <ElTable :data="authUsers" border size="small" :empty-text="t('orbien.proxy.authUserRequired')">
+              <ElTableColumn prop="username" :label="t('orbien.proxy.username')" min-width="140">
                 <template #default="{ row }">
-                  <ElInput v-model="row.username" size="small" placeholder="用户名" clearable/>
+                  <ElInput v-model="row.username" size="small" :placeholder="t('orbien.proxy.username')" clearable/>
                 </template>
               </ElTableColumn>
-              <ElTableColumn prop="password" label="密码" min-width="140">
+              <ElTableColumn prop="password" :label="t('orbien.proxy.password')" min-width="140">
                 <template #default="{ row }">
                   <ElInput
                       v-model="row.password"
                       size="small"
-                      :placeholder="row.id ? '留空则不修改' : '请输入密码'"
+                      :placeholder="row.id ? t('orbien.proxy.leaveBlank') : t('orbien.proxy.enterPassword')"
                       type="password"
                       show-password
                       clearable
                   />
                 </template>
               </ElTableColumn>
-              <ElTableColumn prop="permission" label="权限" width="120">
+              <ElTableColumn prop="permission" :label="t('orbien.proxy.permissions')" width="120">
                 <template #default="{ row }">
                   <ElSelect v-model="row.permission" size="small" style="width: 100%">
                     <ElOption
@@ -107,7 +107,7 @@
                   </ElSelect>
                 </template>
               </ElTableColumn>
-              <ElTableColumn label="操作" width="80" fixed="right">
+              <ElTableColumn :label="t('common.actions')" width="80" fixed="right">
                 <template #default="{ $index }">
                   <ElButton
                       link
@@ -116,24 +116,24 @@
                       :disabled="authUsers.length <= 1"
                       @click="authUsers.splice($index, 1)"
                   >
-                    删除
+                    {{ t('common.delete') }}
                   </ElButton>
                 </template>
               </ElTableColumn>
             </ElTable>
             <ElButton type="primary" plain size="small" class="add-user-btn" @click="authUsers.push(emptyAuthUser())">
-              添加用户
+              {{ t('orbien.proxy.addUser') }}
             </ElButton>
           </div>
         </ElFormItem>
       </template>
 
-      <ElFormItem label="上传限制" prop="maxUploadSizeMb">
+      <ElFormItem :label="t('orbien.proxy.uploadLimit')" prop="maxUploadSizeMb">
         <ElInput
             v-model.number="formData.maxUploadSizeMb"
             type="number"
             :min="1"
-            placeholder="单文件最大上传大小"
+            :placeholder="t('orbien.proxy.maxUploadPlaceholder')"
             style="width: 200px"
         >
           <template #append>MB</template>
@@ -142,20 +142,20 @@
 
       <BandwidthLimitField v-model="formData.limitTotal"/>
 
-      <ElFormItem label="操作权限">
+      <ElFormItem :label="t('orbien.proxy.operationPermissions')">
         <ElSpace wrap>
-          <ElCheckbox v-model="formData.allowUpload">允许上传</ElCheckbox>
-          <ElCheckbox v-model="formData.allowDelete">允许删除</ElCheckbox>
-          <ElCheckbox v-model="formData.allowMkdir">允许创建目录</ElCheckbox>
-          <ElCheckbox v-model="formData.allowMove">允许移动</ElCheckbox>
-          <ElCheckbox v-model="formData.allowRename">允许重命名</ElCheckbox>
+          <ElCheckbox v-model="formData.allowUpload">{{ t('orbien.proxy.allowUpload') }}</ElCheckbox>
+          <ElCheckbox v-model="formData.allowDelete">{{ t('orbien.proxy.allowDelete') }}</ElCheckbox>
+          <ElCheckbox v-model="formData.allowMkdir">{{ t('orbien.proxy.allowMkdir') }}</ElCheckbox>
+          <ElCheckbox v-model="formData.allowMove">{{ t('orbien.proxy.allowMove') }}</ElCheckbox>
+          <ElCheckbox v-model="formData.allowRename">{{ t('orbien.proxy.allowRename') }}</ElCheckbox>
         </ElSpace>
       </ElFormItem>
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
-        <ElButton @click="dialogVisible = false">取消</ElButton>
-        <ElButton type="primary" @click="handleSubmit">提交</ElButton>
+        <ElButton @click="dialogVisible = false">{{ t('common.cancel') }}</ElButton>
+        <ElButton type="primary" @click="handleSubmit">{{ t('common.submit') }}</ElButton>
       </div>
     </template>
   </ElDialog>
@@ -163,6 +163,7 @@
 
 <script setup lang="ts">
 import {ref, reactive, watch, computed} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {ElMessage} from 'element-plus'
 import type {FormInstance, FormRules} from 'element-plus'
 import {DialogType} from '@/types'
@@ -184,6 +185,8 @@ import {
 } from '@/views/orbien/proxy/shared/bandwidth-limit'
 
 defineOptions({name: 'FileShareDialog'})
+
+const {t} = useI18n()
 
 const BYTES_PER_MB = 1024 * 1024
 const DEFAULT_MAX_UPLOAD_MB = 500
@@ -222,10 +225,10 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const permissionOptions = [
-  {label: '只读', value: 'read'},
-  {label: '读写', value: 'read_write'}
-] as const
+const permissionOptions = computed(() => [
+  {label: t('orbien.proxy.readonly'), value: 'read'},
+  {label: t('orbien.proxy.readwrite'), value: 'read_write'}
+] as const)
 
 const dialogVisible = computed({
   get: () => props.visible,
@@ -272,10 +275,10 @@ const isStaleSession = (session: number) => session !== openSession || !props.vi
 const emptyAuthUser = (): AuthUserForm => ({username: '', password: '', permission: 'read'})
 
 const rules = computed<FormRules>(() => ({
-  agentId: [{required: true, message: '请选择客户端', trigger: 'change'}],
-  name: [{required: true, message: '请输入代理名称', trigger: 'blur'}],
-  rootPath: [{required: true, message: '请输入根目录', trigger: 'blur'}],
-  domainType: [{required: true, message: '请选择域名类型', trigger: 'change'}],
+  agentId: [{required: true, message: t('orbien.proxy.selectClient'), trigger: 'change'}],
+  name: [{required: true, message: t('orbien.proxy.enterName'), trigger: 'blur'}],
+  rootPath: [{required: true, message: t('orbien.proxy.enterRootDir'), trigger: 'blur'}],
+  domainType: [{required: true, message: t('orbien.proxy.selectDomainType'), trigger: 'change'}],
   customDomains: [
     {
       validator: (_rule, value: string, callback) => {
@@ -284,7 +287,7 @@ const rules = computed<FormRules>(() => ({
           return
         }
         if (!value?.trim()) {
-          callback(new Error('请输入自定义域名'))
+          callback(new Error(t('orbien.proxy.enterCustomDomain')))
         } else {
           callback()
         }
@@ -293,8 +296,8 @@ const rules = computed<FormRules>(() => ({
     }
   ],
   maxUploadSizeMb: [
-    {required: true, message: '请输入上传限制', trigger: 'blur'},
-    {type: 'number', min: 1, message: '上传限制必须大于 0', trigger: 'blur'}
+    {required: true, message: t('orbien.proxy.enterUploadLimit'), trigger: 'blur'},
+    {type: 'number', min: 1, message: t('orbien.proxy.uploadLimitMin'), trigger: 'blur'}
   ],
   limitTotal: LIMIT_TOTAL_RULES
 }))
@@ -334,14 +337,14 @@ const validateAuthUsers = (): boolean => {
 
   const users = authUsers.value.filter((user) => user.username?.trim())
   if (users.length === 0) {
-    ElMessage.warning('启用认证时请至少添加一个用户')
+    ElMessage.warning(t('orbien.proxy.authUserMinOne'))
     return false
   }
 
   for (const user of users) {
     const needPassword = !user.id
     if (needPassword && !user.password?.trim()) {
-      ElMessage.warning('请填写用户名和密码')
+      ElMessage.warning(t('orbien.proxy.fillUsernamePassword'))
       return false
     }
   }
@@ -418,7 +421,7 @@ const loadEditForm = async (session: number, proxyId: string) => {
   } catch (error) {
     console.error('获取文件共享详情失败:', error)
     if (!isStaleSession(session)) {
-      ElMessage.error('获取文件共享详情失败，请稍后重试')
+      ElMessage.error(t('orbien.proxy.fetchFileShareDetailFail'))
     }
   }
 }
@@ -433,7 +436,7 @@ const openDialog = async () => {
     agents.value = await fetchGetAgentsForProxySelection(includeId) || []
   } catch (error) {
     console.error('获取客户端列表失败:', error)
-    ElMessage.error('获取客户端列表失败')
+    ElMessage.error(t('orbien.proxy.fetchClientFail'))
   }
   if (isStaleSession(session)) return
 

@@ -2,15 +2,15 @@
   <div class="tls-page art-full-height">
     <ElCard class="art-table-card tls-table-card">
       <ElTabs v-model="activeTab" class="tls-tabs" type="card">
-        <ElTabPane label="证书列表" name="certs">
+        <ElTabPane :label="$t('orbien.tls.tabs.certs')" name="certs">
           <div class="tab-panel-content">
             <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
               <template #left>
                 <ElSpace wrap>
-                  <ElButton type="primary" @click="wizardVisible = true" v-ripple>免费申请</ElButton>
-                  <ElButton v-ripple @click="handleAdd">上传证书</ElButton>
+                  <ElButton type="primary" @click="wizardVisible = true" v-ripple>{{ $t('orbien.tls.actions.applyFree') }}</ElButton>
+                  <ElButton v-ripple @click="handleAdd">{{ $t('orbien.tls.actions.upload') }}</ElButton>
                   <ElButton @click="handleBatchDelete" v-ripple :disabled="selectedRows.length === 0">
-                    批量删除
+                    {{ $t('common.batchDelete') }}
                   </ElButton>
                 </ElSpace>
               </template>
@@ -28,13 +28,13 @@
           </div>
         </ElTabPane>
 
-        <ElTabPane label="申请记录" name="orders">
+        <ElTabPane :label="$t('orbien.tls.tabs.orders')" name="orders">
           <div class="tab-panel-content">
             <AcmeOrderPanel ref="orderPanelRef" @apply="wizardVisible = true"/>
           </div>
         </ElTabPane>
 
-        <ElTabPane label="DNS 密钥" name="dns">
+        <ElTabPane :label="$t('orbien.tls.tabs.dns')" name="dns">
           <div class="tab-panel-content">
             <DnsCredentialPanel ref="dnsPanelRef"/>
           </div>
@@ -53,6 +53,7 @@
 
 <script setup lang="ts">
 import {ref, h} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {useTable} from '@/hooks/core/useTable'
 import {ElMessage, ElMessageBox, ElTag, ElSwitch} from 'element-plus'
 import TlsDialog from './modules/tls-dialog.vue'
@@ -65,6 +66,8 @@ import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
 import {downloadBlob} from '@/utils/download'
 
 defineOptions({name: 'TlsManagement'})
+
+const {t} = useI18n()
 
 type TlsItem = Api.Tls.CertDTO
 
@@ -82,18 +85,18 @@ const sourceLabel = (source?: number) => {
   if (source === 2) {
     return h(ElTag, {type: 'primary', size: 'small'}, () => 'ACME')
   }
-  return h(ElTag, {type: 'warning', size: 'small'}, () => '手动')
+  return h(ElTag, {type: 'warning', size: 'small'}, () => t('orbien.tls.source.manual'))
 }
 
 const getExpireDays = (item: TlsItem) => {
   const now = new Date()
   const notAfter = new Date(item.notAfter)
   if (now > notAfter) {
-    return h('span', {style: {color: 'var(--el-color-danger)'}}, '已过期')
+    return h('span', {style: {color: 'var(--el-color-danger)'}}, t('orbien.tls.expire.expired'))
   }
   const diffTime = notAfter.getTime() - now.getTime()
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return h('span', {style: {color: 'var(--el-color-primary)'}}, `剩余${diffDays}天`)
+  return h('span', {style: {color: 'var(--el-color-primary)'}}, t('orbien.tls.expire.remainingDays', {n: diffDays}))
 }
 
 const {
@@ -116,41 +119,41 @@ const {
       {type: 'selection'},
       {
         prop: 'sanDomains',
-        label: '认证域名',
+        label: t('orbien.tls.columns.sanDomains'),
         minWidth: 120,
         formatter: (row: TlsItem) => row.sanDomains?.join(', ') || ''
       },
       {
         prop: 'source',
-        label: '来源',
+        label: t('orbien.tls.columns.source'),
         width: 90,
         formatter: (row: TlsItem) => sourceLabel(row.source)
       },
       {
         prop: 'org',
-        label: '证书分类',
+        label: t('orbien.tls.columns.org'),
         minWidth: 100
       },
       {
         prop: 'issuer',
-        label: '证书品牌',
+        label: t('orbien.tls.columns.issuer'),
         minWidth: 120
       },
       {
         prop: 'boundDomainCount',
-        label: '使用域名数',
+        label: t('orbien.tls.columns.boundDomainCount'),
         width: 100,
         formatter: (row: TlsItem) => row.boundDomainCount ?? 0
       },
       {
         prop: 'notAfter',
-        label: '到期时间',
+        label: t('orbien.tls.columns.notAfter'),
         minWidth: 110,
         formatter: (row: TlsItem) => getExpireDays(row)
       },
       {
         prop: 'autoRenew',
-        label: '自动续签',
+        label: t('orbien.tls.columns.autoRenew'),
         width: 100,
         formatter: (row: TlsItem) => {
           if (row.source !== 2) {
@@ -171,7 +174,7 @@ const {
       },
       {
         prop: 'operation',
-        label: '操作',
+        label: t('common.actions'),
         width: 150,
         fixed: 'right',
         formatter: (row: TlsItem) => {
@@ -183,12 +186,12 @@ const {
             children.push(
                 h(ArtButtonTable, {
                   type: 'link',
-                  text: '绑定',
+                  text: t('orbien.tls.actions.bind'),
                   onClick: () => handleBind(row)
                 }),
                 h(ArtButtonTable, {
                   type: 'link',
-                  text: '下载',
+                  text: t('orbien.tls.actions.download'),
                   onClick: () => handleDownload(row)
                 })
             )
@@ -196,7 +199,7 @@ const {
           children.push(
               h(ArtButtonTable, {
                 type: 'link',
-                text: '删除',
+                text: t('common.delete'),
                 onClick: () => handleDelete(row)
               })
           )
@@ -231,19 +234,19 @@ const handleApplySuccess = () => {
 
 const handleBatchDelete = async () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请选择要删除的证书')
+    ElMessage.warning(t('orbien.tls.messages.selectCertsToDelete'))
     return
   }
 
   try {
-    await ElMessageBox.confirm('确定要删除选中的证书吗？', '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('orbien.tls.messages.confirmBatchDeleteCerts'), t('common.warning'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
     const ids = selectedRows.value.map((row) => row.id)
     await fetchDeleteCert(ids)
-    ElMessage.success('删除成功')
+    ElMessage.success(t('common.success.delete'))
     refreshData()
   } catch (error) {
     if (error === 'cancel') return
@@ -262,9 +265,9 @@ const handleAutoRenewChange = async (row: TlsItem, autoRenew: boolean) => {
     const result = await fetchUpdateCertAutoRenew(row.id, autoRenew)
     row.autoRenew = autoRenew
     if (autoRenew && result.acmeRenewJobAutoEnabled) {
-      ElMessage.success('已开启自动续签，并已自动启用 ACME 续签计划任务')
+      ElMessage.success(t('orbien.tls.messages.autoRenewEnabledWithJob'))
     } else {
-      ElMessage.success(autoRenew ? '已开启自动续签' : '已关闭自动续签')
+      ElMessage.success(autoRenew ? t('orbien.tls.messages.autoRenewEnabled') : t('orbien.tls.messages.autoRenewDisabled'))
     }
   } catch {
     row.autoRenew = !autoRenew
@@ -279,19 +282,19 @@ const handleDownload = async (row: TlsItem) => {
     const fileName = `${row.sanDomains?.join('_') || 'cert'}.zip`
     downloadBlob(blob, fileName)
   } catch (error: any) {
-    ElMessage.error(error?.message || '下载失败')
+    ElMessage.error(error?.message || t('orbien.tls.messages.downloadFailed'))
   }
 }
 
 const handleDelete = async (row: TlsItem) => {
   try {
-    await ElMessageBox.confirm('确定要删除该证书吗？', '证书删除确认', {
-      confirmButtonText: '删除',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('orbien.tls.messages.confirmDeleteCert'), t('orbien.tls.messages.deleteCertTitle'), {
+      confirmButtonText: t('common.delete'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
     await fetchDeleteCert([row.id])
-    ElMessage.success('删除成功')
+    ElMessage.success(t('common.success.delete'))
     refreshData()
   } catch (error) {
     if (error === 'cancel') return

@@ -1,7 +1,7 @@
 <template>
   <ElDialog
       v-model="dialogVisible"
-      :title="dialogType === 'add' ? '添加 UDP 代理' : '编辑 UDP 代理'"
+      :title="dialogType === 'add' ? t('orbien.udp.add') : t('orbien.udp.edit')"
       width="650px"
       align-center
   >
@@ -12,10 +12,10 @@
         label-width="120px"
         :show-message="false"
     >
-      <ElFormItem label="客户端" prop="agentId">
+      <ElFormItem :label="t('orbien.proxy.client')" prop="agentId">
         <ElSelect
             v-model="formData.agentId"
-            placeholder="请选择客户端"
+            :placeholder="t('orbien.proxy.selectClient')"
             :disabled="dialogType === 'edit'"
             style="width: 250px"
         >
@@ -28,8 +28,8 @@
         </ElSelect>
       </ElFormItem>
 
-      <ElFormItem label="代理名称" prop="name">
-        <ElInput v-model="formData.name" placeholder="请输入代理名称" clearable/>
+      <ElFormItem :label="t('orbien.proxy.name')" prop="name">
+        <ElInput v-model="formData.name" :placeholder="t('orbien.proxy.enterName')" clearable/>
       </ElFormItem>
 
       <BackendServiceField
@@ -39,7 +39,7 @@
       >
         <ElRow :gutter="20">
           <ElCol :span="12">
-            <ElInput v-model="formData.localHost" placeholder="如127.0.0.1"/>
+            <ElInput v-model="formData.localHost" :placeholder="t('orbien.proxy.hostPlaceholder')"/>
           </ElCol>
           <ElCol :span="12">
             <LocalPortInput
@@ -50,12 +50,12 @@
           </ElCol>
         </ElRow>
       </BackendServiceField>
-      <ElFormItem label="远程端口" prop="remotePort">
+      <ElFormItem :label="t('orbien.proxy.remotePort')" prop="remotePort">
         <div class="remote-port-field">
           <ElInput
               v-model="remotePortInput"
               type="number"
-              placeholder="不填自动生成"
+              :placeholder="t('orbien.proxy.autoPort')"
               class="remote-port-input"
               @input="onRemotePortInput"
           />
@@ -71,7 +71,7 @@
               {{ port }}
             </ElButton>
             <ElButton link type="primary" :loading="suggestLoading" @click="loadSuggestedPorts">
-              换一批
+              {{ t('orbien.proxy.refreshPorts') }}
             </ElButton>
           </template>
           <ElLink
@@ -80,7 +80,7 @@
               :underline="false"
               @click="goToPortPool"
           >
-            去添加端口
+            {{ t('orbien.proxy.goAddPort') }}
           </ElLink>
         </div>
       </ElFormItem>
@@ -88,8 +88,8 @@
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
-        <ElButton @click="dialogVisible = false">取消</ElButton>
-        <ElButton type="primary" @click="handleSubmit">提交</ElButton>
+        <ElButton @click="dialogVisible = false">{{ t('common.cancel') }}</ElButton>
+        <ElButton type="primary" @click="handleSubmit">{{ t('common.submit') }}</ElButton>
       </div>
     </template>
   </ElDialog>
@@ -97,6 +97,7 @@
 
 <script setup lang="ts">
 import {ref, reactive, watch, computed} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {useRouter} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import type {FormInstance, FormRules} from 'element-plus'
@@ -118,6 +119,8 @@ import {UDP_LOCAL_PORT_PRESETS} from '@/views/orbien/proxy/shared/port-presets'
 import {isClusterMode} from '@/views/orbien/proxy/shared/is-cluster-mode'
 
 defineOptions({name: 'UdpDialog'})
+
+const {t} = useI18n()
 
 interface FormDataState {
   agentId: string
@@ -183,8 +186,8 @@ const targets = ref<Api.Proxy.TargetDTO[]>([])
 const clusterMode = computed(() => isClusterMode(targets.value))
 
 const rules = computed<FormRules>(() => ({
-  agentId: [{required: true, message: '请选择客户端', trigger: 'change'}],
-  name: [{required: true, message: '请输入代理名称', trigger: 'blur'}],
+  agentId: [{required: true, message: t('orbien.proxy.selectClient'), trigger: 'change'}],
+  name: [{required: true, message: t('orbien.proxy.enterName'), trigger: 'blur'}],
   remotePort: [
     {
       validator: (_rule, _value, callback) => {
@@ -194,9 +197,9 @@ const rules = computed<FormRules>(() => ({
         }
         const numValue = parseInt(remotePortInput.value, 10)
         if (isNaN(numValue)) {
-          callback(new Error('远程端口必须是数字'))
+          callback(new Error(t('orbien.proxy.remotePortNumber')))
         } else if (numValue < 1 || numValue > 65535) {
-          callback(new Error('远程端口必须在 1-65535 之间'))
+          callback(new Error(t('orbien.proxy.remotePortRange')))
         } else {
           callback()
         }
@@ -207,11 +210,11 @@ const rules = computed<FormRules>(() => ({
   ...(clusterMode.value
       ? {}
       : {
-        localHost: [{required: true, message: '请输入主机', trigger: 'blur'}],
+        localHost: [{required: true, message: t('orbien.proxy.enterHost'), trigger: 'blur'}],
         localPort: [
-          {required: true, message: '请输入端口', trigger: 'blur'},
-          {type: 'number', message: '端口必须是数字', trigger: 'blur'},
-          {min: 1, max: 65535, message: '端口必须在 1-65535 之间', trigger: 'blur'}
+          {required: true, message: t('orbien.proxy.enterPort'), trigger: 'blur'},
+          {type: 'number', message: t('orbien.proxy.portNumber'), trigger: 'blur'},
+          {min: 1, max: 65535, message: t('orbien.proxy.portRange'), trigger: 'blur'}
         ]
       }),
   limitTotal: LIMIT_TOTAL_RULES
@@ -232,7 +235,7 @@ const fetchAgents = async () => {
     agents.value = agentsList || []
   } catch (error) {
     console.error('获取客户端列表失败:', error)
-    ElMessage.error('获取客户端列表失败')
+    ElMessage.error(t('orbien.proxy.fetchClientFail'))
   }
 }
 
@@ -309,7 +312,7 @@ const initFormData = async () => {
       remotePortInput.value = displayPort != null ? String(displayPort) : ''
     } catch (error) {
       console.error('获取代理详情失败:', error)
-      ElMessage.error('获取代理详情失败，请稍后重试')
+      ElMessage.error(t('orbien.proxy.fetchDetailFail'))
       const row = props.proxyData
       Object.assign(formData, {
         ...DEFAULT_FORM_DATA,
@@ -403,4 +406,3 @@ const handleSubmit = async () => {
   flex-shrink: 0;
 }
 </style>
-

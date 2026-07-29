@@ -1,21 +1,21 @@
 <template>
-  <ElDialog v-model="dialogVisible" title="上传证书" width="60%" align-center>
+  <ElDialog v-model="dialogVisible" :title="$t('orbien.tls.upload.title')" width="60%" align-center>
     <div class="cert-form">
       <div class="form-item">
-        <div class="form-label">私钥(KEY)</div>
+        <div class="form-label">{{ $t('orbien.tls.upload.keyLabel') }}</div>
         <ElInput v-model="formData.keyContent" type="textarea" resize="none" />
       </div>
 
       <div class="form-item">
-        <div class="form-label">证书(PEM格式)</div>
+        <div class="form-label">{{ $t('orbien.tls.upload.certLabel') }}</div>
         <ElInput v-model="formData.certContent" type="textarea" resize="none" />
       </div>
     </div>
 
     <template #footer>
       <div class="dialog-footer">
-        <ElButton @click="handleCancel">取消</ElButton>
-        <ElButton type="primary" @click="handleSubmit">确定</ElButton>
+        <ElButton @click="handleCancel">{{ $t('common.cancel') }}</ElButton>
+        <ElButton type="primary" @click="handleSubmit">{{ $t('common.confirm') }}</ElButton>
       </div>
     </template>
   </ElDialog>
@@ -23,10 +23,13 @@
 
 <script setup lang="ts">
   import { reactive, computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage } from 'element-plus'
   import { fetchSaveCert } from '@/api/tls'
 
   defineOptions({ name: 'TlsDialog' })
+
+  const { t } = useI18n()
 
   interface Props {
     visible: boolean
@@ -58,11 +61,11 @@
 
   const handleSubmit = async () => {
     if (!formData.keyContent.trim()) {
-      ElMessage.warning('请输入私钥内容')
+      ElMessage.warning(t('orbien.tls.upload.keyRequired'))
       return
     }
     if (!formData.certContent.trim()) {
-      ElMessage.warning('请输入证书内容')
+      ElMessage.warning(t('orbien.tls.upload.certRequired'))
       return
     }
 
@@ -71,7 +74,7 @@
       fullChain: formData.certContent.trim()
     })
     if (result) {
-      ElMessage.success('证书上传成功')
+      ElMessage.success(t('orbien.tls.upload.success'))
       dialogVisible.value = false
       formData.keyContent = ''
       formData.certContent = ''

@@ -1,7 +1,7 @@
 <template>
   <ElDialog
       v-model="dialogVisible"
-      title="为当前代理申请证书"
+      :title="t('orbien.plugin.tls.acme.title')"
       width="760px"
       align-center
       destroy-on-close
@@ -9,12 +9,12 @@
       :close-on-click-modal="false"
   >
     <ElSteps :active="currentStep" finish-status="success" align-center class="acme-wizard wizard-steps">
-      <ElStep title="选择域名"/>
-      <ElStep title="验证方式"/>
-      <ElStep title="DNS 验证"/>
+      <ElStep :title="t('orbien.plugin.tls.acme.stepDomain')"/>
+      <ElStep :title="t('orbien.plugin.tls.acme.stepValidation')"/>
+      <ElStep :title="t('orbien.plugin.tls.acme.stepDns')"/>
     </ElSteps>
 
-    <div class="acme-wizard wizard-body" v-loading="submitting" element-loading-text="正在提交申请，请稍候...">
+    <div class="acme-wizard wizard-body" v-loading="submitting" :element-loading-text="t('orbien.plugin.tls.acme.submitting')">
       <AcmeApplyStepDomainProxy
           v-show="currentStep === 0"
           :visible="dialogVisible"
@@ -44,10 +44,12 @@
     </div>
 
     <template #footer>
-      <ElButton v-if="currentStep > 0 && currentStep < 2" :disabled="submitting" @click="currentStep--">上一步
+      <ElButton v-if="currentStep > 0 && currentStep < 2" :disabled="submitting" @click="currentStep--">
+        {{ t('orbien.plugin.tls.acme.prev') }}
       </ElButton>
-      <ElButton v-if="currentStep < 1" type="primary" @click="handleNext">下一步</ElButton>
-      <ElButton v-else-if="currentStep === 1" type="primary" :loading="submitting" @click="handleSubmit">提交申请
+      <ElButton v-if="currentStep < 1" type="primary" @click="handleNext">{{ t('orbien.plugin.tls.acme.next') }}</ElButton>
+      <ElButton v-else-if="currentStep === 1" type="primary" :loading="submitting" @click="handleSubmit">
+        {{ t('orbien.plugin.tls.acme.submit') }}
       </ElButton>
       <ElButton
           v-else-if="validationMode === 1 && canManualVerify"
@@ -55,9 +57,11 @@
           :loading="verifying"
           @click="handleVerify"
       >
-        开始验证
+        {{ t('orbien.plugin.tls.acme.startVerify') }}
       </ElButton>
-      <ElButton v-else-if="currentStep === 2" :loading="refreshing" @click="handleVerifyDone">刷新状态</ElButton>
+      <ElButton v-else-if="currentStep === 2" :loading="refreshing" @click="handleVerifyDone">
+        {{ t('orbien.plugin.tls.acme.refreshStatus') }}
+      </ElButton>
     </template>
   </ElDialog>
 
@@ -66,6 +70,7 @@
 
 <script setup lang="ts">
 import {computed, toRef} from 'vue'
+import {useI18n} from 'vue-i18n'
 import DnsCredentialDialog from '@/views/orbien/tls/modules/dns-credential-dialog.vue'
 import AcmeApplyStepDomainProxy from '@/views/orbien/tls/modules/acme/acme-apply-step-domain-proxy.vue'
 import AcmeApplyStepValidation from '@/views/orbien/tls/modules/acme/acme-apply-step-validation.vue'
@@ -73,6 +78,8 @@ import AcmeApplyStepDnsVerify from '@/views/orbien/tls/modules/acme/acme-apply-s
 import {useAcmeApplyWizard} from '@/views/orbien/tls/modules/acme/use-acme-apply-wizard'
 
 defineOptions({name: 'PluginAcmeApplyWizard'})
+
+const {t} = useI18n()
 
 const props = defineProps<{
   visible: boolean

@@ -6,7 +6,7 @@
         <template #left>
           <ElSpace wrap>
             <ElButton @click="handleBatchDelete" :disabled="selectedRows.length === 0" v-ripple>
-              批量删除
+              {{ $t('common.batchDelete') }}
             </ElButton>
           </ElSpace>
         </template>
@@ -32,6 +32,7 @@
 
 <script setup lang="ts">
   import { ref, h, nextTick } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { fetchGetAgentListByPage, fetchKickoutAgent, fetchDeleteBatchAgents } from '@/api/agent'
@@ -40,6 +41,8 @@
   import { getAgentTypeTag } from '@/enums/orbien/business'
 
   defineOptions({ name: 'ClientManagement' })
+
+  const { t } = useI18n()
 
   type ClientItem = Api.Agent.AgentDTO
 
@@ -56,8 +59,8 @@
    */
   const getClientStatusConfig = (isOnline: boolean) => {
     return isOnline
-      ? { type: 'primary' as const, text: '在线' }
-      : { type: 'info' as const, text: '离线' }
+      ? { type: 'primary' as const, text: t('common.online') }
+      : { type: 'info' as const, text: t('common.offline') }
   }
 
   const {
@@ -80,16 +83,16 @@
         { type: 'selection' },
         {
           prop: 'id',
-          label: '客户端ID',
+          label: t('orbien.common.clientId'),
           width: 180
         },
         {
           prop: 'name',
-          label: '名称'
+          label: t('common.name')
         },
         {
           prop: 'agentType',
-          label: '类型',
+          label: t('orbien.common.type'),
           formatter: (row: ClientItem) => {
             const typeConfig = getAgentTypeTag(row.agentType)
             return h(ElTag, { type: typeConfig.type, size: 'small' }, () => typeConfig.text)
@@ -97,19 +100,19 @@
         },
         {
           prop: 'os',
-          label: '操作系统'
+          label: t('orbien.common.os')
         },
         {
           prop: 'arch',
-          label: '系统架构'
+          label: t('orbien.common.systemArch')
         },
         {
           prop: 'version',
-          label: '版本'
+          label: t('orbien.common.version')
         },
         {
           prop: 'isOnline',
-          label: '状态',
+          label: t('common.status'),
           formatter: (row: ClientItem) => {
             const statusConfig = getClientStatusConfig(row.isOnline)
             return h(ElTag, { type: statusConfig.type, size: 'small' }, () => statusConfig.text)
@@ -117,25 +120,25 @@
         },
         {
           prop: 'operation',
-          label: '操作',
+          label: t('common.actions'),
           width: 220,
           fixed: 'right',
           formatter: (row: ClientItem) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'link',
-                text: '详情',
+                text: t('common.detail'),
                 onClick: () => showClientDetail(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '强退',
+                text: t('orbien.agent.kickout'),
                 onClick: () => kickoutClient(row),
                 disabled: !row.isOnline
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '删除',
+                text: t('common.delete'),
                 onClick: () => deleteClient(row)
               })
             ])
@@ -150,25 +153,29 @@
 
   const deleteClients = async (rows: ClientItem[], title: string, message: string) => {
     await ElMessageBox.confirm(message, title, {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'error'
     })
     await fetchDeleteBatchAgents(rows.map((row) => row.id))
-    ElMessage.success('删除成功')
+    ElMessage.success(t('common.success.delete'))
     refreshData()
   }
 
   const deleteClient = (row: ClientItem): void => {
-    deleteClients([row], '删除客户端', `确定要删除客户端「${row.name}」吗？`).catch(() => {})
+    deleteClients(
+      [row],
+      t('orbien.agent.deleteTitle'),
+      t('orbien.agent.deleteConfirm', { name: row.name })
+    ).catch(() => {})
   }
 
   const handleBatchDelete = (): void => {
     if (selectedRows.value.length === 0) return
     deleteClients(
       selectedRows.value,
-      '批量删除',
-      `确定要删除选中的 ${selectedRows.value.length} 个客户端吗？`
+      t('common.batchDelete'),
+      t('orbien.agent.batchDeleteConfirm', { count: selectedRows.value.length })
     ).catch(() => {})
   }
 
@@ -176,13 +183,13 @@
    * 剔除在线客户端
    */
   const kickoutClient = (row: ClientItem): void => {
-    ElMessageBox.confirm(`确定要剔除该在线客户端吗？`, '剔除客户端', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('orbien.agent.kickoutConfirm'), t('orbien.agent.kickoutTitle'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     }).then(async () => {
       await fetchKickoutAgent(row.id)
-      ElMessage.success('剔除成功')
+      ElMessage.success(t('common.success.kickout'))
       refreshData()
     })
   }

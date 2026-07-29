@@ -1,7 +1,7 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    :title="dialogType === 'add' ? '添加根域名' : '编辑根域名'"
+    :title="dialogType === 'add' ? $t('orbien.domain.addRootDomain') : $t('orbien.domain.editRootDomain')"
     width="500px"
     align-center
   >
@@ -9,19 +9,19 @@
       <ElSkeleton :rows="3" animated />
     </div>
     <ElForm v-else ref="formRef" :model="formData" :rules="rules" label-width="100px" :show-message="false">
-      <ElFormItem label="根域名" prop="domain">
+      <ElFormItem :label="$t('orbien.common.rootDomain')" prop="domain">
         <ElInput
           v-model="formData.domain"
           :disabled="dialogType === 'edit'"
-          placeholder="例如 example.com"
+          :placeholder="$t('orbien.domain.domainPlaceholder')"
         />
       </ElFormItem>
-      <ElFormItem label="描述" prop="remark">
+      <ElFormItem :label="$t('common.description')" prop="remark">
         <ElInput
           v-model="formData.remark"
           type="textarea"
           :rows="3"
-          placeholder="请输入描述"
+          :placeholder="$t('orbien.common.descPlaceholder')"
           maxlength="500"
           show-word-limit
         />
@@ -29,8 +29,8 @@
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
-        <ElButton @click="dialogVisible = false">取消</ElButton>
-        <ElButton type="primary" @click="handleSubmit" :loading="submitting">提交</ElButton>
+        <ElButton @click="dialogVisible = false">{{ $t('common.cancel') }}</ElButton>
+        <ElButton type="primary" @click="handleSubmit" :loading="submitting">{{ $t('common.submit') }}</ElButton>
       </div>
     </template>
   </ElDialog>
@@ -38,6 +38,7 @@
 
 <script setup lang="ts">
   import { ref, reactive, computed, watch, nextTick } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import type { FormInstance, FormRules } from 'element-plus'
   import { ElMessage } from 'element-plus'
   import { fetchCreateDomain, fetchUpdateDomain, fetchGetDomainById } from '@/api/domain'
@@ -56,6 +57,8 @@
   const props = defineProps<Props>()
   const emit = defineEmits<Emits>()
 
+  const { t } = useI18n()
+
   const dialogVisible = computed({
     get: () => props.visible,
     set: (value) => emit('update:visible', value)
@@ -72,9 +75,9 @@
     remark: ''
   })
 
-  const rules: FormRules = {
-    domain: [{ required: true, message: '请输入根域名', trigger: 'blur' }]
-  }
+  const rules = computed<FormRules>(() => ({
+    domain: [{ required: true, message: t('orbien.domain.domainRequired'), trigger: 'blur' }]
+  }))
 
   const initFormData = async () => {
     if (props.type === 'add') {
@@ -97,7 +100,7 @@
         })
       } catch (error) {
         console.error('获取域名详情失败:', error)
-        ElMessage.error('获取域名详情失败')
+        ElMessage.error(t('orbien.domain.fetchDetailFailed'))
       } finally {
         loading.value = false
       }
@@ -130,13 +133,13 @@
             domain: formData.domain.trim(),
             remark: formData.remark.trim() || undefined
           })
-          ElMessage.success('添加成功')
+          ElMessage.success(t('common.success.add'))
         } else if (formData.id) {
           await fetchUpdateDomain({
             id: formData.id,
             remark: formData.remark.trim() || undefined
           })
-          ElMessage.success('更新成功')
+          ElMessage.success(t('common.success.update'))
         }
         dialogVisible.value = false
         emit('submit')

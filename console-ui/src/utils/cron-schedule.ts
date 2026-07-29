@@ -1,3 +1,5 @@
+import { $t } from '@/locales'
+
 export type CronScheduleType =
   | 'daily'
   | 'everyNDays'
@@ -19,27 +21,28 @@ export interface CronSchedule {
   customExpression?: string
 }
 
-export const CRON_SCHEDULE_TYPE_OPTIONS: { label: string; value: CronScheduleType }[] = [
-  { label: '每天', value: 'daily' },
-  { label: 'N 天', value: 'everyNDays' },
-  { label: '每小时', value: 'hourly' },
-  { label: 'N 小时', value: 'everyNHours' },
-  { label: 'N 分钟', value: 'everyNMinutes' },
-  { label: '每周', value: 'weekly' },
-  { label: '每月', value: 'monthly' },
-  { label: 'N 秒', value: 'everyNSeconds' },
-  { label: '自定义', value: 'custom' }
-]
+const WEEKDAY_I18N_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
 
-export const WEEKDAY_OPTIONS = [
-  { label: '周一', value: 1 },
-  { label: '周二', value: 2 },
-  { label: '周三', value: 3 },
-  { label: '周四', value: 4 },
-  { label: '周五', value: 5 },
-  { label: '周六', value: 6 },
-  { label: '周日', value: 7 }
-]
+export function getCronScheduleTypeOptions(): { label: string; value: CronScheduleType }[] {
+  return [
+    { label: $t('orbien.cron.type.daily'), value: 'daily' },
+    { label: $t('orbien.cron.type.everyNDays'), value: 'everyNDays' },
+    { label: $t('orbien.cron.type.hourly'), value: 'hourly' },
+    { label: $t('orbien.cron.type.everyNHours'), value: 'everyNHours' },
+    { label: $t('orbien.cron.type.everyNMinutes'), value: 'everyNMinutes' },
+    { label: $t('orbien.cron.type.weekly'), value: 'weekly' },
+    { label: $t('orbien.cron.type.monthly'), value: 'monthly' },
+    { label: $t('orbien.cron.type.everyNSeconds'), value: 'everyNSeconds' },
+    { label: $t('orbien.cron.type.custom'), value: 'custom' }
+  ]
+}
+
+export function getWeekdayOptions(): { label: string; value: number }[] {
+  return WEEKDAY_I18N_KEYS.map((key, index) => ({
+    label: $t(`orbien.cron.weekday.${key}`),
+    value: index + 1
+  }))
+}
 
 const WEEKDAY_TO_CRON = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 
@@ -82,6 +85,11 @@ function cronDayToUi(dayOfWeek: string): number {
 function parsePositiveInt(value: string, fallback = 0): number {
   const parsed = Number.parseInt(value, 10)
   return Number.isFinite(parsed) ? parsed : fallback
+}
+
+function getWeekdayLabel(dayOfWeek?: number): string {
+  const index = clamp(dayOfWeek ?? 1, 1, 7) - 1
+  return $t(`orbien.cron.weekday.${WEEKDAY_I18N_KEYS[index]}`)
 }
 
 export function createDefaultSchedule(type: CronScheduleType): CronSchedule {
@@ -214,27 +222,43 @@ export function parseCronExpression(cron: string): CronSchedule {
 export function describeCronSchedule(schedule: CronSchedule): string {
   switch (schedule.type) {
     case 'daily':
-      return `每天的 ${pad(schedule.hour)}:${pad(schedule.minute)} 执行一次`
+      return $t('orbien.cron.preview.daily', {
+        hour: pad(schedule.hour),
+        minute: pad(schedule.minute)
+      })
     case 'everyNDays':
-      return `每 ${schedule.interval ?? 1} 天的 ${pad(schedule.hour)}:${pad(schedule.minute)} 执行一次`
+      return $t('orbien.cron.preview.everyNDays', {
+        interval: schedule.interval ?? 1,
+        hour: pad(schedule.hour),
+        minute: pad(schedule.minute)
+      })
     case 'hourly':
-      return `每小时的第 ${schedule.minute ?? 0} 分钟执行一次`
+      return $t('orbien.cron.preview.hourly', { minute: schedule.minute ?? 0 })
     case 'everyNHours':
-      return `每 ${schedule.interval ?? 1} 小时的第 ${schedule.minute ?? 0} 分钟执行一次`
+      return $t('orbien.cron.preview.everyNHours', {
+        interval: schedule.interval ?? 1,
+        minute: schedule.minute ?? 0
+      })
     case 'everyNMinutes':
-      return `每 ${schedule.interval ?? 1} 分钟执行一次`
-    case 'weekly': {
-      const weekday = WEEKDAY_OPTIONS.find((item) => item.value === schedule.dayOfWeek)?.label || '周一'
-      return `每周 ${weekday} ${pad(schedule.hour)}:${pad(schedule.minute)} 执行一次`
-    }
+      return $t('orbien.cron.preview.everyNMinutes', { interval: schedule.interval ?? 1 })
+    case 'weekly':
+      return $t('orbien.cron.preview.weekly', {
+        weekday: getWeekdayLabel(schedule.dayOfWeek),
+        hour: pad(schedule.hour),
+        minute: pad(schedule.minute)
+      })
     case 'monthly':
-      return `每月 ${schedule.dayOfMonth ?? 1} 号 ${pad(schedule.hour)}:${pad(schedule.minute)} 执行一次`
+      return $t('orbien.cron.preview.monthly', {
+        day: schedule.dayOfMonth ?? 1,
+        hour: pad(schedule.hour),
+        minute: pad(schedule.minute)
+      })
     case 'everyNSeconds':
-      return `每 ${schedule.interval ?? 1} 秒执行一次`
+      return $t('orbien.cron.preview.everyNSeconds', { interval: schedule.interval ?? 1 })
     case 'custom':
-      return schedule.customExpression || '自定义 Cron 表达式'
+      return schedule.customExpression || $t('orbien.cron.preview.custom')
     default:
-      return '未配置执行周期'
+      return $t('orbien.cron.preview.notConfigured')
   }
 }
 

@@ -1,4 +1,5 @@
 import type {FormItemRule} from 'element-plus'
+import {$t} from '@/locales/index'
 
 export type LimitTotalMbps = number | null | undefined
 
@@ -10,7 +11,7 @@ export const LIMIT_TOTAL_RULES: FormItemRule[] = [
                 return
             }
             if (typeof value !== 'number' || Number.isNaN(value) || value < 1 || !Number.isInteger(value)) {
-                callback(new Error('带宽必须为大于 0 的整数'))
+                callback(new Error($t('orbien.proxy.bandwidthInteger')))
                 return
             }
             callback()

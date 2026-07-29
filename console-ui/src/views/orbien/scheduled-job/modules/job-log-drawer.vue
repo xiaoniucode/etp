@@ -1,14 +1,14 @@
 <template>
   <ElDrawer
     v-model="drawerVisible"
-    :title="`执行日志 - ${jobName || ''}`"
+    :title="drawerTitle"
     size="760px"
     destroy-on-close
   >
     <ArtTableHeader :loading="loading" @refresh="refreshData">
       <template #left>
         <ElButton @click="handleBatchDelete" :disabled="selectedRows.length === 0" v-ripple>
-          批量删除
+          {{ $t('orbien.scheduledJob.actions.batchDelete') }}
         </ElButton>
       </template>
     </ArtTableHeader>
@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
   import { computed, h, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage, ElMessageBox, ElTag } from 'element-plus'
   import { useTable } from '@/hooks/core/useTable'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
@@ -47,6 +48,7 @@
 
   const props = defineProps<Props>()
   const emit = defineEmits<Emits>()
+  const { t } = useI18n()
 
   const selectedRows = ref<Api.ScheduledJob.JobLogDTO[]>([])
 
@@ -54,6 +56,10 @@
     get: () => props.visible,
     set: (value) => emit('update:visible', value)
   })
+
+  const drawerTitle = computed(() =>
+    t('orbien.scheduledJob.log.title', { name: props.jobName || '' })
+  )
 
   const handleSelectionChange = (selection: Api.ScheduledJob.JobLogDTO[]) => {
     selectedRows.value = selection
@@ -65,18 +71,22 @@
     }
     const ids = rows.map((row) => row.id)
     await fetchDeleteScheduledJobLogs(props.jobCode, ids)
-    ElMessage.success('删除成功')
+    ElMessage.success(t('orbien.scheduledJob.message.deleteSuccess'))
     selectedRows.value = []
     refreshData()
   }
 
   const handleDelete = async (row: Api.ScheduledJob.JobLogDTO) => {
     try {
-      await ElMessageBox.confirm('确定删除该条执行日志吗？', '删除确认', {
-        confirmButtonText: '删除',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
+      await ElMessageBox.confirm(
+        t('orbien.scheduledJob.confirm.deleteLogMessage'),
+        t('orbien.scheduledJob.confirm.deleteLogTitle'),
+        {
+          confirmButtonText: t('orbien.scheduledJob.actions.delete'),
+          cancelButtonText: t('common.cancel'),
+          type: 'warning'
+        }
+      )
       await deleteLogs([row])
     } catch (error) {
       if (error === 'cancel') return
@@ -85,16 +95,18 @@
 
   const handleBatchDelete = async () => {
     if (selectedRows.value.length === 0) {
-      ElMessage.warning('请选择要删除的日志')
+      ElMessage.warning(t('orbien.scheduledJob.message.selectLogs'))
       return
     }
     try {
       await ElMessageBox.confirm(
-        `确定删除选中的 ${selectedRows.value.length} 条执行日志吗？`,
-        '批量删除确认',
+        t('orbien.scheduledJob.confirm.batchDeleteMessage', {
+          count: selectedRows.value.length
+        }),
+        t('orbien.scheduledJob.confirm.batchDeleteTitle'),
         {
-          confirmButtonText: '删除',
-          cancelButtonText: '取消',
+          confirmButtonText: t('orbien.scheduledJob.actions.delete'),
+          cancelButtonText: t('common.cancel'),
           type: 'warning'
         }
       )
@@ -135,22 +147,22 @@
         { type: 'selection' },
         {
           prop: 'startedAt',
-          label: '开始时间',
+          label: t('orbien.scheduledJob.log.columns.startedAt'),
           width: 170
         },
         {
           prop: 'finishedAt',
-          label: '结束时间',
+          label: t('orbien.scheduledJob.log.columns.finishedAt'),
           width: 170
         },
         {
           prop: 'triggerTypeLabel',
-          label: '触发方式',
+          label: t('orbien.scheduledJob.log.columns.triggerType'),
           width: 90
         },
         {
           prop: 'statusLabel',
-          label: '状态',
+          label: t('orbien.scheduledJob.log.columns.status'),
           width: 80,
           formatter: (row: Api.ScheduledJob.JobLogDTO) =>
             h(
@@ -161,25 +173,25 @@
         },
         {
           prop: 'affectedCount',
-          label: '影响数量',
+          label: t('orbien.scheduledJob.log.columns.affectedCount'),
           width: 90
         },
 
         {
           prop: 'message',
-          label: '说明',
+          label: t('orbien.scheduledJob.log.columns.message'),
           minWidth: 140,
           showOverflowTooltip: true
         },
         {
           prop: 'operation',
-          label: '操作',
+          label: t('orbien.scheduledJob.log.columns.operation'),
           width: 80,
           fixed: 'right',
           formatter: (row: Api.ScheduledJob.JobLogDTO) =>
             h(ArtButtonTable, {
               type: 'link',
-              text: '删除',
+              text: t('orbien.scheduledJob.actions.delete'),
               onClick: () => handleDelete(row)
             })
         }

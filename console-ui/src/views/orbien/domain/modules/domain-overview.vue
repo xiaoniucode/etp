@@ -1,9 +1,9 @@
 <template>
   <div class="art-card p-5 mb-5 max-sm:mb-4">
     <div class="mb-5">
-      <h4 class="m-0 text-lg font-semibold">域名资源</h4>
+      <h4 class="m-0 text-lg font-semibold">{{ $t('orbien.domain.resourcesTitle') }}</h4>
       <p class="m-0 mt-1 text-sm text-g-500">
-        根域名池定义平台可用的根域名；已分配域名展示代理隧道当前占用的访问地址。
+        {{ $t('orbien.domain.resourcesDesc') }}
       </p>
     </div>
 
@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
   import { computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import ArtCountTo from '@/components/core/text-effect/art-count-to/index.vue'
   import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
 
@@ -42,19 +43,21 @@
     usedCount: number
   }>()
 
+  const { t } = useI18n()
+
   const items = computed(() => [
     {
       key: 'pool' as DomainView,
-      label: '根域名池',
-      hint: '用于子域名自动拼接的根域名',
+      label: t('orbien.domain.poolLabel'),
+      hint: t('orbien.domain.poolHint'),
       icon: 'ri:global-line',
       iconClass: 'text-theme',
       count: props.baseCount
     },
     {
       key: 'allocated' as DomainView,
-      label: '已分配域名',
-      hint: '已被代理隧道占用的访问域名',
+      label: t('orbien.domain.allocatedLabel'),
+      hint: t('orbien.domain.allocatedHint'),
       icon: 'ri:link',
       iconClass: 'text-g-600',
       count: props.usedCount

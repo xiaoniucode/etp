@@ -5,7 +5,7 @@
         type="warning"
         :closable="false"
         show-icon
-        title="请在 DNS 服务商处添加以下 TXT 记录，生效后点击「开始验证」"
+        :title="$t('orbien.tls.acme.dnsVerify.manualHint')"
         class="mb-4"
     />
     <ElAlert
@@ -13,33 +13,33 @@
         type="success"
         :closable="false"
         show-icon
-        title="系统已自动添加 TXT 记录，正在等待 DNS 生效并验证"
+        :title="$t('orbien.tls.acme.dnsVerify.autoHint')"
         class="mb-4"
     />
 
     <div v-if="orderResult?.challenges?.length">
       <div v-for="item in orderResult.challenges" :key="item.id" class="challenge-card">
         <div class="challenge-domain">{{ item.domain }}</div>
-        <div v-if="item.dnsZone" class="field-row zone-tip">DNS 区域：{{ item.dnsZone }}</div>
+        <div v-if="item.dnsZone" class="field-row zone-tip">{{ $t('orbien.tls.acme.dnsVerify.dnsZone', { zone: item.dnsZone }) }}</div>
         <div class="field-row">
-          <span>主机记录</span>
+          <span>{{ $t('orbien.tls.acme.dnsVerify.hostRecord') }}</span>
           <code>{{ item.hostRecord || item.recordName }}</code>
-          <ElButton link type="primary" @click="emit('copy', item.hostRecord || item.recordName)">复制</ElButton>
+          <ElButton link type="primary" @click="emit('copy', item.hostRecord || item.recordName)">{{ $t('common.copy') }}</ElButton>
         </div>
         <div class="field-row">
-          <span>记录类型</span>
+          <span>{{ $t('orbien.tls.acme.dnsVerify.recordType') }}</span>
           <code>TXT</code>
         </div>
         <div class="field-row">
-          <span>记录值</span>
+          <span>{{ $t('orbien.tls.acme.dnsVerify.recordValue') }}</span>
           <code class="record-value">{{ item.recordValue }}</code>
-          <ElButton link type="primary" @click="emit('copy', item.recordValue)">复制</ElButton>
+          <ElButton link type="primary" @click="emit('copy', item.recordValue)">{{ $t('common.copy') }}</ElButton>
         </div>
       </div>
     </div>
 
     <div v-if="orderResult" class="order-status">
-      当前状态：
+      {{ $t('orbien.tls.acme.dnsVerify.currentStatus') }}
       <ElTag size="small" :type="resolveAcmeOrderStatusTagType(orderResult.status)">
         {{ orderResult.statusLabel }}
       </ElTag>

@@ -1,13 +1,13 @@
 <template>
   <div class="server-config art-card h-105 p-5 mb-5 max-sm:mb-4">
     <div class="config-header">
-      <h4>服务器配置</h4>
+      <h4>{{ $t('dashboard.config.title') }}</h4>
     </div>
 
     <ElSkeleton v-if="loading" :rows="4" animated class="config-body"/>
 
     <div v-else class="config-body">
-      <div v-for="item in configItems" :key="item.label" class="config-item">
+      <div v-for="item in configItems" :key="item.key" class="config-item">
         <div class="config-icon" :class="item.iconBgClass">
           <ArtSvgIcon :icon="item.icon" class="icon"/>
         </div>
@@ -22,12 +22,14 @@
 
 <script setup lang="ts">
 import {computed, onMounted, ref} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {ElSkeleton} from 'element-plus'
 import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
 import {fetchGetAppConfig} from '@/api/app'
 
 defineOptions({name: 'AppConfig'})
 
+const {t} = useI18n()
 const loading = ref(false)
 const configInfo = ref<Api.App.AppConfigInfoDTO | null>(null)
 
@@ -42,44 +44,50 @@ const getData = async () => {
 
 const formatTransportPort = (enabled?: boolean, port?: number) => {
   if (!enabled) {
-    return '未启用'
+    return t('dashboard.config.disabled')
   }
   return port ?? '-'
 }
 
 const configItems = computed(() => [
   {
-    label: '服务器地址',
+    key: 'addr',
+    label: t('dashboard.config.addr'),
     value: configInfo.value?.serverAddr || '-',
     icon: 'ri:global-line',
     iconBgClass: 'icon-bg-blue'
   },
   {
-    label: 'TCP 传输',
+    key: 'tcp',
+    label: t('dashboard.config.tcp'),
     value: configInfo.value?.serverPort || '-',
     icon: 'ri:server-line',
     iconBgClass: 'icon-bg-green'
   },
   {
-    label: 'WebSocket 传输',
+    key: 'websocket',
+    label: t('dashboard.config.websocket'),
     value: formatTransportPort(configInfo.value?.websocketEnabled, configInfo.value?.websocketPort),
     icon: 'ri:links-line',
     iconBgClass: 'icon-bg-purple'
   },
   {
-    label: 'QUIC 传输',
+    key: 'quic',
+    label: t('dashboard.config.quic'),
     value: formatTransportPort(configInfo.value?.quicEnabled, configInfo.value?.quicPort),
     icon: 'ri:flashlight-line',
     iconBgClass: 'icon-bg-indigo'
   },
   {
-    label: 'HTTP 代理',
+    key: 'http',
+    label: t('dashboard.config.http'),
     value: configInfo.value?.httpProxyPort || '-',
     icon: 'ri:router-line',
     iconBgClass: 'icon-bg-orange'
   },
   {
-    label: 'HTTPS 代理',
+    key: 'https',
+    label: t('dashboard.config.https'),
     value: configInfo.value?.httpsProxyPort || '-',
     icon: 'ri:shield-keyhole-line',
     iconBgClass: 'icon-bg-teal'

@@ -1,12 +1,12 @@
 <template>
   <div class="cluster-page" v-loading="loading">
     <div class="mb-6">
-      <h3 class="text-lg font-semibold mb-4">负载均衡</h3>
+      <h3 class="text-lg font-semibold mb-4">{{ t('orbien.plugin.cluster.title') }}</h3>
       <div class="flex items-center gap-3">
-        <span class="w-20 font-medium shrink-0">策略</span>
-        <ElSelect v-model="loadBalanceStrategy" placeholder="请选择策略" style="width: 240px">
+        <span class="w-20 font-medium shrink-0">{{ t('orbien.plugin.cluster.strategy') }}</span>
+        <ElSelect v-model="loadBalanceStrategy" :placeholder="t('orbien.plugin.cluster.selectStrategy')" style="width: 240px">
           <ElOption
-            v-for="item in LOAD_BALANCE_OPTIONS"
+            v-for="item in loadBalanceOptions"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -17,48 +17,48 @@
 
     <div>
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold">服务列表</h3>
+        <h3 class="text-lg font-semibold">{{ t('orbien.plugin.cluster.serviceList') }}</h3>
         <ElButton type="primary" size="small" @click="addTarget">
           <template #icon>
             <Plus />
           </template>
-          添加服务
+          {{ t('orbien.plugin.actions.addService') }}
         </ElButton>
       </div>
 
       <div class="border border-gray-200 rounded p-4">
-        <ElEmpty v-if="targets.length === 0" description="暂无服务，请添加" :image-size="72">
-          <ElButton type="primary" size="small" @click="addTarget">添加服务</ElButton>
+        <ElEmpty v-if="targets.length === 0" :description="t('orbien.plugin.cluster.emptyServices')" :image-size="72">
+          <ElButton type="primary" size="small" @click="addTarget">{{ t('orbien.plugin.actions.addService') }}</ElButton>
         </ElEmpty>
 
         <ElTable v-else :data="targets" border style="width: 100%">
-          <ElTableColumn prop="name" label="服务名称" min-width="140">
+          <ElTableColumn prop="name" :label="t('orbien.plugin.cluster.serviceName')" min-width="140">
             <template #default="{ row }">
-              <ElInput v-model="row.name" size="small" placeholder="可选" clearable />
+              <ElInput v-model="row.name" size="small" :placeholder="t('orbien.plugin.cluster.optional')" clearable />
             </template>
           </ElTableColumn>
-          <ElTableColumn prop="host" label="主机" min-width="160">
+          <ElTableColumn prop="host" :label="t('orbien.plugin.cluster.host')" min-width="160">
             <template #default="{ row }">
-              <ElInput v-model="row.host" size="small" placeholder="内网地址" clearable />
+              <ElInput v-model="row.host" size="small" :placeholder="t('orbien.plugin.cluster.hostPlaceholder')" clearable />
             </template>
           </ElTableColumn>
-          <ElTableColumn prop="port" label="端口" width="110">
+          <ElTableColumn prop="port" :label="t('orbien.plugin.cluster.port')" width="110">
             <template #default="{ row }">
-              <ElInput v-model.number="row.port" size="small" type="number" placeholder="1-65535" />
+              <ElInput v-model.number="row.port" size="small" type="number" :placeholder="t('orbien.plugin.cluster.portPlaceholder')" />
             </template>
           </ElTableColumn>
-          <ElTableColumn prop="weight" label="权重" width="100">
+          <ElTableColumn prop="weight" :label="t('orbien.plugin.cluster.weight')" width="100">
             <template #default="{ row }">
               <ElInput
                 v-model.number="row.weight"
                 size="small"
                 type="number"
-                placeholder="权重"
+                :placeholder="t('orbien.plugin.cluster.weightPlaceholder')"
                 :disabled="loadBalanceStrategy !== LoadBalanceType.WEIGHT"
               />
             </template>
           </ElTableColumn>
-          <ElTableColumn label="操作" width="80" align="center" fixed="right">
+          <ElTableColumn :label="t('common.actions')" width="80" align="center" fixed="right">
             <template #default="{ $index }">
               <ElButton link size="small" @click="removeTarget($index)">
                 <template #icon>
@@ -72,20 +72,23 @@
     </div>
 
     <div class="mt-5">
-      <ElButton type="primary" :loading="saving" @click="handleSave">保存配置</ElButton>
+      <ElButton type="primary" :loading="saving" @click="handleSave">{{ t('orbien.plugin.basic.saveConfig') }}</ElButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage } from 'element-plus'
   import { Plus, Delete } from '@element-plus/icons-vue'
   import { fetchProxyDetail, saveProxyClusterConfig } from '@/api/proxy-plugin'
   import type { ProxyConfigProtocol } from '../../menus'
-  import { LOAD_BALANCE_OPTIONS, LoadBalanceType } from '@/enums/orbien/business'
+  import { LoadBalanceType } from '@/enums/orbien/business'
 
   defineOptions({ name: 'ClusterPage' })
+
+  const { t } = useI18n()
 
   interface TargetRow {
     host: string
@@ -98,6 +101,13 @@
     proxyId: string
     protocol: ProxyConfigProtocol
   }>()
+
+  const loadBalanceOptions = computed(() => [
+    { label: t('orbien.plugin.cluster.strategyOptions.roundRobin'), value: LoadBalanceType.ROUND_ROBIN },
+    { label: t('orbien.plugin.cluster.strategyOptions.weight'), value: LoadBalanceType.WEIGHT },
+    { label: t('orbien.plugin.cluster.strategyOptions.random'), value: LoadBalanceType.RANDOM },
+    { label: t('orbien.plugin.cluster.strategyOptions.leastConn'), value: LoadBalanceType.LEAST_CONN }
+  ])
 
   const loading = ref(false)
   const saving = ref(false)
@@ -153,19 +163,19 @@
 
   const validateTargets = () => {
     if (targets.value.length === 0) {
-      ElMessage.warning('请至少添加一个服务')
+      ElMessage.warning(t('orbien.plugin.cluster.minOneService'))
       return false
     }
 
     for (let i = 0; i < targets.value.length; i++) {
       const { host, port } = targets.value[i]
       if (!host?.trim()) {
-        ElMessage.warning(`第 ${i + 1} 行：请输入主机地址`)
+        ElMessage.warning(t('orbien.plugin.cluster.hostRequired', { row: i + 1 }))
         return false
       }
       const portNum = Number(port)
       if (!portNum || portNum < 1 || portNum > 65535) {
-        ElMessage.warning(`第 ${i + 1} 行：请输入有效端口（1-65535）`)
+        ElMessage.warning(t('orbien.plugin.cluster.portInvalid', { row: i + 1 }))
         return false
       }
     }

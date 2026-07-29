@@ -4,13 +4,13 @@
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
         <template #left>
           <ElSpace wrap>
-            <ElButton type="primary" @click="showDialog('add')" v-ripple>添加端口</ElButton>
+            <ElButton type="primary" @click="showDialog('add')" v-ripple>{{ $t('orbien.portPool.add') }}</ElButton>
             <ElButton
               @click="handleBatchDelete"
               v-ripple
               :disabled="selectedRows.length === 0"
             >
-              批量删除
+              {{ $t('common.batchDelete') }}
             </ElButton>
           </ElSpace>
         </template>
@@ -38,6 +38,7 @@
 
 <script setup lang="ts">
   import { ref, h, nextTick } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { ElTag, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
@@ -50,6 +51,8 @@
   import { getPortPoolTypeLabel } from '@/enums/orbien/business'
 
   defineOptions({ name: 'PortPool' })
+
+  const { t } = useI18n()
 
   type PortPoolItem = Api.PortPool.PortPoolDTO
 
@@ -82,12 +85,12 @@
         { type: 'selection' },
         {
           prop: 'startPort',
-          label: '端口',
+          label: t('orbien.common.port'),
           formatter: (row: PortPoolItem) => formatPort(row)
         },
         {
           prop: 'type',
-          label: '协议',
+          label: t('orbien.common.protocol'),
           formatter: (row: PortPoolItem) => {
             const config = getPortPoolTypeLabel(row.type)
             return h(ElTag, { type: config.type, size: 'small' }, () => config.text)
@@ -95,28 +98,28 @@
         },
         {
           prop: 'remark',
-          label: '备注',
+          label: t('orbien.common.remark'),
           formatter: (row: PortPoolItem) => row.remark || ''
         },
         {
           prop: 'createdAt',
-          label: '创建时间'
+          label: t('common.createTime')
         },
         {
           prop: 'operation',
-          label: '操作',
+          label: t('common.actions'),
           width: 150,
           fixed: 'right',
           formatter: (row: PortPoolItem) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'link',
-                text: '编辑',
+                text: t('common.edit'),
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '删除',
+                text: t('common.delete'),
                 onClick: () => handleDelete(row)
               })
             ])
@@ -131,28 +134,32 @@
 
   const deletePortPools = async (rows: PortPoolItem[], title: string, message: string) => {
     await ElMessageBox.confirm(message, title, {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
     await fetchDeleteBatchPortPools(rows.map((row) => row.id))
-    ElMessage.success('删除成功')
+    ElMessage.success(t('common.success.delete'))
     refreshData()
   }
 
   const handleDelete = (row: PortPoolItem): void => {
-    deletePortPools([row], '删除端口', `确定要删除端口「${formatPort(row)}」吗？`).catch(() => {})
+    deletePortPools(
+      [row],
+      t('orbien.portPool.deleteTitle'),
+      t('orbien.portPool.deleteConfirm', { port: formatPort(row) })
+    ).catch(() => {})
   }
 
   const handleBatchDelete = (): void => {
     if (selectedRows.value.length === 0) {
-      ElMessage.warning('请选择要删除的端口')
+      ElMessage.warning(t('orbien.portPool.selectToDelete'))
       return
     }
     deletePortPools(
       selectedRows.value,
-      '批量删除',
-      `确定要删除选中的 ${selectedRows.value.length} 个端口配置吗？`
+      t('common.batchDelete'),
+      t('orbien.portPool.batchDeleteConfirm', { count: selectedRows.value.length })
     ).catch(() => {})
   }
 

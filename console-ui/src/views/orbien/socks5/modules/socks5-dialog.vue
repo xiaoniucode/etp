@@ -1,7 +1,7 @@
 <template>
   <ElDialog
       v-model="dialogVisible"
-      :title="dialogType === 'add' ? '添加 SOCKS5 代理' : '编辑 SOCKS5 代理'"
+      :title="dialogType === 'add' ? t('orbien.socks5.add') : t('orbien.socks5.edit')"
       width="650px"
       align-center
   >
@@ -12,10 +12,10 @@
         label-width="120px"
         :show-message="false"
     >
-      <ElFormItem label="客户端" prop="agentId">
+      <ElFormItem :label="t('orbien.proxy.client')" prop="agentId">
         <ElSelect
             v-model="formData.agentId"
-            placeholder="请选择客户端"
+            :placeholder="t('orbien.proxy.selectClient')"
             :disabled="dialogType === 'edit'"
             style="width: 250px"
         >
@@ -28,16 +28,16 @@
         </ElSelect>
       </ElFormItem>
 
-      <ElFormItem label="代理名称" prop="name">
-        <ElInput v-model="formData.name" placeholder="请输入代理名称" clearable/>
+      <ElFormItem :label="t('orbien.proxy.name')" prop="name">
+        <ElInput v-model="formData.name" :placeholder="t('orbien.proxy.enterName')" clearable/>
       </ElFormItem>
 
-      <ElFormItem label="远程端口" prop="remotePort">
+      <ElFormItem :label="t('orbien.proxy.remotePort')" prop="remotePort">
         <div class="remote-port-field">
           <ElInput
               v-model="remotePortInput"
               type="number"
-              placeholder="不填自动生成"
+              :placeholder="t('orbien.proxy.autoPort')"
               class="remote-port-input"
               @input="selectedSuggestPort = null"
           />
@@ -53,7 +53,7 @@
               {{ port }}
             </ElButton>
             <ElButton link type="primary" :loading="suggestLoading" @click="loadSuggestedPorts()">
-              换一批
+              {{ t('orbien.proxy.refreshPorts') }}
             </ElButton>
           </template>
           <ElLink
@@ -62,42 +62,42 @@
               :underline="false"
               @click="goToPortPool"
           >
-            去添加端口
+            {{ t('orbien.proxy.goAddPort') }}
           </ElLink>
         </div>
       </ElFormItem>
 
       <BandwidthLimitField v-model="formData.limitTotal"/>
 
-      <ElFormItem label="启用认证">
+      <ElFormItem :label="t('orbien.proxy.authEnabled')">
         <div class="auth-switch-row">
           <ElSwitch v-model="formData.authEnabled"/>
-          <span class="auth-switch-tip">强烈建议开启，防止未经授权的用户访问您的内网</span>
+          <span class="auth-switch-tip">{{ t('orbien.proxy.authTipSocks5') }}</span>
         </div>
       </ElFormItem>
 
       <template v-if="formData.authEnabled">
-        <ElFormItem label="认证用户" required>
+        <ElFormItem :label="t('orbien.proxy.authUsers')" required>
           <div class="auth-users-panel">
-            <ElTable :data="authUsers" border size="small" empty-text="请至少添加一个认证用户">
-              <ElTableColumn prop="username" label="用户名" min-width="160">
+            <ElTable :data="authUsers" border size="small" :empty-text="t('orbien.proxy.authUserRequired')">
+              <ElTableColumn prop="username" :label="t('orbien.proxy.username')" min-width="160">
                 <template #default="{ row }">
-                  <ElInput v-model="row.username" size="small" placeholder="用户名" clearable/>
+                  <ElInput v-model="row.username" size="small" :placeholder="t('orbien.proxy.username')" clearable/>
                 </template>
               </ElTableColumn>
-              <ElTableColumn prop="password" label="密码" min-width="160">
+              <ElTableColumn prop="password" :label="t('orbien.proxy.password')" min-width="160">
                 <template #default="{ row }">
                   <ElInput
                       v-model="row.password"
                       size="small"
-                      :placeholder="row.id ? '留空则不修改' : '请输入密码'"
+                      :placeholder="row.id ? t('orbien.proxy.leaveBlank') : t('orbien.proxy.enterPassword')"
                       type="password"
                       show-password
                       clearable
                   />
                 </template>
               </ElTableColumn>
-              <ElTableColumn label="操作" width="80" fixed="right">
+              <ElTableColumn :label="t('common.actions')" width="80" fixed="right">
                 <template #default="{ $index }">
                   <ElButton
                       link
@@ -106,13 +106,13 @@
                       :disabled="authUsers.length <= 1"
                       @click="authUsers.splice($index, 1)"
                   >
-                    删除
+                    {{ t('common.delete') }}
                   </ElButton>
                 </template>
               </ElTableColumn>
             </ElTable>
             <ElButton type="primary" plain size="small" class="add-user-btn" @click="authUsers.push(emptyAuthUser())">
-              添加用户
+              {{ t('orbien.proxy.addUser') }}
             </ElButton>
           </div>
         </ElFormItem>
@@ -120,8 +120,8 @@
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
-        <ElButton @click="dialogVisible = false">取消</ElButton>
-        <ElButton type="primary" @click="handleSubmit">提交</ElButton>
+        <ElButton @click="dialogVisible = false">{{ t('common.cancel') }}</ElButton>
+        <ElButton type="primary" @click="handleSubmit">{{ t('common.submit') }}</ElButton>
       </div>
     </template>
   </ElDialog>
@@ -130,6 +130,7 @@
 <script setup lang="ts">
 import {ref, reactive, watch, computed} from 'vue'
 import {useRouter} from 'vue-router'
+import {useI18n} from 'vue-i18n'
 import {ElMessage} from 'element-plus'
 import type {FormInstance, FormRules} from 'element-plus'
 import {DialogType} from '@/types'
@@ -146,6 +147,8 @@ import {
 } from '@/views/orbien/proxy/shared/bandwidth-limit'
 
 defineOptions({name: 'Socks5Dialog'})
+
+const {t} = useI18n()
 
 type AuthUserForm = Api.Proxy.Socks5AuthUserParam & { id?: number }
 
@@ -202,14 +205,14 @@ const isStaleSession = (session: number) => session !== openSession || !props.vi
 const emptyAuthUser = (): AuthUserForm => ({username: '', password: ''})
 
 const rules = computed<FormRules>(() => ({
-  agentId: [{required: true, message: '请选择客户端', trigger: 'change'}],
-  name: [{required: true, message: '请输入代理名称', trigger: 'blur'}],
+  agentId: [{required: true, message: t('orbien.proxy.selectClient'), trigger: 'change'}],
+  name: [{required: true, message: t('orbien.proxy.enterName'), trigger: 'blur'}],
   remotePort: [{
     validator: (_rule, _value, callback) => {
       if (!remotePortInput.value) return callback()
       const port = parseInt(remotePortInput.value, 10)
       if (isNaN(port) || port < 1 || port > 65535) {
-        callback(new Error('远程端口必须在 1-65535 之间'))
+        callback(new Error(t('orbien.proxy.remotePortRange')))
       } else {
         callback()
       }
@@ -238,14 +241,14 @@ const validateAuthUsers = (): boolean => {
 
   const users = authUsers.value.filter((user) => user.username?.trim())
   if (users.length === 0) {
-    ElMessage.warning('启用认证时请至少添加一个用户')
+    ElMessage.warning(t('orbien.proxy.authUserMinOne'))
     return false
   }
 
   for (const user of users) {
     const needPassword = !user.id
     if (needPassword && !user.password?.trim()) {
-      ElMessage.warning('请填写用户名和密码')
+      ElMessage.warning(t('orbien.proxy.fillUsernamePassword'))
       return false
     }
   }
@@ -322,7 +325,7 @@ const loadEditForm = async (session: number, proxyId: string) => {
   } catch (error) {
     console.error('获取代理详情失败:', error)
     if (!isStaleSession(session)) {
-      ElMessage.error('获取代理详情失败，请稍后重试')
+      ElMessage.error(t('orbien.proxy.fetchDetailFail'))
     }
   }
 }
@@ -337,7 +340,7 @@ const openDialog = async () => {
     agents.value = await fetchGetAgentsForProxySelection(includeId) || []
   } catch (error) {
     console.error('获取客户端列表失败:', error)
-    ElMessage.error('获取客户端列表失败')
+    ElMessage.error(t('orbien.proxy.fetchClientFail'))
   }
   if (isStaleSession(session)) return
 

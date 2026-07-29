@@ -1,7 +1,7 @@
 <template>
   <ElDialog
       :model-value="visible"
-      title="编辑重放"
+      :title="$t('orbien.inspector.replayEditor.title')"
       width="70%"
       append-to-body
       destroy-on-close
@@ -10,7 +10,7 @@
   >
     <div v-if="detail" class="replay-editor">
       <div class="replay-editor__meta">
-        <span>源请求 {{ detail.method }} {{ detail.path }}</span>
+        <span>{{ $t('orbien.inspector.replayEditor.sourceRequest', { method: detail.method, path: detail.path }) }}</span>
         <span class="replay-editor__meta-muted">· {{ detail.id }}</span>
       </div>
 
@@ -35,10 +35,10 @@
             <span class="replay-fold__count">{{ editableHeaders.length }}</span>
             <span v-if="!headersOpen && headerPreview" class="replay-fold__preview">{{ headerPreview }}</span>
           </button>
-          <ElButton text type="primary" @click.stop="onAddHeader">+ 添加</ElButton>
+          <ElButton text type="primary" @click.stop="onAddHeader">{{ $t('orbien.inspector.replayEditor.addHeader') }}</ElButton>
         </div>
         <div v-show="headersOpen" class="replay-fold__body">
-          <div v-if="!editableHeaders.length" class="replay-editor__empty">暂无</div>
+          <div v-if="!editableHeaders.length" class="replay-editor__empty">{{ $t('orbien.inspector.replayEditor.empty') }}</div>
           <div
               v-for="(row, index) in editableHeaders"
               :key="index"
@@ -61,7 +61,7 @@
         <div class="replay-fold__bar">
           <button type="button" class="replay-fold__toggle" @click="systemOpen = !systemOpen">
             <span class="replay-fold__chevron" aria-hidden="true">›</span>
-            <span class="replay-fold__title">系统 Header</span>
+            <span class="replay-fold__title">{{ $t('orbien.inspector.replayEditor.systemHeaders') }}</span>
             <span class="replay-fold__count">{{ systemHeaders.length }}</span>
           </button>
         </div>
@@ -81,7 +81,7 @@
           <div class="replay-editor__section-actions">
             <span class="replay-editor__hint">{{ bodySize }} / {{ maxBodyBytes }}</span>
             <ElButton text type="primary" :disabled="!canFormatBody" @click="formatBody">
-              格式化
+              {{ $t('orbien.inspector.replayEditor.format') }}
             </ElButton>
           </div>
         </div>
@@ -93,13 +93,13 @@
             class="replay-editor__body"
             placeholder=""
         />
-        <div v-if="bodyTooLarge" class="replay-editor__error">超出大小限制</div>
+        <div v-if="bodyTooLarge" class="replay-editor__error">{{ $t('orbien.inspector.replayEditor.bodyTooLarge') }}</div>
       </div>
     </div>
 
     <template #footer>
       <ElButton type="primary" :loading="submitting" :disabled="!canSubmit" @click="handleSubmit">
-        发送重放
+        {{ $t('orbien.inspector.replayEditor.sendReplay') }}
       </ElButton>
     </template>
   </ElDialog>
@@ -107,8 +107,11 @@
 
 <script setup lang="ts">
 import {computed, reactive, ref, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
 
 defineOptions({name: 'ReplayEditor'})
+
+const {t} = useI18n()
 
 const METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'] as const
 
@@ -170,7 +173,7 @@ const headerPreview = computed(() => {
       .map((row) => row.name?.trim())
       .filter(Boolean)
       .slice(0, 3)
-  if (!names.length) return '未设置'
+  if (!names.length) return t('orbien.inspector.replayEditor.notSet')
   const more = editableHeaders.value.length > names.length
   return names.join(', ') + (more ? '…' : '')
 })
@@ -179,7 +182,7 @@ const headerError = computed(() => {
   for (const row of editableHeaders.value) {
     if (row.error) return row.error
     if (row.name && isForbidden(row.name)) {
-      return `不可修改: ${row.name}`
+      return t('orbien.inspector.replayEditor.notEditableName', {name: row.name})
     }
   }
   return ''
@@ -214,8 +217,8 @@ watch(
         system.unshift({name: 'Host', value: detail.host})
       }
       system.push(
-          {name: 'Content-Length', value: '(自动计算)'},
-          {name: 'Connection / X-Forwarded-* / Orbien-Replay-*', value: '(系统写入)'}
+          {name: 'Content-Length', value: t('orbien.inspector.replayEditor.autoContentLength')},
+          {name: 'Connection / X-Forwarded-* / Orbien-Replay-*', value: t('orbien.inspector.replayEditor.systemWritten')}
       )
       editableHeaders.value = editable
       systemHeaders.value = system
@@ -260,7 +263,7 @@ const validateHeaderRow = (row: HeaderRow) => {
     return
   }
   if (isForbidden(row.name)) {
-    row.error = '不可修改'
+    row.error = t('orbien.inspector.replayEditor.notEditable')
     return
   }
   row.error = undefined

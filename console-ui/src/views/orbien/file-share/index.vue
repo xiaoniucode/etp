@@ -4,12 +4,12 @@
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
         <template #left>
           <ElSpace wrap>
-            <ElButton type="primary" @click="showDialog('add')" v-ripple>添加</ElButton>
+            <ElButton type="primary" @click="showDialog('add')" v-ripple>{{ $t('common.add') }}</ElButton>
             <ElButton
                 @click="handleBatchDelete"
                 v-ripple
                 :disabled="selectedRows.length === 0"
-            >批量删除
+            >{{ $t('common.batchDelete') }}
             </ElButton>
           </ElSpace>
         </template>
@@ -58,6 +58,7 @@
 
 <script setup lang="ts">
 import {ref, h, nextTick, onMounted} from 'vue'
+import {useI18n} from 'vue-i18n'
 import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
 import {useTable} from '@/hooks/core/useTable'
 import {fetchGetFileShareList} from '@/api/file-share'
@@ -76,6 +77,8 @@ import {DialogType} from '@/types'
 import {ProtocolType, ProxyStatus} from '@/enums/orbien/business'
 
 defineOptions({name: 'FileSharePenetration'})
+
+const {t} = useI18n()
 
 type FileShareItem = Api.FileShare.FileShareListDTO
 
@@ -130,16 +133,16 @@ const {
       {type: 'selection'},
       {
         prop: 'name',
-        label: '代理名称'
+        label: t('orbien.proxy.name')
       },
 
       {
         prop: 'rootPath',
-        label: '根目录',
+        label: t('orbien.proxy.rootDir'),
       },
       {
         prop: 'accessUrls',
-        label: '访问地址',
+        label: t('orbien.proxy.accessUrl'),
         minWidth: 100,
         formatter: (row: FileShareItem) => {
           const urls = row.accessUrls?.length ? row.accessUrls : (row.domains || [])
@@ -166,34 +169,34 @@ const {
       },
       {
         prop: 'tlsCertSummary',
-        label: 'TLS 证书',
+        label: t('orbien.proxy.tlsCert'),
         formatter: (row: FileShareItem) =>
             renderTlsCertSummaryTag(row.tlsCertSummary, () => handleOpenTlsConfig(row))
       },
       {
         prop: 'transportProtocol',
-        label: '传输协议',
+        label: t('orbien.proxy.transport'),
         formatter: (row: FileShareItem) => renderTransportProtocolTag(row.transportProtocol)
       },
       {
         prop: 'authEnabled',
-        label: '身份认证',
+        label: t('orbien.proxy.identityAuth'),
         formatter: (row: FileShareItem) =>
             h(ElTag, {
               type: row.authEnabled ? 'primary' : 'info',
               size: 'small'
-            }, () => row.authEnabled ? '已启用' : '未启用')
+            }, () => row.authEnabled ? t('common.enabled') : t('common.disabled'))
       },
       {
         prop: 'traffic',
-        label: '流量',
+        label: t('orbien.proxy.traffic'),
         formatter: (row: FileShareItem) =>
           renderTrafficRate(row.traffic, () => handleMetrics(row))
       },
 
       {
         prop: 'status',
-        label: '状态',
+        label: t('common.status'),
         width: 80,
         formatter: (row: FileShareItem) =>
             h(ElSwitch, {
@@ -205,24 +208,24 @@ const {
       },
       {
         prop: 'operation',
-        label: '操作',
+        label: t('common.actions'),
         width: 150,
         fixed: 'right',
         formatter: (row: FileShareItem) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'link',
-                text: '设置',
+                text: t('common.settings'),
                 onClick: () => handleSettings(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '编辑',
+                text: t('common.edit'),
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '删除',
+                text: t('common.delete'),
                 onClick: () => handleSingleDelete(row)
               })
             ])
@@ -284,14 +287,14 @@ const handleDialogSubmit = async () => {
 
 const handleBatchDelete = async () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请选择要删除的文件共享')
+    ElMessage.warning(t('orbien.proxy.selectFileShareToDelete'))
     return
   }
 
   try {
-    await ElMessageBox.confirm('确定要删除选中的文件共享吗？', '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('orbien.proxy.deleteBatchFileShareTip'), t('common.warning'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
 
@@ -307,9 +310,9 @@ const handleBatchDelete = async () => {
 
 const handleSingleDelete = async (proxy: FileShareItem) => {
   try {
-    await ElMessageBox.confirm(`确定要删除文件共享「${proxy.name}」吗？`, '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('orbien.proxy.deleteOneFileShareTip', {name: proxy.name}), t('common.warning'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
 

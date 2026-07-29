@@ -1,7 +1,7 @@
 <template>
   <div class="acme-wizard domain-step">
     <section class="section-block">
-      <div class="section-title">证书品牌</div>
+      <div class="section-title">{{ $t('orbien.tls.acme.section.certBrand') }}</div>
       <ElRadioGroup :model-value="certBrand" @update:model-value="emit('update:certBrand', $event)">
         <ElRadio v-for="item in certBrandOptions" :key="item.value" :value="item.value">
           {{ item.label }}
@@ -10,16 +10,16 @@
     </section>
 
     <section class="section-block">
-      <div class="section-title">当前代理</div>
+      <div class="section-title">{{ $t('orbien.tls.acme.section.currentProxy') }}</div>
       <div class="proxy-context art-card-sm">
-        <span class="proxy-context__name">{{ proxyName || '当前代理' }}</span>
-        <ElTag size="small" type="info">{{ domainOptions.length }} 个域名</ElTag>
+        <span class="proxy-context__name">{{ proxyName || $t('orbien.tls.acme.section.currentProxy') }}</span>
+        <ElTag size="small" type="info">{{ $t('orbien.tls.acme.proxy.domainCount', { n: domainOptions.length }) }}</ElTag>
       </div>
     </section>
 
     <section class="section-block">
-      <div class="section-title">选择域名</div>
-      <ElEmpty v-if="!domainLoading && !domainOptions.length" description="当前代理暂无可用域名"/>
+      <div class="section-title">{{ $t('orbien.tls.acme.section.selectDomain') }}</div>
+      <ElEmpty v-if="!domainLoading && !domainOptions.length" :description="$t('orbien.tls.acme.proxy.noDomains')"/>
       <AcmeDomainSelectTable
           v-else
           v-model="selectedDomainsModel"

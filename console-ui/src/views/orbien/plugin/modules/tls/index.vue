@@ -2,18 +2,18 @@
   <div class="tls-page">
     <div class="tls-page-content">
       <div v-if="matrix" class="tls-summary">
-        <span>域名证书：{{ matrix.boundCount }}/{{ matrix.totalDomains }} 已配置</span>
+        <span>{{ t('orbien.plugin.tls.summary', { bound: matrix.boundCount, total: matrix.totalDomains }) }}</span>
         <ElTag v-if="matrix.warningCount > 0" type="danger" size="small">
-          {{ matrix.warningCount }} 个异常
+          {{ t('orbien.plugin.tls.warnings', { count: matrix.warningCount }) }}
         </ElTag>
       </div>
 
       <ElTabs v-model="activeName" type="card">
-        <ElTabPane label="域名证书" name="domain-cert">
+        <ElTabPane :label="t('orbien.plugin.tls.domainCert')" name="domain-cert">
           <div class="tab-content">
             <div class="toolbar">
-              <ElButton type="primary" @click="wizardVisible = true">免费申请</ElButton>
-              <ElButton v-ripple @click="openUploadDialog">手动上传</ElButton>
+              <ElButton type="primary" @click="wizardVisible = true">{{ t('orbien.plugin.tls.freeApply') }}</ElButton>
+              <ElButton v-ripple @click="openUploadDialog">{{ t('orbien.plugin.tls.manualUpload') }}</ElButton>
             </div>
 
             <ArtTable
@@ -26,7 +26,7 @@
           </div>
         </ElTabPane>
 
-        <ElTabPane label="证书库" name="cert-folder">
+        <ElTabPane :label="t('orbien.plugin.tls.certFolder')" name="cert-folder">
           <div class="cert-folder-content">
             <ArtTable
                 row-key="id"
@@ -43,11 +43,11 @@
       </ElTabs>
     </div>
 
-    <ElDialog v-model="uploadDialogVisible" title="上传并绑定证书" width="720px" align-center>
+    <ElDialog v-model="uploadDialogVisible" :title="t('orbien.plugin.tls.uploadAndBind')" width="720px" align-center>
       <div class="upload-form">
         <div class="form-item">
-          <div class="form-label">绑定域名</div>
-          <ElSelect v-model="uploadForm.proxyDomainIds" multiple placeholder="选择要绑定的域名" style="width: 100%">
+          <div class="form-label">{{ t('orbien.plugin.tls.bindDomains') }}</div>
+          <ElSelect v-model="uploadForm.proxyDomainIds" multiple :placeholder="t('orbien.plugin.tls.selectBindDomains')" style="width: 100%">
             <ElOption
                 v-for="item in matrix?.domains || []"
                 :key="item.proxyDomainId"
@@ -57,17 +57,17 @@
           </ElSelect>
         </div>
         <div class="form-item">
-          <div class="form-label">私钥(KEY)</div>
+          <div class="form-label">{{ t('orbien.plugin.tls.privateKey') }}</div>
           <ElInput v-model="uploadForm.keyContent" type="textarea" :rows="8" resize="none"/>
         </div>
         <div class="form-item">
-          <div class="form-label">证书(PEM格式)</div>
+          <div class="form-label">{{ t('orbien.plugin.tls.certificate') }}</div>
           <ElInput v-model="uploadForm.certContent" type="textarea" :rows="8" resize="none"/>
         </div>
       </div>
       <template #footer>
-        <ElButton @click="uploadDialogVisible = false">取消</ElButton>
-        <ElButton type="primary" :loading="uploadSubmitting" @click="handleUploadAndBind">保存并绑定</ElButton>
+        <ElButton @click="uploadDialogVisible = false">{{ t('common.cancel') }}</ElButton>
+        <ElButton type="primary" :loading="uploadSubmitting" @click="handleUploadAndBind">{{ t('orbien.plugin.tls.saveAndBind') }}</ElButton>
       </template>
     </ElDialog>
 
@@ -88,6 +88,7 @@
 
 <script setup lang="ts">
 import {ref, reactive, watch, h, computed} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {useTable} from '@/hooks/core/useTable'
 import {ElMessage, ElMessageBox, ElTag} from 'element-plus'
 import ArtTable from '@/components/core/tables/art-table/index.vue'
@@ -106,6 +107,8 @@ import {
 import {resolveTlsBindStatusTagType} from '@/utils/ui/status-tag'
 
 defineOptions({name: 'TlsPage'})
+
+const {t, locale} = useI18n()
 
 const props = defineProps<{ proxyId: string; proxyName?: string }>()
 
@@ -130,19 +133,25 @@ const formatDate = (dateStr: string) => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
-const bindStatusTag = (status?: number) => {
+const bindStatusText = (status?: number) => {
   const map: Record<number, string> = {
-    1: '正常',
-    2: '已禁用',
-    3: 'SAN不匹配',
-    4: '已过期',
-    5: '部署失败'
+    1: t('orbien.plugin.tls.bindStatus.normal'),
+    2: t('orbien.plugin.tls.bindStatus.disabled'),
+    3: t('orbien.plugin.tls.bindStatus.sanMismatch'),
+    4: t('orbien.plugin.tls.bindStatus.expired'),
+    5: t('orbien.plugin.tls.bindStatus.deployFailed')
   }
   if (!status) {
-    return h(ElTag, {type: 'info', size: 'small'}, () => '未配置')
+    return t('orbien.plugin.tls.bindStatus.notConfigured')
   }
-  const text = map[status] || '未知'
-  return h(ElTag, {type: resolveTlsBindStatusTagType(status), size: 'small'}, () => text)
+  return map[status] || t('orbien.plugin.tls.bindStatus.unknown')
+}
+
+const bindStatusTag = (status?: number) => {
+  if (!status) {
+    return h(ElTag, {type: 'info', size: 'small'}, () => bindStatusText(status))
+  }
+  return h(ElTag, {type: resolveTlsBindStatusTagType(status), size: 'small'}, () => bindStatusText(status))
 }
 
 const isDomainMatchedByCert = (domain: string, cert: Api.Tls.CertDTO) => {
@@ -159,96 +168,99 @@ const isDomainMatchedByCert = (domain: string, cert: Api.Tls.CertDTO) => {
   })
 }
 
-const domainColumns = computed(() => [
-  {
-    prop: 'fullDomain',
-    label: '域名',
-    minWidth: 160
-  },
-  {
-    prop: 'binding',
-    label: '证书 SAN',
-    minWidth: 160,
-    formatter: (row: Api.CertBinding.ProxyDomainCertItem) =>
-        row.binding?.certSanDomains?.join(', ') || ''
-  },
-  {
-    prop: 'notAfter',
-    label: '到期时间',
-    width: 120,
-    formatter: (row: Api.CertBinding.ProxyDomainCertItem) =>
-        row.binding?.notAfter ? formatDate(row.binding.notAfter) : ''
-  },
-  {
-    prop: 'status',
-    label: '状态',
-    width: 100,
-    formatter: (row: Api.CertBinding.ProxyDomainCertItem) =>
-        bindStatusTag(row.binding?.bindStatus)
-  },
-  {
-    prop: 'operation',
-    label: '操作',
-    width: 220,
-    formatter: (row: Api.CertBinding.ProxyDomainCertItem) => {
-      const binding = row.binding
-      if (!binding) {
-        return h(ArtButtonTable, {
-          type: 'link',
-          text: '绑定证书',
-          onClick: () => openBindDialog(row)
-        })
-      }
-      const actions = []
-      if (binding.bindStatus === 2) {
-        actions.push(
-            h(ArtButtonTable, {
-              type: 'link',
-              text: '启用',
-              onClick: () => handleEnable(binding.bindingId)
-            })
-        )
-      } else if (binding.bindStatus === 5) {
-        actions.push(
-            h(ArtButtonTable, {
-              type: 'link',
-              text: '重试',
-              onClick: () => handleRedeploy(binding.bindingId)
-            })
-        )
-      } else if (binding.bindStatus === 1) {
-        actions.push(
-            h(ArtButtonTable, {
-              type: 'link',
-              text: '换证',
-              onClick: () => openBindDialog(row)
-            }),
-            h(ArtButtonTable, {
-              type: 'link',
-              text: '禁用',
-              onClick: () => handleDisable(binding.bindingId)
-            })
-        )
-      } else {
-        actions.push(
-            h(ArtButtonTable, {
-              type: 'link',
-              text: '换证',
-              onClick: () => openBindDialog(row)
-            })
-        )
-      }
-      actions.push(
-          h(ArtButtonTable, {
+const domainColumns = computed(() => {
+  void locale.value
+  return [
+    {
+      prop: 'fullDomain',
+      label: t('orbien.plugin.tls.domain'),
+      minWidth: 160
+    },
+    {
+      prop: 'binding',
+      label: t('orbien.plugin.tls.certSan'),
+      minWidth: 160,
+      formatter: (row: Api.CertBinding.ProxyDomainCertItem) =>
+          row.binding?.certSanDomains?.join(', ') || ''
+    },
+    {
+      prop: 'notAfter',
+      label: t('orbien.plugin.tls.notAfter'),
+      width: 120,
+      formatter: (row: Api.CertBinding.ProxyDomainCertItem) =>
+          row.binding?.notAfter ? formatDate(row.binding.notAfter) : ''
+    },
+    {
+      prop: 'status',
+      label: t('orbien.plugin.tls.status'),
+      width: 100,
+      formatter: (row: Api.CertBinding.ProxyDomainCertItem) =>
+          bindStatusTag(row.binding?.bindStatus)
+    },
+    {
+      prop: 'operation',
+      label: t('common.actions'),
+      width: 220,
+      formatter: (row: Api.CertBinding.ProxyDomainCertItem) => {
+        const binding = row.binding
+        if (!binding) {
+          return h(ArtButtonTable, {
             type: 'link',
-            text: '解绑',
-            onClick: () => handleUnbind(binding.bindingId)
+            text: t('orbien.plugin.tls.bindCert'),
+            onClick: () => openBindDialog(row)
           })
-      )
-      return h('div', actions)
+        }
+        const actions = []
+        if (binding.bindStatus === 2) {
+          actions.push(
+              h(ArtButtonTable, {
+                type: 'link',
+                text: t('orbien.plugin.tls.enable'),
+                onClick: () => handleEnable(binding.bindingId)
+              })
+          )
+        } else if (binding.bindStatus === 5) {
+          actions.push(
+              h(ArtButtonTable, {
+                type: 'link',
+                text: t('orbien.plugin.tls.retry'),
+                onClick: () => handleRedeploy(binding.bindingId)
+              })
+          )
+        } else if (binding.bindStatus === 1) {
+          actions.push(
+              h(ArtButtonTable, {
+                type: 'link',
+                text: t('orbien.plugin.tls.replaceCert'),
+                onClick: () => openBindDialog(row)
+              }),
+              h(ArtButtonTable, {
+                type: 'link',
+                text: t('orbien.plugin.tls.disable'),
+                onClick: () => handleDisable(binding.bindingId)
+              })
+          )
+        } else {
+          actions.push(
+              h(ArtButtonTable, {
+                type: 'link',
+                text: t('orbien.plugin.tls.replaceCert'),
+                onClick: () => openBindDialog(row)
+              })
+          )
+        }
+        actions.push(
+            h(ArtButtonTable, {
+              type: 'link',
+              text: t('orbien.plugin.tls.unbind'),
+              onClick: () => handleUnbind(binding.bindingId)
+            })
+        )
+        return h('div', actions)
+      }
     }
-  }
-])
+  ]
+})
 
 const {
   columns: certColumns,
@@ -262,43 +274,46 @@ const {
   core: {
     apiFn: fetchGetCertListByPage,
     apiParams: {current: 1, size: 10},
-    columnsFactory: () => [
-      {
-        prop: 'sanDomains',
-        label: '认证域名',
-        minWidth: 150,
-        formatter: (row: Api.Tls.CertDTO) => row.sanDomains?.join(', ') || ''
-      },
-      {
-        prop: 'issuer',
-        label: '品牌',
-        minWidth: 100
-      },
-      {
-        prop: 'notAfter',
-        label: '到期时间',
-        minWidth: 120,
-        formatter: (row: Api.Tls.CertDTO) => formatDate(row.notAfter)
-      },
-      {
-        prop: 'operation',
-        label: '操作',
-        width: 160,
-        formatter: (row: Api.Tls.CertDTO) =>
-            h('div', [
-              h(ArtButtonTable, {
-                type: 'link',
-                text: '绑定到本代理',
-                onClick: () => handleBindCertToProxy(row)
-              }),
-              h(ArtButtonTable, {
-                type: 'link',
-                text: '删除',
-                onClick: () => handleCertDelete(row)
-              })
-            ])
-      }
-    ]
+    columnsFactory: () => {
+      void locale.value
+      return [
+        {
+          prop: 'sanDomains',
+          label: t('orbien.plugin.tls.authDomain'),
+          minWidth: 150,
+          formatter: (row: Api.Tls.CertDTO) => row.sanDomains?.join(', ') || ''
+        },
+        {
+          prop: 'issuer',
+          label: t('orbien.plugin.tls.issuer'),
+          minWidth: 100
+        },
+        {
+          prop: 'notAfter',
+          label: t('orbien.plugin.tls.notAfter'),
+          minWidth: 120,
+          formatter: (row: Api.Tls.CertDTO) => formatDate(row.notAfter)
+        },
+        {
+          prop: 'operation',
+          label: t('common.actions'),
+          width: 160,
+          formatter: (row: Api.Tls.CertDTO) =>
+              h('div', [
+                h(ArtButtonTable, {
+                  type: 'link',
+                  text: t('orbien.plugin.tls.bindToProxy'),
+                  onClick: () => handleBindCertToProxy(row)
+                }),
+                h(ArtButtonTable, {
+                  type: 'link',
+                  text: t('common.delete'),
+                  onClick: () => handleCertDelete(row)
+                })
+              ])
+        }
+      ]
+    }
   }
 })
 
@@ -320,6 +335,10 @@ watch(
     {immediate: true}
 )
 
+watch(locale, () => {
+  reloadCertList()
+})
+
 const openUploadDialog = () => {
   uploadForm.proxyDomainIds = (matrix.value?.domains || [])
       .filter((item) => !item.binding)
@@ -331,11 +350,11 @@ const openUploadDialog = () => {
 
 const handleUploadAndBind = async () => {
   if (!uploadForm.keyContent.trim() || !uploadForm.certContent.trim()) {
-    ElMessage.warning('请输入完整的私钥和证书')
+    ElMessage.warning(t('orbien.plugin.tls.keyCertRequired'))
     return
   }
   if (uploadForm.proxyDomainIds.length === 0) {
-    ElMessage.warning('请选择至少一个绑定域名')
+    ElMessage.warning(t('orbien.plugin.tls.selectDomainRequired'))
     return
   }
   uploadSubmitting.value = true
@@ -347,9 +366,9 @@ const handleUploadAndBind = async () => {
       proxyDomainIds: uploadForm.proxyDomainIds
     })
     if (result.failedCount > 0) {
-      ElMessage.warning(`绑定完成：成功 ${result.successCount} 个，失败 ${result.failedCount} 个`)
+      ElMessage.warning(t('orbien.plugin.tls.bindResult', { success: result.successCount, failed: result.failedCount }))
     } else {
-      ElMessage.success('证书已保存并绑定')
+      ElMessage.success(t('orbien.plugin.tls.savedAndBound'))
     }
     uploadDialogVisible.value = false
     await Promise.all([loadMatrix(), reloadCertList()])
@@ -373,21 +392,23 @@ const handleBindCertToProxy = async (cert: Api.Tls.CertDTO) => {
       .filter((item) => isDomainMatchedByCert(item.fullDomain, cert))
       .map((item) => item.proxyDomainId)
   if (matchedDomainIds.length === 0) {
-    ElMessage.warning('该证书 SAN 与本代理域名不匹配')
+    ElMessage.warning(t('orbien.plugin.tls.sanMismatchWarning'))
     return
   }
-  await ElMessageBox.confirm(`将绑定到 ${matchedDomainIds.length} 个匹配域名，是否继续？`, '绑定确认', {
-    type: 'warning'
-  })
+  await ElMessageBox.confirm(
+      t('orbien.plugin.tls.bindToMatched', { count: matchedDomainIds.length }),
+      t('orbien.plugin.tls.bindConfirmTitle'),
+      { type: 'warning' }
+  )
   const result = await fetchBindCert({
     certId: cert.id,
     proxyDomainIds: matchedDomainIds,
     override: true
   })
   if (result.failedCount > 0) {
-    ElMessage.warning(`绑定完成：成功 ${result.successCount} 个，失败 ${result.failedCount} 个`)
+    ElMessage.warning(t('orbien.plugin.tls.bindResult', { success: result.successCount, failed: result.failedCount }))
   } else {
-    ElMessage.success('绑定成功')
+    ElMessage.success(t('orbien.plugin.tls.bindSuccess'))
   }
   await loadMatrix()
   activeName.value = 'domain-cert'
@@ -395,26 +416,26 @@ const handleBindCertToProxy = async (cert: Api.Tls.CertDTO) => {
 
 const handleDisable = async (bindingId: number) => {
   await fetchDisableBinding(bindingId)
-  ElMessage.success('已禁用')
+  ElMessage.success(t('orbien.plugin.tls.disabled'))
   await loadMatrix()
 }
 
 const handleEnable = async (bindingId: number) => {
   await fetchEnableBinding(bindingId)
-  ElMessage.success('已启用')
+  ElMessage.success(t('orbien.plugin.tls.enabled'))
   await loadMatrix()
 }
 
 const handleUnbind = async (bindingId: number) => {
-  await ElMessageBox.confirm('确定解绑该域名的证书？', '解绑确认', {type: 'warning'})
+  await ElMessageBox.confirm(t('orbien.plugin.tls.unbindConfirm'), t('orbien.plugin.tls.unbindTitle'), {type: 'warning'})
   await fetchUnbindBinding(bindingId)
-  ElMessage.success('已解绑')
+  ElMessage.success(t('orbien.plugin.tls.unbound'))
   await loadMatrix()
 }
 
 const handleRedeploy = async (bindingId: number) => {
   await fetchRedeployBinding(bindingId)
-  ElMessage.success('已重新部署')
+  ElMessage.success(t('orbien.plugin.tls.redeployed'))
   await loadMatrix()
 }
 
@@ -424,9 +445,9 @@ const handleApplySuccess = async () => {
 }
 
 const handleCertDelete = async (row: Api.Tls.CertDTO) => {
-  await ElMessageBox.confirm('确定要删除该证书？', '警告', {type: 'warning'})
+  await ElMessageBox.confirm(t('orbien.plugin.tls.deleteCertConfirm'), t('common.warning'), {type: 'warning'})
   await fetchDeleteCert([row.id])
-  ElMessage.success('删除成功')
+  ElMessage.success(t('common.success.delete'))
   await reloadCertList()
 }
 </script>

@@ -2,7 +2,7 @@
   <div class="art-card p-5 mb-5 max-sm:mb-4">
     <div class="art-card-header">
       <div class="title">
-        <h4>概览</h4>
+        <h4>{{ $t('dashboard.overview.title') }}</h4>
       </div>
     </div>
     <div class="stats-container">
@@ -24,41 +24,44 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, onMounted } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { fetchGetDashboardSummary } from '@/api/monitor'
 import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
 import ArtCountTo from '@/components/core/text-effect/art-count-to/index.vue'
 
-interface CardDataItem {
-  des: string
-  icon: string
-  num: number
-  iconBgClass: string
-}
+const { t } = useI18n()
 
-const dataList = reactive<CardDataItem[]>([
+const counts = reactive({
+  agents: 0,
+  online: 0,
+  proxies: 0,
+  running: 0
+})
+
+const dataList = computed(() => [
   {
-    des: '客户端总数',
+    des: t('dashboard.overview.agents'),
     icon: 'ri:computer-line',
-    num: 0,
+    num: counts.agents,
     iconBgClass: 'icon-bg-blue'
   },
   {
-    des: '在线客户端数',
+    des: t('dashboard.overview.online'),
     icon: 'ri:user-star-line',
-    num: 0,
+    num: counts.online,
     iconBgClass: 'icon-bg-green'
   },
   {
-    des: '隧道总数',
+    des: t('dashboard.overview.proxies'),
     icon: 'ri:server-line',
-    num: 0,
+    num: counts.proxies,
     iconBgClass: 'icon-bg-orange'
   },
   {
-    des: '已启动隧道数',
+    des: t('dashboard.overview.running'),
     icon: 'ri:play-circle-line',
-    num: 0,
+    num: counts.running,
     iconBgClass: 'icon-bg-purple'
   }
 ])
@@ -66,10 +69,10 @@ const dataList = reactive<CardDataItem[]>([
 const getDashboardSummary = async () => {
   const data = await fetchGetDashboardSummary()
   if (data) {
-    dataList[0].num = data.totalAgents || 0
-    dataList[1].num = data.onlineAgents || 0
-    dataList[2].num = data.totalProxies || 0
-    dataList[3].num = data.startedProxies || 0
+    counts.agents = data.totalAgents || 0
+    counts.online = data.onlineAgents || 0
+    counts.proxies = data.totalProxies || 0
+    counts.running = data.startedProxies || 0
   }
 }
 

@@ -2,22 +2,22 @@
   <div class="rate-limit-page" v-loading="loading">
     <section class="setting-section">
       <div class="section-header">
-        <h3 class="section-title">带宽单位</h3>
-        <p class="section-desc">统一设置下方所有带宽字段的输入与显示单位</p>
+        <h3 class="section-title">{{ t('orbien.plugin.rateLimit.bandwidthUnit') }}</h3>
+        <p class="section-desc">{{ t('orbien.plugin.rateLimit.bandwidthUnitDesc') }}</p>
       </div>
-      <ElSelect v-model="form.bandwidthUnit" placeholder="选择单位" class="unit-select">
+      <ElSelect v-model="form.bandwidthUnit" :placeholder="t('orbien.plugin.rateLimit.selectUnit')" class="unit-select">
         <ElOption v-for="unit in BANDWIDTH_UNIT_OPTIONS" :key="unit" :label="unit" :value="unit" />
       </ElSelect>
     </section>
 
     <section class="setting-section">
       <div class="section-header">
-        <h3 class="section-title">带宽限制</h3>
-        <p class="section-desc">分别限制下载、上传与总带宽，留空表示不限制</p>
+        <h3 class="section-title">{{ t('orbien.plugin.rateLimit.bandwidthLimit') }}</h3>
+        <p class="section-desc">{{ t('orbien.plugin.rateLimit.bandwidthLimitDesc') }}</p>
       </div>
 
       <div class="setting-list">
-        <div v-for="field in LIMIT_FIELDS" :key="field.key" class="setting-item">
+        <div v-for="field in limitFields" :key="field.key" class="setting-item">
           <div class="setting-meta">
             <span class="setting-name">{{ field.label }}</span>
             <span class="setting-hint">{{ field.hint }}</span>
@@ -38,13 +38,14 @@
     </section>
 
     <div class="form-actions">
-      <ElButton type="primary" :loading="saving" @click="handleSave">保存配置</ElButton>
+      <ElButton type="primary" :loading="saving" @click="handleSave">{{ t('orbien.plugin.basic.saveConfig') }}</ElButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, watch } from 'vue'
+  import { ref, reactive, watch, computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import {
     fetchProxyDetail,
     saveProxyBandwidthConfig,
@@ -59,30 +60,31 @@
 
   defineOptions({ name: 'RateLimitPolicyPage' })
 
+  const { t } = useI18n()
+
   type BandwidthUnitOption = (typeof BANDWIDTH_UNIT_OPTIONS)[number]
+  type LimitKey = 'limitTotal' | 'limitIn' | 'limitOut'
 
-  const LIMIT_FIELDS = [
+  const limitFields = computed(() => [
     {
-      key: 'limitTotal',
-      label: '总带宽',
-      hint: '上下行共享总带宽，与单向限制同时配置时需满足总量约束',
-      placeholder: '不限'
+      key: 'limitTotal' as LimitKey,
+      label: t('orbien.plugin.rateLimit.totalBandwidth'),
+      hint: t('orbien.plugin.rateLimit.totalBandwidthHint'),
+      placeholder: t('orbien.plugin.rateLimit.unlimited')
     },
     {
-      key: 'limitIn',
-      label: '下载带宽',
-      hint: '限制客户端下载速率（内网服务 -> 客户端）',
-      placeholder: '不限'
+      key: 'limitIn' as LimitKey,
+      label: t('orbien.plugin.rateLimit.downloadBandwidth'),
+      hint: t('orbien.plugin.rateLimit.downloadBandwidthHint'),
+      placeholder: t('orbien.plugin.rateLimit.unlimited')
     },
     {
-      key: 'limitOut',
-      label: '上传带宽',
-      hint: '限制客户端上传速率（客户端 -> 内网服务）',
-      placeholder: '不限'
+      key: 'limitOut' as LimitKey,
+      label: t('orbien.plugin.rateLimit.uploadBandwidth'),
+      hint: t('orbien.plugin.rateLimit.uploadBandwidthHint'),
+      placeholder: t('orbien.plugin.rateLimit.unlimited')
     }
-  ] as const
-
-  type LimitKey = (typeof LIMIT_FIELDS)[number]['key']
+  ])
 
   const props = defineProps<{
     proxyId: string
@@ -163,7 +165,7 @@
     (newUnit, oldUnit) => {
       if (isInitializing.value || !oldUnit || newUnit === oldUnit) return
 
-      for (const { key } of LIMIT_FIELDS) {
+      for (const { key } of limitFields.value) {
         form[key] = convertBetweenUnits(form[key], oldUnit, newUnit)
       }
     }

@@ -1,24 +1,24 @@
 <template>
   <ElDrawer
     v-model="drawerVisible"
-    :title="`配置 - ${job?.jobName || ''}`"
+    :title="drawerTitle"
     size="560px"
     destroy-on-close
   >
     <div v-loading="loading" class="drawer-body">
       <ElForm v-if="form" ref="formRef" :model="form" label-position="top" class="job-config-form">
         <section v-if="job?.description" class="form-section">
-          <div class="section-label">任务说明</div>
+          <div class="section-label">{{ $t('orbien.scheduledJob.config.description') }}</div>
           <div class="desc-block">{{ job.description }}</div>
         </section>
 
         <section class="form-section">
-          <div class="section-label">执行周期</div>
+          <div class="section-label">{{ $t('orbien.scheduledJob.config.schedule') }}</div>
           <CronSchedulePicker v-model="form.cronExpression" />
         </section>
 
         <section v-if="job?.paramSchema?.length" class="form-section">
-          <div class="section-label">任务参数</div>
+          <div class="section-label">{{ $t('orbien.scheduledJob.config.params') }}</div>
           <div class="param-list">
             <div v-for="field in job.paramSchema" :key="field.key" class="param-item">
               <div class="param-label">{{ field.label }}</div>
@@ -33,7 +33,11 @@
               <div v-else-if="field.type === 'boolean'" class="param-switch">
                 <ElSwitch v-model="form.params[field.key] as boolean" size="small" />
                 <span class="switch-text">
-                  {{ form.params[field.key] ? '开启' : '关闭' }}
+                  {{
+                    form.params[field.key]
+                      ? $t('orbien.scheduledJob.config.on')
+                      : $t('orbien.scheduledJob.config.off')
+                  }}
                 </span>
               </div>
               <ElInput v-else v-model="form.params[field.key] as string" class="param-input" />
@@ -44,8 +48,10 @@
       </ElForm>
 
       <div class="drawer-footer">
-        <ElButton @click="drawerVisible = false">取消</ElButton>
-        <ElButton type="primary" :loading="submitting" @click="handleSubmit">保存</ElButton>
+        <ElButton @click="drawerVisible = false">{{ $t('common.cancel') }}</ElButton>
+        <ElButton type="primary" :loading="submitting" @click="handleSubmit">
+          {{ $t('orbien.scheduledJob.config.save') }}
+        </ElButton>
       </div>
     </div>
   </ElDrawer>
@@ -53,6 +59,7 @@
 
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage } from 'element-plus'
   import { fetchScheduledJobDetail, fetchUpdateScheduledJob } from '@/api/scheduled-job'
   import CronSchedulePicker from './cron-schedule-picker.vue'
@@ -71,6 +78,7 @@
 
   const props = defineProps<Props>()
   const emit = defineEmits<Emits>()
+  const { t } = useI18n()
 
   const loading = ref(false)
   const submitting = ref(false)
@@ -81,6 +89,10 @@
     get: () => props.visible,
     set: (value) => emit('update:visible', value)
   })
+
+  const drawerTitle = computed(() =>
+    t('orbien.scheduledJob.config.title', { name: job.value?.jobName || '' })
+  )
 
   const loadDetail = async () => {
     if (!props.jobCode) {
@@ -106,7 +118,7 @@
     submitting.value = true
     try {
       await fetchUpdateScheduledJob(props.jobCode, form.value)
-      ElMessage.success('保存成功')
+      ElMessage.success(t('orbien.scheduledJob.message.saveSuccess'))
       emit('saved')
       drawerVisible.value = false
     } finally {

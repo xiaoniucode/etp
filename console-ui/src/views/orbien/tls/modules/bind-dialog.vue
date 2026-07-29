@@ -1,5 +1,5 @@
 <template>
-  <ElDialog v-model="dialogVisible" title="绑定证书到域名" width="720px" align-center>
+  <ElDialog v-model="dialogVisible" :title="$t('orbien.tls.bind.title')" width="720px" align-center>
     <div v-loading="loading">
       <ElAlert
         v-if="certSanText"
@@ -7,7 +7,7 @@
         :closable="false"
         show-icon
         class="mb-4"
-        :title="`证书 SAN: ${certSanText}`"
+        :title="$t('orbien.tls.bind.certSan', { san: certSanText })"
       />
       <ElTable
         ref="tableRef"
@@ -17,32 +17,32 @@
         @selection-change="handleSelectionChange"
       >
         <ElTableColumn type="selection" width="48" :selectable="isRowSelectable" />
-        <ElTableColumn prop="fullDomain" label="域名" min-width="180" />
-        <ElTableColumn prop="proxyName" label="所属代理" min-width="120" />
-        <ElTableColumn label="匹配状态" width="110">
+        <ElTableColumn prop="fullDomain" :label="$t('orbien.tls.bind.columns.domain')" min-width="180" />
+        <ElTableColumn prop="proxyName" :label="$t('orbien.tls.bind.columns.proxy')" min-width="120" />
+        <ElTableColumn :label="$t('orbien.tls.bind.columns.matchStatus')" width="110">
           <template #default="{ row }">
             <ElTag :type="row.matched ? 'primary' : 'danger'" size="small">
-              {{ row.matched ? '匹配' : '不匹配' }}
+              {{ row.matched ? $t('orbien.tls.bind.match.matched') : $t('orbien.tls.bind.match.unmatched') }}
             </ElTag>
           </template>
         </ElTableColumn>
-        <ElTableColumn label="当前证书" min-width="120">
+        <ElTableColumn :label="$t('orbien.tls.bind.columns.currentCert')" min-width="120">
           <template #default="{ row }">
-            <span v-if="row.hasBinding" class="text-warning">已绑定</span>
-            <span v-else class="text-secondary">未绑定</span>
+            <span v-if="row.hasBinding" class="text-warning">{{ $t('orbien.tls.bind.match.bound') }}</span>
+            <span v-else class="text-secondary">{{ $t('orbien.tls.bind.match.unbound') }}</span>
           </template>
         </ElTableColumn>
       </ElTable>
       <div v-if="selectedRows.length" class="selection-tip">
-        已选择 {{ selectedRows.length }} 个域名
-        <span v-if="overrideCount">（{{ overrideCount }} 个将覆盖已有绑定）</span>
+        {{ $t('orbien.tls.bind.selection', { n: selectedRows.length }) }}
+        <span v-if="overrideCount">{{ $t('orbien.tls.bind.overrideHint', { n: overrideCount }) }}</span>
       </div>
     </div>
 
     <template #footer>
-      <ElButton @click="handleCancel">取消</ElButton>
+      <ElButton @click="handleCancel">{{ $t('common.cancel') }}</ElButton>
       <ElButton type="primary" :disabled="selectedRows.length === 0" :loading="submitting" @click="handleSubmit">
-        确认绑定
+        {{ $t('orbien.tls.bind.confirmBind') }}
       </ElButton>
     </template>
   </ElDialog>
@@ -50,11 +50,14 @@
 
 <script setup lang="ts">
   import { ref, computed, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import { fetchListBindableDomains, fetchBindCert } from '@/api/cert-binding'
   import { fetchGetCertListByPage } from '@/api/tls'
 
   defineOptions({ name: 'BindDialog' })
+
+  const { t } = useI18n()
 
   interface Props {
     visible: boolean
@@ -122,9 +125,9 @@
 
     const override = overrideCount.value > 0
     if (override) {
-      await ElMessageBox.confirm('部分域名已有绑定，继续将覆盖原有证书，是否继续？', '绑定确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+      await ElMessageBox.confirm(t('orbien.tls.bind.confirmOverride'), t('orbien.tls.bind.confirmOverrideTitle'), {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning'
       })
     }
@@ -137,9 +140,9 @@
         override: true
       })
       if (result.failedCount > 0) {
-        ElMessage.warning(`绑定完成：成功 ${result.successCount} 个，失败 ${result.failedCount} 个`)
+        ElMessage.warning(t('orbien.tls.bind.resultPartial', { success: result.successCount, failed: result.failedCount }))
       } else {
-        ElMessage.success(`已成功绑定 ${result.successCount} 个域名`)
+        ElMessage.success(t('orbien.tls.bind.resultSuccess', { n: result.successCount }))
       }
       dialogVisible.value = false
       emit('submit')

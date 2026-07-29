@@ -1,9 +1,9 @@
 <template>
-  <ElFormItem label="内网服务" :prop="clusterMode ? undefined : hostProp">
+  <ElFormItem :label="t('orbien.proxy.backend')" :prop="clusterMode ? undefined : hostProp">
     <div v-if="clusterMode" class="cluster-backend">
-      <span class="cluster-backend__summary">负载均衡 · {{ targets.length }} 个服务</span>
+      <span class="cluster-backend__summary">{{ t('orbien.proxy.clusterSummary', { n: targets.length }) }}</span>
       <ElButton link type="primary" class="cluster-backend__link" @click="emit('open-cluster')">
-        前往负载均衡配置
+        {{ t('orbien.proxy.goClusterConfig') }}
       </ElButton>
     </div>
     <slot v-else/>
@@ -11,7 +11,11 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 defineOptions({name: 'BackendServiceField'})
+
+const { t } = useI18n()
 
 withDefaults(
     defineProps<{

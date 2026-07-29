@@ -1,5 +1,6 @@
 import {ref} from 'vue'
 import {fetchGetDomainListAll} from '@/api/domain'
+import {$t} from '@/locales/index'
 
 type SubdomainBindingLike =
     | Api.Proxy.SubdomainBindingParam
@@ -139,7 +140,7 @@ export function validateSubdomainBindings(
     rootDomains?: Api.Domain.DomainDTO[]
 ): SubdomainBindingsValidationResult {
     if (!bindings?.length) {
-        return {valid: false, message: '请至少添加一条子域名配置', errorIndexes: []}
+        return {valid: false, message: $t('orbien.proxy.subdomainMinOne'), errorIndexes: []}
     }
 
     const emptyPrefixIndexes: number[] = []
@@ -155,11 +156,11 @@ export function validateSubdomainBindings(
     })
 
     if (emptyPrefixIndexes.length > 0) {
-        return {valid: false, message: '请填写子域名前缀', errorIndexes: emptyPrefixIndexes}
+        return {valid: false, message: $t('orbien.proxy.subdomainPrefixRequired'), errorIndexes: emptyPrefixIndexes}
     }
 
     if (missingRootDomainIndexes.length > 0) {
-        return {valid: false, message: '请选择根域名', errorIndexes: missingRootDomainIndexes}
+        return {valid: false, message: $t('orbien.proxy.selectRootDomain'), errorIndexes: missingRootDomainIndexes}
     }
 
     const duplicateIndexes = new Set<number>()
@@ -181,7 +182,7 @@ export function validateSubdomainBindings(
     if (duplicateIndexes.size > 0) {
         return {
             valid: false,
-            message: '存在重复的子域名配置',
+            message: $t('orbien.proxy.duplicateSubdomain'),
             errorIndexes: [...duplicateIndexes]
         }
     }

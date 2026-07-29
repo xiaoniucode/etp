@@ -1,3 +1,4 @@
+import {$t} from '@/locales'
 
 export enum ProtocolType {
     TCP = 1,
@@ -69,10 +70,6 @@ export enum TunnelType {
     DIRECT = 1
 }
 
-export function getTunnelTypeLabel(tunnelType?: number) {
-    return tunnelType === TunnelType.DIRECT ? '独立连接' : '多路复用'
-}
-
 /** 传输协议 */
 export enum TransportProtocol {
     TCP = 1,
@@ -88,13 +85,6 @@ export enum TargetHealthStatus {
 export const PORT_POOL_TYPE_OPTIONS = [
     {label: 'TCP', value: PortPoolType.TCP},
     {label: 'UDP', value: PortPoolType.UDP}
-] as const
-
-export const LOAD_BALANCE_OPTIONS = [
-    {label: '轮询 (roundrobin)', value: LoadBalanceType.ROUND_ROBIN},
-    {label: '权重 (weight)', value: LoadBalanceType.WEIGHT},
-    {label: '随机 (random)', value: LoadBalanceType.RANDOM},
-    {label: '最少连接 (leastconn)', value: LoadBalanceType.LEAST_CONN}
 ] as const
 
 export const HEADER_ACTION_OPTIONS = [
@@ -151,23 +141,24 @@ export function getProtocolLabel(protocol?: number) {
 export function getDomainTypeLabel(domainType: number) {
     switch (domainType) {
         case DomainType.CUSTOM_DOMAIN:
-            return {type: 'warning' as const, text: '自定义'}
+            return {type: 'warning' as const, text: $t('orbien.enum.domain.custom')}
         case DomainType.SUBDOMAIN:
-            return {type: 'primary' as const, text: '子域名'}
+            return {type: 'primary' as const, text: $t('orbien.enum.domain.subdomain')}
         case DomainType.AUTO:
-            return {type: 'primary' as const, text: '自动子域名'}
+            return {type: 'primary' as const, text: $t('orbien.enum.domain.auto')}
         default:
-            return {type: 'info' as const, text: '未知'}
+            return {type: 'info' as const, text: $t('orbien.enum.unknown')}
     }
 }
+
 export function getAgentTypeTag(agentType?: number) {
     if (agentType === AgentType.STANDALONE) {
-        return { type: 'primary' as const, text: '标准' }
+        return {type: 'primary' as const, text: $t('orbien.enum.agent.standard')}
     }
     if (agentType === AgentType.SESSION) {
-        return { type: 'warning' as const, text: '会话' }
+        return {type: 'warning' as const, text: $t('orbien.enum.agent.session')}
     }
-    return { type: 'info' as const, text: '未知' }
+    return {type: 'info' as const, text: $t('orbien.enum.unknown')}
 }
 
 export function getPortPoolTypeLabel(type: number) {
@@ -177,7 +168,7 @@ export function getPortPoolTypeLabel(type: number) {
         case PortPoolType.UDP:
             return {type: 'warning' as const, text: 'UDP'}
         default:
-            return {type: 'info' as const, text: '未知'}
+            return {type: 'info' as const, text: $t('orbien.enum.unknown')}
     }
 }
 

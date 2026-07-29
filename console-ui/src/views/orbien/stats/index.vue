@@ -9,7 +9,7 @@
               v-ripple
               :disabled="selectedRows.length === 0"
             >
-              批量删除
+              {{ $t('common.batchDelete') }}
             </ElButton>
           </ElSpace>
         </template>
@@ -38,6 +38,7 @@
 
 <script setup lang="ts">
   import { ref, h } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import ArtTable from '@/components/core/tables/art-table/index.vue'
   import ArtTableHeader from '@/components/core/tables/art-table-header/index.vue'
@@ -49,6 +50,8 @@
   import { getProtocolLabel, ProtocolType } from '@/enums/orbien/business'
 
   defineOptions({ name: 'Stats' })
+
+  const { t } = useI18n()
 
   type StatsItem = Api.Metrics.TrafficCountDTO
 
@@ -80,22 +83,22 @@
       },
       columnsFactory: () => [
         { type: 'selection' },
-        { type: 'index', width: 60, label: '序号' },
+        { type: 'index', width: 60, label: t('table.column.index') },
         {
           prop: 'agentName',
-          label: '客户端名称',
+          label: t('orbien.common.clientName'),
           minWidth: 100,
           formatter: (row: StatsItem) => row.agentName || ''
         },
         {
           prop: 'proxyName',
-          label: '代理名称',
+          label: t('orbien.common.proxyName'),
           minWidth: 100,
           formatter: (row: StatsItem) => row.proxyName || ''
         },
         {
           prop: 'protocol',
-          label: '协议',
+          label: t('orbien.common.protocol'),
           width: 90,
           formatter: (row: StatsItem) => {
             const text = getProtocolText(row.protocol)
@@ -106,47 +109,47 @@
         },
         {
           prop: 'writeBytes',
-          label: '上行流量',
+          label: t('orbien.stats.uploadTraffic'),
           width: 120,
           formatter: (row: StatsItem) => ByteUtils.formatBytes(row.writeBytes || 0)
         },
         {
           prop: 'readBytes',
-          label: '下行流量',
+          label: t('orbien.stats.downloadTraffic'),
           width: 120,
           formatter: (row: StatsItem) => ByteUtils.formatBytes(row.readBytes || 0)
         },
         {
           prop: 'writeMessages',
-          label: '上行消息数',
+          label: t('orbien.stats.uploadMessages'),
           width: 120
         },
         {
           prop: 'readMessages',
-          label: '下行消息数',
+          label: t('orbien.stats.downloadMessages'),
           width: 120
         },
         {
           prop: 'totalBytes',
-          label: '总流量',
+          label: t('orbien.stats.totalTraffic'),
           width: 150,
           formatter: (row: StatsItem) => ByteUtils.formatBytes(row.totalBytes || 0)
         },
         {
           prop: 'operation',
-          label: '操作',
+          label: t('common.actions'),
           width: 150,
           fixed: 'right',
           formatter: (row: StatsItem) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'link',
-                text: '数据',
+                text: t('orbien.stats.data'),
                 onClick: () => handleViewMetrics(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '删除',
+                text: t('common.delete'),
                 onClick: () => handleDelete(row)
               })
             ])
@@ -161,8 +164,8 @@
 
   const deleteMetrics = async (rows: StatsItem[], title: string, message: string) => {
     await ElMessageBox.confirm(message, title, {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
     await fetchBatchDeleteMetrics({ ids: rows.map((row) => row.proxyId) })
@@ -171,20 +174,22 @@
 
   const handleDelete = (row: StatsItem): void => {
     const name = row.proxyName || row.proxyId
-    deleteMetrics([row], '删除统计', `确定要删除代理「${name}」的流量统计数据吗？`).catch(
-      () => {}
-    )
+    deleteMetrics(
+      [row],
+      t('orbien.stats.deleteTitle'),
+      t('orbien.stats.deleteConfirm', { name })
+    ).catch(() => {})
   }
 
   const handleBatchDelete = (): void => {
     if (selectedRows.value.length === 0) {
-      ElMessage.warning('请选择要删除的统计数据')
+      ElMessage.warning(t('orbien.stats.selectToDelete'))
       return
     }
     deleteMetrics(
       selectedRows.value,
-      '批量删除',
-      `确定要删除选中的 ${selectedRows.value.length} 条代理流量统计数据吗？`
+      t('common.batchDelete'),
+      t('orbien.stats.batchDeleteConfirm', { count: selectedRows.value.length })
     ).catch(() => {})
   }
 

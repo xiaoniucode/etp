@@ -5,12 +5,12 @@
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
         <template #left>
           <ElSpace wrap>
-            <ElButton type="primary" @click="showDialog('add')" v-ripple>添加</ElButton>
+            <ElButton type="primary" @click="showDialog('add')" v-ripple>{{ $t('common.add') }}</ElButton>
             <ElButton
                 @click="handleBatchDelete"
                 v-ripple
                 :disabled="selectedRows.length === 0"
-            >批量删除
+            >{{ $t('common.batchDelete') }}
             </ElButton
             >
           </ElSpace>
@@ -66,6 +66,7 @@
 
 <script setup lang="ts">
 import {ref, h, nextTick} from 'vue'
+import {useI18n} from 'vue-i18n'
 import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
 import {useTable} from '@/hooks/core/useTable'
 import {fetchGetHttpsProxyList, fetchBatchDeleteProxy} from '@/api/proxy'
@@ -83,6 +84,8 @@ import {DialogType} from '@/types'
 import {ProtocolType, ProxyStatus} from '@/enums/orbien/business'
 
 defineOptions({name: 'HttpsPenetration'})
+
+const {t} = useI18n()
 
 type HttpsProxyItem = Api.Proxy.HttpsProxyListDTO
 
@@ -131,12 +134,12 @@ const {
       {type: 'selection'},
       {
         prop: 'name',
-        label: '代理名称',
+        label: t('orbien.proxy.name'),
         minWidth: 50
       },
       {
         prop: 'domains',
-        label: '外网地址',
+        label: t('orbien.proxy.publicAddr'),
         formatter: (row: HttpsProxyItem) => {
           if (!row.domains || row.domains.length === 0) {
             return ''
@@ -163,30 +166,30 @@ const {
       },
       {
         prop: 'targets',
-        label: '内网服务',
+        label: t('orbien.proxy.backend'),
         formatter: (row: HttpsProxyItem) => renderTargetTags(row.targets)
       },
       {
         prop: 'tlsCertSummary',
-        label: 'TLS 证书',
+        label: t('orbien.proxy.tlsCert'),
         formatter: (row: HttpsProxyItem) =>
             renderTlsCertSummaryTag(row.tlsCertSummary, () => handleOpenTlsConfig(row))
       },
       {
         prop: 'transportProtocol',
-        label: '传输协议',
+        label: t('orbien.proxy.transport'),
         formatter: (row: HttpsProxyItem) => renderTransportProtocolTag(row.transportProtocol)
       },
       {
         prop: 'traffic',
-        label: '流量',
+        label: t('orbien.proxy.traffic'),
         width: 130,
         formatter: (row: HttpsProxyItem) =>
           renderTrafficRate(row.traffic, () => handleMetrics(row))
       },
       {
         prop: 'status',
-        label: '状态',
+        label: t('common.status'),
         width: 80,
         formatter: (row: HttpsProxyItem) =>
             h(ElSwitch, {
@@ -198,29 +201,29 @@ const {
       },
       {
         prop: 'operation',
-        label: '操作',
+        label: t('common.actions'),
         width: 200,
         fixed: 'right',
         formatter: (row: HttpsProxyItem) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'link',
-                text: '设置',
+                text: t('common.settings'),
                 onClick: () => handleSettings(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '抓包',
+                text: t('orbien.proxy.inspector'),
                 onClick: () => handleInspector(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '编辑',
+                text: t('common.edit'),
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '删除',
+                text: t('common.delete'),
                 onClick: () => handleSingleDelete(row)
               })
             ])
@@ -294,14 +297,14 @@ const handleInspector = (proxy: HttpsProxyItem) => {
 
 const handleBatchDelete = async () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请选择要删除的代理')
+    ElMessage.warning(t('orbien.proxy.selectToDelete'))
     return
   }
 
   try {
-    await ElMessageBox.confirm('确定要删除选中的代理吗？', '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('orbien.proxy.deleteBatchTip'), t('common.warning'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
 
@@ -309,25 +312,25 @@ const handleBatchDelete = async () => {
     await fetchBatchDeleteProxy({ids, protocol: ProtocolType.HTTPS})
     refreshData()
   } catch (error) {
-    if (error === 'cancel') {
-      return
+    if (error !== 'cancel') {
+      console.error('删除失败:', error)
     }
   }
 }
 
 const handleSingleDelete = async (proxy: HttpsProxyItem) => {
   try {
-    await ElMessageBox.confirm(`确定要删除代理「${proxy.name}」吗？`, '警告', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('orbien.proxy.deleteOneTip', {name: proxy.name}), t('common.warning'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
 
     await fetchBatchDeleteProxy({ids: [proxy.id], protocol: ProtocolType.HTTPS})
     refreshData()
   } catch (error) {
-    if (error === 'cancel') {
-      return
+    if (error !== 'cancel') {
+      console.error('删除失败:', error)
     }
   }
 }

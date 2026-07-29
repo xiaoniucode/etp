@@ -36,7 +36,42 @@
     "tips": "注意",
     "cancel": "キャンセル",
     "confirm": "確認",
-    "logOutTips": "ログアウトしますか？"
+    "logOutTips": "ログアウトしますか？",
+    "add": "追加",
+    "edit": "編集",
+    "delete": "削除",
+    "save": "保存",
+    "submit": "送信",
+    "close": "閉じる",
+    "refresh": "更新",
+    "copy": "コピー",
+    "detail": "詳細",
+    "settings": "設定",
+    "batchDelete": "一括削除",
+    "warning": "警告",
+    "name": "名称",
+    "description": "説明",
+    "type": "タイプ",
+    "status": "ステータス",
+    "actions": "操作",
+    "createTime": "作成日時",
+    "updateTime": "更新日時",
+    "enabled": "有効",
+    "disabled": "無効",
+    "online": "オンライン",
+    "offline": "オフライン",
+    "unknown": "不明",
+    "success": {
+      "delete": "削除しました",
+      "save": "保存しました",
+      "add": "追加しました",
+      "update": "更新しました",
+      "copy": "コピーしました",
+      "batchDelete": "一括削除しました",
+      "kickout": "切断しました"
+    },
+    "copied": "コピーしました",
+    "copyFailed": "コピーに失敗しました"
   },
   "search": {
     "placeholder": "ページを検索",
@@ -184,6 +219,13 @@
     "success": {
       "title": "ログイン成功",
       "message": "ようこそ"
+    },
+    "oauthCallback": {
+      "failed": "ログインに失敗しました",
+      "processing": "ログインを完了しています…",
+      "pleaseWait": "しばらくお待ちください",
+      "backToLogin": "ログインに戻る",
+      "retryFailed": "ログインに失敗しました。再試行してください"
     }
   },
   "forgetPassword": {
@@ -191,7 +233,8 @@
     "subTitle": "パスワードをリセットするにはメールアドレスを入力してください",
     "placeholder": "メールアドレスを入力してください",
     "submitBtnText": "送信",
-    "backBtnText": "戻る"
+    "backBtnText": "戻る",
+    "accountLabel": "アカウント"
   },
   "register": {
     "title": "アカウントを作成",
@@ -212,7 +255,8 @@
     "privacyPolicy": "プライバシーポリシー",
     "submitBtnText": "登録",
     "hasAccount": "既にアカウントがありますか？",
-    "toLogin": "ログイン"
+    "toLogin": "ログイン",
+    "success": "登録が完了しました"
   },
   "lockScreen": {
     "pwdError": "パスワードエラー",
@@ -237,6 +281,45 @@
     "404": "申し訳ありません。アクセスしようとしているページが存在しません",
     "500": "申し訳ありません。サーバーでエラーが発生しました",
     "gohome": "ホームに戻る"
+  },
+  "dashboard": {
+    "overview": {
+      "title": "概要",
+      "agents": "クライアント",
+      "online": "オンライン",
+      "proxies": "トンネル",
+      "running": "稼働中"
+    },
+    "status": {
+      "cpu": "CPU",
+      "cpuCores": "{n} コア",
+      "heap": "ヒープ",
+      "direct": "ダイレクトメモリ",
+      "physical": "物理メモリ"
+    },
+    "traffic": {
+      "title": "トラフィック",
+      "subtitle": "直近 24 時間の上下りトラフィック推移",
+      "upRate": "上り速度",
+      "downRate": "下り速度",
+      "upload": "上り",
+      "download": "下り",
+      "time": "時間"
+    },
+    "proxy": {
+      "title": "プロキシ分布",
+      "subtitle": "HTTP・HTTPS・TCP・UDP・SOCKS5・FILE の割合"
+    },
+    "config": {
+      "title": "サーバー設定",
+      "addr": "サーバーアドレス",
+      "tcp": "TCP 転送",
+      "websocket": "WebSocket 転送",
+      "quic": "QUIC 転送",
+      "http": "HTTP プロキシ",
+      "https": "HTTPS プロキシ",
+      "disabled": "無効"
+    }
   },
   "menus": {
     "login": {
@@ -312,5 +395,1011 @@
     "zebra": "縞模様",
     "border": "ボーダー",
     "headerBackground": "ヘッダー背景"
+  },
+  "orbien": {
+    "common": {
+      "client": "エージェント",
+      "clientId": "エージェント ID",
+      "clientName": "エージェント名",
+      "proxyName": "プロキシ名",
+      "accessToken": "アクセストークン",
+      "protocol": "プロトコル",
+      "port": "ポート",
+      "remark": "備考",
+      "rootDomain": "ルートドメイン",
+      "fullDomain": "完全ドメイン",
+      "domainType": "ドメイン種別",
+      "linkedProxy": "関連プロキシ",
+      "os": "OS",
+      "arch": "アーキテクチャ",
+      "version": "バージョン",
+      "sourceIp": "送信元 IP",
+      "lastActiveTime": "最終オンライン",
+      "type": "種別",
+      "systemArch": "システムアーキテクチャ",
+      "descPlaceholder": "説明を入力"
+    },
+    "agent": {
+      "detailTitle": "エージェント詳細",
+      "kickout": "切断",
+      "kickoutTitle": "エージェント切断",
+      "kickoutConfirm": "このオンラインエージェントを切断しますか？",
+      "deleteTitle": "エージェント削除",
+      "deleteConfirm": "エージェント「{name}」を削除しますか？",
+      "batchDeleteConfirm": "選択した {count} 件のエージェントを削除しますか？",
+      "fetchDetailFailed": "エージェント詳細の取得に失敗しました"
+    },
+    "token": {
+      "add": "アクセストークン追加",
+      "edit": "アクセストークン編集",
+      "tokenName": "トークン名",
+      "tokenValue": "トークン値",
+      "token": "トークン",
+      "namePlaceholder": "トークン名を入力",
+      "nameRequired": "トークン名を入力してください",
+      "fetchDetailFailed": "トークン詳細の取得に失敗しました",
+      "deleteTitle": "トークン削除",
+      "deleteConfirm": "このアクセストークンを削除しますか？",
+      "batchDeleteConfirm": "選択した {count} 件のトークンを削除しますか？",
+      "successTitle": "新しいトークンを保存してください",
+      "successDesc": "新しい認証トークンが作成されました。これが唯一の表示機会です。安全な場所に保存してください。",
+      "copyAndClose": "コピーして閉じる",
+      "copyEmpty": "コピーする内容がありません",
+      "manualCopyTitle": "手動でコピー",
+      "copied": "コピー済み"
+    },
+    "domain": {
+      "addRootDomain": "ルートドメイン追加",
+      "editRootDomain": "ルートドメイン編集",
+      "resourcesTitle": "ドメインリソース",
+      "resourcesDesc": "ルートドメインプールは利用可能なルートドメインを定義し、割り当て済みドメインはプロキシトンネルが使用中のアクセスアドレスを表示します。",
+      "poolLabel": "ルートドメインプール",
+      "poolHint": "サブドメイン自動結合用のルートドメイン",
+      "allocatedLabel": "割り当て済みドメイン",
+      "allocatedHint": "プロキシトンネルが占有中のアクセスドメイン",
+      "domainPlaceholder": "例: example.com",
+      "domainRequired": "ルートドメインを入力してください",
+      "fetchDetailFailed": "ドメイン詳細の取得に失敗しました",
+      "deleteTitle": "ルートドメイン削除",
+      "deleteConfirm": "ルートドメイン「{domain}」を削除しますか？",
+      "batchDeleteConfirm": "選択した {count} 件のルートドメインを削除しますか？"
+    },
+    "portPool": {
+      "add": "ポート追加",
+      "edit": "ポート編集",
+      "appType": "アプリケーション種別",
+      "selectAppType": "アプリケーション種別を選択",
+      "custom": "カスタム",
+      "selectProtocol": "プロトコルを選択",
+      "portPlaceholder": "単一ポート例: 8000、範囲例: 8000-9000",
+      "remarkPlaceholder": "備考を入力",
+      "fetchDetailFailed": "ポート設定の取得に失敗しました",
+      "deleteTitle": "ポート削除",
+      "deleteConfirm": "ポート「{port}」を削除しますか？",
+      "selectToDelete": "削除するポートを選択してください",
+      "batchDeleteConfirm": "選択した {count} 件のポート設定を削除しますか？",
+      "group": {
+        "remoteLogin": "リモートログイン",
+        "webService": "Web サービス",
+        "database": "データベース",
+        "fileTransfer": "ファイル転送",
+        "networkService": "ネットワークサービス"
+      },
+      "preset": {
+        "ssh": {
+          "label": "SSH (22)",
+          "remark": "SSH リモートログイン"
+        },
+        "rdp": {
+          "label": "RDP (3389)",
+          "remark": "Windows リモートデスクトップ"
+        },
+        "http": {
+          "label": "HTTP (80)",
+          "remark": "HTTP Web サービス"
+        },
+        "https": {
+          "label": "HTTPS (443)",
+          "remark": "HTTPS 暗号化 Web サービス"
+        },
+        "mysql": {
+          "label": "MySQL (3306)",
+          "remark": "MySQL データベース"
+        },
+        "postgresql": {
+          "label": "PostgreSQL (5432)",
+          "remark": "PostgreSQL データベース"
+        },
+        "sqlserver": {
+          "label": "SQL Server (1433)",
+          "remark": "Microsoft SQL Server"
+        },
+        "redis": {
+          "label": "Redis (6379)",
+          "remark": "Redis キャッシュサービス"
+        },
+        "mongodb": {
+          "label": "MongoDB (27017)",
+          "remark": "MongoDB データベース"
+        },
+        "ftp": {
+          "label": "FTP (21)",
+          "remark": "FTP ファイル転送"
+        },
+        "dns": {
+          "label": "DNS (53)",
+          "remark": "DNS 名前解決"
+        },
+        "ntp": {
+          "label": "NTP (123)",
+          "remark": "NTP 時刻同期"
+        },
+        "snmp": {
+          "label": "SNMP (161)",
+          "remark": "SNMP ネットワーク管理"
+        }
+      }
+    },
+    "stats": {
+      "uploadTraffic": "アップロード流量",
+      "downloadTraffic": "ダウンロード流量",
+      "uploadMessages": "アップロードメッセージ数",
+      "downloadMessages": "ダウンロードメッセージ数",
+      "totalTraffic": "総流量",
+      "data": "データ",
+      "deleteTitle": "統計削除",
+      "deleteConfirm": "プロキシ「{name}」の流量統計を削除しますか？",
+      "selectToDelete": "削除する統計を選択してください",
+      "batchDeleteConfirm": "選択した {count} 件のプロキシ流量統計を削除しますか？"
+    },
+    "scheduledJob": {
+      "columns": {
+        "jobName": "タスク名",
+        "status": "状態",
+        "schedule": "実行周期",
+        "lastRun": "前回実行",
+        "result": "実行結果",
+        "nextRun": "次回実行",
+        "operation": "操作"
+      },
+      "status": {
+        "active": "有効",
+        "disabled": "無効"
+      },
+      "actions": {
+        "config": "設定",
+        "run": "実行",
+        "logs": "ログ",
+        "delete": "削除",
+        "disable": "無効化",
+        "batchDelete": "一括削除"
+      },
+      "config": {
+        "title": "設定 - {name}",
+        "description": "タスク説明",
+        "schedule": "実行周期",
+        "params": "タスクパラメータ",
+        "on": "オン",
+        "off": "オフ",
+        "save": "保存"
+      },
+      "log": {
+        "title": "実行ログ - {name}",
+        "columns": {
+          "startedAt": "開始時刻",
+          "finishedAt": "終了時刻",
+          "triggerType": "トリガー",
+          "status": "状態",
+          "affectedCount": "影響件数",
+          "message": "説明",
+          "operation": "操作"
+        }
+      },
+      "confirm": {
+        "disableAcmeMessage": "無効化すると、自動更新が有効な証明書の自動更新が一時停止します。再有効化で自動更新が再開されます。",
+        "disableAcmeTitle": "「{name}」を無効化",
+        "runTitle": "手動実行",
+        "runMessage": "タスク「{name}」を今すぐ実行しますか？",
+        "deleteLogMessage": "この実行ログを削除しますか？",
+        "deleteLogTitle": "削除の確認",
+        "batchDeleteMessage": "選択した {count} 件の実行ログを削除しますか？",
+        "batchDeleteTitle": "一括削除の確認"
+      },
+      "message": {
+        "enabled": "タスクを有効化しました",
+        "disabled": "タスクを無効化しました",
+        "triggered": "タスクを実行しました。しばらくしてから実行ログを確認してください",
+        "saveSuccess": "保存しました",
+        "deleteSuccess": "削除しました",
+        "selectLogs": "削除するログを選択してください"
+      }
+    },
+    "cron": {
+      "type": {
+        "daily": "毎日",
+        "everyNDays": "N 日ごと",
+        "hourly": "毎時",
+        "everyNHours": "N 時間ごと",
+        "everyNMinutes": "N 分ごと",
+        "weekly": "毎週",
+        "monthly": "毎月",
+        "everyNSeconds": "N 秒ごと",
+        "custom": "カスタム"
+      },
+      "weekday": {
+        "mon": "月曜日",
+        "tue": "火曜日",
+        "wed": "水曜日",
+        "thu": "木曜日",
+        "fri": "金曜日",
+        "sat": "土曜日",
+        "sun": "日曜日"
+      },
+      "unit": {
+        "days": "日",
+        "hours": "時間",
+        "minutes": "分",
+        "seconds": "秒"
+      },
+      "customFormat": "形式：秒 分 時 日 月 曜日",
+      "preview": {
+        "daily": "毎日 {hour}:{minute} に実行",
+        "everyNDays": "{interval} 日ごとに {hour}:{minute} に実行",
+        "hourly": "毎時 {minute} 分に実行",
+        "everyNHours": "{interval} 時間ごとに {minute} 分に実行",
+        "everyNMinutes": "{interval} 分ごとに実行",
+        "weekly": "毎週 {weekday} の {hour}:{minute} に実行",
+        "monthly": "毎月 {day} 日の {hour}:{minute} に実行",
+        "everyNSeconds": "{interval} 秒ごとに実行",
+        "custom": "カスタム Cron 式",
+        "notConfigured": "実行周期が未設定です"
+      }
+    },
+    "settings": {
+      "tab": {
+        "oauth": "サードパーティログイン"
+      },
+      "oauth": {
+        "enabled": "有効",
+        "disabled": "無効",
+        "enableLogin": "ログインを有効化",
+        "saveCredentialsFirst": "先に Client ID と Client Secret を保存してください",
+        "clientId": "Client ID",
+        "clientSecret": "Client Secret",
+        "configured": "設定済み",
+        "secretPlaceholderKeep": "空欄のまま既存のシークレットを保持",
+        "secretPlaceholder": "OAuth Client Secret",
+        "clientIdPlaceholder": "OAuth Client ID",
+        "callbackUrl": "コールバック URL",
+        "copy": "コピー",
+        "saveConfig": "設定を保存",
+        "fillClientId": "Client ID を入力してください",
+        "fillClientSecret": "Client Secret を入力してください",
+        "configSaved": "設定を保存しました",
+        "loginEnabled": "ログインを有効化しました",
+        "loginDisabled": "ログインを無効化しました",
+        "copied": "コピーしました",
+        "copyFailed": "コピーに失敗しました"
+      }
+    },
+    "enum": {
+      "unknown": "不明",
+      "domain": {
+        "custom": "カスタム",
+        "subdomain": "サブドメイン",
+        "auto": "自動サブドメイン"
+      },
+      "agent": {
+        "standard": "標準",
+        "session": "セッション"
+      }
+    },
+    "plugin": {
+      "dialog": {
+        "title": "プロキシ設定",
+        "titleWithName": "{name} - 設定",
+        "underDevelopment": "開発中"
+      },
+      "menus": {
+        "accessControl": "アクセス制御",
+        "timeAccess": "時間制限",
+        "basicAuth": "認証",
+        "cluster": "ロードバランシング",
+        "healthCheck": "ヘルスチェック",
+        "tls": "TLS 暗号化",
+        "transport": "転送セキュリティ",
+        "rateLimit": "流量制限",
+        "headerRewrite": "Header 書き換え",
+        "socks5Auth": "SOCKS5 認証"
+      },
+      "basic": {
+        "title": "基本設定",
+        "enabled": "有効状態",
+        "controlMode": "制御モード",
+        "timezone": "タイムゾーン",
+        "saveConfig": "設定を保存"
+      },
+      "actions": {
+        "addRule": "ルールを追加",
+        "addUser": "ユーザーを追加",
+        "addService": "サービスを追加",
+        "addWindow": "時間帯を追加",
+        "selectAll": "すべて選択"
+      },
+      "deleteConfirm": {
+        "rule": "このルールを削除しますか？",
+        "user": "このユーザーを削除しますか？",
+        "window": "この時間帯を削除しますか？",
+        "headerRule": "このルールを削除しますか？"
+      },
+      "access": {
+        "rulesTitle": "アクセスルール",
+        "cidrColumn": "IP CIDR（例：192.168.1.0/24）",
+        "cidrPlaceholder": "IP CIDR を入力（例：192.168.1.0/24）",
+        "ruleType": "ルール種別",
+        "allowWhitelist": "ホワイトリスト（指定 IP のみ許可）",
+        "denyBlacklist": "ブラックリスト（指定 IP を拒否）",
+        "allow": "許可",
+        "deny": "拒否",
+        "cidrRequired": "IP CIDR を入力してください"
+      },
+      "time": {
+        "periodLimit": "周期制限",
+        "timeLimit": "時間制限",
+        "allowInWindow": "許可（時間帯内のみアクセス可）",
+        "denyInWindow": "拒否（時間帯内のみアクセス不可）",
+        "startTime": "開始時刻",
+        "endTime": "終了時刻",
+        "selectStartTime": "開始時刻を選択",
+        "selectEndTime": "終了時刻を選択",
+        "timeRequired": "開始時刻と終了時刻を選択してください",
+        "weekdays": {
+          "mon": "月",
+          "tue": "火",
+          "wed": "水",
+          "thu": "木",
+          "fri": "金",
+          "sat": "土",
+          "sun": "日"
+        }
+      },
+      "auth": {
+        "userList": "ユーザーリスト",
+        "username": "ユーザー名",
+        "password": "パスワード",
+        "usernamePlaceholder": "ユーザー名を入力",
+        "passwordPlaceholder": "パスワードを入力",
+        "usernameRequired": "ユーザー名を入力してください",
+        "passwordRequired": "パスワードを入力してください"
+      },
+      "socks5Auth": {
+        "userList": "ユーザーリスト",
+        "username": "ユーザー名",
+        "password": "パスワード",
+        "usernamePlaceholder": "ユーザー名を入力",
+        "passwordPlaceholder": "パスワードを入力",
+        "usernameRequired": "ユーザー名を入力してください",
+        "passwordRequired": "パスワードを入力してください"
+      },
+      "header": {
+        "requestHeaders": "リクエストヘッダー",
+        "responseHeaders": "レスポンスヘッダー",
+        "action": "アクション",
+        "name": "名称",
+        "value": "値",
+        "actionGuideTitle": "アクション説明",
+        "actionSet": "同名ヘッダーを上書き。存在しない場合は作成",
+        "actionAdd": "存在しない場合のみ書き込み。既存の場合はスキップ",
+        "actionRemove": "同名ヘッダーを削除",
+        "availableVars": "利用可能な変数",
+        "nameRequired": "Header 名称を入力してください",
+        "valueRequired": "Header 値を入力してください"
+      },
+      "transport": {
+        "currentEffective": "現在の設定",
+        "port": "ポート {port}",
+        "notEnabled": "無効",
+        "tunnelEncrypt": "トンネル暗号化",
+        "dataCompress": "データ圧縮",
+        "compressAlgorithm": "圧縮アルゴリズム",
+        "noCompress": "圧縮なし",
+        "compressSuffix": "圧縮",
+        "tlsEncrypt": "TLS 暗号化",
+        "plainText": "平文転送",
+        "saved": "転送設定を保存しました",
+        "tunnel": {
+          "multiplex": "多重化",
+          "direct": "独立接続"
+        },
+        "protocol": {
+          "tcpDesc": "デフォルト。互換性が最も高い",
+          "websocketDesc": "ファイアウォール透過に適し、TLS 必須",
+          "quicDesc": "低遅延、TLS 必須、多重化"
+        },
+        "algorithm": {
+          "balanced": "バランス",
+          "speed": "速度",
+          "ratio": "圧縮率"
+        }
+      },
+      "rateLimit": {
+        "bandwidthUnit": "帯域幅単位",
+        "bandwidthUnitDesc": "以下のすべての帯域幅フィールドの入力・表示単位を統一",
+        "selectUnit": "単位を選択",
+        "bandwidthLimit": "帯域幅制限",
+        "bandwidthLimitDesc": "ダウンロード・アップロード・合計帯域幅を個別に制限。空欄は無制限",
+        "totalBandwidth": "合計帯域幅",
+        "totalBandwidthHint": "上下行共有の合計帯域幅。方向別制限と併用する場合は合計制約を満たす必要があります",
+        "downloadBandwidth": "ダウンロード帯域幅",
+        "downloadBandwidthHint": "クライアントのダウンロード速度を制限（内部サービス → クライアント）",
+        "uploadBandwidth": "アップロード帯域幅",
+        "uploadBandwidthHint": "クライアントのアップロード速度を制限（クライアント → 内部サービス）",
+        "unlimited": "無制限"
+      },
+      "health": {
+        "desc": "有効にすると内部サービスの可用性を定期的に検査し、異常ノードはロードバランシングから自動除外されます",
+        "checkType": "チェック種別",
+        "checkTypeHint": "TCP はポート接続性、HTTP はパスリクエストをチェック",
+        "checkPath": "チェックパス",
+        "checkPathHint": "HTTP ヘルスチェックの URL パス",
+        "interval": "チェック間隔",
+        "intervalHint": "連続するヘルスチェック間の待機時間",
+        "timeout": "タイムアウト",
+        "timeoutHint": "1 回のチェックで許容される最大待機時間",
+        "maxFailed": "最大失敗回数",
+        "maxFailedHint": "連続失敗がこの回数に達するとノードを利用不可とマーク",
+        "unitSecond": "秒",
+        "unitTimes": "回",
+        "pathRequired": "HTTP ヘルスチェックパスを入力してください"
+      },
+      "cluster": {
+        "title": "ロードバランシング",
+        "strategy": "戦略",
+        "selectStrategy": "戦略を選択",
+        "serviceList": "サービス一覧",
+        "emptyServices": "サービスがありません。追加してください",
+        "serviceName": "サービス名",
+        "host": "ホスト",
+        "port": "ポート",
+        "weight": "重み",
+        "optional": "任意",
+        "hostPlaceholder": "内部アドレス",
+        "portPlaceholder": "1-65535",
+        "weightPlaceholder": "重み",
+        "minOneService": "少なくとも 1 つのサービスを追加してください",
+        "hostRequired": "{row} 行目：ホストアドレスを入力してください",
+        "portInvalid": "{row} 行目：有効なポートを入力してください（1-65535）",
+        "strategyOptions": {
+          "roundRobin": "ラウンドロビン (roundrobin)",
+          "weight": "重み付け (weight)",
+          "random": "ランダム (random)",
+          "leastConn": "最少接続 (leastconn)"
+        }
+      },
+      "tls": {
+        "summary": "ドメイン証明書：{bound}/{total} 設定済み",
+        "warnings": "{count} 件の異常",
+        "domainCert": "ドメイン証明書",
+        "certFolder": "証明書ライブラリ",
+        "freeApply": "無料申請",
+        "manualUpload": "手動アップロード",
+        "uploadAndBind": "証明書をアップロードしてバインド",
+        "bindDomains": "バインドドメイン",
+        "selectBindDomains": "バインドするドメインを選択",
+        "privateKey": "秘密鍵 (KEY)",
+        "certificate": "証明書 (PEM)",
+        "saveAndBind": "保存してバインド",
+        "domain": "ドメイン",
+        "certSan": "証明書 SAN",
+        "notAfter": "有効期限",
+        "status": "状態",
+        "bindCert": "証明書をバインド",
+        "enable": "有効化",
+        "retry": "再試行",
+        "replaceCert": "証明書を変更",
+        "disable": "無効化",
+        "unbind": "バインド解除",
+        "authDomain": "認証ドメイン",
+        "issuer": "発行者",
+        "bindToProxy": "このプロキシにバインド",
+        "bindStatus": {
+          "normal": "正常",
+          "disabled": "無効",
+          "sanMismatch": "SAN 不一致",
+          "expired": "期限切れ",
+          "deployFailed": "デプロイ失敗",
+          "notConfigured": "未設定",
+          "unknown": "不明"
+        },
+        "certSource": {
+          "acme": "ACME",
+          "manual": "手動"
+        },
+        "unknownIssuer": "不明な発行者",
+        "expiresAt": "期限 {date}",
+        "usedByDomains": "{count} ドメインで使用中",
+        "batchBindTitle": "一括バインド（{count} ドメイン）",
+        "overrideHint": "{count} ドメインは既に証明書があります。確認後に上書きされます",
+        "selectCert": "証明書を選択",
+        "noMatchingCert": "選択したドメインをカバーする証明書がありません",
+        "confirmBind": "バインドを確認",
+        "overrideConfirm": "一部のドメインは既にバインドされています。続行すると既存の証明書が上書きされます。続行しますか？",
+        "bindConfirmTitle": "バインド確認",
+        "bindResult": "バインド完了：成功 {success} 件、失敗 {failed} 件",
+        "savedAndBound": "証明書を保存してバインドしました",
+        "bindSuccess": "バインド成功",
+        "bindToMatched": "{count} 件の一致ドメインにバインドします。続行しますか？",
+        "sanMismatchWarning": "証明書 SAN がこのプロキシのドメインと一致しません",
+        "keyCertRequired": "秘密鍵と証明書を完全に入力してください",
+        "selectDomainRequired": "バインドするドメインを少なくとも 1 つ選択してください",
+        "unbindConfirm": "このドメインの証明書をバインド解除しますか？",
+        "unbindTitle": "バインド解除確認",
+        "unbound": "バインド解除しました",
+        "disabled": "無効化しました",
+        "enabled": "有効化しました",
+        "redeployed": "再デプロイしました",
+        "deleteCertConfirm": "この証明書を削除しますか？",
+        "bindSuccessCount": "{count} ドメインのバインドに成功しました",
+        "acme": {
+          "title": "このプロキシの証明書を申請",
+          "stepDomain": "ドメインを選択",
+          "stepValidation": "検証方式",
+          "stepDns": "DNS 検証",
+          "submitting": "申請を送信中です。しばらくお待ちください...",
+          "prev": "前へ",
+          "next": "次へ",
+          "submit": "申請を送信",
+          "startVerify": "検証を開始",
+          "refreshStatus": "状態を更新"
+        }
+      }
+    },
+    "proxy": {
+      "name": "プロキシ名",
+      "publicAddr": "公開アドレス",
+      "backend": "内部サービス",
+      "transport": "転送プロトコル",
+      "transportShort": "転送",
+      "traffic": "トラフィック",
+      "remotePort": "リモートポート",
+      "client": "クライアント",
+      "domainType": "ドメインタイプ",
+      "customDomain": "カスタムドメイン",
+      "auto": "自動",
+      "subdomain": "サブドメイン",
+      "host": "ホスト",
+      "port": "ポート",
+      "selectClient": "クライアントを選択",
+      "enterName": "プロキシ名を入力",
+      "enterHost": "ホストを入力",
+      "enterPort": "ポートを入力",
+      "portNumber": "ポートは数値である必要があります",
+      "portRange": "ポートは 1〜65535 の範囲である必要があります",
+      "remotePortNumber": "リモートポートは数値である必要があります",
+      "remotePortRange": "リモートポートは 1〜65535 の範囲である必要があります",
+      "fetchClientFail": "クライアント一覧の取得に失敗しました",
+      "fetchDetailFail": "プロキシ詳細の取得に失敗しました。後でもう一度お試しください",
+      "fetchFileShareDetailFail": "ファイル共有詳細の取得に失敗しました。後でもう一度お試しください",
+      "selectToDelete": "削除するプロキシを選択してください",
+      "selectFileShareToDelete": "削除するファイル共有を選択してください",
+      "deleteBatchTip": "選択したプロキシを削除しますか？",
+      "deleteBatchFileShareTip": "選択したファイル共有を削除しますか？",
+      "deleteOneTip": "プロキシ「{name}」を削除しますか？",
+      "deleteOneFileShareTip": "ファイル共有「{name}」を削除しますか？",
+      "deleteBatchCountTip": "選択した {n} 件のプロキシを削除しますか？",
+      "deleteConfirm": "削除の確認",
+      "inspector": "インスペクター",
+      "forceHttps": "HTTPS を強制",
+      "authEnabled": "認証を有効化",
+      "authUsers": "認証ユーザー",
+      "addUser": "ユーザーを追加",
+      "username": "ユーザー名",
+      "password": "パスワード",
+      "leaveBlank": "空欄の場合は変更しません",
+      "enterPassword": "パスワードを入力",
+      "autoPort": "空欄で自動割り当て",
+      "refreshPorts": "別の候補",
+      "goAddPort": "ポートを追加",
+      "rootDir": "ルートディレクトリ",
+      "enterRootDir": "ルートディレクトリを入力",
+      "rootDirPlaceholder": "例: /data/share",
+      "uploadLimit": "アップロード制限",
+      "enterUploadLimit": "アップロード制限を入力",
+      "uploadLimitMin": "アップロード制限は 0 より大きい必要があります",
+      "maxUploadPlaceholder": "単一ファイルの最大アップロードサイズ",
+      "permissions": "権限",
+      "operationPermissions": "操作権限",
+      "readonly": "読み取り専用",
+      "readwrite": "読み書き",
+      "allowUpload": "アップロードを許可",
+      "allowDelete": "削除を許可",
+      "allowMkdir": "ディレクトリ作成を許可",
+      "allowMove": "移動を許可",
+      "allowRename": "名前変更を許可",
+      "tlsCert": "TLS 証明書",
+      "accessUrl": "アクセス URL",
+      "authStatus": "認証状態",
+      "identityAuth": "認証",
+      "selectDomainType": "ドメインタイプを選択",
+      "enterCustomDomain": "カスタムドメインを入力",
+      "customDomainPlaceholder": "完全なドメインを改行区切りで入力（例: www.example.com）",
+      "customDomainPlaceholderFileShare": "完全なドメインを改行区切りで入力（例: files.example.com）",
+      "hostPlaceholder": "例: 127.0.0.1",
+      "bandwidthLimit": "帯域制限",
+      "noBandwidthLimit": "空欄で無制限",
+      "bandwidthInteger": "帯域は 0 より大きい整数である必要があります",
+      "localPort": "内部ポート",
+      "commonPorts": "よく使うポート",
+      "prefix": "プレフィックス",
+      "rootDomain": "ルートドメイン",
+      "clusterSummary": "ロードバランシング · {n} サービス",
+      "goClusterConfig": "ロードバランシング設定へ",
+      "authTipSocks5": "不正アクセス防止のため、有効化を強く推奨します",
+      "authTipFileShare": "有効にすると、ファイル共有へのアクセスにユーザー名とパスワードが必要です",
+      "authUserRequired": "認証ユーザーを 1 人以上追加してください",
+      "authUserMinOne": "認証を有効にする場合は、ユーザーを 1 人以上追加してください",
+      "fillUsernamePassword": "ユーザー名とパスワードを入力してください",
+      "subdomainMinOne": "サブドメイン設定を 1 件以上追加してください",
+      "subdomainPrefixRequired": "サブドメインプレフィックスを入力してください",
+      "selectRootDomain": "ルートドメインを選択してください",
+      "duplicateSubdomain": "重複するサブドメイン設定があります",
+      "trafficUpDown": "アップロード {up} · ダウンロード {down}",
+      "tlsDeployed": "デプロイ済み",
+      "tlsNotDeployed": "未デプロイ",
+      "tlsDeployError": "デプロイ異常",
+      "tlsPartialDeployed": "{deployed}/{total} デプロイ済み",
+      "portPresets": {
+        "rdp": "Windows リモートデスクトップ - 3389"
+      }
+    },
+    "http": {
+      "add": "HTTP プロキシを追加",
+      "edit": "HTTP プロキシを編集"
+    },
+    "https": {
+      "add": "HTTPS プロキシを追加",
+      "edit": "HTTPS プロキシを編集"
+    },
+    "tcp": {
+      "add": "TCP プロキシを追加",
+      "edit": "TCP プロキシを編集"
+    },
+    "udp": {
+      "add": "UDP プロキシを追加",
+      "edit": "UDP プロキシを編集"
+    },
+    "socks5": {
+      "add": "SOCKS5 プロキシを追加",
+      "edit": "SOCKS5 プロキシを編集"
+    },
+    "fileShare": {
+      "add": "ファイル共有を追加",
+      "edit": "ファイル共有を編集"
+    },
+    "tls": {
+      "tabs": {
+        "certs": "証明書一覧",
+        "orders": "申請履歴",
+        "dns": "DNS 認証情報"
+      },
+      "actions": {
+        "applyFree": "無料申請",
+        "upload": "証明書アップロード",
+        "bind": "バインド",
+        "download": "ダウンロード"
+      },
+      "columns": {
+        "sanDomains": "認証ドメイン",
+        "source": "ソース",
+        "org": "証明書分類",
+        "issuer": "発行元",
+        "boundDomainCount": "使用中ドメイン数",
+        "notAfter": "有効期限",
+        "autoRenew": "自動更新"
+      },
+      "source": {
+        "manual": "手動"
+      },
+      "expire": {
+        "expired": "期限切れ",
+        "remainingDays": "残り{n}日"
+      },
+      "messages": {
+        "selectCertsToDelete": "削除する証明書を選択してください",
+        "confirmBatchDeleteCerts": "選択した証明書を削除しますか？",
+        "confirmDeleteCert": "この証明書を削除しますか？",
+        "deleteCertTitle": "証明書削除の確認",
+        "autoRenewEnabledWithJob": "自動更新を有効にし、ACME 更新ジョブも有効化しました",
+        "autoRenewEnabled": "自動更新を有効にしました",
+        "autoRenewDisabled": "自動更新を無効にしました",
+        "downloadFailed": "ダウンロードに失敗しました"
+      },
+      "upload": {
+        "title": "証明書アップロード",
+        "keyLabel": "秘密鍵 (KEY)",
+        "certLabel": "証明書 (PEM)",
+        "keyRequired": "秘密鍵を入力してください",
+        "certRequired": "証明書を入力してください",
+        "success": "証明書をアップロードしました"
+      },
+      "bind": {
+        "title": "証明書をドメインにバインド",
+        "certSan": "証明書 SAN: {san}",
+        "columns": {
+          "domain": "ドメイン",
+          "proxy": "所属プロキシ",
+          "matchStatus": "一致状態",
+          "currentCert": "現在の証明書"
+        },
+        "match": {
+          "matched": "一致",
+          "unmatched": "不一致",
+          "bound": "バインド済み",
+          "unbound": "未バインド"
+        },
+        "selection": "{n} 件のドメインを選択",
+        "overrideHint": "（{n} 件は既存バインドを上書き）",
+        "confirmBind": "バインドを確認",
+        "confirmOverride": "一部のドメインには既にバインドがあります。続行すると既存証明書が上書きされます。続行しますか？",
+        "confirmOverrideTitle": "バインド確認",
+        "resultPartial": "バインド完了：成功 {success} 件、失敗 {failed} 件",
+        "resultSuccess": "{n} 件のドメインをバインドしました"
+      },
+      "dns": {
+        "addCredential": "認証情報を追加",
+        "dialog": {
+          "addTitle": "DNS 認証情報を追加",
+          "editTitle": "DNS 認証情報を編集",
+          "namePlaceholder": "例：本番環境 - Aliyun",
+          "provider": "DNS プロバイダ",
+          "providerPlaceholder": "プロバイダを選択",
+          "editHint": "編集時は認証情報を再入力してください",
+          "required": "必須",
+          "optional": "任意",
+          "saveAndTest": "保存してテスト"
+        },
+        "columns": {
+          "provider": "プロバイダ",
+          "accountHint": "アカウント識別子",
+          "lastTest": "最終テスト",
+          "testMessage": "テストメッセージ"
+        },
+        "status": {
+          "ok": "正常",
+          "invalid": "無効",
+          "untested": "未テスト"
+        },
+        "actions": {
+          "test": "テスト"
+        },
+        "messages": {
+          "testSuccess": "接続テストに成功しました",
+          "confirmDelete": "認証情報「{name}」を削除しますか？",
+          "deleteTitle": "削除確認"
+        }
+      },
+      "acme": {
+        "wizard": {
+          "title": "無料 TLS 証明書を申請",
+          "steps": {
+            "domain": "ドメイン選択",
+            "validation": "検証方式",
+            "dnsVerify": "DNS 検証"
+          },
+          "submitting": "申請を送信中…",
+          "prev": "前へ",
+          "next": "次へ",
+          "submit": "申請を送信",
+          "startVerify": "検証を開始",
+          "refreshStatus": "ステータスを更新",
+          "selectHttpsProxy": "HTTPS トンネルを選択してください"
+        },
+        "section": {
+          "certBrand": "証明書ブランド",
+          "httpsProxy": "HTTPS / ファイル共有",
+          "selectProxy": "証明書を申請するプロキシを選択",
+          "selectDomain": "ドメインを選択",
+          "currentProxy": "現在のプロキシ",
+          "thisApplication": "今回の申請",
+          "extraDomains": "追加ドメイン（ワイルドカード等）"
+        },
+        "proxy": {
+          "domainCount": "{n} ドメイン",
+          "label": "{name}（{agentName} · {n} ドメイン）",
+          "enabled": "有効",
+          "disabled": "無効",
+          "andMore": "他 {n} 件",
+          "noDomains": "このプロキシに利用可能なドメインがありません"
+        },
+        "domain": {
+          "columns": {
+            "type": "タイプ",
+            "certStatus": "証明書状態"
+          },
+          "bound": "バインド済み",
+          "boundWithIssuer": "バインド済み（{issuer}）",
+          "unbound": "未バインド"
+        },
+        "validation": {
+          "manualTitle": "手動 DNS 検証",
+          "manualDesc": "DNS プロバイダで TXT レコードを追加。一時的な申請向け",
+          "cloudTitle": "クラウド DNS 自動検証",
+          "recommended": "推奨",
+          "cloudDesc": "TXT レコードの追加と検証を自動化。証明書一覧から自動更新に対応",
+          "cloudHint": "クラウド DNS にはプロバイダ API 認証情報が必要です。発行後、証明書一覧から手動で自動更新を有効化できます",
+          "noCredential": "DNS 認証情報が未設定です",
+          "addCredentialHint": "認証情報を追加すると DNS 検証を自動完了できます",
+          "addDnsCredential": "DNS 認証情報を追加",
+          "dnsCredential": "DNS 認証情報",
+          "selectCredential": "自動検証に使用する認証情報を選択",
+          "add": "追加"
+        },
+        "dnsVerify": {
+          "manualHint": "DNS プロバイダで以下の TXT レコードを追加し、反映後に「検証を開始」をクリック",
+          "autoHint": "TXT レコードを自動追加しました。DNS 反映と検証を待機中",
+          "dnsZone": "DNS ゾーン：{zone}",
+          "hostRecord": "ホストレコード",
+          "recordType": "レコードタイプ",
+          "recordValue": "レコード値",
+          "currentStatus": "現在のステータス："
+        },
+        "order": {
+          "columns": {
+            "orderNo": "注文番号",
+            "domains": "ドメイン",
+            "validationMode": "検証方式"
+          },
+          "validationMode": {
+            "cloud": "クラウド DNS",
+            "manual": "手動"
+          },
+          "actions": {
+            "verify": "検証",
+            "retry": "再試行",
+            "cancel": "キャンセル"
+          },
+          "messages": {
+            "verifyStarted": "検証を開始しました",
+            "retrySubmitted": "再送信しました",
+            "cancelled": "キャンセルしました",
+            "confirmDelete": "申請「{orderNo}」を削除しますか？",
+            "confirmBatchDelete": "選択した {n} 件の申請を削除しますか？",
+            "batchDeleteTitle": "一括削除の確認",
+            "selectToDelete": "削除する申請を選択してください"
+          },
+          "detail": {
+            "title": "申請詳細",
+            "orderNo": "注文番号",
+            "status": "ステータス",
+            "domains": "ドメイン",
+            "validationMode": "検証方式",
+            "cloudAuto": "クラウド DNS 自動",
+            "manualDns": "手動 DNS",
+            "renewal": "更新",
+            "autoRenewalSupported": "自動更新に対応",
+            "certId": "証明書 ID",
+            "errorMessage": "エラー",
+            "createdAt": "作成日時",
+            "dnsTxtRecords": "DNS TXT レコード",
+            "pendingVerify": "検証待ち",
+            "cancelApplication": "申請をキャンセル",
+            "verifyStartedRefresh": "検証を開始しました。しばらくして結果を更新してください",
+            "retrySubmitted": "検証を再送信しました"
+          }
+        },
+        "messages": {
+          "selectDomain": "ドメインを 1 件以上選択してください",
+          "addDnsCredentialFirst": "先に DNS 認証情報を追加してください",
+          "selectDnsCredential": "DNS 認証情報を選択してください",
+          "applySuccess": "証明書の申請に成功しました",
+          "submittedAutoVerify": "送信しました。自動検証を実行中です",
+          "verifyStartedRefresh": "検証を開始しました。しばらくしてステータスを更新してください"
+        }
+      }
+    },
+    "inspector": {
+      "title": "トラフィック",
+      "titleWithProxy": "トラフィック · {name}",
+      "capture": "キャプチャ",
+      "switchOn": "オン",
+      "switchOff": "オフ",
+      "clear": "クリア",
+      "recentRecords": "直近 {n} 件",
+      "noRecords": "キャプチャされたリクエストはありません",
+      "replayGenerated": "リプレイ",
+      "fromClient": "{ip} から",
+      "replayedFrom": "リプレイ元 {id}",
+      "replay": "リプレイ",
+      "editReplay": "リプレイを編集",
+      "bodyTruncated": "Body は切り詰められています",
+      "selectRequestHint": "左のリクエストを選択して詳細を表示",
+      "confirmClear": "すべてクリアしますか？",
+      "clearTitle": "クリア",
+      "replayDisabled": {
+        "enableCapture": "先にキャプチャを有効にしてください",
+        "bodyTruncated": "リクエスト Body が切り詰められています",
+        "invalidMethod": "無効なメソッド",
+        "protocolUpgrade": "プロトコルアップグレードは非対応"
+      },
+      "replayEditor": {
+        "title": "リプレイを編集",
+        "sourceRequest": "元リクエスト {method} {path}",
+        "addHeader": "+ 追加",
+        "empty": "なし",
+        "systemHeaders": "システム Header",
+        "format": "整形",
+        "bodyTooLarge": "サイズ制限を超えています",
+        "sendReplay": "リプレイを送信",
+        "notSet": "未設定",
+        "notEditable": "変更不可",
+        "notEditableName": "変更不可: {name}",
+        "autoContentLength": "（自動計算）",
+        "systemWritten": "（システム管理）"
+      }
+    },
+    "metrics": {
+      "title": "トラフィック統計",
+      "timeRange": "期間",
+      "ranges": {
+        "24h": "直近 24 時間",
+        "3d": "直近 3 日",
+        "7d": "直近 7 日",
+        "15d": "直近 15 日",
+        "custom": "カスタム期間"
+      },
+      "dateRangeSeparator": "〜",
+      "startDate": "開始日",
+      "endDate": "終了日",
+      "cards": {
+        "connections": "接続数",
+        "connectionsDesc": "アクティブ接続",
+        "upload": "上りトラフィック",
+        "uploadDesc": "累計上り",
+        "download": "下りトラフィック",
+        "downloadDesc": "累計下り",
+        "upRate": "上り速度",
+        "upRateDesc": "リアルタイム上り",
+        "downRate": "下り速度",
+        "downRateDesc": "リアルタイム下り"
+      },
+      "charts": {
+        "trend": "トラフィック推移",
+        "unit": "単位：{unit}",
+        "trafficCompare": "トラフィック比較",
+        "rateCompare": "速度比較",
+        "totalTraffic": "合計\n{size}",
+        "uploadSeries": "上り",
+        "downloadSeries": "下り",
+        "uploadRateSeries": "上り ({unit}/s)",
+        "downloadRateSeries": "下り ({unit}/s)",
+        "rateAxis": "速度",
+        "tooltipTime": "時間：{time}"
+      }
+    }
+  },
+  "system": {
+    "userCenter": {
+      "admin": "管理者",
+      "changePassword": "パスワード変更",
+      "currentPassword": "現在のパスワード",
+      "newPassword": "新しいパスワード",
+      "confirmPassword": "新しいパスワード（確認）",
+      "savePassword": "パスワードを保存",
+      "oauth": "サードパーティログイン",
+      "bound": "連携済み · {account}",
+      "unbound": "未連携",
+      "unbind": "連携解除",
+      "bind": "連携",
+      "unbindConfirmTitle": "連携解除の確認",
+      "unbindConfirmMessage": "連携を解除しますか？",
+      "unboundSuccess": "連携を解除しました",
+      "bindSuccess": "アカウントを連携しました",
+      "bindFailed": "連携に失敗しました。後でもう一度お試しください",
+      "enterCurrentPassword": "現在のパスワードを入力してください",
+      "enterNewPassword": "新しいパスワードを入力してください",
+      "passwordMismatch": "新しいパスワードが一致しません",
+      "passwordUpdated": "パスワードを更新しました",
+      "noAuthorizeUrl": "認可 URL を取得できませんでした"
+    }
   }
 }

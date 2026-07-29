@@ -2,11 +2,11 @@
   <div class="oauth-callback-page">
     <ElResult
       :icon="errorMessage ? 'error' : 'info'"
-      :title="errorMessage ? '登录失败' : '正在完成登录…'"
-      :sub-title="errorMessage || '请稍候'"
+      :title="errorMessage ? $t('login.oauthCallback.failed') : $t('login.oauthCallback.processing')"
+      :sub-title="errorMessage || $t('login.oauthCallback.pleaseWait')"
     >
       <template v-if="errorMessage" #extra>
-        <ElButton type="primary" @click="goLogin">返回登录</ElButton>
+        <ElButton type="primary" @click="goLogin">{{ $t('login.oauthCallback.backToLogin') }}</ElButton>
       </template>
     </ElResult>
   </div>
@@ -14,6 +14,7 @@
 
 <script setup lang="ts">
   import { onMounted, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import { ElMessage } from 'element-plus'
   import { fetchOAuthToken } from '@/api/oauth'
@@ -24,6 +25,7 @@
   const route = useRoute()
   const router = useRouter()
   const userStore = useUserStore()
+  const { t } = useI18n()
   const errorMessage = ref('')
 
   const goLogin = () => {
@@ -33,21 +35,21 @@
   onMounted(async () => {
     const ticket = route.query.ticket as string
     if (!ticket) {
-      errorMessage.value = '登录失败，请重试'
+      errorMessage.value = t('login.oauthCallback.retryFailed')
       return
     }
     try {
       const { token, refreshToken } = await fetchOAuthToken(ticket)
       if (!token) {
-        errorMessage.value = '登录失败，请重试'
+        errorMessage.value = t('login.oauthCallback.retryFailed')
         return
       }
       userStore.setToken(token, refreshToken)
       userStore.setLoginStatus(true)
-      ElMessage.success('登录成功')
+      ElMessage.success(t('login.success.title'))
       router.replace('/')
     } catch {
-      errorMessage.value = '登录失败，请重试'
+      errorMessage.value = t('login.oauthCallback.retryFailed')
     }
   })
 </script>

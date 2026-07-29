@@ -9,8 +9,8 @@
       @selection-change="handleSelectionChange"
   >
     <ElTableColumn type="selection" width="48" :selectable="isDomainSelectable"/>
-    <ElTableColumn prop="fullDomain" label="域名" show-overflow-tooltip/>
-    <ElTableColumn prop="domainTypeLabel" label="类型">
+    <ElTableColumn prop="fullDomain" :label="$t('orbien.tls.bind.columns.domain')" show-overflow-tooltip/>
+    <ElTableColumn prop="domainTypeLabel" :label="$t('orbien.tls.acme.domain.columns.type')">
       <template #default="{ row }">
         <ElTag
             v-if="row.domainType !== undefined"
@@ -21,13 +21,13 @@
         </ElTag>
       </template>
     </ElTableColumn>
-    <ElTableColumn label="证书状态">
+    <ElTableColumn :label="$t('orbien.tls.acme.domain.columns.certStatus')">
       <template #default="{ row }">
         <span v-if="!row.selectable" class="text-muted">{{ row.unselectableReason }}</span>
         <span v-else-if="row.bound" class="text-warning">
-          已绑定{{ row.boundCertIssuer ? `（${row.boundCertIssuer}）` : '' }}
+          {{ row.boundCertIssuer ? $t('orbien.tls.acme.domain.boundWithIssuer', { issuer: row.boundCertIssuer }) : $t('orbien.tls.acme.domain.bound') }}
         </span>
-        <span v-else class="text-success">未绑定</span>
+        <span v-else class="text-success">{{ $t('orbien.tls.acme.domain.unbound') }}</span>
       </template>
     </ElTableColumn>
   </ElTable>

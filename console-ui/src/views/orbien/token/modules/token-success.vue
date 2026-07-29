@@ -2,16 +2,14 @@
   <ElDialog
     :model-value="visible"
     @update:model-value="handleClose"
-    title="保存您的新令牌!"
+    :title="$t('orbien.token.successTitle')"
     width="500px"
     align-center
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
     <div class="token-success-content">
-      <p class="success-desc"
-        >您的新身份验证令牌已创建！这是最后一次显示该令牌。请将其安全保存到您的计算机中。</p
-      >
+      <p class="success-desc">{{ $t('orbien.token.successDesc') }}</p>
       <div class="token-display">
         <ElInput :model-value="token" size="large" readonly class="token-input" placeholder="Token">
           <template #suffix>
@@ -39,7 +37,7 @@
     <template #footer>
       <div class="dialog-footer">
         <ElButton type="primary" @click="handleCopyAndClose" :loading="copyAndCloseLoading">
-          复制并关闭
+          {{ $t('orbien.token.copyAndClose') }}
         </ElButton>
       </div>
     </template>
@@ -48,6 +46,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import { ClipboardUtils } from '@/utils/ui'
 
@@ -64,18 +63,20 @@
   const props = defineProps<Props>()
   const emit = defineEmits<Emits>()
 
+  const { t } = useI18n()
+
   const copyAndCloseLoading = ref(false)
 
   const doCopy = async (closeAfterCopy = false): Promise<boolean> => {
     if (!props.token) {
-      ElMessage.warning('复制内容为空')
+      ElMessage.warning(t('orbien.token.copyEmpty'))
       return false
     }
 
     const success = await ClipboardUtils.copy(props.token)
     
     if (success) {
-      ElMessage.success('复制成功')
+      ElMessage.success(t('common.success.copy'))
       if (closeAfterCopy) {
         emit('update:visible', false)
         emit('close')
@@ -94,16 +95,16 @@
   const showManualCopyDialog = async (): Promise<void> => {
     return new Promise((resolve) => {
       ElMessageBox({
-        title: '请手动复制',
+        title: t('orbien.token.manualCopyTitle'),
         message: `<input type="text" value="${ClipboardUtils.escapeHtml(props.token)}" id="clipboard_manual_input" style="width:100%;padding:8px;font-size:14px;font-family:monospace;" onclick="this.select()">`,
         showCancelButton: false,
-        confirmButtonText: '已复制',
+        confirmButtonText: t('orbien.token.copied'),
         dangerouslyUseHTMLString: true,
         beforeClose: () => {
           resolve()
         }
       }).then(() => {
-        ElMessage.success('复制成功')
+        ElMessage.success(t('common.success.copy'))
       })
 
       setTimeout(() => {

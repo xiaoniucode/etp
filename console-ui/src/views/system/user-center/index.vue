@@ -4,16 +4,16 @@
     <div class="profile-card art-card-sm">
       <img class="avatar" src="@imgs/user/avatar.webp" alt="avatar" />
       <h2 class="username">{{ userInfo.username || '—' }}</h2>
-      <ElTag type="primary" effect="plain" size="small">管理员</ElTag>
+      <ElTag type="primary" effect="plain" size="small">{{ $t('system.userCenter.admin') }}</ElTag>
     </div>
 
     <div class="content-col">
       <div class="section-card art-card-sm">
         <div class="section-head">
-          <h3>修改密码</h3>
+          <h3>{{ $t('system.userCenter.changePassword') }}</h3>
         </div>
         <ElForm :model="pwdForm" class="section-body" label-position="top" @submit.prevent>
-          <ElFormItem label="当前密码">
+          <ElFormItem :label="$t('system.userCenter.currentPassword')">
             <ElInput
               v-model="pwdForm.password"
               type="password"
@@ -21,7 +21,7 @@
               autocomplete="current-password"
             />
           </ElFormItem>
-          <ElFormItem label="新密码">
+          <ElFormItem :label="$t('system.userCenter.newPassword')">
             <ElInput
               v-model="pwdForm.newPassword"
               type="password"
@@ -29,7 +29,7 @@
               autocomplete="new-password"
             />
           </ElFormItem>
-          <ElFormItem label="确认新密码">
+          <ElFormItem :label="$t('system.userCenter.confirmPassword')">
             <ElInput
               v-model="pwdForm.confirmPassword"
               type="password"
@@ -38,14 +38,16 @@
             />
           </ElFormItem>
           <div class="section-actions">
-            <ElButton type="primary" :loading="pwdLoading" @click="savePassword">保存密码</ElButton>
+            <ElButton type="primary" :loading="pwdLoading" @click="savePassword">
+              {{ $t('system.userCenter.savePassword') }}
+            </ElButton>
           </div>
         </ElForm>
       </div>
 
       <div v-if="providerRows.length" class="section-card art-card-sm">
         <div class="section-head">
-          <h3>三方登录</h3>
+          <h3>{{ $t('system.userCenter.oauth') }}</h3>
         </div>
         <div class="section-body bind-list" v-loading="bindLoading">
           <div v-for="item in providerRows" :key="item.provider" class="bind-row">
@@ -56,8 +58,14 @@
               <div class="bind-info">
                 <div class="bind-name">{{ item.displayName }}</div>
                 <div class="bind-meta" :class="{ ok: item.bound }">
-                  <template v-if="item.bound">已绑定 · {{ item.externalLogin || '—' }}</template>
-                  <template v-else>未绑定</template>
+                  <template v-if="item.bound">
+                    {{
+                      $t('system.userCenter.bound', {
+                        account: item.externalLogin || '—'
+                      })
+                    }}
+                  </template>
+                  <template v-else>{{ $t('system.userCenter.unbound') }}</template>
                 </div>
               </div>
             </div>
@@ -71,7 +79,7 @@
                   :loading="unbindingProvider === item.provider"
                   @click="unbind(item.provider)"
                 >
-                  解绑
+                  {{ $t('system.userCenter.unbind') }}
                 </ElButton>
               </template>
               <template v-else>
@@ -82,7 +90,7 @@
                   :loading="bindingProvider === item.provider"
                   @click="startBind(item.provider)"
                 >
-                  绑定
+                  {{ $t('system.userCenter.bind') }}
                 </ElButton>
               </template>
             </div>
@@ -95,6 +103,7 @@
 
 <script setup lang="ts">
   import { computed, onMounted, reactive, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { useRoute, useRouter } from 'vue-router'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import { useUserStore } from '@/store/modules/user'
@@ -119,6 +128,7 @@
   const router = useRouter()
   const route = useRoute()
   const userStore = useUserStore()
+  const { t } = useI18n()
   const userInfo = computed(() => userStore.getUserInfo)
 
   const pwdLoading = ref(false)
@@ -168,21 +178,21 @@
 
   const savePassword = async () => {
     if (!pwdForm.password) {
-      ElMessage.warning('请输入当前密码')
+      ElMessage.warning(t('system.userCenter.enterCurrentPassword'))
       return
     }
     if (!pwdForm.newPassword) {
-      ElMessage.warning('请输入新密码')
+      ElMessage.warning(t('system.userCenter.enterNewPassword'))
       return
     }
     if (pwdForm.newPassword !== pwdForm.confirmPassword) {
-      ElMessage.warning('两次输入的新密码不一致')
+      ElMessage.warning(t('system.userCenter.passwordMismatch'))
       return
     }
     pwdLoading.value = true
     try {
       await fetchUpdatePassword(pwdForm)
-      ElMessage.success('密码已更新')
+      ElMessage.success(t('system.userCenter.passwordUpdated'))
       pwdForm.password = ''
       pwdForm.newPassword = ''
       pwdForm.confirmPassword = ''
@@ -196,7 +206,7 @@
     try {
       const { authorizeUrl } = await fetchStartOAuthBind(provider)
       if (!authorizeUrl) {
-        ElMessage.error('未获取到授权地址')
+        ElMessage.error(t('system.userCenter.noAuthorizeUrl'))
         return
       }
       window.location.href = authorizeUrl
@@ -206,15 +216,19 @@
   }
 
   const unbind = async (provider: string) => {
-    await ElMessageBox.confirm('确定解绑？', '解绑确认', {
-      type: 'warning',
-      confirmButtonText: '解绑',
-      cancelButtonText: '取消'
-    })
+    await ElMessageBox.confirm(
+      t('system.userCenter.unbindConfirmMessage'),
+      t('system.userCenter.unbindConfirmTitle'),
+      {
+        type: 'warning',
+        confirmButtonText: t('system.userCenter.unbind'),
+        cancelButtonText: t('common.cancel')
+      }
+    )
     unbindingProvider.value = provider
     try {
       await fetchUnbindOAuth(provider)
-      ElMessage.success('已解绑')
+      ElMessage.success(t('system.userCenter.unboundSuccess'))
       await loadOAuthData()
     } finally {
       unbindingProvider.value = ''
@@ -225,9 +239,9 @@
     const bind = route.query.bind as string
     if (bind !== 'ok' && bind !== 'fail') return
     if (bind === 'ok') {
-      ElMessage.success('账号绑定成功')
+      ElMessage.success(t('system.userCenter.bindSuccess'))
     } else {
-      ElMessage.error('绑定失败，请稍后重试')
+      ElMessage.error(t('system.userCenter.bindFailed'))
     }
     await loadOAuthData()
     router.replace({ path: '/system/user-center' })

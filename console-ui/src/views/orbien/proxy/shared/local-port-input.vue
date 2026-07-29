@@ -1,9 +1,9 @@
 <template>
-  <ElInput v-model.number="port" type="number" placeholder="内网端口">
+  <ElInput v-model.number="port" type="number" :placeholder="t('orbien.proxy.localPort')">
     <template #prepend>
       <ElSelect
           v-model="presetPort"
-          placeholder="常用端口"
+          :placeholder="t('orbien.proxy.commonPorts')"
           clearable
           :style="{ width: selectWidth }"
           @change="onPresetChange"
@@ -21,9 +21,12 @@
 
 <script setup lang="ts">
 import {ref, watch} from 'vue'
+import { useI18n } from 'vue-i18n'
 import {matchPortPreset, type PortPresetOption} from './port-presets'
 
 defineOptions({name: 'LocalPortInput'})
+
+const { t } = useI18n()
 
 const props = withDefaults(
     defineProps<{

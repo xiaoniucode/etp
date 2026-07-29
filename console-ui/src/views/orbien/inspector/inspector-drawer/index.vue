@@ -10,23 +10,23 @@
     <div v-loading="configLoading" class="inspector-page">
       <div class="inspector-toolbar">
         <div class="inspector-toolbar__left">
-          <span class="inspector-toolbar__label">抓包</span>
+          <span class="inspector-toolbar__label">{{ $t('orbien.inspector.capture') }}</span>
           <ElSwitch
               v-model="inspectorEnabled"
               :loading="switchLoading"
               inline-prompt
-              active-text="开"
-              inactive-text="关"
+              :active-text="$t('orbien.inspector.switchOn')"
+              :inactive-text="$t('orbien.inspector.switchOff')"
               @change="handleToggleInspector"
           />
         </div>
-        <ElButton :disabled="!records.length" @click="handleClear">清空</ElButton>
+        <ElButton :disabled="!records.length" @click="handleClear">{{ $t('orbien.inspector.clear') }}</ElButton>
       </div>
 
       <div class="inspector-body">
         <div class="inspector-list">
-          <div class="inspector-list__caption">最近 {{ INSPECTOR_DISPLAY_LIMIT }} 条</div>
-          <div v-if="!records.length" class="inspector-empty">暂无捕获记录</div>
+          <div class="inspector-list__caption">{{ $t('orbien.inspector.recentRecords', { n: INSPECTOR_DISPLAY_LIMIT }) }}</div>
+          <div v-if="!records.length" class="inspector-empty">{{ $t('orbien.inspector.noRecords') }}</div>
           <button
               v-for="item in records"
               :key="item.id"
@@ -36,7 +36,7 @@
               @click="selectRecord(item.id)"
           >
             <div class="inspector-list-item__line">
-              <span v-if="item.replay" class="inspector-list-item__replay" title="重放产生">↻</span>
+              <span v-if="item.replay" class="inspector-list-item__replay" :title="$t('orbien.inspector.replayGenerated')">↻</span>
               <span class="inspector-list-item__method">{{ item.method || 'HTTP' }}</span>
               <span class="inspector-list-item__path">{{ item.path || '/' }}</span>
             </div>
@@ -58,9 +58,9 @@
                   <span>{{ detail.scheme }}://{{ detail.host || '-' }}</span>
                   <span :class="statusClass(detail.status)">{{ formatStatus(detail) }}</span>
                   <span>{{ formatDuration(detail.durationMs) }}</span>
-                  <span v-if="detail.clientIp">来自 {{ detail.clientIp }}</span>
+                  <span v-if="detail.clientIp">{{ $t('orbien.inspector.fromClient', { ip: detail.clientIp }) }}</span>
                   <span v-if="detail.replay && detail.sourceRecordId" class="inspector-detail__source">
-                    重放自 {{ detail.sourceRecordId }}
+                    {{ $t('orbien.inspector.replayedFrom', { id: detail.sourceRecordId }) }}
                   </span>
                 </div>
               </div>
@@ -84,13 +84,13 @@
                         :loading="replayLoading"
                         :disabled="!replayEnabled"
                     >
-                      重放
+                      {{ $t('orbien.inspector.replay') }}
                       <span class="inspector-replay-caret">▾</span>
                     </ElButton>
                     <template #dropdown>
                       <ElDropdownMenu>
-                        <ElDropdownItem command="replay">重放</ElDropdownItem>
-                        <ElDropdownItem command="edit">编辑重放</ElDropdownItem>
+                        <ElDropdownItem command="replay">{{ $t('orbien.inspector.replay') }}</ElDropdownItem>
+                        <ElDropdownItem command="edit">{{ $t('orbien.inspector.editReplay') }}</ElDropdownItem>
                       </ElDropdownMenu>
                     </template>
                   </ElDropdown>
@@ -109,7 +109,7 @@
                 </ElTabPane>
                 <ElTabPane label="Body" name="body">
                   <pre class="inspector-code">{{ formatPrettyBody(detail.requestBodyPreview) }}</pre>
-                  <div v-if="detail.requestBodyTruncated" class="inspector-truncated">Body 已截断</div>
+                  <div v-if="detail.requestBodyTruncated" class="inspector-truncated">{{ $t('orbien.inspector.bodyTruncated') }}</div>
                 </ElTabPane>
               </ElTabs>
             </section>
@@ -128,12 +128,12 @@
                 </ElTabPane>
                 <ElTabPane label="Body" name="body">
                   <pre class="inspector-code">{{ formatPrettyBody(detail.responseBodyPreview) }}</pre>
-                  <div v-if="detail.responseBodyTruncated" class="inspector-truncated">Body 已截断</div>
+                  <div v-if="detail.responseBodyTruncated" class="inspector-truncated">{{ $t('orbien.inspector.bodyTruncated') }}</div>
                 </ElTabPane>
               </ElTabs>
             </section>
           </template>
-          <div v-else class="inspector-empty inspector-empty--detail">选择左侧请求查看详情</div>
+          <div v-else class="inspector-empty inspector-empty--detail">{{ $t('orbien.inspector.selectRequestHint') }}</div>
         </div>
       </div>
     </div>
@@ -149,6 +149,7 @@
 
 <script setup lang="ts">
 import {computed, ref, watch, onBeforeUnmount} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {ElMessageBox} from 'element-plus'
 import {useUserStore} from '@/store/modules/user'
 import {
@@ -164,6 +165,8 @@ import {
 import ReplayEditor from './components/ReplayEditor.vue'
 
 defineOptions({name: 'InspectorDrawer'})
+
+const {t} = useI18n()
 
 const ALLOWED_METHODS = new Set(['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'])
 
@@ -183,7 +186,9 @@ const visibleModel = computed({
 })
 
 const drawerTitle = computed(() =>
-    props.proxyName ? `流量 · ${props.proxyName}` : '流量'
+    props.proxyName
+        ? t('orbien.inspector.titleWithProxy', {name: props.proxyName})
+        : t('orbien.inspector.title')
 )
 
 const configLoading = ref(false)
@@ -205,14 +210,14 @@ let sseReconnectTimer: ReturnType<typeof setTimeout> | null = null
 let sseGeneration = 0
 
 const replayDisabledReason = computed(() => {
-  if (!inspectorEnabled.value) return '先开启抓包'
+  if (!inspectorEnabled.value) return t('orbien.inspector.replayDisabled.enableCapture')
   if (!detail.value) return ''
-  if (detail.value.requestBodyTruncated) return '请求体已截断'
+  if (detail.value.requestBodyTruncated) return t('orbien.inspector.replayDisabled.bodyTruncated')
   const method = (detail.value.method || '').toUpperCase()
-  if (!method || !ALLOWED_METHODS.has(method)) return '方法无效'
-  if (detail.value.status === 101) return '不支持协议升级'
+  if (!method || !ALLOWED_METHODS.has(method)) return t('orbien.inspector.replayDisabled.invalidMethod')
+  if (detail.value.status === 101) return t('orbien.inspector.replayDisabled.protocolUpgrade')
   if (hasUpgradeHeader(detail.value.requestHeaders) || hasUpgradeHeader(detail.value.responseHeaders)) {
-    return '不支持协议升级'
+    return t('orbien.inspector.replayDisabled.protocolUpgrade')
   }
   return ''
 })
@@ -315,7 +320,7 @@ const handleToggleInspector = async (enabled: boolean) => {
 }
 
 const handleClear = async () => {
-  await ElMessageBox.confirm('确定清空？', '清空', {type: 'warning'})
+  await ElMessageBox.confirm(t('orbien.inspector.confirmClear'), t('orbien.inspector.clearTitle'), {type: 'warning'})
   await fetchClearInspectorRequests(props.proxyId)
   records.value = []
   selectedId.value = ''

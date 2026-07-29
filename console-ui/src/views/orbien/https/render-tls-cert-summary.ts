@@ -1,5 +1,6 @@
 import {h} from 'vue'
 import {ElTag} from 'element-plus'
+import {$t} from '@/locales/index'
 
 export type TlsCertSummaryTagType = 'primary' | 'success' | 'info' | 'warning' | 'danger'
 
@@ -18,24 +19,29 @@ export function resolveTlsCertSummaryDisplay(
     const {totalDomains, deployedCount, warningCount} = summary
 
     if (deployedCount === totalDomains) {
-        return {text: '已部署', type: 'primary'}
+        return {text: $t('orbien.proxy.tlsDeployed'), type: 'primary'}
     }
 
     if (deployedCount === 0) {
         return warningCount > 0
-            ? {text: '部署异常', type: 'danger'}
-            : {text: '未部署', type: 'info'}
+            ? {text: $t('orbien.proxy.tlsDeployError'), type: 'danger'}
+            : {text: $t('orbien.proxy.tlsNotDeployed'), type: 'info'}
     }
+
+    const partialText = $t('orbien.proxy.tlsPartialDeployed', {
+        deployed: deployedCount,
+        total: totalDomains
+    })
 
     if (warningCount > 0) {
         return {
-            text: `${deployedCount}/${totalDomains} 已部署`,
+            text: partialText,
             type: 'warning'
         }
     }
 
     return {
-        text: `${deployedCount}/${totalDomains} 已部署`,
+        text: partialText,
         type: 'warning'
     }
 }

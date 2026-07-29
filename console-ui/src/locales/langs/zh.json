@@ -36,7 +36,42 @@
     "tips": "提示",
     "cancel": "取消",
     "confirm": "确定",
-    "logOutTips": "您是否要退出登录?"
+    "logOutTips": "您是否要退出登录?",
+    "add": "添加",
+    "edit": "编辑",
+    "delete": "删除",
+    "save": "保存",
+    "submit": "提交",
+    "close": "关闭",
+    "refresh": "刷新",
+    "copy": "复制",
+    "detail": "详情",
+    "settings": "设置",
+    "batchDelete": "批量删除",
+    "warning": "警告",
+    "name": "名称",
+    "description": "描述",
+    "type": "类型",
+    "status": "状态",
+    "actions": "操作",
+    "createTime": "创建时间",
+    "updateTime": "更新时间",
+    "enabled": "已启用",
+    "disabled": "未启用",
+    "online": "在线",
+    "offline": "离线",
+    "unknown": "未知",
+    "success": {
+      "delete": "删除成功",
+      "save": "保存成功",
+      "add": "添加成功",
+      "update": "更新成功",
+      "copy": "复制成功",
+      "batchDelete": "批量删除成功",
+      "kickout": "剔除成功"
+    },
+    "copied": "已复制",
+    "copyFailed": "复制失败"
   },
   "search": {
     "placeholder": "搜索页面",
@@ -184,6 +219,13 @@
     "success": {
       "title": "登录成功",
       "message": "欢迎回来"
+    },
+    "oauthCallback": {
+      "failed": "登录失败",
+      "processing": "正在完成登录…",
+      "pleaseWait": "请稍候",
+      "backToLogin": "返回登录",
+      "retryFailed": "登录失败，请重试"
     }
   },
   "forgetPassword": {
@@ -191,7 +233,8 @@
     "subTitle": "输入您的电子邮件来重置您的密码",
     "placeholder": "请输入您的电子邮件",
     "submitBtnText": "提交",
-    "backBtnText": "返回"
+    "backBtnText": "返回",
+    "accountLabel": "账号"
   },
   "register": {
     "title": "创建账号",
@@ -212,7 +255,8 @@
     "privacyPolicy": "《隐私政策》",
     "submitBtnText": "注册",
     "hasAccount": "已有账号？",
-    "toLogin": "去登录"
+    "toLogin": "去登录",
+    "success": "注册成功"
   },
   "lockScreen": {
     "pwdError": "密码错误",
@@ -237,6 +281,45 @@
     "404": "抱歉，您访问的页面不存在",
     "500": "抱歉，服务器出错了",
     "gohome": "返回首页"
+  },
+  "dashboard": {
+    "overview": {
+      "title": "概览",
+      "agents": "客户端",
+      "online": "在线",
+      "proxies": "隧道",
+      "running": "运行中"
+    },
+    "status": {
+      "cpu": "CPU",
+      "cpuCores": "{n} 核心",
+      "heap": "堆内存",
+      "direct": "直接内存",
+      "physical": "物理内存"
+    },
+    "traffic": {
+      "title": "流量监控",
+      "subtitle": "最近 24 小时上下行流量趋势",
+      "upRate": "上行速率",
+      "downRate": "下行速率",
+      "upload": "上行流量",
+      "download": "下行流量",
+      "time": "时间"
+    },
+    "proxy": {
+      "title": "代理分布",
+      "subtitle": "HTTP、HTTPS、TCP、UDP、SOCKS5 与 FILE 占比"
+    },
+    "config": {
+      "title": "服务器配置",
+      "addr": "服务器地址",
+      "tcp": "TCP 传输",
+      "websocket": "WebSocket 传输",
+      "quic": "QUIC 传输",
+      "http": "HTTP 代理",
+      "https": "HTTPS 代理",
+      "disabled": "未启用"
+    }
   },
   "menus": {
     "login": {
@@ -276,6 +359,13 @@
       "forbidden": "403",
       "notFound": "404",
       "serverError": "500"
+    },
+    "system": {
+      "title": "系统设置",
+      "user": "用户管理",
+      "role": "角色管理",
+      "userCenter": "个人中心",
+      "menu": "菜单管理"
     }
   },
   "table": {
@@ -305,5 +395,1011 @@
     "zebra": "斑马纹",
     "border": "边框",
     "headerBackground": "表头背景"
+  },
+  "orbien": {
+    "common": {
+      "client": "客户端",
+      "clientId": "客户端 ID",
+      "clientName": "客户端名称",
+      "proxyName": "代理名称",
+      "accessToken": "访问令牌",
+      "protocol": "协议",
+      "port": "端口",
+      "remark": "备注",
+      "rootDomain": "根域名",
+      "fullDomain": "完整域名",
+      "domainType": "域名类型",
+      "linkedProxy": "关联代理",
+      "os": "操作系统",
+      "arch": "架构",
+      "version": "版本",
+      "sourceIp": "来源 IP",
+      "lastActiveTime": "最后在线时间",
+      "type": "类型",
+      "systemArch": "系统架构",
+      "descPlaceholder": "请输入描述"
+    },
+    "agent": {
+      "detailTitle": "客户端详情",
+      "kickout": "强退",
+      "kickoutTitle": "剔除客户端",
+      "kickoutConfirm": "确定要剔除该在线客户端吗？",
+      "deleteTitle": "删除客户端",
+      "deleteConfirm": "确定要删除客户端「{name}」吗？",
+      "batchDeleteConfirm": "确定要删除选中的 {count} 个客户端吗？",
+      "fetchDetailFailed": "获取客户端详情失败"
+    },
+    "token": {
+      "add": "添加访问令牌",
+      "edit": "编辑访问令牌",
+      "tokenName": "令牌名称",
+      "tokenValue": "令牌值",
+      "token": "令牌",
+      "namePlaceholder": "请输入令牌名称",
+      "nameRequired": "请输入令牌名称",
+      "fetchDetailFailed": "获取令牌详情失败",
+      "deleteTitle": "删除令牌",
+      "deleteConfirm": "确定要删除该访问令牌吗？",
+      "batchDeleteConfirm": "确定要删除选中的 {count} 个访问令牌吗？",
+      "successTitle": "保存您的新令牌!",
+      "successDesc": "您的新身份验证令牌已创建！这是最后一次显示该令牌。请将其安全保存到您的计算机中。",
+      "copyAndClose": "复制并关闭",
+      "copyEmpty": "复制内容为空",
+      "manualCopyTitle": "请手动复制",
+      "copied": "已复制"
+    },
+    "domain": {
+      "addRootDomain": "添加根域名",
+      "editRootDomain": "编辑根域名",
+      "resourcesTitle": "域名资源",
+      "resourcesDesc": "根域名池定义平台可用的根域名；已分配域名展示代理隧道当前占用的访问地址。",
+      "poolLabel": "根域名池",
+      "poolHint": "用于子域名自动拼接的根域名",
+      "allocatedLabel": "已分配域名",
+      "allocatedHint": "已被代理隧道占用的访问域名",
+      "domainPlaceholder": "例如 example.com",
+      "domainRequired": "请输入根域名",
+      "fetchDetailFailed": "获取域名详情失败",
+      "deleteTitle": "删除根域名",
+      "deleteConfirm": "确定要删除根域名「{domain}」吗？",
+      "batchDeleteConfirm": "确定要删除选中的 {count} 个根域名吗？"
+    },
+    "portPool": {
+      "add": "添加端口",
+      "edit": "编辑端口",
+      "appType": "应用类型",
+      "selectAppType": "请选择应用类型",
+      "custom": "自定义",
+      "selectProtocol": "请选择协议",
+      "portPlaceholder": "单个端口如 8000，范围端口如 8000-9000",
+      "remarkPlaceholder": "请输入备注",
+      "fetchDetailFailed": "获取端口配置失败",
+      "deleteTitle": "删除端口",
+      "deleteConfirm": "确定要删除端口「{port}」吗？",
+      "selectToDelete": "请选择要删除的端口",
+      "batchDeleteConfirm": "确定要删除选中的 {count} 个端口配置吗？",
+      "group": {
+        "remoteLogin": "远程登录",
+        "webService": "Web 服务",
+        "database": "数据库",
+        "fileTransfer": "文件传输",
+        "networkService": "网络服务"
+      },
+      "preset": {
+        "ssh": {
+          "label": "SSH (22)",
+          "remark": "SSH 远程登录"
+        },
+        "rdp": {
+          "label": "RDP (3389)",
+          "remark": "Windows 远程桌面"
+        },
+        "http": {
+          "label": "HTTP (80)",
+          "remark": "HTTP Web 服务"
+        },
+        "https": {
+          "label": "HTTPS (443)",
+          "remark": "HTTPS 加密 Web 服务"
+        },
+        "mysql": {
+          "label": "MySQL (3306)",
+          "remark": "MySQL 数据库"
+        },
+        "postgresql": {
+          "label": "PostgreSQL (5432)",
+          "remark": "PostgreSQL 数据库"
+        },
+        "sqlserver": {
+          "label": "SQL Server (1433)",
+          "remark": "Microsoft SQL Server"
+        },
+        "redis": {
+          "label": "Redis (6379)",
+          "remark": "Redis 缓存服务"
+        },
+        "mongodb": {
+          "label": "MongoDB (27017)",
+          "remark": "MongoDB 数据库"
+        },
+        "ftp": {
+          "label": "FTP (21)",
+          "remark": "FTP 文件传输"
+        },
+        "dns": {
+          "label": "DNS (53)",
+          "remark": "DNS 域名解析"
+        },
+        "ntp": {
+          "label": "NTP (123)",
+          "remark": "NTP 时间同步"
+        },
+        "snmp": {
+          "label": "SNMP (161)",
+          "remark": "SNMP 网络管理"
+        }
+      }
+    },
+    "stats": {
+      "uploadTraffic": "上行流量",
+      "downloadTraffic": "下行流量",
+      "uploadMessages": "上行消息数",
+      "downloadMessages": "下行消息数",
+      "totalTraffic": "总流量",
+      "data": "数据",
+      "deleteTitle": "删除统计",
+      "deleteConfirm": "确定要删除代理「{name}」的流量统计数据吗？",
+      "selectToDelete": "请选择要删除的统计数据",
+      "batchDeleteConfirm": "确定要删除选中的 {count} 条代理流量统计数据吗？"
+    },
+    "scheduledJob": {
+      "columns": {
+        "jobName": "任务名称",
+        "status": "状态",
+        "schedule": "执行周期",
+        "lastRun": "上次执行",
+        "result": "执行结果",
+        "nextRun": "下次执行",
+        "operation": "操作"
+      },
+      "status": {
+        "active": "正常",
+        "disabled": "停用"
+      },
+      "actions": {
+        "config": "配置",
+        "run": "执行",
+        "logs": "日志",
+        "delete": "删除",
+        "disable": "停用",
+        "batchDelete": "批量删除"
+      },
+      "config": {
+        "title": "配置 - {name}",
+        "description": "任务说明",
+        "schedule": "执行周期",
+        "params": "任务参数",
+        "on": "开启",
+        "off": "关闭",
+        "save": "保存"
+      },
+      "log": {
+        "title": "执行日志 - {name}",
+        "columns": {
+          "startedAt": "开始时间",
+          "finishedAt": "结束时间",
+          "triggerType": "触发方式",
+          "status": "状态",
+          "affectedCount": "影响数量",
+          "message": "说明",
+          "operation": "操作"
+        }
+      },
+      "confirm": {
+        "disableAcmeMessage": "停用后，已开启自动续签的证书将暂停自动续签，重新启用可恢复续签。",
+        "disableAcmeTitle": "停用「{name}」",
+        "runTitle": "手动执行",
+        "runMessage": "确定立即执行任务「{name}」吗？",
+        "deleteLogMessage": "确定删除该条执行日志吗？",
+        "deleteLogTitle": "删除确认",
+        "batchDeleteMessage": "确定删除选中的 {count} 条执行日志吗？",
+        "batchDeleteTitle": "批量删除确认"
+      },
+      "message": {
+        "enabled": "任务已启用",
+        "disabled": "任务已停用",
+        "triggered": "任务已触发，请稍后查看执行日志",
+        "saveSuccess": "保存成功",
+        "deleteSuccess": "删除成功",
+        "selectLogs": "请选择要删除的日志"
+      }
+    },
+    "cron": {
+      "type": {
+        "daily": "每天",
+        "everyNDays": "N 天",
+        "hourly": "每小时",
+        "everyNHours": "N 小时",
+        "everyNMinutes": "N 分钟",
+        "weekly": "每周",
+        "monthly": "每月",
+        "everyNSeconds": "N 秒",
+        "custom": "自定义"
+      },
+      "weekday": {
+        "mon": "周一",
+        "tue": "周二",
+        "wed": "周三",
+        "thu": "周四",
+        "fri": "周五",
+        "sat": "周六",
+        "sun": "周日"
+      },
+      "unit": {
+        "days": "天",
+        "hours": "小时",
+        "minutes": "分钟",
+        "seconds": "秒"
+      },
+      "customFormat": "格式：秒 分 时 日 月 周",
+      "preview": {
+        "daily": "每天的 {hour}:{minute} 执行一次",
+        "everyNDays": "每 {interval} 天的 {hour}:{minute} 执行一次",
+        "hourly": "每小时的第 {minute} 分钟执行一次",
+        "everyNHours": "每 {interval} 小时的第 {minute} 分钟执行一次",
+        "everyNMinutes": "每 {interval} 分钟执行一次",
+        "weekly": "每周 {weekday} {hour}:{minute} 执行一次",
+        "monthly": "每月 {day} 号 {hour}:{minute} 执行一次",
+        "everyNSeconds": "每 {interval} 秒执行一次",
+        "custom": "自定义 Cron 表达式",
+        "notConfigured": "未配置执行周期"
+      }
+    },
+    "settings": {
+      "tab": {
+        "oauth": "三方登录"
+      },
+      "oauth": {
+        "enabled": "已启用",
+        "disabled": "未启用",
+        "enableLogin": "启用登录",
+        "saveCredentialsFirst": "请先保存 Client ID 与 Client Secret",
+        "clientId": "Client ID",
+        "clientSecret": "Client Secret",
+        "configured": "已配置",
+        "secretPlaceholderKeep": "留空保留已有密钥",
+        "secretPlaceholder": "OAuth Client Secret",
+        "clientIdPlaceholder": "OAuth Client ID",
+        "callbackUrl": "回调地址",
+        "copy": "复制",
+        "saveConfig": "保存配置",
+        "fillClientId": "请填写 Client ID",
+        "fillClientSecret": "请填写 Client Secret",
+        "configSaved": "配置已保存",
+        "loginEnabled": "登录已启用",
+        "loginDisabled": "登录已关闭",
+        "copied": "已复制",
+        "copyFailed": "复制失败"
+      }
+    },
+    "enum": {
+      "unknown": "未知",
+      "domain": {
+        "custom": "自定义",
+        "subdomain": "子域名",
+        "auto": "自动子域名"
+      },
+      "agent": {
+        "standard": "标准",
+        "session": "会话"
+      }
+    },
+    "plugin": {
+      "dialog": {
+        "title": "代理设置",
+        "titleWithName": "{name} - 设置",
+        "underDevelopment": "功能开发中"
+      },
+      "menus": {
+        "accessControl": "访问控制",
+        "timeAccess": "时间限制",
+        "basicAuth": "认证鉴权",
+        "cluster": "负载均衡",
+        "healthCheck": "健康检查",
+        "tls": "TLS 加密",
+        "transport": "传输安全",
+        "rateLimit": "流量限制",
+        "headerRewrite": "Header 改写",
+        "socks5Auth": "SOCKS5 认证"
+      },
+      "basic": {
+        "title": "基本配置",
+        "enabled": "启用状态",
+        "controlMode": "控制模式",
+        "timezone": "时区",
+        "saveConfig": "保存配置"
+      },
+      "actions": {
+        "addRule": "新增规则",
+        "addUser": "新增用户",
+        "addService": "添加服务",
+        "addWindow": "新增时段",
+        "selectAll": "全选"
+      },
+      "deleteConfirm": {
+        "rule": "确定要删除此规则吗？",
+        "user": "确定要删除此用户吗？",
+        "window": "确定删除该时段吗？",
+        "headerRule": "确定删除该规则吗？"
+      },
+      "access": {
+        "rulesTitle": "访问规则",
+        "cidrColumn": "IP地址段 (例如：192.168.1.0/24)",
+        "cidrPlaceholder": "请输入IP地址段，例如：192.168.1.0/24",
+        "ruleType": "规则类型",
+        "allowWhitelist": "白名单（只允许指定IP访问）",
+        "denyBlacklist": "黑名单（禁止指定IP访问）",
+        "allow": "放行",
+        "deny": "禁止",
+        "cidrRequired": "请输入IP地址段"
+      },
+      "time": {
+        "periodLimit": "周期限制",
+        "timeLimit": "时间限制",
+        "allowInWindow": "允许（仅窗口内可访问）",
+        "denyInWindow": "禁止（仅窗口内不可访问）",
+        "startTime": "开始时间",
+        "endTime": "结束时间",
+        "selectStartTime": "选择开始时间",
+        "selectEndTime": "选择结束时间",
+        "timeRequired": "请选择开始与结束时间",
+        "weekdays": {
+          "mon": "周一",
+          "tue": "周二",
+          "wed": "周三",
+          "thu": "周四",
+          "fri": "周五",
+          "sat": "周六",
+          "sun": "周日"
+        }
+      },
+      "auth": {
+        "userList": "用户列表",
+        "username": "用户名",
+        "password": "密码",
+        "usernamePlaceholder": "请输入用户名",
+        "passwordPlaceholder": "请输入密码",
+        "usernameRequired": "请输入用户名",
+        "passwordRequired": "请输入密码"
+      },
+      "socks5Auth": {
+        "userList": "用户列表",
+        "username": "用户名",
+        "password": "密码",
+        "usernamePlaceholder": "请输入用户名",
+        "passwordPlaceholder": "请输入密码",
+        "usernameRequired": "请输入用户名",
+        "passwordRequired": "请输入密码"
+      },
+      "header": {
+        "requestHeaders": "请求头",
+        "responseHeaders": "响应头",
+        "action": "动作",
+        "name": "名称",
+        "value": "值",
+        "actionGuideTitle": "动作说明",
+        "actionSet": "覆盖同名头；不存在则创建",
+        "actionAdd": "仅当不存在时写入，已有则跳过",
+        "actionRemove": "删除同名头",
+        "availableVars": "可用变量",
+        "nameRequired": "请输入 Header 名称",
+        "valueRequired": "请输入 Header 值"
+      },
+      "transport": {
+        "currentEffective": "当前生效",
+        "port": "端口 {port}",
+        "notEnabled": "未启用",
+        "tunnelEncrypt": "隧道加密",
+        "dataCompress": "数据压缩",
+        "compressAlgorithm": "压缩算法",
+        "noCompress": "无压缩",
+        "compressSuffix": "压缩",
+        "tlsEncrypt": "TLS 加密",
+        "plainText": "明文传输",
+        "saved": "传输配置已保存",
+        "tunnel": {
+          "multiplex": "多路复用",
+          "direct": "独立连接"
+        },
+        "protocol": {
+          "tcpDesc": "默认选项，兼容性最好",
+          "websocketDesc": "穿透防火墙友好，强制 TLS",
+          "quicDesc": "低延迟，强制 TLS，多路复用"
+        },
+        "algorithm": {
+          "balanced": "均衡",
+          "speed": "速度",
+          "ratio": "压缩率"
+        }
+      },
+      "rateLimit": {
+        "bandwidthUnit": "带宽单位",
+        "bandwidthUnitDesc": "统一设置下方所有带宽字段的输入与显示单位",
+        "selectUnit": "选择单位",
+        "bandwidthLimit": "带宽限制",
+        "bandwidthLimitDesc": "分别限制下载、上传与总带宽，留空表示不限制",
+        "totalBandwidth": "总带宽",
+        "totalBandwidthHint": "上下行共享总带宽，与单向限制同时配置时需满足总量约束",
+        "downloadBandwidth": "下载带宽",
+        "downloadBandwidthHint": "限制客户端下载速率（内网服务 -> 客户端）",
+        "uploadBandwidth": "上传带宽",
+        "uploadBandwidthHint": "限制客户端上传速率（客户端 -> 内网服务）",
+        "unlimited": "不限"
+      },
+      "health": {
+        "desc": "开启后将定期检测内网服务可用性，异常节点会被负载均衡自动剔除",
+        "checkType": "检查类型",
+        "checkTypeHint": "TCP 为端口连通性检查，HTTP 为路径请求检查",
+        "checkPath": "检查路径",
+        "checkPathHint": "HTTP 健康检查请求的 URL 路径",
+        "interval": "检查间隔",
+        "intervalHint": "两次健康检查之间的等待时间",
+        "timeout": "超时时间",
+        "timeoutHint": "单次检查允许的最长等待时间",
+        "maxFailed": "最大失败次数",
+        "maxFailedHint": "连续失败达到该次数后标记节点不可用",
+        "unitSecond": "秒",
+        "unitTimes": "次",
+        "pathRequired": "请输入 HTTP 健康检查路径"
+      },
+      "cluster": {
+        "title": "负载均衡",
+        "strategy": "策略",
+        "selectStrategy": "请选择策略",
+        "serviceList": "服务列表",
+        "emptyServices": "暂无服务，请添加",
+        "serviceName": "服务名称",
+        "host": "主机",
+        "port": "端口",
+        "weight": "权重",
+        "optional": "可选",
+        "hostPlaceholder": "内网地址",
+        "portPlaceholder": "1-65535",
+        "weightPlaceholder": "权重",
+        "minOneService": "请至少添加一个服务",
+        "hostRequired": "第 {row} 行：请输入主机地址",
+        "portInvalid": "第 {row} 行：请输入有效端口（1-65535）",
+        "strategyOptions": {
+          "roundRobin": "轮询 (roundrobin)",
+          "weight": "权重 (weight)",
+          "random": "随机 (random)",
+          "leastConn": "最少连接 (leastconn)"
+        }
+      },
+      "tls": {
+        "summary": "域名证书：{bound}/{total} 已配置",
+        "warnings": "{count} 个异常",
+        "domainCert": "域名证书",
+        "certFolder": "证书库",
+        "freeApply": "免费申请",
+        "manualUpload": "手动上传",
+        "uploadAndBind": "上传并绑定证书",
+        "bindDomains": "绑定域名",
+        "selectBindDomains": "选择要绑定的域名",
+        "privateKey": "私钥(KEY)",
+        "certificate": "证书(PEM格式)",
+        "saveAndBind": "保存并绑定",
+        "domain": "域名",
+        "certSan": "证书 SAN",
+        "notAfter": "到期时间",
+        "status": "状态",
+        "bindCert": "绑定证书",
+        "enable": "启用",
+        "retry": "重试",
+        "replaceCert": "换证",
+        "disable": "禁用",
+        "unbind": "解绑",
+        "authDomain": "认证域名",
+        "issuer": "品牌",
+        "bindToProxy": "绑定到本代理",
+        "bindStatus": {
+          "normal": "正常",
+          "disabled": "已禁用",
+          "sanMismatch": "SAN不匹配",
+          "expired": "已过期",
+          "deployFailed": "部署失败",
+          "notConfigured": "未配置",
+          "unknown": "未知"
+        },
+        "certSource": {
+          "acme": "ACME",
+          "manual": "手动"
+        },
+        "unknownIssuer": "未知颁发者",
+        "expiresAt": "到期 {date}",
+        "usedByDomains": "已用于 {count} 个域名",
+        "batchBindTitle": "批量绑定证书（{count} 个域名）",
+        "overrideHint": "{count} 个域名已有证书，确认后将覆盖",
+        "selectCert": "选择证书",
+        "noMatchingCert": "暂无覆盖所选域名的证书",
+        "confirmBind": "确认绑定",
+        "overrideConfirm": "部分域名已有绑定，继续将覆盖原有证书，是否继续？",
+        "bindConfirmTitle": "绑定确认",
+        "bindResult": "绑定完成：成功 {success} 个，失败 {failed} 个",
+        "savedAndBound": "证书已保存并绑定",
+        "bindSuccess": "绑定成功",
+        "bindToMatched": "将绑定到 {count} 个匹配域名，是否继续？",
+        "sanMismatchWarning": "该证书 SAN 与本代理域名不匹配",
+        "keyCertRequired": "请输入完整的私钥和证书",
+        "selectDomainRequired": "请选择至少一个绑定域名",
+        "unbindConfirm": "确定解绑该域名的证书？",
+        "unbindTitle": "解绑确认",
+        "unbound": "已解绑",
+        "disabled": "已禁用",
+        "enabled": "已启用",
+        "redeployed": "已重新部署",
+        "deleteCertConfirm": "确定要删除该证书？",
+        "bindSuccessCount": "已成功绑定 {count} 个域名",
+        "acme": {
+          "title": "为当前代理申请证书",
+          "stepDomain": "选择域名",
+          "stepValidation": "验证方式",
+          "stepDns": "DNS 验证",
+          "submitting": "正在提交申请，请稍候...",
+          "prev": "上一步",
+          "next": "下一步",
+          "submit": "提交申请",
+          "startVerify": "开始验证",
+          "refreshStatus": "刷新状态"
+        }
+      }
+    },
+    "proxy": {
+      "name": "代理名称",
+      "publicAddr": "外网地址",
+      "backend": "内网服务",
+      "transport": "传输协议",
+      "transportShort": "传输",
+      "traffic": "流量",
+      "remotePort": "远程端口",
+      "client": "客户端",
+      "domainType": "域名类型",
+      "customDomain": "自定义域名",
+      "auto": "自动",
+      "subdomain": "子域名",
+      "host": "主机",
+      "port": "端口",
+      "selectClient": "请选择客户端",
+      "enterName": "请输入代理名称",
+      "enterHost": "请输入主机",
+      "enterPort": "请输入端口",
+      "portNumber": "端口必须是数字",
+      "portRange": "端口必须在 1-65535 之间",
+      "remotePortNumber": "远程端口必须是数字",
+      "remotePortRange": "远程端口必须在 1-65535 之间",
+      "fetchClientFail": "获取客户端列表失败",
+      "fetchDetailFail": "获取代理详情失败，请稍后重试",
+      "fetchFileShareDetailFail": "获取文件共享详情失败，请稍后重试",
+      "selectToDelete": "请选择要删除的代理",
+      "selectFileShareToDelete": "请选择要删除的文件共享",
+      "deleteBatchTip": "确定要删除选中的代理吗？",
+      "deleteBatchFileShareTip": "确定要删除选中的文件共享吗？",
+      "deleteOneTip": "确定要删除代理「{name}」吗？",
+      "deleteOneFileShareTip": "确定要删除文件共享「{name}」吗？",
+      "deleteBatchCountTip": "确定删除选中的 {n} 个代理吗？",
+      "deleteConfirm": "删除确认",
+      "inspector": "抓包",
+      "forceHttps": "强制HTTPS",
+      "authEnabled": "启用认证",
+      "authUsers": "认证用户",
+      "addUser": "添加用户",
+      "username": "用户名",
+      "password": "密码",
+      "leaveBlank": "留空则不修改",
+      "enterPassword": "请输入密码",
+      "autoPort": "不填自动生成",
+      "refreshPorts": "换一批",
+      "goAddPort": "去添加端口",
+      "rootDir": "根目录",
+      "enterRootDir": "请输入根目录",
+      "rootDirPlaceholder": "如 /data/share",
+      "uploadLimit": "上传限制",
+      "enterUploadLimit": "请输入上传限制",
+      "uploadLimitMin": "上传限制必须大于 0",
+      "maxUploadPlaceholder": "单文件最大上传大小",
+      "permissions": "权限",
+      "operationPermissions": "操作权限",
+      "readonly": "只读",
+      "readwrite": "读写",
+      "allowUpload": "允许上传",
+      "allowDelete": "允许删除",
+      "allowMkdir": "允许创建目录",
+      "allowMove": "允许移动",
+      "allowRename": "允许重命名",
+      "tlsCert": "TLS 证书",
+      "accessUrl": "访问地址",
+      "authStatus": "认证状态",
+      "identityAuth": "身份认证",
+      "selectDomainType": "请选择域名类型",
+      "enterCustomDomain": "请输入自定义域名",
+      "customDomainPlaceholder": "请输入完整域名，多个用换行分隔，如 www.example.com",
+      "customDomainPlaceholderFileShare": "请输入完整域名，多个用换行分隔，如 files.example.com",
+      "hostPlaceholder": "如127.0.0.1",
+      "bandwidthLimit": "带宽限制",
+      "noBandwidthLimit": "留空不限制",
+      "bandwidthInteger": "带宽必须为大于 0 的整数",
+      "localPort": "内网端口",
+      "commonPorts": "常用端口",
+      "prefix": "前缀",
+      "rootDomain": "根域名",
+      "clusterSummary": "负载均衡 · {n} 个服务",
+      "goClusterConfig": "前往负载均衡配置",
+      "authTipSocks5": "强烈建议开启，防止未经授权的用户访问您的内网",
+      "authTipFileShare": "开启后访问文件共享需要用户名和密码",
+      "authUserRequired": "请至少添加一个认证用户",
+      "authUserMinOne": "启用认证时请至少添加一个用户",
+      "fillUsernamePassword": "请填写用户名和密码",
+      "subdomainMinOne": "请至少添加一条子域名配置",
+      "subdomainPrefixRequired": "请填写子域名前缀",
+      "selectRootDomain": "请选择根域名",
+      "duplicateSubdomain": "存在重复的子域名配置",
+      "trafficUpDown": "上行 {up} · 下行 {down}",
+      "tlsDeployed": "已部署",
+      "tlsNotDeployed": "未部署",
+      "tlsDeployError": "部署异常",
+      "tlsPartialDeployed": "{deployed}/{total} 已部署",
+      "portPresets": {
+        "rdp": "Windows远程桌面 - 3389"
+      }
+    },
+    "http": {
+      "add": "添加 HTTP 代理",
+      "edit": "编辑 HTTP 代理"
+    },
+    "https": {
+      "add": "添加 HTTPS 代理",
+      "edit": "编辑 HTTPS 代理"
+    },
+    "tcp": {
+      "add": "添加 TCP 代理",
+      "edit": "编辑 TCP 代理"
+    },
+    "udp": {
+      "add": "添加 UDP 代理",
+      "edit": "编辑 UDP 代理"
+    },
+    "socks5": {
+      "add": "添加 SOCKS5 代理",
+      "edit": "编辑 SOCKS5 代理"
+    },
+    "fileShare": {
+      "add": "添加文件共享",
+      "edit": "编辑文件共享"
+    },
+    "tls": {
+      "tabs": {
+        "certs": "证书列表",
+        "orders": "申请记录",
+        "dns": "DNS 密钥"
+      },
+      "actions": {
+        "applyFree": "免费申请",
+        "upload": "上传证书",
+        "bind": "绑定",
+        "download": "下载"
+      },
+      "columns": {
+        "sanDomains": "认证域名",
+        "source": "来源",
+        "org": "证书分类",
+        "issuer": "证书品牌",
+        "boundDomainCount": "使用域名数",
+        "notAfter": "到期时间",
+        "autoRenew": "自动续签"
+      },
+      "source": {
+        "manual": "手动"
+      },
+      "expire": {
+        "expired": "已过期",
+        "remainingDays": "剩余{n}天"
+      },
+      "messages": {
+        "selectCertsToDelete": "请选择要删除的证书",
+        "confirmBatchDeleteCerts": "确定要删除选中的证书吗？",
+        "confirmDeleteCert": "确定要删除该证书吗？",
+        "deleteCertTitle": "证书删除确认",
+        "autoRenewEnabledWithJob": "已开启自动续签，并已自动启用 ACME 续签计划任务",
+        "autoRenewEnabled": "已开启自动续签",
+        "autoRenewDisabled": "已关闭自动续签",
+        "downloadFailed": "下载失败"
+      },
+      "upload": {
+        "title": "上传证书",
+        "keyLabel": "私钥(KEY)",
+        "certLabel": "证书(PEM格式)",
+        "keyRequired": "请输入私钥内容",
+        "certRequired": "请输入证书内容",
+        "success": "证书上传成功"
+      },
+      "bind": {
+        "title": "绑定证书到域名",
+        "certSan": "证书 SAN: {san}",
+        "columns": {
+          "domain": "域名",
+          "proxy": "所属代理",
+          "matchStatus": "匹配状态",
+          "currentCert": "当前证书"
+        },
+        "match": {
+          "matched": "匹配",
+          "unmatched": "不匹配",
+          "bound": "已绑定",
+          "unbound": "未绑定"
+        },
+        "selection": "已选择 {n} 个域名",
+        "overrideHint": "（{n} 个将覆盖已有绑定）",
+        "confirmBind": "确认绑定",
+        "confirmOverride": "部分域名已有绑定，继续将覆盖原有证书，是否继续？",
+        "confirmOverrideTitle": "绑定确认",
+        "resultPartial": "绑定完成：成功 {success} 个，失败 {failed} 个",
+        "resultSuccess": "已成功绑定 {n} 个域名"
+      },
+      "dns": {
+        "addCredential": "添加密钥",
+        "dialog": {
+          "addTitle": "添加 DNS 密钥",
+          "editTitle": "编辑 DNS 密钥",
+          "namePlaceholder": "如：生产环境-阿里云",
+          "provider": "DNS 厂商",
+          "providerPlaceholder": "请选择厂商",
+          "editHint": "编辑时需重新填写密钥信息",
+          "required": "必填",
+          "optional": "选填",
+          "saveAndTest": "保存并测试"
+        },
+        "columns": {
+          "provider": "厂商",
+          "accountHint": "账号标识",
+          "lastTest": "最近测试",
+          "testMessage": "测试信息"
+        },
+        "status": {
+          "ok": "正常",
+          "invalid": "无效",
+          "untested": "未测试"
+        },
+        "actions": {
+          "test": "测试"
+        },
+        "messages": {
+          "testSuccess": "连接测试成功",
+          "confirmDelete": "确定删除密钥「{name}」吗？",
+          "deleteTitle": "删除确认"
+        }
+      },
+      "acme": {
+        "wizard": {
+          "title": "申请免费 TLS 证书",
+          "steps": {
+            "domain": "选择域名",
+            "validation": "验证方式",
+            "dnsVerify": "DNS 验证"
+          },
+          "submitting": "正在提交申请，请稍候...",
+          "prev": "上一步",
+          "next": "下一步",
+          "submit": "提交申请",
+          "startVerify": "开始验证",
+          "refreshStatus": "刷新状态",
+          "selectHttpsProxy": "请选择 HTTPS 隧道"
+        },
+        "section": {
+          "certBrand": "证书品牌",
+          "httpsProxy": "HTTPS / 文件共享",
+          "selectProxy": "选择要申请证书的代理",
+          "selectDomain": "选择域名",
+          "currentProxy": "当前代理",
+          "thisApplication": "本次申请",
+          "extraDomains": "补充域名（通配符等）"
+        },
+        "proxy": {
+          "domainCount": "{n} 个域名",
+          "label": "{name}（{agentName} · {n} 个域名）",
+          "enabled": "已启用",
+          "disabled": "已停用",
+          "andMore": "等 {n} 个",
+          "noDomains": "当前代理暂无可用域名"
+        },
+        "domain": {
+          "columns": {
+            "type": "类型",
+            "certStatus": "证书状态"
+          },
+          "bound": "已绑定",
+          "boundWithIssuer": "已绑定（{issuer}）",
+          "unbound": "未绑定"
+        },
+        "validation": {
+          "manualTitle": "手动 DNS 验证",
+          "manualDesc": "自行在 DNS 服务商添加 TXT 记录，适合临时申请",
+          "cloudTitle": "云 DNS 自动解析",
+          "recommended": "推荐",
+          "cloudDesc": "自动添加 TXT、自动验证，支持在证书列表开启自动续期",
+          "cloudHint": "使用云 DNS 需先配置厂商 API 密钥，签发后可在证书列表手动开启自动续期",
+          "noCredential": "尚未配置 DNS 密钥",
+          "addCredentialHint": "添加密钥后即可自动完成 DNS 验证",
+          "addDnsCredential": "添加 DNS 密钥",
+          "dnsCredential": "DNS 密钥",
+          "selectCredential": "选择用于自动解析的密钥",
+          "add": "添加"
+        },
+        "dnsVerify": {
+          "manualHint": "请在 DNS 服务商处添加以下 TXT 记录，生效后点击「开始验证」",
+          "autoHint": "系统已自动添加 TXT 记录，正在等待 DNS 生效并验证",
+          "dnsZone": "DNS 区域：{zone}",
+          "hostRecord": "主机记录",
+          "recordType": "记录类型",
+          "recordValue": "记录值",
+          "currentStatus": "当前状态："
+        },
+        "order": {
+          "columns": {
+            "orderNo": "订单号",
+            "domains": "域名",
+            "validationMode": "验证方式"
+          },
+          "validationMode": {
+            "cloud": "云DNS",
+            "manual": "手动"
+          },
+          "actions": {
+            "verify": "验证",
+            "retry": "重试",
+            "cancel": "取消"
+          },
+          "messages": {
+            "verifyStarted": "已开始验证",
+            "retrySubmitted": "已重新提交",
+            "cancelled": "已取消",
+            "confirmDelete": "确定删除申请记录「{orderNo}」吗？",
+            "confirmBatchDelete": "确定删除选中的 {n} 条申请记录吗？",
+            "batchDeleteTitle": "批量删除确认",
+            "selectToDelete": "请选择要删除的申请记录"
+          },
+          "detail": {
+            "title": "申请详情",
+            "orderNo": "订单号",
+            "status": "状态",
+            "domains": "域名",
+            "validationMode": "验证方式",
+            "cloudAuto": "云 DNS 自动",
+            "manualDns": "手动 DNS",
+            "renewal": "续期",
+            "autoRenewalSupported": "支持自动续期",
+            "certId": "证书 ID",
+            "errorMessage": "错误信息",
+            "createdAt": "创建时间",
+            "dnsTxtRecords": "DNS TXT 记录",
+            "pendingVerify": "待验证",
+            "cancelApplication": "取消申请",
+            "verifyStartedRefresh": "已开始验证，请稍后刷新查看结果",
+            "retrySubmitted": "已重新提交验证"
+          }
+        },
+        "messages": {
+          "selectDomain": "请至少选择一个域名",
+          "addDnsCredentialFirst": "请先添加 DNS 密钥",
+          "selectDnsCredential": "请选择 DNS 密钥",
+          "applySuccess": "证书申请成功",
+          "submittedAutoVerify": "已提交，系统正在自动验证",
+          "verifyStartedRefresh": "已开始验证，请稍后刷新状态"
+        }
+      }
+    },
+    "inspector": {
+      "title": "流量",
+      "titleWithProxy": "流量 · {name}",
+      "capture": "抓包",
+      "switchOn": "开",
+      "switchOff": "关",
+      "clear": "清空",
+      "recentRecords": "最近 {n} 条",
+      "noRecords": "暂无捕获记录",
+      "replayGenerated": "重放产生",
+      "fromClient": "来自 {ip}",
+      "replayedFrom": "重放自 {id}",
+      "replay": "重放",
+      "editReplay": "编辑重放",
+      "bodyTruncated": "Body 已截断",
+      "selectRequestHint": "选择左侧请求查看详情",
+      "confirmClear": "确定清空？",
+      "clearTitle": "清空",
+      "replayDisabled": {
+        "enableCapture": "先开启抓包",
+        "bodyTruncated": "请求体已截断",
+        "invalidMethod": "方法无效",
+        "protocolUpgrade": "不支持协议升级"
+      },
+      "replayEditor": {
+        "title": "编辑重放",
+        "sourceRequest": "源请求 {method} {path}",
+        "addHeader": "+ 添加",
+        "empty": "暂无",
+        "systemHeaders": "系统 Header",
+        "format": "格式化",
+        "bodyTooLarge": "超出大小限制",
+        "sendReplay": "发送重放",
+        "notSet": "未设置",
+        "notEditable": "不可修改",
+        "notEditableName": "不可修改: {name}",
+        "autoContentLength": "(自动计算)",
+        "systemWritten": "(系统写入)"
+      }
+    },
+    "metrics": {
+      "title": "流量统计",
+      "timeRange": "时间范围",
+      "ranges": {
+        "24h": "最近24小时",
+        "3d": "最近3天",
+        "7d": "最近7天",
+        "15d": "最近15天",
+        "custom": "自定义日期"
+      },
+      "dateRangeSeparator": "至",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "cards": {
+        "connections": "连接数",
+        "connectionsDesc": "当前活跃连接",
+        "upload": "上行流量",
+        "uploadDesc": "累计上行",
+        "download": "下行流量",
+        "downloadDesc": "累计下行",
+        "upRate": "上行速率",
+        "upRateDesc": "实时上行",
+        "downRate": "下行速率",
+        "downRateDesc": "实时下行"
+      },
+      "charts": {
+        "trend": "流量趋势",
+        "unit": "单位：{unit}",
+        "trafficCompare": "流量对比",
+        "rateCompare": "速率对比",
+        "totalTraffic": "总流量\n{size}",
+        "uploadSeries": "上行流量",
+        "downloadSeries": "下行流量",
+        "uploadRateSeries": "上行 ({unit}/s)",
+        "downloadRateSeries": "下行 ({unit}/s)",
+        "rateAxis": "速率",
+        "tooltipTime": "时间：{time}"
+      }
+    }
+  },
+  "system": {
+    "userCenter": {
+      "admin": "管理员",
+      "changePassword": "修改密码",
+      "currentPassword": "当前密码",
+      "newPassword": "新密码",
+      "confirmPassword": "确认新密码",
+      "savePassword": "保存密码",
+      "oauth": "三方登录",
+      "bound": "已绑定 · {account}",
+      "unbound": "未绑定",
+      "unbind": "解绑",
+      "bind": "绑定",
+      "unbindConfirmTitle": "解绑确认",
+      "unbindConfirmMessage": "确定解绑？",
+      "unboundSuccess": "已解绑",
+      "bindSuccess": "账号绑定成功",
+      "bindFailed": "绑定失败，请稍后重试",
+      "enterCurrentPassword": "请输入当前密码",
+      "enterNewPassword": "请输入新密码",
+      "passwordMismatch": "两次输入的新密码不一致",
+      "passwordUpdated": "密码已更新",
+      "noAuthorizeUrl": "未获取到授权地址"
+    }
   }
 }

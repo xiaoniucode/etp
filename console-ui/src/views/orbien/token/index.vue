@@ -5,9 +5,9 @@
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
         <template #left>
           <ElSpace wrap>
-            <ElButton type="primary" @click="showDialog('add')" v-ripple>添加访问令牌</ElButton>
+            <ElButton type="primary" @click="showDialog('add')" v-ripple>{{ $t('orbien.token.add') }}</ElButton>
             <ElButton @click="handleBatchDelete" :disabled="selectedRows.length === 0" v-ripple
-              >批量删除</ElButton
+              >{{ $t('common.batchDelete') }}</ElButton
             >
           </ElSpace>
         </template>
@@ -46,6 +46,7 @@
 
 <script setup lang="ts">
   import { ref, h, nextTick } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { fetchGetTokenList, fetchDeleteToken, fetchDeleteBatchTokens } from '@/api/token'
@@ -55,6 +56,8 @@ import { ElMessageBox, ElMessage } from 'element-plus'
   import { DialogType } from '@/types'
 
   defineOptions({ name: 'TokenManagement' })
+
+  const { t } = useI18n()
 
   // 选中行
   const selectedRows = ref<Api.AccessToken.AccessTokenDTO[]>([])
@@ -92,41 +95,41 @@ import { ElMessageBox, ElMessage } from 'element-plus'
         { type: 'selection' },
         {
           prop: 'name',
-          label: '令牌名称',
+          label: t('orbien.token.tokenName'),
           minWidth: 50
         },
         {
           prop: 'token',
-          label: '令牌',
+          label: t('orbien.token.token'),
           minWidth: 200
         },
         {
           prop: 'remark',
-          label: '描述',
+          label: t('common.description'),
         },
         {
           prop: 'createdAt',
-          label: '创建时间',
+          label: t('common.createTime'),
         },
         {
           prop: 'updatedAt',
-          label: '更新时间',
+          label: t('common.updateTime'),
         },
         {
           prop: 'operation',
-          label: '操作',
+          label: t('common.actions'),
           width: 130,
           fixed: 'right',
           formatter: (row: Api.AccessToken.AccessTokenDTO) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'link',
-                text: '编辑',
+                text: t('common.edit'),
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '删除',
+                text: t('common.delete'),
                 onClick: () => deleteToken(row)
               })
             ])
@@ -139,13 +142,13 @@ import { ElMessageBox, ElMessage } from 'element-plus'
    * 删除令牌
    */
   const deleteToken = (row: Api.AccessToken.AccessTokenDTO): void => {
-    ElMessageBox.confirm(`确定要删除该访问令牌吗？`, '删除令牌', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.confirm(t('orbien.token.deleteConfirm'), t('orbien.token.deleteTitle'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'error'
     }).then(async () => {
       await fetchDeleteToken(row.id)
-      ElMessage.success('删除成功')
+      ElMessage.success(t('common.success.delete'))
       refreshData()
     })
   }
@@ -157,17 +160,17 @@ import { ElMessageBox, ElMessage } from 'element-plus'
     if (selectedRows.value.length === 0) return
 
     ElMessageBox.confirm(
-      `确定要删除选中的 ${selectedRows.value.length} 个访问令牌吗？`,
-      '批量删除',
+      t('orbien.token.batchDeleteConfirm', { count: selectedRows.value.length }),
+      t('common.batchDelete'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
         type: 'error'
       }
     ).then(async () => {
       const ids = selectedRows.value.map((row) => row.id)
       await fetchDeleteBatchTokens(ids)
-      ElMessage.success('批量删除成功')
+      ElMessage.success(t('common.success.batchDelete'))
       refreshData()
     })
   }

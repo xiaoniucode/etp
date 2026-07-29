@@ -1,6 +1,6 @@
 <template>
   <section v-if="selectedDomains.length || extraDomainText.trim()" class="section-block">
-    <div class="section-title">本次申请</div>
+    <div class="section-title">{{ $t('orbien.tls.acme.section.thisApplication') }}</div>
     <div class="selected-domains">
       <ElTag
           v-for="item in selectedDomains"
@@ -24,7 +24,7 @@
   </section>
 
   <ElCollapse v-model="advancedPanels" class="advanced-collapse">
-    <ElCollapseItem title="补充域名（通配符等）" name="extra">
+    <ElCollapseItem :title="$t('orbien.tls.acme.section.extraDomains')" name="extra">
       <ElInput
           :model-value="extraDomainText"
           type="textarea"

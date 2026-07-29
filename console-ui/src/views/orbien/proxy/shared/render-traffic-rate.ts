@@ -1,5 +1,6 @@
 import { h } from 'vue'
 import { ByteUtils } from '@/utils/format/byteFormatter'
+import { $t } from '@/locales/index'
 
 const CELL_STYLE: Record<string, string> = {
   display: 'inline-flex',
@@ -33,7 +34,7 @@ export function renderTrafficRate(
     {
       type: 'button',
       style: CELL_STYLE,
-      title: `上行 ${up} · 下行 ${down}`,
+      title: $t('orbien.proxy.trafficUpDown', { up, down }),
       onClick: (e: MouseEvent) => {
         e.stopPropagation()
         onClick?.()

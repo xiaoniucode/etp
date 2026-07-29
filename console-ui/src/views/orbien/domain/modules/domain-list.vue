@@ -2,9 +2,9 @@
   <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
     <template #left>
       <ElSpace wrap>
-        <ElButton type="primary" @click="showDialog('add')" v-ripple>添加根域名</ElButton>
+        <ElButton type="primary" @click="showDialog('add')" v-ripple>{{ $t('orbien.domain.addRootDomain') }}</ElButton>
         <ElButton @click="handleBatchDelete" :disabled="selectedRows.length === 0" v-ripple>
-          批量删除
+          {{ $t('common.batchDelete') }}
         </ElButton>
       </ElSpace>
     </template>
@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
   import { ref, h, nextTick } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
@@ -38,6 +39,8 @@
   import { DialogType } from '@/types'
 
   defineOptions({ name: 'DomainList' })
+
+  const { t } = useI18n()
 
   const emit = defineEmits<{ change: [] }>()
 
@@ -68,40 +71,40 @@
         { type: 'selection' },
         {
           prop: 'domain',
-          label: '根域名',
+          label: t('orbien.common.rootDomain'),
           minWidth: 180
         },
         {
           prop: 'remark',
-          label: '描述',
+          label: t('common.description'),
           minWidth: 160,
           formatter: (row: DomainItem) => row.remark || ''
         },
         {
           prop: 'createdAt',
-          label: '创建时间',
+          label: t('common.createTime'),
           minWidth: 170
         },
         {
           prop: 'updatedAt',
-          label: '更新时间',
+          label: t('common.updateTime'),
           minWidth: 170
         },
         {
           prop: 'operation',
-          label: '操作',
+          label: t('common.actions'),
           width: 150,
           fixed: 'right',
           formatter: (row: DomainItem) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'link',
-                text: '编辑',
+                text: t('common.edit'),
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '删除',
+                text: t('common.delete'),
                 onClick: () => deleteDomain(row)
               })
             ])
@@ -119,25 +122,29 @@
 
   const deleteDomains = async (rows: DomainItem[], title: string, message: string) => {
     await ElMessageBox.confirm(message, title, {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
       type: 'error'
     })
     await fetchDeleteBatchDomains(rows.map((row) => row.id))
-    ElMessage.success('删除成功')
+    ElMessage.success(t('common.success.delete'))
     refreshData()
   }
 
   const deleteDomain = (row: DomainItem): void => {
-    deleteDomains([row], '删除根域名', `确定要删除根域名「${row.domain}」吗？`).catch(() => {})
+    deleteDomains(
+      [row],
+      t('orbien.domain.deleteTitle'),
+      t('orbien.domain.deleteConfirm', { domain: row.domain })
+    ).catch(() => {})
   }
 
   const handleBatchDelete = (): void => {
     if (selectedRows.value.length === 0) return
     deleteDomains(
       selectedRows.value,
-      '批量删除',
-      `确定要删除选中的 ${selectedRows.value.length} 个根域名吗？`
+      t('common.batchDelete'),
+      t('orbien.domain.batchDeleteConfirm', { count: selectedRows.value.length })
     ).catch(() => {})
   }
 

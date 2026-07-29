@@ -1,7 +1,7 @@
 <template>
   <ElDialog
       v-model="dialogVisible"
-      :title="formData.id ? '编辑 DNS 密钥' : '添加 DNS 密钥'"
+      :title="formData.id ? $t('orbien.tls.dns.dialog.editTitle') : $t('orbien.tls.dns.dialog.addTitle')"
       width="580px"
       align-center
       destroy-on-close
@@ -22,19 +22,19 @@
         <input type="password" tabindex="-1" autocomplete="current-password"/>
       </div>
 
-      <ElFormItem label="名称" prop="name">
+      <ElFormItem :label="$t('common.name')" prop="name">
         <ElInput
             v-model="formData.name"
-            placeholder="如：生产环境-阿里云"
+            :placeholder="$t('orbien.tls.dns.dialog.namePlaceholder')"
             maxlength="64"
             autocomplete="off"
             name="dns-credential-label"
         />
       </ElFormItem>
-      <ElFormItem label="DNS 厂商" prop="provider">
+      <ElFormItem :label="$t('orbien.tls.dns.dialog.provider')" prop="provider">
         <ElSelect
             v-model="formData.provider"
-            placeholder="请选择厂商"
+            :placeholder="$t('orbien.tls.dns.dialog.providerPlaceholder')"
             style="width: 100%"
             :disabled="!!formData.id"
             @change="handleProviderChange"
@@ -54,7 +54,7 @@
           type="info"
           :closable="false"
           show-icon
-          title="编辑时需重新填写密钥信息"
+          :title="$t('orbien.tls.dns.dialog.editHint')"
           class="edit-tip"
       />
 
@@ -70,7 +70,7 @@
           <ElInput
               v-model="formData.config[field.key]"
               :type="field.secret ? 'password' : 'text'"
-              :placeholder="field.required ? '必填' : '选填'"
+              :placeholder="field.required ? $t('orbien.tls.dns.dialog.required') : $t('orbien.tls.dns.dialog.optional')"
               :show-password="field.secret"
               :autocomplete="resolveFieldAutocomplete(field)"
               :name="`dns-credential-${formData.provider}-${field.key}`"
@@ -81,19 +81,22 @@
       </template>
     </ElForm>
     <template #footer>
-      <ElButton :disabled="submitting" @click="dialogVisible = false">取消</ElButton>
-      <ElButton type="primary" :loading="submitting" @click="handleSubmit">保存并测试</ElButton>
+      <ElButton :disabled="submitting" @click="dialogVisible = false">{{ $t('common.cancel') }}</ElButton>
+      <ElButton type="primary" :loading="submitting" @click="handleSubmit">{{ $t('orbien.tls.dns.dialog.saveAndTest') }}</ElButton>
     </template>
   </ElDialog>
 </template>
 
 <script setup lang="ts">
 import {computed, nextTick, reactive, ref, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
 import type {FormInstance, FormRules} from 'element-plus'
 import {ElMessage} from 'element-plus'
 import {fetchDnsProviderSchemas, fetchSaveDnsCredential} from '@/api/dns-credential'
 
 defineOptions({name: 'DnsCredentialDialog'})
+
+const {t} = useI18n()
 
 interface Props {
   visible: boolean
@@ -223,7 +226,7 @@ const handleSubmit = async () => {
   submitting.value = true
   try {
     const saved = await fetchSaveDnsCredential(buildSubmitPayload())
-    ElMessage.success('保存成功')
+    ElMessage.success(t('common.success.save'))
     dialogVisible.value = false
     emit('submit', saved)
   } finally {

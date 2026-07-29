@@ -3,8 +3,8 @@
     <!-- header -->
     <div class="art-card-header">
       <div class="title">
-        <h4>流量监控</h4>
-        <p>最近 24 小时上下行流量趋势</p>
+        <h4>{{ $t('dashboard.traffic.title') }}</h4>
+        <p>{{ $t('dashboard.traffic.subtitle') }}</p>
       </div>
     </div>
 
@@ -25,7 +25,7 @@
 
     <ArtLineChart
       height="calc(100% - 140px)"
-      :data="data"
+      :data="chartSeries"
       :xAxisData="xAxisData"
       :showAreaColor="true"
       :showAxisLine="false"
@@ -38,22 +38,14 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { fetchGet24hMetrics } from '@/api/metrics'
   import { ByteUtils } from '@/utils/format/byteFormatter'
 
-  const data = ref([
-    {
-      name: '下行流量',
-      data: [] as number[],
-      showAreaColor: true
-    },
-    {
-      name: '上行流量',
-      data: [] as number[],
-      showAreaColor: true
-    }
-  ])
+  const { t } = useI18n()
 
+  const downSeries = ref<number[]>([])
+  const upSeries = ref<number[]>([])
   const xAxisData = ref<string[]>([])
   const upTotal = ref(0)
   const downTotal = ref(0)
@@ -64,30 +56,41 @@
   const unitDivisor = ref(1)
   const unitLabel = ref('B')
 
-  const metrics = computed(() => {
-    return [
-      {
-        label: '上行速率',
-        value: ByteUtils.formatBytes(upRate.value) + '/s',
-        color: '#22c55e'
-      },
-      {
-        label: '下行速率',
-        value: ByteUtils.formatBytes(downRate.value) + '/s',
-        color: '#f59e0b'
-      },
-      {
-        label: '上行流量',
-        value: ByteUtils.formatBytes(upTotal.value),
-        color: '#3b82f6'
-      },
-      {
-        label: '下行流量',
-        value: ByteUtils.formatBytes(downTotal.value),
-        color: '#8b5cf6'
-      }
-    ]
-  })
+  const chartSeries = computed(() => [
+    {
+      name: t('dashboard.traffic.download'),
+      data: downSeries.value,
+      showAreaColor: true
+    },
+    {
+      name: t('dashboard.traffic.upload'),
+      data: upSeries.value,
+      showAreaColor: true
+    }
+  ])
+
+  const metrics = computed(() => [
+    {
+      label: t('dashboard.traffic.upRate'),
+      value: ByteUtils.formatBytes(upRate.value) + '/s',
+      color: '#22c55e'
+    },
+    {
+      label: t('dashboard.traffic.downRate'),
+      value: ByteUtils.formatBytes(downRate.value) + '/s',
+      color: '#f59e0b'
+    },
+    {
+      label: t('dashboard.traffic.upload'),
+      value: ByteUtils.formatBytes(upTotal.value),
+      color: '#3b82f6'
+    },
+    {
+      label: t('dashboard.traffic.download'),
+      value: ByteUtils.formatBytes(downTotal.value),
+      color: '#8b5cf6'
+    }
+  ])
 
   // Y轴标签（仅数值）
   const yAxisLabelFormatter = (value: number): string => {
@@ -98,7 +101,7 @@
   // Tooltip（带单位）
   const tooltipFormatter = (params: any[]): string => {
     if (!params || params.length === 0) return ''
-    let html = `时间：${params[0].name}<br/>`
+    let html = `${t('dashboard.traffic.time')}: ${params[0].name}<br/>`
     params.forEach((item: any) => {
       html += `${item.marker} ${item.seriesName}: ${ByteUtils.formatBytes(item.value)}<br/>`
     })
@@ -117,8 +120,8 @@
     unitDivisor.value = unitInfo.divisor
     unitLabel.value = unitInfo.unit
 
-    data.value[0].data = downYAxis
-    data.value[1].data = upYAxis
+    downSeries.value = downYAxis
+    upSeries.value = upYAxis
     const rawXAxis = result?.down?.xAxis || []
     // 后端返回 timeUnit='hour' 时为小时粒度，需加 :00
     xAxisData.value = result?.timeUnit === 'hour'

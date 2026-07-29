@@ -36,7 +36,42 @@
     "tips": "Prompt",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "logOutTips": "Do you want to log out?"
+    "logOutTips": "Do you want to log out?",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "submit": "Submit",
+    "close": "Close",
+    "refresh": "Refresh",
+    "copy": "Copy",
+    "detail": "Detail",
+    "settings": "Settings",
+    "batchDelete": "Batch Delete",
+    "warning": "Warning",
+    "name": "Name",
+    "description": "Description",
+    "type": "Type",
+    "status": "Status",
+    "actions": "Actions",
+    "createTime": "Created At",
+    "updateTime": "Updated At",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "online": "Online",
+    "offline": "Offline",
+    "unknown": "Unknown",
+    "success": {
+      "delete": "Deleted successfully",
+      "save": "Saved successfully",
+      "add": "Added successfully",
+      "update": "Updated successfully",
+      "copy": "Copied successfully",
+      "batchDelete": "Batch deleted successfully",
+      "kickout": "Disconnected successfully"
+    },
+    "copied": "Copied",
+    "copyFailed": "Copy failed"
   },
   "search": {
     "placeholder": "Search page",
@@ -184,6 +219,13 @@
     "success": {
       "title": "Login successful",
       "message": "Welcome back"
+    },
+    "oauthCallback": {
+      "failed": "Sign-in failed",
+      "processing": "Completing sign-in…",
+      "pleaseWait": "Please wait",
+      "backToLogin": "Back to sign in",
+      "retryFailed": "Sign-in failed. Please try again"
     }
   },
   "forgetPassword": {
@@ -191,7 +233,8 @@
     "subTitle": "Enter your email to reset your password",
     "placeholder": "Please enter your email",
     "submitBtnText": "Submit",
-    "backBtnText": "Back"
+    "backBtnText": "Back",
+    "accountLabel": "Account"
   },
   "register": {
     "title": "Create account",
@@ -212,7 +255,8 @@
     "privacyPolicy": "Privacy policy",
     "submitBtnText": "Register",
     "hasAccount": "Already have an account?",
-    "toLogin": "To login"
+    "toLogin": "To login",
+    "success": "Registration successful"
   },
   "lockScreen": {
     "pwdError": "Password error",
@@ -237,6 +281,45 @@
     "404": "Sorry, the page you are trying to access does not exist",
     "500": "Sorry, there was an error on the server",
     "gohome": "Go Home"
+  },
+  "dashboard": {
+    "overview": {
+      "title": "Overview",
+      "agents": "Agents",
+      "online": "Online",
+      "proxies": "Proxies",
+      "running": "Running"
+    },
+    "status": {
+      "cpu": "CPU",
+      "cpuCores": "{n} Cores",
+      "heap": "Heap",
+      "direct": "Direct Memory",
+      "physical": "Physical Memory"
+    },
+    "traffic": {
+      "title": "Traffic",
+      "subtitle": "Uplink and downlink over the last 24 hours",
+      "upRate": "Upload Rate",
+      "downRate": "Download Rate",
+      "upload": "Upload",
+      "download": "Download",
+      "time": "Time"
+    },
+    "proxy": {
+      "title": "Proxy Types",
+      "subtitle": "Share of HTTP, HTTPS, TCP, UDP, SOCKS5, and FILE"
+    },
+    "config": {
+      "title": "Server Config",
+      "addr": "Server Address",
+      "tcp": "TCP Transport",
+      "websocket": "WebSocket Transport",
+      "quic": "QUIC Transport",
+      "http": "HTTP Proxy",
+      "https": "HTTPS Proxy",
+      "disabled": "Disabled"
+    }
   },
   "menus": {
     "login": {
@@ -312,5 +395,1011 @@
     "zebra": "Zebra",
     "border": "Border",
     "headerBackground": "Header BG"
+  },
+  "orbien": {
+    "common": {
+      "client": "Agent",
+      "clientId": "Agent ID",
+      "clientName": "Agent Name",
+      "proxyName": "Proxy Name",
+      "accessToken": "Access Token",
+      "protocol": "Protocol",
+      "port": "Port",
+      "remark": "Remark",
+      "rootDomain": "Root Domain",
+      "fullDomain": "Full Domain",
+      "domainType": "Domain Type",
+      "linkedProxy": "Linked Proxy",
+      "os": "Operating System",
+      "arch": "Architecture",
+      "version": "Version",
+      "sourceIp": "Source IP",
+      "lastActiveTime": "Last Online",
+      "type": "Type",
+      "systemArch": "System Architecture",
+      "descPlaceholder": "Enter description"
+    },
+    "agent": {
+      "detailTitle": "Agent Details",
+      "kickout": "Disconnect",
+      "kickoutTitle": "Disconnect Agent",
+      "kickoutConfirm": "Disconnect this online agent?",
+      "deleteTitle": "Delete Agent",
+      "deleteConfirm": "Delete agent \"{name}\"?",
+      "batchDeleteConfirm": "Delete {count} selected agent(s)?",
+      "fetchDetailFailed": "Failed to load agent details"
+    },
+    "token": {
+      "add": "Add Access Token",
+      "edit": "Edit Access Token",
+      "tokenName": "Token Name",
+      "tokenValue": "Token Value",
+      "token": "Token",
+      "namePlaceholder": "Enter token name",
+      "nameRequired": "Please enter token name",
+      "fetchDetailFailed": "Failed to load token details",
+      "deleteTitle": "Delete Token",
+      "deleteConfirm": "Delete this access token?",
+      "batchDeleteConfirm": "Delete {count} selected token(s)?",
+      "successTitle": "Save Your New Token!",
+      "successDesc": "Your new authentication token has been created. This is the only time it will be shown. Store it securely on your device.",
+      "copyAndClose": "Copy and Close",
+      "copyEmpty": "Nothing to copy",
+      "manualCopyTitle": "Copy Manually",
+      "copied": "Copied"
+    },
+    "domain": {
+      "addRootDomain": "Add Root Domain",
+      "editRootDomain": "Edit Root Domain",
+      "resourcesTitle": "Domain Resources",
+      "resourcesDesc": "The root domain pool defines available root domains; allocated domains show access addresses currently used by proxy tunnels.",
+      "poolLabel": "Root Domain Pool",
+      "poolHint": "Root domains used for automatic subdomain composition",
+      "allocatedLabel": "Allocated Domains",
+      "allocatedHint": "Access domains occupied by proxy tunnels",
+      "domainPlaceholder": "e.g. example.com",
+      "domainRequired": "Please enter root domain",
+      "fetchDetailFailed": "Failed to load domain details",
+      "deleteTitle": "Delete Root Domain",
+      "deleteConfirm": "Delete root domain \"{domain}\"?",
+      "batchDeleteConfirm": "Delete {count} selected root domain(s)?"
+    },
+    "portPool": {
+      "add": "Add Port",
+      "edit": "Edit Port",
+      "appType": "Application Type",
+      "selectAppType": "Select application type",
+      "custom": "Custom",
+      "selectProtocol": "Select protocol",
+      "portPlaceholder": "Single port e.g. 8000, range e.g. 8000-9000",
+      "remarkPlaceholder": "Enter remark",
+      "fetchDetailFailed": "Failed to load port configuration",
+      "deleteTitle": "Delete Port",
+      "deleteConfirm": "Delete port \"{port}\"?",
+      "selectToDelete": "Select ports to delete",
+      "batchDeleteConfirm": "Delete {count} selected port configuration(s)?",
+      "group": {
+        "remoteLogin": "Remote Login",
+        "webService": "Web Service",
+        "database": "Database",
+        "fileTransfer": "File Transfer",
+        "networkService": "Network Service"
+      },
+      "preset": {
+        "ssh": {
+          "label": "SSH (22)",
+          "remark": "SSH remote login"
+        },
+        "rdp": {
+          "label": "RDP (3389)",
+          "remark": "Windows Remote Desktop"
+        },
+        "http": {
+          "label": "HTTP (80)",
+          "remark": "HTTP web service"
+        },
+        "https": {
+          "label": "HTTPS (443)",
+          "remark": "HTTPS encrypted web service"
+        },
+        "mysql": {
+          "label": "MySQL (3306)",
+          "remark": "MySQL database"
+        },
+        "postgresql": {
+          "label": "PostgreSQL (5432)",
+          "remark": "PostgreSQL database"
+        },
+        "sqlserver": {
+          "label": "SQL Server (1433)",
+          "remark": "Microsoft SQL Server"
+        },
+        "redis": {
+          "label": "Redis (6379)",
+          "remark": "Redis cache service"
+        },
+        "mongodb": {
+          "label": "MongoDB (27017)",
+          "remark": "MongoDB database"
+        },
+        "ftp": {
+          "label": "FTP (21)",
+          "remark": "FTP file transfer"
+        },
+        "dns": {
+          "label": "DNS (53)",
+          "remark": "DNS resolution"
+        },
+        "ntp": {
+          "label": "NTP (123)",
+          "remark": "NTP time sync"
+        },
+        "snmp": {
+          "label": "SNMP (161)",
+          "remark": "SNMP network management"
+        }
+      }
+    },
+    "stats": {
+      "uploadTraffic": "Upload Traffic",
+      "downloadTraffic": "Download Traffic",
+      "uploadMessages": "Upload Messages",
+      "downloadMessages": "Download Messages",
+      "totalTraffic": "Total Traffic",
+      "data": "Metrics",
+      "deleteTitle": "Delete Statistics",
+      "deleteConfirm": "Delete traffic statistics for proxy \"{name}\"?",
+      "selectToDelete": "Select statistics to delete",
+      "batchDeleteConfirm": "Delete traffic statistics for {count} selected proxy/proxies?"
+    },
+    "scheduledJob": {
+      "columns": {
+        "jobName": "Job Name",
+        "status": "Status",
+        "schedule": "Schedule",
+        "lastRun": "Last Run",
+        "result": "Result",
+        "nextRun": "Next Run",
+        "operation": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "disabled": "Disabled"
+      },
+      "actions": {
+        "config": "Configure",
+        "run": "Run",
+        "logs": "Logs",
+        "delete": "Delete",
+        "disable": "Disable",
+        "batchDelete": "Batch Delete"
+      },
+      "config": {
+        "title": "Configure - {name}",
+        "description": "Description",
+        "schedule": "Schedule",
+        "params": "Parameters",
+        "on": "On",
+        "off": "Off",
+        "save": "Save"
+      },
+      "log": {
+        "title": "Execution Logs - {name}",
+        "columns": {
+          "startedAt": "Started At",
+          "finishedAt": "Finished At",
+          "triggerType": "Trigger",
+          "status": "Status",
+          "affectedCount": "Affected",
+          "message": "Message",
+          "operation": "Actions"
+        }
+      },
+      "confirm": {
+        "disableAcmeMessage": "After disabling, certificates with auto-renewal enabled will pause renewal. Re-enabling restores auto-renewal.",
+        "disableAcmeTitle": "Disable \"{name}\"",
+        "runTitle": "Run Now",
+        "runMessage": "Run job \"{name}\" immediately?",
+        "deleteLogMessage": "Delete this execution log?",
+        "deleteLogTitle": "Confirm Delete",
+        "batchDeleteMessage": "Delete {count} selected execution log(s)?",
+        "batchDeleteTitle": "Confirm Batch Delete"
+      },
+      "message": {
+        "enabled": "Job enabled",
+        "disabled": "Job disabled",
+        "triggered": "Job triggered. Check execution logs shortly.",
+        "saveSuccess": "Saved successfully",
+        "deleteSuccess": "Deleted successfully",
+        "selectLogs": "Select logs to delete"
+      }
+    },
+    "cron": {
+      "type": {
+        "daily": "Daily",
+        "everyNDays": "Every N days",
+        "hourly": "Hourly",
+        "everyNHours": "Every N hours",
+        "everyNMinutes": "Every N minutes",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "everyNSeconds": "Every N seconds",
+        "custom": "Custom"
+      },
+      "weekday": {
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "sun": "Sunday"
+      },
+      "unit": {
+        "days": "days",
+        "hours": "hours",
+        "minutes": "minutes",
+        "seconds": "seconds"
+      },
+      "customFormat": "Format: second minute hour day month weekday",
+      "preview": {
+        "daily": "Runs daily at {hour}:{minute}",
+        "everyNDays": "Runs every {interval} day(s) at {hour}:{minute}",
+        "hourly": "Runs at minute {minute} of every hour",
+        "everyNHours": "Runs every {interval} hour(s) at minute {minute}",
+        "everyNMinutes": "Runs every {interval} minute(s)",
+        "weekly": "Runs every {weekday} at {hour}:{minute}",
+        "monthly": "Runs on day {day} of each month at {hour}:{minute}",
+        "everyNSeconds": "Runs every {interval} second(s)",
+        "custom": "Custom cron expression",
+        "notConfigured": "Schedule not configured"
+      }
+    },
+    "settings": {
+      "tab": {
+        "oauth": "OAuth Sign-in"
+      },
+      "oauth": {
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "enableLogin": "Enable sign-in",
+        "saveCredentialsFirst": "Save Client ID and Client Secret first",
+        "clientId": "Client ID",
+        "clientSecret": "Client Secret",
+        "configured": "Configured",
+        "secretPlaceholderKeep": "Leave blank to keep existing secret",
+        "secretPlaceholder": "OAuth Client Secret",
+        "clientIdPlaceholder": "OAuth Client ID",
+        "callbackUrl": "Callback URL",
+        "copy": "Copy",
+        "saveConfig": "Save",
+        "fillClientId": "Please enter Client ID",
+        "fillClientSecret": "Please enter Client Secret",
+        "configSaved": "Configuration saved",
+        "loginEnabled": "Sign-in enabled",
+        "loginDisabled": "Sign-in disabled",
+        "copied": "Copied",
+        "copyFailed": "Copy failed"
+      }
+    },
+    "enum": {
+      "unknown": "Unknown",
+      "domain": {
+        "custom": "Custom",
+        "subdomain": "Subdomain",
+        "auto": "Auto subdomain"
+      },
+      "agent": {
+        "standard": "Standard",
+        "session": "Session"
+      }
+    },
+    "plugin": {
+      "dialog": {
+        "title": "Proxy Settings",
+        "titleWithName": "{name} - Settings",
+        "underDevelopment": "Under development"
+      },
+      "menus": {
+        "accessControl": "Access Control",
+        "timeAccess": "Time Restrictions",
+        "basicAuth": "Authentication",
+        "cluster": "Load Balancing",
+        "healthCheck": "Health Check",
+        "tls": "TLS Encryption",
+        "transport": "Transport Security",
+        "rateLimit": "Rate Limiting",
+        "headerRewrite": "Header Rewrite",
+        "socks5Auth": "SOCKS5 Authentication"
+      },
+      "basic": {
+        "title": "Basic Settings",
+        "enabled": "Enabled",
+        "controlMode": "Control Mode",
+        "timezone": "Timezone",
+        "saveConfig": "Save Configuration"
+      },
+      "actions": {
+        "addRule": "Add Rule",
+        "addUser": "Add User",
+        "addService": "Add Service",
+        "addWindow": "Add Time Window",
+        "selectAll": "Select All"
+      },
+      "deleteConfirm": {
+        "rule": "Are you sure you want to delete this rule?",
+        "user": "Are you sure you want to delete this user?",
+        "window": "Are you sure you want to delete this time window?",
+        "headerRule": "Are you sure you want to delete this rule?"
+      },
+      "access": {
+        "rulesTitle": "Access Rules",
+        "cidrColumn": "IP CIDR (e.g. 192.168.1.0/24)",
+        "cidrPlaceholder": "Enter IP CIDR, e.g. 192.168.1.0/24",
+        "ruleType": "Rule Type",
+        "allowWhitelist": "Whitelist (allow specified IPs only)",
+        "denyBlacklist": "Blacklist (block specified IPs)",
+        "allow": "Allow",
+        "deny": "Deny",
+        "cidrRequired": "Please enter an IP CIDR"
+      },
+      "time": {
+        "periodLimit": "Schedule",
+        "timeLimit": "Time Windows",
+        "allowInWindow": "Allow (accessible only within windows)",
+        "denyInWindow": "Deny (blocked only within windows)",
+        "startTime": "Start Time",
+        "endTime": "End Time",
+        "selectStartTime": "Select start time",
+        "selectEndTime": "Select end time",
+        "timeRequired": "Please select start and end times",
+        "weekdays": {
+          "mon": "Mon",
+          "tue": "Tue",
+          "wed": "Wed",
+          "thu": "Thu",
+          "fri": "Fri",
+          "sat": "Sat",
+          "sun": "Sun"
+        }
+      },
+      "auth": {
+        "userList": "Users",
+        "username": "Username",
+        "password": "Password",
+        "usernamePlaceholder": "Enter username",
+        "passwordPlaceholder": "Enter password",
+        "usernameRequired": "Please enter a username",
+        "passwordRequired": "Please enter a password"
+      },
+      "socks5Auth": {
+        "userList": "Users",
+        "username": "Username",
+        "password": "Password",
+        "usernamePlaceholder": "Enter username",
+        "passwordPlaceholder": "Enter password",
+        "usernameRequired": "Please enter a username",
+        "passwordRequired": "Please enter a password"
+      },
+      "header": {
+        "requestHeaders": "Request Headers",
+        "responseHeaders": "Response Headers",
+        "action": "Action",
+        "name": "Name",
+        "value": "Value",
+        "actionGuideTitle": "Action Reference",
+        "actionSet": "Overwrite if present; create if missing",
+        "actionAdd": "Set only when absent; skip if already exists",
+        "actionRemove": "Remove matching header",
+        "availableVars": "Available variables",
+        "nameRequired": "Please enter a header name",
+        "valueRequired": "Please enter a header value"
+      },
+      "transport": {
+        "currentEffective": "Currently Active",
+        "port": "Port {port}",
+        "notEnabled": "Disabled",
+        "tunnelEncrypt": "Tunnel Encryption",
+        "dataCompress": "Data Compression",
+        "compressAlgorithm": "Compression Algorithm",
+        "noCompress": "No compression",
+        "compressSuffix": "compression",
+        "tlsEncrypt": "TLS encrypted",
+        "plainText": "Plaintext",
+        "saved": "Transport settings saved",
+        "tunnel": {
+          "multiplex": "Multiplex",
+          "direct": "Direct connection"
+        },
+        "protocol": {
+          "tcpDesc": "Default option with best compatibility",
+          "websocketDesc": "Firewall-friendly, TLS required",
+          "quicDesc": "Low latency, TLS required, multiplexed"
+        },
+        "algorithm": {
+          "balanced": "Balanced",
+          "speed": "Speed",
+          "ratio": "Ratio"
+        }
+      },
+      "rateLimit": {
+        "bandwidthUnit": "Bandwidth Unit",
+        "bandwidthUnitDesc": "Applies to all bandwidth fields below for input and display",
+        "selectUnit": "Select unit",
+        "bandwidthLimit": "Bandwidth Limits",
+        "bandwidthLimitDesc": "Limit download, upload, and total bandwidth; leave empty for unlimited",
+        "totalBandwidth": "Total Bandwidth",
+        "totalBandwidthHint": "Shared uplink/downlink cap; must satisfy total constraints when combined with directional limits",
+        "downloadBandwidth": "Download Bandwidth",
+        "downloadBandwidthHint": "Limit client download rate (internal service → client)",
+        "uploadBandwidth": "Upload Bandwidth",
+        "uploadBandwidthHint": "Limit client upload rate (client → internal service)",
+        "unlimited": "Unlimited"
+      },
+      "health": {
+        "desc": "Periodically checks internal service availability; unhealthy nodes are removed from load balancing",
+        "checkType": "Check Type",
+        "checkTypeHint": "TCP checks port connectivity; HTTP checks a URL path",
+        "checkPath": "Check Path",
+        "checkPathHint": "URL path used for HTTP health checks",
+        "interval": "Check Interval",
+        "intervalHint": "Wait time between consecutive health checks",
+        "timeout": "Timeout",
+        "timeoutHint": "Maximum wait time for a single check",
+        "maxFailed": "Max Failures",
+        "maxFailedHint": "Mark node unavailable after this many consecutive failures",
+        "unitSecond": "sec",
+        "unitTimes": "times",
+        "pathRequired": "Please enter an HTTP health check path"
+      },
+      "cluster": {
+        "title": "Load Balancing",
+        "strategy": "Strategy",
+        "selectStrategy": "Select strategy",
+        "serviceList": "Services",
+        "emptyServices": "No services yet. Add one to get started.",
+        "serviceName": "Service Name",
+        "host": "Host",
+        "port": "Port",
+        "weight": "Weight",
+        "optional": "Optional",
+        "hostPlaceholder": "Internal address",
+        "portPlaceholder": "1-65535",
+        "weightPlaceholder": "Weight",
+        "minOneService": "Add at least one service",
+        "hostRequired": "Row {row}: enter a host address",
+        "portInvalid": "Row {row}: enter a valid port (1-65535)",
+        "strategyOptions": {
+          "roundRobin": "Round robin",
+          "weight": "Weighted",
+          "random": "Random",
+          "leastConn": "Least connections"
+        }
+      },
+      "tls": {
+        "summary": "Domain certificates: {bound}/{total} configured",
+        "warnings": "{count} issues",
+        "domainCert": "Domain Certificates",
+        "certFolder": "Certificate Store",
+        "freeApply": "Apply for Free",
+        "manualUpload": "Upload Manually",
+        "uploadAndBind": "Upload and Bind Certificate",
+        "bindDomains": "Bind Domains",
+        "selectBindDomains": "Select domains to bind",
+        "privateKey": "Private Key (KEY)",
+        "certificate": "Certificate (PEM)",
+        "saveAndBind": "Save and Bind",
+        "domain": "Domain",
+        "certSan": "Certificate SAN",
+        "notAfter": "Expires",
+        "status": "Status",
+        "bindCert": "Bind Certificate",
+        "enable": "Enable",
+        "retry": "Retry",
+        "replaceCert": "Replace",
+        "disable": "Disable",
+        "unbind": "Unbind",
+        "authDomain": "Authorized Domains",
+        "issuer": "Issuer",
+        "bindToProxy": "Bind to This Proxy",
+        "bindStatus": {
+          "normal": "Active",
+          "disabled": "Disabled",
+          "sanMismatch": "SAN mismatch",
+          "expired": "Expired",
+          "deployFailed": "Deploy failed",
+          "notConfigured": "Not configured",
+          "unknown": "Unknown"
+        },
+        "certSource": {
+          "acme": "ACME",
+          "manual": "Manual"
+        },
+        "unknownIssuer": "Unknown issuer",
+        "expiresAt": "Expires {date}",
+        "usedByDomains": "Used by {count} domains",
+        "batchBindTitle": "Batch Bind ({count} domains)",
+        "overrideHint": "{count} domains already have certificates and will be overwritten",
+        "selectCert": "Select Certificate",
+        "noMatchingCert": "No certificates cover the selected domains",
+        "confirmBind": "Confirm Bind",
+        "overrideConfirm": "Some domains are already bound. Continuing will overwrite existing certificates. Proceed?",
+        "bindConfirmTitle": "Confirm Binding",
+        "bindResult": "Binding complete: {success} succeeded, {failed} failed",
+        "savedAndBound": "Certificate saved and bound",
+        "bindSuccess": "Binding successful",
+        "bindToMatched": "Bind to {count} matching domains?",
+        "sanMismatchWarning": "Certificate SAN does not match this proxy's domains",
+        "keyCertRequired": "Enter both private key and certificate",
+        "selectDomainRequired": "Select at least one domain to bind",
+        "unbindConfirm": "Unbind the certificate from this domain?",
+        "unbindTitle": "Confirm Unbind",
+        "unbound": "Unbound",
+        "disabled": "Disabled",
+        "enabled": "Enabled",
+        "redeployed": "Redeployed",
+        "deleteCertConfirm": "Delete this certificate?",
+        "bindSuccessCount": "Successfully bound {count} domains",
+        "acme": {
+          "title": "Apply Certificate for This Proxy",
+          "stepDomain": "Select Domains",
+          "stepValidation": "Validation Method",
+          "stepDns": "DNS Verification",
+          "submitting": "Submitting request, please wait...",
+          "prev": "Previous",
+          "next": "Next",
+          "submit": "Submit Request",
+          "startVerify": "Start Verification",
+          "refreshStatus": "Refresh Status"
+        }
+      }
+    },
+    "proxy": {
+      "name": "Proxy Name",
+      "publicAddr": "Public Address",
+      "backend": "Backend Service",
+      "transport": "Transport",
+      "transportShort": "Transport",
+      "traffic": "Traffic",
+      "remotePort": "Remote Port",
+      "client": "Client",
+      "domainType": "Domain Type",
+      "customDomain": "Custom Domain",
+      "auto": "Auto",
+      "subdomain": "Subdomain",
+      "host": "Host",
+      "port": "Port",
+      "selectClient": "Select a client",
+      "enterName": "Enter proxy name",
+      "enterHost": "Enter host",
+      "enterPort": "Enter port",
+      "portNumber": "Port must be a number",
+      "portRange": "Port must be between 1 and 65535",
+      "remotePortNumber": "Remote port must be a number",
+      "remotePortRange": "Remote port must be between 1 and 65535",
+      "fetchClientFail": "Failed to load clients",
+      "fetchDetailFail": "Failed to load proxy details. Please try again later",
+      "fetchFileShareDetailFail": "Failed to load file share details. Please try again later",
+      "selectToDelete": "Select proxies to delete",
+      "selectFileShareToDelete": "Select file shares to delete",
+      "deleteBatchTip": "Delete the selected proxies?",
+      "deleteBatchFileShareTip": "Delete the selected file shares?",
+      "deleteOneTip": "Delete proxy \"{name}\"?",
+      "deleteOneFileShareTip": "Delete file share \"{name}\"?",
+      "deleteBatchCountTip": "Delete {n} selected proxies?",
+      "deleteConfirm": "Confirm Deletion",
+      "inspector": "Inspector",
+      "forceHttps": "Force HTTPS",
+      "authEnabled": "Enable Authentication",
+      "authUsers": "Auth Users",
+      "addUser": "Add User",
+      "username": "Username",
+      "password": "Password",
+      "leaveBlank": "Leave blank to keep unchanged",
+      "enterPassword": "Enter password",
+      "autoPort": "Leave blank to auto-assign",
+      "refreshPorts": "Refresh",
+      "goAddPort": "Add ports",
+      "rootDir": "Root Directory",
+      "enterRootDir": "Enter root directory",
+      "rootDirPlaceholder": "e.g. /data/share",
+      "uploadLimit": "Upload Limit",
+      "enterUploadLimit": "Enter upload limit",
+      "uploadLimitMin": "Upload limit must be greater than 0",
+      "maxUploadPlaceholder": "Max single-file upload size",
+      "permissions": "Permissions",
+      "operationPermissions": "Operation Permissions",
+      "readonly": "Read-only",
+      "readwrite": "Read & Write",
+      "allowUpload": "Allow upload",
+      "allowDelete": "Allow delete",
+      "allowMkdir": "Allow create directory",
+      "allowMove": "Allow move",
+      "allowRename": "Allow rename",
+      "tlsCert": "TLS Certificate",
+      "accessUrl": "Access URL",
+      "authStatus": "Auth Status",
+      "identityAuth": "Authentication",
+      "selectDomainType": "Select domain type",
+      "enterCustomDomain": "Enter custom domain",
+      "customDomainPlaceholder": "Enter full domains, one per line, e.g. www.example.com",
+      "customDomainPlaceholderFileShare": "Enter full domains, one per line, e.g. files.example.com",
+      "hostPlaceholder": "e.g. 127.0.0.1",
+      "bandwidthLimit": "Bandwidth Limit",
+      "noBandwidthLimit": "Leave blank for unlimited",
+      "bandwidthInteger": "Bandwidth must be a positive integer",
+      "localPort": "Local Port",
+      "commonPorts": "Common Ports",
+      "prefix": "Prefix",
+      "rootDomain": "Root Domain",
+      "clusterSummary": "Load balancing · {n} services",
+      "goClusterConfig": "Configure load balancing",
+      "authTipSocks5": "Strongly recommended to prevent unauthorized access to your internal network",
+      "authTipFileShare": "When enabled, file share access requires username and password",
+      "authUserRequired": "Add at least one auth user",
+      "authUserMinOne": "Add at least one user when authentication is enabled",
+      "fillUsernamePassword": "Please enter username and password",
+      "subdomainMinOne": "Add at least one subdomain configuration",
+      "subdomainPrefixRequired": "Enter subdomain prefix",
+      "selectRootDomain": "Select root domain",
+      "duplicateSubdomain": "Duplicate subdomain configuration exists",
+      "trafficUpDown": "Upload {up} · Download {down}",
+      "tlsDeployed": "Deployed",
+      "tlsNotDeployed": "Not deployed",
+      "tlsDeployError": "Deploy error",
+      "tlsPartialDeployed": "{deployed}/{total} deployed",
+      "portPresets": {
+        "rdp": "Windows RDP - 3389"
+      }
+    },
+    "http": {
+      "add": "Add HTTP Proxy",
+      "edit": "Edit HTTP Proxy"
+    },
+    "https": {
+      "add": "Add HTTPS Proxy",
+      "edit": "Edit HTTPS Proxy"
+    },
+    "tcp": {
+      "add": "Add TCP Proxy",
+      "edit": "Edit TCP Proxy"
+    },
+    "udp": {
+      "add": "Add UDP Proxy",
+      "edit": "Edit UDP Proxy"
+    },
+    "socks5": {
+      "add": "Add SOCKS5 Proxy",
+      "edit": "Edit SOCKS5 Proxy"
+    },
+    "fileShare": {
+      "add": "Add File Share",
+      "edit": "Edit File Share"
+    },
+    "tls": {
+      "tabs": {
+        "certs": "Certificates",
+        "orders": "Applications",
+        "dns": "DNS Credentials"
+      },
+      "actions": {
+        "applyFree": "Apply Free",
+        "upload": "Upload Certificate",
+        "bind": "Bind",
+        "download": "Download"
+      },
+      "columns": {
+        "sanDomains": "SAN Domains",
+        "source": "Source",
+        "org": "Category",
+        "issuer": "Issuer",
+        "boundDomainCount": "Bound Domains",
+        "notAfter": "Expires",
+        "autoRenew": "Auto-Renew"
+      },
+      "source": {
+        "manual": "Manual"
+      },
+      "expire": {
+        "expired": "Expired",
+        "remainingDays": "{n} days left"
+      },
+      "messages": {
+        "selectCertsToDelete": "Select certificates to delete",
+        "confirmBatchDeleteCerts": "Delete selected certificates?",
+        "confirmDeleteCert": "Delete this certificate?",
+        "deleteCertTitle": "Delete Certificate",
+        "autoRenewEnabledWithJob": "Auto-renew enabled and ACME renewal job activated",
+        "autoRenewEnabled": "Auto-renew enabled",
+        "autoRenewDisabled": "Auto-renew disabled",
+        "downloadFailed": "Download failed"
+      },
+      "upload": {
+        "title": "Upload Certificate",
+        "keyLabel": "Private Key (KEY)",
+        "certLabel": "Certificate (PEM)",
+        "keyRequired": "Enter private key content",
+        "certRequired": "Enter certificate content",
+        "success": "Certificate uploaded"
+      },
+      "bind": {
+        "title": "Bind Certificate to Domains",
+        "certSan": "Certificate SAN: {san}",
+        "columns": {
+          "domain": "Domain",
+          "proxy": "Proxy",
+          "matchStatus": "Match",
+          "currentCert": "Current Certificate"
+        },
+        "match": {
+          "matched": "Matched",
+          "unmatched": "Unmatched",
+          "bound": "Bound",
+          "unbound": "Unbound"
+        },
+        "selection": "{n} domain(s) selected",
+        "overrideHint": "({n} will override existing bindings)",
+        "confirmBind": "Confirm Bind",
+        "confirmOverride": "Some domains already have bindings. Continuing will replace the existing certificates. Continue?",
+        "confirmOverrideTitle": "Confirm Bind",
+        "resultPartial": "Bind complete: {success} succeeded, {failed} failed",
+        "resultSuccess": "Bound {n} domain(s) successfully"
+      },
+      "dns": {
+        "addCredential": "Add Credential",
+        "dialog": {
+          "addTitle": "Add DNS Credential",
+          "editTitle": "Edit DNS Credential",
+          "namePlaceholder": "e.g. Production - Aliyun",
+          "provider": "DNS Provider",
+          "providerPlaceholder": "Select provider",
+          "editHint": "Re-enter credential details when editing",
+          "required": "Required",
+          "optional": "Optional",
+          "saveAndTest": "Save & Test"
+        },
+        "columns": {
+          "provider": "Provider",
+          "accountHint": "Account ID",
+          "lastTest": "Last Test",
+          "testMessage": "Test Message"
+        },
+        "status": {
+          "ok": "OK",
+          "invalid": "Invalid",
+          "untested": "Untested"
+        },
+        "actions": {
+          "test": "Test"
+        },
+        "messages": {
+          "testSuccess": "Connection test passed",
+          "confirmDelete": "Delete credential \"{name}\"?",
+          "deleteTitle": "Confirm Delete"
+        }
+      },
+      "acme": {
+        "wizard": {
+          "title": "Apply Free TLS Certificate",
+          "steps": {
+            "domain": "Select Domains",
+            "validation": "Validation",
+            "dnsVerify": "DNS Verification"
+          },
+          "submitting": "Submitting application…",
+          "prev": "Previous",
+          "next": "Next",
+          "submit": "Submit Application",
+          "startVerify": "Start Verification",
+          "refreshStatus": "Refresh Status",
+          "selectHttpsProxy": "Select an HTTPS tunnel"
+        },
+        "section": {
+          "certBrand": "Certificate Authority",
+          "httpsProxy": "HTTPS / File Share",
+          "selectProxy": "Select proxy for certificate",
+          "selectDomain": "Select Domains",
+          "currentProxy": "Current Proxy",
+          "thisApplication": "This Application",
+          "extraDomains": "Additional Domains (wildcards, etc.)"
+        },
+        "proxy": {
+          "domainCount": "{n} domain(s)",
+          "label": "{name} ({agentName} · {n} domain(s))",
+          "enabled": "Enabled",
+          "disabled": "Disabled",
+          "andMore": "and {n} more",
+          "noDomains": "No domains available for this proxy"
+        },
+        "domain": {
+          "columns": {
+            "type": "Type",
+            "certStatus": "Certificate"
+          },
+          "bound": "Bound",
+          "boundWithIssuer": "Bound ({issuer})",
+          "unbound": "Unbound"
+        },
+        "validation": {
+          "manualTitle": "Manual DNS Verification",
+          "manualDesc": "Add TXT records at your DNS provider; suitable for one-off requests",
+          "cloudTitle": "Cloud DNS Auto-Validation",
+          "recommended": "Recommended",
+          "cloudDesc": "Automatically adds TXT records and validates; supports auto-renewal from the certificate list",
+          "cloudHint": "Cloud DNS requires provider API credentials. After issuance, enable auto-renewal manually from the certificate list",
+          "noCredential": "No DNS credentials configured",
+          "addCredentialHint": "Add a credential to complete DNS verification automatically",
+          "addDnsCredential": "Add DNS Credential",
+          "dnsCredential": "DNS Credential",
+          "selectCredential": "Select credential for auto-validation",
+          "add": "Add"
+        },
+        "dnsVerify": {
+          "manualHint": "Add the TXT records below at your DNS provider, then click Start Verification",
+          "autoHint": "TXT records added automatically; waiting for DNS propagation and verification",
+          "dnsZone": "DNS zone: {zone}",
+          "hostRecord": "Host Record",
+          "recordType": "Record Type",
+          "recordValue": "Record Value",
+          "currentStatus": "Current status:"
+        },
+        "order": {
+          "columns": {
+            "orderNo": "Order No.",
+            "domains": "Domains",
+            "validationMode": "Validation"
+          },
+          "validationMode": {
+            "cloud": "Cloud DNS",
+            "manual": "Manual"
+          },
+          "actions": {
+            "verify": "Verify",
+            "retry": "Retry",
+            "cancel": "Cancel"
+          },
+          "messages": {
+            "verifyStarted": "Verification started",
+            "retrySubmitted": "Resubmitted",
+            "cancelled": "Cancelled",
+            "confirmDelete": "Delete application \"{orderNo}\"?",
+            "confirmBatchDelete": "Delete {n} selected application(s)?",
+            "batchDeleteTitle": "Confirm Batch Delete",
+            "selectToDelete": "Select applications to delete"
+          },
+          "detail": {
+            "title": "Application Details",
+            "orderNo": "Order No.",
+            "status": "Status",
+            "domains": "Domains",
+            "validationMode": "Validation",
+            "cloudAuto": "Cloud DNS Auto",
+            "manualDns": "Manual DNS",
+            "renewal": "Renewal",
+            "autoRenewalSupported": "Auto-renewal supported",
+            "certId": "Certificate ID",
+            "errorMessage": "Error",
+            "createdAt": "Created",
+            "dnsTxtRecords": "DNS TXT Records",
+            "pendingVerify": "Pending",
+            "cancelApplication": "Cancel Application",
+            "verifyStartedRefresh": "Verification started; refresh shortly for results",
+            "retrySubmitted": "Verification resubmitted"
+          }
+        },
+        "messages": {
+          "selectDomain": "Select at least one domain",
+          "addDnsCredentialFirst": "Add a DNS credential first",
+          "selectDnsCredential": "Select a DNS credential",
+          "applySuccess": "Certificate issued successfully",
+          "submittedAutoVerify": "Submitted; automatic verification in progress",
+          "verifyStartedRefresh": "Verification started; refresh status shortly"
+        }
+      }
+    },
+    "inspector": {
+      "title": "Traffic",
+      "titleWithProxy": "Traffic · {name}",
+      "capture": "Capture",
+      "switchOn": "On",
+      "switchOff": "Off",
+      "clear": "Clear",
+      "recentRecords": "Latest {n}",
+      "noRecords": "No captured requests",
+      "replayGenerated": "Replay",
+      "fromClient": "From {ip}",
+      "replayedFrom": "Replayed from {id}",
+      "replay": "Replay",
+      "editReplay": "Edit Replay",
+      "bodyTruncated": "Body truncated",
+      "selectRequestHint": "Select a request on the left to view details",
+      "confirmClear": "Clear all captured requests?",
+      "clearTitle": "Clear",
+      "replayDisabled": {
+        "enableCapture": "Enable capture first",
+        "bodyTruncated": "Request body truncated",
+        "invalidMethod": "Invalid method",
+        "protocolUpgrade": "Protocol upgrade not supported"
+      },
+      "replayEditor": {
+        "title": "Edit Replay",
+        "sourceRequest": "Source {method} {path}",
+        "addHeader": "+ Add",
+        "empty": "None",
+        "systemHeaders": "System Headers",
+        "format": "Format",
+        "bodyTooLarge": "Exceeds size limit",
+        "sendReplay": "Send Replay",
+        "notSet": "Not set",
+        "notEditable": "Not editable",
+        "notEditableName": "Not editable: {name}",
+        "autoContentLength": "(auto-calculated)",
+        "systemWritten": "(system-managed)"
+      }
+    },
+    "metrics": {
+      "title": "Traffic Statistics",
+      "timeRange": "Time Range",
+      "ranges": {
+        "24h": "Last 24 hours",
+        "3d": "Last 3 days",
+        "7d": "Last 7 days",
+        "15d": "Last 15 days",
+        "custom": "Custom range"
+      },
+      "dateRangeSeparator": "to",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "cards": {
+        "connections": "Connections",
+        "connectionsDesc": "Active connections",
+        "upload": "Upload",
+        "uploadDesc": "Total upload",
+        "download": "Download",
+        "downloadDesc": "Total download",
+        "upRate": "Upload Rate",
+        "upRateDesc": "Current upload",
+        "downRate": "Download Rate",
+        "downRateDesc": "Current download"
+      },
+      "charts": {
+        "trend": "Traffic Trend",
+        "unit": "Unit: {unit}",
+        "trafficCompare": "Traffic Comparison",
+        "rateCompare": "Rate Comparison",
+        "totalTraffic": "Total\n{size}",
+        "uploadSeries": "Upload",
+        "downloadSeries": "Download",
+        "uploadRateSeries": "Upload ({unit}/s)",
+        "downloadRateSeries": "Download ({unit}/s)",
+        "rateAxis": "Rate",
+        "tooltipTime": "Time: {time}"
+      }
+    }
+  },
+  "system": {
+    "userCenter": {
+      "admin": "Administrator",
+      "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "savePassword": "Save Password",
+      "oauth": "OAuth Sign-in",
+      "bound": "Linked · {account}",
+      "unbound": "Not linked",
+      "unbind": "Unlink",
+      "bind": "Link",
+      "unbindConfirmTitle": "Confirm Unlink",
+      "unbindConfirmMessage": "Unlink this account?",
+      "unboundSuccess": "Unlinked",
+      "bindSuccess": "Account linked successfully",
+      "bindFailed": "Link failed. Please try again later",
+      "enterCurrentPassword": "Please enter your current password",
+      "enterNewPassword": "Please enter a new password",
+      "passwordMismatch": "New passwords do not match",
+      "passwordUpdated": "Password updated",
+      "noAuthorizeUrl": "Authorization URL not received"
+    }
   }
 }

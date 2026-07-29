@@ -2,8 +2,8 @@
   <div class="art-card h-105 p-5 mb-5 max-sm:mb-4">
     <div class="art-card-header">
       <div class="title">
-        <h4>代理类型分布</h4>
-        <p>HTTP、HTTPS、TCP、UDP、SOCKS5 与 FILE 代理数量占比</p>
+        <h4>{{ $t('dashboard.proxy.title') }}</h4>
+        <p>{{ $t('dashboard.proxy.subtitle') }}</p>
       </div>
     </div>
     <div class="flex items-center justify-center h-[calc(100%-56px)]">

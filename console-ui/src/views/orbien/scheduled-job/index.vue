@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
   import { h, ref } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage, ElMessageBox, ElSwitch, ElTag } from 'element-plus'
   import { useTable } from '@/hooks/core/useTable'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
@@ -40,6 +41,8 @@
   import JobLogDrawer from './modules/job-log-drawer.vue'
 
   defineOptions({ name: 'ScheduledJobManagement' })
+
+  const { t } = useI18n()
 
   const ACME_RENEW_JOB_CODE = 'ACME_RENEW'
 
@@ -64,11 +67,11 @@
     if (!enabled && row.jobCode === ACME_RENEW_JOB_CODE) {
       try {
         await ElMessageBox.confirm(
-          '停用后，已开启自动续签的证书将暂停自动续签，重新启用可恢复续签。',
-          `停用「${row.jobName}」`,
+          t('orbien.scheduledJob.confirm.disableAcmeMessage'),
+          t('orbien.scheduledJob.confirm.disableAcmeTitle', { name: row.jobName }),
           {
-            confirmButtonText: '停用',
-            cancelButtonText: '取消',
+            confirmButtonText: t('orbien.scheduledJob.actions.disable'),
+            cancelButtonText: t('common.cancel'),
             type: 'warning'
           }
         )
@@ -84,7 +87,9 @@
       if (!enabled) {
         row.nextRunAt = undefined
       }
-      ElMessage.success(enabled ? '任务已启用' : '任务已停用')
+      ElMessage.success(
+        enabled ? t('orbien.scheduledJob.message.enabled') : t('orbien.scheduledJob.message.disabled')
+      )
       refreshData()
     } catch {
       row.enabled = !enabled
@@ -95,13 +100,17 @@
 
   const handleRun = async (row: Api.ScheduledJob.JobDTO) => {
     try {
-      await ElMessageBox.confirm(`确定立即执行任务「${row.jobName}」吗？`, '手动执行', {
-        confirmButtonText: '执行',
-        cancelButtonText: '取消',
-        type: 'info'
-      })
+      await ElMessageBox.confirm(
+        t('orbien.scheduledJob.confirm.runMessage', { name: row.jobName }),
+        t('orbien.scheduledJob.confirm.runTitle'),
+        {
+          confirmButtonText: t('orbien.scheduledJob.actions.run'),
+          cancelButtonText: t('common.cancel'),
+          type: 'info'
+        }
+      )
       await fetchRunScheduledJob(row.jobCode)
-      ElMessage.success('任务已触发，请稍后查看执行日志')
+      ElMessage.success(t('orbien.scheduledJob.message.triggered'))
       refreshData()
     } catch (error) {
       if (error === 'cancel') return
@@ -120,12 +129,12 @@
       columnsFactory: () => [
         {
           prop: 'jobName',
-          label: '任务名称',
+          label: t('orbien.scheduledJob.columns.jobName'),
           minWidth: 160
         },
         {
           prop: 'enabled',
-          label: '状态',
+          label: t('orbien.scheduledJob.columns.status'),
           width: 130,
           formatter: (row: Api.ScheduledJob.JobDTO) =>
             h('div', { class: 'status-cell' }, [
@@ -134,7 +143,9 @@
                 {
                   class: ['status-text', row.enabled ? 'is-active' : '']
                 },
-                row.enabled ? '正常' : '停用'
+                row.enabled
+                  ? t('orbien.scheduledJob.status.active')
+                  : t('orbien.scheduledJob.status.disabled')
               ),
               h(ElSwitch, {
                 modelValue: row.enabled,
@@ -147,19 +158,19 @@
         },
         {
           prop: 'cronExpression',
-          label: '执行周期',
+          label: t('orbien.scheduledJob.columns.schedule'),
           minWidth: 200,
           showOverflowTooltip: true,
           formatter: (row: Api.ScheduledJob.JobDTO) => describeCronExpression(row.cronExpression)
         },
         {
           prop: 'lastRunAt',
-          label: '上次执行',
+          label: t('orbien.scheduledJob.columns.lastRun'),
           width: 170
         },
         {
           prop: 'lastRunStatusLabel',
-          label: '执行结果',
+          label: t('orbien.scheduledJob.columns.result'),
           width: 100,
           formatter: (row: Api.ScheduledJob.JobDTO) => {
             if (!row.lastRunStatusLabel) {
@@ -174,30 +185,30 @@
         },
         {
           prop: 'nextRunAt',
-          label: '下次执行',
+          label: t('orbien.scheduledJob.columns.nextRun'),
           width: 170,
           formatter: (row: Api.ScheduledJob.JobDTO) => (row.enabled ? row.nextRunAt || '' : '')
         },
         {
           prop: 'operation',
-          label: '操作',
+          label: t('orbien.scheduledJob.columns.operation'),
           width: 150,
           fixed: 'right',
           formatter: (row: Api.ScheduledJob.JobDTO) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'link',
-                text: '配置',
+                text: t('orbien.scheduledJob.actions.config'),
                 onClick: () => openConfig(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '执行',
+                text: t('orbien.scheduledJob.actions.run'),
                 onClick: () => handleRun(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '日志',
+                text: t('orbien.scheduledJob.actions.logs'),
                 onClick: () => openLogs(row)
               })
             ])

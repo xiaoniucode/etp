@@ -1,15 +1,15 @@
 <template>
   <ElDialog
       v-model="dialogVisible"
-      :title="dialogType === 'add' ? '添加 HTTP 代理' : '编辑 HTTP 代理'"
+      :title="dialogType === 'add' ? t('orbien.http.add') : t('orbien.http.edit')"
       width="650px"
       align-center
   >
     <ElForm ref="formRef" :model="formData" :rules="rules" label-width="120px" :show-message="false">
-      <ElFormItem label="客户端" prop="agentId">
+      <ElFormItem :label="t('orbien.proxy.client')" prop="agentId">
         <ElSelect
             v-model="formData.agentId"
-            placeholder="请选择客户端"
+            :placeholder="t('orbien.proxy.selectClient')"
             :disabled="dialogType === 'edit'"
             style="width: 250px"
         >
@@ -22,15 +22,15 @@
         </ElSelect>
       </ElFormItem>
 
-      <ElFormItem label="代理名称" prop="name">
-        <ElInput v-model="formData.name" placeholder="请输入代理名称" clearable/>
+      <ElFormItem :label="t('orbien.proxy.name')" prop="name">
+        <ElInput v-model="formData.name" :placeholder="t('orbien.proxy.enterName')" clearable/>
       </ElFormItem>
 
-      <ElFormItem label="域名类型" prop="domainType">
+      <ElFormItem :label="t('orbien.proxy.domainType')" prop="domainType">
         <ElRadioGroup v-model="formData.domainType">
-          <ElRadio :label="String(DomainType.AUTO)">自动</ElRadio>
-          <ElRadio :label="String(DomainType.SUBDOMAIN)">子域名</ElRadio>
-          <ElRadio :label="String(DomainType.CUSTOM_DOMAIN)">自定义域名</ElRadio>
+          <ElRadio :label="String(DomainType.AUTO)">{{ t('orbien.proxy.auto') }}</ElRadio>
+          <ElRadio :label="String(DomainType.SUBDOMAIN)">{{ t('orbien.proxy.subdomain') }}</ElRadio>
+          <ElRadio :label="String(DomainType.CUSTOM_DOMAIN)">{{ t('orbien.proxy.customDomain') }}</ElRadio>
         </ElRadioGroup>
       </ElFormItem>
 
@@ -47,14 +47,14 @@
 
       <ElFormItem
           v-if="formData.domainType === String(DomainType.CUSTOM_DOMAIN)"
-          label="自定义域名"
+          :label="t('orbien.proxy.customDomain')"
           prop="customDomains"
       >
         <ElInput
             v-model="formData.customDomains"
             type="textarea"
             :rows="3"
-            placeholder="请输入完整域名，多个用换行分隔，如 www.example.com"
+            :placeholder="t('orbien.proxy.customDomainPlaceholder')"
         />
       </ElFormItem>
 
@@ -65,10 +65,10 @@
       >
         <ElRow :gutter="20">
           <ElCol :span="12">
-            <ElInput v-model="formData.localHost" placeholder="如127.0.0.1"/>
+            <ElInput v-model="formData.localHost" :placeholder="t('orbien.proxy.hostPlaceholder')"/>
           </ElCol>
           <ElCol :span="12">
-            <LocalPortInput v-model="formData.localPort" :presets="COMMON_LOCAL_PORT_PRESETS"/>
+            <LocalPortInput v-model="formData.localPort" :presets="commonLocalPortPresets"/>
           </ElCol>
         </ElRow>
       </BackendServiceField>
@@ -77,8 +77,8 @@
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
-        <ElButton @click="dialogVisible = false">取消</ElButton>
-        <ElButton type="primary" @click="handleSubmit">提交</ElButton>
+        <ElButton @click="dialogVisible = false">{{ t('common.cancel') }}</ElButton>
+        <ElButton type="primary" @click="handleSubmit">{{ t('common.submit') }}</ElButton>
       </div>
     </template>
   </ElDialog>
@@ -86,6 +86,7 @@
 
 <script setup lang="ts">
 import {ref, reactive, watch, computed} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {ElMessage} from 'element-plus'
 import type {FormInstance, FormRules} from 'element-plus'
 import {DialogType} from '@/types'
@@ -107,10 +108,12 @@ import {
   toLimitTotalPayload,
   type LimitTotalMbps
 } from '@/views/orbien/proxy/shared/bandwidth-limit'
-import {COMMON_LOCAL_PORT_PRESETS} from '@/views/orbien/proxy/shared/port-presets'
+import {getCommonLocalPortPresets} from '@/views/orbien/proxy/shared/port-presets'
 import {isClusterMode} from '@/views/orbien/proxy/shared/is-cluster-mode'
 
 defineOptions({name: 'HttpDialog'})
+
+const {t} = useI18n()
 
 interface FormDataState {
   agentId: string
@@ -152,6 +155,7 @@ const dialogVisible = computed({
 const dialogType = computed(() => props.type)
 const formRef = ref<FormInstance>()
 const agents = ref<Api.Agent.AgentDTO[]>([])
+const commonLocalPortPresets = computed(() => getCommonLocalPortPresets())
 const {
   rootDomains,
   rootDomainLoading,
@@ -182,9 +186,9 @@ const resetSubdomainErrors = () => {
 }
 
 const rules = computed<FormRules>(() => ({
-  agentId: [{required: true, message: '请选择客户端', trigger: 'change'}],
-  name: [{required: true, message: '请输入代理名称', trigger: 'blur'}],
-  domainType: [{required: true, message: '请选择域名类型', trigger: 'change'}],
+  agentId: [{required: true, message: t('orbien.proxy.selectClient'), trigger: 'change'}],
+  name: [{required: true, message: t('orbien.proxy.enterName'), trigger: 'blur'}],
+  domainType: [{required: true, message: t('orbien.proxy.selectDomainType'), trigger: 'change'}],
   customDomains: [
     {
       validator: (_rule, value: string, callback) => {
@@ -193,7 +197,7 @@ const rules = computed<FormRules>(() => ({
           return
         }
         if (!value?.trim()) {
-          callback(new Error('请输入自定义域名'))
+          callback(new Error(t('orbien.proxy.enterCustomDomain')))
         } else {
           callback()
         }
@@ -204,11 +208,11 @@ const rules = computed<FormRules>(() => ({
   ...(clusterMode.value
       ? {}
       : {
-        localHost: [{required: true, message: '请输入主机', trigger: 'blur'}],
+        localHost: [{required: true, message: t('orbien.proxy.enterHost'), trigger: 'blur'}],
         localPort: [
-          {required: true, message: '请输入端口', trigger: 'blur'},
-          {type: 'number', message: '端口必须是数字', trigger: 'blur'},
-          {min: 1, max: 65535, message: '端口必须在 1-65535 之间', trigger: 'blur'}
+          {required: true, message: t('orbien.proxy.enterPort'), trigger: 'blur'},
+          {type: 'number', message: t('orbien.proxy.portNumber'), trigger: 'blur'},
+          {min: 1, max: 65535, message: t('orbien.proxy.portRange'), trigger: 'blur'}
         ]
       }),
   limitTotal: LIMIT_TOTAL_RULES
@@ -249,7 +253,7 @@ const fetchAgents = async () => {
     agents.value = (await fetchGetAgentsForProxySelection(includeId)) || []
   } catch (error) {
     console.error('获取客户端列表失败:', error)
-    ElMessage.error('获取客户端列表失败')
+    ElMessage.error(t('orbien.proxy.fetchClientFail'))
   }
 }
 
@@ -285,7 +289,7 @@ const initFormData = async () => {
     applyDetail(await fetchGetHttpProxyById(props.proxyData!.id!))
   } catch (error) {
     console.error('获取代理详情失败:', error)
-    ElMessage.error('获取代理详情失败，请稍后重试')
+    ElMessage.error(t('orbien.proxy.fetchDetailFail'))
     Object.assign(formData, {
       ...createDefaultFormData(),
       agentId: props.proxyData?.agentId || '',

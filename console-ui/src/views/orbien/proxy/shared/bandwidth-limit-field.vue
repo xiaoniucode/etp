@@ -1,9 +1,9 @@
 <template>
-  <ElFormItem label="带宽限制" prop="limitTotal">
+  <ElFormItem :label="t('orbien.proxy.bandwidthLimit')" prop="limitTotal">
     <div class="bandwidth-limit-field">
       <ElInputNumber
           v-model="limitTotal"
-          placeholder="留空不限制"
+          :placeholder="t('orbien.proxy.noBandwidthLimit')"
           :controls="false"
           :min="1"
           :precision="0"
@@ -15,9 +15,12 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type {LimitTotalMbps} from './bandwidth-limit'
 
 defineOptions({name: 'BandwidthLimitField'})
+
+const { t } = useI18n()
 
 const limitTotal = defineModel<LimitTotalMbps>()
 </script>

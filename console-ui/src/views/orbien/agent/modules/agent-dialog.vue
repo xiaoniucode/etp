@@ -1,33 +1,33 @@
 <template>
-  <ElDialog v-model="dialogVisible" title="客户端详情" width="60%" align-center>
+  <ElDialog v-model="dialogVisible" :title="$t('orbien.agent.detailTitle')" width="60%" align-center>
     <div v-if="localClientData" class="mt-5">
       <ElDescriptions :column="2" border>
-        <ElDescriptionsItem label="客户端 ID">{{ localClientData.id }}</ElDescriptionsItem>
-        <ElDescriptionsItem label="客户端名称">{{ localClientData.name }}</ElDescriptionsItem>
-        <ElDescriptionsItem label="访问令牌">{{ localClientData.token }}</ElDescriptionsItem>
-        <ElDescriptionsItem label="状态">
+        <ElDescriptionsItem :label="$t('orbien.common.clientId')">{{ localClientData.id }}</ElDescriptionsItem>
+        <ElDescriptionsItem :label="$t('orbien.common.clientName')">{{ localClientData.name }}</ElDescriptionsItem>
+        <ElDescriptionsItem :label="$t('orbien.common.accessToken')">{{ localClientData.token }}</ElDescriptionsItem>
+        <ElDescriptionsItem :label="$t('common.status')">
           <ElTag :type="getStatusType(localClientData.isOnline)">
             {{ getStatusText(localClientData.isOnline) }}
           </ElTag>
         </ElDescriptionsItem>
-        <ElDescriptionsItem label="类型">
+        <ElDescriptionsItem :label="$t('orbien.common.type')">
           <ElTag :type="getAgentTypeTag(localClientData.agentType).type">
             {{ getAgentTypeTag(localClientData.agentType).text }}
           </ElTag>
         </ElDescriptionsItem>
-        <ElDescriptionsItem label="操作系统">{{ localClientData.os }}</ElDescriptionsItem>
-        <ElDescriptionsItem label="架构">{{ localClientData.arch }}</ElDescriptionsItem>
-        <ElDescriptionsItem label="版本">{{ localClientData.version }}</ElDescriptionsItem>
-        <ElDescriptionsItem label="来源 IP">{{ localClientData.sourceIp || '-' }}</ElDescriptionsItem>
-        <ElDescriptionsItem label="最后在线时间">{{
+        <ElDescriptionsItem :label="$t('orbien.common.os')">{{ localClientData.os }}</ElDescriptionsItem>
+        <ElDescriptionsItem :label="$t('orbien.common.arch')">{{ localClientData.arch }}</ElDescriptionsItem>
+        <ElDescriptionsItem :label="$t('orbien.common.version')">{{ localClientData.version }}</ElDescriptionsItem>
+        <ElDescriptionsItem :label="$t('orbien.common.sourceIp')">{{ localClientData.sourceIp || '-' }}</ElDescriptionsItem>
+        <ElDescriptionsItem :label="$t('orbien.common.lastActiveTime')">{{
             formatDate(localClientData.lastActiveTime)
           }}
         </ElDescriptionsItem>
-        <ElDescriptionsItem label="创建时间">{{
+        <ElDescriptionsItem :label="$t('common.createTime')">{{
             formatDate(localClientData.createdAt)
           }}
         </ElDescriptionsItem>
-        <ElDescriptionsItem label="更新时间">{{
+        <ElDescriptionsItem :label="$t('common.updateTime')">{{
             formatDate(localClientData.updatedAt)
           }}
         </ElDescriptionsItem>
@@ -38,7 +38,7 @@
     </div>
     <template #footer>
       <div class="dialog-footer">
-        <ElButton @click="dialogVisible = false">关闭</ElButton>
+        <ElButton @click="dialogVisible = false">{{ $t('common.close') }}</ElButton>
       </div>
     </template>
   </ElDialog>
@@ -46,6 +46,7 @@
 
 <script setup lang="ts">
 import {ref, computed, watch, nextTick} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {ElTag, ElDescriptions, ElSkeleton, ElButton, ElMessage} from 'element-plus'
 import {fetchGetAgentById} from '@/api/agent'
 import {getAgentTypeTag} from '@/enums/orbien/business'
@@ -61,6 +62,8 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+
+const { t } = useI18n()
 
 // 对话框显示控制
 const dialogVisible = computed({
@@ -84,7 +87,7 @@ const fetchClientDetail = async () => {
     localClientData.value = data
   } catch (error) {
     console.error('获取客户端详情失败:', error)
-    ElMessage.error('获取客户端详情失败')
+    ElMessage.error(t('orbien.agent.fetchDetailFailed'))
   } finally {
     loading.value = false
   }
@@ -101,7 +104,7 @@ const getStatusType = (isOnline: boolean) => {
  * 获取状态文本
  */
 const getStatusText = (isOnline: boolean) => {
-  return isOnline ? '在线' : '离线'
+  return isOnline ? t('common.online') : t('common.offline')
 }
 
 /**

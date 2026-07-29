@@ -1,5 +1,6 @@
 import {computed, ref, watch, type Ref} from 'vue'
 import {ElMessage} from 'element-plus'
+import {$t} from '@/locales'
 import {fetchDnsCredentialList} from '@/api/dns-credential'
 import {
     fetchAcmeOrderDetail,
@@ -84,7 +85,7 @@ export function useAcmeApplyWizard(options: {
     const validateDomainStep = () => {
         const domains = buildApplyDomains()
         if (!domains.length) {
-            ElMessage.warning('请至少选择一个域名')
+            ElMessage.warning($t('orbien.tls.acme.messages.selectDomain'))
             return false
         }
         return true
@@ -100,15 +101,15 @@ export function useAcmeApplyWizard(options: {
     const handleSubmit = async () => {
         const domains = buildApplyDomains()
         if (!domains.length) {
-            ElMessage.warning('请至少选择一个域名')
+            ElMessage.warning($t('orbien.tls.acme.messages.selectDomain'))
             return
         }
         if (validationMode.value === 2 && !dnsCredentialId.value) {
             if (!credentialList.value.length) {
-                ElMessage.warning('请先添加 DNS 密钥')
+                ElMessage.warning($t('orbien.tls.acme.messages.addDnsCredentialFirst'))
                 openDnsDialog()
             } else {
-                ElMessage.warning('请选择 DNS 密钥')
+                ElMessage.warning($t('orbien.tls.acme.messages.selectDnsCredential'))
             }
             return
         }
@@ -122,10 +123,10 @@ export function useAcmeApplyWizard(options: {
             })
             currentStep.value = 2
             if (orderResult.value.status === 5) {
-                ElMessage.success('证书申请成功')
+                ElMessage.success($t('orbien.tls.acme.messages.applySuccess'))
                 options.onSuccess()
             } else if (validationMode.value === 2) {
-                ElMessage.info('已提交，系统正在自动验证')
+                ElMessage.info($t('orbien.tls.acme.messages.submittedAutoVerify'))
             }
         } finally {
             submitting.value = false
@@ -138,7 +139,7 @@ export function useAcmeApplyWizard(options: {
         try {
             orderResult.value = await fetchAcmeOrderDetail(orderResult.value.id)
             if (orderResult.value.status === 5) {
-                ElMessage.success('证书申请成功')
+                ElMessage.success($t('orbien.tls.acme.messages.applySuccess'))
                 options.onSuccess()
             }
         } finally {
@@ -151,7 +152,7 @@ export function useAcmeApplyWizard(options: {
         verifying.value = true
         try {
             await fetchVerifyAcmeOrder(orderResult.value.id)
-            ElMessage.success('已开始验证，请稍后刷新状态')
+            ElMessage.success($t('orbien.tls.acme.messages.verifyStartedRefresh'))
             await refreshOrder()
         } finally {
             verifying.value = false
@@ -160,7 +161,7 @@ export function useAcmeApplyWizard(options: {
 
     const copyText = async (text: string) => {
         await navigator.clipboard.writeText(text)
-        ElMessage.success('已复制')
+        ElMessage.success($t('common.copied'))
     }
 
     const initWhenVisible = async () => {

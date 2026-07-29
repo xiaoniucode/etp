@@ -3,7 +3,7 @@
     <div class="picker-row">
       <ElSelect v-model="schedule.type" class="type-select" @change="handleTypeChange">
         <ElOption
-          v-for="item in CRON_SCHEDULE_TYPE_OPTIONS"
+          v-for="item in cronScheduleTypeOptions"
           :key="item.value"
           :label="item.label"
           :value="item.value"
@@ -12,12 +12,12 @@
 
       <div v-if="schedule.type === 'everyNDays'" class="number-field">
         <ElInputNumber v-model="schedule.interval" :min="1" :max="31" controls-position="right" />
-        <span class="number-unit">天</span>
+        <span class="number-unit">{{ $t('orbien.cron.unit.days') }}</span>
       </div>
 
       <ElSelect v-if="schedule.type === 'weekly'" v-model="schedule.dayOfWeek" class="weekday-select">
         <ElOption
-          v-for="item in WEEKDAY_OPTIONS"
+          v-for="item in weekdayOptions"
           :key="item.value"
           :label="item.label"
           :value="item.value"
@@ -26,46 +26,46 @@
 
       <div v-if="schedule.type === 'monthly'" class="number-field">
         <ElInputNumber v-model="schedule.dayOfMonth" :min="1" :max="31" controls-position="right" />
-        <span class="number-unit">天</span>
+        <span class="number-unit">{{ $t('orbien.cron.unit.days') }}</span>
       </div>
 
       <template v-if="showHourMinute">
         <div class="number-field">
           <ElInputNumber v-model="schedule.hour" :min="0" :max="23" controls-position="right" />
-          <span class="number-unit">小时</span>
+          <span class="number-unit">{{ $t('orbien.cron.unit.hours') }}</span>
         </div>
         <div class="number-field">
           <ElInputNumber v-model="schedule.minute" :min="0" :max="59" controls-position="right" />
-          <span class="number-unit">分钟</span>
+          <span class="number-unit">{{ $t('orbien.cron.unit.minutes') }}</span>
         </div>
       </template>
 
       <template v-else-if="schedule.type === 'hourly'">
         <div class="number-field">
           <ElInputNumber v-model="schedule.minute" :min="0" :max="59" controls-position="right" />
-          <span class="number-unit">分钟</span>
+          <span class="number-unit">{{ $t('orbien.cron.unit.minutes') }}</span>
         </div>
       </template>
 
       <template v-else-if="schedule.type === 'everyNHours'">
         <div class="number-field">
           <ElInputNumber v-model="schedule.interval" :min="1" :max="23" controls-position="right" />
-          <span class="number-unit">小时</span>
+          <span class="number-unit">{{ $t('orbien.cron.unit.hours') }}</span>
         </div>
         <div class="number-field">
           <ElInputNumber v-model="schedule.minute" :min="0" :max="59" controls-position="right" />
-          <span class="number-unit">分钟</span>
+          <span class="number-unit">{{ $t('orbien.cron.unit.minutes') }}</span>
         </div>
       </template>
 
       <div v-else-if="schedule.type === 'everyNMinutes'" class="number-field">
         <ElInputNumber v-model="schedule.interval" :min="1" :max="59" controls-position="right" />
-        <span class="number-unit">分钟</span>
+        <span class="number-unit">{{ $t('orbien.cron.unit.minutes') }}</span>
       </div>
 
       <div v-else-if="schedule.type === 'everyNSeconds'" class="number-field">
         <ElInputNumber v-model="schedule.interval" :min="1" :max="59" controls-position="right" />
-        <span class="number-unit">秒</span>
+        <span class="number-unit">{{ $t('orbien.cron.unit.seconds') }}</span>
       </div>
     </div>
 
@@ -75,7 +75,7 @@
       class="custom-input"
       placeholder="0 0 1 * * ?"
     />
-    <div v-if="schedule.type === 'custom'" class="form-tip">格式：秒 分 时 日 月 周</div>
+    <div v-if="schedule.type === 'custom'" class="form-tip">{{ $t('orbien.cron.customFormat') }}</div>
 
     <div class="picker-preview">{{ previewText }}</div>
   </div>
@@ -83,9 +83,10 @@
 
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import {
-    CRON_SCHEDULE_TYPE_OPTIONS,
-    WEEKDAY_OPTIONS,
+    getCronScheduleTypeOptions,
+    getWeekdayOptions,
     buildCronExpression,
     createDefaultSchedule,
     describeCronSchedule,
@@ -106,15 +107,29 @@
 
   const props = defineProps<Props>()
   const emit = defineEmits<Emits>()
+  const { locale } = useI18n()
 
   const schedule = ref<CronSchedule>(parseCronExpression(props.modelValue))
   const syncing = ref(false)
+
+  const cronScheduleTypeOptions = computed(() => {
+    void locale.value
+    return getCronScheduleTypeOptions()
+  })
+
+  const weekdayOptions = computed(() => {
+    void locale.value
+    return getWeekdayOptions()
+  })
 
   const showHourMinute = computed(() =>
     ['daily', 'everyNDays', 'weekly', 'monthly'].includes(schedule.value.type)
   )
 
-  const previewText = computed(() => describeCronSchedule(schedule.value))
+  const previewText = computed(() => {
+    void locale.value
+    return describeCronSchedule(schedule.value)
+  })
 
   const handleTypeChange = (type: CronScheduleType) => {
     schedule.value = createDefaultSchedule(type)

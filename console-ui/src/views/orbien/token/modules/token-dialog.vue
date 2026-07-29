@@ -1,7 +1,7 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    :title="dialogType === 'add' ? '添加访问令牌' : '编辑访问令牌'"
+    :title="dialogType === 'add' ? $t('orbien.token.add') : $t('orbien.token.edit')"
     width="500px"
     align-center
   >
@@ -9,18 +9,18 @@
       <ElSkeleton :rows="5" animated />
     </div>
     <ElForm v-else ref="formRef" :model="formData" :rules="rules" label-width="120px" :show-message="false">
-      <ElFormItem v-if="dialogType === 'edit'" label="令牌值">
+      <ElFormItem v-if="dialogType === 'edit'" :label="$t('orbien.token.tokenValue')">
         <ElInput v-model="formData.token" disabled />
       </ElFormItem>
-      <ElFormItem label="令牌名称" prop="name">
-        <ElInput v-model="formData.name" placeholder="请输入令牌名称" />
+      <ElFormItem :label="$t('orbien.token.tokenName')" prop="name">
+        <ElInput v-model="formData.name" :placeholder="$t('orbien.token.namePlaceholder')" />
       </ElFormItem>
-      <ElFormItem v-if="dialogType === 'edit'" label="描述">
+      <ElFormItem v-if="dialogType === 'edit'" :label="$t('common.description')">
         <ElInput
           v-model="formData.remark"
           type="textarea"
           :rows="3"
-          placeholder="请输入描述"
+          :placeholder="$t('orbien.common.descPlaceholder')"
           maxlength="500"
           show-word-limit
         />
@@ -28,8 +28,8 @@
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
-        <ElButton @click="dialogVisible = false">取消</ElButton>
-        <ElButton type="primary" @click="handleSubmit" :loading="loading">提交</ElButton>
+        <ElButton @click="dialogVisible = false">{{ $t('common.cancel') }}</ElButton>
+        <ElButton type="primary" @click="handleSubmit" :loading="loading">{{ $t('common.submit') }}</ElButton>
       </div>
     </template>
   </ElDialog>
@@ -37,6 +37,7 @@
 
 <script setup lang="ts">
   import { ref, reactive, computed, watch, nextTick } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import type { FormInstance, FormRules } from 'element-plus'
   import { fetchCreateToken, fetchUpdateToken, fetchGetTokenById } from '@/api/token'
   import { ElMessage } from 'element-plus'
@@ -56,6 +57,8 @@
   const props = defineProps<Props>()
   const emit = defineEmits<Emits>()
 
+  const { t } = useI18n()
+
   const dialogVisible = computed({
     get: () => props.visible,
     set: (value) => emit('update:visible', value)
@@ -73,9 +76,9 @@
     remark: ''
   })
 
-  const rules: FormRules = {
-    name: [{ required: true, message: '请输入令牌名称', trigger: 'blur' }]
-  }
+  const rules = computed<FormRules>(() => ({
+    name: [{ required: true, message: t('orbien.token.nameRequired'), trigger: 'blur' }]
+  }))
 
   const initFormData = async () => {
     if (props.type === 'add') {
@@ -97,7 +100,7 @@
         })
       } catch (error) {
         console.error('获取令牌详情失败:', error)
-        ElMessage.error('获取令牌详情失败')
+        ElMessage.error(t('orbien.token.fetchDetailFailed'))
       } finally {
         loading.value = false
       }
@@ -136,7 +139,7 @@
                 name: formData.name,
                 remark: formData.remark
               })
-              ElMessage.success('更新成功')
+              ElMessage.success(t('common.success.update'))
               dialogVisible.value = false
             }
           }

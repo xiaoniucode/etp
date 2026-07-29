@@ -1,18 +1,18 @@
 <template>
   <div class="header-rewrite-page">
     <div class="mb-6">
-      <h3 class="text-lg font-semibold mb-4">基本配置</h3>
+      <h3 class="text-lg font-semibold mb-4">{{ t('orbien.plugin.basic.title') }}</h3>
       <div class="flex items-center gap-3">
-        <span class="w-20 font-medium">启用状态：</span>
+        <span class="w-20 font-medium">{{ t('orbien.plugin.basic.enabled') }}：</span>
         <ElSwitch v-model="formData.enabled" @change="handleEnableChange"/>
       </div>
     </div>
 
     <div class="mb-6">
-      <h3 class="text-lg font-semibold mb-4">请求头</h3>
+      <h3 class="text-lg font-semibold mb-4">{{ t('orbien.plugin.header.requestHeaders') }}</h3>
       <div class="border border-gray-200 rounded p-4">
         <ElTable :data="formData.requestRules" style="width: 100%" border>
-          <ElTableColumn label="动作" width="140">
+          <ElTableColumn :label="t('orbien.plugin.header.action')" width="140">
             <template #default="scope">
               <ElSelect
                   v-if="editingId === scope.row.id && editingDirection === HeaderDirection.REQUEST"
@@ -31,7 +31,7 @@
               <span v-else>{{ getHeaderActionLabel(scope.row.action) }}</span>
             </template>
           </ElTableColumn>
-          <ElTableColumn label="名称" min-width="160">
+          <ElTableColumn :label="t('orbien.plugin.header.name')" min-width="160">
             <template #default="scope">
               <ElInput
                   v-if="editingId === scope.row.id && editingDirection === HeaderDirection.REQUEST"
@@ -42,7 +42,7 @@
               <span v-else>{{ scope.row.name }}</span>
             </template>
           </ElTableColumn>
-          <ElTableColumn label="值" min-width="180">
+          <ElTableColumn :label="t('orbien.plugin.header.value')" min-width="180">
             <template #default="scope">
               <ElInput
                   v-if="editingId === scope.row.id && editingDirection === HeaderDirection.REQUEST"
@@ -54,7 +54,7 @@
               <span v-else>{{ scope.row.action === HeaderAction.REMOVE ? '—' : scope.row.value }}</span>
             </template>
           </ElTableColumn>
-          <ElTableColumn label="操作" width="180" fixed="right">
+          <ElTableColumn :label="t('common.actions')" width="180" fixed="right">
             <template #default="scope">
               <ElSpace size="small">
                 <ElButton
@@ -63,16 +63,16 @@
                     size="small"
                     @click="handleSave(scope.row)"
                 >
-                  保存
+                  {{ t('common.save') }}
                 </ElButton>
                 <ElButton v-else type="link" size="small" @click="handleEdit(scope.row)">
-                  编辑
+                  {{ t('common.edit') }}
                 </ElButton>
                 <ElButton type="link" size="small" @click="handleDelete(scope.row)">
                   <template #icon>
                     <Delete/>
                   </template>
-                  删除
+                  {{ t('common.delete') }}
                 </ElButton>
               </ElSpace>
             </template>
@@ -82,16 +82,16 @@
           <template #icon>
             <Plus/>
           </template>
-          新增规则
+          {{ t('orbien.plugin.actions.addRule') }}
         </ElButton>
       </div>
     </div>
 
     <div class="mb-4">
-      <h3 class="text-lg font-semibold mb-4">响应头</h3>
+      <h3 class="text-lg font-semibold mb-4">{{ t('orbien.plugin.header.responseHeaders') }}</h3>
       <div class="border border-gray-200 rounded p-4">
         <ElTable :data="formData.responseRules" style="width: 100%" border>
-          <ElTableColumn label="动作" width="140">
+          <ElTableColumn :label="t('orbien.plugin.header.action')" width="140">
             <template #default="scope">
               <ElSelect
                   v-if="editingId === scope.row.id && editingDirection === HeaderDirection.RESPONSE"
@@ -110,7 +110,7 @@
               <span v-else>{{ getHeaderActionLabel(scope.row.action) }}</span>
             </template>
           </ElTableColumn>
-          <ElTableColumn label="名称" min-width="160">
+          <ElTableColumn :label="t('orbien.plugin.header.name')" min-width="160">
             <template #default="scope">
               <ElInput
                   v-if="editingId === scope.row.id && editingDirection === HeaderDirection.RESPONSE"
@@ -121,7 +121,7 @@
               <span v-else>{{ scope.row.name }}</span>
             </template>
           </ElTableColumn>
-          <ElTableColumn label="值" min-width="180">
+          <ElTableColumn :label="t('orbien.plugin.header.value')" min-width="180">
             <template #default="scope">
               <ElInput
                   v-if="editingId === scope.row.id && editingDirection === HeaderDirection.RESPONSE"
@@ -133,7 +133,7 @@
               <span v-else>{{ scope.row.action === HeaderAction.REMOVE ? '—' : scope.row.value }}</span>
             </template>
           </ElTableColumn>
-          <ElTableColumn label="操作" width="180" fixed="right">
+          <ElTableColumn :label="t('common.actions')" width="180" fixed="right">
             <template #default="scope">
               <ElSpace size="small">
                 <ElButton
@@ -142,16 +142,16 @@
                     size="small"
                     @click="handleSave(scope.row)"
                 >
-                  保存
+                  {{ t('common.save') }}
                 </ElButton>
                 <ElButton v-else type="link" size="small" @click="handleEdit(scope.row)">
-                  编辑
+                  {{ t('common.edit') }}
                 </ElButton>
                 <ElButton type="link" size="small" @click="handleDelete(scope.row)">
                   <template #icon>
                     <Delete/>
                   </template>
-                  删除
+                  {{ t('common.delete') }}
                 </ElButton>
               </ElSpace>
             </template>
@@ -161,25 +161,26 @@
           <template #icon>
             <Plus/>
           </template>
-          新增规则
+          {{ t('orbien.plugin.actions.addRule') }}
         </ElButton>
       </div>
     </div>
 
     <div class="mt-4 text-sm text-gray-500 space-y-1">
-      <p class="font-medium text-gray-600">动作说明</p>
+      <p class="font-medium text-gray-600">{{ t('orbien.plugin.header.actionGuideTitle') }}</p>
       <ul class="list-disc pl-5 space-y-0.5">
-        <li><span class="font-medium text-gray-600">SET</span>：覆盖同名头；不存在则创建</li>
-        <li><span class="font-medium text-gray-600">ADD</span>：仅当不存在时写入，已有则跳过</li>
-        <li><span class="font-medium text-gray-600">REMOVE</span>：删除同名头</li>
+        <li><span class="font-medium text-gray-600">SET</span>：{{ t('orbien.plugin.header.actionSet') }}</li>
+        <li><span class="font-medium text-gray-600">ADD</span>：{{ t('orbien.plugin.header.actionAdd') }}</li>
+        <li><span class="font-medium text-gray-600">REMOVE</span>：{{ t('orbien.plugin.header.actionRemove') }}</li>
       </ul>
-      <p class="pt-1">可用变量：{{ VAR_HINT }}</p>
+      <p class="pt-1">{{ t('orbien.plugin.header.availableVars') }}：{{ VAR_HINT }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import {reactive, ref, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {Plus, Delete} from '@element-plus/icons-vue'
 import {
@@ -197,6 +198,8 @@ import {
 } from '@/enums/orbien/business'
 
 defineOptions({name: 'HeaderRewritePage'})
+
+const {t} = useI18n()
 
 const props = defineProps<{
   proxyId: string
@@ -275,11 +278,11 @@ const handleEdit = (row: Api.HeaderRewrite.RuleDTO) => {
 
 const handleSave = async (row: Api.HeaderRewrite.RuleDTO) => {
   if (!row.name?.trim()) {
-    ElMessage.error('请输入 Header 名称')
+    ElMessage.error(t('orbien.plugin.header.nameRequired'))
     return
   }
   if (row.action !== HeaderAction.REMOVE && !row.value?.trim()) {
-    ElMessage.error('请输入 Header 值')
+    ElMessage.error(t('orbien.plugin.header.valueRequired'))
     return
   }
   const payload: Api.HeaderRewrite.RuleAddParam = {
@@ -300,9 +303,9 @@ const handleSave = async (row: Api.HeaderRewrite.RuleDTO) => {
 }
 
 const handleDelete = async (row: Api.HeaderRewrite.RuleDTO) => {
-  await ElMessageBox.confirm('确定删除该规则吗？', '警告', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+  await ElMessageBox.confirm(t('orbien.plugin.deleteConfirm.headerRule'), t('common.warning'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
     type: 'warning'
   })
   if (row.id > 0) {

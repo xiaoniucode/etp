@@ -2,7 +2,7 @@
   <div class="transport-page" v-loading="loading">
     <section class="setting-section">
       <div class="summary-bar">
-        <span class="summary-label">当前生效</span>
+        <span class="summary-label">{{ t('orbien.plugin.transport.currentEffective') }}</span>
         <span class="summary-value">{{ summaryText }}</span>
       </div>
     </section>
@@ -22,9 +22,9 @@
             @click="selectProtocol(item.value)"
         >
           <span class="protocol-card__name">{{ item.label }}</span>
-          <span class="protocol-card__port">端口 {{ item.port }}</span>
+          <span class="protocol-card__port">{{ t('orbien.plugin.transport.port', { port: item.port }) }}</span>
           <span class="protocol-card__desc">{{ item.desc }}</span>
-          <span v-if="!item.available" class="protocol-card__badge">未启用</span>
+          <span v-if="!item.available" class="protocol-card__badge">{{ t('orbien.plugin.transport.notEnabled') }}</span>
         </button>
       </div>
     </section>
@@ -33,25 +33,25 @@
       <div class="setting-list">
         <div v-if="showTunnelMode" class="setting-item">
           <ElRadioGroup v-model="form.tunnelType">
-            <ElRadio :label="String(TunnelType.MULTIPLEX)">多路复用</ElRadio>
-            <ElRadio :label="String(TunnelType.DIRECT)">独立连接</ElRadio>
+            <ElRadio :label="String(TunnelType.MULTIPLEX)">{{ t('orbien.plugin.transport.tunnel.multiplex') }}</ElRadio>
+            <ElRadio :label="String(TunnelType.DIRECT)">{{ t('orbien.plugin.transport.tunnel.direct') }}</ElRadio>
           </ElRadioGroup>
         </div>
 
         <div class="setting-item">
-          <span class="setting-name">隧道加密</span>
+          <span class="setting-name">{{ t('orbien.plugin.transport.tunnelEncrypt') }}</span>
           <ElSwitch v-model="form.encrypt" :disabled="!encryptEditable"/>
         </div>
 
         <div class="setting-item">
           <div class="setting-row">
-            <span class="setting-name">数据压缩</span>
+            <span class="setting-name">{{ t('orbien.plugin.transport.dataCompress') }}</span>
             <ElSwitch v-model="form.compress"/>
           </div>
 
           <Transition name="compress-expand">
             <div v-if="form.compress" class="compress-panel">
-              <div class="algorithm-grid" role="radiogroup" aria-label="压缩算法">
+              <div class="algorithm-grid" role="radiogroup" :aria-label="t('orbien.plugin.transport.compressAlgorithm')">
                 <button
                     v-for="item in algorithmOptions"
                     :key="item.value"
@@ -73,13 +73,14 @@
     </section>
 
     <div>
-      <ElButton type="primary" :loading="saving" @click="handleSave">保存配置</ElButton>
+      <ElButton type="primary" :loading="saving" @click="handleSave">{{ t('orbien.plugin.basic.saveConfig') }}</ElButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import {ref, reactive, watch, computed} from 'vue'
+import {useI18n} from 'vue-i18n'
 import {ElMessage} from 'element-plus'
 import {fetchProxyTransport, saveProxyTransport} from '@/api/proxy-transport'
 import type {ProxyConfigProtocol} from '../../menus'
@@ -87,11 +88,12 @@ import {
   TunnelType,
   ProtocolType,
   TransportProtocol,
-  getTunnelTypeLabel,
   getTransportProtocolLabel
 } from '@/enums/orbien/business'
 
 defineOptions({name: 'TransportPage'})
+
+const {t} = useI18n()
 
 const props = defineProps<{
   proxyId: string
@@ -110,15 +112,20 @@ const form = reactive({
   compressAlgorithm: 'snappy'
 })
 
-const algorithmOptions = [
-  {value: 'snappy', label: 'Snappy', tag: '均衡'},
-  {value: 'lz4', label: 'LZ4', tag: '速度'},
-  {value: 'zstd', label: 'Zstd', tag: '压缩率'}
-]
+const algorithmOptions = computed(() => [
+  {value: 'snappy', label: 'Snappy', tag: t('orbien.plugin.transport.algorithm.balanced')},
+  {value: 'lz4', label: 'LZ4', tag: t('orbien.plugin.transport.algorithm.speed')},
+  {value: 'zstd', label: 'Zstd', tag: t('orbien.plugin.transport.algorithm.ratio')}
+])
 
 const isUdpProtocol = computed(() => props.protocol === ProtocolType.UDP)
 const protocolConstraints = computed(() => detail.value?.protocolConstraints)
 const globalTlsEnabled = computed(() => detail.value?.encryptConstraints?.globalTlsEnabled ?? false)
+
+const getTunnelTypeLabel = (tunnelType?: number) =>
+    tunnelType === TunnelType.DIRECT
+        ? t('orbien.plugin.transport.tunnel.direct')
+        : t('orbien.plugin.transport.tunnel.multiplex')
 
 const protocolOptions = computed(() => {
   const c = protocolConstraints.value
@@ -128,21 +135,21 @@ const protocolOptions = computed(() => {
       value: TransportProtocol.TCP,
       label: 'TCP',
       port: c?.tcpPort ?? 9527,
-      desc: '默认选项，兼容性最好',
+      desc: t('orbien.plugin.transport.protocol.tcpDesc'),
       available: available.has(TransportProtocol.TCP)
     },
     {
       value: TransportProtocol.WEBSOCKET,
       label: 'WebSocket',
       port: c?.websocketPort ?? 9528,
-      desc: '穿透防火墙友好，强制 TLS',
+      desc: t('orbien.plugin.transport.protocol.websocketDesc'),
       available: available.has(TransportProtocol.WEBSOCKET)
     },
     {
       value: TransportProtocol.QUIC,
       label: 'QUIC',
       port: c?.quicPort ?? 9529,
-      desc: '低延迟，强制 TLS，多路复用',
+      desc: t('orbien.plugin.transport.protocol.quicDesc'),
       available: available.has(TransportProtocol.QUIC)
     }
   ]
@@ -169,9 +176,9 @@ const encryptEditable = computed(() => {
 })
 
 const compressSummary = computed(() => {
-  if (!form.compress) return '无压缩'
-  const algo = algorithmOptions.find(item => item.value === form.compressAlgorithm)
-  return `${algo?.label ?? form.compressAlgorithm} 压缩`
+  if (!form.compress) return t('orbien.plugin.transport.noCompress')
+  const algo = algorithmOptions.value.find(item => item.value === form.compressAlgorithm)
+  return `${algo?.label ?? form.compressAlgorithm} ${t('orbien.plugin.transport.compressSuffix')}`
 })
 
 const summaryText = computed(() => {
@@ -181,7 +188,9 @@ const summaryText = computed(() => {
   const tunnel = getTunnelTypeLabel(
       multiplexOnly.value ? TunnelType.MULTIPLEX : Number(form.tunnelType)
   )
-  const enc = (requiresTlsProtocol.value ? true : form.encrypt) ? 'TLS 加密' : '明文传输'
+  const enc = (requiresTlsProtocol.value ? true : form.encrypt)
+      ? t('orbien.plugin.transport.tlsEncrypt')
+      : t('orbien.plugin.transport.plainText')
   return `${protocol} · ${tunnel} · ${enc} · ${compressSummary.value}`
 })
 
@@ -232,7 +241,7 @@ const handleSave = async () => {
       compress: form.compress,
       compressAlgorithm: form.compress ? form.compressAlgorithm : undefined
     })
-    ElMessage.success('传输配置已保存')
+    ElMessage.success(t('orbien.plugin.transport.saved'))
     await loadData()
   } finally {
     saving.value = false

@@ -2,12 +2,12 @@
   <div class="health-check-page" v-loading="loading">
     <section class="setting-section">
       <div class="section-header">
-        <h3 class="section-title">基本配置</h3>
-        <p class="section-desc">开启后将定期检测内网服务可用性，异常节点会被负载均衡自动剔除</p>
+        <h3 class="section-title">{{ t('orbien.plugin.basic.title') }}</h3>
+        <p class="section-desc">{{ t('orbien.plugin.health.desc') }}</p>
       </div>
       <div class="setting-item">
         <div class="setting-meta">
-          <span class="setting-name">启用状态</span>
+          <span class="setting-name">{{ t('orbien.plugin.basic.enabled') }}</span>
         </div>
         <ElSwitch v-model="form.enabled" @change="handleEnableChange" />
       </div>
@@ -17,8 +17,8 @@
       <div class="setting-list">
         <div class="setting-item">
           <div class="setting-meta">
-            <span class="setting-name">检查类型</span>
-            <span class="setting-hint">TCP 为端口连通性检查，HTTP 为路径请求检查</span>
+            <span class="setting-name">{{ t('orbien.plugin.health.checkType') }}</span>
+            <span class="setting-hint">{{ t('orbien.plugin.health.checkTypeHint') }}</span>
           </div>
           <ElRadioGroup v-model="form.type">
             <ElRadio :value="HealthCheckType.TCP">TCP</ElRadio>
@@ -26,7 +26,7 @@
           </ElRadioGroup>
         </div>
 
-        <div v-for="field in NUMBER_FIELDS" :key="field.key" class="setting-item">
+        <div v-for="field in numberFields" :key="field.key" class="setting-item">
           <div class="setting-meta">
             <span class="setting-name">{{ field.label }}</span>
             <span class="setting-hint">{{ field.hint }}</span>
@@ -45,8 +45,8 @@
 
         <div v-if="form.type === HealthCheckType.HTTP" class="setting-item">
           <div class="setting-meta">
-            <span class="setting-name">检查路径</span>
-            <span class="setting-hint">HTTP 健康检查请求的 URL 路径</span>
+            <span class="setting-name">{{ t('orbien.plugin.health.checkPath') }}</span>
+            <span class="setting-hint">{{ t('orbien.plugin.health.checkPathHint') }}</span>
           </div>
           <ElInput v-model="form.path" placeholder="/health" class="path-input" />
         </div>
@@ -54,13 +54,14 @@
     </section>
 
     <div class="form-actions">
-      <ElButton type="primary" :loading="saving" @click="handleSave">保存配置</ElButton>
+      <ElButton type="primary" :loading="saving" @click="handleSave">{{ t('orbien.plugin.basic.saveConfig') }}</ElButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, watch } from 'vue'
+  import { ref, reactive, watch, computed } from 'vue'
+  import { useI18n } from 'vue-i18n'
   import { ElMessage } from 'element-plus'
   import {
     fetchGetHealthCheck,
@@ -72,28 +73,30 @@
 
   defineOptions({ name: 'HealthCheckPage' })
 
-  const NUMBER_FIELDS = [
-    {
-      key: 'interval',
-      label: '检查间隔',
-      hint: '两次健康检查之间的等待时间',
-      unit: '秒'
-    },
-    {
-      key: 'timeout',
-      label: '超时时间',
-      hint: '单次检查允许的最长等待时间',
-      unit: '秒'
-    },
-    {
-      key: 'maxFailed',
-      label: '最大失败次数',
-      hint: '连续失败达到该次数后标记节点不可用',
-      unit: '次'
-    }
-  ] as const
+  const { t } = useI18n()
 
-  type NumberFieldKey = (typeof NUMBER_FIELDS)[number]['key']
+  type NumberFieldKey = 'interval' | 'timeout' | 'maxFailed'
+
+  const numberFields = computed(() => [
+    {
+      key: 'interval' as NumberFieldKey,
+      label: t('orbien.plugin.health.interval'),
+      hint: t('orbien.plugin.health.intervalHint'),
+      unit: t('orbien.plugin.health.unitSecond')
+    },
+    {
+      key: 'timeout' as NumberFieldKey,
+      label: t('orbien.plugin.health.timeout'),
+      hint: t('orbien.plugin.health.timeoutHint'),
+      unit: t('orbien.plugin.health.unitSecond')
+    },
+    {
+      key: 'maxFailed' as NumberFieldKey,
+      label: t('orbien.plugin.health.maxFailed'),
+      hint: t('orbien.plugin.health.maxFailedHint'),
+      unit: t('orbien.plugin.health.unitTimes')
+    }
+  ])
 
   const props = defineProps<{
     proxyId: string
@@ -162,7 +165,7 @@
 
   const handleSave = async () => {
     if (form.type === HealthCheckType.HTTP && !form.path.trim()) {
-      ElMessage.warning('请输入 HTTP 健康检查路径')
+      ElMessage.warning(t('orbien.plugin.health.pathRequired'))
       return
     }
 
