@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ORBIEN_VERSION="0.24.0"
+ORBIEN_VERSION="0.25.0"
 ORBIEN_IMAGE="lxien/orbien:${ORBIEN_VERSION}"
 
 if ! command -v docker >/dev/null 2>&1; then
