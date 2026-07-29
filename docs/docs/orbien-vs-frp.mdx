@@ -1,0 +1,45 @@
+---
+sidebar_position: 13
+title: Orbien vs frp
+description: Orbien vs frp
+---
+
+下面对比**orbien**和**frp**的差别，实际以官方具体为准，仅供参考。
+
+| 类别 | 对比项                                | [Orbien 0.24.0](https://github.com/lxien/orbien)           | [frp 0.70.1](https://github.com/fatedier/frp) |
+|----|------------------------------------|-------------------------|------------|
+| 基础 | 开源协议                               | Apache-2.0              | Apache-2.0 |
+| 基础 | 实现语言                               | Java/Rust               | Go         |
+| 代理 | TCP / UDP / HTTP / HTTPS           | ✅                       | ✅          |
+| 传输 | TCP                                | ✅                       | ✅          |
+| 传输 | QUIC                               | ✅                       | ✅          |
+| 传输 | WebSocket                          | ✅                       | ✅          |
+| 传输 | 多路复用 / 连接池                         | ✅                       | ✅          |
+| 传输 | 压缩算法                               | ✅ Snappy / LZ4 / Zstd   | ✅ Snappy   |
+| 安全 | Token                              | ✅                       | ✅          |
+| 安全 | TLS / mTLS                         | ✅                       | ✅          |
+| 安全 | BasicAuth                          | ✅                       | ✅          |
+| 网络 | 域名 / 子域名                           | ✅                       | ✅          |
+| 网络 | Header 重写 / 真实 IP / PROXY protocol | ✅                       | ✅          |
+| 可靠 | 负载均衡 + 健康检查                        | ✅ 轮询 / 加权轮询 / 随机 / 最少连接 | ✅ 组内随机     |
+| 运维 | 现代化可观测管理面板                         | ✅                       | ❌          |
+| 代理 | SOCKS5                             | ✅                       | ⚠️ 插件      |
+| 代理 | 内置轻量文件共享面板                         | ✅                       | ❌          |
+| 安全 | IP CIDR ACL                        | ✅                       | ❌          |
+| 安全 | 时间 ACL                             | ✅                       | ❌          |
+| 网络 | URL path 路由                        | ❌                       | ✅          |
+| 运维 | ACME域名证书全流程管理                      | ✅                       | ❌          |
+| 运维 | 服务端集中配置+客户端推送                      | ✅                       | ❌          |
+| 代理 | STCP / SUDP / XTCP(P2P)            | ❌                       | ✅          |
+| 代理 | TCPMUX / SSH Gateway               | ❌                       | ✅          |
+| 传输 | KCP                                | ❌                       | ✅          |
+| 安全 | OIDC 隧道鉴权                          | ❌                       | ✅          |
+| 开发 | HTTP(S)请求抓包                        | ✅                       | ❌          |
+| 开发 | HTTP(S)请求重放                        | ✅                       | ❌          |
+| 开发 | Spring Boot Starter                | ✅                       | ❌          |
+
+:::tip
+- 对比基于 `Orbien 0.24.0` 与 `frp 0.70.0`，能力随版本会变，细节以双方官方文档为准；上表只谈功能差异，不代表**性能**或**优劣**。
+- 两者都能做内网穿透，只是侧重点不同——frp 更轻、更成熟，生态和场景覆盖更广；**Orbien** 在穿透之上多做了一些可视化运维和开发联调能力。
+:::
+
