@@ -19,7 +19,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class AgentCleanupJobHandler implements ScheduledJobHandler {
-
     private final AgentRepository agentRepository;
     private final ProxyRepository proxyRepository;
     private final AgentService agentService;

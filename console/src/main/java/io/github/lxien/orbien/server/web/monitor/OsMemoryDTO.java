@@ -18,9 +18,21 @@ package io.github.lxien.orbien.server.web.monitor;
 
 import lombok.Data;
 
+/**
+ * 操作系统物理内存监控信息
+ */
 @Data
 public class OsMemoryDTO {
+    /**
+     * 物理内存总量
+     */
     private String total;
+    /**
+     * 已使用物理内存
+     */
     private String used;
+    /**
+     * 物理内存使用率（百分比）
+     */
     private Object usage;
 }

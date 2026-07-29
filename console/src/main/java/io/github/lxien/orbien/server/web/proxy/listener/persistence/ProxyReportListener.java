@@ -52,7 +52,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 代理配置创建事件处理，用于持久化客户端上报的代理配置。
+ * 代理配置创建事件处理，用于持久化客户端上报的代理配置
  */
 @Component
 public class ProxyReportListener implements EventListener<ProxyAddEvent> {

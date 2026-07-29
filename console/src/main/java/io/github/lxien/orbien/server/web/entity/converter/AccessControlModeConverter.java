@@ -17,17 +17,8 @@ package io.github.lxien.orbien.server.web.entity.converter;
 import io.github.lxien.orbien.core.enums.AccessControl;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-/**
- * 访问控制模式转换器
- */
 @Converter
 public class AccessControlModeConverter implements AttributeConverter<AccessControl, Integer> {
-    /**
-     * 将访问控制模式转换为数据库列值
-     * 
-     * @param accessControlMode 访问控制模式
-     * @return 数据库列值
-     */
     @Override
     public Integer convertToDatabaseColumn(AccessControl accessControlMode) {
         if (accessControlMode == null) {
@@ -35,12 +26,6 @@ public class AccessControlModeConverter implements AttributeConverter<AccessCont
         }
         return accessControlMode.getCode();
     }
-    /**
-     * 将数据库列值转换为访问控制模式
-     * 
-     * @param code 数据库列值
-     * @return 访问控制模式
-     */
     @Override
     public AccessControl convertToEntityAttribute(Integer code) {
         if (code == null) {

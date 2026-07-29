@@ -18,9 +18,21 @@ package io.github.lxien.orbien.server.web.monitor;
 
 import lombok.Data;
 
+/**
+ * CPU监控信息
+ */
 @Data
 public class CpuDTO {
+    /**
+     * CPU核心数
+     */
     private int total;
+    /**
+     * CPU使用率
+     */
     private Object used;
+    /**
+     * CPU使用率（百分比）
+     */
     private Object usage;
 }

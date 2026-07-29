@@ -18,10 +18,25 @@ package io.github.lxien.orbien.server.web.monitor;
 
 import lombok.Data;
 
+/**
+ * 服务端监控信息
+ */
 @Data
 public class ServerDTO {
+    /**
+     * CPU信息
+     */
     private CpuDTO cpu;
+    /**
+     * JVM堆内存信息
+     */
     private JvmMemoryDTO jvmMem;
+    /**
+     * 操作系统物理内存信息
+     */
     private OsMemoryDTO osMem;
+    /**
+     * 直接内存信息
+     */
     private DirectMemoryDTO directMem;
 }

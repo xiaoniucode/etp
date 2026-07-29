@@ -19,7 +19,9 @@ public class HttpProxyUpdateParam {
     @EnumValue(enumClass = DomainType.class)
     private Integer domainType;
     private List<String> customDomains;
-    /** 子域名绑定，每行一条：前缀 + 根域名 */
+    /**
+     * 子域名绑定：前缀 + 根域名
+     */
     private List<SubdomainBindingParam> subdomainBindings;
     @NotEmpty(message = "内网主机不能为空")
     private String localHost;

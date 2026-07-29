@@ -18,10 +18,6 @@ package io.github.lxien.orbien.server.web.entity.converter;
 import io.github.lxien.orbien.server.web.enums.TlsCertStatus;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-
-/**
- * TLS 证书状态转换器
- */
 @Converter
 public class TlsCertStatusConverter implements AttributeConverter<TlsCertStatus, Integer> {
     @Override

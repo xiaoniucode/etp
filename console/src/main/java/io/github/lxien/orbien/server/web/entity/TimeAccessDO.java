@@ -26,28 +26,41 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 时间访问控制
+ */
 @Data
 @Entity
 @Table(name = "time_access")
 @NoArgsConstructor
 public class TimeAccessDO {
+    /**
+     * 代理ID
+     */
     @Id
     @Column(name = "proxy_id", length = 64)
     private String proxyId;
-
+    /**
+     * 是否启用
+     */
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
-
+    /**
+     * 访问控制模式
+     */
     @Convert(converter = AccessControlModeConverter.class)
     @Column(name = "mode", nullable = false)
     private AccessControl mode;
-
+    /**
+     * 是否启用时间限制
+     */
     @Column(name = "time_enabled", nullable = false)
     private Boolean timeEnabled;
-
+    /**
+     * 时区
+     */
     @Column(name = "timezone", nullable = false, length = 64)
     private String timezone;
-
     /**
      * 星期位图：bit0=周一 ... bit6=周日
      */

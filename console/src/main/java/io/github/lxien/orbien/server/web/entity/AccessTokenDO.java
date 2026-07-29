@@ -23,7 +23,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 /**
- * 访问令牌实体类
+ * 访问令牌
  */
 @Data
 @Entity

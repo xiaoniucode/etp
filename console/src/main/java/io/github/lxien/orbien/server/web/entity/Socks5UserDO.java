@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * SOCKS5认证用户
+ */
 @Data
 @Entity
 @Table(name = "socks5_user",
@@ -11,16 +14,25 @@ import lombok.NoArgsConstructor;
         indexes = @Index(name = "idx_socks5_username", columnList = "username"))
 @NoArgsConstructor
 public class Socks5UserDO {
+    /**
+     * 主键ID
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    /**
+     * 代理ID
+     */
     @Column(name = "proxy_id")
     private String proxyId;
-
+    /**
+     * 用户名
+     */
     @Column(name = "username")
     private String username;
-
+    /**
+     * 密码
+     */
     @Column(name = "password")
     private String password;
 

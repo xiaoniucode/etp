@@ -19,9 +19,6 @@ import io.github.lxien.orbien.core.enums.TransportProtocol;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-/**
- * 传输协议类型转换器
- */
 @Converter
 public class TransportProtocolConverter implements AttributeConverter<TransportProtocol, Integer> {
 

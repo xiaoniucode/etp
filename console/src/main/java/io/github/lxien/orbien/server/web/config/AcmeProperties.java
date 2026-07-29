@@ -20,7 +20,7 @@ public class AcmeProperties {
     public static final String LETSENCRYPT_STAGING_DIRECTORY = "https://acme-staging-v02.api.letsencrypt.org/directory";
 
     /**
-     * 未显式配置 directory-url 时，将根据该值选择默认 ACME 目录地址。
+     * 未显式配置 directory-url 时，将根据该值选择默认 ACME 目录地址
      */
     private Environment environment = Environment.STAGING;
 
@@ -71,7 +71,7 @@ public class AcmeProperties {
     }
 
     /**
-     * 将 acme:// 快捷 URI 转为 https 目录 URL，避免依赖 SPI 加载 CA Provider。
+     * 将 acme:// 快捷 URI 转为 https 目录 URL，避免依赖 SPI 加载 CA Provider
      */
     static String normalizeDirectoryUrl(String url) {
         if ("acme://letsencrypt.org".equals(url)

@@ -25,6 +25,9 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 时间访问控制时间窗
+ */
 @Data
 @Entity
 @Table(name = "time_access_window",
@@ -33,16 +36,25 @@ import lombok.NoArgsConstructor;
         })
 @NoArgsConstructor
 public class TimeAccessWindowDO {
+    /**
+     * 主键ID
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    /**
+     * 代理ID
+     */
     @Column(name = "proxy_id", nullable = false, length = 64)
     private String proxyId;
-
+    /**
+     * 开始时间
+     */
     @Column(name = "start_time", nullable = false, length = 8)
     private String startTime;
-
+    /**
+     * 结束时间
+     */
     @Column(name = "end_time", nullable = false, length = 8)
     private String endTime;
 }

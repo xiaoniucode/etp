@@ -19,6 +19,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * HTTP Basic认证用户
+ */
 @Data
 @Entity
 @Table(name = "basic_user",

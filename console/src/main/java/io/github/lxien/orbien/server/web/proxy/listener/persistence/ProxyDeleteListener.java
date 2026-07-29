@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 代理删除事件处理，清理数据库中的代理及其关联配置。
+ * 代理删除事件处理，清理数据库中的代理及其关联配置
  */
 @Component
 public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {

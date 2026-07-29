@@ -18,10 +18,9 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
- * SSL 证书解析器，用于从 PEM 格式的证书链中提取关键信息。
+ * SSL 证书解析器，用于从 PEM 格式的证书链中提取关键信息
  *
- * <p>支持解析证书链并自动识别叶证书，提取通用名称、DNS SAN、颁发者信息、
- * 有效期及 SHA-256 指纹等属性。
+ * <p>支持解析证书链并自动识别叶证书，提取通用名称、DNS SAN、颁发者信息、有效期及 SHA-256 指纹等属性
  *
  * @author lxien
  * @since 1.0
@@ -37,7 +36,7 @@ public class TlsCertParser {
     }
 
     /**
-     * SSL 证书信息实体类。
+     * SSL 证书信息实体类
      */
     @Data
     public static class TlsCertInfo {
@@ -88,7 +87,7 @@ public class TlsCertParser {
     }
 
     /**
-     * 解析 PEM 格式的证书链，提取 SSL 证书信息。
+     * 解析 PEM 格式的证书链，提取 SSL 证书信息
      *
      * @param fullChain PEM 格式的完整证书链
      * @return SSL 证书信息对象
@@ -140,7 +139,7 @@ public class TlsCertParser {
     }
 
     /**
-     * 从证书链中选择叶证书（终端实体证书）。
+     * 从证书链中选择叶证书（终端实体证书）
      * <p>选择策略：
      * <ol>
      *   <li>优先选择未被其他证书签发的证书</li>
@@ -154,7 +153,7 @@ public class TlsCertParser {
      * @return 叶证书，若无法确定则返回 null
      */
     private static X509Certificate selectLeafStrictWithFallback(List<X509Certificate> certs, TlsCertInfo info) {
-        // 第一阶段：找出未被其他证书签发的候选证书
+        // 1.找出未被其他证书签发的候选证书
         List<X509Certificate> candidates = new ArrayList<>();
         for (X509Certificate c : certs) {
             boolean isIssuer = false;
@@ -171,7 +170,7 @@ public class TlsCertParser {
         }
         if (candidates.size() == 1) return candidates.getFirst();
 
-        // 第二阶段：基于 BasicConstraints 筛选终端实体证书
+        // 2.基于 BasicConstraints 筛选终端实体证书
         List<X509Certificate> endEntities = new ArrayList<>();
         for (X509Certificate c : candidates.isEmpty() ? certs : candidates) {
             try {
@@ -181,12 +180,12 @@ public class TlsCertParser {
         }
         if (endEntities.size() == 1) return endEntities.getFirst();
 
-        // 第三阶段：选择 DNS SAN 数量最多的证书
+        // 3.选择 DNS SAN 数量最多的证书
         List<X509Certificate> pool = endEntities.isEmpty() ? (candidates.isEmpty() ? certs : candidates) : endEntities;
         X509Certificate best = getX509Certificate(pool);
         if (best != null) return best;
 
-        // 第四阶段：选择最早到期的证书
+        // 4.选择最早到期的证书
         X509Certificate earliest = null;
         Date earliestDate = null;
         for (X509Certificate c : pool) {
@@ -202,7 +201,7 @@ public class TlsCertParser {
         return earliest;
     }
 
-    private static  X509Certificate getX509Certificate(List<X509Certificate> pool) {
+    private static X509Certificate getX509Certificate(List<X509Certificate> pool) {
         X509Certificate best = null;
         int bestSan = -1;
         for (X509Certificate c : pool) {
@@ -223,7 +222,7 @@ public class TlsCertParser {
     }
 
     /**
-     * 安全编码主体信息，避免空指针异常。
+     * 安全编码主体信息，避免空指针异常
      *
      * @param enc 原始编码字节数组
      * @return 编码字节数组，若输入为 null 则返回空数组
@@ -233,7 +232,7 @@ public class TlsCertParser {
     }
 
     /**
-     * 从证书中提取信息并填充到 TlsCertInfo 对象。
+     * 从证书中提取信息并填充到 TlsCertInfo 对象
      *
      * @param c    X.509 证书
      * @param info 用于存放提取结果的对象
@@ -283,7 +282,7 @@ public class TlsCertParser {
     }
 
     /**
-     * 将字节数组转换为十六进制字符串。
+     * 将字节数组转换为十六进制字符串
      *
      * @param b 字节数组
      * @return 十六进制字符串

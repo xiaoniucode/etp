@@ -1,5 +1,6 @@
 package io.github.lxien.orbien.server.web.service.support;
 
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
 import io.github.lxien.orbien.server.web.dto.transport.TransportCompressConstraints;
 
@@ -8,7 +9,7 @@ import java.util.List;
 public final class TransportCompressConstraintSupport {
 
     private static final List<String> ALLOWED_ALGORITHMS = List.of("snappy", "lz4", "zstd");
-    private static final String DEFAULT_ALGORITHM = "snappy";
+    private static final CompressionType DEFAULT_ALGORITHM = CompressionType.DEFAULT;
 
     private TransportCompressConstraintSupport() {
     }
@@ -34,34 +35,40 @@ public final class TransportCompressConstraintSupport {
         }
     }
 
-    public static String resolveStoredAlgorithm(Boolean compress, String compressAlgorithm) {
+    /**
+     * 表单回显用的算法值：关闭压缩时仍返回默认算法
+     */
+    public static String resolveStoredAlgorithm(Boolean compress, CompressionType compressAlgorithm) {
         if (!Boolean.TRUE.equals(compress)) {
-            return DEFAULT_ALGORITHM;
+            return DEFAULT_ALGORITHM.toConfigValue();
         }
-        if (compressAlgorithm == null || compressAlgorithm.isBlank()) {
-            return DEFAULT_ALGORITHM;
+        if (compressAlgorithm == null || !compressAlgorithm.isCompressed()) {
+            return DEFAULT_ALGORITHM.toConfigValue();
         }
-        return compressAlgorithm.trim().toLowerCase();
+        return compressAlgorithm.toConfigValue();
     }
 
-    public static String resolveEffectiveAlgorithm(Boolean compress, String compressAlgorithm) {
+    /**
+     * 实际生效的算法值：关闭压缩时为 none
+     */
+    public static String resolveEffectiveAlgorithm(Boolean compress, CompressionType compressAlgorithm) {
         if (!Boolean.TRUE.equals(compress)) {
-            return "none";
+            return CompressionType.NONE.toConfigValue();
         }
         return resolveStoredAlgorithm(true, compressAlgorithm);
     }
 
     public static String normalizeAlgorithm(String compressAlgorithm) {
         if (compressAlgorithm == null || compressAlgorithm.isBlank()) {
-            return DEFAULT_ALGORITHM;
+            return DEFAULT_ALGORITHM.toConfigValue();
         }
         return compressAlgorithm.trim().toLowerCase();
     }
 
-    public static String toStorageValue(Boolean compress, String compressAlgorithm) {
+    public static CompressionType toStorageValue(Boolean compress, String compressAlgorithm) {
         if (!Boolean.TRUE.equals(compress)) {
-            return "none";
+            return CompressionType.NONE;
         }
-        return normalizeAlgorithm(compressAlgorithm);
+        return CompressionType.of(normalizeAlgorithm(compressAlgorithm));
     }
 }

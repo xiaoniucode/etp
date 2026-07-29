@@ -21,7 +21,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 /**
- * 访问控制规则实体类
+ * 访问控制规则
  */
 @Data
 @Entity
@@ -40,11 +40,11 @@ public class AccessControlRuleDO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     /**
-     * 访问控制ID
+     * 代理ID
      */
     private String proxyId;
     /**
-     * CIDR 地址段
+     * CIDR地址段
      */
     private String cidr;
     /**

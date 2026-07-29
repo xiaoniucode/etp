@@ -23,7 +23,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 基础认证实体类
+ * HTTP Basic认证开关
  */
 @Data
 @Entity

@@ -35,9 +35,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-    /**
-     * 将代理运行时配置推送给在线客户端。
-     */
+/**
+ * 将代理运行时配置推送给在线客户端
+ */
 @Service
 public class ProxyRuntimeSyncService {
     private final Logger logger = LoggerFactory.getLogger(ProxyRuntimeSyncService.class);

@@ -35,9 +35,7 @@ import io.github.lxien.orbien.server.web.param.bandwidth.BandwidthSaveParam;
 import java.util.Collection;
 
 public interface ProxyService {
-    /**
-     * 创建 TCP 代理
-     */
+
     void createTcpProxy(TcpProxyCreateParam param);
 
     void createSocks5Proxy(Socks5ProxyCreateParam param);
@@ -46,19 +44,10 @@ public interface ProxyService {
 
     void createUdpProxy(UdpProxyCreateParam param);
 
-    /**
-     * 创建 HTTP 代理
-     */
     void createHttpProxy(HttpProxyCreateParam param);
 
-    /**
-     * 创建 HTTPS 代理
-     */
     void createHttpsProxy(HttpsProxyCreateParam param);
 
-    /**
-     * 更新 TCP 代理
-     */
     void updateTcpProxy(TcpProxyUpdateParam param);
 
     void updateUdpProxy(UdpProxyUpdateParam param);
@@ -67,19 +56,10 @@ public interface ProxyService {
 
     void updateFileShare(FileShareUpdateParam param);
 
-    /**
-     * 更新 HTTP 代理
-     */
     void updateHttpProxy(HttpProxyUpdateParam param);
 
-    /**
-     * 更新 HTTPS 代理
-     */
     void updateHttpsProxy(HttpsProxyUpdateParam param);
 
-    /**
-     * 根据 ID 查询tcp代理
-     */
     TcpProxyDetailDTO getTcpProxyById(String id);
 
     UdpProxyDetailDTO getUdpProxyById(String id);
@@ -94,9 +74,6 @@ public interface ProxyService {
 
     void batchDeleteProxies(ProxyBatchDeleteParam param);
 
-    /**
-     * 删除指定客户端下的全部代理
-     */
     void deleteByAgentIds(Collection<String> agentIds);
 
     void setProxyStatus(String id, Integer status);

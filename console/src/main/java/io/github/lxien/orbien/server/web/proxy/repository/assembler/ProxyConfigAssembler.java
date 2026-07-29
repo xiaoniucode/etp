@@ -37,9 +37,6 @@ public class ProxyConfigAssembler {
     @Autowired
     private ProxyModelConvert proxyModelConvert;
 
-    /**
-     * 组装完整的代理扩展配置。
-     */
     public ProxyConfigExt assembleExt(ProxyDetailQueryResult detail, ProxyRelations relations) {
         if (detail == null || detail.getProxyDO() == null) {
             return null;
@@ -170,7 +167,8 @@ public class ProxyConfigAssembler {
         if (!Boolean.TRUE.equals(proxyDO.getCompress())) {
             return CompressionType.NONE;
         }
-        return CompressionType.of(proxyDO.getCompressAlgorithm());
+        CompressionType algorithm = proxyDO.getCompressAlgorithm();
+        return algorithm != null && algorithm.isCompressed() ? algorithm : CompressionType.DEFAULT;
     }
 
     public void assembleTargets(ProxyConfig config, List<ProxyTargetDO> targets) {

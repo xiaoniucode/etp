@@ -30,6 +30,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * TLS证书
+ */
 @Data
 @Entity
 @Table(name = "ssl_cert", indexes = {
@@ -41,21 +44,18 @@ public class TlsCertDO {
      */
     @Id
     private String id;
-
     /**
      * 证书颁发者
      */
     @Column(name = "issuer")
     private String issuer;
-
     /**
      * 证书组织
      */
     @Column(name = "org")
     private String org;
-
     /**
-     * SAN域名，可能多个
+     * SAN域名，可多个
      */
     @Column(name = "san_domains")
     private String sanDomains;
@@ -65,60 +65,58 @@ public class TlsCertDO {
     @Column(name = "cert_source")
     @Convert(converter = CertSourceConverter.class)
     private CertSource source;
-
     /**
      * 证书状态
      */
     @Column(name = "status")
     @Convert(converter = TlsCertStatusConverter.class)
     private TlsCertStatus status;
-
     /**
      * 生效时间
      */
     @Column(name = "not_before")
     private LocalDate notBefore;
-
     /**
      * 过期时间
      */
     @Column(name = "not_after")
     private LocalDate notAfter;
-
+    /**
+     * 是否自动续期
+     */
     @Column(name = "auto_renew")
     private Boolean autoRenew = false;
-
+    /**
+     * 最近续期时间
+     */
     @Column(name = "last_renew_at")
     private LocalDateTime lastRenewAt;
-
+    /**
+     * 续期订单ID
+     */
     @Column(name = "renew_order_id")
     private Long renewOrderId;
-
     /**
-     * 指纹
+     * 证书指纹
      */
     @Column(name = "fingerprint")
     private String fingerprint;
-
     /**
      * 私钥路径
      */
     @Column(name = "key_path")
     private String keyPath;
-
     /**
-     * 证书路径
+     * 完整证书链路径
      */
     @Column(name = "full_chain_path")
     private String fullChainPath;
-
     /**
      * 创建时间
      */
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
-
     /**
      * 更新时间
      */

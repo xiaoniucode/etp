@@ -24,13 +24,15 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-
+/**
+ * 客户端Agent
+ */
 @Data
 @Entity
 @Table(name = "agent")
 public class AgentDO {
     /**
-     * agentId 唯一标识
+     * Agent唯一标识
      */
     @Id
     @Column(name = "id", nullable = false)
@@ -41,7 +43,7 @@ public class AgentDO {
     @Column(name = "name", nullable = false)
     private String name;
     /**
-     * 最后登陆令牌
+     * 最近登录令牌
      */
     @Column(name = "token", nullable = false)
     private String token;
@@ -67,11 +69,13 @@ public class AgentDO {
     @Column(name = "version", nullable = false)
     private String version;
     /**
-     * 来源 IP
+     * 来源IP
      */
     @Column(name = "source_ip")
     private String sourceIp;
-
+    /**
+     * 最近活跃时间
+     */
     @Column(name = "last_active_time",nullable = false)
     private LocalDateTime lastActiveTime;
     /**

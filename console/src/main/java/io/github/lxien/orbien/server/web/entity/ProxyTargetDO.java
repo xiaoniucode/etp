@@ -19,7 +19,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 /**
- * 代理目标实体类
+ * 代理目标
  */
 @Data
 @Entity

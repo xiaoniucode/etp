@@ -24,10 +24,49 @@ import io.github.lxien.orbien.server.web.entity.converter.HealthCheckConverter;
 import jakarta.persistence.*;
 import lombok.Data;
 
+/**
+ * 代理健康检查配置
+ */
 @Data
 @Entity
 @Table(name = "health_check")
 public class HealthCheckDO {
+    /**
+     * 代理ID
+     */
+    @Id
+    private String proxyId;
+    /**
+     * 检查类型
+     */
+    @Convert(converter = HealthCheckConverter.class)
+    @Column(name = "type", nullable = false)
+    private HealthCheckType type;
+    /**
+     * 检查间隔（秒）
+     */
+    @Column(name = "interval_sec", nullable = false)
+    private Integer interval;
+    /**
+     * 超时时间（秒）
+     */
+    @Column(name = "timeout_sec", nullable = false)
+    private Integer timeout;
+    /**
+     * 最大失败次数
+     */
+    @Column(name = "max_failed", nullable = false)
+    private Integer maxFailed;
+    /**
+     * 检查路径
+     */
+    @Column(name = "path", nullable = false)
+    private String path;
+    /**
+     * 是否启用
+     */
+    @Column(name = "enabled", nullable = false)
+    private Boolean enabled;
 
     public static HealthCheckDO createDefault(String proxyId, HealthCheckType type) {
         HealthCheckDO healthCheckDO = new HealthCheckDO();
@@ -40,25 +79,4 @@ public class HealthCheckDO {
         healthCheckDO.setPath(type.isHttpCheck() ? HealthCheckConfig.DEFAULT_PATH : "/");
         return healthCheckDO;
     }
-    @Id
-    private String proxyId;
-
-    @Convert(converter = HealthCheckConverter.class)
-    @Column(name = "type", nullable = false)
-    private HealthCheckType type;
-
-    @Column(name = "interval_sec", nullable = false)
-    private Integer interval;
-
-    @Column(name = "timeout_sec", nullable = false)
-    private Integer timeout;
-
-    @Column(name = "max_failed", nullable = false)
-    private Integer maxFailed;
-
-    @Column(name = "path",nullable = false)
-    private String path;
-
-    @Column(name = "enabled", nullable = false)
-    private Boolean enabled;
 }

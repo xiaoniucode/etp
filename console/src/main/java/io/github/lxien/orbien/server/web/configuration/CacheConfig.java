@@ -23,10 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties({
-        CaffeineCacheProperties.class,
-        RedisCacheProperties.class
-})
+@EnableConfigurationProperties({CaffeineCacheProperties.class})
 public class CacheConfig {
 
     /**

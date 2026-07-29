@@ -23,16 +23,24 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 请求头改写开关
+ */
 @Data
 @Entity
 @Table(name = "header_rewrite")
 @NoArgsConstructor
 @AllArgsConstructor
 public class HeaderRewriteDO {
+    /**
+     * 代理ID
+     */
     @Id
     @Column(name = "proxy_id")
     private String proxyId;
-
+    /**
+     * 是否启用
+     */
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
 }

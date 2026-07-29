@@ -25,9 +25,13 @@ import lombok.Getter;
  */
 @Getter
 public enum TlsCertStatus {
-    /** TLS 证书已激活 */
+    /**
+     * TLS 证书已激活
+     */
     ACTIVE(1, "已激活"),
-    /** TLS 证书已过期 */
+    /**
+     * TLS 证书已过期
+     */
     EXPIRED(2, "已过期");
 
     private final Integer code;

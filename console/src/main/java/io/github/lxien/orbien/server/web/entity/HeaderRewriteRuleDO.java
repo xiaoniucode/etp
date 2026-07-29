@@ -23,6 +23,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 请求头改写规则
+ */
 @Data
 @Entity
 @Table(name = "header_rewrite_rule",
@@ -31,24 +34,37 @@ import lombok.NoArgsConstructor;
         })
 @NoArgsConstructor
 public class HeaderRewriteRuleDO {
+    /**
+     * 主键ID
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    /**
+     * 代理ID
+     */
     @Column(name = "proxy_id", nullable = false)
     private String proxyId;
-
+    /**
+     * 改写方向
+     */
     @Convert(converter = HeaderDirectionConverter.class)
     @Column(name = "direction", nullable = false)
     private HeaderDirection direction;
-
+    /**
+     * 改写动作
+     */
     @Convert(converter = HeaderActionConverter.class)
     @Column(name = "action", nullable = false)
     private HeaderAction action;
-
+    /**
+     * 请求头名称
+     */
     @Column(name = "name", nullable = false, length = 256)
     private String name;
-
+    /**
+     * 请求头值
+     */
     @Column(name = "header_value", length = 1024)
     private String value;
 }

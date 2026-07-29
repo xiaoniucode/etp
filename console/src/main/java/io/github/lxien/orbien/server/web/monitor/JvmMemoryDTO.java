@@ -18,9 +18,21 @@ package io.github.lxien.orbien.server.web.monitor;
 
 import lombok.Data;
 
+/**
+ * JVM堆内存监控信息
+ */
 @Data
 public class JvmMemoryDTO {
+    /**
+     * 堆内存总量
+     */
     private String total;
+    /**
+     * 已使用堆内存
+     */
     private String used;
+    /**
+     * 堆内存使用率（百分比）
+     */
     private Object usage;
 }

@@ -8,16 +8,24 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 文件共享认证开关
+ */
 @Data
 @Entity
 @Table(name = "file_share_auth")
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileShareAuthDO {
+    /**
+     * 代理ID
+     */
     @Id
     @Column(name = "proxy_id")
     private String proxyId;
-
+    /**
+     * 是否启用
+     */
     @Column(name = "enabled")
     private Boolean enabled;
 }

@@ -8,7 +8,7 @@ import io.github.lxien.orbien.server.web.dto.transport.TransportEncryptConstrain
 import java.util.List;
 
 /**
- * 管理面板：传输加密字段的可编辑性约束。
+ * 管理面板：传输加密字段的可编辑性约束
  */
 public final class TransportEncryptConstraintSupport {
 
@@ -40,10 +40,6 @@ public final class TransportEncryptConstraintSupport {
         constraints.setEncryptLocked(false);
         constraints.setAllowedEncryptValues(List.of(true, false));
         return constraints;
-    }
-
-    public static boolean resolveStoredEncrypt(Boolean storedEncrypt) {
-        return storedEncrypt == null || storedEncrypt;
     }
 
     public static boolean resolveEffectiveEncrypt(TransportProtocol dataProtocol,

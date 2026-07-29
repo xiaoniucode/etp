@@ -30,8 +30,6 @@ public interface ProxyTargetRepository extends JpaRepository<ProxyTargetDO, Inte
 
     List<ProxyTargetDO> findByProxyId(String id);
 
-    Optional<ProxyTargetDO> findFirstByProxyIdOrderByIdAsc(String proxyId);
-
     void deleteByProxyIdIn(List<String> ids);
 
     List<ProxyTargetDO> findByProxyIdIn(List<String> proxyIds);

@@ -22,7 +22,7 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 /**
- * 登录令牌实体类
+ * 登录令牌
  */
 @Data
 @Entity

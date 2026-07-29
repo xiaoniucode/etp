@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 计划任务启用/停用辅助类，仅依赖仓储与调度器，供 SSL 续签联动等场景使用，避免与任务执行链循环依赖。
+ * 计划任务启用/停用辅助类，仅依赖仓储与调度器，供 SSL 续签联动等场景使用，避免与任务执行链循环依赖
  */
 @Component
 public class ScheduledJobEnableSupport {

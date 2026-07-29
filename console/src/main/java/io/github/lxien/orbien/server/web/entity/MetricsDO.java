@@ -24,28 +24,47 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
+/**
+ * 代理流量指标
+ */
 @Data
 @Entity
 @Table(name = "metrics")
 public class MetricsDO {
+    /**
+     * 主键ID
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    /**
+     * 代理ID
+     */
     @Column(name = "proxy_id", length = 64, nullable = false)
     private String proxyId;
-
+    /**
+     * 写出字节数
+     */
     @Column(name = "write_bytes")
     private Long writeBytes;
-
+    /**
+     * 写出消息数
+     */
     @Column(name = "write_messages")
     private Long writeMessages;
-
+    /**
+     * 读入字节数
+     */
     @Column(name = "read_bytes")
     private Long readBytes;
-
+    /**
+     * 读入消息数
+     */
     @Column(name = "read_messages")
     private Long readMessages;
-
+    /**
+     * 创建时间
+     */
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;

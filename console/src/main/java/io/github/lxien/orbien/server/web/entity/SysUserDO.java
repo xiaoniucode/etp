@@ -23,7 +23,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 /**
- * 系统用户实体类
+ * 系统用户
  */
 @Data
 @Entity

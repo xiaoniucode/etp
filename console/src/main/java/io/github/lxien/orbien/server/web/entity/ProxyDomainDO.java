@@ -22,7 +22,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 代理域名实体类
+ * 代理域名
  */
 @Data
 @Entity
@@ -41,14 +41,18 @@ public class ProxyDomainDO {
     @Column(name = "proxy_id", nullable = false)
     private String proxyId;
     /**
-     * 原始域名 子域名前缀/自定义域名(完整域名)
+     * 原始域名：子域名前缀或自定义完整域名
      */
     @Column(nullable = false)
     private String domain;
-
+    /**
+     * 根域名
+     */
     @Column(name = "root_domain")
     private String rootDomain;
-
+    /**
+     * 完整域名
+     */
     @Column(name = "full_domain", nullable = false, unique = true)
     private String fullDomain;
     /**

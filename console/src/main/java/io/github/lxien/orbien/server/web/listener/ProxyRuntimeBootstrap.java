@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * 服务启动后将数据库中已启用的代理回填到运行时注册中心（域名、端口等）。
+ * 服务启动后将数据库中已启用的代理回填到运行时注册中心（域名、端口等）
  */
 @Component
 public class ProxyRuntimeBootstrap implements EventListener<TunnelServerBindEvent> {

@@ -28,5 +28,4 @@ public interface CertDomainBindingRepository extends JpaRepository<CertDomainBin
 
     void deleteByProxyDomainIdIn(Collection<Long> proxyDomainIds);
 
-    void deleteByCertIdIn(Collection<String> certIds);
 }

@@ -36,36 +36,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * <p>
- * 处理系统中各类异常，包括业务异常、系统异常、参数校验异常等
- * </p>
+ * 统一处理响应系统中的各种异常
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    /**
-     * 日志记录器
-     */
     private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    /**
-     * 处理业务异常
-     *
-     * @param e 业务异常
-     * @return 错误响应
-     */
     @ExceptionHandler(BizException.class)
     public Ajax handleBusinessException(BizException e) {
         logger.error("业务异常", e);
         return Ajax.error(e.getCode(), e.getMessage());
     }
 
-    /**
-     * 处理系统异常
-     *
-     * @param e 系统异常
-     * @return 错误响应
-     */
     @ExceptionHandler(SystemException.class)
     public Ajax handleSystemException(SystemException e) {
         logger.error("系统异常", e);
@@ -73,7 +55,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * SSE / 长连接客户端主动断开时常见，响应已提交，无需再写错误体。
+     * SSE / 长连接客户端主动断开时常见，响应已提交，无需再写错误体
      */
     @ExceptionHandler(AsyncRequestNotUsableException.class)
     public void handleAsyncRequestNotUsable(AsyncRequestNotUsableException e) {
@@ -84,12 +66,6 @@ public class GlobalExceptionHandler {
         logger.warn("异步请求不可用", e);
     }
 
-    /**
-     * 处理通用异常
-     *
-     * @param e 异常
-     * @return 错误响应
-     */
     @ExceptionHandler(Throwable.class)
     public Ajax handleException(Throwable e) {
         if (isClientDisconnect(e)) {

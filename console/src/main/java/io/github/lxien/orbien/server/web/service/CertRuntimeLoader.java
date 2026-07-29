@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class CertRuntimeLoader {
-
     private static final Logger logger = LoggerFactory.getLogger(CertRuntimeLoader.class);
 
     private final CertDomainBindingRepository bindingRepository;

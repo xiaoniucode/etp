@@ -9,6 +9,8 @@ public class FileShareAuthUserParam {
     private Long id;
     private String username;
     private String password;
-    /** read | read_write */
+    /**
+     * read | read_write
+     */
     private String permission;
 }

@@ -28,35 +28,51 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+/**
+ * 端口池
+ */
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "port_pool")
 public class PortPoolDO {
+    /**
+     * 主键ID
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    /**
+     * 起始端口
+     */
     @Column(name = "start_port", nullable = false)
     private Integer startPort;
     /**
-     * 只有范围端口时才有值，如：8000-8100
+     * 结束端口，仅范围端口时有值
      */
     @Column(name = "end_port")
     private Integer endPort;
-
+    /**
+     * 端口池类型
+     */
     @Convert(converter = PortPoolTypeConverter.class)
     @Column(name = "type", nullable = false)
     private PortPoolType type;
-
+    /**
+     * 创建时间
+     */
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
+    /**
+     * 更新时间
+     */
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
+    /**
+     * 备注
+     */
     @Column(name = "remark")
     private String remark;
 

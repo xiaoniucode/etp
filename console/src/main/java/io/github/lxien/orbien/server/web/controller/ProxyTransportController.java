@@ -9,9 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * 代理传输配置（隧道加密、隧道模式），独立于 {@link ProxyController} 的协议 CRUD。
- */
 @RestController
 @RequestMapping("/api/proxy-transport")
 @Validated

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class AcmeRenewJobHandler implements ScheduledJobHandler {
-
     private final AcmeRenewService acmeRenewService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 

@@ -10,8 +10,5 @@ import java.util.Optional;
  */
 @Repository
 public interface UserRepository extends JpaRepository<SysUserDO, Integer> {
-    /**
-     * 根据用户名查询用户
-     */
     Optional<SysUserDO> findByUsername(String username);
 }

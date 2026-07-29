@@ -18,7 +18,6 @@ package io.github.lxien.orbien.server.web.common.exception;
 
 import lombok.Getter;
 
-
 @Getter
 public class SystemException extends RuntimeException {
 

@@ -19,9 +19,6 @@ import io.github.lxien.orbien.core.enums.HealthCheckType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-/**
- * 健康检查类型转换器
- */
 @Converter
 public class HealthCheckConverter implements AttributeConverter<HealthCheckType, Integer> {
 

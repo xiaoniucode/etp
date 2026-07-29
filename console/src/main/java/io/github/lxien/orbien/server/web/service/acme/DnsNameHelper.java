@@ -25,7 +25,7 @@ public final class DnsNameHelper {
     }
 
     /**
-     * 根据域名推断 DNS 区域（用于手动模式展示，无 API 时作为兜底）。
+     * 根据域名推断 DNS 区域（用于手动模式展示，无 API 时作为兜底）
      */
     public static String guessZone(String fqdn) {
         String normalized = normalize(fqdn);

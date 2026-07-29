@@ -28,7 +28,5 @@ import java.util.Set;
 public interface DomainRepository extends JpaRepository<DomainDO, Integer> {
     boolean existsByDomain(String domain);
 
-    Optional<DomainDO> findByDomain(String domain);
-
     Set<DomainDO> findByDomainIn(Collection<String> domains);
 }

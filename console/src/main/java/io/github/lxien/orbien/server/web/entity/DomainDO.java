@@ -24,25 +24,39 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+/**
+ * 根域名
+ */
 @Data
 @Entity
 @Table(name = "domains")
 @NoArgsConstructor
 public class DomainDO {
+    /**
+     * 主键ID
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
+    /**
+     * 域名
+     */
     @Column(name = "domain", unique = true, nullable = false)
     private String domain;
-
+    /**
+     * 备注
+     */
     @Column(name = "remark")
     private String remark;
-
+    /**
+     * 创建时间
+     */
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
+    /**
+     * 更新时间
+     */
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;

@@ -18,9 +18,21 @@ package io.github.lxien.orbien.server.web.monitor;
 
 import lombok.Data;
 
+/**
+ * 直接内存监控信息
+ */
 @Data
 public class DirectMemoryDTO {
+    /**
+     * 直接内存上限
+     */
     private String total;
+    /**
+     * 已使用直接内存
+     */
     private String used;
+    /**
+     * 直接内存使用率（百分比）
+     */
     private Object usage;
 }

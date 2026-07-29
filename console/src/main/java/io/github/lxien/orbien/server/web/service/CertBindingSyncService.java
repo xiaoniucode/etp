@@ -33,7 +33,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CertBindingSyncService {
-
     private final CertDomainBindingRepository bindingRepository;
     private final ProxyDomainRepository proxyDomainRepository;
     private final TlsCertificateManager tlsCertificateManager;

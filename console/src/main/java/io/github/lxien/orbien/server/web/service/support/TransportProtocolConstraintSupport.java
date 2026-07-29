@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 数据隧道传输协议可选项与校验。
+ * 数据隧道传输协议可选项与校验
  */
 public final class TransportProtocolConstraintSupport {
 

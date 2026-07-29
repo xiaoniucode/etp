@@ -28,10 +28,16 @@ import java.util.List;
 
 public interface DomainService {
     PageResult<DomainDTO> findByPage(PageQuery pageQuery);
+
     List<DomainDTO> findAll();
+
     PageResult<UsedDomainDTO> findUsedByPage(PageQuery pageQuery);
+
     DomainDTO getById(Integer id);
+
     DomainDTO create(DomainCreateParam param);
+
     void update(DomainUpdateParam param);
+
     void deleteBatch(DomainBatchDeleteParam param);
 }

@@ -31,7 +31,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 批量加载代理关联表，避免在组装层散落多次单表查询。
+ * 批量加载代理关联表，避免在组装层散落多次单表查询
  */
 @Component
 public class ProxyRelationsLoader {

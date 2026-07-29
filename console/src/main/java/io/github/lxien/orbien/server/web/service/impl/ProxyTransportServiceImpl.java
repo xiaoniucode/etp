@@ -4,6 +4,7 @@ import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.enums.TunnelType;
 import io.github.lxien.orbien.core.transport.api.TransportEncryptResolver;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.config.domain.TransportConfig;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
@@ -85,7 +86,7 @@ public class ProxyTransportServiceImpl implements ProxyTransportService {
         TransportProtocolConstraints protocolConstraints = TransportProtocolConstraintSupport.build(appConfig);
 
         Boolean storedCompress = proxyDO.getCompress();
-        String storedAlgorithm = proxyDO.getCompressAlgorithm();
+        CompressionType storedAlgorithm = proxyDO.getCompressAlgorithm();
         boolean effectiveCompress = Boolean.TRUE.equals(storedCompress);
         String effectiveAlgorithm = TransportCompressConstraintSupport.resolveEffectiveAlgorithm(
                 storedCompress, storedAlgorithm);

@@ -37,8 +37,6 @@ public class StatsServiceImpl implements StatsService {
     @Autowired
     private ProxyRepository proxyRepository;
     @Autowired
-    private ProxyService proxyService;
-    @Autowired
     private AgentManager agentManager;
 
     @Override

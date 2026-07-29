@@ -16,8 +16,7 @@
 package io.github.lxien.orbien.server.web.entity;
 
 import io.github.lxien.orbien.core.enums.*;
-import io.github.lxien.orbien.server.web.entity.converter.*;
-import io.github.lxien.orbien.core.enums.*;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import io.github.lxien.orbien.server.web.entity.converter.*;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -26,6 +25,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+/**
+ * 代理配置
+ */
 @Data
 @Entity
 @Table(name = "proxies",
@@ -44,7 +46,9 @@ public class ProxyDO {
     @Id
     @Column(name = "id")
     private String id;
-
+    /**
+     * 所属Agent ID
+     */
     @Column(name = "agent_id")
     private String agentId;
     /**
@@ -59,15 +63,13 @@ public class ProxyDO {
     @Convert(converter = ProtocolTypeConverter.class)
     private ProtocolType protocol;
     /**
-     * 是否启用
-     *
+     * 代理状态
      */
     @Column(name = "status", nullable = false)
     @Convert(converter = ProxyStatusConverter.class)
     private ProxyStatus status;
     /**
      * 配置来源类型
-     * 用于区分是后台手动创建，还是客户端上报等
      */
     @Column(name = "source_type", nullable = false)
     @Convert(converter = ProxySourceTypeConverter.class)
@@ -84,12 +86,12 @@ public class ProxyDO {
     @Column(name = "remote_port")
     private Integer remotePort;
     /**
-     * 实际监听的端口
+     * 实际监听端口
      */
     @Column(name = "listen_port")
     private Integer listenPort;
     /**
-     * 是否采用多路复用传输
+     * 是否多路复用传输
      */
     @Column(name = "multiplex")
     private Boolean multiplex;
@@ -104,10 +106,11 @@ public class ProxyDO {
     @Column(name = "compress")
     private Boolean compress;
     /**
-     * 压缩算法：snappy / lz4 / zstd
+     * 压缩算法
      */
     @Column(name = "compress_algorithm", length = 16)
-    private String compressAlgorithm;
+    @Convert(converter = CompressionTypeConverter.class)
+    private CompressionType compressAlgorithm;
     /**
      * 数据隧道传输协议
      */
@@ -115,12 +118,12 @@ public class ProxyDO {
     @Convert(converter = TransportProtocolConverter.class)
     private TransportProtocol transportProtocol;
     /**
-     * 是否强制HTTPS，只有HTTPS协议有效
+     * 是否强制HTTPS，仅HTTPS协议有效
      */
     @Column(name = "force_https")
     private Boolean forceHttps;
     /**
-     * 负载均衡策略，只有目标服务端集群部署才有效
+     * 负载均衡策略，仅目标集群部署有效
      */
     @Convert(converter = LoadBalanceConverter.class)
     @Column(name = "load_balance_strategy")
@@ -141,7 +144,7 @@ public class ProxyDO {
     @Column(name = "limit_out", comment = "出站带宽限制（bps）")
     private Long limitOut;
     /**
-     * 是否启用 HTTP 请求抓包（Inspector）
+     * 是否启用HTTP请求抓包
      */
     @Column(name = "inspector_enabled")
     private Boolean inspectorEnabled;

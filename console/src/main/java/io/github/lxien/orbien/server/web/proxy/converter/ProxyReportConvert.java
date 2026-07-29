@@ -19,11 +19,10 @@ package io.github.lxien.orbien.server.web.proxy.converter;
 import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.core.domain.HealthCheckConfig;
 import io.github.lxien.orbien.core.enums.*;
-import io.github.lxien.orbien.core.enums.*;
 import io.github.lxien.orbien.core.message.Message;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import io.github.lxien.orbien.core.utils.BandwidthParser;
 import io.github.lxien.orbien.server.event.ProxyAddEvent;
-import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.entity.*;
 import org.springframework.stereotype.Component;
 
@@ -82,9 +81,9 @@ public class ProxyReportConvert {
             proxyDO.setCompress(transport.getCompress());
         }
         if (transport.hasCompressAlgorithm()) {
-            proxyDO.setCompressAlgorithm(transport.getCompressAlgorithm());
+            proxyDO.setCompressAlgorithm(CompressionType.of(transport.getCompressAlgorithm()));
         } else if (transport.hasCompress() && !transport.getCompress()) {
-            proxyDO.setCompressAlgorithm("none");
+            proxyDO.setCompressAlgorithm(CompressionType.NONE);
         }
         if (transport.hasProtocol()) {
             TransportProtocol protocol = TransportProtocol.fromName(transport.getProtocol());

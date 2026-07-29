@@ -24,7 +24,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 访问控制实体类
+ * 访问控制
  */
 @Data
 @Entity
