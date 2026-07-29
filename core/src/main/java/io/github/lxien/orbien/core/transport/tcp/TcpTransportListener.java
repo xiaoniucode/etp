@@ -13,7 +13,6 @@ import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
 public class TcpTransportListener implements TransportListener {
-
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(TcpTransportListener.class);
 
     private Channel serverChannel;

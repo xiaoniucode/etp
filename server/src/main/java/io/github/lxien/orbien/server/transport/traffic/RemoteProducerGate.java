@@ -11,8 +11,7 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 /**
- * 远端（Agent 后端）生产者门控：限流排队 / visitor 不可写等原因 bitmask，
- * 首次置位发 PAUSE，全部清除发 RESUME
+ * 远端（Agent 后端）生产者门控：限流排队 / visitor 不可写等原因 bitmask，首次置位发 PAUSE，全部清除发 RESUME
  */
 public final class RemoteProducerGate {
 
@@ -31,7 +30,7 @@ public final class RemoteProducerGate {
     }
 
     public void pause(int reason) {
-        for (;;) {
+        for (; ; ) {
             int current = reasons.get();
             int next = current | reason;
             if (!reasons.compareAndSet(current, next)) {
@@ -45,7 +44,7 @@ public final class RemoteProducerGate {
     }
 
     public void resume(int reason) {
-        for (;;) {
+        for (; ; ) {
             int current = reasons.get();
             if ((current & reason) == 0) {
                 return;

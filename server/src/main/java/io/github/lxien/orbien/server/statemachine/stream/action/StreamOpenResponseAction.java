@@ -157,7 +157,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     }
 
     private void enableVisitorReading(StreamContext context, Channel visitor, TunnelBridge tunnelBridge) {
-        // 先冲刷 OPENING 期间缓存的下行数据（如 MySQL 握手），再放开访问者读取
+        // 先冲刷 OPENING 期间缓存的下行数据，再放开访问者读取
         flushPendingDownloads(context);
         if (context.getProtocol() != null && context.getProtocol().isHttpOrHttps()) {
             relayHttpFirstPackage(context, visitor, tunnelBridge);

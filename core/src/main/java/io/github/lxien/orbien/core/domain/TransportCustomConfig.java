@@ -18,7 +18,7 @@ public class TransportCustomConfig {
     private CompressionType compressAlgorithm;
 
     /**
-     * 解析当前代理应使用的压缩算法；未开启压缩时返回 {@link CompressionType#NONE}。
+     * 解析当前代理应使用的压缩算法；未开启压缩时返回 {@link CompressionType#NONE}
      */
     public CompressionType resolveCompressAlgorithm() {
         if (!Boolean.TRUE.equals(compress)) {

@@ -46,7 +46,6 @@ import java.util.Map;
 @Component
 @ChannelHandler.Sharable
 public class FileShareDispatchHandler extends ChannelInboundHandlerAdapter {
-
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(FileShareDispatchHandler.class);
 
     private static final AttributeKey<IngressState> INGRESS =

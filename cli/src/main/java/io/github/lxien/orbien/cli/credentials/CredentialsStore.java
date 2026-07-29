@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class CredentialsStore {
-
     public static final int DEFAULT_SERVER_PORT = 9527;
     private static final Path CREDENTIALS_DIR = Paths.get(System.getProperty("user.home"), ".orbien");
     private static final Path CREDENTIALS_FILE = CREDENTIALS_DIR.resolve("credentials.toml");

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 服务端启动前端口占用检查（仅 server 模块使用）。
+ * 服务端启动前端口占用检查
  */
 public final class PortChecker {
 

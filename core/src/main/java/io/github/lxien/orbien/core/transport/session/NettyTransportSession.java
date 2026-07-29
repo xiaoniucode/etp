@@ -7,7 +7,6 @@ import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
 public final class NettyTransportSession implements TransportSession {
-
     private final Channel channel;
     private final TransportProtocol protocol;
     private final String sessionId;

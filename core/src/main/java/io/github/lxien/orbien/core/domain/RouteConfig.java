@@ -46,20 +46,6 @@ public class RouteConfig {
     }
 
     /**
-     * 是否有自定义域名
-     */
-    public boolean hasCustomDomains() {
-        return !customDomains.isEmpty();
-    }
-
-    /**
-     * 是否有子域名
-     */
-    public boolean hasSubDomains() {
-        return !subDomains.isEmpty();
-    }
-
-    /**
      * 计算域名的类型
      * 优先级：自定义域名 --> 子域名 --> 自动生成
      *

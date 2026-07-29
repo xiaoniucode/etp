@@ -76,7 +76,7 @@ public class DirectConnectionPool {
     }
 
     /**
-     * 按 channel 移除独立隧道（解码异常、连接污染等场景）。
+     * 按 channel 移除独立隧道（解码异常、连接污染等场景）
      */
     public boolean removeByChannel(Channel channel) {
         if (channel == null) {

@@ -46,7 +46,7 @@ public class TMSP {
     public static final byte FLAG_MUX = 0x04;        // bit 2：多路复用
     public static final byte FLAG_DATAGRAM = 0x08;   // bit 3：UDP 数据报
 
-    // bit 4~6 表示压缩算法（与 FLAG_DATAGRAM 分离，避免位冲突）
+    // bit 4~6 表示压缩算法
     public static final byte COMPRESS_ALGO_NONE = 0x00;
     public static final byte COMPRESS_ALGO_SNAPPY = 0x10;   // bit 4
     public static final byte COMPRESS_ALGO_LZ4 = 0x20;      // bit 5

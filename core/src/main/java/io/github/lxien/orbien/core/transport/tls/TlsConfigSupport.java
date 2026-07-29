@@ -47,28 +47,4 @@ public final class TlsConfigSupport {
         }
         return configDir.resolve(resolved).normalize().toString();
     }
-
-    /**
-     * 合并 TLS 配置：优先保留 target 的 enabled/port 等，缺失的证书字段从 fallback 补齐
-     */
-    public static TlsConfig merge(TlsConfig fallback, TlsConfig target) {
-        if (fallback == null) {
-            return target;
-        }
-        if (target == null) {
-            return fallback;
-        }
-        TlsConfig merged = new TlsConfig(
-                target.isEnabled(),
-                pick(target.getCertFile(), fallback.getCertFile()),
-                pick(target.getKeyFile(), fallback.getKeyFile()),
-                pick(target.getCaFile(), fallback.getCaFile()),
-                pick(target.getKeyPassword(), fallback.getKeyPassword())
-        );
-        return merged;
-    }
-
-    private static String pick(String preferred, String alternate) {
-        return StringUtils.hasText(preferred) ? preferred : alternate;
-    }
 }

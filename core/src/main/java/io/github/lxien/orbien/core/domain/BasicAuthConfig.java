@@ -10,9 +10,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-/**
- * Basic Auth 配置领域对象
- */
 public class BasicAuthConfig {
 
     @Getter

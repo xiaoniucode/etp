@@ -16,7 +16,7 @@ public enum AgentType {
     SESSION(0, "Session Agent", true),
 
     /**
-     * 标准客户端（独立运行的可执行程序，长期运行，支持配置持久化）
+     * 标准客户端
      */
     STANDALONE(1, "Standalone Agent", false),
     UNKNOWN(-1, "UNKNOWN", true);

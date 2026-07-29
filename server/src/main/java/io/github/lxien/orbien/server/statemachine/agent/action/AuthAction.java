@@ -1,6 +1,5 @@
 package io.github.lxien.orbien.server.statemachine.agent.action;
 
-import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.statemachine.agent.*;
 import io.github.lxien.orbien.server.uid.UidGenerator;
 import io.github.lxien.orbien.core.enums.AgentType;
@@ -19,7 +18,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
-import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

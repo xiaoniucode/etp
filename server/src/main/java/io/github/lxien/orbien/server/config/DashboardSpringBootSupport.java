@@ -7,7 +7,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import java.nio.file.Path;
 
 /**
- * 将 {@link DashboardConfig} 映射为 Spring Boot 嵌入式 Web 容器属性。
+ * 将 {@link DashboardConfig} 映射为 Spring Boot 嵌入式 Web 容器属性
  */
 public final class DashboardSpringBootSupport {
 

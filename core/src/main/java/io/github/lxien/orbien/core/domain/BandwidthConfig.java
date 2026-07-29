@@ -51,7 +51,6 @@ public class BandwidthConfig {
         if (outBps != null && outBps < 0) {
             throw new IllegalArgumentException("出站带宽限制必须大于等于 0");
         }
-        // 总量约束
         if (totalBps != null) {
 
             if (inBps != null && inBps > totalBps) {

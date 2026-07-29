@@ -28,9 +28,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * 时间周期访问限制配置
- */
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode

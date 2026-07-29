@@ -22,5 +22,4 @@ public interface NettyConstants {
     String WEBSOCKET_HANDLER = "webSocketHandler";
     String WEBSOCKET_FRAME_AGGREGATOR = "webSocketFrameAggregator";
     String WEBSOCKET_FRAME_CODEC = "webSocketFrameCodec";
-
 }

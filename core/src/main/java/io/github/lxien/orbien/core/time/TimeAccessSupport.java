@@ -198,7 +198,7 @@ public final class TimeAccessSupport {
         if (dayOfWeek == null) {
             return false;
         }
-        // daysMask == 0：未选任何星期，语义为「每天」
+        // daysMask == 0：未选任何星期，语义为 每天
         if (daysMask == 0) {
             return true;
         }

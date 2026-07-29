@@ -11,7 +11,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 空闲检查。
+ * 空闲检查
  * <p>
  * 数据隧道在限流/背压暂停写时不应因 writer idle 被拆掉
  */

@@ -34,7 +34,6 @@ public class TlsHelper {
         }
     }
 
-
     private static SslContext buildServerSslContext(TlsConfig tlsConfig, boolean isTestMode, SslProvider provider) throws IOException, CertificateException {
         if (isTestMode) {
             return createTestSslContextForServer(provider);
@@ -51,7 +50,6 @@ public class TlsHelper {
                 .trustManager(InsecureTrustManagerFactory.INSTANCE)
                 .build();
     }
-
 
     private static SslContext createSslContextForClient(TlsConfig tlsConfig, SslProvider provider) throws IOException {
         SslContextBuilder sslContextBuilder = SslContextBuilder

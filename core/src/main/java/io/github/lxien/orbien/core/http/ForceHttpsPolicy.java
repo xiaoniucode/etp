@@ -3,7 +3,7 @@ package io.github.lxien.orbien.core.http;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
 
 /**
- * HTTPS 强制跳转策略：HTTPS 代理默认开启 HTTP→HTTPS 重定向，可通过 {@code force_https=false} 关闭
+ * HTTPS 强制跳转策略：HTTPS 代理默认开启 HTTP->HTTPS 重定向，可通过 {@code force_https=false} 关闭
  * 文件共享固定走 HTTPS，明文访问一律重定向
  */
 public final class ForceHttpsPolicy {

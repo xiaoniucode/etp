@@ -11,7 +11,6 @@ import java.util.Set;
  * 文件列表排序常量与比较器
  */
 public final class FileListSort {
-
     public static final String NAME = "name";
     public static final String KIND = "kind";
     public static final String LAST_OPENED = "last_opened";

@@ -1,6 +1,5 @@
 package io.github.lxien.orbien.server.configuration;
 
-import io.github.lxien.orbien.server.loadbalance.*;
 import io.github.lxien.orbien.server.loadbalance.LeastConnHooks;
 import io.github.lxien.orbien.server.loadbalance.LeastConnLoadBalancer;
 import io.github.lxien.orbien.server.loadbalance.LeastConnectionCounter;

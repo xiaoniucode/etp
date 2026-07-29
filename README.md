@@ -26,12 +26,6 @@
   <a href="https://somsubhra.github.io/github-release-stats/?username=lxien&repository=orbien">
     <img src="https://img.shields.io/github/downloads/lxien/orbien/total?style=for-the-badge" alt="Downloads"/>
   </a>
-  <a href="https://hub.docker.com/r/lxien/orbien-server">
-    <img src="https://img.shields.io/docker/pulls/lxien/orbien-server?style=for-the-badge&logo=docker&label=orbien-server" alt="Docker Pulls (orbien-server)"/>
-  </a>
-  <a href="https://hub.docker.com/r/lxien/orbien">
-    <img src="https://img.shields.io/docker/pulls/lxien/orbien?style=for-the-badge&logo=docker&label=orbien" alt="Docker Pulls (orbien)"/>
-  </a>
   <a href="https://discord.gg/4dgQjCS3k">
     <img src="https://img.shields.io/badge/Discord-Join-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord"/>
   </a>

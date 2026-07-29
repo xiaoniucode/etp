@@ -11,7 +11,6 @@ import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import org.slf4j.LoggerFactory;
 
 public final class CliLogbackSupport {
-
     private static final String STDERR_PATTERN = "%msg%n";
 
     private CliLogbackSupport() {

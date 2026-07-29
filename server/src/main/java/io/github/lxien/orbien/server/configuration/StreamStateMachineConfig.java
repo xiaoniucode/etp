@@ -12,33 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-/**
- * 服务端流状态机配置
- * 负责配置服务端流的状态机，管理流的各种状态转换
- */
 @Component
 public class StreamStateMachineConfig {
-    /**
-     * 目标解析动作
-     */
     @Autowired
     private TargetResolverAction targetResolverAction;
 
-    /**
-     * 流打开动作
-     */
     @Autowired
     private StreamOpenAction streamOpenAction;
 
-    /**
-     * 流打开响应动作
-     */
     @Autowired
     private StreamOpenResponseAction streamOpenResponseAction;
 
-    /**
-     * 流关闭动作
-     */
     @Autowired
     private StreamCloseAction streamCloseAction;
 
@@ -109,7 +93,7 @@ public class StreamStateMachineConfig {
 
         // 本地关闭流事件
         builder.externalTransitions()
-                .fromAmong(StreamState.OPENED,StreamState.FAILED, StreamState.OPENING, StreamState.PAUSED)
+                .fromAmong(StreamState.OPENED, StreamState.FAILED, StreamState.OPENING, StreamState.PAUSED)
                 .to(StreamState.CLOSED)
                 .on(StreamEvent.STREAM_LOCAL_CLOSE)
                 .when(ctx -> true)

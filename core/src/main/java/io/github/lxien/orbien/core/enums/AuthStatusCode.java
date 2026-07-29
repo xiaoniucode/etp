@@ -6,7 +6,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum AuthStatusCode {
-
     SUCCESS(0, "认证成功"),
     FAILURE(1, "认证失败"),
     INVALID_TOKEN(100, "无效令牌"),

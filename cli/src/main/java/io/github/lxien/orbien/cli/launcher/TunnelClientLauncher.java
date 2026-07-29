@@ -17,7 +17,6 @@ import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
 
 public final class TunnelClientLauncher {
-
     private static final CountDownLatch SHUTDOWN_LATCH = new CountDownLatch(1);
 
     private static TunnelClient tunnelClient;

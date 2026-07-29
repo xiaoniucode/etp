@@ -17,6 +17,8 @@ package io.github.lxien.orbien.server.config;
 
 import io.github.lxien.orbien.common.config.ConfigSource;
 import io.github.lxien.orbien.common.config.ConfigSourceType;
+import io.github.lxien.orbien.core.domain.transport.QuicProtocolConfig;
+import io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig;
 import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
@@ -145,7 +147,7 @@ public class TomlConfigSource implements ConfigSource {
         }
         int port = readServerPort(table, defaultPort);
         target.setPort(port);
-        if (target instanceof io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig ws) {
+        if (target instanceof WebSocketProtocolConfig ws) {
             String wsPath = table.getString("path");
             if (StringUtils.hasText(wsPath)) {
                 ws.setPath(wsPath.trim());
@@ -155,7 +157,7 @@ public class TomlConfigSource implements ConfigSource {
                 ws.setMaxFrameSize(maxFrame.intValue());
             }
         }
-        if (target instanceof io.github.lxien.orbien.core.domain.transport.QuicProtocolConfig quic) {
+        if (target instanceof QuicProtocolConfig quic) {
             Long maxIdle = table.getLong("max_idle_timeout_ms");
             if (maxIdle != null) {
                 quic.setMaxIdleTimeoutMs(maxIdle);

@@ -6,7 +6,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public final class CliBootstrap {
-
     private static final Set<String> SESSION_COMMANDS = Set.of(
             "login", "logout", "http", "tcp", "udp"
     );
