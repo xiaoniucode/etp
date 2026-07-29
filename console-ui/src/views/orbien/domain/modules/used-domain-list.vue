@@ -15,12 +15,12 @@
 import {h} from 'vue'
 import {useI18n} from 'vue-i18n'
 import {useRouter} from 'vue-router'
+import type {RouteLocationRaw} from 'vue-router'
 import {ElTag} from 'element-plus'
 import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
 import {useTable} from '@/hooks/core/useTable'
-import {getDomainTypeLabel} from '@/enums/orbien/business'
+import {ProtocolType, getDomainTypeLabel} from '@/enums/orbien/business'
 import {fetchGetUsedDomainListByPage} from '@/api/domain'
-import {resolveProxyListRoute} from '@/views/orbien/proxy/shared/resolve-proxy-list-route'
 
 defineOptions({name: 'UsedDomainList'})
 
@@ -30,6 +30,20 @@ const emit = defineEmits<{ change: [] }>()
 const router = useRouter()
 
 type UsedDomainItem = Api.Domain.UsedDomainDTO
+
+const PROTOCOL_LIST_ROUTE: Partial<Record<ProtocolType, RouteLocationRaw>> = {
+  [ProtocolType.HTTP]: {name: 'HTTP'},
+  [ProtocolType.HTTPS]: {name: 'HTTPS'},
+  [ProtocolType.TCP]: {name: 'TCP'},
+  [ProtocolType.UDP]: {name: 'UDP'},
+  [ProtocolType.SOCKS5]: {name: 'SOCKS5'},
+  [ProtocolType.FILE]: {name: 'FileShare'}
+}
+
+const resolveProxyListRoute = (protocol?: number | null): RouteLocationRaw | null => {
+  if (protocol == null) return null
+  return PROTOCOL_LIST_ROUTE[protocol as ProtocolType] ?? null
+}
 
 const renderProxyLink = (row: UsedDomainItem) => {
   const label = row.proxyName || row.proxyId || ''
