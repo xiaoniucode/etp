@@ -2,11 +2,18 @@ server_addr = "127.0.0.1"
 server_port = 9527
 
 [auth]
-token = "token"
+token = "YOUR_TOKEN"
 
 #[[proxies]]
 #name = "MySQL"
 #protocol = "tcp"
-#local_ip="127.0.0.1"
+#local_ip = "127.0.0.1"
 #local_port = 3306
+
+#[[proxies]]
+#name = "web"
+#protocol = "http"
+#local_ip = "127.0.0.1"
+#local_port = 8080
+#custom_domains = ["web.example.com"]
 
