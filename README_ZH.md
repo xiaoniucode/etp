@@ -14,12 +14,24 @@
   <a href="https://github.com/lxien/orbien/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/lxien/orbien?style=for-the-badge" alt="License"/>
   </a>
- <a href="https://github.com/lxien/orbien/releases/v0.25.0">
+  <a href="https://openjdk.org/projects/jdk/25/">
+    <img src="https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 25"/>
+  </a>
+  <a href="https://github.com/lxien/orbien/releases/v0.25.0">
     <img src="https://img.shields.io/badge/orbien-0.25.0-blue?style=for-the-badge" alt="orbien:0.25.0"/>
   </a>
-<a href="https://somsubhra.github.io/github-release-stats/?username=lxien&repository=orbien">
-  <img src="https://img.shields.io/github/downloads/lxien/orbien/total?style=for-the-badge" alt="Downloads"/>
-</a>
+  <a href="https://central.sonatype.com/artifact/io.github.lxien/orbien-spring-boot-starter">
+    <img src="https://img.shields.io/maven-central/v/io.github.lxien/orbien-spring-boot-starter?style=for-the-badge&logo=apachemaven&logoColor=white" alt="Maven Central"/>
+  </a>
+  <a href="https://somsubhra.github.io/github-release-stats/?username=lxien&repository=orbien">
+    <img src="https://img.shields.io/github/downloads/lxien/orbien/total?style=for-the-badge" alt="Downloads"/>
+  </a>
+  <a href="https://hub.docker.com/r/lxien/orbien-server">
+    <img src="https://img.shields.io/docker/pulls/lxien/orbien-server?style=for-the-badge&logo=docker&label=orbien-server" alt="Docker Pulls (orbien-server)"/>
+  </a>
+  <a href="https://hub.docker.com/r/lxien/orbien">
+    <img src="https://img.shields.io/docker/pulls/lxien/orbien?style=for-the-badge&logo=docker&label=orbien" alt="Docker Pulls (orbien)"/>
+  </a>
   <a href="https://discord.gg/4dgQjCS3k">
     <img src="https://img.shields.io/badge/Discord-Join-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord"/>
   </a>
