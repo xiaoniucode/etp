@@ -16,8 +16,8 @@
 package io.github.lxien.orbien.server.web.service.impl;
 
 import io.github.lxien.orbien.core.enums.*;
+import io.github.lxien.orbien.core.utils.BandwidthParser;
 import io.github.lxien.orbien.server.uid.UidGenerator;
-import io.github.lxien.orbien.core.enums.*;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.manager.ProxyManager;
 import io.github.lxien.orbien.server.port.PortPoolManager;
@@ -29,13 +29,11 @@ import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
-import io.github.lxien.orbien.server.web.dto.bandwidth.BandwidthDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.*;
 import io.github.lxien.orbien.server.web.dto.socks5auth.Socks5UserDTO;
 import io.github.lxien.orbien.server.web.dto.transport.TransportDTO;
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.param.proxy.*;
-import io.github.lxien.orbien.server.web.param.bandwidth.BandwidthSaveParam;
 import io.github.lxien.orbien.server.web.dto.loadbalance.LoadBalanceDTO;
 import io.github.lxien.orbien.server.web.proxy.service.ProxyConfigSyncService;
 import io.github.lxien.orbien.server.loadbalance.HealthManager;
@@ -173,7 +171,7 @@ public class ProxyServiceImpl implements ProxyService {
 
         String proxyId = uidGenerator.getUIDAsString();
         ProxyDO proxyDO = buildHttpLikeProxyDO(param.getAgentId(), param.getName(), proxyId, domainType, protocol, forceHttps);
-        applyHttpLimitTotal(proxyDO, param.getLimitTotal());
+        applyBandwidth(proxyDO, param.getBandwidth());
         proxyRepository.save(proxyDO);
 
         proxyTargetRepository.save(buildHttpTarget(param.getLocalHost(), param.getLocalPort(), param.getName(), proxyId));
@@ -218,7 +216,7 @@ public class ProxyServiceImpl implements ProxyService {
 
         existsProxyDO.setName(param.getName());
         existsProxyDO.setDomainType(requestDomainType);
-        applyHttpLimitTotal(existsProxyDO, param.getLimitTotal());
+        applyBandwidth(existsProxyDO, param.getBandwidth());
         if (protocol.isHttps()) {
             existsProxyDO.setForceHttps(forceHttps == null || Boolean.TRUE.equals(forceHttps));
         }
@@ -387,7 +385,7 @@ public class ProxyServiceImpl implements ProxyService {
             dto.setLocalHost(target.getHost());
             dto.setLocalPort(target.getPort());
         }
-        dto.setLimitTotal(toMbps(proxyDO.getLimitTotal()));
+        dto.setBandwidth(toMbps(proxyDO.getBandwidth()));
         dto.setCreatedAt(proxyDO.getCreatedAt());
         dto.setUpdatedAt(proxyDO.getUpdatedAt());
     }
@@ -402,7 +400,7 @@ public class ProxyServiceImpl implements ProxyService {
         String proxyId = uidGenerator.getUIDAsString();
         ProxyDO proxyDO = buildTcpProxyDO(param.getAgentId(), param.getName(), proxyId);
         applyTcpListenPort(proxyDO, param.getRemotePort(), null, null);
-        applyTcpLimitTotal(proxyDO, param.getLimitTotal());
+        applyBandwidth(proxyDO, param.getBandwidth());
         proxyRepository.save(proxyDO);
 
         proxyTargetRepository.save(buildTcpTarget(param, proxyId));
@@ -422,7 +420,7 @@ public class ProxyServiceImpl implements ProxyService {
         String proxyId = uidGenerator.getUIDAsString();
         ProxyDO proxyDO = buildSocks5ProxyDO(param.getAgentId(), param.getName(), proxyId);
         applyTcpListenPort(proxyDO, param.getRemotePort(), null, null);
-        applyTcpLimitTotal(proxyDO, param.getLimitTotal());
+        applyBandwidth(proxyDO, param.getBandwidth());
         proxyRepository.save(proxyDO);
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
         timeAccessRepository.save(new TimeAccessDO(proxyId));
@@ -448,7 +446,7 @@ public class ProxyServiceImpl implements ProxyService {
         Integer existsRemotePort = existsProxyDO.getRemotePort();
         existsProxyDO.setName(param.getName());
         applyTcpListenPort(existsProxyDO, param.getRemotePort(), existsListenPort, existsRemotePort);
-        applyTcpLimitTotal(existsProxyDO, param.getLimitTotal());
+        applyBandwidth(existsProxyDO, param.getBandwidth());
         proxyRepository.save(existsProxyDO);
         if (param.getAuthEnabled() != null || !CollectionUtils.isEmpty(param.getAuthUsers())) {
             Boolean enabled = param.getAuthEnabled();
@@ -474,7 +472,7 @@ public class ProxyServiceImpl implements ProxyService {
         dto.setName(proxyDO.getName());
         dto.setRemotePort(proxyDO.getRemotePort());
         dto.setListenPort(proxyDO.getListenPort());
-        dto.setLimitTotal(toMbps(proxyDO.getLimitTotal()));
+        dto.setBandwidth(toMbps(proxyDO.getBandwidth()));
         dto.setCreatedAt(proxyDO.getCreatedAt());
         dto.setUpdatedAt(proxyDO.getUpdatedAt());
         socks5AuthRepository.findById(id).ifPresent(authDO -> {
@@ -531,7 +529,7 @@ public class ProxyServiceImpl implements ProxyService {
         }
         String proxyId = uidGenerator.getUIDAsString();
         ProxyDO proxyDO = buildFileShareProxyDO(param.getAgentId(), param.getName(), proxyId, domainType);
-        applyHttpLimitTotal(proxyDO, param.getLimitTotal());
+        applyBandwidth(proxyDO, param.getBandwidth());
         proxyRepository.save(proxyDO);
         saveHttpDomains(proxyId, domainType, param.getSubdomainBindings(), param.getCustomDomains(), null);
         saveFileShareLimits(proxyId, param.getRootPath(), param.getMaxUploadSize(),
@@ -561,8 +559,7 @@ public class ProxyServiceImpl implements ProxyService {
 
         existsProxyDO.setName(param.getName());
         existsProxyDO.setDomainType(requestDomainType);
-        applyHttpLimitTotal(existsProxyDO, param.getLimitTotal());
-        applyBandwidthLimits(existsProxyDO, param.getLimitIn(), param.getLimitOut());
+        applyBandwidth(existsProxyDO, param.getBandwidth());
         proxyRepository.save(existsProxyDO);
 
         if (requestDomainType.isAuto() && existsDomainType.isAuto()) {
@@ -662,7 +659,7 @@ public class ProxyServiceImpl implements ProxyService {
         String proxyId = uidGenerator.getUIDAsString();
         ProxyDO proxyDO = buildUdpProxyDO(param.getAgentId(), param.getName(), proxyId);
         applyUdpListenPort(proxyDO, param.getRemotePort(), null, null);
-        applyTcpLimitTotal(proxyDO, param.getLimitTotal());
+        applyBandwidth(proxyDO, param.getBandwidth());
         proxyRepository.save(proxyDO);
 
         proxyTargetRepository.save(buildUdpTarget(param, proxyId));
@@ -688,7 +685,7 @@ public class ProxyServiceImpl implements ProxyService {
         Integer existsRemotePort = existsProxyDO.getRemotePort();
         existsProxyDO.setName(param.getName());
         applyTcpListenPort(existsProxyDO, param.getRemotePort(), existsListenPort, existsRemotePort);
-        applyTcpLimitTotal(existsProxyDO, param.getLimitTotal());
+        applyBandwidth(existsProxyDO, param.getBandwidth());
         proxyRepository.save(existsProxyDO);
 
         replaceSingleTargetIfNotCluster(proxyId, () ->
@@ -715,7 +712,7 @@ public class ProxyServiceImpl implements ProxyService {
         Integer existsRemotePort = existsProxyDO.getRemotePort();
         existsProxyDO.setName(param.getName());
         applyUdpListenPort(existsProxyDO, param.getRemotePort(), existsListenPort, existsRemotePort);
-        applyTcpLimitTotal(existsProxyDO, param.getLimitTotal());
+        applyBandwidth(existsProxyDO, param.getBandwidth());
         proxyRepository.save(existsProxyDO);
 
         replaceSingleTargetIfNotCluster(proxyId, () ->
@@ -768,7 +765,7 @@ public class ProxyServiceImpl implements ProxyService {
             dto.setLocalHost(target.getHost());
             dto.setLocalPort(target.getPort());
         }
-        dto.setLimitTotal(toMbps(proxyDO.getLimitTotal()));
+        dto.setBandwidth(toMbps(proxyDO.getBandwidth()));
         dto.setCreatedAt(proxyDO.getCreatedAt());
         dto.setUpdatedAt(proxyDO.getUpdatedAt());
         return dto;
@@ -794,7 +791,7 @@ public class ProxyServiceImpl implements ProxyService {
             dto.setLocalHost(target.getHost());
             dto.setLocalPort(target.getPort());
         }
-        dto.setLimitTotal(toMbps(proxyDO.getLimitTotal()));
+        dto.setBandwidth(toMbps(proxyDO.getBandwidth()));
         dto.setCreatedAt(proxyDO.getCreatedAt());
         dto.setUpdatedAt(proxyDO.getUpdatedAt());
         return dto;
@@ -940,12 +937,8 @@ public class ProxyServiceImpl implements ProxyService {
         transactionHelper.afterRollback(() -> portPoolManager.release(PortPoolType.TCP, requestRemotePort));
     }
 
-    private void applyTcpLimitTotal(ProxyDO proxyDO, Integer limitTotalMbps) {
-        if (limitTotalMbps == null) {
-            proxyDO.setLimitTotal(null);
-            return;
-        }
-        proxyDO.setLimitTotal(BandwidthUnit.MBPS.toBps(limitTotalMbps));
+    private void applyBandwidth(ProxyDO proxyDO, Integer bandwidthMbps) {
+        proxyDO.setBandwidth(BandwidthParser.mbpsToBpsOrNull(bandwidthMbps));
     }
 
     private ProxyTargetDO buildTcpTarget(TcpProxyCreateParam param, String proxyId) {
@@ -969,10 +962,7 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     private Integer toMbps(Long bps) {
-        if (bps == null) {
-            return null;
-        }
-        return (int) (bps / BandwidthUnit.MBPS.getFactor());
+        return BandwidthParser.bpsToMbps(bps);
     }
 
     private ProxyDO buildHttpLikeProxyDO(String agentId, String name, String proxyId, DomainType domainType,
@@ -1060,47 +1050,6 @@ public class ProxyServiceImpl implements ProxyService {
         return target;
     }
 
-    private void applyHttpLimitTotal(ProxyDO proxyDO, Integer limitTotalMbps) {
-        if (limitTotalMbps == null) {
-            proxyDO.setLimitTotal(null);
-            return;
-        }
-        proxyDO.setLimitTotal(BandwidthUnit.MBPS.toBps(limitTotalMbps));
-    }
-
-    private void applyBandwidthLimits(ProxyDO proxyDO, Long limitIn, Long limitOut) {
-        if (limitIn != null) {
-            proxyDO.setLimitIn(limitIn > 0 ? limitIn : null);
-        }
-        if (limitOut != null) {
-            proxyDO.setLimitOut(limitOut > 0 ? limitOut : null);
-        }
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateProxyBandwidth(String proxyId, BandwidthSaveParam param) {
-        param.valid();
-        ProxyDO proxyDO = proxyRepository.findById(proxyId)
-                .orElseThrow(() -> new BizException("代理配置不存在"));
-        BandwidthUnit unit = BandwidthUnit.fromCode(param.getUnit());
-        proxyDO.setLimitTotal(resolveBandwidthBps(param.getLimitTotal(), unit));
-        proxyDO.setLimitIn(resolveBandwidthBps(param.getLimitIn(), unit));
-        proxyDO.setLimitOut(resolveBandwidthBps(param.getLimitOut(), unit));
-        proxyRepository.save(proxyDO);
-        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, false));
-    }
-
-    private Long resolveBandwidthBps(Long value, BandwidthUnit unit) {
-        if (value == null) {
-            return null;
-        }
-        if (value <= 0) {
-            return null;
-        }
-        return unit.toBps(value);
-    }
-
     private TransportDTO buildTransportDTO(ProxyDO proxyDO) {
         TransportDTO dto = new TransportDTO();
         dto.setEncrypt(Boolean.TRUE.equals(proxyDO.getEncrypt()));
@@ -1108,13 +1057,6 @@ public class ProxyServiceImpl implements ProxyService {
                 ? TunnelType.MULTIPLEX.getCode()
                 : TunnelType.DIRECT.getCode());
         return dto;
-    }
-
-    private BandwidthDTO buildBandwidthDTO(ProxyDO proxyDO) {
-        return new BandwidthDTO(
-                proxyDO.getLimitTotal(),
-                proxyDO.getLimitIn(),
-                proxyDO.getLimitOut());
     }
 
     private void assertHttpLikeProtocol(ProxyDO proxyDO, ProtocolType protocol) {
@@ -1663,10 +1605,9 @@ public class ProxyServiceImpl implements ProxyService {
         fillHttpDomainFields(dto, proxyDO.getDomainType(), domainRecords);
         dto.setDomains(domains);
         dto.setAccessUrls(buildFileShareAccessUrls(domains, httpsProxyPort));
-        dto.setLimitTotal(toMbps(proxyDO.getLimitTotal()));
+        dto.setBandwidth(toMbps(proxyDO.getBandwidth()));
         dto.setTransportProtocol(ProxyConvert.resolveTransportProtocolCode(proxyDO.getTransportProtocol()));
         dto.setTransport(buildTransportDTO(proxyDO));
-        dto.setBandwidth(buildBandwidthDTO(proxyDO));
         dto.setCreatedAt(proxyDO.getCreatedAt());
         dto.setUpdatedAt(proxyDO.getUpdatedAt());
 

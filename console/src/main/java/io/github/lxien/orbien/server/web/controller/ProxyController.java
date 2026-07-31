@@ -20,7 +20,6 @@ import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.dto.proxy.*;
 import io.github.lxien.orbien.server.web.param.proxy.*;
-import io.github.lxien.orbien.server.web.param.bandwidth.BandwidthSaveParam;
 import io.github.lxien.orbien.server.web.service.ProxyService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,13 +104,6 @@ public class ProxyController {
     @PutMapping("https")
     public Ajax updateHttpsProxy(@RequestBody @Validated HttpsProxyUpdateParam param) {
         proxyService.updateHttpsProxy(param);
-        return Ajax.success();
-    }
-
-    @PutMapping("{id}/bandwidth")
-    public Ajax updateProxyBandwidth(@PathVariable String id,
-                                     @RequestBody @Validated BandwidthSaveParam param) {
-        proxyService.updateProxyBandwidth(id, param);
         return Ajax.success();
     }
 

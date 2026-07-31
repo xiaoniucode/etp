@@ -261,15 +261,6 @@ pub struct FileOpResponse {
     pub status: ::core::option::Option<Status>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Bandwidth {
-    #[prost(string, optional, tag = "1")]
-    pub limit: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(string, optional, tag = "2")]
-    pub limit_in: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(string, optional, tag = "3")]
-    pub limit_out: ::core::option::Option<::prost::alloc::string::String>,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Target {
     #[prost(string, tag = "1")]
     pub host: ::prost::alloc::string::String,
@@ -346,8 +337,9 @@ pub struct Proxy {
     pub access_control: ::core::option::Option<AccessControl>,
     #[prost(message, optional, tag = "10")]
     pub basic_auth: ::core::option::Option<BasicAuth>,
-    #[prost(message, optional, tag = "11")]
-    pub bandwidth: ::core::option::Option<Bandwidth>,
+    /// Shared total bandwidth, e.g. "10Mbps"
+    #[prost(string, optional, tag = "11")]
+    pub bandwidth: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(enumeration = "LoadBalanceStrategy", optional, tag = "12")]
     pub load_balance_strategy: ::core::option::Option<i32>,
     #[prost(message, optional, tag = "13")]

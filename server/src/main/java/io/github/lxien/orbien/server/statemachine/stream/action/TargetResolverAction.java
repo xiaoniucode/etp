@@ -90,10 +90,10 @@ public class TargetResolverAction extends StreamBaseAction {
                 }
                 context.setTarget(selectedTarget);
             }
-            BandwidthConfig bandwidth = config.getBandwidth();
-            if (bandwidth != null && bandwidth.hasLimitConfigured()) {
+            Long bandwidthBps = config.getBandwidth();
+            if (bandwidthBps != null && bandwidthBps > 0) {
                 StreamManager streamManager = context.getStreamManager();
-                BandwidthLimiter bandwidthLimiter = streamManager.getOrCreateProxyLimiter(config.getProxyId(), bandwidth);
+                BandwidthLimiter bandwidthLimiter = streamManager.getOrCreateProxyLimiter(config.getProxyId(), bandwidthBps);
                 context.setBandwidthLimiter(bandwidthLimiter);
                 streamManager.incrementStreamCount(config.getProxyId());
             }

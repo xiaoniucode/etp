@@ -222,12 +222,6 @@ message FileOpResponse {
   Status status = 2;
 }
 
-message Bandwidth {
-  optional string limit = 1;
-  optional string limit_in = 2;
-  optional string limit_out = 3;
-}
-
 message Target {
   string host = 1;
   uint32 port = 2;
@@ -272,7 +266,7 @@ message Proxy {
   optional Domain domain = 8;
   optional AccessControl access_control = 9;
   optional BasicAuth basic_auth = 10;
-  optional Bandwidth bandwidth = 11;
+  optional string bandwidth = 11;
   optional LoadBalanceStrategy load_balance_strategy = 12;
   optional Transport transport = 13;
   optional TlsCert tls_cert = 14;

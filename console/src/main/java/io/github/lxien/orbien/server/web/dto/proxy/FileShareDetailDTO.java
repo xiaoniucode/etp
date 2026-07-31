@@ -1,7 +1,6 @@
 package io.github.lxien.orbien.server.web.dto.proxy;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.github.lxien.orbien.server.web.dto.bandwidth.BandwidthDTO;
 import io.github.lxien.orbien.server.web.dto.transport.TransportDTO;
 import lombok.Data;
 
@@ -26,10 +25,9 @@ public class FileShareDetailDTO {
     private Boolean allowMkdir;
     private Boolean allowMove;
     private Boolean allowRename;
-    private Integer limitTotal;
+    private Integer bandwidth;
     private Integer transportProtocol;
     private TransportDTO transport;
-    private BandwidthDTO bandwidth;
     private Boolean authEnabled;
     private List<FileShareUserDTO> authUsers = new ArrayList<>();
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")

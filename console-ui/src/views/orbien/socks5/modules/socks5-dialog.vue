@@ -67,7 +67,7 @@
         </div>
       </ElFormItem>
 
-      <BandwidthLimitField v-model="formData.limitTotal"/>
+      <BandwidthLimitField v-model="formData.bandwidth"/>
 
       <ElFormItem :label="t('orbien.proxy.authEnabled')">
         <div class="auth-switch-row">
@@ -141,9 +141,9 @@ import {PortPoolType} from '@/enums/orbien/business'
 import {formatAgentOptionLabel} from '@/views/orbien/agent/shared/format-agent-option'
 import BandwidthLimitField from '@/views/orbien/proxy/shared/bandwidth-limit-field.vue'
 import {
-  LIMIT_TOTAL_RULES,
-  toLimitTotalPayload,
-  type LimitTotalMbps
+  BANDWIDTH_RULES,
+  toBandwidthPayload,
+  type BandwidthMbps
 } from '@/views/orbien/proxy/shared/bandwidth-limit'
 
 defineOptions({name: 'Socks5Dialog'})
@@ -155,7 +155,7 @@ type AuthUserForm = Api.Proxy.Socks5AuthUserParam & { id?: number }
 interface FormDataState {
   agentId: string
   name: string
-  limitTotal: LimitTotalMbps
+  bandwidth: BandwidthMbps
   authEnabled: boolean
 }
 
@@ -194,7 +194,7 @@ let openSession = 0
 const DEFAULT_FORM: FormDataState = {
   agentId: '',
   name: '',
-  limitTotal: undefined,
+  bandwidth: undefined,
   authEnabled: false
 }
 
@@ -219,7 +219,7 @@ const rules = computed<FormRules>(() => ({
     },
     trigger: 'blur'
   }],
-  limitTotal: LIMIT_TOTAL_RULES
+  bandwidth: BANDWIDTH_RULES
 }))
 
 const resetForm = () => {
@@ -311,7 +311,7 @@ const loadEditForm = async (session: number, proxyId: string) => {
     Object.assign(formData, {
       agentId: detail.agentId || '',
       name: detail.name || '',
-      limitTotal: detail.limitTotal ?? undefined,
+      bandwidth: detail.bandwidth ?? undefined,
       authEnabled: detail.authEnabled ?? false
     })
     const displayPort = detail.remotePort ?? detail.listenPort
@@ -380,7 +380,7 @@ const handleSubmit = async () => {
       const remotePort = parseRemotePort()
       const payload: Omit<Api.Proxy.Socks5ProxyUpdateParam, 'id'> = {
         name: formData.name,
-        limitTotal: toLimitTotalPayload(formData.limitTotal),
+        bandwidth: toBandwidthPayload(formData.bandwidth),
         authEnabled: formData.authEnabled,
         authUsers: buildAuthPayload(),
         ...(remotePort != null ? {remotePort} : {})

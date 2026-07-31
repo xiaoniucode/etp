@@ -2,7 +2,6 @@ package io.github.lxien.orbien.server.statemachine.stream;
 
 import com.alibaba.cola.statemachine.StateMachine;
 import io.github.lxien.orbien.core.utils.StringUtils;
-import io.github.lxien.orbien.core.domain.BandwidthConfig;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.transport.PausedStreamRegistry;
@@ -380,15 +379,15 @@ public class StreamManager {
     /**
      * 每一个代理 一个限流器
      *
-     * @param proxyId         代理ID
-     * @param bandwidthConfig 限流配置
+     * @param proxyId      代理ID
+     * @param bandwidthBps 带宽限制（bps）
      * @return 限流器
      */
-    public BandwidthLimiter getOrCreateProxyLimiter(String proxyId, BandwidthConfig bandwidthConfig) {
+    public BandwidthLimiter getOrCreateProxyLimiter(String proxyId, Long bandwidthBps) {
         return proxyLimiters.computeIfAbsent(proxyId, id -> {
             proxyStreamCount.put(proxyId, new AtomicInteger(0));
             logger.debug("创建代理限流器：proxyId={}", proxyId);
-            return new BandwidthLimiter(bandwidthConfig);
+            return new BandwidthLimiter(bandwidthBps);
         });
     }
 

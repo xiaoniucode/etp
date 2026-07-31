@@ -1,11 +1,11 @@
 import type {FormItemRule} from 'element-plus'
 import {$t} from '@/locales/index'
 
-export type LimitTotalMbps = number | null | undefined
+export type BandwidthMbps = number | null | undefined
 
-export const LIMIT_TOTAL_RULES: FormItemRule[] = [
+export const BANDWIDTH_RULES: FormItemRule[] = [
     {
-        validator: (_rule, value: LimitTotalMbps, callback) => {
+        validator: (_rule, value: BandwidthMbps, callback) => {
             if (value == null) {
                 callback()
                 return
@@ -20,7 +20,7 @@ export const LIMIT_TOTAL_RULES: FormItemRule[] = [
     }
 ]
 
-export function toLimitTotalPayload(value: LimitTotalMbps): number | null {
+export function toBandwidthPayload(value: BandwidthMbps): number | null {
     if (value == null || Number.isNaN(value)) {
         return null
     }

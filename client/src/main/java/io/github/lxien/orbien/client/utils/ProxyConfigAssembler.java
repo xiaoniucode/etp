@@ -22,6 +22,7 @@ import io.github.lxien.orbien.core.enums.AccessControl;
 import io.github.lxien.orbien.core.enums.HeaderAction;
 import io.github.lxien.orbien.core.enums.HeaderDirection;
 import io.github.lxien.orbien.core.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.BandwidthParser;
 import io.github.lxien.orbien.core.domain.*;
 import io.github.lxien.orbien.core.http.ForceHttpsPolicy;
 import io.github.lxien.orbien.core.enums.LoadBalanceType;
@@ -247,18 +248,10 @@ public class ProxyConfigAssembler {
 
         //带宽限制
         if (config.hasBandwidthLimit()) {
-            BandwidthConfig bandwidth = config.getBandwidth();
-            Message.Bandwidth.Builder bw = Message.Bandwidth.newBuilder();
-            if (bandwidth.hasLimitConfigured()) {
-                bw.setLimit(bandwidth.getLimitTotal());
+            String bandwidth = BandwidthParser.formatMbps(config.getBandwidth());
+            if (StringUtils.hasText(bandwidth)) {
+                proxyBuilder.setBandwidth(bandwidth);
             }
-            if (bandwidth.hasLimitInConfigured()) {
-                bw.setLimitIn(bandwidth.getLimitIn());
-            }
-            if (bandwidth.hasLimitOutConfigured()) {
-                bw.setLimitOut(bandwidth.getLimitOut());
-            }
-            proxyBuilder.setBandwidth(bw.build());
         }
         Message.HealthCheck healthCheck = RuntimeInfoSupport.toHealthCheckProto(config.getHealthCheck());
         if (healthCheck != null) {

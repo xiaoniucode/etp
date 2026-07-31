@@ -206,6 +206,7 @@ docker run -d \
 ```
 
 ```yaml
+# application.yml
 orbien:
   client:
     enabled: true

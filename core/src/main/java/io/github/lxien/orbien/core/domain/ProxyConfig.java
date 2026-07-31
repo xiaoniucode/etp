@@ -116,10 +116,10 @@ public class ProxyConfig implements Serializable {
     @Setter
     private TimeAccessConfig timeAccess;
     /**
-     * 带宽限制配置
+     * 带宽限制
      */
     @Setter
-    private BandwidthConfig bandwidth;
+    private Long bandwidth;
 
     /**
      * 传输配置
@@ -199,7 +199,7 @@ public class ProxyConfig implements Serializable {
     }
 
     public boolean hasBandwidthLimit() {
-        return bandwidth != null;
+        return bandwidth != null && bandwidth > 0;
     }
 
     public boolean hasBasicAuth() {

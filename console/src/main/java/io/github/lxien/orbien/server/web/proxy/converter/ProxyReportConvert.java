@@ -94,16 +94,8 @@ public class ProxyReportConvert {
         }
     }
 
-    public void applyBandwidth(ProxyDO proxyDO, Message.Bandwidth bandwidth) {
-        if (bandwidth.hasLimit()) {
-            proxyDO.setLimitTotal(BandwidthParser.parseToBps(bandwidth.getLimit()));
-        }
-        if (bandwidth.hasLimitIn()) {
-            proxyDO.setLimitIn(BandwidthParser.parseToBps(bandwidth.getLimitIn()));
-        }
-        if (bandwidth.hasLimitOut()) {
-            proxyDO.setLimitOut(BandwidthParser.parseToBps(bandwidth.getLimitOut()));
-        }
+    public void applyBandwidth(ProxyDO proxyDO, String bandwidth) {
+        proxyDO.setBandwidth(BandwidthParser.parseToBps(bandwidth));
     }
 
     public AccessControlDO toAccessControlDO(Message.AccessControl accessControl, String proxyId) {

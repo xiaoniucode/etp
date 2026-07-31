@@ -73,7 +73,7 @@
         </ElRow>
       </BackendServiceField>
 
-      <BandwidthLimitField v-model="formData.limitTotal"/>
+      <BandwidthLimitField v-model="formData.bandwidth"/>
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
@@ -104,9 +104,9 @@ import BackendServiceField from '@/views/orbien/proxy/shared/backend-service-fie
 import LocalPortInput from '@/views/orbien/proxy/shared/local-port-input.vue'
 import BandwidthLimitField from '@/views/orbien/proxy/shared/bandwidth-limit-field.vue'
 import {
-  LIMIT_TOTAL_RULES,
-  toLimitTotalPayload,
-  type LimitTotalMbps
+  BANDWIDTH_RULES,
+  toBandwidthPayload,
+  type BandwidthMbps
 } from '@/views/orbien/proxy/shared/bandwidth-limit'
 import {getCommonLocalPortPresets} from '@/views/orbien/proxy/shared/port-presets'
 import {isClusterMode} from '@/views/orbien/proxy/shared/is-cluster-mode'
@@ -123,7 +123,7 @@ interface FormDataState {
   customDomains: string
   localHost: string
   localPort: number | undefined
-  limitTotal: LimitTotalMbps
+  bandwidth: BandwidthMbps
 }
 
 interface Props {
@@ -172,7 +172,7 @@ const createDefaultFormData = (): FormDataState => ({
   customDomains: '',
   localHost: '127.0.0.1',
   localPort: undefined,
-  limitTotal: undefined
+  bandwidth: undefined
 })
 
 const formData = reactive<FormDataState>(createDefaultFormData())
@@ -215,7 +215,7 @@ const rules = computed<FormRules>(() => ({
           {min: 1, max: 65535, message: t('orbien.proxy.portRange'), trigger: 'blur'}
         ]
       }),
-  limitTotal: LIMIT_TOTAL_RULES
+  bandwidth: BANDWIDTH_RULES
 }))
 
 const parseLines = (value: string): string[] =>
@@ -242,7 +242,7 @@ const applyDetail = (detail: Api.Proxy.HttpProxyDetailDTO) => {
     customDomains: (detail.customDomains || []).join('\n'),
     localHost: detail.localHost || '127.0.0.1',
     localPort: detail.localPort,
-    limitTotal: detail.limitTotal ?? undefined
+    bandwidth: detail.bandwidth ?? undefined
   })
   refreshSubdomainBindings()
 }
@@ -388,7 +388,7 @@ const handleSubmit = async () => {
       domainType: parseInt(formData.domainType, 10),
       localHost: formData.localHost,
       localPort: formData.localPort!,
-      limitTotal: toLimitTotalPayload(formData.limitTotal),
+      bandwidth: toBandwidthPayload(formData.bandwidth),
       ...buildDomainPayload()
     }
 

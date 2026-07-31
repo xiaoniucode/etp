@@ -25,9 +25,9 @@ public class UdpProxyDetailDTO {
     private List<TargetDTO> targets;
     private LoadBalanceDTO loadBalance;
     /**
-     * 总带宽 Mbps
+     * 带宽 Mbps
      */
-    private Integer limitTotal;
+    private Integer bandwidth;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")

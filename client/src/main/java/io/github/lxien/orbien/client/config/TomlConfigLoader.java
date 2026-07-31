@@ -8,6 +8,7 @@ import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.client.config.domain.*;
 import io.github.lxien.orbien.core.http.HeaderRewriteSupport;
 import io.github.lxien.orbien.core.time.TimeAccessSupport;
+import io.github.lxien.orbien.core.utils.BandwidthParser;
 import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
@@ -409,15 +410,9 @@ public class TomlConfigLoader implements ConfigSource {
                 }
 
                 //带宽限制
-                Toml bandwidth = proxyTable.getTable("bandwidth");
-                if (bandwidth != null) {
-                    String limit = bandwidth.getString("limit_total");
-                    String limitIn = bandwidth.getString("limit_in");
-                    String limitOut = bandwidth.getString("limit_out");
-                    if (StringUtils.hasText(limit) || StringUtils.hasText(limitIn) || StringUtils.hasText(limitOut)) {
-                        BandwidthConfig bandwidthConfig = new BandwidthConfig(limit, limitIn, limitOut);
-                        proxyConfig.setBandwidth(bandwidthConfig);
-                    }
+                String bandwidth = proxyTable.getString("bandwidth");
+                if (StringUtils.hasText(bandwidth)) {
+                    proxyConfig.setBandwidth(BandwidthParser.parseToBps(bandwidth));
                 }
                 //自定义传输配置
                 Toml transport = proxyTable.getTable("transport");

@@ -708,7 +708,6 @@
         "healthCheck": "健康检查",
         "tls": "TLS 加密",
         "transport": "传输安全",
-        "rateLimit": "流量限制",
         "headerRewrite": "Header 改写",
         "socks5Auth": "SOCKS5 认证"
       },
@@ -821,20 +820,6 @@
           "speed": "速度",
           "ratio": "压缩率"
         }
-      },
-      "rateLimit": {
-        "bandwidthUnit": "带宽单位",
-        "bandwidthUnitDesc": "统一设置下方所有带宽字段的输入与显示单位",
-        "selectUnit": "选择单位",
-        "bandwidthLimit": "带宽限制",
-        "bandwidthLimitDesc": "分别限制下载、上传与总带宽，留空表示不限制",
-        "totalBandwidth": "总带宽",
-        "totalBandwidthHint": "上下行共享总带宽，与单向限制同时配置时需满足总量约束",
-        "downloadBandwidth": "下载带宽",
-        "downloadBandwidthHint": "限制客户端下载速率（内网服务 -> 客户端）",
-        "uploadBandwidth": "上传带宽",
-        "uploadBandwidthHint": "限制客户端上传速率（客户端 -> 内网服务）",
-        "unlimited": "不限"
       },
       "health": {
         "desc": "开启后将定期检测内网服务可用性，异常节点会被负载均衡自动剔除",

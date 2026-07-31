@@ -15,7 +15,7 @@ public class Socks5ProxyDetailDTO implements Serializable {
     private String name;
     private Integer remotePort;
     private Integer listenPort;
-    private Integer limitTotal;
+    private Integer bandwidth;
     private Boolean authEnabled;
     private List<Socks5UserDTO> authUsers = new ArrayList<>();
     private LocalDateTime createdAt;

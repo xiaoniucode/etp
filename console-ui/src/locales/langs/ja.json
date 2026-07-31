@@ -708,7 +708,6 @@
         "healthCheck": "ヘルスチェック",
         "tls": "TLS 暗号化",
         "transport": "転送セキュリティ",
-        "rateLimit": "流量制限",
         "headerRewrite": "Header 書き換え",
         "socks5Auth": "SOCKS5 認証"
       },
@@ -821,20 +820,6 @@
           "speed": "速度",
           "ratio": "圧縮率"
         }
-      },
-      "rateLimit": {
-        "bandwidthUnit": "帯域幅単位",
-        "bandwidthUnitDesc": "以下のすべての帯域幅フィールドの入力・表示単位を統一",
-        "selectUnit": "単位を選択",
-        "bandwidthLimit": "帯域幅制限",
-        "bandwidthLimitDesc": "ダウンロード・アップロード・合計帯域幅を個別に制限。空欄は無制限",
-        "totalBandwidth": "合計帯域幅",
-        "totalBandwidthHint": "上下行共有の合計帯域幅。方向別制限と併用する場合は合計制約を満たす必要があります",
-        "downloadBandwidth": "ダウンロード帯域幅",
-        "downloadBandwidthHint": "クライアントのダウンロード速度を制限（内部サービス → クライアント）",
-        "uploadBandwidth": "アップロード帯域幅",
-        "uploadBandwidthHint": "クライアントのアップロード速度を制限（クライアント → 内部サービス）",
-        "unlimited": "無制限"
       },
       "health": {
         "desc": "有効にすると内部サービスの可用性を定期的に検査し、異常ノードはロードバランシングから自動除外されます",

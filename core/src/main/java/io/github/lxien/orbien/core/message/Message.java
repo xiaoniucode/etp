@@ -23867,893 +23867,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
   }
 
-  public interface BandwidthOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.Bandwidth)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>optional string limit = 1;</code>
-     * @return Whether the limit field is set.
-     */
-    boolean hasLimit();
-    /**
-     * <code>optional string limit = 1;</code>
-     * @return The limit.
-     */
-    java.lang.String getLimit();
-    /**
-     * <code>optional string limit = 1;</code>
-     * @return The bytes for limit.
-     */
-    com.google.protobuf.ByteString
-        getLimitBytes();
-
-    /**
-     * <code>optional string limit_in = 2;</code>
-     * @return Whether the limitIn field is set.
-     */
-    boolean hasLimitIn();
-    /**
-     * <code>optional string limit_in = 2;</code>
-     * @return The limitIn.
-     */
-    java.lang.String getLimitIn();
-    /**
-     * <code>optional string limit_in = 2;</code>
-     * @return The bytes for limitIn.
-     */
-    com.google.protobuf.ByteString
-        getLimitInBytes();
-
-    /**
-     * <code>optional string limit_out = 3;</code>
-     * @return Whether the limitOut field is set.
-     */
-    boolean hasLimitOut();
-    /**
-     * <code>optional string limit_out = 3;</code>
-     * @return The limitOut.
-     */
-    java.lang.String getLimitOut();
-    /**
-     * <code>optional string limit_out = 3;</code>
-     * @return The bytes for limitOut.
-     */
-    com.google.protobuf.ByteString
-        getLimitOutBytes();
-  }
-  /**
-   * Protobuf type {@code io.github.lxien.orbien.core.message.Bandwidth}
-   */
-  public static final class Bandwidth extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.Bandwidth)
-      BandwidthOrBuilder {
-  private static final long serialVersionUID = 0L;
-    static {
-      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
-        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
-        /* major= */ 4,
-        /* minor= */ 33,
-        /* patch= */ 4,
-        /* suffix= */ "",
-        "Bandwidth");
-    }
-    // Use Bandwidth.newBuilder() to construct.
-    private Bandwidth(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-    }
-    private Bandwidth() {
-      limit_ = "";
-      limitIn_ = "";
-      limitOut_ = "";
-    }
-
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Bandwidth_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              io.github.lxien.orbien.core.message.Message.Bandwidth.class, io.github.lxien.orbien.core.message.Message.Bandwidth.Builder.class);
-    }
-
-    private int bitField0_;
-    public static final int LIMIT_FIELD_NUMBER = 1;
-    @SuppressWarnings("serial")
-    private volatile java.lang.Object limit_ = "";
-    /**
-     * <code>optional string limit = 1;</code>
-     * @return Whether the limit field is set.
-     */
-    @java.lang.Override
-    public boolean hasLimit() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>optional string limit = 1;</code>
-     * @return The limit.
-     */
-    @java.lang.Override
-    public java.lang.String getLimit() {
-      java.lang.Object ref = limit_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        limit_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>optional string limit = 1;</code>
-     * @return The bytes for limit.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getLimitBytes() {
-      java.lang.Object ref = limit_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        limit_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int LIMIT_IN_FIELD_NUMBER = 2;
-    @SuppressWarnings("serial")
-    private volatile java.lang.Object limitIn_ = "";
-    /**
-     * <code>optional string limit_in = 2;</code>
-     * @return Whether the limitIn field is set.
-     */
-    @java.lang.Override
-    public boolean hasLimitIn() {
-      return ((bitField0_ & 0x00000002) != 0);
-    }
-    /**
-     * <code>optional string limit_in = 2;</code>
-     * @return The limitIn.
-     */
-    @java.lang.Override
-    public java.lang.String getLimitIn() {
-      java.lang.Object ref = limitIn_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        limitIn_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>optional string limit_in = 2;</code>
-     * @return The bytes for limitIn.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getLimitInBytes() {
-      java.lang.Object ref = limitIn_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        limitIn_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int LIMIT_OUT_FIELD_NUMBER = 3;
-    @SuppressWarnings("serial")
-    private volatile java.lang.Object limitOut_ = "";
-    /**
-     * <code>optional string limit_out = 3;</code>
-     * @return Whether the limitOut field is set.
-     */
-    @java.lang.Override
-    public boolean hasLimitOut() {
-      return ((bitField0_ & 0x00000004) != 0);
-    }
-    /**
-     * <code>optional string limit_out = 3;</code>
-     * @return The limitOut.
-     */
-    @java.lang.Override
-    public java.lang.String getLimitOut() {
-      java.lang.Object ref = limitOut_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        limitOut_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>optional string limit_out = 3;</code>
-     * @return The bytes for limitOut.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getLimitOutBytes() {
-      java.lang.Object ref = limitOut_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        limitOut_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (((bitField0_ & 0x00000001) != 0)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 1, limit_);
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 2, limitIn_);
-      }
-      if (((bitField0_ & 0x00000004) != 0)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 3, limitOut_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) != 0)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, limit_);
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, limitIn_);
-      }
-      if (((bitField0_ & 0x00000004) != 0)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, limitOut_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.Bandwidth)) {
-        return super.equals(obj);
-      }
-      io.github.lxien.orbien.core.message.Message.Bandwidth other = (io.github.lxien.orbien.core.message.Message.Bandwidth) obj;
-
-      if (hasLimit() != other.hasLimit()) return false;
-      if (hasLimit()) {
-        if (!getLimit()
-            .equals(other.getLimit())) return false;
-      }
-      if (hasLimitIn() != other.hasLimitIn()) return false;
-      if (hasLimitIn()) {
-        if (!getLimitIn()
-            .equals(other.getLimitIn())) return false;
-      }
-      if (hasLimitOut() != other.hasLimitOut()) return false;
-      if (hasLimitOut()) {
-        if (!getLimitOut()
-            .equals(other.getLimitOut())) return false;
-      }
-      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasLimit()) {
-        hash = (37 * hash) + LIMIT_FIELD_NUMBER;
-        hash = (53 * hash) + getLimit().hashCode();
-      }
-      if (hasLimitIn()) {
-        hash = (37 * hash) + LIMIT_IN_FIELD_NUMBER;
-        hash = (53 * hash) + getLimitIn().hashCode();
-      }
-      if (hasLimitOut()) {
-        hash = (37 * hash) + LIMIT_OUT_FIELD_NUMBER;
-        hash = (53 * hash) + getLimitOut().hashCode();
-      }
-      hash = (29 * hash) + getUnknownFields().hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.Bandwidth prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code io.github.lxien.orbien.core.message.Bandwidth}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.Bandwidth)
-        io.github.lxien.orbien.core.message.Message.BandwidthOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Bandwidth_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                io.github.lxien.orbien.core.message.Message.Bandwidth.class, io.github.lxien.orbien.core.message.Message.Bandwidth.Builder.class);
-      }
-
-      // Construct using io.github.lxien.orbien.core.message.Message.Bandwidth.newBuilder()
-      private Builder() {
-
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        bitField0_ = 0;
-        limit_ = "";
-        limitIn_ = "";
-        limitOut_ = "";
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor;
-      }
-
-      @java.lang.Override
-      public io.github.lxien.orbien.core.message.Message.Bandwidth getDefaultInstanceForType() {
-        return io.github.lxien.orbien.core.message.Message.Bandwidth.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public io.github.lxien.orbien.core.message.Message.Bandwidth build() {
-        io.github.lxien.orbien.core.message.Message.Bandwidth result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public io.github.lxien.orbien.core.message.Message.Bandwidth buildPartial() {
-        io.github.lxien.orbien.core.message.Message.Bandwidth result = new io.github.lxien.orbien.core.message.Message.Bandwidth(this);
-        if (bitField0_ != 0) { buildPartial0(result); }
-        onBuilt();
-        return result;
-      }
-
-      private void buildPartial0(io.github.lxien.orbien.core.message.Message.Bandwidth result) {
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.limit_ = limit_;
-          to_bitField0_ |= 0x00000001;
-        }
-        if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.limitIn_ = limitIn_;
-          to_bitField0_ |= 0x00000002;
-        }
-        if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.limitOut_ = limitOut_;
-          to_bitField0_ |= 0x00000004;
-        }
-        result.bitField0_ |= to_bitField0_;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof io.github.lxien.orbien.core.message.Message.Bandwidth) {
-          return mergeFrom((io.github.lxien.orbien.core.message.Message.Bandwidth)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.Bandwidth other) {
-        if (other == io.github.lxien.orbien.core.message.Message.Bandwidth.getDefaultInstance()) return this;
-        if (other.hasLimit()) {
-          limit_ = other.limit_;
-          bitField0_ |= 0x00000001;
-          onChanged();
-        }
-        if (other.hasLimitIn()) {
-          limitIn_ = other.limitIn_;
-          bitField0_ |= 0x00000002;
-          onChanged();
-        }
-        if (other.hasLimitOut()) {
-          limitOut_ = other.limitOut_;
-          bitField0_ |= 0x00000004;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        if (extensionRegistry == null) {
-          throw new java.lang.NullPointerException();
-        }
-        try {
-          boolean done = false;
-          while (!done) {
-            int tag = input.readTag();
-            switch (tag) {
-              case 0:
-                done = true;
-                break;
-              case 10: {
-                limit_ = input.readStringRequireUtf8();
-                bitField0_ |= 0x00000001;
-                break;
-              } // case 10
-              case 18: {
-                limitIn_ = input.readStringRequireUtf8();
-                bitField0_ |= 0x00000002;
-                break;
-              } // case 18
-              case 26: {
-                limitOut_ = input.readStringRequireUtf8();
-                bitField0_ |= 0x00000004;
-                break;
-              } // case 26
-              default: {
-                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
-                  done = true; // was an endgroup tag
-                }
-                break;
-              } // default:
-            } // switch (tag)
-          } // while (!done)
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.unwrapIOException();
-        } finally {
-          onChanged();
-        } // finally
-        return this;
-      }
-      private int bitField0_;
-
-      private java.lang.Object limit_ = "";
-      /**
-       * <code>optional string limit = 1;</code>
-       * @return Whether the limit field is set.
-       */
-      public boolean hasLimit() {
-        return ((bitField0_ & 0x00000001) != 0);
-      }
-      /**
-       * <code>optional string limit = 1;</code>
-       * @return The limit.
-       */
-      public java.lang.String getLimit() {
-        java.lang.Object ref = limit_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          limit_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>optional string limit = 1;</code>
-       * @return The bytes for limit.
-       */
-      public com.google.protobuf.ByteString
-          getLimitBytes() {
-        java.lang.Object ref = limit_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          limit_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string limit = 1;</code>
-       * @param value The limit to set.
-       * @return This builder for chaining.
-       */
-      public Builder setLimit(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        limit_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string limit = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearLimit() {
-        limit_ = getDefaultInstance().getLimit();
-        bitField0_ = (bitField0_ & ~0x00000001);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string limit = 1;</code>
-       * @param value The bytes for limit to set.
-       * @return This builder for chaining.
-       */
-      public Builder setLimitBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        limit_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object limitIn_ = "";
-      /**
-       * <code>optional string limit_in = 2;</code>
-       * @return Whether the limitIn field is set.
-       */
-      public boolean hasLimitIn() {
-        return ((bitField0_ & 0x00000002) != 0);
-      }
-      /**
-       * <code>optional string limit_in = 2;</code>
-       * @return The limitIn.
-       */
-      public java.lang.String getLimitIn() {
-        java.lang.Object ref = limitIn_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          limitIn_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>optional string limit_in = 2;</code>
-       * @return The bytes for limitIn.
-       */
-      public com.google.protobuf.ByteString
-          getLimitInBytes() {
-        java.lang.Object ref = limitIn_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          limitIn_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string limit_in = 2;</code>
-       * @param value The limitIn to set.
-       * @return This builder for chaining.
-       */
-      public Builder setLimitIn(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        limitIn_ = value;
-        bitField0_ |= 0x00000002;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string limit_in = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearLimitIn() {
-        limitIn_ = getDefaultInstance().getLimitIn();
-        bitField0_ = (bitField0_ & ~0x00000002);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string limit_in = 2;</code>
-       * @param value The bytes for limitIn to set.
-       * @return This builder for chaining.
-       */
-      public Builder setLimitInBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        limitIn_ = value;
-        bitField0_ |= 0x00000002;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object limitOut_ = "";
-      /**
-       * <code>optional string limit_out = 3;</code>
-       * @return Whether the limitOut field is set.
-       */
-      public boolean hasLimitOut() {
-        return ((bitField0_ & 0x00000004) != 0);
-      }
-      /**
-       * <code>optional string limit_out = 3;</code>
-       * @return The limitOut.
-       */
-      public java.lang.String getLimitOut() {
-        java.lang.Object ref = limitOut_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          limitOut_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>optional string limit_out = 3;</code>
-       * @return The bytes for limitOut.
-       */
-      public com.google.protobuf.ByteString
-          getLimitOutBytes() {
-        java.lang.Object ref = limitOut_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          limitOut_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string limit_out = 3;</code>
-       * @param value The limitOut to set.
-       * @return This builder for chaining.
-       */
-      public Builder setLimitOut(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        limitOut_ = value;
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string limit_out = 3;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearLimitOut() {
-        limitOut_ = getDefaultInstance().getLimitOut();
-        bitField0_ = (bitField0_ & ~0x00000004);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string limit_out = 3;</code>
-       * @param value The bytes for limitOut to set.
-       * @return This builder for chaining.
-       */
-      public Builder setLimitOutBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        limitOut_ = value;
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.Bandwidth)
-    }
-
-    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.Bandwidth)
-    private static final io.github.lxien.orbien.core.message.Message.Bandwidth DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.Bandwidth();
-    }
-
-    public static io.github.lxien.orbien.core.message.Message.Bandwidth getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<Bandwidth>
-        PARSER = new com.google.protobuf.AbstractParser<Bandwidth>() {
-      @java.lang.Override
-      public Bandwidth parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        Builder builder = newBuilder();
-        try {
-          builder.mergeFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(builder.buildPartial());
-        } catch (com.google.protobuf.UninitializedMessageException e) {
-          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
-        } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(e)
-              .setUnfinishedMessage(builder.buildPartial());
-        }
-        return builder.buildPartial();
-      }
-    };
-
-    public static com.google.protobuf.Parser<Bandwidth> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Bandwidth> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public io.github.lxien.orbien.core.message.Message.Bandwidth getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
   public interface TargetOrBuilder extends
       // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.Target)
       com.google.protobuf.MessageOrBuilder {
@@ -29210,19 +28323,33 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     io.github.lxien.orbien.core.message.Message.BasicAuthOrBuilder getBasicAuthOrBuilder();
 
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+     * <pre>
+     * 共享总带宽，如 "10Mbps"
+     * </pre>
+     *
+     * <code>optional string bandwidth = 11;</code>
      * @return Whether the bandwidth field is set.
      */
     boolean hasBandwidth();
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+     * <pre>
+     * 共享总带宽，如 "10Mbps"
+     * </pre>
+     *
+     * <code>optional string bandwidth = 11;</code>
      * @return The bandwidth.
      */
-    io.github.lxien.orbien.core.message.Message.Bandwidth getBandwidth();
+    java.lang.String getBandwidth();
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+     * <pre>
+     * 共享总带宽，如 "10Mbps"
+     * </pre>
+     *
+     * <code>optional string bandwidth = 11;</code>
+     * @return The bytes for bandwidth.
      */
-    io.github.lxien.orbien.core.message.Message.BandwidthOrBuilder getBandwidthOrBuilder();
+    com.google.protobuf.ByteString
+        getBandwidthBytes();
 
     /**
      * <code>optional .io.github.lxien.orbien.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
@@ -29386,6 +28513,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       name_ = "";
       protocol_ = 0;
       targets_ = java.util.Collections.emptyList();
+      bandwidth_ = "";
       loadBalanceStrategy_ = 0;
     }
 
@@ -29660,9 +28788,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     }
 
     public static final int BANDWIDTH_FIELD_NUMBER = 11;
-    private io.github.lxien.orbien.core.message.Message.Bandwidth bandwidth_;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object bandwidth_ = "";
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+     * <pre>
+     * 共享总带宽，如 "10Mbps"
+     * </pre>
+     *
+     * <code>optional string bandwidth = 11;</code>
      * @return Whether the bandwidth field is set.
      */
     @java.lang.Override
@@ -29670,19 +28803,47 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return ((bitField0_ & 0x00000010) != 0);
     }
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+     * <pre>
+     * 共享总带宽，如 "10Mbps"
+     * </pre>
+     *
+     * <code>optional string bandwidth = 11;</code>
      * @return The bandwidth.
      */
     @java.lang.Override
-    public io.github.lxien.orbien.core.message.Message.Bandwidth getBandwidth() {
-      return bandwidth_ == null ? io.github.lxien.orbien.core.message.Message.Bandwidth.getDefaultInstance() : bandwidth_;
+    public java.lang.String getBandwidth() {
+      java.lang.Object ref = bandwidth_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        bandwidth_ = s;
+        return s;
+      }
     }
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+     * <pre>
+     * 共享总带宽，如 "10Mbps"
+     * </pre>
+     *
+     * <code>optional string bandwidth = 11;</code>
+     * @return The bytes for bandwidth.
      */
     @java.lang.Override
-    public io.github.lxien.orbien.core.message.Message.BandwidthOrBuilder getBandwidthOrBuilder() {
-      return bandwidth_ == null ? io.github.lxien.orbien.core.message.Message.Bandwidth.getDefaultInstance() : bandwidth_;
+    public com.google.protobuf.ByteString
+        getBandwidthBytes() {
+      java.lang.Object ref = bandwidth_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        bandwidth_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     public static final int LOAD_BALANCE_STRATEGY_FIELD_NUMBER = 12;
@@ -29963,7 +29124,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         output.writeMessage(10, getBasicAuth());
       }
       if (((bitField0_ & 0x00000010) != 0)) {
-        output.writeMessage(11, getBandwidth());
+        com.google.protobuf.GeneratedMessage.writeString(output, 11, bandwidth_);
       }
       if (((bitField0_ & 0x00000020) != 0)) {
         output.writeEnum(12, loadBalanceStrategy_);
@@ -30040,8 +29201,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           .computeMessageSize(10, getBasicAuth());
       }
       if (((bitField0_ & 0x00000010) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(11, getBandwidth());
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(11, bandwidth_);
       }
       if (((bitField0_ & 0x00000020) != 0)) {
         size += com.google.protobuf.CodedOutputStream
@@ -30391,7 +29551,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           internalGetDomainFieldBuilder();
           internalGetAccessControlFieldBuilder();
           internalGetBasicAuthFieldBuilder();
-          internalGetBandwidthFieldBuilder();
           internalGetTransportFieldBuilder();
           internalGetTlsCertFieldBuilder();
           internalGetHealthCheckFieldBuilder();
@@ -30434,11 +29593,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           basicAuthBuilder_.dispose();
           basicAuthBuilder_ = null;
         }
-        bandwidth_ = null;
-        if (bandwidthBuilder_ != null) {
-          bandwidthBuilder_.dispose();
-          bandwidthBuilder_ = null;
-        }
+        bandwidth_ = "";
         loadBalanceStrategy_ = 0;
         transport_ = null;
         if (transportBuilder_ != null) {
@@ -30565,9 +29720,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           to_bitField0_ |= 0x00000008;
         }
         if (((from_bitField0_ & 0x00000400) != 0)) {
-          result.bandwidth_ = bandwidthBuilder_ == null
-              ? bandwidth_
-              : bandwidthBuilder_.build();
+          result.bandwidth_ = bandwidth_;
           to_bitField0_ |= 0x00000010;
         }
         if (((from_bitField0_ & 0x00000800) != 0)) {
@@ -30695,7 +29848,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           mergeBasicAuth(other.getBasicAuth());
         }
         if (other.hasBandwidth()) {
-          mergeBandwidth(other.getBandwidth());
+          bandwidth_ = other.bandwidth_;
+          bitField0_ |= 0x00000400;
+          onChanged();
         }
         if (other.hasLoadBalanceStrategy()) {
           setLoadBalanceStrategyValue(other.getLoadBalanceStrategyValue());
@@ -30815,9 +29970,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 break;
               } // case 82
               case 90: {
-                input.readMessage(
-                    internalGetBandwidthFieldBuilder().getBuilder(),
-                    extensionRegistry);
+                bandwidth_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000400;
                 break;
               } // case 90
@@ -31801,125 +30954,107 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return basicAuthBuilder_;
       }
 
-      private io.github.lxien.orbien.core.message.Message.Bandwidth bandwidth_;
-      private com.google.protobuf.SingleFieldBuilder<
-          io.github.lxien.orbien.core.message.Message.Bandwidth, io.github.lxien.orbien.core.message.Message.Bandwidth.Builder, io.github.lxien.orbien.core.message.Message.BandwidthOrBuilder> bandwidthBuilder_;
+      private java.lang.Object bandwidth_ = "";
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+       * <pre>
+       * 共享总带宽，如 "10Mbps"
+       * </pre>
+       *
+       * <code>optional string bandwidth = 11;</code>
        * @return Whether the bandwidth field is set.
        */
       public boolean hasBandwidth() {
         return ((bitField0_ & 0x00000400) != 0);
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+       * <pre>
+       * 共享总带宽，如 "10Mbps"
+       * </pre>
+       *
+       * <code>optional string bandwidth = 11;</code>
        * @return The bandwidth.
        */
-      public io.github.lxien.orbien.core.message.Message.Bandwidth getBandwidth() {
-        if (bandwidthBuilder_ == null) {
-          return bandwidth_ == null ? io.github.lxien.orbien.core.message.Message.Bandwidth.getDefaultInstance() : bandwidth_;
+      public java.lang.String getBandwidth() {
+        java.lang.Object ref = bandwidth_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          bandwidth_ = s;
+          return s;
         } else {
-          return bandwidthBuilder_.getMessage();
+          return (java.lang.String) ref;
         }
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+       * <pre>
+       * 共享总带宽，如 "10Mbps"
+       * </pre>
+       *
+       * <code>optional string bandwidth = 11;</code>
+       * @return The bytes for bandwidth.
        */
-      public Builder setBandwidth(io.github.lxien.orbien.core.message.Message.Bandwidth value) {
-        if (bandwidthBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          bandwidth_ = value;
+      public com.google.protobuf.ByteString
+          getBandwidthBytes() {
+        java.lang.Object ref = bandwidth_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          bandwidth_ = b;
+          return b;
         } else {
-          bandwidthBuilder_.setMessage(value);
+          return (com.google.protobuf.ByteString) ref;
         }
-        bitField0_ |= 0x00000400;
-        onChanged();
-        return this;
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+       * <pre>
+       * 共享总带宽，如 "10Mbps"
+       * </pre>
+       *
+       * <code>optional string bandwidth = 11;</code>
+       * @param value The bandwidth to set.
+       * @return This builder for chaining.
        */
       public Builder setBandwidth(
-          io.github.lxien.orbien.core.message.Message.Bandwidth.Builder builderForValue) {
-        if (bandwidthBuilder_ == null) {
-          bandwidth_ = builderForValue.build();
-        } else {
-          bandwidthBuilder_.setMessage(builderForValue.build());
-        }
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        bandwidth_ = value;
         bitField0_ |= 0x00000400;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
-       */
-      public Builder mergeBandwidth(io.github.lxien.orbien.core.message.Message.Bandwidth value) {
-        if (bandwidthBuilder_ == null) {
-          if (((bitField0_ & 0x00000400) != 0) &&
-            bandwidth_ != null &&
-            bandwidth_ != io.github.lxien.orbien.core.message.Message.Bandwidth.getDefaultInstance()) {
-            getBandwidthBuilder().mergeFrom(value);
-          } else {
-            bandwidth_ = value;
-          }
-        } else {
-          bandwidthBuilder_.mergeFrom(value);
-        }
-        if (bandwidth_ != null) {
-          bitField0_ |= 0x00000400;
-          onChanged();
-        }
-        return this;
-      }
-      /**
-       * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+       * <pre>
+       * 共享总带宽，如 "10Mbps"
+       * </pre>
+       *
+       * <code>optional string bandwidth = 11;</code>
+       * @return This builder for chaining.
        */
       public Builder clearBandwidth() {
+        bandwidth_ = getDefaultInstance().getBandwidth();
         bitField0_ = (bitField0_ & ~0x00000400);
-        bandwidth_ = null;
-        if (bandwidthBuilder_ != null) {
-          bandwidthBuilder_.dispose();
-          bandwidthBuilder_ = null;
-        }
         onChanged();
         return this;
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
+       * <pre>
+       * 共享总带宽，如 "10Mbps"
+       * </pre>
+       *
+       * <code>optional string bandwidth = 11;</code>
+       * @param value The bytes for bandwidth to set.
+       * @return This builder for chaining.
        */
-      public io.github.lxien.orbien.core.message.Message.Bandwidth.Builder getBandwidthBuilder() {
+      public Builder setBandwidthBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        bandwidth_ = value;
         bitField0_ |= 0x00000400;
         onChanged();
-        return internalGetBandwidthFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
-       */
-      public io.github.lxien.orbien.core.message.Message.BandwidthOrBuilder getBandwidthOrBuilder() {
-        if (bandwidthBuilder_ != null) {
-          return bandwidthBuilder_.getMessageOrBuilder();
-        } else {
-          return bandwidth_ == null ?
-              io.github.lxien.orbien.core.message.Message.Bandwidth.getDefaultInstance() : bandwidth_;
-        }
-      }
-      /**
-       * <code>optional .io.github.lxien.orbien.core.message.Bandwidth bandwidth = 11;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          io.github.lxien.orbien.core.message.Message.Bandwidth, io.github.lxien.orbien.core.message.Message.Bandwidth.Builder, io.github.lxien.orbien.core.message.Message.BandwidthOrBuilder> 
-          internalGetBandwidthFieldBuilder() {
-        if (bandwidthBuilder_ == null) {
-          bandwidthBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              io.github.lxien.orbien.core.message.Message.Bandwidth, io.github.lxien.orbien.core.message.Message.Bandwidth.Builder, io.github.lxien.orbien.core.message.Message.BandwidthOrBuilder>(
-                  getBandwidth(),
-                  getParentForChildren(),
-                  isClean());
-          bandwidth_ = null;
-        }
-        return bandwidthBuilder_;
+        return this;
       }
 
       private int loadBalanceStrategy_ = 0;
@@ -39951,11 +39086,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_io_github_lxien_orbien_core_message_FileOpResponse_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_io_github_lxien_orbien_core_message_Bandwidth_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_io_github_lxien_orbien_core_message_Target_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -40104,107 +39234,103 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       "path\030\004 \001(\t\022\014\n\004name\030\005 \001(\t\"a\n\016FileOpRespon" +
       "se\022\022\n\nrequest_id\030\001 \001(\t\022;\n\006status\030\002 \001(\0132+" +
       ".io.github.lxien.orbien.core.message.Sta" +
-      "tus\"s\n\tBandwidth\022\022\n\005limit\030\001 \001(\tH\000\210\001\001\022\025\n\010" +
-      "limit_in\030\002 \001(\tH\001\210\001\001\022\026\n\tlimit_out\030\003 \001(\tH\002" +
-      "\210\001\001B\010\n\006_limitB\013\n\t_limit_inB\014\n\n_limit_out" +
-      "\"`\n\006Target\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\r\022\021" +
-      "\n\004name\030\003 \001(\tH\000\210\001\001\022\023\n\006weight\030\004 \001(\005H\001\210\001\001B\007" +
-      "\n\005_nameB\t\n\007_weight\"_\n\006Domain\022\030\n\013auto_dom" +
-      "ain\030\001 \001(\010H\000\210\001\001\022\026\n\016custom_domains\030\002 \003(\t\022\023" +
-      "\n\013sub_domains\030\003 \003(\tB\016\n\014_auto_domain\":\n\007T" +
-      "lsCert\022\027\n\017private_key_pem\030\001 \001(\t\022\026\n\016cert_" +
-      "chain_pem\030\002 \001(\t\"\323\001\n\tTransport\022\026\n\tmultipl" +
-      "ex\030\001 \001(\010H\000\210\001\001\022\024\n\007encrypt\030\002 \001(\010H\001\210\001\001\022\025\n\010c" +
-      "ompress\030\003 \001(\010H\002\210\001\001\022\025\n\010protocol\030\004 \001(\tH\003\210\001" +
-      "\001\022\037\n\022compress_algorithm\030\005 \001(\tH\004\210\001\001B\014\n\n_m" +
-      "ultiplexB\n\n\010_encryptB\013\n\t_compressB\013\n\t_pr" +
-      "otocolB\025\n\023_compress_algorithm\"\247\001\n\013Health" +
-      "Check\022B\n\004type\030\001 \001(\01624.io.github.lxien.or" +
-      "bien.core.message.HealthCheckType\022\020\n\010int" +
-      "erval\030\002 \001(\005\022\017\n\007timeout\030\003 \001(\005\022\022\n\nmax_fail" +
-      "ed\030\004 \001(\005\022\014\n\004path\030\005 \001(\t\022\017\n\007enabled\030\006 \001(\010\"" +
-      "\252\013\n\005Proxy\022\017\n\007proxyId\030\001 \001(\t\022\014\n\004name\030\002 \001(\t" +
-      "\022C\n\010protocol\030\003 \001(\01621.io.github.lxien.orb" +
-      "ien.core.message.ProtocolType\022\017\n\007enabled" +
-      "\030\004 \001(\010\022<\n\007targets\030\005 \003(\0132+.io.github.lxie" +
-      "n.orbien.core.message.Target\022\023\n\013force_ht" +
-      "tps\030\006 \001(\010\022\030\n\013remote_port\030\007 \001(\rH\000\210\001\001\022@\n\006d" +
-      "omain\030\010 \001(\0132+.io.github.lxien.orbien.cor" +
-      "e.message.DomainH\001\210\001\001\022O\n\016access_control\030" +
-      "\t \001(\01322.io.github.lxien.orbien.core.mess" +
-      "age.AccessControlH\002\210\001\001\022G\n\nbasic_auth\030\n \001" +
-      "(\0132..io.github.lxien.orbien.core.message" +
-      ".BasicAuthH\003\210\001\001\022F\n\tbandwidth\030\013 \001(\0132..io." +
-      "github.lxien.orbien.core.message.Bandwid" +
-      "thH\004\210\001\001\022\\\n\025load_balance_strategy\030\014 \001(\01628" +
-      ".io.github.lxien.orbien.core.message.Loa" +
-      "dBalanceStrategyH\005\210\001\001\022F\n\ttransport\030\r \001(\013" +
-      "2..io.github.lxien.orbien.core.message.T" +
-      "ransportH\006\210\001\001\022C\n\010tls_cert\030\016 \001(\0132,.io.git" +
-      "hub.lxien.orbien.core.message.TlsCertH\007\210" +
-      "\001\001\022K\n\014health_check\030\017 \001(\01320.io.github.lxi" +
-      "en.orbien.core.message.HealthCheckH\010\210\001\001\022" +
-      "I\n\013socks5_auth\030\020 \001(\0132/.io.github.lxien.o" +
-      "rbien.core.message.Socks5AuthH\t\210\001\001\022J\n\tfi" +
-      "le_auth\030\021 \001(\01322.io.github.lxien.orbien.c" +
-      "ore.message.FileShareAuthH\n\210\001\001\022N\n\013file_l" +
-      "imits\030\022 \001(\01324.io.github.lxien.orbien.cor" +
-      "e.message.FileShareLimitsH\013\210\001\001\022O\n\016header" +
-      "_rewrite\030\023 \001(\01322.io.github.lxien.orbien." +
-      "core.message.HeaderRewriteH\014\210\001\001\022I\n\013time_" +
-      "access\030\024 \001(\0132/.io.github.lxien.orbien.co" +
-      "re.message.TimeAccessH\r\210\001\001B\016\n\014_remote_po" +
-      "rtB\t\n\007_domainB\021\n\017_access_controlB\r\n\013_bas" +
-      "ic_authB\014\n\n_bandwidthB\030\n\026_load_balance_s" +
-      "trategyB\014\n\n_transportB\013\n\t_tls_certB\017\n\r_h" +
-      "ealth_checkB\016\n\014_socks5_authB\014\n\n_file_aut" +
-      "hB\016\n\014_file_limitsB\021\n\017_header_rewriteB\016\n\014" +
-      "_time_access\"\223\003\n\013RuntimeInfo\022\017\n\007proxyId\030" +
-      "\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\007targets\030\003 \003(\0132+.i" +
-      "o.github.lxien.orbien.core.message.Targe" +
-      "t\022\023\n\013remote_addr\030\004 \003(\t\022K\n\014health_check\030\005" +
-      " \001(\01320.io.github.lxien.orbien.core.messa" +
-      "ge.HealthCheckH\000\210\001\001\022F\n\ttransport\030\006 \001(\0132." +
-      ".io.github.lxien.orbien.core.message.Tra" +
-      "nsportH\001\210\001\001\022N\n\013file_limits\030\007 \001(\01324.io.gi" +
-      "thub.lxien.orbien.core.message.FileShare" +
-      "LimitsH\002\210\001\001B\017\n\r_health_checkB\014\n\n_transpo" +
-      "rtB\016\n\014_file_limits\"X\n\031BatchCreateProxies" +
-      "Request\022;\n\007proxies\030\001 \003(\0132*.io.github.lxi" +
-      "en.orbien.core.message.Proxy\"\232\001\n\032BatchCr" +
-      "eateProxiesResponse\022?\n\005items\030\001 \003(\01320.io." +
-      "github.lxien.orbien.core.message.Runtime" +
-      "Info\022;\n\006status\030\002 \001(\0132+.io.github.lxien.o" +
-      "rbien.core.message.Status\"\264\001\n\021ProxySyncR" +
-      "esponse\022K\n\017proxy_sync_type\030\001 \001(\01622.io.gi" +
-      "thub.lxien.orbien.core.message.ProxySync" +
-      "Type\022?\n\005items\030\002 \003(\01320.io.github.lxien.or" +
-      "bien.core.message.RuntimeInfo\022\021\n\tproxy_i" +
-      "ds\030\003 \003(\t\"\230\001\n\rServiceHealth\022\020\n\010proxy_id\030\001" +
-      " \001(\t\022\014\n\004host\030\002 \001(\t\022\014\n\004port\030\003 \001(\r\022A\n\006stat" +
-      "us\030\004 \001(\01621.io.github.lxien.orbien.core.m" +
-      "essage.HealthStatus\022\026\n\016responseTimeMs\030\005 " +
-      "\001(\004\"d\n\037BatchReportServiceHealthRequest\022A" +
-      "\n\005items\030\001 \003(\01322.io.github.lxien.orbien.c" +
-      "ore.message.ServiceHealth\"D\n\005Error\022;\n\006st" +
-      "atus\030\001 \001(\0132+.io.github.lxien.orbien.core" +
-      ".message.Status*K\n\014ProtocolType\022\007\n\003TCP\020\000" +
-      "\022\010\n\004HTTP\020\001\022\t\n\005HTTPS\020\002\022\007\n\003UDP\020\003\022\n\n\006SOCKS5" +
-      "\020\004\022\010\n\004FILE\020\005*$\n\tAgentType\022\n\n\006BINARY\020\000\022\013\n" +
-      "\007SESSION\020\001*!\n\nAccessMode\022\t\n\005ALLOW\020\000\022\010\n\004D" +
-      "ENY\020\001*N\n\023LoadBalanceStrategy\022\017\n\013ROUND_RO" +
-      "BIN\020\000\022\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022\016\n\nLEAST_C" +
-      "ONN\020\003*-\n\014HealthStatus\022\013\n\007UNKNOWN\020\000\022\006\n\002UP" +
-      "\020\001\022\010\n\004DOWN\020\002*:\n\rProxySyncType\022\010\n\004FULL\020\000\022" +
-      "\007\n\003ADD\020\001\022\n\n\006UPDATE\020\002\022\n\n\006DELETE\020\003*H\n\017Heal" +
-      "thCheckType\022\031\n\025HEALTH_CHECK_TYPE_TCP\020\000\022\032" +
-      "\n\026HEALTH_CHECK_TYPE_HTTP\020\001*p\n\017HeaderDire" +
-      "ction\022 \n\034HEADER_DIRECTION_UNSPECIFIED\020\000\022" +
-      "\034\n\030HEADER_DIRECTION_REQUEST\020\001\022\035\n\031HEADER_" +
-      "DIRECTION_RESPONSE\020\002*u\n\014HeaderAction\022\035\n\031" +
-      "HEADER_ACTION_UNSPECIFIED\020\000\022\025\n\021HEADER_AC" +
-      "TION_SET\020\001\022\025\n\021HEADER_ACTION_ADD\020\002\022\030\n\024HEA" +
-      "DER_ACTION_REMOVE\020\003b\006proto3"
+      "tus\"`\n\006Target\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(" +
+      "\r\022\021\n\004name\030\003 \001(\tH\000\210\001\001\022\023\n\006weight\030\004 \001(\005H\001\210\001" +
+      "\001B\007\n\005_nameB\t\n\007_weight\"_\n\006Domain\022\030\n\013auto_" +
+      "domain\030\001 \001(\010H\000\210\001\001\022\026\n\016custom_domains\030\002 \003(" +
+      "\t\022\023\n\013sub_domains\030\003 \003(\tB\016\n\014_auto_domain\":" +
+      "\n\007TlsCert\022\027\n\017private_key_pem\030\001 \001(\t\022\026\n\016ce" +
+      "rt_chain_pem\030\002 \001(\t\"\323\001\n\tTransport\022\026\n\tmult" +
+      "iplex\030\001 \001(\010H\000\210\001\001\022\024\n\007encrypt\030\002 \001(\010H\001\210\001\001\022\025" +
+      "\n\010compress\030\003 \001(\010H\002\210\001\001\022\025\n\010protocol\030\004 \001(\tH" +
+      "\003\210\001\001\022\037\n\022compress_algorithm\030\005 \001(\tH\004\210\001\001B\014\n" +
+      "\n_multiplexB\n\n\010_encryptB\013\n\t_compressB\013\n\t" +
+      "_protocolB\025\n\023_compress_algorithm\"\247\001\n\013Hea" +
+      "lthCheck\022B\n\004type\030\001 \001(\01624.io.github.lxien" +
+      ".orbien.core.message.HealthCheckType\022\020\n\010" +
+      "interval\030\002 \001(\005\022\017\n\007timeout\030\003 \001(\005\022\022\n\nmax_f" +
+      "ailed\030\004 \001(\005\022\014\n\004path\030\005 \001(\t\022\017\n\007enabled\030\006 \001" +
+      "(\010\"\372\n\n\005Proxy\022\017\n\007proxyId\030\001 \001(\t\022\014\n\004name\030\002 " +
+      "\001(\t\022C\n\010protocol\030\003 \001(\01621.io.github.lxien." +
+      "orbien.core.message.ProtocolType\022\017\n\007enab" +
+      "led\030\004 \001(\010\022<\n\007targets\030\005 \003(\0132+.io.github.l" +
+      "xien.orbien.core.message.Target\022\023\n\013force" +
+      "_https\030\006 \001(\010\022\030\n\013remote_port\030\007 \001(\rH\000\210\001\001\022@" +
+      "\n\006domain\030\010 \001(\0132+.io.github.lxien.orbien." +
+      "core.message.DomainH\001\210\001\001\022O\n\016access_contr" +
+      "ol\030\t \001(\01322.io.github.lxien.orbien.core.m" +
+      "essage.AccessControlH\002\210\001\001\022G\n\nbasic_auth\030" +
+      "\n \001(\0132..io.github.lxien.orbien.core.mess" +
+      "age.BasicAuthH\003\210\001\001\022\026\n\tbandwidth\030\013 \001(\tH\004\210" +
+      "\001\001\022\\\n\025load_balance_strategy\030\014 \001(\01628.io.g" +
+      "ithub.lxien.orbien.core.message.LoadBala" +
+      "nceStrategyH\005\210\001\001\022F\n\ttransport\030\r \001(\0132..io" +
+      ".github.lxien.orbien.core.message.Transp" +
+      "ortH\006\210\001\001\022C\n\010tls_cert\030\016 \001(\0132,.io.github.l" +
+      "xien.orbien.core.message.TlsCertH\007\210\001\001\022K\n" +
+      "\014health_check\030\017 \001(\01320.io.github.lxien.or" +
+      "bien.core.message.HealthCheckH\010\210\001\001\022I\n\013so" +
+      "cks5_auth\030\020 \001(\0132/.io.github.lxien.orbien" +
+      ".core.message.Socks5AuthH\t\210\001\001\022J\n\tfile_au" +
+      "th\030\021 \001(\01322.io.github.lxien.orbien.core.m" +
+      "essage.FileShareAuthH\n\210\001\001\022N\n\013file_limits" +
+      "\030\022 \001(\01324.io.github.lxien.orbien.core.mes" +
+      "sage.FileShareLimitsH\013\210\001\001\022O\n\016header_rewr" +
+      "ite\030\023 \001(\01322.io.github.lxien.orbien.core." +
+      "message.HeaderRewriteH\014\210\001\001\022I\n\013time_acces" +
+      "s\030\024 \001(\0132/.io.github.lxien.orbien.core.me" +
+      "ssage.TimeAccessH\r\210\001\001B\016\n\014_remote_portB\t\n" +
+      "\007_domainB\021\n\017_access_controlB\r\n\013_basic_au" +
+      "thB\014\n\n_bandwidthB\030\n\026_load_balance_strate" +
+      "gyB\014\n\n_transportB\013\n\t_tls_certB\017\n\r_health" +
+      "_checkB\016\n\014_socks5_authB\014\n\n_file_authB\016\n\014" +
+      "_file_limitsB\021\n\017_header_rewriteB\016\n\014_time" +
+      "_access\"\223\003\n\013RuntimeInfo\022\017\n\007proxyId\030\001 \001(\t" +
+      "\022\014\n\004name\030\002 \001(\t\022<\n\007targets\030\003 \003(\0132+.io.git" +
+      "hub.lxien.orbien.core.message.Target\022\023\n\013" +
+      "remote_addr\030\004 \003(\t\022K\n\014health_check\030\005 \001(\0132" +
+      "0.io.github.lxien.orbien.core.message.He" +
+      "althCheckH\000\210\001\001\022F\n\ttransport\030\006 \001(\0132..io.g" +
+      "ithub.lxien.orbien.core.message.Transpor" +
+      "tH\001\210\001\001\022N\n\013file_limits\030\007 \001(\01324.io.github." +
+      "lxien.orbien.core.message.FileShareLimit" +
+      "sH\002\210\001\001B\017\n\r_health_checkB\014\n\n_transportB\016\n" +
+      "\014_file_limits\"X\n\031BatchCreateProxiesReque" +
+      "st\022;\n\007proxies\030\001 \003(\0132*.io.github.lxien.or" +
+      "bien.core.message.Proxy\"\232\001\n\032BatchCreateP" +
+      "roxiesResponse\022?\n\005items\030\001 \003(\01320.io.githu" +
+      "b.lxien.orbien.core.message.RuntimeInfo\022" +
+      ";\n\006status\030\002 \001(\0132+.io.github.lxien.orbien" +
+      ".core.message.Status\"\264\001\n\021ProxySyncRespon" +
+      "se\022K\n\017proxy_sync_type\030\001 \001(\01622.io.github." +
+      "lxien.orbien.core.message.ProxySyncType\022" +
+      "?\n\005items\030\002 \003(\01320.io.github.lxien.orbien." +
+      "core.message.RuntimeInfo\022\021\n\tproxy_ids\030\003 " +
+      "\003(\t\"\230\001\n\rServiceHealth\022\020\n\010proxy_id\030\001 \001(\t\022" +
+      "\014\n\004host\030\002 \001(\t\022\014\n\004port\030\003 \001(\r\022A\n\006status\030\004 " +
+      "\001(\01621.io.github.lxien.orbien.core.messag" +
+      "e.HealthStatus\022\026\n\016responseTimeMs\030\005 \001(\004\"d" +
+      "\n\037BatchReportServiceHealthRequest\022A\n\005ite" +
+      "ms\030\001 \003(\01322.io.github.lxien.orbien.core.m" +
+      "essage.ServiceHealth\"D\n\005Error\022;\n\006status\030" +
+      "\001 \001(\0132+.io.github.lxien.orbien.core.mess" +
+      "age.Status*K\n\014ProtocolType\022\007\n\003TCP\020\000\022\010\n\004H" +
+      "TTP\020\001\022\t\n\005HTTPS\020\002\022\007\n\003UDP\020\003\022\n\n\006SOCKS5\020\004\022\010\n" +
+      "\004FILE\020\005*$\n\tAgentType\022\n\n\006BINARY\020\000\022\013\n\007SESS" +
+      "ION\020\001*!\n\nAccessMode\022\t\n\005ALLOW\020\000\022\010\n\004DENY\020\001" +
+      "*N\n\023LoadBalanceStrategy\022\017\n\013ROUND_ROBIN\020\000" +
+      "\022\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022\016\n\nLEAST_CONN\020\003" +
+      "*-\n\014HealthStatus\022\013\n\007UNKNOWN\020\000\022\006\n\002UP\020\001\022\010\n" +
+      "\004DOWN\020\002*:\n\rProxySyncType\022\010\n\004FULL\020\000\022\007\n\003AD" +
+      "D\020\001\022\n\n\006UPDATE\020\002\022\n\n\006DELETE\020\003*H\n\017HealthChe" +
+      "ckType\022\031\n\025HEALTH_CHECK_TYPE_TCP\020\000\022\032\n\026HEA" +
+      "LTH_CHECK_TYPE_HTTP\020\001*p\n\017HeaderDirection" +
+      "\022 \n\034HEADER_DIRECTION_UNSPECIFIED\020\000\022\034\n\030HE" +
+      "ADER_DIRECTION_REQUEST\020\001\022\035\n\031HEADER_DIREC" +
+      "TION_RESPONSE\020\002*u\n\014HeaderAction\022\035\n\031HEADE" +
+      "R_ACTION_UNSPECIFIED\020\000\022\025\n\021HEADER_ACTION_" +
+      "SET\020\001\022\025\n\021HEADER_ACTION_ADD\020\002\022\030\n\024HEADER_A" +
+      "CTION_REMOVE\020\003b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -40366,86 +39492,80 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_FileOpResponse_descriptor,
         new java.lang.String[] { "RequestId", "Status", });
-    internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor =
-      getDescriptor().getMessageType(26);
-    internal_static_io_github_lxien_orbien_core_message_Bandwidth_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor,
-        new java.lang.String[] { "Limit", "LimitIn", "LimitOut", });
     internal_static_io_github_lxien_orbien_core_message_Target_descriptor =
-      getDescriptor().getMessageType(27);
+      getDescriptor().getMessageType(26);
     internal_static_io_github_lxien_orbien_core_message_Target_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Target_descriptor,
         new java.lang.String[] { "Host", "Port", "Name", "Weight", });
     internal_static_io_github_lxien_orbien_core_message_Domain_descriptor =
-      getDescriptor().getMessageType(28);
+      getDescriptor().getMessageType(27);
     internal_static_io_github_lxien_orbien_core_message_Domain_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Domain_descriptor,
         new java.lang.String[] { "AutoDomain", "CustomDomains", "SubDomains", });
     internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor =
-      getDescriptor().getMessageType(29);
+      getDescriptor().getMessageType(28);
     internal_static_io_github_lxien_orbien_core_message_TlsCert_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor,
         new java.lang.String[] { "PrivateKeyPem", "CertChainPem", });
     internal_static_io_github_lxien_orbien_core_message_Transport_descriptor =
-      getDescriptor().getMessageType(30);
+      getDescriptor().getMessageType(29);
     internal_static_io_github_lxien_orbien_core_message_Transport_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Transport_descriptor,
         new java.lang.String[] { "Multiplex", "Encrypt", "Compress", "Protocol", "CompressAlgorithm", });
     internal_static_io_github_lxien_orbien_core_message_HealthCheck_descriptor =
-      getDescriptor().getMessageType(31);
+      getDescriptor().getMessageType(30);
     internal_static_io_github_lxien_orbien_core_message_HealthCheck_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_HealthCheck_descriptor,
         new java.lang.String[] { "Type", "Interval", "Timeout", "MaxFailed", "Path", "Enabled", });
     internal_static_io_github_lxien_orbien_core_message_Proxy_descriptor =
-      getDescriptor().getMessageType(32);
+      getDescriptor().getMessageType(31);
     internal_static_io_github_lxien_orbien_core_message_Proxy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Proxy_descriptor,
         new java.lang.String[] { "ProxyId", "Name", "Protocol", "Enabled", "Targets", "ForceHttps", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalanceStrategy", "Transport", "TlsCert", "HealthCheck", "Socks5Auth", "FileAuth", "FileLimits", "HeaderRewrite", "TimeAccess", });
     internal_static_io_github_lxien_orbien_core_message_RuntimeInfo_descriptor =
-      getDescriptor().getMessageType(33);
+      getDescriptor().getMessageType(32);
     internal_static_io_github_lxien_orbien_core_message_RuntimeInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_RuntimeInfo_descriptor,
         new java.lang.String[] { "ProxyId", "Name", "Targets", "RemoteAddr", "HealthCheck", "Transport", "FileLimits", });
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesRequest_descriptor =
-      getDescriptor().getMessageType(34);
+      getDescriptor().getMessageType(33);
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesRequest_descriptor,
         new java.lang.String[] { "Proxies", });
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesResponse_descriptor =
-      getDescriptor().getMessageType(35);
+      getDescriptor().getMessageType(34);
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesResponse_descriptor,
         new java.lang.String[] { "Items", "Status", });
     internal_static_io_github_lxien_orbien_core_message_ProxySyncResponse_descriptor =
-      getDescriptor().getMessageType(36);
+      getDescriptor().getMessageType(35);
     internal_static_io_github_lxien_orbien_core_message_ProxySyncResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_ProxySyncResponse_descriptor,
         new java.lang.String[] { "ProxySyncType", "Items", "ProxyIds", });
     internal_static_io_github_lxien_orbien_core_message_ServiceHealth_descriptor =
-      getDescriptor().getMessageType(37);
+      getDescriptor().getMessageType(36);
     internal_static_io_github_lxien_orbien_core_message_ServiceHealth_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_ServiceHealth_descriptor,
         new java.lang.String[] { "ProxyId", "Host", "Port", "Status", "ResponseTimeMs", });
     internal_static_io_github_lxien_orbien_core_message_BatchReportServiceHealthRequest_descriptor =
-      getDescriptor().getMessageType(38);
+      getDescriptor().getMessageType(37);
     internal_static_io_github_lxien_orbien_core_message_BatchReportServiceHealthRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_BatchReportServiceHealthRequest_descriptor,
         new java.lang.String[] { "Items", });
     internal_static_io_github_lxien_orbien_core_message_Error_descriptor =
-      getDescriptor().getMessageType(39);
+      getDescriptor().getMessageType(38);
     internal_static_io_github_lxien_orbien_core_message_Error_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Error_descriptor,

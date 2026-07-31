@@ -26,9 +26,7 @@ public class FileShareUpdateParam {
     @NotEmpty(message = "根目录不能为空")
     private String rootPath;
     @Min(value = 1, message = "总带宽限制必须大于0")
-    private Integer limitTotal;
-    private Long limitIn;
-    private Long limitOut;
+    private Integer bandwidth;
     private Boolean authEnabled;
     private List<FileShareAuthUserParam> authUsers = new ArrayList<>();
     private Long maxUploadSize;

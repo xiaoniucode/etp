@@ -84,7 +84,7 @@
           </ElLink>
         </div>
       </ElFormItem>
-      <BandwidthLimitField v-model="formData.limitTotal"/>
+      <BandwidthLimitField v-model="formData.bandwidth"/>
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
@@ -111,9 +111,9 @@ import BackendServiceField from '@/views/orbien/proxy/shared/backend-service-fie
 import LocalPortInput from '@/views/orbien/proxy/shared/local-port-input.vue'
 import BandwidthLimitField from '@/views/orbien/proxy/shared/bandwidth-limit-field.vue'
 import {
-  LIMIT_TOTAL_RULES,
-  toLimitTotalPayload,
-  type LimitTotalMbps
+  BANDWIDTH_RULES,
+  toBandwidthPayload,
+  type BandwidthMbps
 } from '@/views/orbien/proxy/shared/bandwidth-limit'
 import {getCommonLocalPortPresets} from '@/views/orbien/proxy/shared/port-presets'
 import {isClusterMode} from '@/views/orbien/proxy/shared/is-cluster-mode'
@@ -127,7 +127,7 @@ interface FormDataState {
   name: string
   localHost: string
   localPort: number | undefined
-  limitTotal: LimitTotalMbps
+  bandwidth: BandwidthMbps
 }
 
 interface Props {
@@ -179,7 +179,7 @@ const DEFAULT_FORM_DATA: FormDataState = {
   name: '',
   localHost: '127.0.0.1',
   localPort: undefined,
-  limitTotal: undefined
+  bandwidth: undefined
 }
 const formData = reactive<FormDataState>({...DEFAULT_FORM_DATA})
 const targets = ref<Api.Proxy.TargetDTO[]>([])
@@ -218,7 +218,7 @@ const rules = computed<FormRules>(() => ({
           {min: 1, max: 65535, message: t('orbien.proxy.portRange'), trigger: 'blur'}
         ]
       }),
-  limitTotal: LIMIT_TOTAL_RULES
+  bandwidth: BANDWIDTH_RULES
 }))
 
 const parseRemotePort = (): number | undefined => {
@@ -307,7 +307,7 @@ const initFormData = async () => {
         name: proxyDetail.name || '',
         localHost: proxyDetail.localHost || '127.0.0.1',
         localPort: proxyDetail.localPort,
-        limitTotal: proxyDetail.limitTotal ?? undefined
+        bandwidth: proxyDetail.bandwidth ?? undefined
       })
       const displayPort = proxyDetail.remotePort ?? proxyDetail.listenPort
       remotePortInput.value = displayPort != null ? String(displayPort) : ''
@@ -365,7 +365,7 @@ const handleSubmit = async () => {
           name: formData.name,
           localHost: formData.localHost,
           localPort: formData.localPort!,
-          limitTotal: toLimitTotalPayload(formData.limitTotal),
+          bandwidth: toBandwidthPayload(formData.bandwidth),
           ...(remotePort != null ? {remotePort} : {})
         }
 

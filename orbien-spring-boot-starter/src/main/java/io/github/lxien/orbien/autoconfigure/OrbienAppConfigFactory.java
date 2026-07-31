@@ -10,7 +10,6 @@ import io.github.lxien.orbien.client.config.domain.RetryConfig;
 import io.github.lxien.orbien.client.config.domain.TransportConfig;
 import io.github.lxien.orbien.core.domain.AccessControlConfig;
 import io.github.lxien.orbien.core.domain.BasicAuthConfig;
-import io.github.lxien.orbien.core.domain.BandwidthConfig;
 import io.github.lxien.orbien.core.domain.HttpUser;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.domain.RouteConfig;
@@ -18,6 +17,7 @@ import io.github.lxien.orbien.core.domain.Target;
 import io.github.lxien.orbien.core.domain.TimeAccessConfig;
 import io.github.lxien.orbien.core.domain.TimeAccessWindow;
 import io.github.lxien.orbien.core.domain.TlsConfig;
+import io.github.lxien.orbien.core.utils.BandwidthParser;
 import io.github.lxien.orbien.core.domain.TransportCustomConfig;
 import io.github.lxien.orbien.core.enums.AccessControl;
 import io.github.lxien.orbien.core.enums.AgentType;
@@ -180,15 +180,8 @@ final class OrbienAppConfigFactory {
             proxyConfig.setTimeAccess(timeAccessConfig);
         }
 
-        BandwidthProperties bandwidth = proxy.getBandwidth();
-        if (StringUtils.hasText(bandwidth.getLimitTotal())
-                || StringUtils.hasText(bandwidth.getLimitIn())
-                || StringUtils.hasText(bandwidth.getLimitOut())) {
-            proxyConfig.setBandwidth(new BandwidthConfig(
-                    bandwidth.getLimitTotal(),
-                    bandwidth.getLimitIn(),
-                    bandwidth.getLimitOut()
-            ));
+        if (StringUtils.hasText(proxy.getBandwidth())) {
+            proxyConfig.setBandwidth(BandwidthParser.parseToBps(proxy.getBandwidth()));
         }
 
         if (protocol.isHttpOrHttps()) {

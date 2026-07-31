@@ -5,11 +5,9 @@ import {
     fetchGetHttpsProxyById,
     fetchGetTcpProxyById,
     fetchGetUdpProxyById,
-    fetchSaveProxyClusterConfig,
-    fetchUpdateProxyBandwidth
+    fetchSaveProxyClusterConfig
 } from './proxy'
 import {fetchGetFileShareById} from './file-share'
-import {saveProxyTransport} from './proxy-transport'
 
 export type ProxyDetail =
     | Api.Proxy.HttpProxyDetailDTO
@@ -41,21 +39,4 @@ export function saveProxyClusterConfig(
     loadBalance: Api.Proxy.LoadBalanceParam
 ) {
     return fetchSaveProxyClusterConfig(detail.id, {targets, loadBalance})
-}
-
-export function saveProxyTransportConfig(
-    _protocol: ProxyConfigProtocol,
-    _detail: ProxyDetail,
-    transport: Api.Proxy.TransportSaveParam,
-    proxyId: string
-) {
-    return saveProxyTransport(proxyId, transport)
-}
-
-export function saveProxyBandwidthConfig(
-    _protocol: ProxyConfigProtocol,
-    detail: ProxyDetail,
-    bandwidth: Api.Proxy.BandwidthSaveParam
-) {
-    return fetchUpdateProxyBandwidth(detail.id, bandwidth)
 }

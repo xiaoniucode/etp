@@ -16,32 +16,29 @@
 
 package io.github.lxien.orbien.core.utils;
 
-import io.github.lxien.orbien.core.enums.BandwidthUnit;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 带宽限流解析器
+ * 带宽限流解析
  */
 public final class BandwidthParser {
 
+    public static final long BPS_PER_MBPS = 1_000_000L;
+
     /**
-     * 严格匹配：
-     * - 只允许正整数（不允许小数）
-     * - 不允许前导0（0除外）
-     * - 单位严格大小写
+     * 严格匹配：正整数 + Mbps（不允许小数、前导 0、空格，单位大小写固定）
      */
-    private static final Pattern STRICT_PATTERN = Pattern.compile("^(0|[1-9][0-9]*)(bps|Kbps|Mbps|Gbps)$");
+    private static final Pattern STRICT_PATTERN = Pattern.compile("^(0|[1-9][0-9]*)Mbps$");
 
     private BandwidthParser() {
     }
 
     /**
-     * 将原始带宽值解析为bps单位值
+     * 将配置字符串解析为 bps
      *
-     * @param value 原始带宽，如 2Mbps
-     * @return 转换后的值 单位：bps
+     * @param value 如 {@code 10Mbps}
+     * @return bps；空串返回 null
      */
     public static Long parseToBps(String value) {
         if (value == null || value.isEmpty()) {
@@ -51,26 +48,57 @@ public final class BandwidthParser {
         Matcher matcher = STRICT_PATTERN.matcher(value.trim());
         if (!matcher.matches()) {
             throw new IllegalArgumentException(
-                    "带宽格式无效: " + value +
-                            "（必须为: 10Mbps / 100Kbps / 1Gbps，整数，无空格，区分大小写）"
+                    "带宽格式无效: " + value + "（必须为: 10Mbps，整数，无空格，单位固定为 Mbps）"
             );
         }
 
-        long number;
+        long mbps;
         try {
-            number = Long.parseLong(matcher.group(1));
+            mbps = Long.parseLong(matcher.group(1));
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("数值过大: " + value);
         }
 
-        String unitStr = matcher.group(2);
-        BandwidthUnit unit = BandwidthUnit.fromCode(unitStr);
+        return mbpsToBps(mbps);
+    }
 
-        long factor = unit.getFactor();
-        if (number > Long.MAX_VALUE / factor) {
-            throw new IllegalArgumentException("带宽值过大导致溢出: " + value);
+    public static long mbpsToBps(long mbps) {
+        if (mbps < 0) {
+            throw new IllegalArgumentException("带宽值不能为负");
         }
+        if (mbps > Long.MAX_VALUE / BPS_PER_MBPS) {
+            throw new IllegalArgumentException("带宽值过大导致溢出: " + mbps + "Mbps");
+        }
+        return mbps * BPS_PER_MBPS;
+    }
 
-        return number * factor;
+    /**
+     * Mbps -> bps；null 或 ≤0 视为未配置
+     */
+    public static Long mbpsToBpsOrNull(Integer mbps) {
+        if (mbps == null || mbps <= 0) {
+            return null;
+        }
+        return mbpsToBps(mbps.longValue());
+    }
+
+    /**
+     * bps -> Mbps（向下取整）
+     */
+    public static Integer bpsToMbps(Long bps) {
+        if (bps == null) {
+            return null;
+        }
+        return (int) (bps / BPS_PER_MBPS);
+    }
+
+    /**
+     * bps -> 配置字符串（如 {@code 10Mbps}）
+     */
+    public static String formatMbps(Long bps) {
+        if (bps == null) {
+            return null;
+        }
+        return (bps / BPS_PER_MBPS) + "Mbps";
     }
 }

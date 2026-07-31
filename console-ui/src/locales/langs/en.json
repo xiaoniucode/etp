@@ -708,7 +708,6 @@
         "healthCheck": "Health Check",
         "tls": "TLS Encryption",
         "transport": "Transport Security",
-        "rateLimit": "Rate Limiting",
         "headerRewrite": "Header Rewrite",
         "socks5Auth": "SOCKS5 Authentication"
       },
@@ -821,20 +820,6 @@
           "speed": "Speed",
           "ratio": "Ratio"
         }
-      },
-      "rateLimit": {
-        "bandwidthUnit": "Bandwidth Unit",
-        "bandwidthUnitDesc": "Applies to all bandwidth fields below for input and display",
-        "selectUnit": "Select unit",
-        "bandwidthLimit": "Bandwidth Limits",
-        "bandwidthLimitDesc": "Limit download, upload, and total bandwidth; leave empty for unlimited",
-        "totalBandwidth": "Total Bandwidth",
-        "totalBandwidthHint": "Shared uplink/downlink cap; must satisfy total constraints when combined with directional limits",
-        "downloadBandwidth": "Download Bandwidth",
-        "downloadBandwidthHint": "Limit client download rate (internal service → client)",
-        "uploadBandwidth": "Upload Bandwidth",
-        "uploadBandwidthHint": "Limit client upload rate (client → internal service)",
-        "unlimited": "Unlimited"
       },
       "health": {
         "desc": "Periodically checks internal service availability; unhealthy nodes are removed from load balancing",

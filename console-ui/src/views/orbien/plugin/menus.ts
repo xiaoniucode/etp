@@ -27,7 +27,6 @@ const menuLabelKeys = {
     health: 'orbien.plugin.menus.healthCheck',
     tls: 'orbien.plugin.menus.tls',
     trans: 'orbien.plugin.menus.transport',
-    limit: 'orbien.plugin.menus.rateLimit',
     headers: 'orbien.plugin.menus.headerRewrite'
 } as const
 
@@ -39,7 +38,6 @@ const menuIcons = {
     health: 'ri:heart-pulse-line',
     tls: 'ri:shield-check-line',
     trans: 'ri:lock-line',
-    limit: 'ri:speed-line',
     headers: 'ri:edit-box-line'
 } as const
 
@@ -54,12 +52,12 @@ function buildMenuItem(key: MenuKey): ProxyConfigMenuItem {
 }
 
 const protocolMenuKeys: Record<ProxyConfigProtocol, MenuKey[]> = {
-    [ProtocolType.TCP]: ['access', 'time', 'load', 'trans', 'health', 'limit'],
-    [ProtocolType.UDP]: ['access', 'time', 'load', 'trans', 'limit'],
-    [ProtocolType.HTTP]: ['access', 'time', 'auth', 'load', 'trans', 'health', 'limit', 'headers'],
-    [ProtocolType.HTTPS]: ['access', 'time', 'auth', 'load', 'tls', 'health', 'trans', 'limit', 'headers'],
-    [ProtocolType.SOCKS5]: ['access', 'time', 'trans', 'limit'],
-    [ProtocolType.FILE]: ['access', 'time', 'tls', 'trans', 'limit']
+    [ProtocolType.TCP]: ['access', 'time', 'load', 'trans', 'health'],
+    [ProtocolType.UDP]: ['access', 'time', 'load', 'trans'],
+    [ProtocolType.HTTP]: ['access', 'time', 'auth', 'load', 'trans', 'health', 'headers'],
+    [ProtocolType.HTTPS]: ['access', 'time', 'auth', 'load', 'tls', 'health', 'trans', 'headers'],
+    [ProtocolType.SOCKS5]: ['access', 'time', 'trans'],
+    [ProtocolType.FILE]: ['access', 'time', 'tls', 'trans']
 }
 
 /** 各协议对应的侧边栏菜单 */

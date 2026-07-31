@@ -91,8 +91,8 @@ public class ProxyConfigAssembler {
         config.setListenPort(config.getRemotePort());
         config.setInspectorEnabled(Boolean.TRUE.equals(proxyDO.getInspectorEnabled()));
 
-        if (proxyDO.getLimitTotal() != null || proxyDO.getLimitIn() != null || proxyDO.getLimitOut() != null) {
-            config.setBandwidth(new BandwidthConfig(proxyDO.getLimitTotal(), proxyDO.getLimitIn(), proxyDO.getLimitOut()));
+        if (proxyDO.getBandwidth() != null) {
+            config.setBandwidth(proxyDO.getBandwidth());
         }
 
         AccessControlDO accessControlDO = result.getAccessControlDO();

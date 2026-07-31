@@ -207,7 +207,6 @@ docker run -d \
 #### 2.3.3 Spring Boot Starter
 
 ```xml
-
 <dependency>
     <groupId>io.github.lxien</groupId>
     <artifactId>orbien-spring-boot-starter</artifactId>
@@ -216,6 +215,7 @@ docker run -d \
 ```
 
 ```yaml
+# application.yml
 orbien:
   client:
     enabled: true

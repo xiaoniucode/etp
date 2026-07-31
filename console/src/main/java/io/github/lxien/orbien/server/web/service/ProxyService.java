@@ -30,7 +30,6 @@ import io.github.lxien.orbien.server.web.dto.proxy.Socks5ProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyDetailDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyListDTO;
 import io.github.lxien.orbien.server.web.param.proxy.*;
-import io.github.lxien.orbien.server.web.param.bandwidth.BandwidthSaveParam;
 
 import java.util.Collection;
 
@@ -91,6 +90,4 @@ public interface ProxyService {
     PageResult<HttpsProxyListDTO> findHttpsProxies(PageQuery pageQuery);
 
     void saveClusterConfig(String proxyId, ProxyClusterSaveParam param);
-
-    void updateProxyBandwidth(String proxyId, BandwidthSaveParam param);
 }

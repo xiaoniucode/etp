@@ -55,8 +55,10 @@ public class ProxyProperties implements Serializable {
     @NestedConfigurationProperty
     private BasicAuthProperties basicAuth = new BasicAuthProperties();
 
-    @NestedConfigurationProperty
-    private BandwidthProperties bandwidth = new BandwidthProperties();
+    /**
+     * 带宽限制
+     */
+    private String bandwidth;
 
     @NestedConfigurationProperty
     private TransportCustomProperties transport = new TransportCustomProperties();

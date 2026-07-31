@@ -59,10 +59,9 @@ declare namespace Api.FileShare {
         allowMkdir?: boolean
         allowMove?: boolean
         allowRename?: boolean
-        limitTotal?: number | null
+        bandwidth?: number | null
         transportProtocol?: number
         transport?: Api.Proxy.TransportDTO
-        bandwidth?: Api.Proxy.BandwidthDTO | null
         authEnabled?: boolean
         authUsers?: FileShareUserDTO[]
         createdAt?: string
@@ -77,7 +76,7 @@ declare namespace Api.FileShare {
         subdomainBindings?: Api.Proxy.SubdomainBindingParam[]
         customDomains?: string[]
         rootPath: string
-        limitTotal?: number | null
+        bandwidth?: number | null
         authEnabled?: boolean
         authUsers?: FileShareAuthUserParam[]
         maxUploadSize?: number
@@ -96,9 +95,7 @@ declare namespace Api.FileShare {
         subdomainBindings?: Api.Proxy.SubdomainBindingParam[]
         customDomains?: string[]
         rootPath: string
-        limitTotal?: number | null
-        limitIn?: number
-        limitOut?: number
+        bandwidth?: number | null
         authEnabled?: boolean
         authUsers?: FileShareAuthUserParam[]
         maxUploadSize?: number

@@ -20,7 +20,7 @@ public class Socks5ProxyUpdateParam {
     @Max(value = 65535, message = "远程端口号不能大于65535")
     private Integer remotePort;
     @Min(value = 1, message = "总带宽限制必须大于0")
-    private Integer limitTotal;
+    private Integer bandwidth;
     private Boolean authEnabled;
     private List<Socks5AuthUserParam> authUsers = new ArrayList<>();
 }

@@ -140,7 +140,7 @@
         </ElInput>
       </ElFormItem>
 
-      <BandwidthLimitField v-model="formData.limitTotal"/>
+      <BandwidthLimitField v-model="formData.bandwidth"/>
 
       <ElFormItem :label="t('orbien.proxy.operationPermissions')">
         <ElSpace wrap>
@@ -179,9 +179,9 @@ import {
 import SubdomainBindingRows from '@/views/orbien/proxy/shared/subdomain-binding-rows.vue'
 import BandwidthLimitField from '@/views/orbien/proxy/shared/bandwidth-limit-field.vue'
 import {
-  LIMIT_TOTAL_RULES,
-  toLimitTotalPayload,
-  type LimitTotalMbps
+  BANDWIDTH_RULES,
+  toBandwidthPayload,
+  type BandwidthMbps
 } from '@/views/orbien/proxy/shared/bandwidth-limit'
 
 defineOptions({name: 'FileShareDialog'})
@@ -202,7 +202,7 @@ interface FormDataState {
   customDomains: string
   authEnabled: boolean
   maxUploadSizeMb: number
-  limitTotal: LimitTotalMbps
+  bandwidth: BandwidthMbps
   allowUpload: boolean
   allowDelete: boolean
   allowMkdir: boolean
@@ -260,7 +260,7 @@ const createDefaultFormData = (): FormDataState => ({
   customDomains: '',
   authEnabled: false,
   maxUploadSizeMb: DEFAULT_MAX_UPLOAD_MB,
-  limitTotal: undefined,
+  bandwidth: undefined,
   allowUpload: true,
   allowDelete: true,
   allowMkdir: true,
@@ -299,7 +299,7 @@ const rules = computed<FormRules>(() => ({
     {required: true, message: t('orbien.proxy.enterUploadLimit'), trigger: 'blur'},
     {type: 'number', min: 1, message: t('orbien.proxy.uploadLimitMin'), trigger: 'blur'}
   ],
-  limitTotal: LIMIT_TOTAL_RULES
+  bandwidth: BANDWIDTH_RULES
 }))
 
 const resetSubdomainErrors = () => {
@@ -396,7 +396,7 @@ const applyDetail = (detail: Api.FileShare.FileShareDetailDTO) => {
     customDomains: (detail.customDomains || []).join('\n'),
     authEnabled: detail.authEnabled ?? false,
     maxUploadSizeMb: bytesToMb(detail.maxUploadSize),
-    limitTotal: detail.limitTotal ?? undefined,
+    bandwidth: detail.bandwidth ?? undefined,
     allowUpload: detail.allowUpload ?? true,
     allowDelete: detail.allowDelete ?? true,
     allowMkdir: detail.allowMkdir ?? true,
@@ -520,7 +520,7 @@ const handleSubmit = async () => {
       name: formData.name,
       domainType: parseInt(formData.domainType, 10),
       rootPath: formData.rootPath.trim(),
-      limitTotal: toLimitTotalPayload(formData.limitTotal),
+      bandwidth: toBandwidthPayload(formData.bandwidth),
       authEnabled: formData.authEnabled,
       authUsers: buildAuthPayload(),
       maxUploadSize: mbToBytes(formData.maxUploadSizeMb),

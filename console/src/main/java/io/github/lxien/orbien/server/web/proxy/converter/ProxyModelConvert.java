@@ -87,11 +87,6 @@ public interface ProxyModelConvert {
     @Mapping(target = "id", source = "proxyId")
     ProxyDO toProxyDO(ProxyConfig config);
 
-    @Mapping(target = "limitTotal", expression = "java(bandwidth.getTotalBps())")
-    @Mapping(target = "limitIn", expression = "java(bandwidth.getInBps())")
-    @Mapping(target = "limitOut", expression = "java(bandwidth.getOutBps())")
-    void updateProxyDO(@MappingTarget ProxyDO proxyDO, BandwidthConfig bandwidth);
-
     default AccessControlDO toAccessControlDO(AccessControlConfig accessControl, String proxyId) {
         if (accessControl == null) {
             return null;

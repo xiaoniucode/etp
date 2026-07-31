@@ -32,11 +32,7 @@ orbien:
       transport:
         encrypt: true
         multiplex: true
-
-      bandwidth:
-        limit-total: 2Mbps
-        limit-in: 1Mbps
-        limit-out: 1Mbps
+      bandwidth: 2Mbps
 
       basic-auth:
         enabled: true
@@ -65,7 +61,7 @@ orbien:
         mode: allow
         time-enabled: true
         timezone: Asia/Shanghai
-        days: [1, 2, 3, 4, 5]
+        days: [ 1, 2, 3, 4, 5 ]
         windows:
           - start: "09:00:00"
             end: "18:00:00"

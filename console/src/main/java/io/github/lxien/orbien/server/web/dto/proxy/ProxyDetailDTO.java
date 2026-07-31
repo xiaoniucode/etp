@@ -16,7 +16,6 @@
 
 package io.github.lxien.orbien.server.web.dto.proxy;
 
-import io.github.lxien.orbien.server.web.dto.bandwidth.BandwidthDTO;
 import io.github.lxien.orbien.server.web.dto.loadbalance.LoadBalanceDTO;
 import io.github.lxien.orbien.server.web.dto.transport.TransportDTO;
 import lombok.Data;
@@ -34,7 +33,6 @@ public class ProxyDetailDTO implements Serializable {
     private Integer agentType;
     private Integer status;
     private TransportDTO transport;
-    private BandwidthDTO bandwidth;
     private LoadBalanceDTO loadBalance;
     private List<TargetDTO> targets;
     private LocalDateTime createdAt;

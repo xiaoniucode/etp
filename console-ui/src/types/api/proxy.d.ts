@@ -27,13 +27,6 @@ declare namespace Api.Proxy {
         healthStatus?: number
     }
 
-    /** 带宽配置 */
-    interface BandwidthDTO {
-        limitTotal: number | null
-        limitIn: number | null
-        limitOut: number | null
-    }
-
     /** 负载均衡配置 */
     interface LoadBalanceDTO {
         strategy: number
@@ -111,7 +104,6 @@ declare namespace Api.Proxy {
         agentType: number
         status: number
         transport: TransportDTO
-        bandwidth: BandwidthDTO | null
         loadBalance: LoadBalanceDTO | null
         targets: TargetDTO[]
         createdAt: string
@@ -144,8 +136,8 @@ declare namespace Api.Proxy {
         loadBalance?: LoadBalanceDTO | null
         localHost: string
         localPort: number
-        /** 总带宽 Mbps */
-        limitTotal: number | null
+        /** 带宽 Mbps */
+        bandwidth: number | null
         createdAt: string
         updatedAt: string
     }
@@ -169,8 +161,8 @@ declare namespace Api.Proxy {
         loadBalance?: LoadBalanceDTO | null
         localHost: string
         localPort: number
-        /** 总带宽 Mbps */
-        limitTotal: number | null
+        /** 带宽 Mbps */
+        bandwidth: number | null
         createdAt: string
         updatedAt: string
     }
@@ -187,7 +179,7 @@ declare namespace Api.Proxy {
         loadBalance?: LoadBalanceDTO | null
         localHost: string
         localPort: number
-        limitTotal: number | null
+        bandwidth: number | null
         createdAt: string
         updatedAt: string
     }
@@ -212,7 +204,7 @@ declare namespace Api.Proxy {
         name: string
         remotePort: number | null
         listenPort: number
-        limitTotal: number | null
+        bandwidth: number | null
         authEnabled?: boolean
         authUsers?: Socks5AuthUserDTO[]
         createdAt: string
@@ -283,14 +275,6 @@ declare namespace Api.Proxy {
         compressConstraints?: TransportCompressConstraints
     }
 
-    /** 带宽配置参数 */
-    interface BandwidthSaveParam {
-        limitTotal: number | null
-        limitIn: number | null
-        limitOut: number | null
-        unit: string | null
-    }
-
     /** 负载均衡参数 */
     interface LoadBalanceParam {
         strategy: number
@@ -305,7 +289,7 @@ declare namespace Api.Proxy {
         customDomains?: string[]
         localHost: string
         localPort: number
-        limitTotal?: number | null
+        bandwidth?: number | null
     }
 
     /** HTTP 代理更新参数 */
@@ -317,7 +301,7 @@ declare namespace Api.Proxy {
         customDomains?: string[]
         localHost: string
         localPort: number
-        limitTotal?: number | null
+        bandwidth?: number | null
     }
 
     /** HTTPS 代理创建参数 */
@@ -330,7 +314,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         forceHttps?: boolean
-        limitTotal?: number | null
+        bandwidth?: number | null
     }
 
     /** HTTPS 代理更新参数 */
@@ -343,7 +327,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         forceHttps?: boolean
-        limitTotal?: number | null
+        bandwidth?: number | null
     }
 
     /** TCP 代理创建参数 */
@@ -353,7 +337,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         remotePort?: number
-        limitTotal?: number | null
+        bandwidth?: number | null
     }
 
     /** TCP 代理更新参数 */
@@ -363,7 +347,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         remotePort?: number
-        limitTotal?: number | null
+        bandwidth?: number | null
     }
 
     /** UDP 代理创建参数 */
@@ -373,7 +357,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         remotePort?: number
-        limitTotal?: number | null
+        bandwidth?: number | null
     }
 
     /** UDP 代理更新参数 */
@@ -383,7 +367,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         remotePort?: number
-        limitTotal?: number | null
+        bandwidth?: number | null
     }
 
     /** SOCKS5 代理创建参数 */
@@ -391,7 +375,7 @@ declare namespace Api.Proxy {
         agentId: string
         name: string
         remotePort?: number
-        limitTotal?: number | null
+        bandwidth?: number | null
         authEnabled?: boolean
         authUsers?: Socks5AuthUserParam[]
     }
@@ -401,7 +385,7 @@ declare namespace Api.Proxy {
         id: string
         name: string
         remotePort?: number
-        limitTotal?: number | null
+        bandwidth?: number | null
         authEnabled?: boolean
         authUsers?: Socks5AuthUserParam[]
     }

@@ -58,13 +58,6 @@ export enum AgentType {
     STANDALONE = 1
 }
 
-export enum BandwidthUnit {
-    BPS = 'bps',
-    KBPS = 'Kbps',
-    MBPS = 'Mbps',
-    GBPS = 'Gbps'
-}
-
 export enum TunnelType {
     MULTIPLEX = 0,
     DIRECT = 1
@@ -104,19 +97,6 @@ export function getHeaderActionLabel(action?: number) {
         default:
             return action == null ? '' : String(action)
     }
-}
-
-export const BANDWIDTH_UNIT_OPTIONS = [
-    BandwidthUnit.KBPS,
-    BandwidthUnit.MBPS,
-    BandwidthUnit.GBPS
-] as const
-
-export const BANDWIDTH_UNIT_TO_BPS: Record<BandwidthUnit, number> = {
-    [BandwidthUnit.BPS]: 1,
-    [BandwidthUnit.KBPS]: 1_000,
-    [BandwidthUnit.MBPS]: 1_000_000,
-    [BandwidthUnit.GBPS]: 1_000_000_000
 }
 
 export function getProtocolLabel(protocol?: number) {

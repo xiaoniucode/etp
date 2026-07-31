@@ -129,20 +129,10 @@ public class ProxyDO {
     @Column(name = "load_balance_strategy")
     private LoadBalanceType loadBalanceStrategy;
     /**
-     * 总带宽限制（bps）
+     * 带宽限制
      */
-    @Column(name = "limit_total", comment = "总带宽限制（bps）")
-    private Long limitTotal;
-    /**
-     * 入站带宽限制（bps）
-     */
-    @Column(name = "limit_in", comment = "入站带宽限制（bps）")
-    private Long limitIn;
-    /**
-     * 出站带宽限制（bps）
-     */
-    @Column(name = "limit_out", comment = "出站带宽限制（bps）")
-    private Long limitOut;
+    @Column(name = "limit_total", comment = "带宽限制（bps）")
+    private Long bandwidth;
     /**
      * 是否启用HTTP请求抓包
      */

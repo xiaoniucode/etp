@@ -66,7 +66,6 @@ import BasicAuthPage from './modules/basic-auth/index.vue'
 import TlsPage from './modules/tls/index.vue'
 import ClusterPage from './modules/cluster/index.vue'
 import TransportPage from './modules/transport/index.vue'
-import RateLimitPolicyPage from './modules/rate-limit-policy/index.vue'
 import HealthCheckPage from './modules/health-check/index.vue'
 import HeaderRewritePage from './modules/header-rewrite/index.vue'
 import TimeAccessPage from './modules/time-access/index.vue'
@@ -128,7 +127,6 @@ const pageComponents: Record<string, Component> = {
   time: TimeAccessPage,
   load: ClusterPage,
   trans: TransportPage,
-  limit: RateLimitPolicyPage,
   health: HealthCheckPage,
   tls: TlsPage,
   headers: HeaderRewritePage
