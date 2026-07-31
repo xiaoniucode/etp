@@ -116,15 +116,15 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
 
     @Override
     public void onEvent(ProxyAddEvent event) {
-        transactionTemplate.executeWithoutResult(status -> {
-            try {
-                persistProxy(event);
-            } catch (Exception e) {
-                status.setRollbackOnly();
-                logger.error("代理配置信息保存到数据库失败: agentId={}, proxyId={}, name={}",
-                        event.getAgentId(), event.getProxyId(), event.getProxy().getName(), e);
-            }
-        });
+        try {
+            transactionTemplate.executeWithoutResult(status -> persistProxy(event));
+        } catch (Exception e) {
+            logger.error("代理配置信息保存到数据库失败: agentId={}, proxyId={}, name={}",
+                    event.getAgentId(), event.getProxyId(), event.getProxy().getName(), e);
+            return;
+        }
+        // 证书处理必须在代理事务完全结束后再跑，避免 afterCommit 内复用已结束事务上下文
+        applyReportedTlsCertIfNeeded(event);
     }
 
     private void persistProxy(ProxyAddEvent event) {
@@ -163,10 +163,6 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
             persistFileShareAuth(proxyId, proxy);
             persistFileShareLimits(proxyId, proxy);
             persistDomains(proxyId, event.getDomains());
-        }
-
-        if (protocol.requiresVisitorTls() && proxy.hasTlsCert()) {
-            persistReportedTlsCert(proxyId, proxy);
         }
 
         logger.debug("代理配置信息已保存到数据库: agentId={}, proxyId={}, name={}, protocol={}",
@@ -432,17 +428,28 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
         }
     }
 
-    private void persistReportedTlsCert(String proxyId, Message.Proxy proxy) {
+    /**
+     * 证书保存/绑定独立于代理落库事务，外层提交完成后再执行
+     */
+    private void applyReportedTlsCertIfNeeded(ProxyAddEvent event) {
+        Message.Proxy proxy = event.getProxy();
+        ProtocolType protocol = ProtocolType.fromName(proxy.getProtocol().name());
+        if (!protocol.requiresVisitorTls() || !proxy.hasTlsCert()) {
+            return;
+        }
         Message.TlsCert tlsCert = proxy.getTlsCert();
         if (!StringUtils.hasText(tlsCert.getPrivateKeyPem()) || !StringUtils.hasText(tlsCert.getCertChainPem())) {
             return;
         }
         try {
             TlsCertDTO cert = tlsCertificateService.saveOrGetCert(
-                    tlsCert.getPrivateKeyPem(), tlsCert.getCertChainPem(), CertSource.AGENT);
-            certBindingService.bindMatchingDomainsForProxy(cert.getId(), proxyId, true);
+                    tlsCert.getPrivateKeyPem(),
+                    tlsCert.getCertChainPem(),
+                    CertSource.AGENT);
+            certBindingService.bindMatchingDomainsForProxy(cert.getId(), event.getProxyId(), true);
         } catch (Exception e) {
-            logger.warn("客户端上报 TLS 证书处理失败: proxyId={}, name={}", proxyId, proxy.getName(), e);
+            logger.warn("客户端上报 TLS 证书处理失败: proxyId={}, name={}",
+                    event.getProxyId(), proxy.getName(), e);
         }
     }
 }

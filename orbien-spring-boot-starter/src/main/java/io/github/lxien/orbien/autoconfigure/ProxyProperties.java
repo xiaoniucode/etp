@@ -56,6 +56,12 @@ public class ProxyProperties implements Serializable {
     private BasicAuthProperties basicAuth = new BasicAuthProperties();
 
     /**
+     * HTTPS 代理 TLS 证书
+     */
+    @NestedConfigurationProperty
+    private HttpsProxyTlsProperties tls = new HttpsProxyTlsProperties();
+
+    /**
      * 带宽限制
      */
     private String bandwidth;

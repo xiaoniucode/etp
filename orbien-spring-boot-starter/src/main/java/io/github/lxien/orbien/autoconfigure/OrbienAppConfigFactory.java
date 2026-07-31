@@ -12,6 +12,7 @@ import io.github.lxien.orbien.core.domain.AccessControlConfig;
 import io.github.lxien.orbien.core.domain.BasicAuthConfig;
 import io.github.lxien.orbien.core.domain.HttpUser;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
+import io.github.lxien.orbien.core.domain.ProxyTlsCertConfig;
 import io.github.lxien.orbien.core.domain.RouteConfig;
 import io.github.lxien.orbien.core.domain.Target;
 import io.github.lxien.orbien.core.domain.TimeAccessConfig;
@@ -54,7 +55,7 @@ final class OrbienAppConfigFactory {
                 .authConfig(buildAuthConfig(properties))
                 .transportConfig(buildTransportConfig(properties, resourceLoader))
                 .connectionConfig(buildConnectionConfig(properties))
-                .addProxy(buildProxyConfig(properties, appName, localPort))
+                .addProxy(buildProxyConfig(properties, resourceLoader, appName, localPort))
                 .build();
     }
 
@@ -131,6 +132,7 @@ final class OrbienAppConfigFactory {
     }
 
     private static ProxyConfig buildProxyConfig(OrbienClientProperties properties,
+                                                ResourceLoader resourceLoader,
                                                 String appName,
                                                 int localPort) {
         ProxyProperties proxy = properties.getProxy();
@@ -203,6 +205,10 @@ final class OrbienAppConfigFactory {
             }
         }
 
+        if (protocol == ProxyProtocol.HTTPS) {
+            proxyConfig.setTlsCertConfig(buildProxyTlsCertConfig(proxy.getTls(), resourceLoader));
+        }
+
         TransportCustomProperties transport = proxy.getTransport();
         TransportCustomConfig.TransportCustomConfigBuilder transportBuilder = TransportCustomConfig.builder()
                 .multiplex(transport.isMultiplex())
@@ -216,6 +222,28 @@ final class OrbienAppConfigFactory {
         }
         proxyConfig.setTransport(transportBuilder.build());
         return proxyConfig;
+    }
+
+    /**
+     * HTTPS 代理证书
+     */
+    private static ProxyTlsCertConfig buildProxyTlsCertConfig(HttpsProxyTlsProperties tls,
+                                                              ResourceLoader resourceLoader) {
+        boolean hasCert = StringUtils.hasText(tls.getCertFile());
+        boolean hasKey = StringUtils.hasText(tls.getKeyFile());
+        if (!hasCert && !hasKey) {
+            return null;
+        }
+        if (!hasCert) {
+            throw new IllegalStateException("orbien.client.proxy.tls.cert-file 不能为空");
+        }
+        if (!hasKey) {
+            throw new IllegalStateException("orbien.client.proxy.tls.key-file 不能为空");
+        }
+        return new ProxyTlsCertConfig(
+                resolveTlsPath(tls.getKeyFile(), resourceLoader),
+                resolveTlsPath(tls.getCertFile(), resourceLoader)
+        );
     }
 
     /**
