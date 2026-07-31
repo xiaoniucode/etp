@@ -17,8 +17,8 @@
   <a href="https://openjdk.org/projects/jdk/25/">
     <img src="https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 25"/>
   </a>
-  <a href="https://github.com/lxien/orbien/releases/v0.25.0">
-    <img src="https://img.shields.io/badge/orbien-0.25.0-blue?style=for-the-badge" alt="orbien:0.25.0"/>
+  <a href="https://github.com/lxien/orbien/releases/v0.26.0">
+    <img src="https://img.shields.io/badge/orbien-0.26.0-blue?style=for-the-badge" alt="orbien:0.26.0"/>
   </a>
   <a href="https://central.sonatype.com/artifact/io.github.lxien/orbien-spring-boot-starter">
     <img src="https://img.shields.io/maven-central/v/io.github.lxien/orbien-spring-boot-starter?style=for-the-badge&logo=apachemaven&logoColor=white" alt="Maven Central"/>
@@ -112,7 +112,7 @@ docker run -d \
   -v /opt/orbien/data:/app/data \
   -v /opt/orbien/cert:/app/cert \
   -v /opt/orbien/config:/app/config \
-  lxien/orbien-server:0.25.0
+  lxien/orbien-server:0.26.0
 ```
 
 | 项目   | 说明                                                             |
@@ -147,11 +147,11 @@ Commands:
 以配置文件的方式启动
 ```toml
 # orbien.toml
-server_addr = "127.0.0.1"
+server_addr = "YOUR_SERVER_ADDR"
 server_port = 9527
 
 [auth]
-token = "<your-access-token>"
+token = "YOUR_TOKEN"
 
 [[proxies]]
 name = "MySQL"
@@ -166,7 +166,7 @@ orbien run orbien.toml
 
 使用命令行快速暴露
 ```shell
-orbien login --server <server-host>:9527 --token <access-token>
+orbien login --server YOUR_SERVER_ADDR:9527 --token YOUR_TOKEN
 orbien http 8080
 orbien tcp 3306
 ```
@@ -177,11 +177,11 @@ orbien tcp 3306
 mkdir -p /path/to/orbien/logs /path/to/orbien/.orbien
 
 cat > /path/to/orbien/orbien.toml <<'EOF'
-server_addr = "<server-host>"
+server_addr = "YOUR_SERVER_ADDR"
 server_port = 9527
 
 [auth]
-token = "<access-token>"
+token = "YOUR_TOKEN"
 
 EOF
 
@@ -192,7 +192,7 @@ docker run -d \
   -v /path/to/orbien/orbien.toml:/app/orbien.toml:ro \
   -v /path/to/orbien/logs:/app/logs \
   -v /path/to/orbien/.orbien:/root/.orbien \
-  lxien/orbien:0.25.0
+  lxien/orbien:0.26.0
 ```
 
 #### 2.3.3 Spring Boot Starter
@@ -201,7 +201,7 @@ docker run -d \
 <dependency>
     <groupId>io.github.lxien</groupId>
     <artifactId>orbien-spring-boot-starter</artifactId>
-    <version>0.7.0</version>
+    <version>0.8.0</version>
 </dependency>
 ```
 
@@ -209,11 +209,11 @@ docker run -d \
 orbien:
   client:
     enabled: true
-    server-addr: <server-host>
+    server-addr: YOUR_SERVER_ADDR
     auth:
-      token: <access-token>
+      token: YOUR_TOKEN
     proxy:
-      protocol: http
+      protocol: HTTP
 ```
 
 ## 问题反馈
