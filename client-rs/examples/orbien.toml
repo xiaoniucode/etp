@@ -16,3 +16,15 @@ token = "YOUR_TOKEN"
 #local_ip = "127.0.0.1"
 #local_port = 8080
 #custom_domains = ["web.example.com"]
+
+#[[proxies]]
+#name = "web-https"
+#protocol = "https"
+#local_ip = "127.0.0.1"
+#local_port = 8080
+#force_https = true
+#custom_domains = ["web.example.com"]
+#
+#[proxies.tls]
+#cert_file = "cert/cert.crt"
+#key_file = "cert/key.key"

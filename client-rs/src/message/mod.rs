@@ -6,7 +6,7 @@ pub use generated::*;
 
 use prost::Message;
 
-use crate::config::{AppConfig, ProxyConfig, ProxyProtocol};
+use crate::config::{AppConfig, ProxyConfig, ProxyProtocol, ProxyTlsCertConfig};
 use crate::AGENT_VERSION;
 
 pub fn build_auth_info(config: &AppConfig, agent_id: Option<&str>) -> AuthInfo {
@@ -37,6 +37,7 @@ fn proxy_to_proto(p: &ProxyConfig) -> Proxy {
     let protocol = match p.protocol {
         ProxyProtocol::Tcp => ProtocolType::Tcp,
         ProxyProtocol::Http => ProtocolType::Http,
+        ProxyProtocol::Https => ProtocolType::Https,
     } as i32;
 
     let targets = p
@@ -75,13 +76,18 @@ fn proxy_to_proto(p: &ProxyConfig) -> Proxy {
         }
     };
 
+    let tls_cert = match (&p.protocol, &p.tls_cert) {
+        (ProxyProtocol::Https, Some(cert)) => load_tls_cert(cert),
+        _ => None,
+    };
+
     Proxy {
         proxy_id: String::new(),
         name: p.name.clone(),
         protocol,
         enabled: p.enabled,
         targets,
-        force_https: false,
+        force_https: p.force_https,
         remote_port: p.remote_port,
         domain,
         access_control: None,
@@ -89,13 +95,39 @@ fn proxy_to_proto(p: &ProxyConfig) -> Proxy {
         bandwidth: None,
         load_balance_strategy: None,
         transport,
-        tls_cert: None,
+        tls_cert,
         health_check: None,
         socks5_auth: None,
         file_auth: None,
         file_limits: None,
         header_rewrite: None,
         time_access: None,
+    }
+}
+
+fn load_tls_cert(cert: &ProxyTlsCertConfig) -> Option<TlsCert> {
+    match (
+        std::fs::read_to_string(&cert.key_file),
+        std::fs::read_to_string(&cert.cert_file),
+    ) {
+        (Ok(private_key_pem), Ok(cert_chain_pem)) => Some(TlsCert {
+            private_key_pem,
+            cert_chain_pem,
+        }),
+        (Err(e), _) => {
+            tracing::error!(
+                "读取 TLS 私钥失败: {}: {e}",
+                cert.key_file.display()
+            );
+            None
+        }
+        (_, Err(e)) => {
+            tracing::error!(
+                "读取 TLS 证书失败: {}: {e}",
+                cert.cert_file.display()
+            );
+            None
+        }
     }
 }
 

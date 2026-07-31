@@ -47,6 +47,7 @@ pub struct RetryConfig {
 pub enum ProxyProtocol {
     Tcp,
     Http,
+    Https,
 }
 
 impl ProxyProtocol {
@@ -54,8 +55,19 @@ impl ProxyProtocol {
         match self {
             Self::Tcp => "tcp",
             Self::Http => "http",
+            Self::Https => "https",
         }
     }
+
+    pub fn is_http_or_https(self) -> bool {
+        matches!(self, Self::Http | Self::Https)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ProxyTlsCertConfig {
+    pub key_file: PathBuf,
+    pub cert_file: PathBuf,
 }
 
 #[derive(Debug, Clone)]
@@ -65,7 +77,9 @@ pub struct ProxyConfig {
     pub enabled: bool,
     pub targets: Vec<TargetConfig>,
     pub remote_port: Option<u32>,
+    pub force_https: bool,
     pub domain: Option<DomainConfig>,
+    pub tls_cert: Option<ProxyTlsCertConfig>,
     pub transport: ProxyTransportConfig,
 }
 
@@ -116,6 +130,51 @@ pub fn load_from_path(path: impl AsRef<Path>) -> Result<AppConfig, ConfigError> 
 pub fn load_from_str(text: &str) -> Result<AppConfig, ConfigError> {
     let raw: RawRoot = toml::from_str(text)?;
     build_config(raw)
+}
+
+fn parse_proxy_tls(
+    proxy_name: &str,
+    tls: Option<RawProxyTls>,
+) -> Result<Option<ProxyTlsCertConfig>, ConfigError> {
+    let Some(tls) = tls else {
+        return Ok(None);
+    };
+    let key_file = tls
+        .key_file
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| {
+            ConfigError::Invalid(format!(
+                "配置错误: 代理 [{proxy_name}] 请配置 tls.key_file"
+            ))
+        })?;
+    let cert_file = tls
+        .cert_file
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| {
+            ConfigError::Invalid(format!(
+                "配置错误: 代理 [{proxy_name}] 请配置 tls.cert_file"
+            ))
+        })?;
+    let key_path = PathBuf::from(key_file);
+    let cert_path = PathBuf::from(cert_file);
+    if !key_path.is_file() {
+        return Err(ConfigError::Invalid(format!(
+            "配置错误: 代理 [{proxy_name}] 私钥不存在: {key_file}"
+        )));
+    }
+    if !cert_path.is_file() {
+        return Err(ConfigError::Invalid(format!(
+            "配置错误: 代理 [{proxy_name}] 证书不存在: {cert_file}"
+        )));
+    }
+    Ok(Some(ProxyTlsCertConfig {
+        key_file: key_path,
+        cert_file: cert_path,
+    }))
 }
 
 fn default_server_addr() -> String {
@@ -255,6 +314,7 @@ struct RawProxy {
     local_ip: String,
     local_port: Option<u32>,
     remote_port: Option<u32>,
+    force_https: Option<bool>,
     #[serde(default = "default_true")]
     auto_domain: bool,
     #[serde(default)]
@@ -264,7 +324,17 @@ struct RawProxy {
     #[serde(default)]
     targets: Vec<RawTarget>,
     #[serde(default)]
+    tls: Option<RawProxyTls>,
+    #[serde(default)]
+    ssl: Option<RawProxyTls>,
+    #[serde(default)]
     transport: Option<RawProxyTransport>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawProxyTls {
+    cert_file: Option<String>,
+    key_file: Option<String>,
 }
 
 fn default_local_ip() -> String {
@@ -330,9 +400,10 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
         let proto = match p.protocol.trim().to_ascii_lowercase().as_str() {
             "tcp" => ProxyProtocol::Tcp,
             "http" => ProxyProtocol::Http,
+            "https" => ProxyProtocol::Https,
             other => {
                 return Err(ConfigError::Invalid(format!(
-                    "配置错误: 代理 [{name}] 的 protocol=\"{other}\" ，当前仅支持 tcp/http"
+                    "配置错误: 代理 [{name}] 的 protocol=\"{other}\" ，当前仅支持 tcp/http/https"
                 )));
             }
         };
@@ -356,9 +427,9 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
             });
         }
         if targets.is_empty() {
-            return Err(ConfigError::Invalid(format!(
-                "配置错误"
-            )));
+            return Err(ConfigError::Invalid(
+                "配置错误: 代理目标不能为空，请配置 local_port 或 [[proxies.targets]]".into(),
+            ));
         }
 
         let transport = match p.transport {
@@ -384,13 +455,24 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
             },
         };
 
-        let domain = match proto {
-            ProxyProtocol::Http => Some(DomainConfig {
+        let force_https = match proto {
+            ProxyProtocol::Https => p.force_https.unwrap_or(true),
+            _ => false,
+        };
+
+        let domain = if proto.is_http_or_https() {
+            Some(DomainConfig {
                 auto_domain: p.auto_domain,
                 custom_domains: p.custom_domains,
                 sub_domains: p.sub_domains,
-            }),
-            ProxyProtocol::Tcp => None,
+            })
+        } else {
+            None
+        };
+
+        let tls_cert = match proto {
+            ProxyProtocol::Https => parse_proxy_tls(&name, p.tls.or(p.ssl))?,
+            _ => None,
         };
 
         proxies.push(ProxyConfig {
@@ -403,7 +485,9 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
             } else {
                 None
             },
+            force_https,
             domain,
+            tls_cert,
             transport,
         });
     }
