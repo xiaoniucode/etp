@@ -1,5 +1,6 @@
 ✨ 新特性
 - orbien-spring-boot-starter：HTTPS代理增加客户端上传自定义TLS证书功能
+- Rust客户端增加HTTPS配置推送支持
 
 ♻️ 改进
 - 带宽限流统一限制上行+下行流量只和，不再提供单独方向配置和限流，减少复杂度
