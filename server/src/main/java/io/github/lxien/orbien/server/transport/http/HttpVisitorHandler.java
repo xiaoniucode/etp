@@ -108,7 +108,8 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             logger.error("[HTTP] 访问者连接发生异常，关闭流", cause);
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
-        ctx.fireExceptionCaught(cause);
+        // 在此处理并关闭，勿再 fire，避免 "reached the tail of the pipeline" 警告
+        ChannelUtils.closeOnFlush(ctx.channel());
     }
 
     private boolean isOutOfMemoryError(Throwable cause) {

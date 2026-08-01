@@ -31,6 +31,7 @@ import io.netty.buffer.CompositeByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -116,8 +117,20 @@ public class HeaderRewriteRequestDecoder extends ByteToMessageDecoder {
             }
         } catch (IllegalStateException e) {
             logger.debug("[HTTP] 请求头改写失败: {}", e.getMessage());
+            releaseOut(out);
+            ChannelUtils.closeOnFlush(ctx.channel());
+        } catch (RuntimeException e) {
+            logger.error("[HTTP] 请求头改写异常", e);
+            releaseOut(out);
             ChannelUtils.closeOnFlush(ctx.channel());
         }
+    }
+
+    private static void releaseOut(List<Object> out) {
+        for (Object item : out) {
+            ReferenceCountUtil.release(item);
+        }
+        out.clear();
     }
 
     private List<HeaderRewriteRule> loadRequestRules(Channel visitor) {

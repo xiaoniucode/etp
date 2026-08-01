@@ -71,6 +71,11 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
         }
 
         String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
+        if (!StringUtils.hasText(domain)) {
+            ReferenceCountUtil.release(msg);
+            ctx.close();
+            return;
+        }
         String proxyId = domainRegistry.getProxyIdByDomain(domain);
         if (!StringUtils.hasText(proxyId)) {
             ctx.fireChannelRead(msg);

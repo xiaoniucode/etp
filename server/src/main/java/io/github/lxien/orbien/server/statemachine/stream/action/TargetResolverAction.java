@@ -165,6 +165,9 @@ public class TargetResolverAction extends StreamBaseAction {
         }
         if (context.getProtocol().isHttpOrHttps()) {
             String domain = context.getVisitorDomain();
+            if (!StringUtils.hasText(domain)) {
+                return null;
+            }
             String proxyId = domainRegistry.getProxyIdByDomain(domain);
             if (!StringUtils.hasText(proxyId)) {
                 return null;

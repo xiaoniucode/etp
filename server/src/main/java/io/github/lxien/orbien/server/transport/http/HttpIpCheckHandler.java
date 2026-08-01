@@ -55,26 +55,37 @@ public class HttpIpCheckHandler extends IpCheckHandler {
             return;
         }
 
-        String visitorIp = NetUtils.getIp(visitor);
-        String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
-        String proxyId = domainRegistry.getProxyIdByDomain(domain);
-        if (!StringUtils.hasText(proxyId)) {
-            logger.debug("{} 访问域名 {} 没有对应的代理配置", visitorIp, domain);
-            ReferenceCountUtil.release(msg);
-            ctx.close();
-            return;
-        }
-        ProxyConfigExt ext = proxyConfigService.findById(proxyId);
-        if (ext != null && !doCheckAccess(visitor, ext.getProxyConfig())) {
-            logger.debug("{} 没有访问权限", visitorIp);
-            ReferenceCountUtil.release(msg);
-            return;
-        }
+        boolean forwarded = false;
+        try {
+            String visitorIp = NetUtils.getIp(visitor);
+            String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
+            if (!StringUtils.hasText(domain)) {
+                logger.debug("{} 访问缺少 Host/域名，关闭连接", visitorIp);
+                ctx.close();
+                return;
+            }
+            String proxyId = domainRegistry.getProxyIdByDomain(domain);
+            if (!StringUtils.hasText(proxyId)) {
+                logger.debug("{} 访问域名 {} 没有对应的代理配置", visitorIp, domain);
+                ctx.close();
+                return;
+            }
+            ProxyConfigExt ext = proxyConfigService.findById(proxyId);
+            if (ext != null && !doCheckAccess(visitor, ext.getProxyConfig())) {
+                logger.debug("{} 没有访问权限", visitorIp);
+                return;
+            }
 
-        visitor.attr(AttributeKeys.IP_ACCESS_PASSED).set(Boolean.TRUE);
-        if (ctx.pipeline().context(this) != null) {
-            ctx.pipeline().remove(this);
+            visitor.attr(AttributeKeys.IP_ACCESS_PASSED).set(Boolean.TRUE);
+            if (ctx.pipeline().context(this) != null) {
+                ctx.pipeline().remove(this);
+            }
+            forwarded = true;
+            ctx.fireChannelRead(msg);
+        } finally {
+            if (!forwarded) {
+                ReferenceCountUtil.release(msg);
+            }
         }
-        ctx.fireChannelRead(msg);
     }
 }

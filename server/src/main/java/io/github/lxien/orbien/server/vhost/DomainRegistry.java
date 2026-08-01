@@ -16,6 +16,7 @@
 
 package io.github.lxien.orbien.server.vhost;
 
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.server.exceptions.OrbienException;
 import org.springframework.stereotype.Component;
 
@@ -59,6 +60,9 @@ public class DomainRegistry {
     }
 
     public String getProxyIdByDomain(String domain) {
+        if (!StringUtils.hasText(domain)) {
+            return null;
+        }
         return domainIndex.get(domain);
     }
 }

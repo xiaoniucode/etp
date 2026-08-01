@@ -18,6 +18,8 @@ package io.github.lxien.orbien.server.transport;
 
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.enums.ProtocolType;
+import io.github.lxien.orbien.core.utils.ChannelUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -50,6 +52,7 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
         }
         in.markReaderIndex();
         boolean isHttp = false;
+        boolean headersComplete = false;
         String domain = null;
         String basicAuth = null;
         try {
@@ -59,6 +62,8 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
             String content = new String(bytes, CharsetUtil.UTF_8);
 
             if (isHttp(content)) {
+                isHttp = true;
+                headersComplete = content.contains("\r\n\r\n");
                 String host = parseHost(content);
                 if (host != null) {
                     if (host.contains(":")) {
@@ -68,7 +73,6 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
                     }
                     basicAuth = parseAuthHeader(content);
                 }
-                isHttp = true;
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -76,9 +80,21 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
             in.resetReaderIndex();
         }
         if (isHttp) {
+            // Host 可能还在后续 TCP 分片中：头未收齐前继续攒包，避免误关连接
+            if (!StringUtils.hasText(domain) && !headersComplete && in.readableBytes() < 8192) {
+                return;
+            }
             visitor.attr(AttributeKeys.PROTOCOL_TYPE).set(ProtocolType.HTTP);
-            visitor.attr(AttributeKeys.VISIT_DOMAIN).set(domain);
             visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).set(basicAuth);
+            if (!StringUtils.hasText(domain)) {
+                // 头已收齐仍无 Host（扫描/HTTP1.0/畸形请求），尽早关闭避免后续改写分配 ByteBuf
+                logger.debug("HTTP 请求缺少 Host，关闭连接");
+                in.skipBytes(in.readableBytes());
+                finished = true;
+                ChannelUtils.closeOnFlush(visitor);
+                return;
+            }
+            visitor.attr(AttributeKeys.VISIT_DOMAIN).set(domain);
         }
         out.add(in.readRetainedSlice(in.readableBytes()));
         finished = true;
