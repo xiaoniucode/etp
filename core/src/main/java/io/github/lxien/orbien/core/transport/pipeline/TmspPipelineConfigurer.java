@@ -44,12 +44,13 @@ public final class TmspPipelineConfigurer {
                                                SslContext sslContext,
                                                WebSocketProtocolConfig wsConfig,
                                                String remoteHost,
+                                               int remotePort,
                                                boolean connectionEncrypt) {
         ChannelPipeline pipeline = channel.pipeline();
         switch (protocol) {
-            case TCP -> addTcpClient(pipeline, tlsConfig, sslContext, remoteHost, connectionEncrypt);
+            case TCP -> addTcpClient(pipeline, tlsConfig, sslContext, remoteHost, remotePort, connectionEncrypt);
             case WEBSOCKET -> {
-                addWebSocketClient(pipeline, sslContext, wsConfig, remoteHost);
+                addWebSocketClient(pipeline, sslContext, wsConfig, remoteHost, remotePort);
                 channel.config().setOption(ChannelOption.WRITE_BUFFER_WATER_MARK, WEBSOCKET_WRITE_BUFFER_WATER_MARK);
             }
             case QUIC -> {
@@ -83,12 +84,14 @@ public final class TmspPipelineConfigurer {
     }
 
     private static void addTcpClient(ChannelPipeline pipeline,
-                                   TlsConfig tlsConfig,
-                                   SslContext sslContext,
-                                   String remoteHost,
-                                   boolean connectionEncrypt) {
+                                     TlsConfig tlsConfig,
+                                     SslContext sslContext,
+                                     String remoteHost,
+                                     int remotePort,
+                                     boolean connectionEncrypt) {
         if (connectionEncrypt && tlsConfig != null && tlsConfig.isEnabled() && sslContext != null) {
-            SslHandler sslHandler = sslContext.newHandler(pipeline.channel().alloc(), remoteHost, 443);
+            int sniPort = remotePort > 0 ? remotePort : 443;
+            SslHandler sslHandler = sslContext.newHandler(pipeline.channel().alloc(), remoteHost, sniPort);
             pipeline.addLast(NettyConstants.TLS_HANDLER, sslHandler);
         }
     }
@@ -102,18 +105,23 @@ public final class TmspPipelineConfigurer {
     private static void addWebSocketClient(ChannelPipeline pipeline,
                                            SslContext sslContext,
                                            WebSocketProtocolConfig wsConfig,
-                                           String remoteHost) {
+                                           String remoteHost,
+                                           int remotePort) {
         if (sslContext == null) {
             throw new IllegalStateException("WebSocket 传输必须启用 TLS");
         }
+        if (remotePort <= 0) {
+            throw new IllegalArgumentException("WebSocket 远程端口无效: " + remotePort);
+        }
         int maxFrame = resolveMaxFrame(wsConfig);
-        String path = wsConfig != null ? wsConfig.getPath() : "/tunnel";
-        pipeline.addLast(NettyConstants.TLS_HANDLER, sslContext.newHandler(pipeline.channel().alloc(), remoteHost, 443));
+        String path = normalizeWebSocketPath(wsConfig != null ? wsConfig.getPath() : null);
+        pipeline.addLast(NettyConstants.TLS_HANDLER,
+                sslContext.newHandler(pipeline.channel().alloc(), remoteHost, remotePort));
         pipeline.addLast(new HttpClientCodec());
         pipeline.addLast(new HttpObjectAggregator(maxFrame));
-        // allowExtensions=false：隧道承载二进制 TMSP，不协商 permessage-deflate，避免 RSV/扩展破坏帧流
+        URI wsUri = buildWebSocketUri(remoteHost, remotePort, path);
         WebSocketClientProtocolHandler wsHandler = new WebSocketClientProtocolHandler(
-                URI.create("wss://" + remoteHost + path),
+                wsUri,
                 WebSocketVersion.V13,
                 null,
                 false,
@@ -132,7 +140,7 @@ public final class TmspPipelineConfigurer {
             throw new IllegalStateException("WebSocket 传输必须启用 TLS");
         }
         int maxFrame = resolveMaxFrame(wsConfig);
-        String path = wsConfig != null ? wsConfig.getPath() : "/tunnel";
+        String path = normalizeWebSocketPath(wsConfig != null ? wsConfig.getPath() : null);
         pipeline.addLast(NettyConstants.TLS_HANDLER, sslContext.newHandler(pipeline.channel().alloc()));
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(maxFrame));
@@ -151,5 +159,18 @@ public final class TmspPipelineConfigurer {
             return DEFAULT_MAX_FRAME;
         }
         return wsConfig.getMaxFrameSize();
+    }
+
+    static URI buildWebSocketUri(String host, int port, String path) {
+        String normalizedPath = normalizeWebSocketPath(path);
+        return URI.create("wss://" + host + ":" + port + normalizedPath);
+    }
+
+    static String normalizeWebSocketPath(String path) {
+        if (path == null || path.isBlank()) {
+            return "/tunnel";
+        }
+        String trimmed = path.trim();
+        return trimmed.startsWith("/") ? trimmed : "/" + trimmed;
     }
 }

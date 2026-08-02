@@ -2,7 +2,7 @@ server_addr = "localhost"
 server_port = 9527
 
 [auth]
-token = "3EE449DAFD7B2CBC1151EA6FF4AEAF28"
+token = "DBF76B6879AD791013C3A6BCFD5F95C7"
 ########################################################################################################################
 
 #[connection]

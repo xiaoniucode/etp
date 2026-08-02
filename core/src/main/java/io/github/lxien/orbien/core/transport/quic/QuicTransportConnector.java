@@ -114,6 +114,7 @@ public class QuicTransportConnector implements TransportConnector {
                                                     null,
                                                     null,
                                                     endpoint.getHost(),
+                                                    endpoint.getPort(),
                                                     true
                                             );
                                             if (options.getPipelineTailConfigurer() != null) {

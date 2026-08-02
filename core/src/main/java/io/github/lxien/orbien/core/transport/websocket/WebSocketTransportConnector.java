@@ -24,6 +24,16 @@ public class WebSocketTransportConnector implements TransportConnector {
     public CompletableFuture<TransportSession> connect(TransportConnectOptions options) {
         CompletableFuture<TransportSession> future = new CompletableFuture<>();
         TransportEndpoint endpoint = options.getEndpoint();
+        if (options.getSslContext() == null) {
+            future.completeExceptionally(new IllegalStateException(
+                    "WebSocket 传输必须启用 TLS，请设置 [transport.tls] enabled = true"));
+            return future;
+        }
+        if (options.getWebSocketConfig() != null
+                && endpoint.getWebSocketPath() != null
+                && !endpoint.getWebSocketPath().isBlank()) {
+            options.getWebSocketConfig().setPath(endpoint.getWebSocketPath());
+        }
 
         Bootstrap bootstrap = new Bootstrap()
                 .group(options.getEventLoopGroup())
@@ -42,6 +52,7 @@ public class WebSocketTransportConnector implements TransportConnector {
                                 options.getSslContext(),
                                 options.getWebSocketConfig(),
                                 endpoint.getHost(),
+                                endpoint.getPort(),
                                 true
                         );
                         ch.pipeline().addLast(new WebSocketHandshakeAwaiter(future));

@@ -19,6 +19,7 @@ import io.github.lxien.orbien.core.domain.*;
 import io.github.lxien.orbien.core.enums.*;
 import io.github.lxien.orbien.client.config.domain.*;
 import io.github.lxien.orbien.core.enums.*;
+import io.github.lxien.orbien.core.transport.api.TransportEncryptResolver;
 import io.github.lxien.orbien.core.transport.tls.TlsConfigSupport;
 import lombok.Getter;
 import io.netty.util.internal.logging.InternalLogger;
@@ -90,6 +91,7 @@ public class TomlConfigLoader implements ConfigSource {
             }
             parseClientProtocolTable(transportTable.getTable("websocket"), globalTransportConfig.getWebsocket(), 9528);
             parseClientProtocolTable(transportTable.getTable("quic"), globalTransportConfig.getQuic(), 9529);
+            normalizeWebSocketPath(globalTransportConfig.getWebsocket());
 
             resolveTransportCertPaths(globalTransportConfig, Paths.get(path).getParent());
             builder.transportConfig(globalTransportConfig);
@@ -486,7 +488,53 @@ public class TomlConfigLoader implements ConfigSource {
         }
         builder.logConfig(logConfig);
 
-        return builder.build();
+        AppConfig appConfig = builder.build();
+        validateTransportTlsRequirements(appConfig);
+        return appConfig;
+    }
+
+    private static void validateTransportTlsRequirements(AppConfig appConfig) {
+        TransportConfig transportConfig = appConfig.getTransportConfig();
+        if (transportConfig == null) {
+            return;
+        }
+        TlsConfig tlsConfig = transportConfig.getTlsConfig();
+        boolean tlsEnabled = tlsConfig == null || tlsConfig.isEnabled();
+        if (tlsEnabled) {
+            return;
+        }
+        if (TransportEncryptResolver.requiresTls(transportConfig.getProtocol())) {
+            throw new IllegalArgumentException(
+                    "控制连接协议 " + transportConfig.getProtocol().getName()
+                            + " 必须启用 TLS，请设置 [transport.tls] enabled = true");
+        }
+        if (appConfig.getProxies() == null) {
+            return;
+        }
+        for (ProxyConfig proxy : appConfig.getProxies()) {
+            if (proxy == null || proxy.getTransport() == null || proxy.getTransport().getProtocol() == null) {
+                continue;
+            }
+            TransportProtocol dataProtocol = proxy.getTransport().getProtocol();
+            if (TransportEncryptResolver.requiresTls(dataProtocol)) {
+                throw new IllegalArgumentException(
+                        "代理 [" + proxy.getName() + "] 数据隧道协议 " + dataProtocol.getName()
+                                + " 必须启用 TLS，请设置 [transport.tls] enabled = true");
+            }
+        }
+    }
+
+    private static void normalizeWebSocketPath(WebSocketProtocolConfig websocket) {
+        if (websocket == null) {
+            return;
+        }
+        String path = websocket.getPath();
+        if (path == null || path.isBlank()) {
+            websocket.setPath("/tunnel");
+            return;
+        }
+        String trimmed = path.trim();
+        websocket.setPath(trimmed.startsWith("/") ? trimmed : "/" + trimmed);
     }
 
     @Override
@@ -513,6 +561,7 @@ public class TomlConfigLoader implements ConfigSource {
             if (StringUtils.hasText(path)) {
                 ws.setPath(path.trim());
             }
+            normalizeWebSocketPath(ws);
         }
         if (target instanceof QuicProtocolConfig quic) {
             Long maxIdle = table.getLong("max_idle_timeout_ms");

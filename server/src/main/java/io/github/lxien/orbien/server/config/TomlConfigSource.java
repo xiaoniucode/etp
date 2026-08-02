@@ -152,6 +152,7 @@ public class TomlConfigSource implements ConfigSource {
             if (StringUtils.hasText(wsPath)) {
                 ws.setPath(wsPath.trim());
             }
+            normalizeWebSocketPath(ws);
             Long maxFrame = table.getLong("max_frame_size");
             if (maxFrame != null) {
                 ws.setMaxFrameSize(maxFrame.intValue());
@@ -181,6 +182,19 @@ public class TomlConfigSource implements ConfigSource {
             return legacyPort.intValue();
         }
         return defaultPort;
+    }
+
+    private static void normalizeWebSocketPath(WebSocketProtocolConfig websocket) {
+        if (websocket == null) {
+            return;
+        }
+        String path = websocket.getPath();
+        if (path == null || path.isBlank()) {
+            websocket.setPath("/tunnel");
+            return;
+        }
+        String trimmed = path.trim();
+        websocket.setPath(trimmed.startsWith("/") ? trimmed : "/" + trimmed);
     }
 
     private void parseTls(TransportConfig transportConfig, Toml transport) {

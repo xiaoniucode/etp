@@ -69,6 +69,11 @@ public final class TransportClientBootstrap {
                                                                      TlsConfig tlsConfig,
                                                                      boolean connectionEncrypt,
                                                                      java.util.function.Consumer<io.netty.channel.ChannelPipeline> pipelineTail) {
+        if (TransportEncryptResolver.requiresTls(protocol) && sslContext == null) {
+            return CompletableFuture.failedFuture(new IllegalStateException(
+                    "协议 " + protocol.getName()
+                            + " 必须启用 TLS，请设置 [transport.tls] enabled = true"));
+        }
         TransportConfig transportConfig = config.getTransportConfig();
         TransportConnectOptions options = TransportConnectOptions.builder()
                 .endpoint(endpoint)
@@ -81,8 +86,13 @@ public final class TransportClientBootstrap {
                 .connectionEncrypt(connectionEncrypt)
                 .pipelineTailConfigurer(pipelineTail)
                 .build();
-        logger.debug("[传输] 发起连接 role={} protocol={} endpoint={}:{} connectionEncrypt={}",
-                role, protocol.getName(), endpoint.getHost(), endpoint.getPort(), connectionEncrypt);
+        logger.debug("[传输] 发起连接 role={} protocol={} endpoint={}:{} path={} connectionEncrypt={}",
+                role,
+                protocol.getName(),
+                endpoint.getHost(),
+                endpoint.getPort(),
+                endpoint.getWebSocketPath(),
+                connectionEncrypt);
         return TransportRegistry.getConnector(protocol).connect(options);
     }
 }

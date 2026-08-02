@@ -6,6 +6,8 @@ import io.github.lxien.orbien.client.statemachine.agent.AgentContext;
 import io.github.lxien.orbien.client.statemachine.agent.AgentEvent;
 import io.github.lxien.orbien.client.statemachine.agent.AgentState;
 import io.github.lxien.orbien.core.domain.TlsConfig;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
+import io.github.lxien.orbien.core.transport.api.TransportEncryptResolver;
 import io.github.lxien.orbien.core.transport.tls.TlsHelper;
 import io.github.lxien.orbien.core.transport.TlsContextHolder;
 import io.netty.handler.ssl.SslContext;
@@ -21,9 +23,17 @@ public class TlslnitAction extends AgentBaseAction {
         try {
             AppConfig config = context.getConfig();
             TransportConfig transportConfig = config.getTransportConfig();
-            TlsConfig tlsConfig = transportConfig.resolveTls(transportConfig.getProtocol());
+            TransportProtocol protocol = transportConfig.getProtocol();
+            TlsConfig tlsConfig = transportConfig.resolveTls(protocol);
+            if (TransportEncryptResolver.requiresTls(protocol)
+                    && (tlsConfig == null || !tlsConfig.isEnabled())) {
+                throw new IllegalStateException(
+                        "协议 " + protocol.getName()
+                                + " 必须启用 TLS，请设置 [transport.tls] enabled = true");
+            }
+
             if (tlsConfig == null || tlsConfig.isEnabled()) {
-                logger.debug("[传输] 初始化 TLS 上下文，控制连接协议={}", transportConfig.getProtocol().getName());
+                logger.debug("[传输] 初始化 TLS 上下文，控制连接协议={}", protocol.getName());
                 SslContext sslContext = TlsHelper.buildSslContext(true, tlsConfig, tlsConfig == null);
                 TlsContextHolder.initialize(sslContext);
                 context.setTlsContext(sslContext);

@@ -33,13 +33,19 @@ public final class TransportEndpointResolver {
                     .protocol(TransportProtocol.TCP)
                     .tlsConfig(tlsConfig)
                     .build();
-            case WEBSOCKET -> TransportEndpoint.builder()
-                    .host(serverHost)
-                    .port(resolvePort(websocket, TransportProtocol.WEBSOCKET.getDefaultPort()))
-                    .protocol(TransportProtocol.WEBSOCKET)
-                    .tlsConfig(tlsConfig)
-                    .webSocketPath(websocket != null ? websocket.getPath() : "/tunnel")
-                    .build();
+            case WEBSOCKET -> {
+                String path = normalizeWebSocketPath(websocket != null ? websocket.getPath() : null);
+                if (websocket != null) {
+                    websocket.setPath(path);
+                }
+                yield TransportEndpoint.builder()
+                        .host(serverHost)
+                        .port(resolvePort(websocket, TransportProtocol.WEBSOCKET.getDefaultPort()))
+                        .protocol(TransportProtocol.WEBSOCKET)
+                        .tlsConfig(tlsConfig)
+                        .webSocketPath(path)
+                        .build();
+            }
             case QUIC -> TransportEndpoint.builder()
                     .host(serverHost)
                     .port(resolvePort(quic, TransportProtocol.QUIC.getDefaultPort()))
@@ -65,5 +71,13 @@ public final class TransportEndpointResolver {
             return config.getPort();
         }
         return defaultPort;
+    }
+
+    private static String normalizeWebSocketPath(String path) {
+        if (path == null || path.isBlank()) {
+            return "/tunnel";
+        }
+        String trimmed = path.trim();
+        return trimmed.startsWith("/") ? trimmed : "/" + trimmed;
     }
 }

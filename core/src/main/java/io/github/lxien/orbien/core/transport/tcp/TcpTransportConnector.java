@@ -42,6 +42,7 @@ public class TcpTransportConnector implements TransportConnector {
                                 options.getSslContext(),
                                 options.getWebSocketConfig(),
                                 endpoint.getHost(),
+                                endpoint.getPort(),
                                 options.isConnectionEncrypt()
                         );
                         if (options.getPipelineTailConfigurer() != null) {

@@ -72,12 +72,15 @@ public class TransportListenerManager implements Lifecycle {
 
             WebSocketProtocolConfig websocket = transportConfig.getWebsocket();
             if (websocket.isEnabled()) {
+                normalizeWebSocketPath(websocket);
+                requireTlsForProtocol(TransportProtocol.WEBSOCKET, sharedTls, tlsContext);
                 startListener(TransportProtocol.WEBSOCKET, websocket.getPort(), tlsContext, sharedTls,
                         agentManager, websocket, transportConfig.getQuic());
             }
 
             QuicProtocolConfig quic = transportConfig.getQuic();
             if (quic.isEnabled()) {
+                requireTlsForProtocol(TransportProtocol.QUIC, sharedTls, tlsContext);
                 startListener(TransportProtocol.QUIC, quic.getPort(), tlsContext, sharedTls,
                         agentManager, transportConfig.getWebsocket(), quic);
             }
@@ -135,6 +138,33 @@ public class TransportListenerManager implements Lifecycle {
         }
         logger.info("[传输] TLS 已启用但未配置证书，使用自签名证书（非 mTLS）");
         return TlsHelper.buildSslContext(false, tlsConfig, true);
+    }
+
+    private static void requireTlsForProtocol(TransportProtocol protocol,
+                                              TlsConfig tlsConfig,
+                                              SslContext tlsContext) {
+        if (tlsContext == null) {
+            throw new IllegalStateException(
+                    "协议 " + protocol.getName() + " 必须启用 TLS，SslContext 未初始化");
+        }
+        if (tlsConfig != null && !tlsConfig.isEnabled()) {
+            throw new IllegalStateException(
+                    "协议 " + protocol.getName()
+                            + " 必须启用 TLS，请设置 [transport.tls] enabled = true");
+        }
+    }
+
+    private static void normalizeWebSocketPath(WebSocketProtocolConfig websocket) {
+        if (websocket == null) {
+            return;
+        }
+        String path = websocket.getPath();
+        if (path == null || path.isBlank()) {
+            websocket.setPath("/tunnel");
+            return;
+        }
+        String trimmed = path.trim();
+        websocket.setPath(trimmed.startsWith("/") ? trimmed : "/" + trimmed);
     }
 
     @Override
