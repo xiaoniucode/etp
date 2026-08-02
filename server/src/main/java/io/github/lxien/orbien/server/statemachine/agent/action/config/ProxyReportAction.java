@@ -91,7 +91,8 @@ public class ProxyReportAction extends AgentBaseAction {
             if (cause != null && StringUtils.hasText(cause.getMessage())) {
                 message = cause.getMessage();
             }
-        } else {
+        }
+        if (!StringUtils.hasText(message)) {
             message = "代理配置推送失败，未知错误";
         }
         Message.Error error = Message.Error.newBuilder()

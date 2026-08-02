@@ -94,6 +94,7 @@ pub enum ProxyProtocol {
     Http,
     Https,
     Udp,
+    Socks5,
 }
 
 impl ProxyProtocol {
@@ -103,15 +104,33 @@ impl ProxyProtocol {
             Self::Http => "http",
             Self::Https => "https",
             Self::Udp => "udp",
+            Self::Socks5 => "socks5",
         }
     }
 
     pub fn is_http_or_https(self) -> bool {
         matches!(self, Self::Http | Self::Https)
     }
-    pub fn reports_remote_port(self) -> bool {
-        matches!(self, Self::Tcp | Self::Udp)
+
+    pub fn requires_targets(self) -> bool {
+        !matches!(self, Self::Socks5)
     }
+
+    pub fn reports_remote_port(self) -> bool {
+        matches!(self, Self::Tcp | Self::Udp | Self::Socks5)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Socks5AuthConfig {
+    pub enabled: bool,
+    pub users: Vec<Socks5User>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Socks5User {
+    pub username: String,
+    pub password: String,
 }
 
 #[derive(Debug, Clone)]
@@ -130,6 +149,7 @@ pub struct ProxyConfig {
     pub force_https: bool,
     pub domain: Option<DomainConfig>,
     pub tls_cert: Option<ProxyTlsCertConfig>,
+    pub socks5_auth: Option<Socks5AuthConfig>,
     pub transport: ProxyTransportConfig,
 }
 
@@ -481,7 +501,25 @@ struct RawProxy {
     #[serde(default)]
     ssl: Option<RawProxyTls>,
     #[serde(default)]
+    socks5_auth: Option<RawSocks5Auth>,
+    #[serde(default)]
     transport: Option<RawProxyTransport>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawSocks5Auth {
+    #[serde(default)]
+    enabled: bool,
+    #[serde(default)]
+    users: Vec<RawSocks5User>,
+}
+
+#[derive(Debug, Deserialize)]
+struct RawSocks5User {
+    #[serde(default)]
+    user: String,
+    #[serde(default)]
+    pass: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -591,9 +629,10 @@ fn build_config(raw: RawRoot, base_dir: Option<&Path>) -> Result<AppConfig, Conf
             "http" => ProxyProtocol::Http,
             "https" => ProxyProtocol::Https,
             "udp" => ProxyProtocol::Udp,
+            "socks5" => ProxyProtocol::Socks5,
             other => {
                 return Err(ConfigError::Invalid(format!(
-                    "配置错误: 代理 [{name}] 的 protocol=\"{other}\" ，当前仅支持 tcp/http/https/udp"
+                    "配置错误: 代理 [{name}] 的 protocol=\"{other}\" ，当前仅支持 tcp/http/https/udp/socks5"
                 )));
             }
         };
@@ -606,45 +645,60 @@ fn build_config(raw: RawRoot, base_dir: Option<&Path>) -> Result<AppConfig, Conf
             None => None,
         };
 
-        if let Some(port) = p.local_port {
-            validate_port(port, &format!("代理 [{name}] local_port"))?;
-        }
+        let (targets, socks5_auth) = if proto == ProxyProtocol::Socks5 {
+            if !p.targets.is_empty() || p.local_port.is_some() {
+                warn!(
+                    "代理 [{name}] protocol=socks5 不使用 targets/local_port，\
+                     目标由访客 CONNECT 动态决定，已忽略"
+                );
+            }
+            let auth = parse_socks5_auth(&name, p.socks5_auth)?;
+            (Vec::new(), auth)
+        } else {
+            if p.socks5_auth.is_some() {
+                warn!("代理 [{name}] socks5_auth 仅对 socks5 协议生效，已忽略");
+            }
+            if let Some(port) = p.local_port {
+                validate_port(port, &format!("代理 [{name}] local_port"))?;
+            }
+            let mut targets = Vec::with_capacity(p.targets.len() + 1);
+            for t in p.targets {
+                validate_port(t.port, &format!("代理 [{name}] targets.port"))?;
+                let host = t.host.trim();
+                if host.is_empty() {
+                    return Err(ConfigError::Invalid(format!(
+                        "配置错误: 代理 [{name}] targets.host 不能为空"
+                    )));
+                }
+                targets.push(TargetConfig {
+                    host: host.to_string(),
+                    port: t.port,
+                    name: t.name,
+                    weight: t.weight,
+                });
+            }
+            if let Some(port) = p.local_port {
+                let local_ip = p.local_ip.trim();
+                if local_ip.is_empty() {
+                    return Err(ConfigError::Invalid(format!(
+                        "配置错误: 代理 [{name}] local_ip 不能为空"
+                    )));
+                }
+                targets.push(TargetConfig {
+                    host: local_ip.to_string(),
+                    port,
+                    name: Some(name.clone()),
+                    weight: 1,
+                });
+            }
+            if proto.requires_targets() && targets.is_empty() {
+                return Err(ConfigError::Invalid(
+                    "配置错误: 代理目标不能为空，请配置 local_port 或 [[proxies.targets]]".into(),
+                ));
+            }
+            (targets, None)
+        };
 
-        let mut targets: Vec<TargetConfig> = Vec::with_capacity(p.targets.len() + 1);
-        for t in p.targets {
-            validate_port(t.port, &format!("代理 [{name}] targets.port"))?;
-            let host = t.host.trim();
-            if host.is_empty() {
-                return Err(ConfigError::Invalid(format!(
-                    "配置错误: 代理 [{name}] targets.host 不能为空"
-                )));
-            }
-            targets.push(TargetConfig {
-                host: host.to_string(),
-                port: t.port,
-                name: t.name,
-                weight: t.weight,
-            });
-        }
-        if let Some(port) = p.local_port {
-            let local_ip = p.local_ip.trim();
-            if local_ip.is_empty() {
-                return Err(ConfigError::Invalid(format!(
-                    "配置错误: 代理 [{name}] local_ip 不能为空"
-                )));
-            }
-            targets.push(TargetConfig {
-                host: local_ip.to_string(),
-                port,
-                name: Some(name.clone()),
-                weight: 1,
-            });
-        }
-        if targets.is_empty() {
-            return Err(ConfigError::Invalid(
-                "配置错误: 代理目标不能为空，请配置 local_port 或 [[proxies.targets]]".into(),
-            ));
-        }
         let mut transport = match p.transport {
             Some(t) => {
                 let proxy_protocol = normalize_proxy_transport_protocol(t.protocol, &name)?;
@@ -705,6 +759,7 @@ fn build_config(raw: RawRoot, base_dir: Option<&Path>) -> Result<AppConfig, Conf
             force_https,
             domain,
             tls_cert,
+            socks5_auth,
             transport,
         });
     }
@@ -804,6 +859,36 @@ fn build_websocket_config(raw: &RawWebsocket) -> Result<WebSocketConfig, ConfigE
         path,
         max_frame_size,
     })
+}
+
+fn parse_socks5_auth(
+    proxy_name: &str,
+    raw: Option<RawSocks5Auth>,
+) -> Result<Option<Socks5AuthConfig>, ConfigError> {
+    let Some(raw) = raw else {
+        return Ok(None);
+    };
+    let mut users = Vec::with_capacity(raw.users.len());
+    for (i, u) in raw.users.into_iter().enumerate() {
+        let username = u.user.trim().to_string();
+        let password = u.pass;
+        if username.is_empty() {
+            return Err(ConfigError::Invalid(format!(
+                "配置错误: 代理 [{proxy_name}] socks5_auth.users[{i}].user 不能为空"
+            )));
+        }
+        users.push(Socks5User { username, password });
+    }
+    if raw.enabled && users.is_empty() {
+        warn!(
+            "代理 [{proxy_name}] socks5_auth.enabled=true 但未配置 users，\
+             服务端将要求用户名密码认证且无可用账号"
+        );
+    }
+    Ok(Some(Socks5AuthConfig {
+        enabled: raw.enabled,
+        users,
+    }))
 }
 
 fn normalize_proxy_transport_protocol(

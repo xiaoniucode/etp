@@ -6,7 +6,9 @@ pub use generated::*;
 
 use prost::Message;
 
-use crate::config::{AppConfig, ProxyConfig, ProxyProtocol, ProxyTlsCertConfig};
+use crate::config::{
+    AppConfig, ProxyConfig, ProxyProtocol, ProxyTlsCertConfig, Socks5AuthConfig,
+};
 use crate::AGENT_VERSION;
 
 pub fn build_auth_info(config: &AppConfig, agent_id: Option<&str>) -> AuthInfo {
@@ -34,6 +36,7 @@ fn proxy_to_proto(p: &ProxyConfig) -> Proxy {
         ProxyProtocol::Http => ProtocolType::Http,
         ProxyProtocol::Https => ProtocolType::Https,
         ProxyProtocol::Udp => ProtocolType::Udp,
+        ProxyProtocol::Socks5 => ProtocolType::Socks5,
     } as i32;
 
     let targets = p
@@ -53,26 +56,21 @@ fn proxy_to_proto(p: &ProxyConfig) -> Proxy {
         sub_domains: d.sub_domains.clone(),
     });
 
-    let transport = {
-        let t = &p.transport;
-        Some(Transport {
-            multiplex: t.multiplex,
-            encrypt: t.encrypt,
-            compress: t.compress,
-            protocol: t.protocol.clone(),
-            compress_algorithm: None,
-        })
-    };
+    let transport = transport_to_proto(&p.transport);
 
     let tls_cert = match (&p.protocol, &p.tls_cert) {
         (ProxyProtocol::Https, Some(cert)) => load_tls_cert(cert),
         _ => None,
     };
 
-    let remote_port = if p.protocol.reports_remote_port() {
-        p.remote_port
-    } else {
-        None
+    let remote_port = match (p.protocol.reports_remote_port(), p.remote_port) {
+        (true, Some(port)) if port > 0 => Some(port),
+        _ => None,
+    };
+
+    let socks5_auth = match p.protocol {
+        ProxyProtocol::Socks5 => p.socks5_auth.as_ref().map(socks5_auth_to_proto),
+        _ => None,
     };
 
     Proxy {
@@ -91,11 +89,42 @@ fn proxy_to_proto(p: &ProxyConfig) -> Proxy {
         transport,
         tls_cert,
         health_check: None,
-        socks5_auth: None,
+        socks5_auth,
         file_auth: None,
         file_limits: None,
         header_rewrite: None,
         time_access: None,
+    }
+}
+
+fn transport_to_proto(t: &crate::config::ProxyTransportConfig) -> Option<Transport> {
+    let has_any = t.multiplex.is_some()
+        || t.encrypt.is_some()
+        || t.compress.is_some()
+        || t.protocol.is_some();
+    if !has_any {
+        return None;
+    }
+    Some(Transport {
+        multiplex: t.multiplex,
+        encrypt: t.encrypt,
+        compress: t.compress,
+        protocol: t.protocol.clone(),
+        compress_algorithm: None,
+    })
+}
+
+fn socks5_auth_to_proto(auth: &Socks5AuthConfig) -> Socks5Auth {
+    Socks5Auth {
+        enabled: auth.enabled,
+        users: auth
+            .users
+            .iter()
+            .map(|u| Socks5User {
+                username: u.username.clone(),
+                password: u.password.clone(),
+            })
+            .collect(),
     }
 }
 

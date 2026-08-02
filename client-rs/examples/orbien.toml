@@ -36,6 +36,17 @@ token = "YOUR_TOKEN"
 #local_port = 9998
 
 #[[proxies]]
+#name = "socks5-proxy"
+#protocol = "socks5"
+#remote_port = 9070
+#
+#[proxies.socks5_auth]
+#enabled = true
+#users = [
+#    { user = "demo", pass = "demo123" }
+#]
+
+#[[proxies]]
 #name = "web"
 #protocol = "http"
 #local_ip = "127.0.0.1"

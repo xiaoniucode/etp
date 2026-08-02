@@ -253,6 +253,23 @@ async fn run_session(
     let connection_id = auth_resp.connection_id;
 
     let report = build_proxy_report(config);
+    for p in &report.proxies {
+        debug!(
+            "上报代理 name={} protocol={} enabled={} remote_port={:?} targets={} socks5_auth={} transport={:?}",
+            p.name,
+            p.protocol,
+            p.enabled,
+            p.remote_port,
+            p.targets.len(),
+            p.socks5_auth.is_some(),
+            p.transport.as_ref().map(|t| (
+                t.multiplex,
+                t.encrypt,
+                t.compress,
+                t.protocol.as_deref()
+            )),
+        );
+    }
     frame_tx
         .send(OutboundFrame::new(Frame::new(
             0,
@@ -507,7 +524,6 @@ async fn serve_loop(
                         let err = ProtoError::decode(frame.payload).unwrap_or_default();
                         let (code, msg) = status_pair(err.status);
                         error!("收到服务端 ERROR code={code} message={msg}");
-                        break Ok(SessionEnd::Reconnect { stable: false });
                     }
                     MSG_PROXY_REPORT_RESP => {
                         handle_proxy_report_resp(frame.payload);
