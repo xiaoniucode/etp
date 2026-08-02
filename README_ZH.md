@@ -17,8 +17,8 @@
   <a href="https://openjdk.org/projects/jdk/25/">
     <img src="https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 25"/>
   </a>
-  <a href="https://github.com/lxien/orbien/releases/v0.26.1">
-    <img src="https://img.shields.io/badge/orbien-0.26.1-blue?style=for-the-badge" alt="orbien:0.26.1"/>
+  <a href="https://github.com/lxien/orbien/releases/v0.27.0">
+    <img src="https://img.shields.io/badge/orbien-0.27.0-blue?style=for-the-badge" alt="orbien:0.27.0"/>
   </a>
   <a href="https://central.sonatype.com/artifact/io.github.lxien/orbien-spring-boot-starter">
     <img src="https://img.shields.io/maven-central/v/io.github.lxien/orbien-spring-boot-starter?style=for-the-badge&logo=apachemaven&logoColor=white" alt="Maven Central"/>
@@ -112,7 +112,7 @@ docker run -d \
   -v /opt/orbien/data:/app/data \
   -v /opt/orbien/cert:/app/cert \
   -v /opt/orbien/config:/app/config \
-  lxien/orbien-server:0.26.1
+  lxien/orbien-server:0.27.0
 ```
 
 | 项目   | 说明                                                             |
@@ -192,7 +192,7 @@ docker run -d \
   -v /path/to/orbien/orbien.toml:/app/orbien.toml:ro \
   -v /path/to/orbien/logs:/app/logs \
   -v /path/to/orbien/.orbien:/root/.orbien \
-  lxien/orbien:0.26.1
+  lxien/orbien:0.27.0
 ```
 
 #### 2.3.3 Spring Boot Starter
@@ -201,7 +201,7 @@ docker run -d \
 <dependency>
     <groupId>io.github.lxien</groupId>
     <artifactId>orbien-spring-boot-starter</artifactId>
-    <version>0.26.1</version>
+    <version>0.27.0</version>
 </dependency>
 ```
 

@@ -4,14 +4,14 @@
 
     <groupId>io.github.lxien</groupId>
     <artifactId>orbien-spring-boot-starter</artifactId>
-    <version>0.26.1</version>
+    <version>0.27.0</version>
     <name>orbien-spring-boot-starter</name>
     <packaging>jar</packaging>
     <description>orbien-spring-boot-starter</description>
     <properties>
         <java.version>17</java.version>
-        <orbien.version>0.26.1</orbien.version>
-        <orbien-spring-boot.version>0.26.1</orbien-spring-boot.version>
+        <orbien.version>0.27.0</orbien.version>
+        <orbien-spring-boot.version>0.27.0</orbien-spring-boot.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -22,7 +22,7 @@
         <lombok.version>1.18.42</lombok.version>
         <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
         <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
-        <maven-javadoc-plugin.version>3.8.0</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
@@ -144,7 +144,7 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <source>${java.version}</source>
+                            <release>${java.version}</release>
                             <doclint>none</doclint>
                             <show>private</show>
                             <nohelp>true</nohelp>
