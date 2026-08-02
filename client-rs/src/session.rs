@@ -26,11 +26,11 @@ use crate::message::{
     ProxySyncType,
 };
 use crate::protocol::{
-    build_flags, decode_new_stream, is_encrypted, opcode_name, Codec, Frame, MSG_AUTH,
-    MSG_AUTH_RESP, MSG_CONFIG_SYNC, MSG_CONNECTION_CREATE, MSG_CONNECTION_CREATE_RESP, MSG_ERROR,
-    MSG_GOAWAY, MSG_PING, MSG_PONG, MSG_PROXY_REPORT_REQ, MSG_PROXY_REPORT_RESP, MSG_STREAM_CLOSE,
-    MSG_STREAM_DATA, MSG_STREAM_OPEN, MSG_STREAM_OPEN_RESP, MSG_STREAM_PAUSE, MSG_STREAM_RESET,
-    MSG_STREAM_RESUME,
+    build_flags, decode_new_stream, is_datagram, is_encrypted, is_mux, opcode_name, Codec, Frame,
+    TunnelTransport, MSG_AUTH, MSG_AUTH_RESP, MSG_CONFIG_SYNC, MSG_CONNECTION_CREATE,
+    MSG_CONNECTION_CREATE_RESP, MSG_ERROR, MSG_GOAWAY, MSG_PING, MSG_PONG, MSG_PROXY_REPORT_REQ,
+    MSG_PROXY_REPORT_RESP, MSG_STREAM_CLOSE, MSG_STREAM_DATA, MSG_STREAM_OPEN, MSG_STREAM_OPEN_RESP,
+    MSG_STREAM_PAUSE, MSG_STREAM_RESET, MSG_STREAM_RESUME,
 };
 use crate::transport::{self, BoxedConn};
 
@@ -154,14 +154,26 @@ fn rand_f64() -> f64 {
 
 async fn dial_framed(
     config: &AppConfig,
-    encrypt: bool,
+    protocol: &str,
+    stream_encrypt: bool,
 ) -> Result<(FramedRead<ConnRead, Codec>, FramedWrite<ConnWrite, Codec>)> {
-    let stream = transport::dial(
-        &config.transport.protocol,
-        &config.server_addr,
+    let port = transport::resolve_endpoint_port(
+        protocol,
         config.server_port,
-        encrypt,
+        &config.transport.quic,
+    );
+    let conn_encrypt = transport::resolve_effective_encrypt(
+        protocol,
+        config.transport.tls.enabled,
+        Some(stream_encrypt),
+    );
+    let stream = transport::dial(
+        protocol,
+        &config.server_addr,
+        port,
+        conn_encrypt,
         &config.transport.tls,
+        &config.transport.quic,
     )
     .await?;
     let (read_half, write_half) = tokio::io::split(stream);
@@ -177,8 +189,12 @@ async fn run_session(
     shutdown: &mut mpsc::Receiver<()>,
 ) -> Result<SessionEnd> {
     let started = Instant::now();
-    let (mut framed_read, framed_write) =
-        dial_framed(config, config.transport.tls.enabled).await?;
+    let (mut framed_read, framed_write) = dial_framed(
+        config,
+        &config.transport.protocol,
+        config.transport.tls.enabled,
+    )
+    .await?;
 
     let (frame_tx, frame_rx) = mpsc::channel::<OutboundFrame>(256);
     let writer_task = tokio::spawn(frame_writer(framed_write, frame_rx));
@@ -382,34 +398,24 @@ struct StreamHandle {
 
 #[derive(Default)]
 struct MuxSlots {
-    plain: Option<MuxTunnelState>,
-    encrypted: Option<MuxTunnelState>,
+    map: HashMap<(String, bool), MuxTunnelState>,
 }
 
 impl MuxSlots {
-    fn get(&self, encrypt: bool) -> Option<&MuxTunnelState> {
-        if encrypt {
-            self.encrypted.as_ref()
-        } else {
-            self.plain.as_ref()
-        }
+    fn get(&self, protocol: &str, encrypt: bool) -> Option<&MuxTunnelState> {
+        self.map
+            .get(&(protocol.to_ascii_lowercase(), encrypt))
     }
 
-    fn insert(&mut self, state: MuxTunnelState) {
-        if state.encrypt {
-            if let Some(old) = self.encrypted.replace(state) {
-                old.shutdown();
-            }
-        } else if let Some(old) = self.plain.replace(state) {
+    fn insert(&mut self, protocol: &str, state: MuxTunnelState) {
+        let key = (protocol.to_ascii_lowercase(), state.encrypt);
+        if let Some(old) = self.map.insert(key, state) {
             old.shutdown();
         }
     }
 
     fn clear(&mut self) {
-        if let Some(t) = self.plain.take() {
-            t.shutdown();
-        }
-        if let Some(t) = self.encrypted.take() {
+        for (_, t) in self.map.drain() {
             t.shutdown();
         }
     }
@@ -704,12 +710,32 @@ async fn handle_stream_open(
 ) -> Result<()> {
     let stream_id = frame.stream_id;
     let visit = decode_new_stream(frame.payload).context("解析 STREAM_OPEN 载荷失败")?;
-    let encrypt = is_encrypted(frame.flags);
 
-    if visit.transport != 0 {
-        debug!(
-            "流 {} 请求非 TCP 传输 ordinal={}，当前仅支持 TCP",
-            stream_id, visit.transport
+    let encrypt = is_encrypted(frame.flags);
+    let frame_mux = is_mux(frame.flags);
+    let datagram = is_datagram(frame.flags);
+    if datagram {
+        warn!("流 {stream_id} 为 UDP/datagram，当前 Rust 客户端尚未实现");
+        send_open_resp(
+            &control_tx,
+            stream_id,
+            connection_id,
+            "",
+            1,
+            "datagram not supported",
+            encrypt,
+            false,
+            false,
+        )
+        .await?;
+        return Ok(());
+    }
+
+    let tunnel_transport = visit.transport;
+    let protocol = tunnel_transport.as_str();
+    if !tunnel_transport.is_supported() {
+        warn!(
+            "流 {stream_id} 数据隧道协议 {protocol} 当前仅支持 tcp/quic（websocket 未实现）"
         );
         send_open_resp(
             &control_tx,
@@ -719,14 +745,34 @@ async fn handle_stream_open(
             1,
             "unsupported transport",
             encrypt,
+            false,
+            false,
+        )
+        .await?;
+        return Ok(());
+    }
+
+    let multiplex = transport::normalize_multiplex(protocol, frame_mux);
+    if !multiplex {
+        warn!("流 {stream_id} 要求独立隧道(multiplex=false)，当前 Rust 客户端未实现");
+        send_open_resp(
+            &control_tx,
+            stream_id,
+            connection_id,
+            "",
+            1,
+            "direct tunnel not supported",
+            encrypt,
+            false,
+            false,
         )
         .await?;
         return Ok(());
     }
 
     debug!(
-        "打开流 stream_id={} target={}:{} encrypt={}",
-        stream_id, visit.host, visit.port, encrypt
+        "打开流 stream_id={stream_id} target={}:{} protocol={protocol} encrypt={encrypt} multiplex={multiplex}",
+        visit.host, visit.port
     );
 
     let local = match TcpStream::connect((visit.host.as_str(), visit.port)).await {
@@ -744,6 +790,8 @@ async fn handle_stream_open(
                 1,
                 &format!("local connect failed: {e}"),
                 encrypt,
+                multiplex,
+                false,
             )
             .await?;
             return Ok(());
@@ -753,7 +801,9 @@ async fn handle_stream_open(
     let (tunnel_tx, tunnel_id) = ensure_mux_tunnel(
         config,
         connection_id,
+        tunnel_transport,
         encrypt,
+        multiplex,
         mux,
         streams.clone(),
         mux_create,
@@ -783,6 +833,8 @@ async fn handle_stream_open(
         0,
         "",
         encrypt,
+        multiplex,
+        false,
     )
     .await?;
 
@@ -794,6 +846,7 @@ async fn handle_stream_open(
             to_local_rx,
             tunnel_tx,
             encrypt,
+            multiplex,
             paused,
             resume_notify,
             stream_cancel,
@@ -814,6 +867,8 @@ async fn send_open_resp(
     code: i32,
     message: &str,
     encrypt: bool,
+    multiplex: bool,
+    datagram: bool,
 ) -> Result<()> {
     let resp = OpenStreamResponse {
         connection_id,
@@ -821,7 +876,7 @@ async fn send_open_resp(
         status: make_status(code, message),
     };
     let frame = Frame::new(stream_id, MSG_STREAM_OPEN_RESP, encode_message(&resp))
-        .with_flags(build_flags(true, encrypt, false));
+        .with_flags(build_flags(multiplex, encrypt, datagram));
     // 等待帧 flush 到传输层后再读本地服务，避免握手数据早于流就绪
     let (out, flushed) = OutboundFrame::with_flush_notify(frame);
     control_tx
@@ -836,17 +891,21 @@ async fn send_open_resp(
     Ok(())
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn ensure_mux_tunnel(
     config: &AppConfig,
     connection_id: u32,
+    tunnel_transport: TunnelTransport,
     encrypt: bool,
+    multiplex: bool,
     mux: Arc<Mutex<MuxSlots>>,
     streams: Arc<Mutex<HashMap<u32, StreamHandle>>>,
     mux_create: Arc<Mutex<()>>,
 ) -> Result<(FrameTx, String)> {
+    let protocol = tunnel_transport.as_str();
     {
         let guard = mux.lock().await;
-        if let Some(t) = guard.get(encrypt) {
+        if let Some(t) = guard.get(protocol, encrypt) {
             return Ok((t.frame_tx.clone(), t.tunnel_id.clone()));
         }
     }
@@ -854,15 +913,17 @@ async fn ensure_mux_tunnel(
     let _create_guard = mux_create.lock().await;
     {
         let guard = mux.lock().await;
-        if let Some(t) = guard.get(encrypt) {
+        if let Some(t) = guard.get(protocol, encrypt) {
             return Ok((t.frame_tx.clone(), t.tunnel_id.clone()));
         }
     }
 
     let tunnel_id = Uuid::new_v4().to_string();
-    debug!("创建多路复用数据隧道 tunnel_id={tunnel_id} encrypt={encrypt}");
+    debug!(
+        "创建多路复用数据隧道 tunnel_id={tunnel_id} protocol={protocol} encrypt={encrypt} multiplex={multiplex}"
+    );
 
-    let (mut framed_read, mut framed_write) = dial_framed(config, encrypt).await?;
+    let (mut framed_read, mut framed_write) = dial_framed(config, protocol, encrypt).await?;
 
     let req = CreateConnectionRequest {
         tunnel_id: tunnel_id.clone(),
@@ -874,7 +935,7 @@ async fn ensure_mux_tunnel(
                 MSG_CONNECTION_CREATE,
                 encode_message(&req),
             )
-            .with_flags(build_flags(true, encrypt, false)),
+            .with_flags(build_flags(multiplex, encrypt, false)),
         )
         .await
         .context("发送 CONNECTION_CREATE 失败")?;
@@ -925,7 +986,7 @@ async fn ensure_mux_tunnel(
         writer,
         reader,
     };
-    mux.lock().await.insert(state);
+    mux.lock().await.insert(protocol, state);
 
     Ok((tunnel_tx, final_tunnel_id))
 }
@@ -963,11 +1024,12 @@ async fn bridge_stream(
     mut from_remote: mpsc::Receiver<Bytes>,
     tunnel_tx: FrameTx,
     encrypt: bool,
+    multiplex: bool,
     paused: Arc<AtomicBool>,
     resume_notify: Arc<Notify>,
     cancel: CancellationToken,
 ) -> Result<()> {
-    let flags = build_flags(true, encrypt, false);
+    let flags = build_flags(multiplex, encrypt, false);
     let (mut local_read, mut local_write) = local.into_split();
 
     let upload_tx = tunnel_tx.clone();

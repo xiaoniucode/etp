@@ -12,11 +12,26 @@ use tracing::warn;
 
 use crate::config::TlsConfig;
 
+pub const QUIC_ALPN: &[u8] = b"orbien";
+
 static TLS_CLIENT_CACHE: Mutex<Option<(String, Arc<ClientConfig>)>> = Mutex::new(None);
+static QUIC_TLS_CLIENT_CACHE: Mutex<Option<(String, Arc<ClientConfig>)>> = Mutex::new(None);
 
 pub fn build_client_config(tls: &TlsConfig) -> Result<Arc<ClientConfig>> {
+    cached_client_config(tls, &TLS_CLIENT_CACHE, None)
+}
+
+pub fn build_quic_client_config(tls: &TlsConfig) -> Result<Arc<ClientConfig>> {
+    cached_client_config(tls, &QUIC_TLS_CLIENT_CACHE, Some(QUIC_ALPN))
+}
+
+fn cached_client_config(
+    tls: &TlsConfig,
+    cache: &Mutex<Option<(String, Arc<ClientConfig>)>>,
+    alpn: Option<&'static [u8]>,
+) -> Result<Arc<ClientConfig>> {
     let key = cache_key(tls);
-    if let Ok(guard) = TLS_CLIENT_CACHE.lock() {
+    if let Ok(guard) = cache.lock() {
         if let Some((cached_key, cfg)) = guard.as_ref() {
             if *cached_key == key {
                 return Ok(cfg.clone());
@@ -24,8 +39,15 @@ pub fn build_client_config(tls: &TlsConfig) -> Result<Arc<ClientConfig>> {
         }
     }
 
-    let built = build_client_config_uncached(tls)?;
-    if let Ok(mut guard) = TLS_CLIENT_CACHE.lock() {
+    let mut built = build_client_config_uncached(tls)?;
+    if let Some(proto) = alpn {
+        built.alpn_protocols = vec![proto.to_vec()];
+    }
+    if std::env::var_os("SSLKEYLOGFILE").is_some() {
+        built.key_log = Arc::new(rustls::KeyLogFile::new());
+    }
+    let built = Arc::new(built);
+    if let Ok(mut guard) = cache.lock() {
         *guard = Some((key, built.clone()));
     }
     Ok(built)
@@ -46,7 +68,7 @@ fn path_key(path: &Option<std::path::PathBuf>) -> String {
         .unwrap_or_default()
 }
 
-fn build_client_config_uncached(tls: &TlsConfig) -> Result<Arc<ClientConfig>> {
+fn build_client_config_uncached(tls: &TlsConfig) -> Result<ClientConfig> {
     let builder = ClientConfig::builder();
 
     let builder = if let Some(ca) = &tls.ca_file {
@@ -69,7 +91,7 @@ fn build_client_config_uncached(tls: &TlsConfig) -> Result<Arc<ClientConfig>> {
         builder.with_no_client_auth()
     };
 
-    Ok(Arc::new(config))
+    Ok(config)
 }
 
 fn load_root_certs(path: &Path) -> Result<rustls::RootCertStore> {

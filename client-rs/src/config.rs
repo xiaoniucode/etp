@@ -26,6 +26,7 @@ pub struct TransportConfig {
     pub protocol: String,
     pub multiplex: bool,
     pub tls: TlsConfig,
+    pub quic: QuicConfig,
 }
 
 #[derive(Debug, Clone)]
@@ -34,6 +35,29 @@ pub struct TlsConfig {
     pub ca_file: Option<PathBuf>,
     pub cert_file: Option<PathBuf>,
     pub key_file: Option<PathBuf>,
+}
+
+pub const DEFAULT_QUIC_PORT: u16 = 9529;
+
+#[derive(Debug, Clone)]
+pub struct QuicConfig {
+    pub port: u16,
+    pub max_idle_timeout_ms: u64,
+    pub initial_max_data: u64,
+    pub initial_max_stream_data: u64,
+    pub initial_max_streams_bidi: u32,
+}
+
+impl Default for QuicConfig {
+    fn default() -> Self {
+        Self {
+            port: DEFAULT_QUIC_PORT,
+            max_idle_timeout_ms: 120_000,
+            initial_max_data: 1_048_576,
+            initial_max_stream_data: 1_048_576,
+            initial_max_streams_bidi: 100,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -213,6 +237,8 @@ struct RawTransport {
     multiplex: RawMultiplex,
     #[serde(default)]
     tls: RawTls,
+    #[serde(default)]
+    quic: RawQuic,
 }
 
 impl Default for RawTransport {
@@ -221,6 +247,7 @@ impl Default for RawTransport {
             protocol: default_tcp(),
             multiplex: RawMultiplex::default(),
             tls: RawTls::default(),
+            quic: RawQuic::default(),
         }
     }
 }
@@ -261,6 +288,47 @@ impl Default for RawTls {
             key_file: None,
         }
     }
+}
+
+#[derive(Debug, Deserialize)]
+struct RawQuic {
+    #[serde(default)]
+    server_port: Option<u16>,
+    #[serde(default)]
+    port: Option<u16>,
+    #[serde(default = "default_quic_idle")]
+    max_idle_timeout_ms: u64,
+    #[serde(default = "default_quic_max_data")]
+    initial_max_data: u64,
+    #[serde(default = "default_quic_max_data")]
+    initial_max_stream_data: u64,
+    #[serde(default = "default_quic_max_streams")]
+    initial_max_streams_bidi: u32,
+}
+
+impl Default for RawQuic {
+    fn default() -> Self {
+        Self {
+            server_port: None,
+            port: None,
+            max_idle_timeout_ms: default_quic_idle(),
+            initial_max_data: default_quic_max_data(),
+            initial_max_stream_data: default_quic_max_data(),
+            initial_max_streams_bidi: default_quic_max_streams(),
+        }
+    }
+}
+
+fn default_quic_idle() -> u64 {
+    120_000
+}
+
+fn default_quic_max_data() -> u64 {
+    1_048_576
+}
+
+fn default_quic_max_streams() -> u32 {
+    100
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -338,6 +406,7 @@ struct RawTarget {
 struct RawProxyTransport {
     multiplex: Option<bool>,
     encrypt: Option<bool>,
+    compress: Option<bool>,
     protocol: Option<String>,
 }
 
@@ -361,6 +430,13 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
         return Err(ConfigError::Invalid(
             "配置错误: 当前仅支持多路复用，请设置 [transport.multiplex] enabled = true".into(),
         ));
+    }
+
+    let quic = build_quic_config(&raw.transport.quic)?;
+    if protocol == "quic" {
+        if let Err(e) = crate::transport::quic::validate_quic_config(&quic) {
+            return Err(ConfigError::Invalid(e.to_string()));
+        }
     }
 
     if raw.proxies.is_empty() {
@@ -417,19 +493,17 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
             ));
         }
 
+        // 对齐 Java TomlConfigLoader：代理 transport 与全局 transport.protocol 解耦
+        // - 无 [proxies.transport]：仅带上全局 multiplex，不上报 protocol（服务端缺省 TCP）
+        // - 有 [proxies.transport]：protocol 仅在显式配置时上报；encrypt 默认 true；compress 默认 false
         let transport = match p.transport {
             Some(t) => {
-                if let Some(false) = t.multiplex {
-                    return Err(ConfigError::Invalid(format!(
-                        "配置错误: 代理 [{name}] 设置 multiplex=false，当前仅支持多路复用"
-                    )));
-                }
-                let protocol = t.protocol.filter(|tp| tp.trim().eq_ignore_ascii_case("tcp"));
+                let proxy_protocol = normalize_proxy_transport_protocol(t.protocol, &name)?;
                 ProxyTransportConfig {
-                    multiplex: t.multiplex.or(Some(true)),
-                    encrypt: t.encrypt,
-                    compress: Some(false),
-                    protocol,
+                    multiplex: Some(t.multiplex.unwrap_or(true)),
+                    encrypt: Some(t.encrypt.unwrap_or(true)),
+                    compress: Some(t.compress.unwrap_or(false)),
+                    protocol: proxy_protocol,
                 }
             }
             None => ProxyTransportConfig {
@@ -509,6 +583,7 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
                 cert_file: raw.transport.tls.cert_file.map(PathBuf::from),
                 key_file: raw.transport.tls.key_file.map(PathBuf::from),
             },
+            quic,
         },
         retry: RetryConfig {
             initial_delay_secs: raw.connection.retry.initial_delay,
@@ -517,4 +592,37 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
         },
         proxies,
     })
+}
+
+fn build_quic_config(raw: &RawQuic) -> Result<QuicConfig, ConfigError> {
+    let port = raw.server_port.or(raw.port).unwrap_or(DEFAULT_QUIC_PORT);
+    if port == 0 {
+        return Err(ConfigError::Invalid(
+            "配置错误: [transport.quic] server_port/port 无效".into(),
+        ));
+    }
+    Ok(QuicConfig {
+        port,
+        max_idle_timeout_ms: raw.max_idle_timeout_ms,
+        initial_max_data: raw.initial_max_data,
+        initial_max_stream_data: raw.initial_max_stream_data,
+        initial_max_streams_bidi: raw.initial_max_streams_bidi,
+    })
+}
+
+fn normalize_proxy_transport_protocol(
+    protocol: Option<String>,
+    proxy_name: &str,
+) -> Result<Option<String>, ConfigError> {
+    let Some(raw) = protocol else {
+        return Ok(None);
+    };
+    let p = raw.trim().to_ascii_lowercase();
+    match p.as_str() {
+        "tcp" | "quic" => Ok(Some(p)),
+        "" => Ok(None),
+        other => Err(ConfigError::Invalid(format!(
+            "配置错误: 代理 [{proxy_name}] transport.protocol=\"{other}\" ，当前仅支持 tcp/quic"
+        ))),
+    }
 }

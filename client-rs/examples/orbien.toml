@@ -4,6 +4,22 @@ server_port = 9527
 [auth]
 token = "YOUR_TOKEN"
 
+# 控制通道：tcp | quic（
+# [transport]
+# protocol = "quic"
+#
+# [transport.quic]
+# server_port = 9529
+# max_idle_timeout_ms = 120000
+# initial_max_streams_bidi = 100
+#
+# [transport.tls]
+# enabled = true
+# ca_file = "cert/ca.crt"
+#
+# [proxies.transport]
+# protocol = "quic"
+
 #[[proxies]]
 #name = "MySQL"
 #protocol = "tcp"

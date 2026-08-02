@@ -57,6 +57,14 @@ pub fn is_encrypted(flags: u8) -> bool {
     flags & FLAG_ENCRYPTED != 0
 }
 
+pub fn is_mux(flags: u8) -> bool {
+    flags & FLAG_MUX != 0
+}
+
+pub fn is_datagram(flags: u8) -> bool {
+    flags & FLAG_DATAGRAM != 0
+}
+
 pub const MSG_AUTH: u8 = 0x01;
 pub const MSG_AUTH_RESP: u8 = 0x02;
 pub const MSG_PING: u8 = 0x03;
@@ -105,12 +113,40 @@ pub fn opcode_name(opcode: u8) -> &'static str {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum TunnelTransport {
+    Tcp = 0,
+    Websocket = 1,
+    Quic = 2,
+}
+
+impl TunnelTransport {
+    pub fn from_wire(value: u8) -> Self {
+        match value {
+            1 => Self::Websocket,
+            2 => Self::Quic,
+            _ => Self::Tcp,
+        }
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Tcp => "tcp",
+            Self::Websocket => "websocket",
+            Self::Quic => "quic",
+        }
+    }
+
+    pub fn is_supported(self) -> bool {
+        matches!(self, Self::Tcp | Self::Quic)
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NewStreamInfo {
     pub host: String,
     pub port: u16,
-    /// 传输类型序号：TCP=0，WEBSOCKET=1，QUIC=2
-    pub transport: u8,
+    pub transport: TunnelTransport,
 }
 
 #[derive(Debug, Error)]
@@ -139,7 +175,7 @@ pub fn decode_new_stream(mut buf: Bytes) -> Result<NewStreamInfo, NewStreamError
         .map_err(|_| NewStreamError::InvalidUtf8)?
         .to_string();
     let port = buf.get_u16();
-    let transport = buf.get_u8();
+    let transport = TunnelTransport::from_wire(buf.get_u8());
     Ok(NewStreamInfo {
         host,
         port,
