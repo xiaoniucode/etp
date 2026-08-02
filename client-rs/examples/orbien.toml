@@ -30,6 +30,12 @@ token = "YOUR_TOKEN"
 #local_port = 3306
 
 #[[proxies]]
+#name = "udp"
+#protocol = "udp"
+#local_ip = "127.0.0.1"
+#local_port = 9998
+
+#[[proxies]]
 #name = "web"
 #protocol = "http"
 #local_ip = "127.0.0.1"

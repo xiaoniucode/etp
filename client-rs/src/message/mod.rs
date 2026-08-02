@@ -24,12 +24,7 @@ pub fn build_auth_info(config: &AppConfig, agent_id: Option<&str>) -> AuthInfo {
 }
 
 pub fn build_proxy_report(config: &AppConfig) -> BatchCreateProxiesRequest {
-    let proxies = config
-        .proxies
-        .iter()
-        .filter(|p| p.enabled)
-        .map(proxy_to_proto)
-        .collect();
+    let proxies = config.proxies.iter().map(proxy_to_proto).collect();
     BatchCreateProxiesRequest { proxies }
 }
 
@@ -38,6 +33,7 @@ fn proxy_to_proto(p: &ProxyConfig) -> Proxy {
         ProxyProtocol::Tcp => ProtocolType::Tcp,
         ProxyProtocol::Http => ProtocolType::Http,
         ProxyProtocol::Https => ProtocolType::Https,
+        ProxyProtocol::Udp => ProtocolType::Udp,
     } as i32;
 
     let targets = p
@@ -47,7 +43,7 @@ fn proxy_to_proto(p: &ProxyConfig) -> Proxy {
             host: t.host.clone(),
             port: t.port,
             name: t.name.clone(),
-            weight: t.weight,
+            weight: Some(t.weight),
         })
         .collect();
 
@@ -59,26 +55,24 @@ fn proxy_to_proto(p: &ProxyConfig) -> Proxy {
 
     let transport = {
         let t = &p.transport;
-        let has_any = t.multiplex.is_some()
-            || t.encrypt.is_some()
-            || t.compress.is_some()
-            || t.protocol.is_some();
-        if has_any {
-            Some(Transport {
-                multiplex: t.multiplex,
-                encrypt: t.encrypt,
-                compress: t.compress,
-                protocol: t.protocol.clone(),
-                compress_algorithm: None,
-            })
-        } else {
-            None
-        }
+        Some(Transport {
+            multiplex: t.multiplex,
+            encrypt: t.encrypt,
+            compress: t.compress,
+            protocol: t.protocol.clone(),
+            compress_algorithm: None,
+        })
     };
 
     let tls_cert = match (&p.protocol, &p.tls_cert) {
         (ProxyProtocol::Https, Some(cert)) => load_tls_cert(cert),
         _ => None,
+    };
+
+    let remote_port = if p.protocol.reports_remote_port() {
+        p.remote_port
+    } else {
+        None
     };
 
     Proxy {
@@ -88,7 +82,7 @@ fn proxy_to_proto(p: &ProxyConfig) -> Proxy {
         enabled: p.enabled,
         targets,
         force_https: p.force_https,
-        remote_port: p.remote_port,
+        remote_port,
         domain,
         access_control: None,
         basic_auth: None,

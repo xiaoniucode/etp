@@ -1,14 +1,15 @@
 use std::collections::HashMap;
+use std::net::SocketAddr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::{anyhow, bail, Context, Result};
-use bytes::Bytes;
+use bytes::{Bytes, BytesMut};
 use futures_util::{SinkExt, StreamExt};
 use prost::Message;
 use tokio::io::{AsyncReadExt, AsyncWriteExt, ReadHalf, WriteHalf};
-use tokio::net::TcpStream;
+use tokio::net::{TcpStream, UdpSocket};
 use tokio::sync::{mpsc, oneshot, Mutex, Notify};
 use tokio::task::JoinHandle;
 use tokio::time::{interval, sleep, Instant, MissedTickBehavior};
@@ -396,6 +397,7 @@ struct StreamHandle {
     resume_notify: Arc<Notify>,
     /// 远端关流或会话拆毁时取消本地桥接
     cancel: CancellationToken,
+    datagram: bool,
 }
 
 #[derive(Default)]
@@ -578,16 +580,20 @@ async fn handle_stream_side_frame(
         }
         MSG_STREAM_PAUSE => {
             if let Some(h) = streams.lock().await.get(&frame.stream_id) {
-                h.paused.store(true, Ordering::SeqCst);
-                debug!("流暂停 stream_id={}", frame.stream_id);
+                if !h.datagram {
+                    h.paused.store(true, Ordering::SeqCst);
+                    debug!("流暂停 stream_id={}", frame.stream_id);
+                }
             }
             true
         }
         MSG_STREAM_RESUME => {
             if let Some(h) = streams.lock().await.get(&frame.stream_id) {
-                h.paused.store(false, Ordering::SeqCst);
-                h.resume_notify.notify_waiters();
-                debug!("流恢复 stream_id={}", frame.stream_id);
+                if !h.datagram {
+                    h.paused.store(false, Ordering::SeqCst);
+                    h.resume_notify.notify_waiters();
+                    debug!("流恢复 stream_id={}", frame.stream_id);
+                }
             }
             true
         }
@@ -670,31 +676,32 @@ async fn dispatch_to_local(
     if payload.is_empty() {
         return;
     }
-    let tx = streams
-        .lock()
-        .await
-        .get(&stream_id)
-        .map(|h| h.to_local.clone());
-    match tx {
-        Some(tx) => {
-            //避免慢消费者头阻塞控制/隧道读循环
-            match tx.try_send(payload) {
-                Ok(()) => {}
-                Err(mpsc::error::TrySendError::Full(_)) => {
-                    debug!("流下行背压溢出，关闭流 stream_id={stream_id}");
-                    close_stream(streams, stream_id).await;
-                }
-                Err(mpsc::error::TrySendError::Closed(_)) => {
-                    debug!("流下行通道已关闭 stream_id={stream_id}");
-                }
+    let (tx, datagram) = {
+        let guard = streams.lock().await;
+        match guard.get(&stream_id) {
+            Some(h) => (h.to_local.clone(), h.datagram),
+            None => {
+                debug!(
+                    "丢弃无归属流的数据 stream_id={} bytes={}",
+                    stream_id,
+                    payload.len()
+                );
+                return;
             }
         }
-        None => {
-            debug!(
-                "丢弃无归属流的数据 stream_id={} bytes={}",
-                stream_id,
-                payload.len()
-            );
+    };
+    // 避免慢消费者头阻塞控制/隧道读循环
+    match tx.try_send(payload) {
+        Ok(()) => {}
+        Err(mpsc::error::TrySendError::Full(_)) if datagram => {
+            debug!("UDP 下行背压，丢弃 datagram stream_id={stream_id}");
+        }
+        Err(mpsc::error::TrySendError::Full(_)) => {
+            debug!("流下行背压溢出，关闭流 stream_id={stream_id}");
+            close_stream(streams, stream_id).await;
+        }
+        Err(mpsc::error::TrySendError::Closed(_)) => {
+            debug!("流下行通道已关闭 stream_id={stream_id}");
         }
     }
 }
@@ -716,29 +723,11 @@ async fn handle_stream_open(
     let encrypt = is_encrypted(frame.flags);
     let frame_mux = is_mux(frame.flags);
     let datagram = is_datagram(frame.flags);
-    if datagram {
-        warn!("流 {stream_id} 为 UDP/datagram，当前 Rust 客户端尚未实现");
-        send_open_resp(
-            &control_tx,
-            stream_id,
-            connection_id,
-            "",
-            1,
-            "datagram not supported",
-            encrypt,
-            false,
-            false,
-        )
-        .await?;
-        return Ok(());
-    }
 
     let tunnel_transport = visit.transport;
     let protocol = tunnel_transport.as_str();
     if !tunnel_transport.is_supported() {
-        warn!(
-            "流 {stream_id} 数据隧道协议 {protocol} 不受支持"
-        );
+        warn!("流 {stream_id} 数据隧道协议 {protocol} 不受支持");
         send_open_resp(
             &control_tx,
             stream_id,
@@ -748,13 +737,17 @@ async fn handle_stream_open(
             "unsupported transport",
             encrypt,
             false,
-            false,
+            datagram,
         )
         .await?;
         return Ok(());
     }
 
-    let multiplex = transport::normalize_multiplex(protocol, frame_mux);
+    let multiplex = if datagram {
+        true
+    } else {
+        transport::normalize_multiplex(protocol, frame_mux)
+    };
     if !multiplex {
         warn!("流 {stream_id} 要求独立隧道(multiplex=false)，当前 Rust 客户端未实现");
         send_open_resp(
@@ -773,9 +766,28 @@ async fn handle_stream_open(
     }
 
     debug!(
-        "打开流 stream_id={stream_id} target={}:{} protocol={protocol} encrypt={encrypt} multiplex={multiplex}",
+        "打开流 stream_id={stream_id} target={}:{} protocol={protocol} encrypt={encrypt} multiplex={multiplex} datagram={datagram}",
         visit.host, visit.port
     );
+
+    if datagram {
+        return open_datagram_stream(
+            config,
+            connection_id,
+            stream_id,
+            visit.host,
+            visit.port,
+            tunnel_transport,
+            encrypt,
+            multiplex,
+            control_tx,
+            streams,
+            mux,
+            mux_create,
+            session_cancel,
+        )
+        .await;
+    }
 
     let local = match TcpStream::connect((visit.host.as_str(), visit.port)).await {
         Ok(s) => {
@@ -824,6 +836,7 @@ async fn handle_stream_open(
             paused: paused.clone(),
             resume_notify: resume_notify.clone(),
             cancel: stream_cancel.clone(),
+            datagram: false,
         },
     );
 
@@ -859,6 +872,161 @@ async fn handle_stream_open(
     });
 
     Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+async fn open_datagram_stream(
+    config: &AppConfig,
+    connection_id: u32,
+    stream_id: u32,
+    host: String,
+    port: u16,
+    tunnel_transport: TunnelTransport,
+    encrypt: bool,
+    multiplex: bool,
+    control_tx: FrameTx,
+    streams: Arc<Mutex<HashMap<u32, StreamHandle>>>,
+    mux: Arc<Mutex<MuxSlots>>,
+    mux_create: Arc<Mutex<()>>,
+    session_cancel: CancellationToken,
+) -> Result<()> {
+    let target = match resolve_udp_target(&host, port).await {
+        Ok(addr) => addr,
+        Err(e) => {
+            debug!("解析 UDP 目标失败 {host}:{port} — {e:#}");
+            send_open_resp(
+                &control_tx,
+                stream_id,
+                connection_id,
+                "",
+                1,
+                &format!("udp resolve failed: {e}"),
+                encrypt,
+                multiplex,
+                true,
+            )
+            .await?;
+            return Ok(());
+        }
+    };
+
+    let socket = match bind_udp_ephemeral(target).await {
+        Ok(s) => s,
+        Err(e) => {
+            debug!("绑定本地 UDP 失败 stream_id={stream_id}: {e}");
+            send_open_resp(
+                &control_tx,
+                stream_id,
+                connection_id,
+                "",
+                1,
+                &format!("udp bind failed: {e}"),
+                encrypt,
+                multiplex,
+                true,
+            )
+            .await?;
+            return Ok(());
+        }
+    };
+
+    let (tunnel_tx, tunnel_id) = match ensure_mux_tunnel(
+        config,
+        connection_id,
+        tunnel_transport,
+        encrypt,
+        multiplex,
+        mux,
+        streams.clone(),
+        mux_create,
+    )
+    .await
+    {
+        Ok(v) => v,
+        Err(e) => {
+            debug!("获取 UDP 数据隧道失败 stream_id={stream_id}: {e:#}");
+            send_open_resp(
+                &control_tx,
+                stream_id,
+                connection_id,
+                "",
+                1,
+                &format!("tunnel unavailable: {e}"),
+                encrypt,
+                multiplex,
+                true,
+            )
+            .await?;
+            return Ok(());
+        }
+    };
+
+    let (to_local_tx, to_local_rx) = mpsc::channel::<Bytes>(1024);
+    let paused = Arc::new(AtomicBool::new(false));
+    let resume_notify = Arc::new(Notify::new());
+    let stream_cancel = session_cancel.child_token();
+    streams.lock().await.insert(
+        stream_id,
+        StreamHandle {
+            to_local: to_local_tx,
+            paused,
+            resume_notify,
+            cancel: stream_cancel.clone(),
+            datagram: true,
+        },
+    );
+
+    send_open_resp(
+        &control_tx,
+        stream_id,
+        connection_id,
+        &tunnel_id,
+        0,
+        "",
+        encrypt,
+        multiplex,
+        true,
+    )
+    .await?;
+
+    let streams_cleanup = streams.clone();
+    tokio::spawn(async move {
+        let _ = bridge_datagram(
+            stream_id,
+            socket,
+            target,
+            to_local_rx,
+            tunnel_tx,
+            encrypt,
+            multiplex,
+            stream_cancel,
+        )
+        .await;
+        streams_cleanup.lock().await.remove(&stream_id);
+        debug!("UDP 流桥接已清理 stream_id={stream_id}");
+    });
+
+    Ok(())
+}
+
+async fn resolve_udp_target(host: &str, port: u16) -> Result<SocketAddr> {
+    let mut addrs = tokio::net::lookup_host((host, port))
+        .await
+        .with_context(|| format!("lookup_host {host}:{port}"))?;
+    addrs
+        .next()
+        .ok_or_else(|| anyhow!("无可用地址 {host}:{port}"))
+}
+
+async fn bind_udp_ephemeral(target: SocketAddr) -> Result<UdpSocket> {
+    let bind_addr: SocketAddr = if target.is_ipv6() {
+        "[::]:0".parse().unwrap()
+    } else {
+        "0.0.0.0:0".parse().unwrap()
+    };
+    UdpSocket::bind(bind_addr)
+        .await
+        .with_context(|| format!("bind UDP {bind_addr}"))
 }
 
 async fn send_open_resp(
@@ -1096,6 +1264,93 @@ async fn bridge_stream(
             }
         }
         let _ = local_write.shutdown().await;
+    };
+
+    tokio::select! {
+        _ = cancel.cancelled() => {}
+        _ = upload => {}
+        _ = download => {}
+    }
+
+    let _ = tunnel_tx
+        .send(OutboundFrame::new(
+            Frame::empty(stream_id, MSG_STREAM_CLOSE).with_flags(flags),
+        ))
+        .await;
+    Ok(())
+}
+
+async fn bridge_datagram(
+    stream_id: u32,
+    socket: UdpSocket,
+    target: SocketAddr,
+    mut from_remote: mpsc::Receiver<Bytes>,
+    tunnel_tx: FrameTx,
+    encrypt: bool,
+    multiplex: bool,
+    cancel: CancellationToken,
+) -> Result<()> {
+    let flags = build_flags(multiplex, encrypt, false);
+    let socket = Arc::new(socket);
+
+    let upload_tx = tunnel_tx.clone();
+    let cancel_up = cancel.clone();
+    let socket_up = socket.clone();
+    let upload = async move {
+        let mut buf = BytesMut::with_capacity(65536);
+        loop {
+            buf.clear();
+            buf.reserve(65536);
+            tokio::select! {
+                _ = cancel_up.cancelled() => return,
+                result = socket_up.recv_buf_from(&mut buf) => {
+                    match result {
+                        Ok((n, _)) => {
+                            if n == 0 {
+                                continue;
+                            }
+                            let payload = buf.split().freeze();
+                            let frame = Frame::new(stream_id, MSG_STREAM_DATA, payload)
+                                .with_flags(flags);
+                            match upload_tx.try_send(OutboundFrame::new(frame)) {
+                                Ok(()) => {}
+                                Err(mpsc::error::TrySendError::Full(_)) => {
+                                    debug!(
+                                        "UDP 上行隧道背压，丢弃 datagram stream_id={stream_id}"
+                                    );
+                                }
+                                Err(mpsc::error::TrySendError::Closed(_)) => return,
+                            }
+                        }
+                        Err(e) => {
+                            debug!("本地 UDP 读结束 stream_id={stream_id}: {e}");
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    let cancel_down = cancel.clone();
+    let socket_down = socket;
+    let download = async move {
+        loop {
+            tokio::select! {
+                _ = cancel_down.cancelled() => break,
+                item = from_remote.recv() => {
+                    match item {
+                        Some(data) => {
+                            if let Err(e) = socket_down.send_to(&data, target).await {
+                                debug!("本地 UDP 写失败 stream_id={stream_id}: {e}");
+                                break;
+                            }
+                        }
+                        None => break,
+                    }
+                }
+            }
+        }
     };
 
     tokio::select! {

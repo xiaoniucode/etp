@@ -93,6 +93,7 @@ pub enum ProxyProtocol {
     Tcp,
     Http,
     Https,
+    Udp,
 }
 
 impl ProxyProtocol {
@@ -101,11 +102,15 @@ impl ProxyProtocol {
             Self::Tcp => "tcp",
             Self::Http => "http",
             Self::Https => "https",
+            Self::Udp => "udp",
         }
     }
 
     pub fn is_http_or_https(self) -> bool {
         matches!(self, Self::Http | Self::Https)
+    }
+    pub fn reports_remote_port(self) -> bool {
+        matches!(self, Self::Tcp | Self::Udp)
     }
 }
 
@@ -133,7 +138,7 @@ pub struct TargetConfig {
     pub host: String,
     pub port: u32,
     pub name: Option<String>,
-    pub weight: Option<i32>,
+    pub weight: i32,
 }
 
 #[derive(Debug, Clone)]
@@ -162,25 +167,38 @@ pub enum ConfigError {
 }
 
 pub fn load_from_path(path: impl AsRef<Path>) -> Result<AppConfig, ConfigError> {
-    let text = fs::read_to_string(path.as_ref())?;
-    load_from_str(&text)
+    let path = path.as_ref();
+    if !path.is_file() {
+        return Err(ConfigError::Invalid(format!(
+            "配置文件不存在: {}",
+            path.display()
+        )));
+    }
+    let text = fs::read_to_string(path)?;
+    let base_dir = path.parent().map(Path::to_path_buf);
+    load_from_str_with_base(&text, base_dir.as_deref())
 }
 
 pub fn load_from_str(text: &str) -> Result<AppConfig, ConfigError> {
+    load_from_str_with_base(text, None)
+}
+
+fn load_from_str_with_base(text: &str, base_dir: Option<&Path>) -> Result<AppConfig, ConfigError> {
     let raw: RawRoot = toml::from_str(text)?;
-    build_config(raw)
+    build_config(raw, base_dir)
 }
 
 fn parse_proxy_tls(
     proxy_name: &str,
     tls: Option<RawProxyTls>,
+    base_dir: Option<&Path>,
 ) -> Result<Option<ProxyTlsCertConfig>, ConfigError> {
     let Some(tls) = tls else {
         return Ok(None);
     };
     Ok(Some(ProxyTlsCertConfig {
-        key_file: require_existing_file(proxy_name, "tls.key_file", tls.key_file)?,
-        cert_file: require_existing_file(proxy_name, "tls.cert_file", tls.cert_file)?,
+        key_file: require_existing_file(proxy_name, "tls.key_file", tls.key_file, base_dir)?,
+        cert_file: require_existing_file(proxy_name, "tls.cert_file", tls.cert_file, base_dir)?,
     }))
 }
 
@@ -188,6 +206,7 @@ fn require_existing_file(
     proxy_name: &str,
     field: &str,
     value: Option<String>,
+    base_dir: Option<&Path>,
 ) -> Result<PathBuf, ConfigError> {
     let path = value
         .as_deref()
@@ -196,13 +215,46 @@ fn require_existing_file(
         .ok_or_else(|| {
             ConfigError::Invalid(format!("配置错误: 代理 [{proxy_name}] 请配置 {field}"))
         })?;
-    let path_buf = PathBuf::from(path);
+    let path_buf = resolve_path(base_dir, path);
     if !path_buf.is_file() {
         return Err(ConfigError::Invalid(format!(
-            "配置错误: 代理 [{proxy_name}] {field} 不存在: {path}"
+            "配置错误: 代理 [{proxy_name}] {field} 不存在: {}",
+            path_buf.display()
         )));
     }
     Ok(path_buf)
+}
+
+fn resolve_path(base_dir: Option<&Path>, value: &str) -> PathBuf {
+    let path = PathBuf::from(value);
+    if path.is_absolute() {
+        return path;
+    }
+    match base_dir {
+        Some(base) => base.join(path),
+        None => path,
+    }
+}
+
+fn resolve_optional_path(base_dir: Option<&Path>, value: Option<String>) -> Option<PathBuf> {
+    value
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .map(|s| resolve_path(base_dir, s))
+}
+
+fn validate_port(port: u32, field: &str) -> Result<(), ConfigError> {
+    if !(1..=65535).contains(&port) {
+        return Err(ConfigError::Invalid(format!(
+            "配置错误: {field} 必须在 1-65535 范围内: {port}"
+        )));
+    }
+    Ok(())
+}
+
+fn validate_port_u16(port: u16, field: &str) -> Result<(), ConfigError> {
+    validate_port(u32::from(port), field)
 }
 
 fn default_server_addr() -> String {
@@ -414,6 +466,7 @@ struct RawProxy {
     local_ip: String,
     local_port: Option<u32>,
     remote_port: Option<u32>,
+    #[serde(default, alias = "force_Https")]
     force_https: Option<bool>,
     #[serde(default = "default_true")]
     auto_domain: bool,
@@ -443,10 +496,16 @@ fn default_local_ip() -> String {
 
 #[derive(Debug, Deserialize)]
 struct RawTarget {
+    #[serde(default = "default_local_ip")]
     host: String,
     port: u32,
     name: Option<String>,
-    weight: Option<i32>,
+    #[serde(default = "default_target_weight")]
+    weight: i32,
+}
+
+fn default_target_weight() -> i32 {
+    1
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -457,13 +516,21 @@ struct RawProxyTransport {
     protocol: Option<String>,
 }
 
-fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
+fn build_config(raw: RawRoot, base_dir: Option<&Path>) -> Result<AppConfig, ConfigError> {
     let token = raw.auth.token.trim();
     if token.is_empty() {
         return Err(ConfigError::Invalid(
             "配置错误: [auth].token 不能为空".into(),
         ));
     }
+
+    let server_addr = raw.server_addr.trim().to_string();
+    if server_addr.is_empty() {
+        return Err(ConfigError::Invalid(
+            "配置错误: server_addr 不能为空".into(),
+        ));
+    }
+    validate_port_u16(raw.server_port, "server_port")?;
 
     let protocol = raw.transport.protocol.trim().to_ascii_lowercase();
     if !crate::transport::is_supported(&protocol) {
@@ -473,10 +540,13 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
             raw.transport.protocol
         )));
     }
-    if !raw.transport.multiplex.enabled {
-        return Err(ConfigError::Invalid(
-            "配置错误: 当前仅支持多路复用，请设置 [transport.multiplex] enabled = true".into(),
-        ));
+
+    let global_multiplex = raw.transport.multiplex.enabled;
+    if !global_multiplex {
+        warn!(
+            "[transport.multiplex] enabled=false：当前 Rust 客户端数据隧道仅支持多路复用，\
+             若服务端下发独立隧道将失败"
+        );
     }
 
     let quic = build_quic_config(&raw.transport.quic)?;
@@ -489,6 +559,11 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
     if protocol == "websocket" && !raw.transport.tls.enabled {
         return Err(ConfigError::Invalid(
             "配置错误: WebSocket 传输必须启用 TLS，请设置 [transport.tls] enabled = true".into(),
+        ));
+    }
+    if protocol == "quic" && !raw.transport.tls.enabled {
+        return Err(ConfigError::Invalid(
+            "配置错误: QUIC 传输必须启用 TLS，请设置 [transport.tls] enabled = true".into(),
         ));
     }
 
@@ -515,29 +590,54 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
             "tcp" => ProxyProtocol::Tcp,
             "http" => ProxyProtocol::Http,
             "https" => ProxyProtocol::Https,
+            "udp" => ProxyProtocol::Udp,
             other => {
                 return Err(ConfigError::Invalid(format!(
-                    "配置错误: 代理 [{name}] 的 protocol=\"{other}\" ，当前仅支持 tcp/http/https"
+                    "配置错误: 代理 [{name}] 的 protocol=\"{other}\" ，当前仅支持 tcp/http/https/udp"
                 )));
             }
         };
 
-        let mut targets: Vec<TargetConfig> = p
-            .targets
-            .into_iter()
-            .map(|t| TargetConfig {
-                host: t.host,
+        let remote_port = match p.remote_port {
+            Some(port) => {
+                validate_port(port, &format!("代理 [{name}] remote_port"))?;
+                Some(port)
+            }
+            None => None,
+        };
+
+        if let Some(port) = p.local_port {
+            validate_port(port, &format!("代理 [{name}] local_port"))?;
+        }
+
+        let mut targets: Vec<TargetConfig> = Vec::with_capacity(p.targets.len() + 1);
+        for t in p.targets {
+            validate_port(t.port, &format!("代理 [{name}] targets.port"))?;
+            let host = t.host.trim();
+            if host.is_empty() {
+                return Err(ConfigError::Invalid(format!(
+                    "配置错误: 代理 [{name}] targets.host 不能为空"
+                )));
+            }
+            targets.push(TargetConfig {
+                host: host.to_string(),
                 port: t.port,
                 name: t.name,
                 weight: t.weight,
-            })
-            .collect();
+            });
+        }
         if let Some(port) = p.local_port {
+            let local_ip = p.local_ip.trim();
+            if local_ip.is_empty() {
+                return Err(ConfigError::Invalid(format!(
+                    "配置错误: 代理 [{name}] local_ip 不能为空"
+                )));
+            }
             targets.push(TargetConfig {
-                host: p.local_ip.clone(),
+                host: local_ip.to_string(),
                 port,
                 name: Some(name.clone()),
-                weight: Some(1),
+                weight: 1,
             });
         }
         if targets.is_empty() {
@@ -545,27 +645,26 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
                 "配置错误: 代理目标不能为空，请配置 local_port 或 [[proxies.targets]]".into(),
             ));
         }
-
-        // 对齐 Java TomlConfigLoader：代理 transport 与全局 transport.protocol 解耦
-        // - 无 [proxies.transport]：仅带上全局 multiplex，不上报 protocol（服务端缺省 TCP）
-        // - 有 [proxies.transport]：protocol 仅在显式配置时上报；encrypt 默认 true；compress 默认 false
-        let transport = match p.transport {
+        let mut transport = match p.transport {
             Some(t) => {
                 let proxy_protocol = normalize_proxy_transport_protocol(t.protocol, &name)?;
                 ProxyTransportConfig {
-                    multiplex: Some(t.multiplex.unwrap_or(true)),
+                    multiplex: Some(t.multiplex.unwrap_or(global_multiplex)),
                     encrypt: Some(t.encrypt.unwrap_or(true)),
                     compress: Some(t.compress.unwrap_or(false)),
                     protocol: proxy_protocol,
                 }
             }
             None => ProxyTransportConfig {
-                multiplex: Some(true),
+                multiplex: Some(global_multiplex),
                 encrypt: None,
                 compress: None,
                 protocol: None,
             },
         };
+        if proto == ProxyProtocol::Udp {
+            transport.multiplex = Some(true);
+        }
 
         let force_https = match proto {
             ProxyProtocol::Https => p.force_https.unwrap_or(true),
@@ -575,15 +674,25 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
         let domain = if proto.is_http_or_https() {
             Some(DomainConfig {
                 auto_domain: p.auto_domain,
-                custom_domains: p.custom_domains,
-                sub_domains: p.sub_domains,
+                custom_domains: p
+                    .custom_domains
+                    .into_iter()
+                    .map(|d| d.trim().to_string())
+                    .filter(|d| !d.is_empty())
+                    .collect(),
+                sub_domains: p
+                    .sub_domains
+                    .into_iter()
+                    .map(|d| d.trim().to_string())
+                    .filter(|d| !d.is_empty())
+                    .collect(),
             })
         } else {
             None
         };
 
         let tls_cert = match proto {
-            ProxyProtocol::Https => parse_proxy_tls(&name, p.tls.or(p.ssl))?,
+            ProxyProtocol::Https => parse_proxy_tls(&name, p.tls.or(p.ssl), base_dir)?,
             _ => None,
         };
 
@@ -592,11 +701,7 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
             protocol: proto,
             enabled: p.enabled,
             targets,
-            remote_port: if proto == ProxyProtocol::Tcp {
-                p.remote_port
-            } else {
-                None
-            },
+            remote_port,
             force_https,
             domain,
             tls_cert,
@@ -621,7 +726,7 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
         });
 
     Ok(AppConfig {
-        server_addr: raw.server_addr,
+        server_addr,
         server_port: raw.server_port,
         auth: AuthConfig {
             token: token.to_string(),
@@ -629,12 +734,12 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
         },
         transport: TransportConfig {
             protocol,
-            multiplex: true,
+            multiplex: global_multiplex,
             tls: TlsConfig {
                 enabled: raw.transport.tls.enabled,
-                ca_file: raw.transport.tls.ca_file.map(PathBuf::from),
-                cert_file: raw.transport.tls.cert_file.map(PathBuf::from),
-                key_file: raw.transport.tls.key_file.map(PathBuf::from),
+                ca_file: resolve_optional_path(base_dir, raw.transport.tls.ca_file),
+                cert_file: resolve_optional_path(base_dir, raw.transport.tls.cert_file),
+                key_file: resolve_optional_path(base_dir, raw.transport.tls.key_file),
             },
             quic,
             websocket,
