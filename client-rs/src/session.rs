@@ -7,7 +7,7 @@ use anyhow::{anyhow, bail, Context, Result};
 use bytes::Bytes;
 use futures_util::{SinkExt, StreamExt};
 use prost::Message;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::io::{AsyncReadExt, AsyncWriteExt, ReadHalf, WriteHalf};
 use tokio::net::TcpStream;
 use tokio::sync::{mpsc, oneshot, Mutex, Notify};
 use tokio::task::JoinHandle;
@@ -20,11 +20,11 @@ use uuid::Uuid;
 use crate::config::AppConfig;
 use crate::identity::AgentIdentity;
 use crate::message::{
-    build_auth_info, build_proxy_report, encode_message, AuthResponse, BatchCreateProxiesResponse,
-    CreateConnectionRequest, CreateConnectionResponse, Error as ProtoError, OpenStreamResponse,
-    ProxySyncResponse, ProxySyncType, Status,
+    build_auth_info, build_proxy_report, encode_message, make_status, status_code, status_message,
+    status_pair, AuthResponse, BatchCreateProxiesResponse, CreateConnectionRequest,
+    CreateConnectionResponse, Error as ProtoError, OpenStreamResponse, ProxySyncResponse,
+    ProxySyncType,
 };
-use crate::transport;
 use crate::protocol::{
     build_flags, decode_new_stream, is_encrypted, opcode_name, Codec, Frame, MSG_AUTH,
     MSG_AUTH_RESP, MSG_CONFIG_SYNC, MSG_CONNECTION_CREATE, MSG_CONNECTION_CREATE_RESP, MSG_ERROR,
@@ -32,6 +32,7 @@ use crate::protocol::{
     MSG_STREAM_DATA, MSG_STREAM_OPEN, MSG_STREAM_OPEN_RESP, MSG_STREAM_PAUSE, MSG_STREAM_RESET,
     MSG_STREAM_RESUME,
 };
+use crate::transport::{self, BoxedConn};
 
 const HEARTBEAT_SECS: u64 = 30;
 const IDLE_SECS: u64 = 90;
@@ -39,6 +40,8 @@ const MAX_MISSED_HEARTBEATS: u32 = 3;
 const STABLE_SESSION_SECS: u64 = 3;
 
 type FrameTx = mpsc::Sender<OutboundFrame>;
+type ConnRead = ReadHalf<BoxedConn>;
+type ConnWrite = WriteHalf<BoxedConn>;
 
 struct OutboundFrame {
     frame: Frame,
@@ -88,14 +91,12 @@ pub async fn run_agent(config: AppConfig, mut shutdown: mpsc::Receiver<()>) -> R
                 } else {
                     attempt += 1;
                 }
-                if config.retry.max_retries > 0 && attempt > config.retry.max_retries {
-                    bail!("重连次数已达上限 ({})", config.retry.max_retries);
-                }
+                ensure_retries_left(&config, attempt)?;
             }
             Err(e) => {
                 error!("会话异常: {e:#}");
                 attempt += 1;
-                if config.retry.max_retries > 0 && attempt > config.retry.max_retries {
+                if retries_exhausted(&config, attempt) {
                     return Err(e).context(format!(
                         "重连次数已达上限 ({})",
                         config.retry.max_retries
@@ -114,6 +115,17 @@ pub async fn run_agent(config: AppConfig, mut shutdown: mpsc::Receiver<()>) -> R
             _ = sleep(delay) => {}
         }
     }
+}
+
+fn retries_exhausted(config: &AppConfig, attempt: u32) -> bool {
+    config.retry.max_retries > 0 && attempt > config.retry.max_retries
+}
+
+fn ensure_retries_left(config: &AppConfig, attempt: u32) -> Result<()> {
+    if retries_exhausted(config, attempt) {
+        bail!("重连次数已达上限 ({})", config.retry.max_retries);
+    }
+    Ok(())
 }
 
 enum SessionEnd {
@@ -140,23 +152,33 @@ fn rand_f64() -> f64 {
     (h.finish() as f64) / (u64::MAX as f64)
 }
 
+async fn dial_framed(
+    config: &AppConfig,
+    encrypt: bool,
+) -> Result<(FramedRead<ConnRead, Codec>, FramedWrite<ConnWrite, Codec>)> {
+    let stream = transport::dial(
+        &config.transport.protocol,
+        &config.server_addr,
+        config.server_port,
+        encrypt,
+        &config.transport.tls,
+    )
+    .await?;
+    let (read_half, write_half) = tokio::io::split(stream);
+    Ok((
+        FramedRead::new(read_half, Codec::default()),
+        FramedWrite::new(write_half, Codec::default()),
+    ))
+}
+
 async fn run_session(
     config: &AppConfig,
     identity: &mut AgentIdentity,
     shutdown: &mut mpsc::Receiver<()>,
 ) -> Result<SessionEnd> {
     let started = Instant::now();
-    let stream = transport::dial(
-        &config.transport.protocol,
-        &config.server_addr,
-        config.server_port,
-        config.transport.tls.enabled,
-        &config.transport.tls,
-    )
-    .await?;
-    let (read_half, write_half) = tokio::io::split(stream);
-    let mut framed_read = FramedRead::new(read_half, Codec::default());
-    let framed_write = FramedWrite::new(write_half, Codec::default());
+    let (mut framed_read, framed_write) =
+        dial_framed(config, config.transport.tls.enabled).await?;
 
     let (frame_tx, frame_rx) = mpsc::channel::<OutboundFrame>(256);
     let writer_task = tokio::spawn(frame_writer(framed_write, frame_rx));
@@ -183,7 +205,7 @@ async fn run_session(
     };
     let auth_resp =
         AuthResponse::decode(auth_frame.payload).context("解析 AuthResponse 失败")?;
-    let status_code = auth_resp.status.as_ref().map(|s| s.code).unwrap_or(-1);
+    let (status_code, status_msg) = status_pair(auth_resp.status);
     match status_code {
         0 => {
             if !auth_resp.agent_id.is_empty() {
@@ -204,12 +226,8 @@ async fn run_session(
             return Ok(SessionEnd::ClearIdentityAndRetry);
         }
         other => {
-            let msg = auth_resp
-                .status
-                .and_then(|s| s.message)
-                .unwrap_or_default();
             stop_writer(writer_task, frame_tx).await;
-            error!("鉴权失败 code={other} message={msg}，停止客户端");
+            error!("鉴权失败 code={other} message={status_msg}，停止客户端");
             return Ok(SessionEnd::Shutdown);
         }
     }
@@ -252,12 +270,10 @@ async fn stop_writer(mut writer_task: JoinHandle<()>, frame_tx: FrameTx) {
     }
 }
 
-async fn frame_writer<W>(
-    mut writer: FramedWrite<W, Codec>,
+async fn frame_writer(
+    mut writer: FramedWrite<ConnWrite, Codec>,
     mut rx: mpsc::Receiver<OutboundFrame>,
-) where
-    W: tokio::io::AsyncWrite + Unpin,
-{
+) {
     while let Some(out) = rx.recv().await {
         if out.frame.msg_type == MSG_STREAM_DATA {
             tracing::trace!(
@@ -290,13 +306,10 @@ enum RecvUntilError {
     Other(anyhow::Error),
 }
 
-async fn recv_until<R>(
-    reader: &mut FramedRead<R, Codec>,
+async fn recv_until(
+    reader: &mut FramedRead<ConnRead, Codec>,
     expect: u8,
-) -> Result<Frame, RecvUntilError>
-where
-    R: tokio::io::AsyncRead + Unpin,
-{
+) -> Result<Frame, RecvUntilError> {
     let deadline = sleep(Duration::from_secs(30));
     tokio::pin!(deadline);
     loop {
@@ -323,8 +336,7 @@ where
                     MSG_GOAWAY => return Err(RecvUntilError::RemoteStop),
                     MSG_ERROR => {
                         let err = ProtoError::decode(frame.payload).unwrap_or_default();
-                        let code = err.status.as_ref().map(|s| s.code).unwrap_or(-1);
-                        let msg = err.status.and_then(|s| s.message).unwrap_or_default();
+                        let (code, msg) = status_pair(err.status);
                         return Err(RecvUntilError::Other(anyhow!(
                             "服务端错误 code={code} message={msg}"
                         )));
@@ -339,10 +351,9 @@ where
 }
 
 /// 控制通道异常结束时短时清空读缓冲，避免错过已到达的 GOAWAY
-async fn conclude_control_disconnect<R>(reader: &mut FramedRead<R, Codec>) -> SessionEnd
-where
-    R: tokio::io::AsyncRead + Unpin,
-{
+async fn conclude_control_disconnect(
+    reader: &mut FramedRead<ConnRead, Codec>,
+) -> SessionEnd {
     let deadline = Instant::now() + Duration::from_millis(200);
     loop {
         let left = deadline.saturating_duration_since(Instant::now());
@@ -420,16 +431,13 @@ impl MuxTunnelState {
     }
 }
 
-async fn serve_loop<R>(
+async fn serve_loop(
     config: &AppConfig,
     connection_id: u32,
-    mut framed_read: FramedRead<R, Codec>,
+    mut framed_read: FramedRead<ConnRead, Codec>,
     control_tx: FrameTx,
     shutdown: &mut mpsc::Receiver<()>,
-) -> Result<SessionEnd>
-where
-    R: tokio::io::AsyncRead + Unpin,
-{
+) -> Result<SessionEnd> {
     let mut heartbeat = interval(Duration::from_secs(HEARTBEAT_SECS));
     heartbeat.set_missed_tick_behavior(MissedTickBehavior::Delay);
     let mut last_rx = Instant::now();
@@ -481,20 +489,13 @@ where
                 missed = 0;
 
                 match frame.msg_type {
-                    MSG_PONG => {}
-                    MSG_PING => {
-                        let _ = control_tx
-                            .send(OutboundFrame::new(Frame::empty(0, MSG_PONG)))
-                            .await;
-                    }
                     MSG_GOAWAY => {
                         info!("收到服务端停止指令，准备停止客户端");
                         break Ok(SessionEnd::Shutdown);
                     }
                     MSG_ERROR => {
                         let err = ProtoError::decode(frame.payload).unwrap_or_default();
-                        let code = err.status.as_ref().map(|s| s.code).unwrap_or(-1);
-                        let msg = err.status.and_then(|s| s.message).unwrap_or_default();
+                        let (code, msg) = status_pair(err.status);
                         error!("收到服务端 ERROR code={code} message={msg}");
                         break Ok(SessionEnd::Reconnect { stable: false });
                     }
@@ -518,31 +519,17 @@ where
                             debug!("处理 STREAM_OPEN 失败: {e:#}");
                         }
                     }
-                    MSG_STREAM_CLOSE | MSG_STREAM_RESET => {
-                        close_stream(&streams, frame.stream_id).await;
-                    }
-                    MSG_STREAM_PAUSE => {
-                        if let Some(h) = streams.lock().await.get(&frame.stream_id) {
-                            h.paused.store(true, Ordering::SeqCst);
-                            debug!("流暂停 stream_id={}", frame.stream_id);
-                        }
-                    }
-                    MSG_STREAM_RESUME => {
-                        if let Some(h) = streams.lock().await.get(&frame.stream_id) {
-                            h.paused.store(false, Ordering::SeqCst);
-                            h.resume_notify.notify_waiters();
-                            debug!("流恢复 stream_id={}", frame.stream_id);
-                        }
-                    }
-                    MSG_STREAM_DATA => {
-                        dispatch_to_local(&streams, frame.stream_id, frame.payload).await;
-                    }
                     other => {
-                        debug!(
-                            "忽略控制消息 type={} stream_id={}",
-                            opcode_name(other),
-                            frame.stream_id
-                        );
+                        let stream_id = frame.stream_id;
+                        if !handle_stream_side_frame(&streams, other, frame, Some(&control_tx))
+                            .await
+                        {
+                            debug!(
+                                "忽略控制消息 type={} stream_id={}",
+                                opcode_name(other),
+                                stream_id
+                            );
+                        }
                     }
                 }
             }
@@ -561,15 +548,55 @@ where
     end
 }
 
+async fn handle_stream_side_frame(
+    streams: &Arc<Mutex<HashMap<u32, StreamHandle>>>,
+    msg_type: u8,
+    frame: Frame,
+    reply_tx: Option<&FrameTx>,
+) -> bool {
+    match msg_type {
+        MSG_PONG => true,
+        MSG_PING => {
+            if let Some(tx) = reply_tx {
+                let _ = tx
+                    .send(OutboundFrame::new(Frame::empty(0, MSG_PONG)))
+                    .await;
+            }
+            true
+        }
+        MSG_STREAM_CLOSE | MSG_STREAM_RESET => {
+            close_stream(streams, frame.stream_id).await;
+            true
+        }
+        MSG_STREAM_PAUSE => {
+            if let Some(h) = streams.lock().await.get(&frame.stream_id) {
+                h.paused.store(true, Ordering::SeqCst);
+                debug!("流暂停 stream_id={}", frame.stream_id);
+            }
+            true
+        }
+        MSG_STREAM_RESUME => {
+            if let Some(h) = streams.lock().await.get(&frame.stream_id) {
+                h.paused.store(false, Ordering::SeqCst);
+                h.resume_notify.notify_waiters();
+                debug!("流恢复 stream_id={}", frame.stream_id);
+            }
+            true
+        }
+        MSG_STREAM_DATA => {
+            dispatch_to_local(streams, frame.stream_id, frame.payload).await;
+            true
+        }
+        _ => false,
+    }
+}
+
 fn handle_proxy_report_resp(payload: Bytes) {
     match BatchCreateProxiesResponse::decode(payload) {
         Ok(resp) => {
-            let code = resp.status.as_ref().map(|s| s.code).unwrap_or(-1);
+            let code = status_code(&resp.status);
             if code != 0 {
-                let msg = resp
-                    .status
-                    .and_then(|s| s.message)
-                    .unwrap_or_default();
+                let msg = status_message(resp.status);
                 error!("代理上报失败 code={code} message={msg}");
                 return;
             }
@@ -791,14 +818,7 @@ async fn send_open_resp(
     let resp = OpenStreamResponse {
         connection_id,
         tunnel_id: tunnel_id.to_string(),
-        status: Some(Status {
-            code,
-            message: if message.is_empty() {
-                None
-            } else {
-                Some(message.to_string())
-            },
-        }),
+        status: make_status(code, message),
     };
     let frame = Frame::new(stream_id, MSG_STREAM_OPEN_RESP, encode_message(&resp))
         .with_flags(build_flags(true, encrypt, false));
@@ -842,17 +862,7 @@ async fn ensure_mux_tunnel(
     let tunnel_id = Uuid::new_v4().to_string();
     debug!("创建多路复用数据隧道 tunnel_id={tunnel_id} encrypt={encrypt}");
 
-    let stream = transport::dial(
-        &config.transport.protocol,
-        &config.server_addr,
-        config.server_port,
-        encrypt,
-        &config.transport.tls,
-    )
-    .await?;
-    let (read_half, write_half) = tokio::io::split(stream);
-    let mut framed_read = FramedRead::new(read_half, Codec::default());
-    let mut framed_write = FramedWrite::new(write_half, Codec::default());
+    let (mut framed_read, mut framed_write) = dial_framed(config, encrypt).await?;
 
     let req = CreateConnectionRequest {
         tunnel_id: tunnel_id.clone(),
@@ -894,9 +904,8 @@ async fn ensure_mux_tunnel(
 
     let resp = CreateConnectionResponse::decode(resp_frame.payload)
         .context("解析 CreateConnectionResponse 失败")?;
-    let code = resp.status.as_ref().map(|s| s.code).unwrap_or(-1);
+    let (code, msg) = status_pair(resp.status);
     if code != 0 {
-        let msg = resp.status.and_then(|s| s.message).unwrap_or_default();
         bail!("创建数据隧道失败 code={code} message={msg}");
     }
     let final_tunnel_id = if resp.tunnel_id.is_empty() {
@@ -921,13 +930,11 @@ async fn ensure_mux_tunnel(
     Ok((tunnel_tx, final_tunnel_id))
 }
 
-async fn tunnel_reader<R>(
-    mut framed_read: FramedRead<R, Codec>,
+async fn tunnel_reader(
+    mut framed_read: FramedRead<ConnRead, Codec>,
     streams: Arc<Mutex<HashMap<u32, StreamHandle>>>,
     tunnel_tx: FrameTx,
-) where
-    R: tokio::io::AsyncRead + Unpin,
-{
+) {
     while let Some(item) = framed_read.next().await {
         let frame = match item {
             Ok(f) => f,
@@ -936,37 +943,14 @@ async fn tunnel_reader<R>(
                 break;
             }
         };
-        match frame.msg_type {
-            MSG_STREAM_DATA => {
-                dispatch_to_local(&streams, frame.stream_id, frame.payload).await;
-            }
-            MSG_STREAM_CLOSE | MSG_STREAM_RESET => {
-                close_stream(&streams, frame.stream_id).await;
-            }
-            MSG_STREAM_PAUSE => {
-                if let Some(h) = streams.lock().await.get(&frame.stream_id) {
-                    h.paused.store(true, Ordering::SeqCst);
-                }
-            }
-            MSG_STREAM_RESUME => {
-                if let Some(h) = streams.lock().await.get(&frame.stream_id) {
-                    h.paused.store(false, Ordering::SeqCst);
-                    h.resume_notify.notify_waiters();
-                }
-            }
-            MSG_PING => {
-                let _ = tunnel_tx
-                    .send(OutboundFrame::new(Frame::empty(0, MSG_PONG)))
-                    .await;
-            }
-            MSG_PONG => {}
-            other => {
-                debug!(
-                    "数据隧道忽略消息 type={} stream_id={}",
-                    opcode_name(other),
-                    frame.stream_id
-                );
-            }
+        let msg_type = frame.msg_type;
+        let stream_id = frame.stream_id;
+        if !handle_stream_side_frame(&streams, msg_type, frame, Some(&tunnel_tx)).await {
+            debug!(
+                "数据隧道忽略消息 type={} stream_id={}",
+                opcode_name(msg_type),
+                stream_id
+            );
         }
     }
     warn!("数据隧道读循环结束");

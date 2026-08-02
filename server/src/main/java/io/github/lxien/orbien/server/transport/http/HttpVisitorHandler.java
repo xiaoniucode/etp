@@ -48,7 +48,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 }
                 Channel tunnel = tunnelEntry.getChannel();
                 if (!tunnel.isWritable()) {
-                    logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
+                    logger.debug("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
                     streamContext.pauseVisitorRead(StreamContext.VISITOR_PAUSE_BACKPRESSURE);
                     if (tunnelEntry.getTunnelType().isMultiplex()) {
                         streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());

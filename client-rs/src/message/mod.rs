@@ -136,3 +136,29 @@ pub fn encode_message<M: Message>(msg: &M) -> bytes::Bytes {
     msg.encode(&mut buf).expect("protobuf 编码失败");
     bytes::Bytes::from(buf)
 }
+
+pub fn status_code(status: &Option<Status>) -> i32 {
+    status.as_ref().map(|s| s.code).unwrap_or(-1)
+}
+
+pub fn status_message(status: Option<Status>) -> String {
+    status.and_then(|s| s.message).unwrap_or_default()
+}
+
+pub fn status_pair(status: Option<Status>) -> (i32, String) {
+    match status {
+        Some(s) => (s.code, s.message.unwrap_or_default()),
+        None => (-1, String::new()),
+    }
+}
+
+pub fn make_status(code: i32, message: &str) -> Option<Status> {
+    Some(Status {
+        code,
+        message: if message.is_empty() {
+            None
+        } else {
+            Some(message.to_string())
+        },
+    })
+}

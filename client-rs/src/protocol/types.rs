@@ -1,10 +1,7 @@
-#![allow(dead_code)]
-
-use bytes::{Buf, BufMut, Bytes, BytesMut};
+use bytes::{Buf, Bytes};
 use thiserror::Error;
 
 use super::{MAGIC, VERSION};
-
 
 #[derive(Debug, Clone)]
 pub struct Frame {
@@ -38,15 +35,9 @@ impl Frame {
     }
 }
 
-pub const FLAG_COMPRESSED: u8 = 0x01;
 pub const FLAG_ENCRYPTED: u8 = 0x02;
 pub const FLAG_MUX: u8 = 0x04;
 pub const FLAG_DATAGRAM: u8 = 0x08;
-
-pub const COMPRESS_ALGO_SNAPPY: u8 = 0x10;
-pub const COMPRESS_ALGO_LZ4: u8 = 0x20;
-pub const COMPRESS_ALGO_ZSTD: u8 = 0x40;
-pub const COMPRESS_ALGO_MASK: u8 = 0x70;
 
 pub fn build_flags(mux: bool, encrypted: bool, datagram: bool) -> u8 {
     let mut flags = 0u8;
@@ -62,20 +53,8 @@ pub fn build_flags(mux: bool, encrypted: bool, datagram: bool) -> u8 {
     flags
 }
 
-pub fn is_mux(flags: u8) -> bool {
-    flags & FLAG_MUX != 0
-}
-
 pub fn is_encrypted(flags: u8) -> bool {
     flags & FLAG_ENCRYPTED != 0
-}
-
-pub fn is_compressed(flags: u8) -> bool {
-    flags & FLAG_COMPRESSED != 0
-}
-
-pub fn is_datagram(flags: u8) -> bool {
-    flags & FLAG_DATAGRAM != 0
 }
 
 pub const MSG_AUTH: u8 = 0x01;
@@ -126,7 +105,6 @@ pub fn opcode_name(opcode: u8) -> &'static str {
     }
 }
 
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NewStreamInfo {
     pub host: String,
@@ -167,21 +145,4 @@ pub fn decode_new_stream(mut buf: Bytes) -> Result<NewStreamInfo, NewStreamError
         port,
         transport,
     })
-}
-
-#[allow(dead_code)]
-pub fn encode_new_stream(info: &NewStreamInfo) -> Result<Bytes, NewStreamError> {
-    if info.host.is_empty() {
-        return Err(NewStreamError::EmptyHost);
-    }
-    let host_bytes = info.host.as_bytes();
-    if host_bytes.len() > u16::MAX as usize {
-        return Err(NewStreamError::Incomplete);
-    }
-    let mut buf = BytesMut::with_capacity(2 + host_bytes.len() + 3);
-    buf.put_u16(host_bytes.len() as u16);
-    buf.put_slice(host_bytes);
-    buf.put_u16(info.port);
-    buf.put_u8(info.transport);
-    Ok(buf.freeze())
 }

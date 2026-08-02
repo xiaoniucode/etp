@@ -1,4 +1,5 @@
 pub mod tcp;
+pub mod tls;
 
 use std::future::Future;
 use std::pin::Pin;

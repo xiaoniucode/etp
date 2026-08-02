@@ -106,12 +106,6 @@ pub struct ProxyTransportConfig {
     pub protocol: Option<String>,
 }
 
-impl AppConfig {
-    pub fn resolve_tunnel_encrypt(&self, proxy_encrypt: Option<bool>) -> bool {
-        self.transport.tls.enabled && proxy_encrypt.unwrap_or(true)
-    }
-}
-
 #[derive(Debug, Error)]
 pub enum ConfigError {
     #[error("读取配置文件失败: {0}")]
@@ -139,42 +133,31 @@ fn parse_proxy_tls(
     let Some(tls) = tls else {
         return Ok(None);
     };
-    let key_file = tls
-        .key_file
-        .as_deref()
-        .map(str::trim)
-        .filter(|s| !s.is_empty())
-        .ok_or_else(|| {
-            ConfigError::Invalid(format!(
-                "配置错误: 代理 [{proxy_name}] 请配置 tls.key_file"
-            ))
-        })?;
-    let cert_file = tls
-        .cert_file
-        .as_deref()
-        .map(str::trim)
-        .filter(|s| !s.is_empty())
-        .ok_or_else(|| {
-            ConfigError::Invalid(format!(
-                "配置错误: 代理 [{proxy_name}] 请配置 tls.cert_file"
-            ))
-        })?;
-    let key_path = PathBuf::from(key_file);
-    let cert_path = PathBuf::from(cert_file);
-    if !key_path.is_file() {
-        return Err(ConfigError::Invalid(format!(
-            "配置错误: 代理 [{proxy_name}] 私钥不存在: {key_file}"
-        )));
-    }
-    if !cert_path.is_file() {
-        return Err(ConfigError::Invalid(format!(
-            "配置错误: 代理 [{proxy_name}] 证书不存在: {cert_file}"
-        )));
-    }
     Ok(Some(ProxyTlsCertConfig {
-        key_file: key_path,
-        cert_file: cert_path,
+        key_file: require_existing_file(proxy_name, "tls.key_file", tls.key_file)?,
+        cert_file: require_existing_file(proxy_name, "tls.cert_file", tls.cert_file)?,
     }))
+}
+
+fn require_existing_file(
+    proxy_name: &str,
+    field: &str,
+    value: Option<String>,
+) -> Result<PathBuf, ConfigError> {
+    let path = value
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| {
+            ConfigError::Invalid(format!("配置错误: 代理 [{proxy_name}] 请配置 {field}"))
+        })?;
+    let path_buf = PathBuf::from(path);
+    if !path_buf.is_file() {
+        return Err(ConfigError::Invalid(format!(
+            "配置错误: 代理 [{proxy_name}] {field} 不存在: {path}"
+        )));
+    }
+    Ok(path_buf)
 }
 
 fn default_server_addr() -> String {
@@ -254,7 +237,9 @@ struct RawMultiplex {
 
 impl Default for RawMultiplex {
     fn default() -> Self {
-        Self { enabled: true }
+        Self {
+            enabled: default_true(),
+        }
     }
 }
 
@@ -270,7 +255,7 @@ struct RawTls {
 impl Default for RawTls {
     fn default() -> Self {
         Self {
-            enabled: true,
+            enabled: default_true(),
             ca_file: None,
             cert_file: None,
             key_file: None,
@@ -297,9 +282,9 @@ struct RawRetry {
 impl Default for RawRetry {
     fn default() -> Self {
         Self {
-            initial_delay: 1,
-            max_delay: 20,
-            max_retries: 5,
+            initial_delay: default_retry_initial(),
+            max_delay: default_retry_max_delay(),
+            max_retries: default_retry_max(),
         }
     }
 }

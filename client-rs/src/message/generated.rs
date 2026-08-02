@@ -337,7 +337,6 @@ pub struct Proxy {
     pub access_control: ::core::option::Option<AccessControl>,
     #[prost(message, optional, tag = "10")]
     pub basic_auth: ::core::option::Option<BasicAuth>,
-    /// Shared total bandwidth, e.g. "10Mbps"
     #[prost(string, optional, tag = "11")]
     pub bandwidth: ::core::option::Option<::prost::alloc::string::String>,
     #[prost(enumeration = "LoadBalanceStrategy", optional, tag = "12")]
