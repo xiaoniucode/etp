@@ -4,21 +4,24 @@ server_port = 9527
 [auth]
 token = "YOUR_TOKEN"
 
-# 控制通道：tcp | quic（
+# 控制通道：tcp | quic | websocket
 # [transport]
-# protocol = "quic"
+# protocol = "websocket"
+#
+# [transport.websocket]
+# server_port = 9528
+# path = "/tunnel"
+# max_frame_size = 10485760
 #
 # [transport.quic]
 # server_port = 9529
-# max_idle_timeout_ms = 120000
-# initial_max_streams_bidi = 100
 #
 # [transport.tls]
 # enabled = true
 # ca_file = "cert/ca.crt"
 #
 # [proxies.transport]
-# protocol = "quic"
+# protocol = "websocket"
 
 #[[proxies]]
 #name = "MySQL"
@@ -32,15 +35,3 @@ token = "YOUR_TOKEN"
 #local_ip = "127.0.0.1"
 #local_port = 8080
 #custom_domains = ["web.example.com"]
-
-#[[proxies]]
-#name = "web-https"
-#protocol = "https"
-#local_ip = "127.0.0.1"
-#local_port = 8080
-#force_https = true
-#custom_domains = ["web.example.com"]
-#
-#[proxies.tls]
-#cert_file = "cert/cert.crt"
-#key_file = "cert/key.key"

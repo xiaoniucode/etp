@@ -138,7 +138,7 @@ impl TunnelTransport {
     }
 
     pub fn is_supported(self) -> bool {
-        matches!(self, Self::Tcp | Self::Quic)
+        matches!(self, Self::Tcp | Self::Quic | Self::Websocket)
     }
 }
 

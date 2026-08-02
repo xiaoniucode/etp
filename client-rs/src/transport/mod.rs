@@ -1,6 +1,7 @@
 pub mod quic;
 pub mod tcp;
 pub mod tls;
+pub mod websocket;
 
 use std::future::Future;
 use std::pin::Pin;
@@ -9,7 +10,7 @@ use std::sync::Arc;
 use anyhow::{bail, Result};
 use tokio::io::{AsyncRead, AsyncWrite};
 
-use crate::config::{QuicConfig, TlsConfig};
+use crate::config::{QuicConfig, TlsConfig, WebSocketConfig};
 
 pub trait Conn: AsyncRead + AsyncWrite + Send + Unpin {}
 
@@ -25,6 +26,7 @@ pub struct DialOptions<'a> {
     pub encrypt: bool,
     pub tls: &'a TlsConfig,
     pub quic: &'a QuicConfig,
+    pub websocket: &'a WebSocketConfig,
 }
 
 pub trait Transport: Send + Sync {
@@ -33,7 +35,7 @@ pub trait Transport: Send + Sync {
 }
 
 pub fn supported_protocols() -> &'static [&'static str] {
-    &["tcp", "quic"]
+    &["tcp", "quic", "websocket"]
 }
 
 pub fn is_supported(protocol: &str) -> bool {
@@ -46,6 +48,7 @@ pub fn resolve(protocol: &str) -> Result<Arc<dyn Transport>> {
     match protocol.trim().to_ascii_lowercase().as_str() {
         "tcp" => Ok(Arc::new(tcp::TcpTransport)),
         "quic" => Ok(Arc::new(quic::QuicTransport)),
+        "websocket" => Ok(Arc::new(websocket::WebSocketTransport)),
         other => bail!(
             "不支持的传输协议: \"{other}\"，当前支持: {}",
             supported_protocols().join(", ")
@@ -53,13 +56,25 @@ pub fn resolve(protocol: &str) -> Result<Arc<dyn Transport>> {
     }
 }
 
-pub fn resolve_endpoint_port(protocol: &str, server_port: u16, quic: &QuicConfig) -> u16 {
+pub fn resolve_endpoint_port(
+    protocol: &str,
+    server_port: u16,
+    quic: &QuicConfig,
+    websocket: &WebSocketConfig,
+) -> u16 {
     match protocol.trim().to_ascii_lowercase().as_str() {
         "quic" => {
             if quic.port > 0 {
                 quic.port
             } else {
                 quic::DEFAULT_QUIC_PORT
+            }
+        }
+        "websocket" => {
+            if websocket.port > 0 {
+                websocket.port
+            } else {
+                websocket::DEFAULT_WEBSOCKET_PORT
             }
         }
         _ => server_port,
@@ -73,6 +88,7 @@ pub async fn dial(
     encrypt: bool,
     tls: &TlsConfig,
     quic: &QuicConfig,
+    websocket: &WebSocketConfig,
 ) -> Result<BoxedConn> {
     let transport = resolve(protocol)?;
     transport
@@ -82,6 +98,7 @@ pub async fn dial(
             encrypt,
             tls,
             quic,
+            websocket,
         })
         .await
 }

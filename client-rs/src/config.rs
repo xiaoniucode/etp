@@ -27,6 +27,7 @@ pub struct TransportConfig {
     pub multiplex: bool,
     pub tls: TlsConfig,
     pub quic: QuicConfig,
+    pub websocket: WebSocketConfig,
 }
 
 #[derive(Debug, Clone)]
@@ -38,6 +39,9 @@ pub struct TlsConfig {
 }
 
 pub const DEFAULT_QUIC_PORT: u16 = 9529;
+pub const DEFAULT_WEBSOCKET_PORT: u16 = 9528;
+pub const DEFAULT_WEBSOCKET_PATH: &str = "/tunnel";
+pub const DEFAULT_WEBSOCKET_MAX_FRAME_SIZE: usize = 10 * 1024 * 1024;
 
 #[derive(Debug, Clone)]
 pub struct QuicConfig {
@@ -56,6 +60,23 @@ impl Default for QuicConfig {
             initial_max_data: 1_048_576,
             initial_max_stream_data: 1_048_576,
             initial_max_streams_bidi: 100,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WebSocketConfig {
+    pub port: u16,
+    pub path: String,
+    pub max_frame_size: usize,
+}
+
+impl Default for WebSocketConfig {
+    fn default() -> Self {
+        Self {
+            port: DEFAULT_WEBSOCKET_PORT,
+            path: DEFAULT_WEBSOCKET_PATH.to_string(),
+            max_frame_size: DEFAULT_WEBSOCKET_MAX_FRAME_SIZE,
         }
     }
 }
@@ -239,6 +260,8 @@ struct RawTransport {
     tls: RawTls,
     #[serde(default)]
     quic: RawQuic,
+    #[serde(default)]
+    websocket: RawWebsocket,
 }
 
 impl Default for RawTransport {
@@ -248,6 +271,7 @@ impl Default for RawTransport {
             multiplex: RawMultiplex::default(),
             tls: RawTls::default(),
             quic: RawQuic::default(),
+            websocket: RawWebsocket::default(),
         }
     }
 }
@@ -329,6 +353,29 @@ fn default_quic_max_data() -> u64 {
 
 fn default_quic_max_streams() -> u32 {
     100
+}
+
+#[derive(Debug, Deserialize)]
+struct RawWebsocket {
+    #[serde(default)]
+    server_port: Option<u16>,
+    #[serde(default)]
+    port: Option<u16>,
+    #[serde(default)]
+    path: Option<String>,
+    #[serde(default)]
+    max_frame_size: Option<usize>,
+}
+
+impl Default for RawWebsocket {
+    fn default() -> Self {
+        Self {
+            server_port: None,
+            port: None,
+            path: None,
+            max_frame_size: None,
+        }
+    }
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -433,10 +480,16 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
     }
 
     let quic = build_quic_config(&raw.transport.quic)?;
+    let websocket = build_websocket_config(&raw.transport.websocket)?;
     if protocol == "quic" {
         if let Err(e) = crate::transport::quic::validate_quic_config(&quic) {
             return Err(ConfigError::Invalid(e.to_string()));
         }
+    }
+    if protocol == "websocket" && !raw.transport.tls.enabled {
+        return Err(ConfigError::Invalid(
+            "配置错误: WebSocket 传输必须启用 TLS，请设置 [transport.tls] enabled = true".into(),
+        ));
     }
 
     if raw.proxies.is_empty() {
@@ -584,6 +637,7 @@ fn build_config(raw: RawRoot) -> Result<AppConfig, ConfigError> {
                 key_file: raw.transport.tls.key_file.map(PathBuf::from),
             },
             quic,
+            websocket,
         },
         retry: RetryConfig {
             initial_delay_secs: raw.connection.retry.initial_delay,
@@ -610,6 +664,43 @@ fn build_quic_config(raw: &RawQuic) -> Result<QuicConfig, ConfigError> {
     })
 }
 
+fn build_websocket_config(raw: &RawWebsocket) -> Result<WebSocketConfig, ConfigError> {
+    let port = raw
+        .server_port
+        .or(raw.port)
+        .unwrap_or(DEFAULT_WEBSOCKET_PORT);
+    if port == 0 {
+        return Err(ConfigError::Invalid(
+            "配置错误: [transport.websocket] server_port/port 无效".into(),
+        ));
+    }
+    let path = raw
+        .path
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .unwrap_or(DEFAULT_WEBSOCKET_PATH)
+        .to_string();
+    let path = if path.starts_with('/') {
+        path
+    } else {
+        format!("/{path}")
+    };
+    let max_frame_size = raw
+        .max_frame_size
+        .unwrap_or(DEFAULT_WEBSOCKET_MAX_FRAME_SIZE);
+    if max_frame_size == 0 {
+        return Err(ConfigError::Invalid(
+            "配置错误: [transport.websocket] max_frame_size 必须 > 0".into(),
+        ));
+    }
+    Ok(WebSocketConfig {
+        port,
+        path,
+        max_frame_size,
+    })
+}
+
 fn normalize_proxy_transport_protocol(
     protocol: Option<String>,
     proxy_name: &str,
@@ -619,10 +710,10 @@ fn normalize_proxy_transport_protocol(
     };
     let p = raw.trim().to_ascii_lowercase();
     match p.as_str() {
-        "tcp" | "quic" => Ok(Some(p)),
+        "tcp" | "quic" | "websocket" => Ok(Some(p)),
         "" => Ok(None),
         other => Err(ConfigError::Invalid(format!(
-            "配置错误: 代理 [{proxy_name}] transport.protocol=\"{other}\" ，当前仅支持 tcp/quic"
+            "配置错误: 代理 [{proxy_name}] transport.protocol=\"{other}\" ，当前仅支持 tcp/quic/websocket"
         ))),
     }
 }

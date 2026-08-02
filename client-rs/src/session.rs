@@ -161,6 +161,7 @@ async fn dial_framed(
         protocol,
         config.server_port,
         &config.transport.quic,
+        &config.transport.websocket,
     );
     let conn_encrypt = transport::resolve_effective_encrypt(
         protocol,
@@ -174,6 +175,7 @@ async fn dial_framed(
         conn_encrypt,
         &config.transport.tls,
         &config.transport.quic,
+        &config.transport.websocket,
     )
     .await?;
     let (read_half, write_half) = tokio::io::split(stream);
@@ -735,7 +737,7 @@ async fn handle_stream_open(
     let protocol = tunnel_transport.as_str();
     if !tunnel_transport.is_supported() {
         warn!(
-            "流 {stream_id} 数据隧道协议 {protocol} 当前仅支持 tcp/quic（websocket 未实现）"
+            "流 {stream_id} 数据隧道协议 {protocol} 不受支持"
         );
         send_open_resp(
             &control_tx,
