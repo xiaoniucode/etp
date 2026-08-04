@@ -158,7 +158,7 @@ name = "MySQL"
 protocol = "tcp"
 local_ip = "127.0.0.1"
 local_port = 3306
-remote_port = 9052
+#remote_port = 9052
 ```
 ```shell
 orbien run orbien.toml
