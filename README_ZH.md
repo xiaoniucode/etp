@@ -44,7 +44,7 @@
   <a href="https://stackoak.com/"><strong>在线演示</strong></a>
 </div>
 
-![dashboard.png](doc/image/dashboard.png)
+![dashboard.png](doc/image/dashboard_ZH.png)
 
 ## 一、介绍
 
