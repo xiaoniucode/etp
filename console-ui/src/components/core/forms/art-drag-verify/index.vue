@@ -356,7 +356,7 @@
         color: #999;
       }
 
-      .el-icon-circle-check {
+      .is-success-icon {
         margin-top: 9px;
         color: #6c6;
       }

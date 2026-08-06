@@ -185,7 +185,7 @@ const {
               modelValue: row.status === ProxyStatus.OPEN,
               size: 'small',
               loading: isToggling(row.id),
-              'onUpdate:modelValue': (enabled: boolean) => handleStatusChange(row, enabled)
+              'onUpdate:modelValue': (enabled: string | number | boolean) => handleStatusChange(row, enabled)
             })
       },
       {

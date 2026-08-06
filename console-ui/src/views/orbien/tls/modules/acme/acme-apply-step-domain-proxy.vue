@@ -2,7 +2,7 @@
   <div class="acme-wizard domain-step">
     <section class="section-block">
       <div class="section-title">{{ $t('orbien.tls.acme.section.certBrand') }}</div>
-      <ElRadioGroup :model-value="certBrand" @update:model-value="emit('update:certBrand', $event)">
+      <ElRadioGroup :model-value="certBrand" @update:model-value="onCertBrandChange">
         <ElRadio v-for="item in certBrandOptions" :key="item.value" :value="item.value">
           {{ item.label }}
         </ElRadio>
@@ -13,7 +13,7 @@
       <div class="section-title">{{ $t('orbien.tls.acme.section.currentProxy') }}</div>
       <div class="proxy-context art-card-sm">
         <span class="proxy-context__name">{{ proxyName || $t('orbien.tls.acme.section.currentProxy') }}</span>
-        <ElTag size="small" type="info">{{ $t('orbien.tls.acme.proxy.domainCount', { n: domainOptions.length }) }}</ElTag>
+        <ElTag size="small" type="info">{{ $t('orbien.tls.acme.proxy.domainCount', {n: domainOptions.length}) }}</ElTag>
       </div>
     </section>
 
@@ -62,6 +62,10 @@ const emit = defineEmits<{
   (e: 'update:selectedDomains', value: Api.AcmeOrder.HttpsProxyDomainOption[]): void
   (e: 'update:extraDomainText', value: string): void
 }>()
+
+const onCertBrandChange = (value: string | number | boolean | undefined) => {
+  emit('update:certBrand', value as CertBrand)
+}
 
 const domainOptions = ref<Api.AcmeOrder.HttpsProxyDomainOption[]>([])
 const domainLoading = ref(false)

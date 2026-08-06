@@ -183,10 +183,6 @@
     }
   },
   "login": {
-    "leftView": {
-      "title": "Intranet Penetration Platform",
-      "subTitle": "Orbien"
-    },
     "title": "Welcome back",
     "subTitle": "Please enter your account and password to login",
     "roles": {
@@ -1350,14 +1346,8 @@
       "charts": {
         "trend": "Traffic Trend",
         "unit": "Unit: {unit}",
-        "trafficCompare": "Traffic Comparison",
-        "rateCompare": "Rate Comparison",
-        "totalTraffic": "Total\n{size}",
         "uploadSeries": "Upload",
         "downloadSeries": "Download",
-        "uploadRateSeries": "Upload ({unit}/s)",
-        "downloadRateSeries": "Download ({unit}/s)",
-        "rateAxis": "Rate",
         "tooltipTime": "Time: {time}"
       }
     }

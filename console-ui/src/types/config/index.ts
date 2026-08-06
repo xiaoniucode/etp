@@ -163,6 +163,8 @@ export interface AppConfig extends SystemConfig {
 export interface FeatureConfigItem {
   enabled: boolean
   description: string
+  /** 可选最小宽度（如快速入口） */
+  minWidth?: number
 }
 
 // 顶部栏功能配置接口
@@ -175,14 +177,8 @@ export interface HeaderBarFeatureConfig {
   fastEnter: FeatureConfigItem
   /** 面包屑导航 */
   breadcrumb: FeatureConfigItem
-  /** 全局搜索 */
-  globalSearch: FeatureConfigItem
   /** 全屏功能 */
   fullscreen: FeatureConfigItem
-  /** 通知功能 */
-  notification: FeatureConfigItem
-  /** 聊天功能 */
-  chat: FeatureConfigItem
   /** 多语言切换 */
   language: FeatureConfigItem
   /** 设置面板 */

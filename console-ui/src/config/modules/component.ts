@@ -15,7 +15,7 @@
  * @author Art Design Pro Team
  */
 
-import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent, type Component } from 'vue'
 
 /**
  * 全局组件配置列表
@@ -30,26 +30,10 @@ export const globalComponentsConfig: GlobalComponentConfig[] = [
     enabled: true
   },
   {
-    name: '全局搜索',
-    key: 'global-search',
-    component: defineAsyncComponent(
-      () => import('@/components/core/layouts/art-global-search/index.vue')
-    ),
-    enabled: true
-  },
-  {
     name: '锁屏',
     key: 'screen-lock',
     component: defineAsyncComponent(
       () => import('@/components/core/layouts/art-screen-lock/index.vue')
-    ),
-    enabled: true
-  },
-  {
-    name: '聊天窗口',
-    key: 'chat-window',
-    component: defineAsyncComponent(
-      () => import('@/components/core/layouts/art-chat-window/index.vue')
     ),
     enabled: true
   }
@@ -64,7 +48,7 @@ export interface GlobalComponentConfig {
   /** 组件标识 */
   key: string
   /** 组件 */
-  component: any
+  component: Component
   /** 是否启用 */
   enabled?: boolean
   /** 组件描述 */

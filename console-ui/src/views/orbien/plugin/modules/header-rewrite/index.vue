@@ -65,10 +65,10 @@
                 >
                   {{ t('common.save') }}
                 </ElButton>
-                <ElButton v-else type="link" size="small" @click="handleEdit(scope.row)">
+                <ElButton v-else link size="small" @click="handleEdit(scope.row)">
                   {{ t('common.edit') }}
                 </ElButton>
-                <ElButton type="link" size="small" @click="handleDelete(scope.row)">
+                <ElButton link size="small" @click="handleDelete(scope.row)">
                   <template #icon>
                     <Delete/>
                   </template>
@@ -144,10 +144,10 @@
                 >
                   {{ t('common.save') }}
                 </ElButton>
-                <ElButton v-else type="link" size="small" @click="handleEdit(scope.row)">
+                <ElButton v-else link size="small" @click="handleEdit(scope.row)">
                   {{ t('common.edit') }}
                 </ElButton>
-                <ElButton type="link" size="small" @click="handleDelete(scope.row)">
+                <ElButton link size="small" @click="handleDelete(scope.row)">
                   <template #icon>
                     <Delete/>
                   </template>

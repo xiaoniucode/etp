@@ -5,7 +5,7 @@
       <div class="flex flex-col gap-4">
         <div class="flex items-center gap-3">
           <span class="w-20 font-medium">{{ t('orbien.plugin.basic.enabled') }}：</span>
-          <ElSwitch v-model="formData.enabled" @change="handleEnableChange" />
+          <ElSwitch v-model="formData.enabled" @change="handleEnableChange"/>
         </div>
       </div>
     </div>
@@ -17,11 +17,11 @@
           <ElTableColumn prop="username" :label="t('orbien.plugin.auth.username')" width="200">
             <template #default="scope">
               <ElInput
-                v-if="editingUserId === scope.row.id"
-                v-model="scope.row.username"
-                size="small"
-                :placeholder="t('orbien.plugin.auth.usernamePlaceholder')"
-                style="width: 100%"
+                  v-if="editingUserId === scope.row.id"
+                  v-model="scope.row.username"
+                  size="small"
+                  :placeholder="t('orbien.plugin.auth.usernamePlaceholder')"
+                  style="width: 100%"
               />
               <span v-else>{{ scope.row.username }}</span>
             </template>
@@ -29,12 +29,12 @@
           <ElTableColumn prop="password" :label="t('orbien.plugin.auth.password')" width="200">
             <template #default="scope">
               <ElInput
-                v-if="editingUserId === scope.row.id"
-                v-model="scope.row.password"
-                size="small"
-                :placeholder="t('orbien.plugin.auth.passwordPlaceholder')"
-                type="password"
-                style="width: 100%"
+                  v-if="editingUserId === scope.row.id"
+                  v-model="scope.row.password"
+                  size="small"
+                  :placeholder="t('orbien.plugin.auth.passwordPlaceholder')"
+                  type="password"
+                  style="width: 100%"
               />
               <span v-else>{{ '••••••••' }}</span>
             </template>
@@ -43,19 +43,19 @@
             <template #default="scope">
               <ElSpace size="small">
                 <ElButton
-                  v-if="editingUserId === scope.row.id"
-                  type="primary"
-                  size="small"
-                  @click="handleSaveUser(scope.row)"
+                    v-if="editingUserId === scope.row.id"
+                    type="primary"
+                    size="small"
+                    @click="handleSaveUser(scope.row)"
                 >
                   {{ t('common.save') }}
                 </ElButton>
-                <ElButton v-else type="link" size="small" @click="handleEditUser(scope.row)">
+                <ElButton v-else link size="small" @click="handleEditUser(scope.row)">
                   {{ t('common.edit') }}
                 </ElButton>
-                <ElButton type="link" size="small" @click="handleDeleteUser(scope.row.id)">
+                <ElButton link size="small" @click="handleDeleteUser(scope.row.id)">
                   <template #icon>
-                    <Delete />
+                    <Delete/>
                   </template>
                   {{ t('common.delete') }}
                 </ElButton>
@@ -65,7 +65,7 @@
         </ElTable>
         <ElButton type="primary" size="small" @click="addUser" class="mt-3">
           <template #icon>
-            <Plus />
+            <Plus/>
           </template>
           {{ t('orbien.plugin.actions.addUser') }}
         </ElButton>
@@ -75,132 +75,133 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, watch } from 'vue'
-  import { useI18n } from 'vue-i18n'
-  import { ElMessage, ElMessageBox } from 'element-plus'
-  import { Plus, Delete } from '@element-plus/icons-vue'
-  import {
-    fetchGetBasicAuth,
-    fetchUpdateBasicAuth,
-    fetchAddBasicAuthUser,
-    fetchUpdateBasicAuthUser,
-    fetchDeleteBasicAuthUser
-  } from '@/api/basic-auth'
+import {ref, reactive, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {Plus, Delete} from '@element-plus/icons-vue'
+import {
+  fetchGetBasicAuth,
+  fetchUpdateBasicAuth,
+  fetchAddBasicAuthUser,
+  fetchUpdateBasicAuthUser,
+  fetchDeleteBasicAuthUser
+} from '@/api/basic-auth'
 
-  defineOptions({ name: 'BasicAuthPage' })
+defineOptions({name: 'BasicAuthPage'})
 
-  const { t } = useI18n()
+const {t} = useI18n()
 
-  const props = defineProps<{
+const props = defineProps<{
+  proxyId: string
+}>()
+
+const formData = reactive({
+  enabled: false,
+  users: [] as Array<{
+    id: number
     proxyId: string
-  }>()
+    username: string
+    password: string
+  }>
+})
 
-  const formData = reactive({
-    enabled: false,
-    users: [] as Array<{
-      id: number
-      proxyId: string
-      username: string
-      password: string
-    }>
-  })
+const editingUserId = ref<number | null>(null)
+type AuthUser = (typeof formData.users)[number]
+const editingUserBackup = ref<AuthUser | null>(null)
 
-  const editingUserId = ref<number | null>(null)
-  const editingUserBackup = ref<any>(null)
+const resetFormData = () => {
+  formData.enabled = false
+  formData.users = []
+  editingUserId.value = null
+  editingUserBackup.value = null
+}
 
-  const resetFormData = () => {
-    formData.enabled = false
-    formData.users = []
-    editingUserId.value = null
-    editingUserBackup.value = null
+const fetchBasicAuthData = async () => {
+  const response = await fetchGetBasicAuth(props.proxyId)
+  if (response) {
+    formData.enabled = response.enabled || false
+    formData.users = response.users || []
   }
+}
 
-  const fetchBasicAuthData = async () => {
-    const response = await fetchGetBasicAuth(props.proxyId)
-    if (response) {
-      formData.enabled = response.enabled || false
-      formData.users = response.users || []
-    }
-  }
-
-  watch(
+watch(
     () => props.proxyId,
     async (proxyId) => {
       if (!proxyId) return
       resetFormData()
       await fetchBasicAuthData()
     },
-    { immediate: true }
-  )
+    {immediate: true}
+)
 
-  const handleEnableChange = async () => {
-    await fetchUpdateBasicAuth({
+const handleEnableChange = async () => {
+  await fetchUpdateBasicAuth({
+    proxyId: props.proxyId,
+    enabled: formData.enabled
+  })
+}
+
+const addUser = () => {
+  formData.users.push({
+    id: 0,
+    proxyId: props.proxyId,
+    username: '',
+    password: ''
+  })
+  const newUser = formData.users[formData.users.length - 1]
+  handleEditUser(newUser)
+}
+
+const handleEditUser = (user: AuthUser) => {
+  editingUserBackup.value = {...user}
+  editingUserId.value = user.id
+}
+
+const handleSaveUser = async (user: AuthUser) => {
+  if (!user.username) {
+    ElMessage.error(t('orbien.plugin.auth.usernameRequired'))
+    return
+  }
+  if (!user.password) {
+    ElMessage.error(t('orbien.plugin.auth.passwordRequired'))
+    return
+  }
+
+  if (user.id > 0) {
+    await fetchUpdateBasicAuthUser({
+      id: user.id,
       proxyId: props.proxyId,
-      enabled: formData.enabled
+      username: user.username,
+      password: user.password
+    })
+  } else {
+    await fetchAddBasicAuthUser({
+      proxyId: props.proxyId,
+      username: user.username,
+      password: user.password
     })
   }
+  editingUserId.value = null
+  await fetchBasicAuthData()
+  editingUserBackup.value = null
+}
 
-  const addUser = () => {
-    formData.users.push({
-      id: 0,
-      proxyId: props.proxyId,
-      username: '',
-      password: ''
-    })
-    const newUser = formData.users[formData.users.length - 1]
-    handleEditUser(newUser)
-  }
+const handleDeleteUser = async (id: number) => {
+  await ElMessageBox.confirm(t('orbien.plugin.deleteConfirm.user'), t('common.warning'), {
+    confirmButtonText: t('common.confirm'),
+    cancelButtonText: t('common.cancel'),
+    type: 'warning'
+  })
 
-  const handleEditUser = (user: any) => {
-    editingUserBackup.value = { ...user }
-    editingUserId.value = user.id
-  }
-
-  const handleSaveUser = async (user: any) => {
-    if (!user.username) {
-      ElMessage.error(t('orbien.plugin.auth.usernameRequired'))
-      return
-    }
-    if (!user.password) {
-      ElMessage.error(t('orbien.plugin.auth.passwordRequired'))
-      return
-    }
-
-    if (user.id > 0) {
-      await fetchUpdateBasicAuthUser({
-        id: user.id,
-        proxyId: props.proxyId,
-        username: user.username,
-        password: user.password
-      })
-    } else {
-      await fetchAddBasicAuthUser({
-        proxyId: props.proxyId,
-        username: user.username,
-        password: user.password
-      })
-    }
-    editingUserId.value = null
+  if (id > 0) {
+    await fetchDeleteBasicAuthUser(id)
     await fetchBasicAuthData()
-    editingUserBackup.value = null
-  }
-
-  const handleDeleteUser = async (id: number) => {
-    await ElMessageBox.confirm(t('orbien.plugin.deleteConfirm.user'), t('common.warning'), {
-      confirmButtonText: t('common.confirm'),
-      cancelButtonText: t('common.cancel'),
-      type: 'warning'
-    })
-
-    if (id > 0) {
-      await fetchDeleteBasicAuthUser(id)
-      await fetchBasicAuthData()
-    } else {
-      const index = formData.users.findIndex((user) => user.id === id)
-      if (index > -1) {
-        formData.users.splice(index, 1)
-        editingUserId.value = null
-      }
+  } else {
+    const index = formData.users.findIndex((user) => user.id === id)
+    if (index > -1) {
+      formData.users.splice(index, 1)
+      editingUserId.value = null
     }
   }
+}
 </script>

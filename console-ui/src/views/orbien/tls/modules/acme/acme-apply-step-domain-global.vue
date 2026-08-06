@@ -2,7 +2,7 @@
   <div class="acme-wizard domain-step">
     <section class="section-block">
       <div class="section-title">{{ $t('orbien.tls.acme.section.certBrand') }}</div>
-      <ElRadioGroup :model-value="certBrand" @update:model-value="emit('update:certBrand', $event)">
+      <ElRadioGroup :model-value="certBrand" @update:model-value="onCertBrandChange">
         <ElRadio v-for="item in certBrandOptions" :key="item.value" :value="item.value">
           {{ item.label }}
         </ElRadio>
@@ -28,19 +28,23 @@
         >
           <div class="proxy-option">
             <span class="proxy-option__name">{{ item.name }}</span>
-            <span class="proxy-option__meta">{{ item.agentName }} · {{ $t('orbien.tls.acme.proxy.domainCount', { n: item.domainCount }) }}</span>
+            <span class="proxy-option__meta">{{
+                item.agentName
+              }} · {{ $t('orbien.tls.acme.proxy.domainCount', {n: item.domainCount}) }}</span>
           </div>
         </ElOption>
       </ElSelect>
 
       <div v-if="selectedProxy" class="proxy-summary">
         <ElTag size="small" :type="selectedProxy.status === ProxyStatus.OPEN ? 'success' : 'info'">
-          {{ selectedProxy.status === ProxyStatus.OPEN ? $t('orbien.tls.acme.proxy.enabled') : $t('orbien.tls.acme.proxy.disabled') }}
+          {{
+            selectedProxy.status === ProxyStatus.OPEN ? $t('orbien.tls.acme.proxy.enabled') : $t('orbien.tls.acme.proxy.disabled')
+          }}
         </ElTag>
         <span v-if="selectedProxy.domainPreview.length" class="proxy-summary__domains">
           {{ selectedProxy.domainPreview.join('、') }}
           <template v-if="selectedProxy.domainCount > selectedProxy.domainPreview.length">
-            {{ $t('orbien.tls.acme.proxy.andMore', { n: selectedProxy.domainCount }) }}
+            {{ $t('orbien.tls.acme.proxy.andMore', {n: selectedProxy.domainCount}) }}
           </template>
         </span>
       </div>
@@ -91,6 +95,10 @@ const emit = defineEmits<{
   (e: 'update:selectedDomains', value: Api.AcmeOrder.HttpsProxyDomainOption[]): void
   (e: 'update:extraDomainText', value: string): void
 }>()
+
+const onCertBrandChange = (value: string | number | boolean | undefined) => {
+  emit('update:certBrand', value as CertBrand)
+}
 
 const selectedProxyId = ref<string>()
 const proxyOptions = ref<Api.AcmeOrder.HttpsProxyOption[]>([])

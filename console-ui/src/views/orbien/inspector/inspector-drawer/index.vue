@@ -25,7 +25,10 @@
 
       <div class="inspector-body">
         <div class="inspector-list">
-          <div class="inspector-list__caption">{{ $t('orbien.inspector.recentRecords', { n: INSPECTOR_DISPLAY_LIMIT }) }}</div>
+          <div class="inspector-list__caption">{{
+              $t('orbien.inspector.recentRecords', {n: INSPECTOR_DISPLAY_LIMIT})
+            }}
+          </div>
           <div v-if="!records.length" class="inspector-empty">{{ $t('orbien.inspector.noRecords') }}</div>
           <button
               v-for="item in records"
@@ -36,7 +39,8 @@
               @click="selectRecord(item.id)"
           >
             <div class="inspector-list-item__line">
-              <span v-if="item.replay" class="inspector-list-item__replay" :title="$t('orbien.inspector.replayGenerated')">↻</span>
+              <span v-if="item.replay" class="inspector-list-item__replay"
+                    :title="$t('orbien.inspector.replayGenerated')">↻</span>
               <span class="inspector-list-item__method">{{ item.method || 'HTTP' }}</span>
               <span class="inspector-list-item__path">{{ item.path || '/' }}</span>
             </div>
@@ -58,9 +62,9 @@
                   <span>{{ detail.scheme }}://{{ detail.host || '-' }}</span>
                   <span :class="statusClass(detail.status)">{{ formatStatus(detail) }}</span>
                   <span>{{ formatDuration(detail.durationMs) }}</span>
-                  <span v-if="detail.clientIp">{{ $t('orbien.inspector.fromClient', { ip: detail.clientIp }) }}</span>
+                  <span v-if="detail.clientIp">{{ $t('orbien.inspector.fromClient', {ip: detail.clientIp}) }}</span>
                   <span v-if="detail.replay && detail.sourceRecordId" class="inspector-detail__source">
-                    {{ $t('orbien.inspector.replayedFrom', { id: detail.sourceRecordId }) }}
+                    {{ $t('orbien.inspector.replayedFrom', {id: detail.sourceRecordId}) }}
                   </span>
                 </div>
               </div>
@@ -109,7 +113,9 @@
                 </ElTabPane>
                 <ElTabPane label="Body" name="body">
                   <pre class="inspector-code">{{ formatPrettyBody(detail.requestBodyPreview) }}</pre>
-                  <div v-if="detail.requestBodyTruncated" class="inspector-truncated">{{ $t('orbien.inspector.bodyTruncated') }}</div>
+                  <div v-if="detail.requestBodyTruncated" class="inspector-truncated">
+                    {{ $t('orbien.inspector.bodyTruncated') }}
+                  </div>
                 </ElTabPane>
               </ElTabs>
             </section>
@@ -128,12 +134,17 @@
                 </ElTabPane>
                 <ElTabPane label="Body" name="body">
                   <pre class="inspector-code">{{ formatPrettyBody(detail.responseBodyPreview) }}</pre>
-                  <div v-if="detail.responseBodyTruncated" class="inspector-truncated">{{ $t('orbien.inspector.bodyTruncated') }}</div>
+                  <div v-if="detail.responseBodyTruncated" class="inspector-truncated">
+                    {{ $t('orbien.inspector.bodyTruncated') }}
+                  </div>
                 </ElTabPane>
               </ElTabs>
             </section>
           </template>
-          <div v-else class="inspector-empty inspector-empty--detail">{{ $t('orbien.inspector.selectRequestHint') }}</div>
+          <div v-else class="inspector-empty inspector-empty--detail">{{
+              $t('orbien.inspector.selectRequestHint')
+            }}
+          </div>
         </div>
       </div>
     </div>
@@ -304,16 +315,17 @@ const selectRecord = async (id: string) => {
   await loadDetail(id)
 }
 
-const handleToggleInspector = async (enabled: boolean) => {
+const handleToggleInspector = async (enabled: string | number | boolean) => {
+  const nextEnabled = Boolean(enabled)
   switchLoading.value = true
   try {
     const config = await fetchUpdateInspectorConfig({
       proxyId: props.proxyId,
-      inspectorEnabled: enabled
+      inspectorEnabled: nextEnabled
     })
     inspectorEnabled.value = config.inspectorEnabled
   } catch {
-    inspectorEnabled.value = !enabled
+    inspectorEnabled.value = !nextEnabled
   } finally {
     switchLoading.value = false
   }

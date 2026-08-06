@@ -18,7 +18,10 @@
         <ElDescriptionsItem :label="$t('orbien.common.os')">{{ localClientData.os }}</ElDescriptionsItem>
         <ElDescriptionsItem :label="$t('orbien.common.arch')">{{ localClientData.arch }}</ElDescriptionsItem>
         <ElDescriptionsItem :label="$t('orbien.common.version')">{{ localClientData.version }}</ElDescriptionsItem>
-        <ElDescriptionsItem :label="$t('orbien.common.sourceIp')">{{ localClientData.sourceIp || '-' }}</ElDescriptionsItem>
+        <ElDescriptionsItem :label="$t('orbien.common.sourceIp')">{{
+            localClientData.sourceIp || '-'
+          }}
+        </ElDescriptionsItem>
         <ElDescriptionsItem :label="$t('orbien.common.lastActiveTime')">{{
             formatDate(localClientData.lastActiveTime)
           }}
@@ -53,7 +56,7 @@ import {getAgentTypeTag} from '@/enums/orbien/business'
 
 interface Props {
   visible: boolean
-  clientData?: Api.Agent.AgentDTO
+  clientData?: Api.Agent.AgentDTO | null
 }
 
 interface Emits {
@@ -63,7 +66,7 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const { t } = useI18n()
+const {t} = useI18n()
 
 // 对话框显示控制
 const dialogVisible = computed({

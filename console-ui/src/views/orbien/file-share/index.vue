@@ -191,7 +191,7 @@ const {
         prop: 'traffic',
         label: t('orbien.proxy.traffic'),
         formatter: (row: FileShareItem) =>
-          renderTrafficRate(row.traffic, () => handleMetrics(row))
+            renderTrafficRate(row.traffic, () => handleMetrics(row))
       },
 
       {
@@ -203,7 +203,7 @@ const {
               modelValue: row.status === ProxyStatus.OPEN,
               size: 'small',
               loading: isToggling(row.id),
-              'onUpdate:modelValue': (enabled: boolean) => handleStatusChange(row, enabled)
+              'onUpdate:modelValue': (enabled: string | number | boolean) => handleStatusChange(row, enabled)
             })
       },
       {

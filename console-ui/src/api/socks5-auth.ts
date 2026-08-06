@@ -22,7 +22,15 @@ import request from '@/utils/http'
  * @returns SOCKS5 认证详情
  */
 export function fetchGetSocks5Auth(proxyId: string) {
-  return request.get({
+  return request.get<{
+    enabled: boolean
+    users: Array<{
+      id: number
+      proxyId: string
+      username: string
+      password: string
+    }>
+  }>({
     url: `/api/socks5-auth/${proxyId}`
   })
 }
@@ -62,7 +70,12 @@ export function fetchAddSocks5AuthUser(data: {
  * @param data 用户数据
  * @returns 操作结果
  */
-export function fetchUpdateSocks5AuthUser(data: { id: number; username: string; password: string }) {
+export function fetchUpdateSocks5AuthUser(data: {
+  id: number
+  username: string
+  password: string
+  proxyId?: string
+}) {
   return request.put({
     url: '/api/socks5-auth/user',
     params: data,

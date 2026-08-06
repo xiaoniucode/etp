@@ -16,13 +16,24 @@
 
 import request from '@/utils/http'
 
+type AccessControlDetail = {
+  enabled: boolean
+  mode: number
+  rules: Array<{
+    id: number
+    proxyId: string
+    cidr: string
+    ruleType: number
+  }>
+}
+
 /**
  * 获取访问控制详情
  * @param proxyId 代理ID
  * @returns 访问控制详情
  */
 export function fetchGetAccessControl(proxyId: string) {
-  return request.get<any>({
+  return request.get<AccessControlDetail>({
     url: `/api/access-control/${proxyId}`
   })
 }
@@ -37,7 +48,7 @@ export function fetchUpdateAccessControl(params: {
   enabled: boolean
   mode: number
 }) {
-  return request.put<any>({
+  return request.put({
     url: '/api/access-control',
     params,
     showSuccessMessage: true
@@ -54,7 +65,7 @@ export function fetchAddAccessControlRule(params: {
   cidr: string
   ruleType: number
 }) {
-  return request.post<any>({
+  return request.post({
     url: '/api/access-control/rule',
     params,
     showSuccessMessage: true
@@ -71,7 +82,7 @@ export function fetchUpdateAccessControlRule(params: {
   cidr: string
   ruleType: number
 }) {
-  return request.put<any>({
+  return request.put({
     url: '/api/access-control/rule',
     params,
     showSuccessMessage: true
@@ -84,7 +95,7 @@ export function fetchUpdateAccessControlRule(params: {
  * @returns 删除结果
  */
 export function fetchDeleteAccessControlRule(id: number) {
-  return request.del<any>({
+  return request.del({
     url: `/api/access-control/rule/${id}`,
     showSuccessMessage: true
   })

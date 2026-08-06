@@ -62,8 +62,6 @@
     "crypto-js": "^4.2.0",
     "echarts": "^6.0.0",
     "element-plus": "^2.11.2",
-    "file-saver": "^2.0.5",
-    "highlight.js": "^11.10.0",
     "mitt": "^3.0.1",
     "nprogress": "^0.2.0",
     "ohash": "^2.0.11",
@@ -74,9 +72,7 @@
     "vue": "^3.5.21",
     "vue-draggable-plus": "^0.6.0",
     "vue-i18n": "^9.14.0",
-    "vue-router": "^4.5.1",
-    "xgplayer": "^3.0.20",
-    "xlsx": "^0.18.5"
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.4.1",
@@ -116,7 +112,6 @@
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-vue-devtools": "^7.7.6",
     "vue-demi": "^0.14.9",
-    "vue-img-cutter": "^3.0.5",
     "vue-tsc": "~2.1.6"
   }
 }

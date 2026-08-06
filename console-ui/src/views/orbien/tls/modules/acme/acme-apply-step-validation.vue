@@ -1,7 +1,10 @@
 <template>
   <div class="acme-wizard validation-step">
-    <ElRadioGroup :model-value="validationMode" class="validation-modes"
-                  @update:model-value="emit('update:validationMode', $event)">
+    <ElRadioGroup
+        :model-value="validationMode"
+        class="validation-modes"
+        @update:model-value="onValidationModeChange"
+    >
       <label class="mode-card art-card" :class="{ 'is-active': validationMode === 1 }">
         <ElRadio :value="1"/>
         <div class="mode-card__body">
@@ -14,7 +17,9 @@
         <div class="mode-card__body">
           <div class="mode-card__title">
             {{ $t('orbien.tls.acme.validation.cloudTitle') }}
-            <ElTag size="small" type="success" effect="plain" class="mode-card__tag">{{ $t('orbien.tls.acme.validation.recommended') }}</ElTag>
+            <ElTag size="small" type="success" effect="plain" class="mode-card__tag">
+              {{ $t('orbien.tls.acme.validation.recommended') }}
+            </ElTag>
           </div>
           <div class="mode-card__desc">{{ $t('orbien.tls.acme.validation.cloudDesc') }}</div>
         </div>
@@ -36,7 +41,9 @@
         <template #title>{{ $t('orbien.tls.acme.validation.noCredential') }}</template>
         <div class="empty-credential">
           <span>{{ $t('orbien.tls.acme.validation.addCredentialHint') }}</span>
-          <ElButton type="primary" size="small" @click="emit('add-credential')">{{ $t('orbien.tls.acme.validation.addDnsCredential') }}</ElButton>
+          <ElButton type="primary" size="small" @click="emit('add-credential')">
+            {{ $t('orbien.tls.acme.validation.addDnsCredential') }}
+          </ElButton>
         </div>
       </ElAlert>
 
@@ -57,7 +64,10 @@
                   :value="item.id"
               />
             </ElSelect>
-            <ElButton link type="primary" @click="emit('add-credential')">{{ $t('orbien.tls.acme.validation.add') }}</ElButton>
+            <ElButton link type="primary" @click="emit('add-credential')">{{
+                $t('orbien.tls.acme.validation.add')
+              }}
+            </ElButton>
           </div>
         </ElFormItem>
       </ElForm>
@@ -80,6 +90,10 @@ const emit = defineEmits<{
   (e: 'update:dnsCredentialId', value?: number): void
   (e: 'add-credential'): void
 }>()
+
+const onValidationModeChange = (value: string | number | boolean | undefined) => {
+  emit('update:validationMode', Number(value))
+}
 </script>
 
 <style lang="scss">

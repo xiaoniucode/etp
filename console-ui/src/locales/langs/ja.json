@@ -183,10 +183,6 @@
     }
   },
   "login": {
-    "leftView": {
-      "title": "イントラネットペネトレーションプラットフォーム",
-      "subTitle": "Orbien"
-    },
     "title": "ようこそ",
     "subTitle": "アカウントとパスワードを入力してログインしてください",
     "roles": {
@@ -1350,14 +1346,8 @@
       "charts": {
         "trend": "トラフィック推移",
         "unit": "単位：{unit}",
-        "trafficCompare": "トラフィック比較",
-        "rateCompare": "速度比較",
-        "totalTraffic": "合計\n{size}",
         "uploadSeries": "上り",
         "downloadSeries": "下り",
-        "uploadRateSeries": "上り ({unit}/s)",
-        "downloadRateSeries": "下り ({unit}/s)",
-        "rateAxis": "速度",
         "tooltipTime": "時間：{time}"
       }
     }

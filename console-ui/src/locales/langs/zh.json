@@ -183,10 +183,6 @@
     }
   },
   "login": {
-    "leftView": {
-      "title": "内网穿透平台",
-      "subTitle": "Orbien"
-    },
     "title": "欢迎回来",
     "subTitle": "输入您的账号和密码登录",
     "roles": {
@@ -1350,14 +1346,8 @@
       "charts": {
         "trend": "流量趋势",
         "unit": "单位：{unit}",
-        "trafficCompare": "流量对比",
-        "rateCompare": "速率对比",
-        "totalTraffic": "总流量\n{size}",
         "uploadSeries": "上行流量",
         "downloadSeries": "下行流量",
-        "uploadRateSeries": "上行 ({unit}/s)",
-        "downloadRateSeries": "下行 ({unit}/s)",
-        "rateAxis": "速率",
         "tooltipTime": "时间：{time}"
       }
     }

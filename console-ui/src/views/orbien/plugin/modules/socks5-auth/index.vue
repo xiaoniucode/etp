@@ -50,10 +50,10 @@
                 >
                   {{ t('common.save') }}
                 </ElButton>
-                <ElButton v-else type="link" size="small" @click="handleEditUser(scope.row)">
+                <ElButton v-else link size="small" @click="handleEditUser(scope.row)">
                   {{ t('common.edit') }}
                 </ElButton>
-                <ElButton type="link" size="small" @click="handleDeleteUser(scope.row.id)">
+                <ElButton link size="small" @click="handleDeleteUser(scope.row.id)">
                   <template #icon>
                     <Delete/>
                   </template>
@@ -106,7 +106,8 @@ const formData = reactive({
 })
 
 const editingUserId = ref<number | null>(null)
-const editingUserBackup = ref<any>(null)
+type AuthUser = (typeof formData.users)[number]
+const editingUserBackup = ref<AuthUser | null>(null)
 
 const resetFormData = () => {
   formData.enabled = false
@@ -151,12 +152,12 @@ const addUser = () => {
   handleEditUser(newUser)
 }
 
-const handleEditUser = (user: any) => {
+const handleEditUser = (user: AuthUser) => {
   editingUserBackup.value = {...user}
   editingUserId.value = user.id
 }
 
-const handleSaveUser = async (user: any) => {
+const handleSaveUser = async (user: AuthUser) => {
   if (!user.username) {
     ElMessage.error(t('orbien.plugin.socks5Auth.usernameRequired'))
     return

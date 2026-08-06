@@ -22,9 +22,17 @@ import request from '@/utils/http'
  * @returns Basic Auth 详情
  */
 export function fetchGetBasicAuth(proxyId: string) {
-  return request.get({
-    url: `/api/basic-auth/${proxyId}`
-  })
+    return request.get<{
+        enabled: boolean
+        users: Array<{
+            id: number
+            proxyId: string
+            username: string
+            password: string
+        }>
+    }>({
+        url: `/api/basic-auth/${proxyId}`
+    })
 }
 
 /**
@@ -33,11 +41,11 @@ export function fetchGetBasicAuth(proxyId: string) {
  * @returns 操作结果
  */
 export function fetchUpdateBasicAuth(data: { proxyId: string; enabled: boolean }) {
-  return request.put({
-    url: '/api/basic-auth',
-    params: data,
-    showSuccessMessage: true
-  })
+    return request.put({
+        url: '/api/basic-auth',
+        params: data,
+        showSuccessMessage: true
+    })
 }
 
 /**
@@ -46,15 +54,15 @@ export function fetchUpdateBasicAuth(data: { proxyId: string; enabled: boolean }
  * @returns 操作结果
  */
 export function fetchAddBasicAuthUser(data: {
-  proxyId: string
-  username: string
-  password: string
+    proxyId: string
+    username: string
+    password: string
 }) {
-  return request.post({
-    url: '/api/basic-auth/user',
-    params: data,
-    showSuccessMessage: true
-  })
+    return request.post({
+        url: '/api/basic-auth/user',
+        params: data,
+        showSuccessMessage: true
+    })
 }
 
 /**
@@ -62,12 +70,17 @@ export function fetchAddBasicAuthUser(data: {
  * @param data 用户数据
  * @returns 操作结果
  */
-export function fetchUpdateBasicAuthUser(data: { id: number; username: string; password: string }) {
-  return request.put({
-    url: '/api/basic-auth/user',
-    params: data,
-    showSuccessMessage: true
-  })
+export function fetchUpdateBasicAuthUser(data: {
+    id: number
+    username: string
+    password: string
+    proxyId?: string
+}) {
+    return request.put({
+        url: '/api/basic-auth/user',
+        params: data,
+        showSuccessMessage: true
+    })
 }
 
 /**
@@ -76,8 +89,8 @@ export function fetchUpdateBasicAuthUser(data: { id: number; username: string; p
  * @returns 操作结果
  */
 export function fetchDeleteBasicAuthUser(id: number) {
-  return request.del({
-    url: `/api/basic-auth/user/${id}`,
-    showSuccessMessage: true
-  })
+    return request.del({
+        url: `/api/basic-auth/user/${id}`,
+        showSuccessMessage: true
+    })
 }

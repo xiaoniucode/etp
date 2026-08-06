@@ -15,6 +15,8 @@
   import { useUserStore } from './store/modules/user'
   import zh from 'element-plus/es/locale/lang/zh-cn'
   import en from 'element-plus/es/locale/lang/en'
+  import ja from 'element-plus/es/locale/lang/ja'
+  import { LanguageEnum } from '@/enums/appEnum'
   import { systemUpgrade } from './utils/sys'
   import { toggleTransition } from './utils/ui/animation'
   import { checkStorageCompatibility } from './utils/storage'
@@ -23,9 +25,10 @@
   const userStore = useUserStore()
   const { language } = storeToRefs(userStore)
 
-  const locales = {
-    zh: zh,
-    en: en
+  const locales: Record<LanguageEnum, typeof zh> = {
+    [LanguageEnum.ZH]: zh,
+    [LanguageEnum.EN]: en,
+    [LanguageEnum.JA]: ja
   }
 
   onBeforeMount(() => {

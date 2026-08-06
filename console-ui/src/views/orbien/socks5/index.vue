@@ -152,7 +152,7 @@ const {
         label: t('orbien.proxy.traffic'),
         width: 130,
         formatter: (row: Socks5ProxyItem) =>
-          renderTrafficRate(row.traffic, () => handleMetrics(row))
+            renderTrafficRate(row.traffic, () => handleMetrics(row))
       },
       {
         prop: 'status',
@@ -163,7 +163,7 @@ const {
               modelValue: row.status === ProxyStatus.OPEN,
               size: 'small',
               loading: isToggling(row.id),
-              'onUpdate:modelValue': (enabled: boolean) => handleStatusChange(row, enabled)
+              'onUpdate:modelValue': (enabled: string | number | boolean) => handleStatusChange(row, enabled)
             })
       },
       {
