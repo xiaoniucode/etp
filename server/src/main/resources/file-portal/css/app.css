@@ -1739,8 +1739,8 @@ tr.drop-target,
 
 .login-logo-slot {
     width: 100%;
-    max-width: 220px;
-    height: 48px;
+    max-width: 180px;
+    height: 40px;
 }
 
 .login-wrap h2 {
@@ -1907,8 +1907,8 @@ tr.drop-target,
     }
 
     .login-logo-slot {
-        max-width: 180px;
-        height: 40px;
+        max-width: 150px;
+        height: 34px;
     }
 
     .main {

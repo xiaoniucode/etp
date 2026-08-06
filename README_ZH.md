@@ -63,6 +63,9 @@
 - **配置模式**：客户端自治 + 服务端集中化配置管理，规则双向同步，满足公网和内网配置场景
 - **开发集成**：二进制客户端、Spring Boot Starter 嵌入式接入
 - **跨平台**：兼容 Windows、Linux、macOS（含 amd64 / arm64）
+## 架构图
+
+![architecture.png](doc/architecture.png)
 
 ## 二、快速开始
 

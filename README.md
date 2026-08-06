@@ -73,6 +73,10 @@ multiple transport channels, secure authentication, and visual operations manage
 - **Developer integration**: Binary client and Spring Boot Starter for embedded access
 - **Cross-platform**: Compatible with Windows, Linux, and macOS (amd64 / arm64)
 
+## Architecture
+
+![architecture.png](doc/architecture.png)
+
 ## 2. Quick Start
 
 ### 2.2 Server
