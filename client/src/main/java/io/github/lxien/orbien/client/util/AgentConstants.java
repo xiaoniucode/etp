@@ -17,5 +17,5 @@
 package io.github.lxien.orbien.client.util;
 
 public interface AgentConstants {
-    String AGENT_VERSION = "0.27.0";
+    String AGENT_VERSION = "0.28.0";
 }
