@@ -2,13 +2,15 @@
 node_modules/
 dist/
 build/
+temp/
+bak/
 out/
 target/
 venv/
 .env
 .env.local
 .env.production
-
+.db
 # 日志和临时文件
 *.log
 logs/
@@ -18,9 +20,6 @@ data/
 log/
 
 # 大文件和媒体
-*.jpg
-*.jpeg
-*.png
 *.gif
 *.svg
 *.ico

@@ -14,12 +14,14 @@
  *    limitations under the License.
  */
 package io.github.lxien.orbien.server.web.param.basicauth.httpuser;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 /**
  * 添加 HTTP 用户请求
  */

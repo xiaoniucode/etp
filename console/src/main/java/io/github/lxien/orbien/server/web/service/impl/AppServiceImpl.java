@@ -41,6 +41,7 @@ public class AppServiceImpl implements AppService {
         AppConfigInfoDTO dto = new AppConfigInfoDTO();
         dto.setServerAddr(appConfig.getServerAddr());
         dto.setServerPort(appConfig.getServerPort());
+
         domainRepository.findAll().stream()
                 .map(DomainDO::getDomain)
                 .filter(StringUtils::hasText)

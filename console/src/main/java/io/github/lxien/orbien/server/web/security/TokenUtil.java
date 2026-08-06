@@ -1,4 +1,5 @@
 package io.github.lxien.orbien.server.web.security;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -7,17 +8,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
 import javax.crypto.SecretKey;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 @Component
 public class TokenUtil {
     private static final Logger logger = LoggerFactory.getLogger(TokenUtil.class);
     private final String secret;
     private final long expiration;
+
     public TokenUtil(@Value("${jwt.secret:}") String secret,
                      @Value("${jwt.expiration:3600}") long expiration) {
         this.expiration = expiration;
@@ -32,9 +36,11 @@ public class TokenUtil {
         }
         logger.debug("Token令牌过期时间设置为: {}秒", expiration);
     }
+
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
+
     public String generateToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration * 1000);
@@ -49,6 +55,7 @@ public class TokenUtil {
                 .signWith(getSigningKey())
                 .compact();
     }
+
     public Claims getClaimsFromToken(String token) {
         try {
             return Jwts.parser()
@@ -61,9 +68,11 @@ public class TokenUtil {
             throw e;
         }
     }
+
     public String getUsernameFromToken(String token) {
         return getClaimsFromToken(token).getSubject();
     }
+
     public boolean validateToken(String token) {
         try {
             Claims claims = getClaimsFromToken(token);

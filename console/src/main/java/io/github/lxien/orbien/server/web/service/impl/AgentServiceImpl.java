@@ -97,7 +97,7 @@ public class AgentServiceImpl implements AgentService {
         AgentType agentType = resolveOnlineAgentType(agentId);
         logger.info("强制客户端下线：{}, type={}", agentId, agentType);
 
-        // SESSION 强退等同会话结束/删除：同步清理代理与 agent，不单独依赖异步离线事件
+        // SESSION 强退等同会话结束/删除：同步清理代理与 agent
         if (agentType != null && agentType.isSession()) {
             deleteSessionAgentData(agentId);
             transactionHelper.afterCommit(() -> safeKickout(agentId));
@@ -116,7 +116,6 @@ public class AgentServiceImpl implements AgentService {
             return;
         }
 
-        // DB 级联删除代理；提交后按 proxyId 释放运行时（覆盖离线 STANDALONE 场景）
         proxyService.deleteByAgentIds(ids);
 
         List<String> onlineAgentIds = ids.stream()

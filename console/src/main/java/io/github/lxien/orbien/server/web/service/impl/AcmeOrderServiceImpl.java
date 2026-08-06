@@ -12,6 +12,7 @@ import io.github.lxien.orbien.server.web.dto.tls.TlsCertDTO;
 import io.github.lxien.orbien.server.web.entity.AcmeCertOrderDO;
 import io.github.lxien.orbien.server.web.entity.AcmeDnsChallengeDO;
 import io.github.lxien.orbien.server.web.entity.DnsCredentialDO;
+import io.github.lxien.orbien.server.web.entity.ProxyDomainDO;
 import io.github.lxien.orbien.server.web.enums.*;
 import io.github.lxien.orbien.server.web.enums.AcmeChallengeStatus;
 import io.github.lxien.orbien.server.web.enums.AcmeOrderStatus;
@@ -52,12 +53,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
@@ -539,12 +535,12 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
         if (CollectionUtils.isEmpty(bindDomainIds)) {
             return List.of();
         }
-        List<Long> requested = bindDomainIds.stream().filter(id -> id != null).distinct().toList();
+        List<Long> requested = bindDomainIds.stream().filter(Objects::nonNull).distinct().toList();
         if (requested.isEmpty()) {
             return List.of();
         }
         Set<Long> existing = proxyDomainRepository.findAllById(requested).stream()
-                .map(domain -> domain.getId())
+                .map(ProxyDomainDO::getId)
                 .collect(Collectors.toSet());
         List<Long> retained = requested.stream().filter(existing::contains).toList();
         if (retained.size() != requested.size()) {

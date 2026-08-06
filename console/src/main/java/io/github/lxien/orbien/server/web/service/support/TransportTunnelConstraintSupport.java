@@ -16,7 +16,7 @@ public final class TransportTunnelConstraintSupport {
     private TransportTunnelConstraintSupport() {
     }
 
-    public static TransportTunnelConstraints build(ProtocolType proxyProtocol, TransportProtocol dataProtocol, Boolean storedMultiplex) {
+    public static TransportTunnelConstraints build(ProtocolType proxyProtocol, TransportProtocol dataProtocol) {
         TransportTunnelConstraints constraints = new TransportTunnelConstraints();
         boolean multiplexOnly = requiresMultiplexOnly(proxyProtocol, dataProtocol);
 

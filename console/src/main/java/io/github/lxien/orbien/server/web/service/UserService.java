@@ -14,9 +14,12 @@
  *    limitations under the License.
  */
 package io.github.lxien.orbien.server.web.service;
+
 import io.github.lxien.orbien.server.web.dto.user.UserInfoDTO;
 import io.github.lxien.orbien.server.web.param.user.UserPasswordUpdateParam;
+
 public interface UserService {
     UserInfoDTO getByUsername(String username);
+
     void updatePassword(String username, UserPasswordUpdateParam req);
 }

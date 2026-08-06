@@ -112,12 +112,6 @@ public class ScheduledJobServiceImpl implements ScheduledJobService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public boolean enableIfDisabled(String jobCode) {
-        return scheduledJobEnableSupport.enableIfDisabled(jobCode);
-    }
-
-    @Override
     public void runNow(String jobCode) {
         requireJob(jobCode);
         executeJob(jobCode, true);

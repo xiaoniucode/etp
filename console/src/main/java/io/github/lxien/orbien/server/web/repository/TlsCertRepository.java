@@ -20,7 +20,10 @@ package io.github.lxien.orbien.server.web.repository;
 
 import io.github.lxien.orbien.server.web.entity.TlsCertDO;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface TlsCertRepository extends JpaRepository<TlsCertDO, String> {
@@ -34,7 +37,7 @@ public interface TlsCertRepository extends JpaRepository<TlsCertDO, String> {
             WHERE c.notAfter <= :deadline AND c.notAfter > :today
             ORDER BY c.notAfter ASC
             """)
-    java.util.List<TlsCertDO> findRenewCandidates(
-            @org.springframework.data.repository.query.Param("deadline") java.time.LocalDate deadline,
-            @org.springframework.data.repository.query.Param("today") java.time.LocalDate today);
+    List<TlsCertDO> findRenewCandidates(
+            @Param("deadline") java.time.LocalDate deadline,
+            @Param("today") java.time.LocalDate today);
 }

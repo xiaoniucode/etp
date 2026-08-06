@@ -41,13 +41,6 @@ public class BizException extends RuntimeException {
         return new BizException(message);
     }
 
-    public static void throwIfNull(Object value, String msg) {
-        if (value == null || !StringUtils.hasText(value.toString())) {
-            throw new BizException(msg);
-        }
-    }
-
-
     @Override
     public String getMessage() {
         return message;

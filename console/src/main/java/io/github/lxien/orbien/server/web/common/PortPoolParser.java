@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.github.lxien.orbien.server.web.support.portpool;
+package io.github.lxien.orbien.server.web.common;
 
 import io.github.lxien.orbien.server.web.common.exception.BizException;
 import org.springframework.util.StringUtils;

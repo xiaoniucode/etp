@@ -8,9 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * 端口池 Repository
- */
 @Repository
 public interface PortPoolRepository extends JpaRepository<PortPoolDO, Long>, JpaSpecificationExecutor<PortPoolDO> {
 

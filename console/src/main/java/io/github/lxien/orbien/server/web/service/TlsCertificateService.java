@@ -45,12 +45,6 @@ public interface TlsCertificateService {
 
     void deleteByIds(List<String> ids);
 
-    /**
-     * 下载证书文件
-     *
-     * @param certId   证书ID
-     * @param response HTTP响应
-     */
     void downloadCert(String certId, HttpServletResponse response);
 
     CertBindResultDTO saveAndDeployCert(TlsCertSaveAndDeployParam param);

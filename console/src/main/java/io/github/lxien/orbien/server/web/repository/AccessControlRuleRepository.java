@@ -6,9 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * 访问控制规则 Repository
- */
 @Repository
 public interface AccessControlRuleRepository extends JpaRepository<AccessControlRuleDO, Long> {
 

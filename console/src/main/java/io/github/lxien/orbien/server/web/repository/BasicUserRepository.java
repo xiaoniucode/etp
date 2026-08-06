@@ -6,9 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * HttpUser Repository
- */
 @Repository
 public interface BasicUserRepository extends JpaRepository<BasicUserDO, Long> {
     void deleteByProxyIdIn(List<String> ids);

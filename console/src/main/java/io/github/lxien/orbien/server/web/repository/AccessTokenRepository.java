@@ -4,9 +4,6 @@ import io.github.lxien.orbien.server.web.entity.AccessTokenDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * 访问令牌 Repository
- */
 @Repository
 public interface AccessTokenRepository extends JpaRepository<AccessTokenDO, Integer> {
     /**

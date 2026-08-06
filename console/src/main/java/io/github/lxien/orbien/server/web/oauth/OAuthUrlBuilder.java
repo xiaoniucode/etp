@@ -14,8 +14,8 @@ import java.util.Locale;
 /**
  * OAuth 相关 URL 解析
  * <p>
- * 生产同域单体：默认从当前请求（含 Forwarded）推导，无需额外配置
- * 开发前后端分离：经 Vite 代理并开启 xfwd 后，与同域一致；亦可由前端传递经校验的 return_origin
+ * 生产同域单体：默认从当前请求推导
+ * 开发前后端分离：经 Vite 代理并开启 xfwd 后，与同域一致，可由前端传递经校验的 return_origin
  */
 @Component
 @RequiredArgsConstructor

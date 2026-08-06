@@ -8,15 +8,14 @@ import io.github.lxien.orbien.server.web.dto.transport.TransportEncryptConstrain
 import java.util.List;
 
 /**
- * 管理面板：传输加密字段的可编辑性约束
+ * 传输加密字段的可编辑性约束
  */
 public final class TransportEncryptConstraintSupport {
 
     private TransportEncryptConstraintSupport() {
     }
 
-    public static TransportEncryptConstraints build(TransportProtocol dataProtocol, boolean globalTlsEnabled,
-                                                    Boolean storedEncrypt) {
+    public static TransportEncryptConstraints build(TransportProtocol dataProtocol, boolean globalTlsEnabled) {
         TransportEncryptConstraints constraints = new TransportEncryptConstraints();
         constraints.setGlobalTlsEnabled(globalTlsEnabled);
 
@@ -42,8 +41,7 @@ public final class TransportEncryptConstraintSupport {
         return constraints;
     }
 
-    public static boolean resolveEffectiveEncrypt(TransportProtocol dataProtocol,
-                                                 boolean globalTlsEnabled,
+    public static boolean resolveEffectiveEncrypt(TransportProtocol dataProtocol, boolean globalTlsEnabled,
                                                  Boolean storedEncrypt) {
         return TransportEncryptResolver.resolveEffectiveEncrypt(
                 dataProtocol, globalTlsEnabled, storedEncrypt);

@@ -61,6 +61,7 @@ public class ScheduledJobSchemaProvider {
             Integer min,
             Integer max,
             String description) {
+
         ScheduledJobParamFieldDTO dto = new ScheduledJobParamFieldDTO();
         dto.setKey(key);
         dto.setLabel(label);

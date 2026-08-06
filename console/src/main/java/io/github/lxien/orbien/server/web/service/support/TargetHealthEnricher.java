@@ -40,13 +40,6 @@ public class TargetHealthEnricher {
     @Autowired
     private ProxyRepository proxyRepository;
 
-    public void enrich(String proxyId, List<TargetDTO> targets) {
-        if (CollectionUtils.isEmpty(targets) || isUdpProxy(proxyId) || !isHealthCheckEnabled(proxyId)) {
-            return;
-        }
-        fillHealthStatus(proxyId, targets);
-    }
-
     public void enrichBatch(Map<String, List<TargetDTO>> targetsByProxyId) {
         if (CollectionUtils.isEmpty(targetsByProxyId)) {
             return;
@@ -78,17 +71,5 @@ public class TargetHealthEnricher {
                 target.setHealthStatus(healthCode);
             }
         }
-    }
-
-    private boolean isHealthCheckEnabled(String proxyId) {
-        return healthCheckRepository.findById(proxyId)
-                .map(item -> Boolean.TRUE.equals(item.getEnabled()))
-                .orElse(false);
-    }
-
-    private boolean isUdpProxy(String proxyId) {
-        return proxyRepository.findById(proxyId)
-                .map(proxy -> proxy.getProtocol().isUdp())
-                .orElse(false);
     }
 }

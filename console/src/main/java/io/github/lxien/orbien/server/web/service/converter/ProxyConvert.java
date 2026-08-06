@@ -51,20 +51,6 @@ public interface ProxyConvert {
     @Mapping(target = "transportProtocol", ignore = true)
     UdpProxyListDTO toUdpListDTO(ProxyDO proxy);
 
-    List<TcpProxyListDTO> toTcpDTOList(List<ProxyDO> proxies);
-
-    List<UdpProxyListDTO> toUdpDTOList(List<ProxyDO> proxies);
-
-    @Named("domainTypeToCode")
-    static Integer domainTypeToCode(DomainType domainType) {
-        return domainType != null ? domainType.getCode() : null;
-    }
-
-    @Named("codeToDomainType")
-    static DomainType codeToDomainType(Integer code) {
-        return DomainType.fromCode(code);
-    }
-
     @Mapping(source = "httpProxyPort", target = "httpProxyPort")
     @Mapping(target = "transportProtocol", ignore = true)
     HttpProxyListDTO toHttpListDTO(ProxyDO proxyDO, int httpProxyPort);

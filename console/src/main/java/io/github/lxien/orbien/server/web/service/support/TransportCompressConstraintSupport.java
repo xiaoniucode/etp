@@ -35,9 +35,6 @@ public final class TransportCompressConstraintSupport {
         }
     }
 
-    /**
-     * 表单回显用的算法值：关闭压缩时仍返回默认算法
-     */
     public static String resolveStoredAlgorithm(Boolean compress, CompressionType compressAlgorithm) {
         if (!Boolean.TRUE.equals(compress)) {
             return DEFAULT_ALGORITHM.toConfigValue();
@@ -48,9 +45,6 @@ public final class TransportCompressConstraintSupport {
         return compressAlgorithm.toConfigValue();
     }
 
-    /**
-     * 实际生效的算法值：关闭压缩时为 none
-     */
     public static String resolveEffectiveAlgorithm(Boolean compress, CompressionType compressAlgorithm) {
         if (!Boolean.TRUE.equals(compress)) {
             return CompressionType.NONE.toConfigValue();

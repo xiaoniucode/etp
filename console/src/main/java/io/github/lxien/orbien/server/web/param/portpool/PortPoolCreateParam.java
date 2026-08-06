@@ -27,9 +27,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PortPoolCreateParam {
-    /**
-     * 端口，支持单个端口或范围端口，如 8000 或 8000-9000
-     */
     @NotBlank(message = "端口不能为空")
     private String port;
 

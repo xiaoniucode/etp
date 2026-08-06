@@ -21,9 +21,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * 代理目标 Repository
- */
 @Repository
 public interface ProxyTargetRepository extends JpaRepository<ProxyTargetDO, Integer> {
     void deleteByProxyId(String proxyId);

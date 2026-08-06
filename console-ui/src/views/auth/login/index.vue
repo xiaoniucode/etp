@@ -8,8 +8,9 @@
 
       <div class="auth-right-wrap">
         <div class="form">
-          <h3 class="title">{{ $t('login.title') }}</h3>
-          <p class="sub-title">{{ $t('login.subTitle') }}</p>
+          <div class="form-logo">
+            <img src="@imgs/common/logo-text.png" alt="orbien" />
+          </div>
           <ElForm
             ref="formRef"
             :model="formData"

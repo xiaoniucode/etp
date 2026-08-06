@@ -78,9 +78,9 @@ public class ProxyTransportServiceImpl implements ProxyTransportService {
         boolean effectiveEncrypt = TransportEncryptConstraintSupport.resolveEffectiveEncrypt(
                 effectiveProtocol, globalTlsEnabled, storedEncrypt);
         TransportEncryptConstraints encryptConstraints = TransportEncryptConstraintSupport.build(
-                effectiveProtocol, globalTlsEnabled, storedEncrypt);
+                effectiveProtocol, globalTlsEnabled);
         TransportTunnelConstraints tunnelConstraints = TransportTunnelConstraintSupport.build(
-                proxyDO.getProtocol(), effectiveProtocol, storedMultiplex);
+                proxyDO.getProtocol(), effectiveProtocol);
         int effectiveTunnelType = TransportTunnelConstraintSupport.resolveEffectiveTunnelType(
                 proxyDO.getProtocol(), effectiveProtocol, storedMultiplex);
         TransportProtocolConstraints protocolConstraints = TransportProtocolConstraintSupport.build(appConfig);

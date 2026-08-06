@@ -5,9 +5,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-/**
- * 用户 Repository
- */
 @Repository
 public interface UserRepository extends JpaRepository<SysUserDO, Integer> {
     Optional<SysUserDO> findByUsername(String username);

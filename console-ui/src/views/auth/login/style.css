@@ -11,12 +11,12 @@
     @apply h-full py-[40px];
   }
 
-  .title {
-    @apply text-g-900 text-4xl font-semibold max-md:text-3xl max-sm:pt-10;
-  }
+  .form-logo {
+    @apply flex justify-center items-center max-sm:pt-10;
 
-  .sub-title {
-    @apply mt-[10px] text-g-600 text-sm;
+    img {
+      @apply h-[36px] w-auto max-w-[180px] object-contain;
+    }
   }
 
   .custom-height {

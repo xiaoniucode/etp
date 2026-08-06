@@ -34,8 +34,5 @@ public class TlsCertSaveAndDeployParam {
     @NotBlank(message = "证书不能为空")
     private String fullChain;
 
-    /**
-     * 指定绑定的代理域名ID，为空时自动绑定 SAN 匹配的域名
-     */
     private List<Long> proxyDomainIds;
 }
