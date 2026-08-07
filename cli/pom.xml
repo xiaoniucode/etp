@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.github.lxien</groupId>
         <artifactId>orbien</artifactId>
-        <version>0.28.0</version>
+        <version>0.28.1</version>
     </parent>
     <artifactId>orbien-cli</artifactId>
     <packaging>jar</packaging>
