@@ -28,7 +28,6 @@ import io.github.lxien.orbien.server.web.repository.BasicAuthRepository;
 import io.github.lxien.orbien.server.web.repository.BasicUserRepository;
 import io.github.lxien.orbien.server.web.service.BasicAuthService;
 import io.github.lxien.orbien.server.web.service.converter.BasicAuthConvert;
-import io.github.lxien.orbien.server.transport.http.BasicAuthHandler;
 import io.github.lxien.orbien.server.web.support.tx.TransactionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,8 +51,6 @@ public class BasicAuthServiceImpl implements BasicAuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ProxyRuntimeSyncService proxyRuntimeSyncService;
-    @Autowired
-    private BasicAuthHandler basicAuthHandler;
 
     @Override
     public BasicAuthDetailDTO getByProxyId(String proxyId) {
@@ -116,9 +113,6 @@ public class BasicAuthServiceImpl implements BasicAuthService {
     }
 
     private void scheduleEntryPolicyRefresh(String proxyId) {
-        transactionHelper.afterCommit(() -> {
-            basicAuthHandler.invalidate(proxyId);
-            proxyRuntimeSyncService.refreshServerEntryPolicy(proxyId);
-        });
+        transactionHelper.afterCommit(() -> proxyRuntimeSyncService.refreshBasicAuthPolicy(proxyId));
     }
 }

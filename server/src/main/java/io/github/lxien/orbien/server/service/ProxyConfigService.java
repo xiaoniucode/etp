@@ -30,6 +30,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -54,6 +56,11 @@ public class ProxyConfigService {
             .expireAfterWrite(30, TimeUnit.SECONDS)
             .build();
 
+    /**
+     * 反向索引：proxyId -> 一级缓存 keys，保证 L2 过期后仍能完整清理 L1
+     */
+    private final ConcurrentHashMap<String, Set<String>> indexKeysByProxyId = new ConcurrentHashMap<>();
+
     public ProxyConfigExt findById(String proxyId) {
         return configCache.get(proxyId, key -> {
             ProxyConfigExt config = proxyQueryRepository.findById(key);
@@ -72,26 +79,17 @@ public class ProxyConfigService {
             return;
         }
 
-        // 从二级缓存中取出配置，用于构建一级缓存的 key
+        // 从二级缓存中取出配置，用于兜底构建一级缓存的 key
         ProxyConfigExt ext = configCache.getIfPresent(proxyId);
         // 清理二级缓存
         configCache.invalidate(proxyId);
-        // 清理一级缓存中所有相关的 key
-        if (ext != null) {
-            ProxyConfig config = ext.getProxyConfig();
 
-            String agentNameKey = "agent:" + config.getAgentId() + ":name:" + config.getName();
-            proxyIdCache.invalidate(agentNameKey);
-
-            if (config.isTcp() && config.getListenPort() != null) {
-                proxyIdCache.invalidate(portCacheKey(ProtocolType.TCP, config.getListenPort()));
-            }
-            if (config.isSocks5() && config.getListenPort() != null) {
-                proxyIdCache.invalidate(portCacheKey(ProtocolType.SOCKS5, config.getListenPort()));
-            }
-            if (config.isUdp() && config.getListenPort() != null) {
-                proxyIdCache.invalidate(portCacheKey(ProtocolType.UDP, config.getListenPort()));
-            }
+        Set<String> indexKeys = indexKeysByProxyId.remove(proxyId);
+        if (indexKeys != null && !indexKeys.isEmpty()) {
+            proxyIdCache.invalidateAll(indexKeys);
+        } else if (ext != null) {
+            // 兼容尚未写入反向索引的旧条目
+            invalidateIndexKeys(ext.getProxyConfig());
         }
 
         logger.debug("已清理代理缓存: proxyId={}", proxyId);
@@ -114,6 +112,7 @@ public class ProxyConfigService {
     public void evictAll() {
         proxyIdCache.invalidateAll();
         configCache.invalidateAll();
+        indexKeysByProxyId.clear();
         logger.debug("已清理所有代理缓存");
     }
 
@@ -121,16 +120,45 @@ public class ProxyConfigService {
     private void fillIndexCaches(ProxyConfigExt ext) {
         ProxyConfig config = ext.getProxyConfig();
         String proxyId = config.getProxyId();
+        Set<String> keys = ConcurrentHashMap.newKeySet();
+
         String agentNameKey = "agent:" + config.getAgentId() + ":name:" + config.getName();
         proxyIdCache.put(agentNameKey, proxyId);
+        keys.add(agentNameKey);
+
         if (config.isTcp() && config.getListenPort() != null) {
-            proxyIdCache.put(portCacheKey(ProtocolType.TCP, config.getListenPort()), proxyId);
+            String key = portCacheKey(ProtocolType.TCP, config.getListenPort());
+            proxyIdCache.put(key, proxyId);
+            keys.add(key);
         }
         if (config.isSocks5() && config.getListenPort() != null) {
-            proxyIdCache.put(portCacheKey(ProtocolType.SOCKS5, config.getListenPort()), proxyId);
+            String key = portCacheKey(ProtocolType.SOCKS5, config.getListenPort());
+            proxyIdCache.put(key, proxyId);
+            keys.add(key);
         }
         if (config.isUdp() && config.getListenPort() != null) {
-            proxyIdCache.put(portCacheKey(ProtocolType.UDP, config.getListenPort()), proxyId);
+            String key = portCacheKey(ProtocolType.UDP, config.getListenPort());
+            proxyIdCache.put(key, proxyId);
+            keys.add(key);
+        }
+        indexKeysByProxyId.put(proxyId, keys);
+    }
+
+    private void invalidateIndexKeys(ProxyConfig config) {
+        if (config == null) {
+            return;
+        }
+        String agentNameKey = "agent:" + config.getAgentId() + ":name:" + config.getName();
+        proxyIdCache.invalidate(agentNameKey);
+
+        if (config.isTcp() && config.getListenPort() != null) {
+            proxyIdCache.invalidate(portCacheKey(ProtocolType.TCP, config.getListenPort()));
+        }
+        if (config.isSocks5() && config.getListenPort() != null) {
+            proxyIdCache.invalidate(portCacheKey(ProtocolType.SOCKS5, config.getListenPort()));
+        }
+        if (config.isUdp() && config.getListenPort() != null) {
+            proxyIdCache.invalidate(portCacheKey(ProtocolType.UDP, config.getListenPort()));
         }
     }
 
@@ -158,6 +186,7 @@ public class ProxyConfigService {
         ProxyConfig config = ext.getProxyConfig();
         proxyIdCache.put(indexKey, config.getProxyId());
         configCache.put(config.getProxyId(), ext);
+        fillIndexCaches(ext);
 
         return ext;
     }
@@ -184,6 +213,7 @@ public class ProxyConfigService {
         // 回填两级缓存
         proxyIdCache.put(indexKey, config.getProxyId());
         configCache.put(config.getProxyId(), ext);
+        fillIndexCaches(ext);
 
         return ext;
     }

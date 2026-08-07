@@ -51,7 +51,6 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer {
          */
         public void setWeight(int weight) {
             this.weight = weight;
-            // 权重变更时重置当前权重
             current.set(0);
         }
 
@@ -85,6 +84,12 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer {
      */
     public WeightRoundRobinLoadBalancer() {
         logger.debug("创建加权轮询负载均衡器");
+    }
+
+    public void removeProxy(String proxyId) {
+        if (proxyId != null) {
+            proxyWeightMap.remove(proxyId);
+        }
     }
 
     /**
@@ -135,7 +140,6 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer {
                 selectedWRR = weightedRoundRobin;
             }
 
-            // 计算总权重
             totalWeight += weight;
         }
 
@@ -152,7 +156,7 @@ public class WeightRoundRobinLoadBalancer implements LoadBalancer {
             return selectedTarget;
         }
 
-        // 兜底方案，返回第一个目标服务器
+        // 兜底方案
         return targets.getFirst();
     }
 }

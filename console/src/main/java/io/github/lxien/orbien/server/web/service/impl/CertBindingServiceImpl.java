@@ -320,6 +320,7 @@ public class CertBindingServiceImpl implements CertBindingService {
         binding.setDomain(proxyDomain.getFullDomain().trim().toLowerCase(Locale.ROOT));
         binding.setEnabled(true);
 
+        // 部署成功后才落库 ACTIVE
         try {
             tlsCertificateManager.deploy(cert.getId(), binding.getDomain(), keyFile, certFile);
             binding.setStatus(BindStatus.ACTIVE);
@@ -330,6 +331,8 @@ public class CertBindingServiceImpl implements CertBindingService {
             item.setStatus("ACTIVE");
         } catch (Exception e) {
             logger.error("部署证书失败: {}", binding.getDomain(), e);
+            // 部署失败时确保运行时无残留 SslContext
+            tlsCertificateManager.cancelDeploy(binding.getDomain());
             binding.setStatus(BindStatus.DEPLOY_FAILED);
             bindingRepository.save(binding);
             item.setBindingId(binding.getId());
@@ -350,6 +353,7 @@ public class CertBindingServiceImpl implements CertBindingService {
             binding.setLastDeployedAt(LocalDateTime.now());
             bindingRepository.save(binding);
         } catch (Exception e) {
+            tlsCertificateManager.cancelDeploy(binding.getDomain());
             binding.setStatus(BindStatus.DEPLOY_FAILED);
             bindingRepository.save(binding);
             throw new SystemException("SSL 证书部署失败: " + binding.getDomain(), e);

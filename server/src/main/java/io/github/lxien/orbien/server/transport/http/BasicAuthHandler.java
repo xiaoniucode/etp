@@ -25,6 +25,7 @@ import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.server.service.ProxyConfigService;
+import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
 import io.github.lxien.orbien.server.utils.NettyHttpUtils;
 import io.github.lxien.orbien.server.vhost.DomainRegistry;
 import io.netty.channel.Channel;
@@ -40,7 +41,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @ChannelHandler.Sharable
@@ -55,12 +60,19 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
             .expireAfterWrite(Duration.ofMinutes(5))
             .build();
 
+    /**
+     * 已通过鉴权的 visitor 连接索引
+     */
+    private final ConcurrentHashMap<String/*proxyId*/, Set<Channel>> authedVisitors = new ConcurrentHashMap<>();
+
     @Autowired
     private ProxyConfigService proxyConfigService;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     private DomainRegistry domainRegistry;
+    @Autowired
+    private StreamManager streamManager;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
@@ -84,7 +96,7 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
 
         ProxyConfigExt ext = proxyConfigService.findById(proxyId);
         if (ext == null || ext.getProxyConfig().isFile()) {
-            markPassed(ctx);
+            markPassedAndDetach(ctx, proxyId);
             ctx.fireChannelRead(msg);
             return;
         }
@@ -92,7 +104,7 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
         ProxyConfig config = ext.getProxyConfig();
         BasicAuthConfig basicAuth = config.getBasicAuth();
         if (basicAuth == null || !basicAuth.isEnabled()) {
-            markPassed(ctx);
+            markPassedAndDetach(ctx, proxyId);
             ctx.fireChannelRead(msg);
             return;
         }
@@ -106,7 +118,7 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
 
         String cacheKey = cacheKey(proxyId, basicAuthHeader);
         if (Boolean.TRUE.equals(verifiedAuthCache.getIfPresent(cacheKey))) {
-            markPassed(ctx);
+            markPassedAndDetach(ctx, proxyId);
             ctx.fireChannelRead(msg);
             return;
         }
@@ -121,7 +133,7 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
             verifiedAuthCache.put(cacheKey, Boolean.TRUE);
-            markPassed(ctx);
+            markPassedAndDetach(ctx, proxyId);
             ctx.fireChannelRead(msg);
         } catch (Exception e) {
             logger.debug("Basic Auth 解码失败: {}", e.getMessage());
@@ -130,10 +142,33 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void markPassed(ChannelHandlerContext ctx) {
-        ctx.channel().attr(AttributeKeys.BASIC_AUTH_PASSED).set(Boolean.TRUE);
+    /**
+     * 标记通过并从 pipeline 移除，后续读写不再经过本 Handler
+     */
+    private void markPassedAndDetach(ChannelHandlerContext ctx, String proxyId) {
+        Channel visitor = ctx.channel();
+        visitor.attr(AttributeKeys.BASIC_AUTH_PASSED).set(Boolean.TRUE);
+        trackAuthedVisitor(proxyId, visitor);
         if (ctx.pipeline().context(this) != null) {
             ctx.pipeline().remove(this);
+        }
+    }
+
+    private void trackAuthedVisitor(String proxyId, Channel visitor) {
+        if (!StringUtils.hasText(proxyId) || visitor == null) {
+            return;
+        }
+        Set<Channel> channels = authedVisitors.computeIfAbsent(proxyId, id -> ConcurrentHashMap.newKeySet());
+        if (channels.add(visitor)) {
+            visitor.closeFuture().addListener(future -> {
+                Set<Channel> set = authedVisitors.get(proxyId);
+                if (set != null) {
+                    set.remove(visitor);
+                    if (set.isEmpty()) {
+                        authedVisitors.remove(proxyId, set);
+                    }
+                }
+            });
         }
     }
 
@@ -160,5 +195,30 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
         }
         String prefix = proxyId + '\0';
         verifiedAuthCache.asMap().keySet().removeIf(key -> key.startsWith(prefix));
+    }
+
+    /**
+     * 清缓存并主动断开该代理已鉴权连接，保证立即生效
+     */
+    public void invalidateAndDisconnect(String proxyId) {
+        invalidate(proxyId);
+        if (!StringUtils.hasText(proxyId)) {
+            return;
+        }
+
+        Set<Channel> channels = authedVisitors.remove(proxyId);
+        if (channels != null && !channels.isEmpty()) {
+            List<Channel> snapshot = new ArrayList<>(channels);
+            channels.clear();
+            for (Channel channel : snapshot) {
+                ChannelUtils.closeOnFlush(channel);
+            }
+        }
+
+        Set<String> domains = domainRegistry.getDomainsByProxyId(proxyId);
+        for (String domain : domains) {
+            streamManager.fireCloseByDomain(domain);
+        }
+        logger.debug("Basic Auth 策略变更，已断开代理 {} 的现有会话", proxyId);
     }
 }

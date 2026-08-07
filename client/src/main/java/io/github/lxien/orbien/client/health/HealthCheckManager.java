@@ -22,6 +22,7 @@ public class HealthCheckManager {
 
     private final Map<String, ScheduledFuture<?>> proxyTasks = new ConcurrentHashMap<>();
     private final Set<ServiceHealth> pendingReports = ConcurrentHashMap.newKeySet();
+    private static final int MAX_PENDING_REPORTS = 2000;
 
     private volatile Channel control;
 
@@ -126,11 +127,28 @@ public class HealthCheckManager {
                         }
                     }
                     pendingReports.addAll(results);
+                    trimPendingReportsIfNeeded();
 
                     if (pendingReports.size() >= 10) {
                         reportHealthBatch();
                     }
                 });
+    }
+
+    private void trimPendingReportsIfNeeded() {
+        int overflow = pendingReports.size() - MAX_PENDING_REPORTS;
+        if (overflow <= 0) {
+            return;
+        }
+        // 控制通道长时间不可用时丢弃最旧条目，避免无界增长导致内存泄漏
+        Iterator<ServiceHealth> iterator = pendingReports.iterator();
+        int removed = 0;
+        while (iterator.hasNext() && removed < overflow) {
+            iterator.next();
+            iterator.remove();
+            removed++;
+        }
+        logger.warn("健康上报队列超限，已丢弃 {} 条旧记录，当前队列长度: {}", removed, pendingReports.size());
     }
 
     private void reportHealthBatch() {

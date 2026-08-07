@@ -18,13 +18,16 @@ package io.github.lxien.orbien.server.manager;
 
 import io.github.lxien.orbien.server.exceptions.OrbienException;
 import io.github.lxien.orbien.server.loadbalance.HealthManager;
+import io.github.lxien.orbien.server.loadbalance.WeightRoundRobinLoadBalancer;
 import io.github.lxien.orbien.server.metrics.MetricsCollector;
 import io.github.lxien.orbien.server.port.PortAcceptor;
 import io.github.lxien.orbien.server.port.UdpPortAcceptor;
 import io.github.lxien.orbien.core.enums.PortPoolType;
 import io.github.lxien.orbien.server.port.PortPoolManager;
 import io.github.lxien.orbien.server.security.IpAccessChecker;
+import io.github.lxien.orbien.server.security.TimeAccessChecker;
 import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
+import io.github.lxien.orbien.server.transport.http.BasicAuthHandler;
 import io.github.lxien.orbien.server.transport.https.TlsCertificateManager;
 import io.github.lxien.orbien.server.vhost.DomainRegistry;
 import io.netty.util.internal.logging.InternalLogger;
@@ -58,6 +61,12 @@ public class ProxyManager {
     private HealthManager healthManager;
     @Autowired
     private IpAccessChecker ipAccessChecker;
+    @Autowired
+    private TimeAccessChecker timeAccessChecker;
+    @Autowired
+    private BasicAuthHandler basicAuthHandler;
+    @Autowired
+    private WeightRoundRobinLoadBalancer weightRoundRobinLoadBalancer;
     @Autowired
     private PortAcceptor portAcceptor;
     @Autowired
@@ -199,10 +208,11 @@ public class ProxyManager {
         for (String domain : domains) {
             streamManager.fireCloseByDomain(domain);
         }
-        //从注册中心删除域名
         domainRegistry.unregister(proxyId);
-        //删除IP访问控制
         ipAccessChecker.invalidate(proxyId);
+        timeAccessChecker.invalidate(proxyId);
+        basicAuthHandler.invalidate(proxyId);
+        weightRoundRobinLoadBalancer.removeProxy(proxyId);
         metricsCollector.removeByProxyId(proxyId);
         healthManager.removeProxy(proxyId);
     }

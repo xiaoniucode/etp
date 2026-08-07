@@ -60,27 +60,34 @@ public class ProxyConfigSyncAction extends AgentBaseAction {
         logger.debug("开始将代理配置运行信息同步到在线客户端");
         String agentId = context.getAgentId();
         List<ProxyConfigExt> proxies = proxyConfigService.findByAgentId(agentId);
-        if (!CollectionUtils.isEmpty(proxies)) {
-            List<Message.RuntimeInfo> list = proxies.stream()
-                    .filter(p -> !p.getProxyConfig().isSocks5())
-                    .map(p -> {
-                        ProxyConfig config = p.getProxyConfig();
-                        List<String> remoteAddrs = RuntimeInfoSupport.buildRemoteAddrs(
-                                p.getDomains(),
-                                config.getProtocol(),
-                                appConfig.getHttpProxyPort(),
-                                appConfig.getHttpsProxyPort());
-                        return RuntimeInfoSupport.buildRuntimeInfo(config, remoteAddrs);
-                    }).toList();
-            Message.ProxySyncResponse.Builder builder = Message.ProxySyncResponse.newBuilder();
-            builder.setProxySyncType(Message.ProxySyncType.FULL);
-            builder.addAllItems(list);
+        List<Message.RuntimeInfo> list = CollectionUtils.isEmpty(proxies)
+                ? List.of()
+                : proxies.stream()
+                .filter(p -> {
+                    ProxyConfig config = p.getProxyConfig();
+                    return config != null
+                            && !config.isSocks5()
+                            && config.getStatus() != null
+                            && config.getStatus().isOpen();
+                })
+                .map(p -> {
+                    ProxyConfig config = p.getProxyConfig();
+                    List<String> remoteAddrs = RuntimeInfoSupport.buildRemoteAddrs(
+                            p.getDomains(),
+                            config.getProtocol(),
+                            appConfig.getHttpProxyPort(),
+                            appConfig.getHttpsProxyPort());
+                    return RuntimeInfoSupport.buildRuntimeInfo(config, remoteAddrs);
+                }).toList();
 
-            Channel control = context.getControl();
-            ByteBuf payload = ProtobufUtil.toByteBuf(builder.build(), control.alloc());
-            TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_CONFIG_SYNC, payload);
-            control.writeAndFlush(frame);
-        }
+        Message.ProxySyncResponse.Builder builder = Message.ProxySyncResponse.newBuilder();
+        builder.setProxySyncType(Message.ProxySyncType.FULL);
+        builder.addAllItems(list);
+
+        Channel control = context.getControl();
+        ByteBuf payload = ProtobufUtil.toByteBuf(builder.build(), control.alloc());
+        TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_CONFIG_SYNC, payload);
+        control.writeAndFlush(frame);
         proxyRuntimeRegistry.registerByAgentId(agentId);
     }
 

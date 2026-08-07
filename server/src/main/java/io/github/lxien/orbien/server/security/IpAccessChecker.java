@@ -54,7 +54,9 @@ public class IpAccessChecker {
     }
 
     public void invalidate(String proxyId) {
-        matcherMap.remove(proxyId);
+        if (proxyId != null) {
+            matcherMap.remove(proxyId);
+        }
     }
 
     public void invalidateAll() {

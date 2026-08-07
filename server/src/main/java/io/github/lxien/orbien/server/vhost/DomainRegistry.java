@@ -40,7 +40,15 @@ public class DomainRegistry {
                 throw new OrbienException("域名冲突: " + domain);
             }
         }
-        proxyDomains.put(proxyId, domains);
+        Set<String> previous = proxyDomains.get(proxyId);
+        if (previous != null) {
+            for (String oldDomain : previous) {
+                if (!domains.contains(oldDomain)) {
+                    domainIndex.remove(oldDomain, proxyId);
+                }
+            }
+        }
+        proxyDomains.put(proxyId, Set.copyOf(domains));
         for (String domain : domains) {
             domainIndex.put(domain, proxyId);
         }

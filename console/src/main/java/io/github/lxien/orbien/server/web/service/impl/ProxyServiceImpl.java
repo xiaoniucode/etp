@@ -35,10 +35,8 @@ import io.github.lxien.orbien.server.web.dto.transport.TransportDTO;
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.param.proxy.*;
 import io.github.lxien.orbien.server.web.dto.loadbalance.LoadBalanceDTO;
-import io.github.lxien.orbien.server.web.proxy.service.ProxyConfigSyncService;
-import io.github.lxien.orbien.server.loadbalance.HealthManager;
 import io.github.lxien.orbien.server.web.proxy.service.ProxyRuntimeSyncService;
-import io.github.lxien.orbien.server.web.repository.*;
+import io.github.lxien.orbien.server.loadbalance.HealthManager;
 import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.service.ProxyCacheEvictionService;
 import io.github.lxien.orbien.server.web.service.AcmeOrderBindSyncService;
@@ -128,8 +126,6 @@ public class ProxyServiceImpl implements ProxyService {
     private PortPoolManager portPoolManager;
     @Autowired
     private TransactionHelper transactionHelper;
-    @Autowired
-    private ProxyConfigSyncService proxyConfigSyncService;
     @Autowired
     private CertBindingSyncService certBindingSyncService;
     @Autowired
@@ -1345,6 +1341,15 @@ public class ProxyServiceImpl implements ProxyService {
             return;
         }
 
+        Map<String, List<String>> edgeDeleteByAgent = proxies.stream()
+                .filter(proxy -> proxy.getProtocol() != null
+                        && !proxy.getProtocol().isSocks5()
+                        && StringUtils.hasText(proxy.getId())
+                        && StringUtils.hasText(proxy.getAgentId()))
+                .collect(Collectors.groupingBy(
+                        ProxyDO::getAgentId,
+                        Collectors.mapping(ProxyDO::getId, Collectors.toList())));
+
         proxyCacheEvictionService.evictByProxyIds(ids);
 
         proxyTargetRepository.deleteByProxyIdIn(ids);
@@ -1368,7 +1373,16 @@ public class ProxyServiceImpl implements ProxyService {
         proxyRepository.deleteByIdIn(ids);
 
         List<String> runtimeIds = List.copyOf(ids);
-        transactionHelper.afterCommit(() -> proxyManager.deactivates(runtimeIds));
+        Map<String, List<String>> edgeDeletes = Map.copyOf(edgeDeleteByAgent.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> List.copyOf(e.getValue()),
+                        (a, b) -> a,
+                        LinkedHashMap::new)));
+        transactionHelper.afterCommit(() -> {
+            proxyManager.deactivates(runtimeIds);
+            proxyRuntimeSyncService.syncProxiesRemoved(edgeDeletes);
+        });
         logger.debug("级联删除代理完成，数量: {}", ids.size());
     }
 
@@ -1459,6 +1473,9 @@ public class ProxyServiceImpl implements ProxyService {
         proxyConfigService.evictByProxyId(proxyId);
         if (proxyDO.getStatus().isClosed()) {
             proxyManager.deactivate(proxyId);
+            if (!proxyDO.getProtocol().isSocks5()) {
+                proxyRuntimeSyncService.syncProxyRemoved(proxyDO.getAgentId(), proxyId);
+            }
             return;
         }
         proxyManager.deactivate(proxyId);

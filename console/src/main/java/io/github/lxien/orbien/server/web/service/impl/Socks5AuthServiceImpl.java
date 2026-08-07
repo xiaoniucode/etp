@@ -98,6 +98,6 @@ public class Socks5AuthServiceImpl implements Socks5AuthService {
     }
 
     private void scheduleRefresh(String proxyId) {
-        transactionHelper.afterCommit(() -> proxyRuntimeSyncService.refreshServerEntryPolicy(proxyId));
+        transactionHelper.afterCommit(() -> proxyRuntimeSyncService.refreshSocks5AuthPolicy(proxyId));
     }
 }

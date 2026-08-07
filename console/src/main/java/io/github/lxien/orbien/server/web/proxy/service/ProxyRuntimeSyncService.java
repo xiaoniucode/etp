@@ -27,13 +27,18 @@ import io.github.lxien.orbien.server.security.IpAccessChecker;
 import io.github.lxien.orbien.server.security.TimeAccessChecker;
 import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.service.repository.ProxyQueryRepository;
+import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
+import io.github.lxien.orbien.server.transport.http.BasicAuthHandler;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 将代理运行时配置推送给在线客户端
@@ -57,6 +62,10 @@ public class ProxyRuntimeSyncService {
     private IpAccessChecker ipAccessChecker;
     @Autowired
     private TimeAccessChecker timeAccessChecker;
+    @Autowired
+    private BasicAuthHandler basicAuthHandler;
+    @Autowired
+    private StreamManager streamManager;
 
     public void refreshServerEntryPolicy(String proxyId) {
         if (proxyId == null) {
@@ -65,6 +74,29 @@ public class ProxyRuntimeSyncService {
         proxyConfigService.evictByProxyId(proxyId);
         ipAccessChecker.invalidate(proxyId);
         timeAccessChecker.invalidate(proxyId);
+        basicAuthHandler.invalidate(proxyId);
+    }
+
+    public void refreshBasicAuthPolicy(String proxyId) {
+        if (proxyId == null) {
+            return;
+        }
+        proxyConfigService.evictByProxyId(proxyId);
+        basicAuthHandler.invalidateAndDisconnect(proxyId);
+    }
+
+    public void refreshSocks5AuthPolicy(String proxyId) {
+        if (proxyId == null) {
+            return;
+        }
+        proxyConfigService.evictByProxyId(proxyId);
+        ProxyConfigExt ext = proxyQueryRepository.findById(proxyId);
+        if (ext == null || ext.getProxyConfig() == null || ext.getProxyConfig().getListenPort() == null) {
+            return;
+        }
+        streamManager.fireCloseByPort(ext.getProxyConfig().getListenPort());
+        logger.debug("SOCKS5 鉴权变更，已断开代理 {} 端口 {} 的现有会话",
+                proxyId, ext.getProxyConfig().getListenPort());
     }
 
     public void syncProxyCreated(String proxyId) {
@@ -73,6 +105,38 @@ public class ProxyRuntimeSyncService {
 
     public void syncProxy(String proxyId) {
         publishRuntimeProxy(proxyId, false);
+    }
+
+    public void syncProxyRemoved(String agentId, String proxyId) {
+        if (!StringUtils.hasText(proxyId)) {
+            return;
+        }
+        proxyConfigService.evictByProxyId(proxyId);
+        if (!StringUtils.hasText(agentId)) {
+            return;
+        }
+        proxyConfigSyncService.syncOnDelete(agentId, proxyId);
+    }
+
+    public void syncProxiesRemoved(Map<String, List<String>> agentProxyIds) {
+        if (CollectionUtils.isEmpty(agentProxyIds)) {
+            return;
+        }
+        for (Map.Entry<String, List<String>> entry : agentProxyIds.entrySet()) {
+            String agentId = entry.getKey();
+            List<String> proxyIds = entry.getValue();
+            if (!StringUtils.hasText(agentId) || CollectionUtils.isEmpty(proxyIds)) {
+                continue;
+            }
+            for (String proxyId : proxyIds) {
+                proxyConfigService.evictByProxyId(proxyId);
+            }
+            if (proxyIds.size() == 1) {
+                proxyConfigSyncService.syncOnDelete(agentId, proxyIds.getFirst());
+            } else {
+                proxyConfigSyncService.syncOnBatchDelete(agentId, proxyIds);
+            }
+        }
     }
 
     private void publishRuntimeProxy(String proxyId, boolean create) {
@@ -84,7 +148,7 @@ public class ProxyRuntimeSyncService {
         }
         ProxyConfig config = ext.getProxyConfig();
         if (config.isSocks5()) {
-            logger.debug("跳过 SOCKES5 运行配置同步", proxyId);
+            logger.debug("跳过 SOCKS5 运行配置同步: {}", proxyId);
             return;
         }
         if (!config.getStatus().isOpen()) {
