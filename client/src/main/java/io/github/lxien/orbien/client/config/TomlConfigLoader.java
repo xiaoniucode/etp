@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * TOML 客户端配置加载器
+ *客户端配置加载器
  *
  * @author lxien
  */
@@ -124,17 +124,15 @@ public class TomlConfigLoader implements ConfigSource {
             Toml poolTable = connectionTable.getTable("pool");
             if (poolTable != null) {
                 PoolConfig poolConfig = new PoolConfig();
-                Boolean enabled = poolTable.getBoolean("enabled", false);
+                Boolean enabled = poolTable.getBoolean("enabled", true);
                 poolConfig.setEnabled(enabled);
-                // 读取多路复用连接池配置
                 Toml multiplexPoolTable = poolTable.getTable("multiplex");
+                PoolConfig.MultiplexPoolConfig multiplexPoolConfig = poolConfig.getMultiplex();
                 if (multiplexPoolTable != null) {
-                    PoolConfig.MultiplexPoolConfig multiplexPoolConfig = poolConfig.getMultiplex();
-                    multiplexPoolConfig.setPlain(multiplexPoolTable.getBoolean("plain", false));
-                    multiplexPoolConfig.setEncrypt(multiplexPoolTable.getBoolean("encrypt", false));
+                    multiplexPoolConfig.setPlain(multiplexPoolTable.getBoolean("plain", true));
+                    multiplexPoolConfig.setEncrypt(multiplexPoolTable.getBoolean("encrypt", true));
                 }
 
-                // 读取独立连接池配置
                 Toml directPoolTable = poolTable.getTable("direct");
                 if (directPoolTable != null) {
                     PoolConfig.DirectPoolConfig directPoolConfig = poolConfig.getDirect();

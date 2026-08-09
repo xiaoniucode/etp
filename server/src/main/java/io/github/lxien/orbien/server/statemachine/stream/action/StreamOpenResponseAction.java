@@ -25,7 +25,9 @@ import io.github.lxien.orbien.core.transport.TunnelBridge;
 import io.github.lxien.orbien.server.transport.bridge.TunnelBridgeFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.EventLoop;
 import io.netty.util.ReferenceCountUtil;
+import io.netty.util.concurrent.Promise;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class StreamOpenResponseAction extends StreamBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(StreamOpenResponseAction.class);
+
+    private static final long MUX_ACQUIRE_WAIT_MS = 5_000L;
+
     @Autowired
     private DirectConnectionPool directConnectionPool;
     @Autowired
@@ -57,12 +62,32 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         AgentContext agentContext = context.getAgentContext();
         AgentInfo agentInfo = agentContext.getAgentInfo();
         String agentId = agentInfo.getAgentId();
-        TunnelEntry tunnelEntry;
+
         if (context.isMultiplex()) {
-            tunnelEntry = multiplexConnectionPool.acquire(agentId, context.getTransportProtocol(), context.isEncrypt());
-        } else {
-            tunnelEntry = directConnectionPool.borrow(agentId, tunnelId, context.isEncrypt());
+            Channel visitor = context.getVisitor();
+            EventLoop loop = visitor != null ? visitor.eventLoop() : agentContext.getControl().eventLoop();
+            Promise<TunnelEntry> promise = loop.newPromise();
+            multiplexConnectionPool.acquireAsync(
+                    agentId,
+                    context.getTransportProtocol(),
+                    context.isEncrypt(),
+                    MUX_ACQUIRE_WAIT_MS,
+                    loop,
+                    promise);
+            promise.addListener(f -> {
+                if (!f.isSuccess()) {
+                    logger.warn("[传输] 连接池无可用隧道 streamId={} agentId={} protocol={} encrypt={} multiplex={}",
+                            context.getStreamId(), agentId, context.getTransportProtocol().getName(),
+                            context.isEncrypt(), context.isMultiplex(), f.cause());
+                    context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                    return;
+                }
+                bindTunnelAndOpen(context, agentInfo, (TunnelEntry) f.getNow());
+            });
+            return;
         }
+
+        TunnelEntry tunnelEntry = directConnectionPool.borrow(agentId, tunnelId, context.isEncrypt());
         if (tunnelEntry == null) {
             logger.warn("[传输] 连接池无可用隧道 streamId={} agentId={} protocol={} encrypt={} multiplex={}",
                     context.getStreamId(), agentId, context.getTransportProtocol().getName(),
@@ -70,6 +95,10 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
+        bindTunnelAndOpen(context, agentInfo, tunnelEntry);
+    }
+
+    private void bindTunnelAndOpen(StreamContext context, AgentInfo agentInfo, TunnelEntry tunnelEntry) {
         if (!tunnelEntry.isActive()) {
             logger.warn("[传输] 隧道不可用 streamId={} tunnelId={} protocol={} channelClass={} channelActive={}",
                     context.getStreamId(), tunnelEntry.getTunnelId(),
@@ -121,7 +150,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             leastConnHooks.onStreamOpened(context);
             metricsCollector.onChannelActive(context.getProxyId(), agentInfo.getAgentType());
             if (context.isDatagram()) {
-                relayUdpFirstPacket(context, tunnelBridge);
+                relayUdpFirstPacket(context);
             }
             if (context.isDirectConnection() && !context.isDatagram()) {
                 context.markAwaitingClientPassthroughAck();
@@ -133,9 +162,6 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         });
     }
 
-    /**
-     * 客户端确认透传就绪后，开启 visitor 读取以及 HTTP 首包转发
-     */
     public void onClientPassthroughReady(StreamContext context) {
         if (!context.compareAndClearAwaitingClientPassthroughAck()) {
             return;
@@ -161,7 +187,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         flushPendingDownloads(context);
         if (context.getProtocol() != null && context.getProtocol().isHttpOrHttps()) {
             relayHttpFirstPackage(context, visitor, tunnelBridge);
-            flushPendingUploads(context, tunnelBridge);
+            flushPendingUploads(context);
         }
         if (context.getProtocol().isSocks5() && context.hasVariable(StreamConstants.SOCKS5_AWAIT_REPLY)) {
             context.removeVariable(StreamConstants.SOCKS5_AWAIT_REPLY);
@@ -214,10 +240,6 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         }
     }
 
-    /**
-     * HTTP 单条交换抓包完成，写入 Inspector 缓冲
-     * 重放流只完成 Future，由 {@code InspectorReplayService} 负责关流，避免在转发回调中同步关闭
-     */
     private void onHttpCaptureComplete(StreamContext context, HttpCaptureRecord record) {
         if (context.isReplay()) {
             if (record != null && context.isReplayCaptureToBuffer()) {
@@ -238,11 +260,6 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         }
     }
 
-    /**
-     * 发送 HTTP 协议首次缓存的第一个数据包
-     * <p>
-     * 使用 {@code getAndSet} 原子取走 attr，避免与 {@link StreamContext#abortLocalForwarding()} 竞态双重释放
-     */
     public void relayHttpFirstPackage(StreamContext context, Channel visitor, TunnelBridge tunnelBridge) {
         ByteBuf cached = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).getAndSet(null);
         if (cached == null || !cached.isReadable()) {
@@ -255,7 +272,6 @@ public class StreamOpenResponseAction extends StreamBaseAction {
                 context.getStreamId(), cached.readableBytes(),
                 context.getTransportProtocol() != null ? context.getTransportProtocol().getName() : "unknown",
                 cached.refCnt());
-        // HTTP_FIRST_PACKET 在 HttpVisitorHandler 中已 retain，此处为 sole owner
         context.forwardToLocal(cached, false);
     }
 
@@ -265,10 +281,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         }
     }
 
-    /**
-     * 流打开前到达的上传 body 分片（OPENING 状态缓存）
-     */
-    private void flushPendingUploads(StreamContext context, TunnelBridge tunnelBridge) {
+    private void flushPendingUploads(StreamContext context) {
         ByteBuf pending;
         while ((pending = context.pollPending()) != null) {
             try {
@@ -292,7 +305,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         context.getControl().writeAndFlush(frame);
     }
 
-    public void relayUdpFirstPacket(StreamContext context, TunnelBridge tunnelBridge) {
+    public void relayUdpFirstPacket(StreamContext context) {
         ByteBuf cached = context.getPendingFirstPacket();
         context.setPendingFirstPacket(null);
         if (cached == null || cached.refCnt() <= 0 || !cached.isReadable()) {

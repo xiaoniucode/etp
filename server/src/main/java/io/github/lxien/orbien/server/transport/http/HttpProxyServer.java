@@ -90,7 +90,7 @@ public class HttpProxyServer implements Lifecycle {
                         protected void initChannel(SocketChannel sc) {
                             ChannelPipeline pipeline = sc.pipeline();
                             VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
-                            pipeline.addLast(new IdleCheckHandler());
+                            pipeline.addLast(IdleCheckHandler.forVisitor());
                             pipeline.addLast(new VisitorInfoDecoder());
                             pipeline.addLast(forceHttpsRedirectHandler);
                             pipeline.addLast(new HeaderInjectDecoder());

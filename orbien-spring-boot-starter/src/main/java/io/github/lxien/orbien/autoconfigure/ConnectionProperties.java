@@ -24,7 +24,7 @@ public class ConnectionProperties implements Serializable {
 
     @Data
     public static class PoolProperties implements Serializable {
-        private boolean enabled = false;
+        private boolean enabled = true;
 
         @NestedConfigurationProperty
         private MultiplexPoolProperties multiplex = new MultiplexPoolProperties();
@@ -35,8 +35,8 @@ public class ConnectionProperties implements Serializable {
 
     @Data
     public static class MultiplexPoolProperties implements Serializable {
-        private boolean plain;
-        private boolean encrypt;
+        private boolean plain = true;
+        private boolean encrypt = true;
     }
 
     @Data

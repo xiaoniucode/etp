@@ -15,6 +15,7 @@ import io.github.lxien.orbien.core.utils.ProtobufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -56,11 +57,44 @@ public final class ConnCreateHelper {
             Channel tunnel = session.nettyChannel();
             logger.debug("[传输] 数据隧道连接成功 protocol={} channelClass={} sessionId={}",
                     protocol.getName(), tunnel.getClass().getSimpleName(), session.sessionId());
-            TunnelEntry tunnelEntry = multiplex
-                    ? context.getPoolManager().createMultiplex(protocol, isEncrypt, tunnel)
-                    : context.getPoolManager().createDirect(protocol, isEncrypt, tunnel);
-            if (tunnelEntry != null) {
-                sendTunnelCreateRequest(context, tunnel, tunnelEntry, protocol, isEncrypt, multiplex);
+            whenTlsReady(tunnel, isEncrypt, () -> {
+                if (!tunnel.eventLoop().inEventLoop()) {
+                    tunnel.eventLoop().execute(() -> registerTunnel(context, protocol, isEncrypt, multiplex, tunnel));
+                    return;
+                }
+                registerTunnel(context, protocol, isEncrypt, multiplex, tunnel);
+            }, cause -> {
+                logger.error("[传输] 数据隧道 TLS 握手失败 protocol={} encrypt={}",
+                        protocol.getName(), isEncrypt, cause);
+                tunnel.close();
+            });
+        });
+    }
+
+    private static void registerTunnel(AgentContext context, TransportProtocol protocol,
+                                       boolean isEncrypt, boolean multiplex, Channel tunnel) {
+        TunnelEntry tunnelEntry = multiplex
+                ? context.getPoolManager().createMultiplex(protocol, isEncrypt, tunnel)
+                : context.getPoolManager().createDirect(protocol, isEncrypt, tunnel);
+        if (tunnelEntry != null && tunnelEntry.getChannel() == tunnel) {
+            sendTunnelCreateRequest(context, tunnel, tunnelEntry, protocol, isEncrypt, multiplex);
+        }
+    }
+    private static void whenTlsReady(Channel tunnel, boolean encrypt, Runnable onReady, java.util.function.Consumer<Throwable> onFailure) {
+        if (!encrypt) {
+            onReady.run();
+            return;
+        }
+        SslHandler sslHandler = tunnel.pipeline().get(SslHandler.class);
+        if (sslHandler == null) {
+            onReady.run();
+            return;
+        }
+        sslHandler.handshakeFuture().addListener(f -> {
+            if (f.isSuccess()) {
+                onReady.run();
+            } else {
+                onFailure.accept(f.cause() != null ? f.cause() : new IllegalStateException("TLS handshake failed"));
             }
         });
     }

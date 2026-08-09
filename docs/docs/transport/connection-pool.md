@@ -48,16 +48,16 @@ max_retries = 5
 
 ### connection.pool
 
-| 参数名     | 类型      | 默认值   | 描述      | 必填 |
-|:--------|:--------|:------|:--------|:---|
-| enabled | Boolean | false | 是否开启连接池 | 否  |
+| 参数名     | 类型      | 默认值  | 描述      | 必填 |
+|:--------|:--------|:-----|:--------|:---|
+| enabled | Boolean | true | 是否开启连接池 | 否  |
 
 ### connection.pool.multiplex
 
-| 参数名     | 类型      | 默认值   | 描述         | 必填 |
-|:--------|:--------|:------|:-----------|:---|
-| plain   | Boolean | false | 预热明文多路复用连接 | 否  |
-| encrypt | Boolean | false | 预热加密多路复用连接 | 否  |
+| 参数名     | 类型      | 默认值  | 描述         | 必填 |
+|:--------|:--------|:-----|:-----------|:---|
+| plain   | Boolean | true | 预热明文多路复用连接 | 否  |
+| encrypt | Boolean | true | 预热加密多路复用连接 | 否  |
 
 ### connection.pool.direct
 

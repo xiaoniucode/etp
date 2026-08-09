@@ -59,6 +59,6 @@ public class ConnPoolCreateAction extends AgentBaseAction {
     }
 
     private boolean needsPool(AgentContext context, TransportProtocol protocol, boolean encrypt, boolean multiplex) {
-        return context.getPoolManager().acquire(protocol, encrypt, multiplex) == null;
+        return !context.getPoolManager().hasAliveTunnel(protocol, encrypt, multiplex);
     }
 }

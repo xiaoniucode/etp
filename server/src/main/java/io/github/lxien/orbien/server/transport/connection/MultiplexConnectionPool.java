@@ -5,33 +5,79 @@ import io.github.lxien.orbien.core.transport.api.TransportPoolKey;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
+import io.netty.channel.EventLoop;
+import io.netty.util.concurrent.Promise;
+import io.netty.util.concurrent.ScheduledFuture;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class MultiplexConnectionPool {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(MultiplexConnectionPool.class);
 
     private final ConcurrentHashMap<String, AgentPool> agentPools = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<WaitKey, List<AcquireWaiter>> waiters = new ConcurrentHashMap<>();
 
-    public TunnelEntry acquire(String agentId, TransportProtocol protocol, boolean isTls) {
+    public void acquireAsync(String agentId,
+                             TransportProtocol protocol,
+                             boolean isTls,
+                             long timeoutMs,
+                             EventLoop eventLoop,
+                             Promise<TunnelEntry> promise) {
+        TunnelEntry entry = tryAcquire(agentId, protocol, isTls);
+        if (entry != null) {
+            promise.setSuccess(entry);
+            return;
+        }
+
+        WaitKey key = new WaitKey(agentId, protocol, isTls);
+        AcquireWaiter waiter = new AcquireWaiter(promise);
+        List<AcquireWaiter> list = waiters.computeIfAbsent(key, k -> new ArrayList<>());
+        synchronized (list) {
+            list.add(waiter);
+        }
+
+        entry = tryAcquire(agentId, protocol, isTls);
+        if (entry != null) {
+            removeWaiter(key, waiter);
+            if (!promise.isDone()) {
+                promise.setSuccess(entry);
+            }
+            return;
+        }
+
+        ScheduledFuture<?> timeoutFuture = eventLoop.schedule(() -> {
+            removeWaiter(key, waiter);
+            if (!promise.isDone()) {
+                logger.warn("[传输] 等待多路复用隧道入池超时 agentId={} protocol={} encrypt={} timeoutMs={}",
+                        agentId, protocol.getName(), isTls, timeoutMs);
+                promise.setFailure(new IllegalStateException("等待多路复用隧道超时"));
+            }
+        }, timeoutMs, TimeUnit.MILLISECONDS);
+        waiter.timeoutFuture = timeoutFuture;
+        promise.addListener(f -> {
+            if (waiter.timeoutFuture != null) {
+                waiter.timeoutFuture.cancel(false);
+            }
+        });
+    }
+
+    private TunnelEntry tryAcquire(String agentId, TransportProtocol protocol, boolean isTls) {
         AgentPool pool = agentPools.get(agentId);
         if (pool == null) {
-            logger.warn("[传输] 客户端 {} 连接池为空 protocol={} encrypt={}", agentId, protocol.getName(), isTls);
             return null;
         }
         TunnelEntry entry = pool.acquire(protocol, isTls);
-        if (entry == null) {
-            logger.warn("[传输] 客户端 {} 无可用多路复用隧道 protocol={} encrypt={}",
-                    agentId, protocol.getName(), isTls);
-        } else {
-            logger.debug("[传输] 客户端 {} 命中多路复用隧道 protocol={} encrypt={} tunnelId={} channelClass={} active={}",
-                    agentId, protocol.getName(), isTls, entry.getTunnelId(),
-                    entry.getChannel().getClass().getSimpleName(), entry.getChannel().isActive());
+        if (entry == null || !entry.isActive()) {
+            return null;
         }
         return entry;
     }
@@ -45,6 +91,41 @@ public class MultiplexConnectionPool {
                 entry.getChannel().getClass().getSimpleName());
         AgentPool pool = agentPools.computeIfAbsent(agentId, k -> new AgentPool());
         pool.setChannel(protocol, isTls, entry);
+        notifyWaiters(agentId, protocol, isTls, entry);
+    }
+
+    private void notifyWaiters(String agentId, TransportProtocol protocol, boolean isTls, TunnelEntry entry) {
+        WaitKey key = new WaitKey(agentId, protocol, isTls);
+        List<AcquireWaiter> list = waiters.remove(key);
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        List<AcquireWaiter> snapshot;
+        synchronized (list) {
+            snapshot = new ArrayList<>(list);
+            list.clear();
+        }
+        for (AcquireWaiter waiter : snapshot) {
+            if (waiter.timeoutFuture != null) {
+                waiter.timeoutFuture.cancel(false);
+            }
+            if (!waiter.promise.isDone()) {
+                waiter.promise.setSuccess(entry);
+            }
+        }
+    }
+
+    private void removeWaiter(WaitKey key, AcquireWaiter waiter) {
+        List<AcquireWaiter> list = waiters.get(key);
+        if (list == null) {
+            return;
+        }
+        synchronized (list) {
+            list.remove(waiter);
+            if (list.isEmpty()) {
+                waiters.remove(key, list);
+            }
+        }
     }
 
     public void offline(String agentId) {
@@ -55,11 +136,29 @@ public class MultiplexConnectionPool {
         if (pool != null) {
             pool.offline();
         }
+        failWaitersForAgent(agentId);
     }
 
-    /**
-     * 数据隧道断开时从池中移除，避免后续 acquire 命中已关闭 channel
-     */
+    private void failWaitersForAgent(String agentId) {
+        List<WaitKey> keys = waiters.keySet().stream()
+                .filter(k -> Objects.equals(k.agentId, agentId))
+                .toList();
+        for (WaitKey key : keys) {
+            List<AcquireWaiter> list = waiters.remove(key);
+            if (list == null) {
+                continue;
+            }
+            for (AcquireWaiter waiter : list) {
+                if (waiter.timeoutFuture != null) {
+                    waiter.timeoutFuture.cancel(false);
+                }
+                if (!waiter.promise.isDone()) {
+                    waiter.promise.setFailure(new IllegalStateException("客户端已离线"));
+                }
+            }
+        }
+    }
+
     public void removeByChannel(Channel channel) {
         if (channel == null) {
             return;
@@ -93,6 +192,18 @@ public class MultiplexConnectionPool {
                 TunnelEntry entry = e.getValue();
                 return entry != null && entry.getChannel() == channel;
             });
+        }
+    }
+
+    private record WaitKey(String agentId, TransportProtocol protocol, boolean tls) {
+    }
+
+    private static final class AcquireWaiter {
+        private final Promise<TunnelEntry> promise;
+        private volatile ScheduledFuture<?> timeoutFuture;
+
+        private AcquireWaiter(Promise<TunnelEntry> promise) {
+            this.promise = promise;
         }
     }
 }

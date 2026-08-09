@@ -4,10 +4,12 @@ import io.github.lxien.orbien.core.transport.TunnelEntry;
 import io.github.lxien.orbien.core.transport.api.TransportPoolKey;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.netty.channel.Channel;
+import io.netty.channel.EventLoop;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TransportPoolManager {
@@ -27,6 +29,34 @@ public class TransportPoolManager {
             return multiplexPools.computeIfAbsent(key, ProtocolMultiplexPool::new).acquire(encrypt);
         }
         return directPools.computeIfAbsent(key, ProtocolDirectPool::new).borrow(encrypt);
+    }
+
+    public boolean hasAliveTunnel(TransportProtocol protocol, boolean encrypt, boolean multiplex) {
+        TransportPoolKey key = multiplex
+                ? TransportPoolKey.multiplex(protocol, encrypt)
+                : TransportPoolKey.direct(protocol, encrypt);
+        if (multiplex) {
+            ProtocolMultiplexPool pool = multiplexPools.get(key);
+            return pool != null && pool.hasAliveTunnel(encrypt);
+        }
+        ProtocolDirectPool pool = directPools.get(key);
+        return pool != null && pool.hasAliveTunnel(encrypt);
+    }
+
+    public CompletableFuture<TunnelEntry> awaitReady(TransportProtocol protocol,
+                                                     boolean encrypt,
+                                                     boolean multiplex,
+                                                     long timeoutMs,
+                                                     EventLoop eventLoop) {
+        TransportPoolKey key = multiplex
+                ? TransportPoolKey.multiplex(protocol, encrypt)
+                : TransportPoolKey.direct(protocol, encrypt);
+        if (multiplex) {
+            return multiplexPools.computeIfAbsent(key, ProtocolMultiplexPool::new)
+                    .awaitReady(encrypt, timeoutMs, eventLoop);
+        }
+        return directPools.computeIfAbsent(key, ProtocolDirectPool::new)
+                .awaitReady(encrypt, timeoutMs, eventLoop);
     }
 
     public TunnelEntry createMultiplex(TransportProtocol protocol, boolean encrypt, Channel channel) {

@@ -54,6 +54,10 @@ public class TunnelEntry {
     }
 
     public boolean isActive() {
+        return active && channel != null && channel.isActive();
+    }
+
+    public boolean isChannelAlive() {
         return channel != null && channel.isActive();
     }
 }

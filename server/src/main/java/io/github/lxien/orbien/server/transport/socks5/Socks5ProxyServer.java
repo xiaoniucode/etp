@@ -80,7 +80,7 @@ public final class Socks5ProxyServer implements Lifecycle {
                     protected void initChannel(SocketChannel sc) {
                         ChannelPipeline pipeline = sc.pipeline();
                         VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
-                        pipeline.addLast(new IdleCheckHandler());
+                        pipeline.addLast(IdleCheckHandler.forVisitor());
                         pipeline.addLast(ipCheckHandler);
                         pipeline.addLast(timeAccessHandler);
                         pipeline.addLast(NettyConstants.SOCKS5_HANDSHAKE_HANDLER, handshakeHandler);

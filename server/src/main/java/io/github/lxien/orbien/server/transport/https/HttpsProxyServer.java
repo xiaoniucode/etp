@@ -99,7 +99,7 @@ public class HttpsProxyServer implements Lifecycle {
                             ChannelPipeline pipeline = sc.pipeline();
                             VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
                             pipeline.addLast(new SniHandler(tlsCertificateManager::getSslContext));
-                            pipeline.addLast(new IdleCheckHandler());
+                            pipeline.addLast(IdleCheckHandler.forVisitor());
                             pipeline.addLast(new VisitorInfoDecoder());
                             pipeline.addLast(new HeaderInjectDecoder());
                             pipeline.addLast(new HeaderRewriteRequestDecoder(proxyConfigService, domainRegistry, "https"));

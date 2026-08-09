@@ -81,7 +81,7 @@ public final class TcpProxyServer implements Lifecycle {
                         ChannelPipeline pipeline = sc.pipeline();
 
                         VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
-                        pipeline.addLast(new IdleCheckHandler());
+                        pipeline.addLast(IdleCheckHandler.forVisitor());
                         pipeline.addLast(tcpIpCheckHandler);
                         pipeline.addLast(tcpTimeAccessHandler);
                         pipeline.addLast(NettyConstants.TCP_VISITOR_HANDLER, tcpVisitorHandler);
