@@ -40,8 +40,6 @@
   <a href="README_ZH.md"><strong>简体中文</strong></a>
   &nbsp;|&nbsp;
   <a href="https://lxien.github.io/orbien/"><strong>文档</strong></a>
-  &nbsp;|&nbsp;
-  <a href="https://stackoak.com/"><strong>在线演示</strong></a>
 </div>
 
 ![dashboard.png](doc/image/dashboard_ZH.png)

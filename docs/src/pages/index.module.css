@@ -11,7 +11,6 @@
     --orbien-home-border: var(--ifm-color-emphasis-300);
 }
 
-/* ----- Hero ----- */
 .hero {
     display: flex;
     align-items: flex-start;
@@ -40,17 +39,48 @@
     font-weight: 800;
     line-height: 1.15;
     letter-spacing: -0.04em;
-    color: var(--ifm-color-primary);
 }
 
-.heroText {
-    display: block;
-    margin-top: 0.35rem;
-    font-size: clamp(1.75rem, 4.5vw, 3.5rem);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.2;
-    color: var(--ifm-heading-color);
+.heroBrand {
+    background-image: linear-gradient(
+            100deg,
+            #1e6ad4 0%,
+            #2b78e0 55%,
+            #4a7eb8 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.heroSuffix {
+    background-image: linear-gradient(
+            100deg,
+            #6e8294 0%,
+            #5f6974 45%,
+            #525a64 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+[data-theme='dark'] .heroBrand {
+    background-image: linear-gradient(
+            100deg,
+            #4d9af0 0%,
+            #5aa3f5 55%,
+            #7a9fc4 100%
+    );
+}
+
+[data-theme='dark'] .heroSuffix {
+    background-image: linear-gradient(
+            100deg,
+            #9aabba 0%,
+            #8e97a2 45%,
+            #7f8791 100%
+    );
 }
 
 .heroTagline {
@@ -80,14 +110,48 @@
 }
 
 .btnBrand {
-    background: var(--ifm-color-primary);
-    color: var(--orbien-color-on-primary) !important;
+    background: #2b74d8;
+    color: #ffffff !important;
     border: 1px solid transparent;
 }
 
 .btnBrand:hover {
-    background: var(--ifm-color-primary-dark);
-    color: var(--orbien-color-on-primary) !important;
+    background: #1f63c4;
+    color: #ffffff !important;
+}
+
+[data-theme='dark'] .btnBrand {
+    background: #3d86e8;
+    color: #ffffff !important;
+}
+
+[data-theme='dark'] .btnBrand:hover {
+    background: #5296f0;
+    color: #ffffff !important;
+}
+
+.btnGithub {
+    background: #111111;
+    color: #ffffff !important;
+    border: 1px solid #111111;
+}
+
+.btnGithub:hover {
+    background: #000000;
+    color: #ffffff !important;
+    border-color: #000000;
+}
+
+[data-theme='dark'] .btnGithub {
+    background: #0a0a0a;
+    color: #f5f5f5 !important;
+    border-color: #3a3a3a;
+}
+
+[data-theme='dark'] .btnGithub:hover {
+    background: #1a1a1a;
+    border-color: #5a5a5a;
+    color: #ffffff !important;
 }
 
 .btnAlt {
@@ -97,11 +161,15 @@
 }
 
 .btnAlt:hover {
-    border-color: var(--ifm-color-primary);
-    color: var(--ifm-color-primary) !important;
+    border-color: #2b74d8;
+    color: #1f63c4 !important;
 }
 
-/* 图片按内容收缩，避免 contain + 满宽边框在左侧留空框 */
+[data-theme='dark'] .btnAlt:hover {
+    border-color: #4d9af0;
+    color: #5aa3f5 !important;
+}
+
 .heroImage {
     display: flex;
     justify-content: flex-end;

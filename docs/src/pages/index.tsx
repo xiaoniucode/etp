@@ -93,11 +93,11 @@ export default function Home() {
                     <div className={styles.heroInner}>
                         <div className={styles.heroCopy}>
                             <h1 className={styles.heroName}>
-                                Orbien
-                                <span className={styles.heroText}></span>
+                                <span className={styles.heroBrand}>Orb</span>
+                                <span className={styles.heroSuffix}>ien</span>
                             </h1>
                             <p className={styles.heroTagline}>
-                                🚀一个开箱即用的内网穿透与反向代理平台
+                                一个开箱即用的内网穿透与反向代理平台
                             </p>
                             <div className={styles.heroActions}>
                                 <Link className={clsx(styles.btn, styles.btnBrand)} to="/docs/getting-started">
@@ -109,7 +109,7 @@ export default function Home() {
                                 <Link className={clsx(styles.btn, styles.btnAlt)} href={DEMO}>
                                     在线演示
                                 </Link>
-                                <Link className={clsx(styles.btn, styles.btnAlt)} href={GITHUB}>
+                                <Link className={clsx(styles.btn, styles.btnGithub)} href={GITHUB}>
                                     GitHub
                                 </Link>
                             </div>
