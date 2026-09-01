@@ -7,6 +7,7 @@ import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
+import io.github.lxien.orbien.client.transport.HeartbeatHandler;
 import io.github.lxien.orbien.core.transport.IdleCheckHandler;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
@@ -15,6 +16,7 @@ import io.github.lxien.orbien.core.utils.ProtobufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -46,9 +48,7 @@ public final class ConnCreateHelper {
                 isEncrypt,
                 context.getControlWorkerGroup(),
                 context.getTlsContext(),
-                pipeline -> pipeline
-                        .addLast(NettyConstants.IDLE_CHECK_HANDLER, IdleCheckHandler.forDataTunnel())
-                        .addLast(NettyConstants.CONTROL_FRAME_HANDLER, context.getControlFrameHandler())
+                pipeline -> configureDataTunnelPipeline(pipeline, multiplex, context)
         ).whenComplete((session, error) -> {
             if (error != null) {
                 logger.error("创建{}连接失败 [{}]", multiplex ? "多路复用" : "独立", protocol.getName(), error);
@@ -69,6 +69,16 @@ public final class ConnCreateHelper {
                 tunnel.close();
             });
         });
+    }
+
+    private static void configureDataTunnelPipeline(ChannelPipeline pipeline, boolean multiplex, AgentContext context) {
+        if (multiplex) {
+            pipeline.addLast(NettyConstants.IDLE_CHECK_HANDLER, IdleCheckHandler.forMultiplexTunnel());
+            pipeline.addLast(new HeartbeatHandler(30));
+        } else {
+            pipeline.addLast(NettyConstants.IDLE_CHECK_HANDLER, IdleCheckHandler.forDataTunnel());
+        }
+        pipeline.addLast(NettyConstants.CONTROL_FRAME_HANDLER, context.getControlFrameHandler());
     }
 
     private static void registerTunnel(AgentContext context, TransportProtocol protocol,
