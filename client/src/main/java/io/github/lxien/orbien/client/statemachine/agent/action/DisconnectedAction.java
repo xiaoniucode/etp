@@ -26,6 +26,7 @@ public class DisconnectedAction extends AgentBaseAction {
         if (context.isShuttingDown()) {
             return;
         }
+        context.getPoolManager().closeAll();
         ChannelUtils.closeOnFlush(context.getControl());
         context.fireEvent(AgentEvent.CONNECT_FAILURE);
     }

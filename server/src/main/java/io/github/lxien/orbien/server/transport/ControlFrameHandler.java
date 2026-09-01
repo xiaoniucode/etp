@@ -167,14 +167,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 }
                 case TMSP.MSG_PING -> {
                     logger.debug("收到来自客户端PING消息");
-                    Optional<AgentContext> ag = agentManager.getAgentContext(ctx.channel());
-                    if (ag.isPresent()) {
-                        AgentContext agentContext = ag.get();
-                        TMSPFrame pong = new TMSPFrame(0, TMSP.MSG_PONG);
-                        Channel control = agentContext.getControl();
-                        control.writeAndFlush(pong);
-                        logger.debug("回复客户端 {} PONG 消息", agentContext.getAgentId());
-                    }
+                    ctx.writeAndFlush(new TMSPFrame(0, TMSP.MSG_PONG));
                 }
 
                 //---------------------------------------Stream-------------------------------------------------//

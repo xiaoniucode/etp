@@ -46,7 +46,29 @@ public class ProtocolMultiplexPool {
 
     public synchronized boolean hasAliveTunnel(boolean isTls) {
         TunnelEntry tunnelEntry = isTls ? tlsTunnelEntry : plainTunnelEntry;
+        return tunnelEntry != null && tunnelEntry.isActive();
+    }
+
+    public synchronized boolean hasChannelAlive(boolean isTls) {
+        TunnelEntry tunnelEntry = isTls ? tlsTunnelEntry : plainTunnelEntry;
         return tunnelEntry != null && tunnelEntry.isChannelAlive();
+    }
+
+    public synchronized boolean removeByChannel(Channel channel) {
+        if (channel == null) {
+            return false;
+        }
+        if (tlsTunnelEntry != null && tlsTunnelEntry.getChannel() == channel) {
+            this.tlsTunnelEntry = null;
+            failWaitersLocked(true, new IllegalStateException("多路复用加密隧道已断开"));
+            return true;
+        }
+        if (plainTunnelEntry != null && plainTunnelEntry.getChannel() == channel) {
+            this.plainTunnelEntry = null;
+            failWaitersLocked(false, new IllegalStateException("多路复用明文隧道已断开"));
+            return true;
+        }
+        return false;
     }
 
     public synchronized TunnelEntry createChannel(boolean isTls, Channel tunnel) {

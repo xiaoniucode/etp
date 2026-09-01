@@ -163,7 +163,7 @@ public class StreamOpenAction extends StreamBaseAction {
             return CompletableFuture.completedFuture(tunnelEntry);
         }
 
-        if (!agentContext.getPoolManager().hasAliveTunnel(protocol, encrypt, multiplex)) {
+        if (!agentContext.getPoolManager().hasChannelAlive(protocol, encrypt, multiplex)) {
             logger.debug("[传输] 流 {} 无可用隧道，创建新连接 protocol={} encrypt={} multiplex={}",
                     context.getStreamId(), protocol.getName(), encrypt, multiplex);
             ConnCreateCommand connCreateCommand;
@@ -174,9 +174,6 @@ public class StreamOpenAction extends StreamBaseAction {
             }
             agentContext.setVariable("create_conn_command", connCreateCommand);
             agentContext.fireEvent(AgentEvent.CREATE_NEW_CONN);
-        } else {
-            logger.debug("[传输] 流 {} 等待 pending 隧道激活 protocol={} encrypt={} multiplex={}",
-                    context.getStreamId(), protocol.getName(), encrypt, multiplex);
         }
 
         return agentContext.getPoolManager()

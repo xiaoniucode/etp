@@ -16,7 +16,6 @@
 package io.github.lxien.orbien.client.transport;
 
 import io.github.lxien.orbien.client.statemachine.agent.AgentContext;
-import io.github.lxien.orbien.client.statemachine.agent.AgentEvent;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleState;
@@ -46,7 +45,6 @@ public class ControlIdleCheckHandler extends IdleStateHandler {
                 logger.warn("客户端控制连接检测到连续 {} 次读超时，准备关闭并重连", missed);
                 context.getMissedHeartbeats().set(0);
                 ChannelUtils.closeOnFlush(ctx.channel());
-                context.fireEvent(AgentEvent.DISCONNECT);
             } else {
                 logger.debug("客户端控制连接读空闲第 {} 次（容忍中）", missed);
             }

@@ -219,6 +219,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             agentContext.fireEvent(AgentEvent.DISCONNECT);
         } else {
             logger.error("数据连接断开：channel-{}", ctx.channel().id());
+            agentContext.getPoolManager().removeByChannel(ctx.channel());
         }
     }
 

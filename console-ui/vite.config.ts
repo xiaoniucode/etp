@@ -31,11 +31,9 @@ export default ({mode}: { mode: string }) => {
                     target: VITE_API_PROXY_URL,
                     changeOrigin: true,
                     secure: false,
-                    // 转发客户端 Host/Proto，便于后端同域推导 OAuth redirect_uri
                     xfwd: true
                 }
             },
-            allowedHosts:["a.domain1.com"],
             host: true
         },
         // 路径别名

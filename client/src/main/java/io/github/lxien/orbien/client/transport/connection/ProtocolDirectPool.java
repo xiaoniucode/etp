@@ -189,6 +189,23 @@ public class ProtocolDirectPool {
         }
     }
 
+    public boolean removeByChannel(Channel channel) {
+        if (channel == null) {
+            return false;
+        }
+        return removeByChannel(plainTunnels, channel) || removeByChannel(encryptTunnels, channel);
+    }
+
+    private boolean removeByChannel(Map<String, TunnelEntry> tunnels, Channel channel) {
+        for (Map.Entry<String, TunnelEntry> entry : tunnels.entrySet()) {
+            if (entry.getValue() != null && entry.getValue().getChannel() == channel) {
+                tunnels.remove(entry.getKey());
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void closeAll() {
         plainTunnels.values().forEach(entry -> ChannelUtils.closeOnFlush(entry.getChannel()));
         encryptTunnels.values().forEach(entry -> ChannelUtils.closeOnFlush(entry.getChannel()));

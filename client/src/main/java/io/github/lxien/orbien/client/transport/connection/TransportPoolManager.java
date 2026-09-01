@@ -43,6 +43,32 @@ public class TransportPoolManager {
         return pool != null && pool.hasAliveTunnel(encrypt);
     }
 
+    public boolean hasChannelAlive(TransportProtocol protocol, boolean encrypt, boolean multiplex) {
+        TransportPoolKey key = multiplex
+                ? TransportPoolKey.multiplex(protocol, encrypt)
+                : TransportPoolKey.direct(protocol, encrypt);
+        if (multiplex) {
+            ProtocolMultiplexPool pool = multiplexPools.get(key);
+            return pool != null && pool.hasChannelAlive(encrypt);
+        }
+        ProtocolDirectPool pool = directPools.get(key);
+        return pool != null && pool.hasAliveTunnel(encrypt);
+    }
+
+    public void removeByChannel(Channel channel) {
+        if (channel == null) {
+            return;
+        }
+        for (ProtocolMultiplexPool pool : multiplexPools.values()) {
+            if (pool.removeByChannel(channel)) {
+                return;
+            }
+        }
+        for (ProtocolDirectPool pool : directPools.values()) {
+            pool.removeByChannel(channel);
+        }
+    }
+
     public CompletableFuture<TunnelEntry> awaitReady(TransportProtocol protocol,
                                                      boolean encrypt,
                                                      boolean multiplex,

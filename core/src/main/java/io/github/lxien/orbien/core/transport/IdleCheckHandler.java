@@ -28,6 +28,10 @@ public class IdleCheckHandler extends IdleStateHandler {
         return new IdleCheckHandler(300, 0);
     }
 
+    public static IdleCheckHandler forMultiplexTunnel() {
+        return new IdleCheckHandler(90, 0);
+    }
+
     public static IdleCheckHandler forVisitor() {
         return new IdleCheckHandler(300, 0);
     }

@@ -16,7 +16,6 @@
 package io.github.lxien.orbien.server.transport;
 
 import io.github.lxien.orbien.core.utils.ChannelUtils;
-import io.github.lxien.orbien.server.statemachine.agent.AgentEvent;
 import io.github.lxien.orbien.server.statemachine.agent.AgentManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -49,7 +48,6 @@ public class ControlIdleCheckHandler extends IdleStateHandler {
                             missed, ctx.channel().remoteAddress(), context.getConnectionId());
                     context.getMissedHeartbeats().set(0);
                     ChannelUtils.closeOnFlush(control);
-                    context.fireEvent(AgentEvent.DISCONNECT);
                 } else {
                     logger.debug("服务端控制连接读空闲第 {} 次（容忍范围内）", missed);
                 }
